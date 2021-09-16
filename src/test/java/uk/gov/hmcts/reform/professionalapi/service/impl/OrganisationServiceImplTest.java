@@ -19,13 +19,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -854,8 +854,8 @@ public class OrganisationServiceImplTest {
     public void test_addPaymentAccountsToOrganisation() {
         Set<String> pbas = new HashSet<>();
         pbas.add("PBA0000001");
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(pbas);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
         AddPbaResponse addPbaResponse = new AddPbaResponse();
         ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(200)
@@ -866,7 +866,7 @@ public class OrganisationServiceImplTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
     }
@@ -875,8 +875,8 @@ public class OrganisationServiceImplTest {
     public void test_addPaymentAccountsToOrganisation_pba_invalid() {
         Set<String> pbas = new HashSet<>();
         pbas.add("PBA00000012");
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(pbas);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
         AddPbaResponse addPbaResponse = new AddPbaResponse();
         ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(200)
@@ -887,7 +887,7 @@ public class OrganisationServiceImplTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
     }
@@ -896,8 +896,8 @@ public class OrganisationServiceImplTest {
     public void test_addPaymentAccountsToOrganisation_pbaDb_NoMatch() {
         Set<String> pbas = new HashSet<>();
         pbas.add("PBA00000012");
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(pbas);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
         organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
@@ -910,7 +910,7 @@ public class OrganisationServiceImplTest {
         ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(200)
                 .body(new AddPbaResponse());
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest,
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest,
                 UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID().toString());
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
@@ -919,10 +919,10 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = ResourceNotFoundException.class)
     public void test_addPaymentAccountsToOrganisationEmpty() {
-        Set<String> pbas = new HashSet<>();
-        pbas.add("PBA0000001");
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(pbas);
+        var pbas = new HashSet<String>();
+        var set = Set.of("PBA0000001");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
         AddPbaResponse addPbaResponse = new AddPbaResponse();
         ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(200)
@@ -932,17 +932,17 @@ public class OrganisationServiceImplTest {
         String userId = UUID.randomUUID().toString();
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
 
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNotNull();
     }
 
     @Test
     public void test_addPaymentAccountsToOrganisation_pba_valid_And_invalid() {
-        Set<String> pbas = new HashSet<>();
+        var pbas = new HashSet<String>();
         pbas.add("PBA0000001");
         pbas.add("test");
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(pbas);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
         AddPbaResponse addPbaResponse = new AddPbaResponse();
         ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(200)
@@ -953,7 +953,7 @@ public class OrganisationServiceImplTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         AddPbaResponse response = (AddPbaResponse)responseEntity.getBody();
 
         assertThat(response).isNotNull();

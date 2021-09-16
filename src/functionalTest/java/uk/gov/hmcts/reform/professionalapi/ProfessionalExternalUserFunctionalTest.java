@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
@@ -537,10 +536,10 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiFinanceManager));
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
-        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaAddRequest,
+        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
 
         log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
@@ -557,10 +556,10 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         Set<String> addPaymentAccounts =  new HashSet<>();
         addPaymentAccounts.add("PBA".concat(RandomStringUtils.randomAlphanumeric(7)));
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(addPaymentAccounts);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(addPaymentAccounts);
 
-        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaAddRequest,
+        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), CREATED);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,

@@ -42,6 +42,7 @@ import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
@@ -76,7 +77,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import org.springframework.http.ResponseEntity;
@@ -487,8 +487,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaAddRequest pbaAddRequest,
-                                                      String organisationIdentifier, String userId) {
+    public ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaRequest pbaRequest,
+                                                                   String organisationIdentifier, String userId) {
         Optional<Organisation> organisation = Optional.ofNullable(
                 getOrganisationByOrgIdentifier(organisationIdentifier));
 
@@ -500,29 +500,29 @@ public class OrganisationServiceImpl implements OrganisationService {
         validateOrganisationIsActive(organisation.get());
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
-        pbaAddRequest.getPaymentAccounts().removeIf(item -> item == null || "".equals(item.trim()));
-        Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaAddRequest);
+        pbaRequest.getPaymentAccounts().removeIf(item -> item == null || "".equals(item.trim()));
+        Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaRequest);
 
-        if (!isEmpty(pbaAddRequest.getPaymentAccounts())) {
-            addPbaAccountToOrganisation(pbaAddRequest.getPaymentAccounts(), organisation.get(), false, false);
+        if (!isEmpty(pbaRequest.getPaymentAccounts())) {
+            addPbaAccountToOrganisation(pbaRequest.getPaymentAccounts(), organisation.get(), false, false);
         }
         return getResponse(unsuccessfulPbas.getLeft(),
-                unsuccessfulPbas.getRight(), pbaAddRequest.getPaymentAccounts());
+                unsuccessfulPbas.getRight(), pbaRequest.getPaymentAccounts());
 
     }
 
-    private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaAddRequest pbaAddRequest) {
+    private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaRequest pbaRequest) {
         Set<String> invalidPaymentAccounts = null;
-        String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaAddRequest.getPaymentAccounts(),
+        String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaRequest.getPaymentAccounts(),
                 Boolean.FALSE);
         if (StringUtils.isNotEmpty(invalidPbas)) {
             invalidPaymentAccounts = new HashSet<>(Arrays.asList(invalidPbas.split(",")));
-            pbaAddRequest.getPaymentAccounts().removeAll(invalidPaymentAccounts);
+            pbaRequest.getPaymentAccounts().removeAll(invalidPaymentAccounts);
         }
 
         Set<String> duplicatePaymentAccounts = paymentAccountValidator.getDuplicatePbas(
-                pbaAddRequest.getPaymentAccounts());
-        pbaAddRequest.getPaymentAccounts().removeAll(duplicatePaymentAccounts);
+                pbaRequest.getPaymentAccounts());
+        pbaRequest.getPaymentAccounts().removeAll(duplicatePaymentAccounts);
 
         return Pair.of(invalidPaymentAccounts, duplicatePaymentAccounts);
     }

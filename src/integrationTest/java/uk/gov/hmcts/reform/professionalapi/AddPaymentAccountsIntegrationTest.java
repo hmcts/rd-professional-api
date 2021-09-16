@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -35,13 +35,13 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000002");
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
 
@@ -64,13 +64,13 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         paymentAccountsToAdd.add("PBA0000002");
         paymentAccountsToAdd.add("PBA0000003");
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         LinkedHashMap reason = (LinkedHashMap)pbaResponse.get("reason");
         ArrayList duplicatePaymentAccountsList = (ArrayList) reason.get("duplicatePaymentAccounts");
@@ -103,13 +103,13 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         paymentAccountsToAdd.add("PBA0000002");
         paymentAccountsToAdd.add("PBA0000003");
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         LinkedHashMap reason = (LinkedHashMap)pbaResponse.get("reason");
         ArrayList duplicatePaymentAccountsList = (ArrayList) reason.get("duplicatePaymentAccounts");
@@ -139,13 +139,13 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         paymentAccountsToAdd.add("invalid-test02");
         paymentAccountsToAdd.add("PBA0000002");
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         LinkedHashMap reason = (LinkedHashMap)pbaResponse.get("reason");
         ArrayList duplicatePaymentAccountsList = (ArrayList) reason.get("duplicatePaymentAccounts");
@@ -173,12 +173,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         paymentAccountsToAdd.add("invalid-test01");
         paymentAccountsToAdd.add("invalid-test02");
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
         String userId = createActiveUserAndOrganisation(true);
 
-        Map<String, Object> pbaResponse = professionalReferenceDataClient.addPaymentsAccountsByOrgId(pbaAddRequest,
+        Map<String, Object> pbaResponse = professionalReferenceDataClient.addPaymentsAccountsByOrgId(pbaRequest,
                 puiFinanceManager, userId);
 
         AddPbaResponse addPbaResponse = convertJsonStringToObj(pbaResponse);
@@ -195,12 +195,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         paymentAccountsToAdd.add("PBA0000001");
         paymentAccountsToAdd.add("PBA0000003");
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
         String userId = createActiveUserAndOrganisation(true);
 
-        Map<String, Object> pbaResponse = professionalReferenceDataClient.addPaymentsAccountsByOrgId(pbaAddRequest,
+        Map<String, Object> pbaResponse = professionalReferenceDataClient.addPaymentsAccountsByOrgId(pbaRequest,
                 puiFinanceManager, userId);
 
         AddPbaResponse addPbaResponse = convertJsonStringToObj(pbaResponse);
@@ -212,14 +212,14 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     public void test_addPaymentAccounts_Failure_UserIsNotActive_ShouldThrow_400() {
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
+        PbaRequest pbaRequest = new PbaRequest();
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000003");
 
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
         String userId = createActiveUserAndOrganisation(false);
         userProfileGetPendingUserWireMock();
-        Map<String, Object> response = professionalReferenceDataClient.addPaymentsAccountsByOrgId(pbaAddRequest,
+        Map<String, Object> response = professionalReferenceDataClient.addPaymentsAccountsByOrgId(pbaRequest,
                 puiFinanceManager, userId);
         assertThat(response).containsEntry("http_status", "403");
         assertThat(response.get("response_body").toString())
@@ -235,13 +235,13 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         paymentAccountsToAdd.add("PBA0000001");
         paymentAccountsToAdd.add("PBA0000002");
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         LinkedHashMap reason = (LinkedHashMap)pbaResponse.get("reason");
         ArrayList duplicatePaymentAccountsList = (ArrayList) reason.get("duplicatePaymentAccounts");
@@ -312,14 +312,14 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         return errorResponse;
     }
 
-    private PbaAddRequest convertJsonReqStringToObj(String request) {
-        PbaAddRequest pbaAddRequest = null;
+    private PbaRequest convertJsonReqStringToObj(String request) {
+        PbaRequest pbaRequest = null;
         try {
-            pbaAddRequest = mapper.readValue(request, PbaAddRequest.class);
+            pbaRequest = mapper.readValue(request, PbaRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        return pbaAddRequest;
+        return pbaRequest;
     }
 
     @Test
@@ -332,12 +332,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
                 + "    ]\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
@@ -355,12 +355,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
                 + "    ]\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
@@ -376,12 +376,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         String request = "{\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
@@ -392,7 +392,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_Has_Null_Value_PBA_ShouldThrow_400() {
+    public void test_add_PaymentAccounts_Success_Has_Null_Value_also_PBA_ShouldReturn_201() {
 
         String request = "{\n"
                 + "    \"paymentAccounts\": [\n"
@@ -404,12 +404,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
                 + "    ]\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         LinkedHashMap reason = (LinkedHashMap)pbaResponse.get("reason");
         ArrayList duplicatePaymentAccountsList = (ArrayList) reason.get("duplicatePaymentAccounts");
@@ -447,12 +447,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
                 + "    ]\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
@@ -469,12 +469,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
                 + "    ]\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
@@ -491,12 +491,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
                 + "    ]\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
@@ -520,14 +520,14 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         paymentAccountsEmptyOrNullToAdd.add("");
         paymentAccountsEmptyOrNullToAdd.add(" ");
 
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
-        pbaAddRequest.getPaymentAccounts().addAll(paymentAccountsEmptyOrNullToAdd);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
+        pbaRequest.getPaymentAccounts().addAll(paymentAccountsEmptyOrNullToAdd);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         LinkedHashMap reason = (LinkedHashMap)pbaResponse.get("reason");
         ArrayList duplicatePaymentAccountsList = (ArrayList) reason.get("duplicatePaymentAccounts");
@@ -560,12 +560,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
                 + "    ]\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
@@ -575,7 +575,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_PartialSuccess_Dupl_And_null_02_ShouldReturn_201() {
+    public void test_add_PaymentAccounts_Failure_Dupl_And_null_02_ShouldReturn_400() {
         String request = "{\n"
                 + "    \"paymentAccounts\": [\n"
                 + "       \"PBAKQNROCB8\",\n"
@@ -589,12 +589,12 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
                 + "    ]\n"
                 + "}";
 
-        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
 
         Map<String, Object> pbaResponse = professionalReferenceDataClient
-                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
 
         AddPbaResponse addPbaResponse = convertJsonStringToObj(pbaResponse);
         assertThat(addPbaResponse.getMessage()).isNull();

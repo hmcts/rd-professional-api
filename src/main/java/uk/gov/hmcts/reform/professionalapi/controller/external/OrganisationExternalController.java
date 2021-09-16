@@ -46,7 +46,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -408,18 +407,18 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured("pui-finance-manager")
     public ResponseEntity<Object> addPaymentAccountsToOrganisation(
-            @Valid @NotNull @RequestBody PbaAddRequest pbaAddRequest,
+            @Valid @NotNull @RequestBody PbaRequest pbaRequest,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
         log.info("Received request to add payment accounts to organisation Id");
 
-        if (pbaAddRequest.getPaymentAccounts() == null
-                || CollectionUtils.isEmpty(pbaAddRequest.getPaymentAccounts())
-                || pbaAddRequest.getPaymentAccounts().stream().allMatch(s -> (s == null || s.trim().equals("")))) {
+        if (pbaRequest.getPaymentAccounts() == null
+                || CollectionUtils.isEmpty(pbaRequest.getPaymentAccounts())
+                || pbaRequest.getPaymentAccounts().stream().allMatch(s -> (s == null || s.trim().equals("")))) {
             throw new InvalidRequest(ADD_PBA_REQUEST_EMPTY);
         }
-        return organisationService.addPaymentAccountsToOrganisation(pbaAddRequest, organisationIdentifier, userId);
+        return organisationService.addPaymentAccountsToOrganisation(pbaRequest, organisationIdentifier, userId);
 
     }
 

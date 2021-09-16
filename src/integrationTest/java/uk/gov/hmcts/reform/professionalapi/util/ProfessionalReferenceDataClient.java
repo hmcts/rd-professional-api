@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -601,13 +600,13 @@ public class ProfessionalReferenceDataClient {
         return deleteOrganisationResponse;
     }
 
-    public Map<String, Object> addPaymentsAccountsByOrgId(PbaAddRequest pbaAddRequest, String supportedRole,
+    public Map<String, Object> addPaymentsAccountsByOrgId(PbaRequest pbaRequest, String supportedRole,
                                                              String userId) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/pba";
 
         try {
-            HttpEntity<PbaAddRequest> requestEntity = new HttpEntity<>(pbaAddRequest,
+            HttpEntity<PbaRequest> requestEntity = new HttpEntity<>(pbaRequest,
                     getMultipleAuthHeaders(supportedRole, userId));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.POST, requestEntity, Map.class);
 

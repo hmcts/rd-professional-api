@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -54,7 +53,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.Set;
-import java.util.HashSet;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -355,8 +353,8 @@ public class OrganisationExternalControllerTest {
     public void test_addPaymentAccountsToOrganisation() throws JsonProcessingException {
         Set<String> pbas = new HashSet<>();
         pbas.add("PBA0000001");
-        PbaAddRequest pbaAddRequest = new PbaAddRequest();
-        pbaAddRequest.setPaymentAccounts(pbas);
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
         AddPbaResponse addPbaResponse = new AddPbaResponse();
         addPbaResponse.setMessage("");
         ResponseEntity<Object> responseEntity = ResponseEntity
@@ -365,18 +363,18 @@ public class OrganisationExternalControllerTest {
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
-        when(organisationServiceMock.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId))
+        when(organisationServiceMock.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId))
                 .thenReturn(responseEntity);
 
         ResponseEntity<?> actual = organisationExternalController
-                .addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
+                .addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
 
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
+                .addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
 
     }
 }
