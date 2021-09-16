@@ -22,11 +22,15 @@ spring:
         registration:
           oidc:
             client-id: microservicekey-rd-professional-api
-            client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+            client-secret: DUMMY
 
 auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
 
 idam:
+  s2s-auth:
+    totp_secret: DUMMY
+    microservice: rd_professional_api
+    url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
     services: rd_professional_api
   api.url: ${IDAM_URL:http://127.0.0.1:5000}
