@@ -43,6 +43,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
         launchDarklyMap.put("OrganisationExternalController.deletePaymentAccountsOfOrganisation",
                 "rd-professional-multi-pba");
         launchDarklyMap.put("OrganisationInternalController.retrieveOrgByPbaStatus", "rd-professional-multi-pba");
+        launchDarklyMap.put("OrganisationExternalController.addPaymentAccountsToOrganisation",
+                "rd-professional-multi-pba");
     }
 
     @Override

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -872,7 +873,7 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
-  
+
     public void deletePaymentAccountsOfOrganisation(PbaRequest deletePbaRequest,
                                                     RequestSpecification requestSpecification,
                                                     HttpStatus expectedStatus) {
@@ -884,7 +885,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
-    
+
         log.info("{}:: Delete PBA of organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
     }
@@ -904,5 +905,23 @@ public class ProfessionalApiClient {
         } else {
             return response.getBody().as(ErrorResponse.class);
         }
+    }
+
+    public ResponseBody addPaymentAccountsOfOrganisation(PbaRequest pbaRequest,
+                                                         RequestSpecification requestSpecification,
+                                                         HttpStatus expectedStatus) {
+        Response response = requestSpecification
+                .body(pbaRequest)
+                .post("/refdata/external/v1/organisations/pba")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: Add PBA of organisation status response: {}",
+                loggingComponentName, response.getStatusCode());
+
+        return response.body();
     }
 }

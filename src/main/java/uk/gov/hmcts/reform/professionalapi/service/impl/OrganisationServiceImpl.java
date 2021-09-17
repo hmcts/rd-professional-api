@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,11 +22,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.tuple.Pair;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +45,7 @@ import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
@@ -72,7 +81,11 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
 
 @Service
 @Slf4j
@@ -102,6 +115,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     PaymentAccountValidator paymentAccountValidator;
     @Autowired
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
+    @Autowired
+    ProfessionalUserService professionalUserService;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -160,7 +175,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                                             Organisation organisation, boolean pbasValidated, boolean isEditPba) {
         if (paymentAccounts != null) {
             if (!pbasValidated) {
-                PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
+                PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts, true);
             }
 
             paymentAccounts.forEach(pbaAccount -> {
@@ -175,7 +190,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    private void updateStatusAndMessage(PaymentAccount paymentAccount, PbaStatus pbaStatus, String statusMessage) {
+    public void updateStatusAndMessage(PaymentAccount paymentAccount, PbaStatus pbaStatus, String statusMessage) {
         paymentAccount.setPbaStatus(pbaStatus);
         paymentAccount.setStatusMessage(statusMessage);
     }
@@ -500,6 +515,83 @@ public class OrganisationServiceImpl implements OrganisationService {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(organisationsWithPbaStatusResponses);
+    }
+
+    @Override
+    public ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaRequest pbaRequest,
+                                                                   String organisationIdentifier, String userId) {
+        Optional<Organisation> organisation = Optional.ofNullable(
+                getOrganisationByOrgIdentifier(organisationIdentifier));
+
+        if (organisation.isEmpty()) {
+            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
+        }
+
+        validateOrganisationIsActive(organisation.get());
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+
+        Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaRequest);
+
+        if (!isEmpty(pbaRequest.getPaymentAccounts())) {
+            addPbaAccountToOrganisation(pbaRequest.getPaymentAccounts(), organisation.get(), false, false);
+        }
+        return getResponse(unsuccessfulPbas.getLeft(),
+                unsuccessfulPbas.getRight(), pbaRequest.getPaymentAccounts());
+
+    }
+
+    private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaRequest pbaRequest) {
+        Set<String> invalidPaymentAccounts = null;
+        paymentAccountValidator.isPbaRequestEmptyOrNull(pbaRequest);
+        pbaRequest.getPaymentAccounts().removeIf(item -> item == null || "".equals(item.trim()));
+
+        String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaRequest.getPaymentAccounts(),
+                Boolean.FALSE);
+        if (StringUtils.isNotEmpty(invalidPbas)) {
+            invalidPaymentAccounts = new HashSet<>(Arrays.asList(invalidPbas.split(",")));
+            pbaRequest.getPaymentAccounts().removeAll(invalidPaymentAccounts);
+        }
+
+        Set<String> duplicatePaymentAccounts = paymentAccountValidator.getDuplicatePbas(
+                pbaRequest.getPaymentAccounts());
+        pbaRequest.getPaymentAccounts().removeAll(duplicatePaymentAccounts);
+
+        return Pair.of(invalidPaymentAccounts, duplicatePaymentAccounts);
+    }
+
+    private ResponseEntity<Object> getResponse(Set<String> invalidPaymentAccounts,
+                                               Set<String> duplicatePaymentAccounts, Set<String> validPaymentAccounts) {
+        AddPbaResponse addPbaResponse = null;
+        HttpStatus status = HttpStatus.CREATED;
+
+        if ((!isEmpty(invalidPaymentAccounts) || !isEmpty(duplicatePaymentAccounts))
+                && (!isEmpty(validPaymentAccounts))) {
+            addPbaResponse = getAddPbaResponse(invalidPaymentAccounts,
+                    duplicatePaymentAccounts, ERROR_MSG_PARTIAL_SUCCESS);
+        } else if (validPaymentAccounts.isEmpty()) {
+            status = HttpStatus.BAD_REQUEST;
+            addPbaResponse = getAddPbaResponse(invalidPaymentAccounts, duplicatePaymentAccounts, null);
+        }
+        return ResponseEntity
+                .status(status)
+                .body(addPbaResponse);
+    }
+
+    private AddPbaResponse getAddPbaResponse(Set<String> invalidPaymentAccounts,
+                                             Set<String> duplicatePaymentAccounts, String msg) {
+        AddPbaResponse addPbaResponse;
+        addPbaResponse = new AddPbaResponse();
+        addPbaResponse.setMessage(msg);
+        addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
+        return addPbaResponse;
+    }
+
+    public void validateOrganisationIsActive(Organisation existingOrganisation) {
+        if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
+            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
+            throw new EmptyResultDataAccessException(1);
+        }
     }
 
 }

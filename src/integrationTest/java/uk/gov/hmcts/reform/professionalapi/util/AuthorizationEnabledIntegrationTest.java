@@ -809,4 +809,3 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 }
-

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -41,4 +42,7 @@ public interface OrganisationService {
     void updatePaymentAccounts(List<PaymentAccount> pbas);
 
     ResponseEntity<Object> getOrganisationsByPbaStatus(String pbaStatus);
+
+    ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaRequest pbaRequest,
+                                                            String organisationIdentifier, String userId);
 }

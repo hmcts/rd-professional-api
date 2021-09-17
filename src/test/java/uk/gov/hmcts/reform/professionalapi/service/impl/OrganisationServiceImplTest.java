@@ -41,9 +41,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -60,6 +62,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWith
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
@@ -84,9 +87,11 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doNothing;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 
 @SuppressWarnings("unchecked")
 public class OrganisationServiceImplTest {
@@ -145,6 +150,9 @@ public class OrganisationServiceImplTest {
 
     @InjectMocks
     private OrganisationServiceImpl sut;
+
+    private final ProfessionalUserService professionalUserServiceMock
+            = mock(ProfessionalUserService.class);
 
     @Before
     public void setUp() {
@@ -907,6 +915,119 @@ public class OrganisationServiceImplTest {
         orgs.add(org2);
 
         return orgs;
+    }
+
+
+    @Test
+    public void test_addPaymentAccountsToOrganisation() {
+        var pbas = new HashSet<String>();
+        pbas.add("PBA0000001");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+    }
+
+    @Test
+    public void test_addPaymentAccountsToOrganisation_pba_invalid() {
+        var pbas = new HashSet<String>();
+        pbas.add("PBA00000012");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNotNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+    }
+
+    @Test
+    public void test_addPaymentAccountsToOrganisation_pbaDb_NoMatch() {
+        var pbas = new HashSet<String>();
+        pbas.add("PBA00000012");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA1234568");
+        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(paymentAccount);
+        when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(paymentAccounts);
+
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(new AddPbaResponse());
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest,
+                UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID().toString());
+        assertThat(responseEntity.getBody()).isNotNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void test_addPaymentAccountsToOrganisationEmpty() {
+        var pbas = new HashSet<String>();
+        var set = Set.of("PBA0000001");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
+
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNotNull();
+    }
+
+    @Test
+    public void test_addPaymentAccountsToOrganisation_pba_valid_And_invalid() {
+        var pbas = new HashSet<String>();
+        pbas.add("PBA0000001");
+        pbas.add("test");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        AddPbaResponse response = (AddPbaResponse)responseEntity.getBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getReason()).isNotNull();
+        assertThat(response.getMessage()).isEqualTo(ERROR_MSG_PARTIAL_SUCCESS);
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
     }
 
 
