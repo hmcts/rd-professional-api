@@ -500,7 +500,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         validateOrganisationIsActive(organisation.get());
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
-        pbaRequest.getPaymentAccounts().removeIf(item -> item == null || "".equals(item.trim()));
+        paymentAccountValidator.IsPbaRequestEmptyOrNull(pbaRequest);
         Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaRequest);
 
         if (!isEmpty(pbaRequest.getPaymentAccounts())) {
@@ -513,6 +513,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaRequest pbaRequest) {
         Set<String> invalidPaymentAccounts = null;
+        pbaRequest.getPaymentAccounts().removeIf(item -> item == null || "".equals(item.trim()));
+
         String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaRequest.getPaymentAccounts(),
                 Boolean.FALSE);
         if (StringUtils.isNotEmpty(invalidPbas)) {

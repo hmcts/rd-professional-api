@@ -14,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ADD_PBA_REQUEST_EMPTY;
 
 @Component
 @Slf4j
@@ -89,4 +92,11 @@ public class PaymentAccountValidator {
     }
 
 
+    public void IsPbaRequestEmptyOrNull(PbaRequest pbaRequest) {
+        if (pbaRequest.getPaymentAccounts() == null
+                || CollectionUtils.isEmpty(pbaRequest.getPaymentAccounts())
+                || pbaRequest.getPaymentAccounts().stream().allMatch(s -> (s == null || s.trim().equals("")))) {
+            throw new InvalidRequest(ADD_PBA_REQUEST_EMPTY);
+        }
+    }
 }
