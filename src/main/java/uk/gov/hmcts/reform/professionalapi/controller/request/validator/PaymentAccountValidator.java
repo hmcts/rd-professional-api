@@ -92,7 +92,7 @@ public class PaymentAccountValidator {
     }
 
 
-    public void IsPbaRequestEmptyOrNull(PbaRequest pbaRequest) {
+    public void isPbaRequestEmptyOrNull(PbaRequest pbaRequest) {
         if (pbaRequest.getPaymentAccounts() == null
                 || CollectionUtils.isEmpty(pbaRequest.getPaymentAccounts())
                 || pbaRequest.getPaymentAccounts().stream().allMatch(s -> (s == null || s.trim().equals("")))) {
