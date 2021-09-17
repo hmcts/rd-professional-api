@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 
 import java.util.List;
 
@@ -85,8 +85,8 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void validateOrganisationIsActive(Organisation existingOrganisation) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
-            throw new EmptyResultDataAccessException(1);
+            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE);
+            throw new ResourceNotFoundException(ORG_NOT_ACTIVE);
         }
     }
 

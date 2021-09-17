@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -105,7 +106,7 @@ public class OrganisationIdentifierValidatorImplTest {
         assertThat(result).isFalse();
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void test_validateOrganisationIsActiveThrows404WhenOrganisationIsNotActive() {
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation);
     }
