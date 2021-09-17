@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import org.springframework.http.ResponseEntity;
 
 
 public interface OrganisationService {
@@ -40,6 +40,8 @@ public interface OrganisationService {
     void deletePaymentsOfOrganisation(Set<String> paymentAccounts, Organisation organisation);
 
     void updatePaymentAccounts(List<PaymentAccount> pbas);
+
+    ResponseEntity<Object> getOrganisationsByPbaStatus(String pbaStatus);
 
     ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaRequest pbaRequest,
                                                             String organisationIdentifier, String userId);

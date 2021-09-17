@@ -56,6 +56,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -408,7 +409,7 @@ public class OrganisationInternalControllerTest {
         verify(orgIdValidatorMock, times(1)).validateOrganisationExistsWithGivenOrgId(orgId);
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
     }
-
+  
     @Test
     public void testUpdateOrganisation() {
         organisationCreationRequest.setStatusMessage("Company in review");
@@ -430,4 +431,21 @@ public class OrganisationInternalControllerTest {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserById(any());
     }
+
+    @Test
+    public void testRetrieveOrgByPbaStatus() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.OK).build();
+        PbaStatus pbaStatus = PbaStatus.ACCEPTED;
+        when(organisationServiceMock.getOrganisationsByPbaStatus(pbaStatus.toString())).thenReturn(responseEntity);
+
+        ResponseEntity<Object> response = organisationInternalController.retrieveOrgByPbaStatus(pbaStatus.toString());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+                .getOrganisationsByPbaStatus(pbaStatus.toString());
+    }
+
 }

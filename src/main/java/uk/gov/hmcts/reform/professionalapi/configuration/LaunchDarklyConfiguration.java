@@ -35,5 +35,7 @@ public class LaunchDarklyConfiguration implements WebMvcConfigurer {
                 .addPathPatterns("/refdata/external/v1/organisations/pba");
         registry.addInterceptor(featureConditionEvaluation)
             .addPathPatterns("/refdata/internal/v1/organisations/{orgId}/mfa");
+        registry.addInterceptor(featureConditionEvaluation)
+            .addPathPatterns("/refdata/internal/v1/organisations/pba/{status}");
     }
 }
