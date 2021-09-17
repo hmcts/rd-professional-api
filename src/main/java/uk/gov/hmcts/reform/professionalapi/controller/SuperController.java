@@ -4,6 +4,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
@@ -385,7 +387,7 @@ public abstract class SuperController {
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation, NOT_FOUND);
         ResponseEntity<Object> responseEntity;
 
         showDeleted = getShowDeletedValue(showDeleted);
@@ -418,7 +420,7 @@ public abstract class SuperController {
 
     public void checkUserAlreadyExist(String userEmail) {
         if (professionalUserService.findProfessionalUserByEmailAddress(userEmail) != null) {
-            throw new HttpClientErrorException(HttpStatus.CONFLICT, "User already exists");
+            throw new HttpClientErrorException(CONFLICT, "User already exists");
         }
     }
 

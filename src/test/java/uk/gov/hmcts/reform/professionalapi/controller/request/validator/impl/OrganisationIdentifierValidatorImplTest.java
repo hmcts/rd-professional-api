@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +15,8 @@ import org.junit.Test;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -106,14 +108,19 @@ public class OrganisationIdentifierValidatorImplTest {
         assertThat(result).isFalse();
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test(expected = EmptyResultDataAccessException.class)
     public void test_validateOrganisationIsActiveThrows404WhenOrganisationIsNotActive() {
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation);
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void test_validateOrganisationIsActiveThrows400WhenOrganisationIsNotActive() {
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, BAD_REQUEST);
     }
 
     @Test(expected = Test.None.class)
     public void test_validateOrganisationIsActiveDoesNotThrow404WhenOrganisationIsActive() {
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation);
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND);
     }
 }

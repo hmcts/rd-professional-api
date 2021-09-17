@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
@@ -11,9 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -45,7 +48,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     private void checkOrganisationDoesNotExist(Organisation organisation, String inputOrganisationIdentifier) {
         if (null == organisation) {
             String errorMessage = NO_ORG_FOUND_FOR_GIVEN_ID + inputOrganisationIdentifier;
-            log.error(loggingComponentName,errorMessage);
+            log.error(loggingComponentName, errorMessage);
             throw new EmptyResultDataAccessException(errorMessage, 1);
         }
     }
@@ -83,10 +86,16 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         return doesRoleExist;
     }
 
-    public void validateOrganisationIsActive(Organisation existingOrganisation) {
+    public void validateOrganisationIsActive(Organisation existingOrganisation, HttpStatus statusCodeToBeThrown) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE);
-            throw new ResourceNotFoundException(ORG_NOT_ACTIVE);
+
+            if (statusCodeToBeThrown == HttpStatus.valueOf(404)) {
+                log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE);
+                throw new EmptyResultDataAccessException(1);
+            } else if (statusCodeToBeThrown == HttpStatus.valueOf(400)) {
+                log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE);
+                throw new InvalidRequest(ORG_NOT_ACTIVE);
+            }
         }
     }
 
@@ -99,6 +108,6 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void validateOrganisationExistsAndActive(String orgId) {
         validateOrganisationExistsWithGivenOrgId(orgId);
-        validateOrganisationIsActive(organisationService.getOrganisationByOrgIdentifier(orgId));
+        validateOrganisationIsActive(organisationService.getOrganisationByOrgIdentifier(orgId), BAD_REQUEST);
     }
 }

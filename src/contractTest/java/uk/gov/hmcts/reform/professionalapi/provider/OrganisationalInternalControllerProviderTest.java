@@ -196,7 +196,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
         paymentAccount.setOrganisation(organisation);
 
-        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any());
+        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(paymentAccountRepository.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
         when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
