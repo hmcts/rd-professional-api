@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
@@ -475,5 +476,47 @@ public class OrganisationInternalController extends SuperController {
         }
 
         return mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest,organisation);
+    }
+
+    @ApiOperation(
+            value = "Retrieves the list of organisations with particular PBA status",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "",
+                    response = OrganisationsWithPbaStatusResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "PBA status is not valid"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = ""
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = ""
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @GetMapping(
+            path = "/pba/{status}",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<Object> retrieveOrgByPbaStatus(@PathVariable("status") @NotBlank String pbaStatus) {
+
+        log.info("{}:: Received request to retrieve organisations by pba status::", loggingComponentName);
+        return organisationService.getOrganisationsByPbaStatus(pbaStatus.toUpperCase());
     }
 }

@@ -12,11 +12,13 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,8 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -46,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -349,7 +354,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         Organisation savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
-        if (isNotEmpty(savedOrganisation.getPaymentAccounts())) {
+        if (isNotEmpty(savedOrganisation.getPaymentAccounts())
+                && organisationCreationRequest.getStatus().equals("ACTIVE")) {
             updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
         }
 
@@ -467,6 +473,33 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
         return organisationRepository.findByStatus(status);
+    }
+
+    public ResponseEntity<Object> getOrganisationsByPbaStatus(String pbaStatus) {
+
+        if (Stream.of(PbaStatus.values()).noneMatch(status -> status.name().equalsIgnoreCase(pbaStatus))) {
+            throw new InvalidRequest("Invalid PBA status provided");
+        }
+
+        List<Organisation> organisations = organisationRepository.findByPbaStatus(PbaStatus.valueOf(pbaStatus));
+
+        LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
+                .stream()
+                .collect(Collectors.groupingBy(
+                        Organisation::getOrganisationIdentifier,LinkedHashMap::new, Collectors.toList()));
+
+        var organisationsWithPbaStatusResponses = new ArrayList<OrganisationsWithPbaStatusResponse>();
+
+        orgPbaMap.forEach((k,v) -> organisationsWithPbaStatusResponses.add(
+                new OrganisationsWithPbaStatusResponse(k, v.get(0).getStatus(),
+                v.get(0).getPaymentAccounts()
+                       .stream()
+                       .filter(paymentAccount -> paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
+                       .collect(Collectors.toList()))));
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(organisationsWithPbaStatusResponses);
     }
 
 }

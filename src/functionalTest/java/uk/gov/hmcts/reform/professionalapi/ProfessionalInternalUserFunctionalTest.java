@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -27,8 +29,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
@@ -448,7 +453,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
 
         log.info("updateOrgMFAShouldReturn403 :: END");
     }
-
+  
     public void  updateOrgStatusScenarios() {
         updateOrgStatusShouldBeSuccess();
     }
@@ -468,5 +473,43 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertEquals(statusMessage, orgResponse.get("statusMessage"));
 
         log.info("updateOrgStatusShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = true)
+    public void retrieveOrgsByPbaStatusScenario() {
+        setUpTestData();
+        findOrganisationByPbaStatusShouldBeSuccessWithPbas();
+    }
+
+    public void findOrganisationByPbaStatusShouldBeSuccessWithPbas() {
+        log.info("findOrganisationByPbaStatusShouldBeSuccess :: STARTED");
+
+        var orgsResponse = (List<OrganisationsWithPbaStatusResponse>)
+                professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
+
+        assertNotNull(orgsResponse);
+        assertThat(orgsResponse.size()).isPositive();
+        assertThat(orgsResponse.stream()).allMatch(org -> org.getOrganisationStatus().isActive());
+
+        var pbaByStatusResponses = new ArrayList<FetchPbaByStatusResponse>();
+        orgsResponse.forEach(org -> pbaByStatusResponses.addAll(org.getPbaNumbers()));
+
+        assertThat(pbaByStatusResponses.size()).isPositive();
+        assertThat(pbaByStatusResponses.stream()).allMatch(pba -> pba.getStatus().equals("ACCEPTED"));
+        assertThat(pbaByStatusResponses).allMatch(pba -> nonNull(pba.getDateAccepted()));
+
+        log.info("findOrganisationByPbaStatusShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = false)
+    public void findOrganisationByPbaStatusShouldReturn403WhenToggledOff() throws IOException {
+        log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: STARTED");
+
+        professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
+
+        log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: END");
+    
     }
 }

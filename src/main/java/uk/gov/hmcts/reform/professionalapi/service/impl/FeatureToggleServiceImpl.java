@@ -42,6 +42,7 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
         launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus", "prd-mfa-flag");
         launchDarklyMap.put("OrganisationExternalController.deletePaymentAccountsOfOrganisation",
                 "rd-professional-multi-pba");
+        launchDarklyMap.put("OrganisationInternalController.retrieveOrgByPbaStatus", "rd-professional-multi-pba");
     }
 
     @Override

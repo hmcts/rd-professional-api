@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -38,4 +39,6 @@ public interface OrganisationService {
     void deletePaymentsOfOrganisation(Set<String> paymentAccounts, Organisation organisation);
 
     void updatePaymentAccounts(List<PaymentAccount> pbas);
+
+    ResponseEntity<Object> getOrganisationsByPbaStatus(String pbaStatus);
 }

@@ -28,6 +28,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -870,7 +872,7 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
-
+  
     public void deletePaymentAccountsOfOrganisation(PbaRequest deletePbaRequest,
                                                     RequestSpecification requestSpecification,
                                                     HttpStatus expectedStatus) {
@@ -882,9 +884,25 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
-
+    
         log.info("{}:: Delete PBA of organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
+    }
 
+    public Object findOrganisationsByPbaStatus(HttpStatus expectedStatus, PbaStatus pbaStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .get("/refdata/internal/v1/organisations/pba/" + pbaStatus.toString())
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        if (expectedStatus.is2xxSuccessful()) {
+            return Arrays.asList(response.getBody().as(OrganisationsWithPbaStatusResponse[].class));
+        } else {
+            return response.getBody().as(ErrorResponse.class);
+        }
     }
 }
