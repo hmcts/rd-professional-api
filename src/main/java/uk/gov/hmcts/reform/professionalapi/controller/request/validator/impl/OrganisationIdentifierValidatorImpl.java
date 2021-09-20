@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_TWO_ARG_PLACEHOLDER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 
@@ -90,10 +91,10 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
 
             if (statusCodeToBeThrown == HttpStatus.valueOf(404)) {
-                log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE);
+                log.error(LOG_TWO_ARG_PLACEHOLDER, loggingComponentName, ORG_NOT_ACTIVE);
                 throw new EmptyResultDataAccessException(1);
             } else if (statusCodeToBeThrown == HttpStatus.valueOf(400)) {
-                log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE);
+                log.error(LOG_TWO_ARG_PLACEHOLDER, loggingComponentName, ORG_NOT_ACTIVE);
                 throw new InvalidRequest(ORG_NOT_ACTIVE);
             }
         }
@@ -101,7 +102,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void validateOrganisationExistsWithGivenOrgId(String orgId) {
         if (null == organisationService.getOrganisationByOrgIdentifier(orgId)) {
-            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            log.error(LOG_TWO_ARG_PLACEHOLDER, loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
     }

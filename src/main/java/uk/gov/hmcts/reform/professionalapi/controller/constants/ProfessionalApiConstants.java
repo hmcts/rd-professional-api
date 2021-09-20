@@ -69,5 +69,7 @@ public class ProfessionalApiConstants {
             "PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters";
     public static final String ERROR_MSG_PBAS_ENTERED_ARE_INVALID = ". The following PBAs entered are invalid: ";
 
+    public static final String LOG_TWO_ARG_PLACEHOLDER = "{}:: {}";
+
 
 }
