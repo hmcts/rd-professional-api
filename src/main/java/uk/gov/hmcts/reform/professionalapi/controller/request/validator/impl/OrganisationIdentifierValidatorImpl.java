@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_TWO_ARG_PLACEHOLDER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
@@ -90,10 +91,10 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     public void validateOrganisationIsActive(Organisation existingOrganisation, HttpStatus statusCodeToBeThrown) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
 
-            if (statusCodeToBeThrown == HttpStatus.valueOf(404)) {
+            if (statusCodeToBeThrown == NOT_FOUND) {
                 log.error(LOG_TWO_ARG_PLACEHOLDER, loggingComponentName, ORG_NOT_ACTIVE);
                 throw new EmptyResultDataAccessException(1);
-            } else if (statusCodeToBeThrown == HttpStatus.valueOf(400)) {
+            } else if (statusCodeToBeThrown == BAD_REQUEST) {
                 log.error(LOG_TWO_ARG_PLACEHOLDER, loggingComponentName, ORG_NOT_ACTIVE);
                 throw new InvalidRequest(ORG_NOT_ACTIVE);
             }
