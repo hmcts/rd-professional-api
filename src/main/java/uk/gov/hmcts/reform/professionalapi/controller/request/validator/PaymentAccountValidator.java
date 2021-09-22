@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,9 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBAS_ENTERED_ARE_INVALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
 
@@ -78,6 +81,14 @@ public class PaymentAccountValidator {
         if (!uniquePBas.isEmpty()) {
             throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", uniquePBas)
                     .concat(" belongs to another Organisation"));
+        }
+    }
+
+    public void checkUpdatePbaRequestIsValid(UpdatePbaRequest updatePbaRequest) {
+        if (isEmpty(updatePbaRequest.getPbaRequestList())) {
+            throw new InvalidRequest("No PBAs have been sent in the request");
+        } else if (updatePbaRequest.getPbaRequestList().stream().anyMatch(Objects::isNull)) {
+            throw new InvalidRequest("null values not allowed in Update PBA Request");
         }
     }
 

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
@@ -527,13 +526,14 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<Object> updateAnOrganisationsRegisteredPbas(
             @Valid @NotNull @RequestBody UpdatePbaRequest updatePbaRequest,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
 
         //Received request to update an Organisation's PBAs
 
-        if (isEmpty(updatePbaRequest.getPbaRequestList())) {
-            throw new InvalidRequest("No PBAs have been sent in the request");
-        }
+        paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
+
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
         organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
 
