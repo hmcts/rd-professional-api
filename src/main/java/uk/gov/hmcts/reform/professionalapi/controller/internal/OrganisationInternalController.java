@@ -533,9 +533,9 @@ public class OrganisationInternalController extends SuperController {
 
         paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
 
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
-
         organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
+
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
         UpdatePbaStatusResponse updatePbaStatusResponse =
                 updateAnOrganisationsPbas(updatePbaRequest.getPbaRequestList(), organisationIdentifier);

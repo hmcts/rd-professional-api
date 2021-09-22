@@ -483,13 +483,13 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> updatePaymentsAccountsByOrgId(UpdatePbaRequest updatePbaRequest, String orgId,
-                                                             String hmctsAdmin) {
+                                                             String hmctsAdmin, String userId) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pba/status";
 
         try {
             HttpEntity<UpdatePbaRequest> requestEntity = new HttpEntity<>(updatePbaRequest,
-                    getMultipleAuthHeaders(hmctsAdmin));
+                    getMultipleAuthHeaders(hmctsAdmin, userId));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
 
         } catch (RestClientResponseException ex) {
