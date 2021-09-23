@@ -202,6 +202,12 @@ task runProviderPactVerification(type: Test) {
     include "uk/gov/hmcts/reform/professionalapi/provider/**"
 }
 
+task fortifyScan(type: JavaExec)  {
+  main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  classpath += sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 runProviderPactVerification.finalizedBy pactVerify
 
 def getCheckedOutGitCommitHash() {
@@ -374,6 +380,7 @@ dependencies {
     testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '3.0.8'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
+    testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
