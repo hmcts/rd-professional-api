@@ -526,16 +526,13 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<Object> updateAnOrganisationsRegisteredPbas(
             @Valid @NotNull @RequestBody UpdatePbaRequest updatePbaRequest,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier,
-            @ApiParam(hidden = true) @UserId String userId) {
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         //Received request to update an Organisation's PBAs
 
         paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
 
         organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
-
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
         UpdatePbaStatusResponse updatePbaStatusResponse =
                 updateAnOrganisationsPbas(updatePbaRequest.getPbaRequestList(), organisationIdentifier);

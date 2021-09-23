@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.REJECTED;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -33,8 +33,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     public void update_pba_account_numbers_for_an_organisation_200_success_scenario() {
-        String orgId = createOrganisation();
-        String userId = setUpData(orgId);
+        String orgId = setUpData();
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(asList(
@@ -42,8 +41,8 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
                 new PbaRequest(pba2, REJECTED.name(), ""),
                 new PbaRequest(pba3, ACCEPTED.name(), null)));
 
-        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
-                .updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin, userId);
+        Map<String, Object> updatePbaResponse =
+                professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNull();
@@ -62,8 +61,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     public void update_pba_account_numbers_for_an_organisation_200_partial_success_scenario() {
-        String orgId = createOrganisation();
-        String userId = setUpData(orgId);
+        String orgId = setUpData();
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(asList(
@@ -71,8 +69,8 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
                 new PbaRequest(pba2, "INVALID STATUS", ""),
                 new PbaRequest(pba3, ACCEPTED.name(), "")));
 
-        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
-                .updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin, userId);
+        Map<String, Object> updatePbaResponse =
+                professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("200");
@@ -95,8 +93,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     public void update_pba_account_numbers_for_an_organisation_422_failure_scenario() {
-        String orgId = createOrganisation();
-        final String userId = setUpData(orgId);
+        final String orgId = setUpData();
 
         createOrganisationRequest();
 
@@ -116,8 +113,8 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
                 new PbaRequest("PBA1122334", ACCEPTED.name(), ""),
                 new PbaRequest("PBA1239999", null, "")));
 
-        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
-                .updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin, userId);
+        Map<String, Object> updatePbaResponse =
+                professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("422");
@@ -151,7 +148,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         String orgId = (String) createOrganisationResponse.get(ORG_IDENTIFIER);
 
         Map<String, Object> updatePbaResponse = professionalReferenceDataClient
-                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin, UUID.randomUUID().toString());
+                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("400");
@@ -159,11 +156,10 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     public void update_pba_account_numbers_with_empty_pba_request_400_failure_scenario() {
-        String orgId = createOrganisation();
-        String userId = setUpData(orgId);
+        String orgId = setUpData();
 
         Map<String, Object> updatePbaResponse = professionalReferenceDataClient
-                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin, userId);
+                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("400");
@@ -171,18 +167,35 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     public void update_pba_account_numbers_with_non_prdAdmin_role_403_failure_scenario() {
-        String orgId = createOrganisation();
-        String userId = setUpData(orgId);
-
-        Map<String, Object> updatePbaResponse = professionalReferenceDataClient.updatePaymentsAccountsByOrgId(
-                new UpdatePbaRequest(), UUID.randomUUID().toString(), puiUserManager, userId);
+        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
+                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), UUID.randomUUID().toString(), puiUserManager);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("403");
     }
 
-    public String setUpData(String orgId) {
-        String userId = createActiveUserAndOrganisation(orgId);
+    public String setUpData() {
+        paymentAccounts.addAll(asList(pba1, pba2, pba3));
+
+        OrganisationCreationRequest organisationCreationRequest =
+                someMinimalOrganisationRequest().paymentAccount(paymentAccounts).build();
+
+        Map<String, Object> createOrganisationResponse =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
+
+        String orgId = (String) createOrganisationResponse.get(ORG_IDENTIFIER);
+
+        OrganisationCreationRequest organisationUpdateRequest =
+                organisationRequestWithAllFieldsAreUpdated().status(ACTIVE).build();
+
+        userProfileCreateUserWireMock(HttpStatus.OK);
+
+        Map<String, Object> responseForOrganisationUpdate =
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, orgId);
+
+        assertThat(responseForOrganisationUpdate.get("http_status")).asString().contains("200");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findByPbaNumberIn(paymentAccounts);
 
@@ -191,25 +204,6 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
             paymentAccountRepository.save(pba);
         });
 
-        return userId;
-    }
-
-    private String createOrganisation() {
-        paymentAccounts.addAll(asList(pba1, pba2, pba3));
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-
-        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
-                .paymentAccount(paymentAccounts).build();
-
-        return createOrganisationWithGivenRequest(organisationCreationRequest);
-    }
-
-    private String createActiveUserAndOrganisation(String organisationIdentifier) {
-        String userId = updateOrgAndInviteUser(organisationIdentifier, puiFinanceManager);
-
-        updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-
-        return userId;
+        return orgId;
     }
 }
