@@ -23,7 +23,7 @@ String component = "professional-api"
 
 def secrets = [
     's2s-${env}': [    
-    secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+    secret('microservicekey-rd-professional-api', 'PROFESSIONAL_API_S2S_SECRET')
     ]
 ]
 
@@ -58,7 +58,7 @@ withParameterizedPipeline(type, product, component, 'sandbox', 'sandbox') {
     env.OAUTH2_CLIENT_ID = params.OAUTH2_CLIENT_ID_TO_TEST
     env.OAUTH2_CLIENT_SECRET = params.OAUTH2_CLIENT_SECRET_TO_TEST
     env.OAUTH2_REDIRECT_URI = params.OAUTH2_REDIRECT_URI_TO_TEST
-    env.S2S_SECRET = params.S2S_SECRET_TO_TEST
+    env.PROFESSIONAL_API_S2S_SECRET = params.S2S_SECRET_TO_TEST
 
     after('integrationTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
