@@ -252,7 +252,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         List<PaymentAccount> pbasToDelete = new ArrayList<>();
 
         pbasFromDb.forEach(pba -> pbaRequestList.forEach(pba1 -> {
-            if (pba1.getPbaNumber().equals(pba.getPbaNumber())) {
+            if (null != pba1.getPbaNumber() && pba1.getPbaNumber().equals(pba.getPbaNumber())) {
                 //if PBA status is ACCEPTED update status and statusMessage in DB
                 if (pba1.getStatus().equalsIgnoreCase(ACCEPTED.name())) {
                     //check PBA's current status is NOT ACCEPTED before updating to ACCEPTED
