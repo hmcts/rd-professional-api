@@ -5,10 +5,10 @@ s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-c
 s2s-name: rd_professional_api
 
 idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
-oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
-idam.auth.clientId: ${OAUTH2_CLIENT_ID:AAAAAAAAAAAAAAAA}
+oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:}
+idam.auth.clientId: ${OAUTH2_CLIENT_ID:}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}
-s2s-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+s2s-secret: ${PROFESSIONAL_API_S2S_SECRET:}
 
 spring.flyway.enabled: false
 ## Secure roles configuration 1
