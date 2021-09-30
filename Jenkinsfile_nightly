@@ -19,7 +19,7 @@ def component = "professional-api"
 
 def secrets = [
   's2s-${env}': [
-    secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+    secret('microservicekey-rd-professional-api', 'PROFESSIONAL_API_S2S_SECRET')
   ],
   'rd-${env}': [
           secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
@@ -69,6 +69,7 @@ withNightlyPipeline(type, product, component) {
     enableMutationTest()
     enableFullFunctionalTest()
     enableSecurityScan()
+    enableFortifyScan()
 
     after('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
@@ -79,6 +80,10 @@ withNightlyPipeline(type, product, component) {
             }
         }
         print "completed delete script for nightly"
+    }
+
+    after('fortify-scan') {
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     }
 }
 
