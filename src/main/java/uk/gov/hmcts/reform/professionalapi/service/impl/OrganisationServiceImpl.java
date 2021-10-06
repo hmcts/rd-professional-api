@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.checkIfValidOrgStatusesAndReturnList;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.doesListContainActiveStatus;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.getOrgStatusEnumsExcludingActiveStatus;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.validateAndReturnStatusList;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
@@ -377,20 +378,15 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationsDetailResponse findByOrganisationStatus(String status) {
         List<Organisation> organisations = new ArrayList<>();
 
-        List<String> statuses = checkIfValidOrgStatusesAndReturnList(status, EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED);
+        List<String> statuses = validateAndReturnStatusList(status);
 
         if (doesListContainActiveStatus(statuses)) {
-
-        }
-
-        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status)) {
-
-            organisations.addAll(getOrganisationByStatus(OrganisationStatus.valueOf(status)));
-
-        } else if (ACTIVE.name().equalsIgnoreCase(status)) {
-
             organisations = retrieveActiveOrganisationDetails();
         }
+
+        List<OrganisationStatus> enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
+
+        organisations.addAll(getOrganisationByStatuses(enumStatuses));
 
         if (CollectionUtils.isEmpty(organisations)) {
             throw new EmptyResultDataAccessException(ONE);
@@ -462,12 +458,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
-    public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
-        return organisationRepository.findByStatus(status);
+    public List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses) {
+        return organisationRepository.findByStatusIn(enumStatuses);
     }
 
-    public boolean doesListContainActiveStatus(List<String> statuses) {
-        return statuses.stream().anyMatch(status -> status.equalsIgnoreCase(ACTIVE.name()));
+    public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
+        return organisationRepository.findByStatus(status);
     }
 
 }

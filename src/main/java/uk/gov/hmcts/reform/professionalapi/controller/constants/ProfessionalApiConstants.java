@@ -62,6 +62,6 @@ public class ProfessionalApiConstants {
 
     public static final String BAD_REQUEST_STR = "Bad Request - ";
     public static final String EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED = BAD_REQUEST_STR
-            + "Invalid status(es): %s  passed.";
+            + "Invalid status(es) passed : %s";
 
 }

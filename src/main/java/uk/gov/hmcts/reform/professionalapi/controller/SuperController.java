@@ -185,15 +185,9 @@ public abstract class SuperController {
 
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
 
-            if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
-
                 //Received request to retrieve organisation with status
                 organisationResponse =
                         organisationService.findByOrganisationStatus(orgStatus.toUpperCase());
-            } else {
-                log.error("{}:: Invalid Request param for status field", loggingComponentName);
-                throw new InvalidRequest("400");
-            }
         }
         log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
         return ResponseEntity
