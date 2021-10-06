@@ -243,6 +243,34 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
+    public void persists_and_returns_all_organisations_details_by_pending_and_active_status() {
+
+        String organisationIdentifier = createOrganisationRequest("PENDING");
+        String organisationIdentifier1 = createOrganisationRequest("ACTIVE");
+        assertThat(organisationIdentifier).isNotEmpty();
+        assertThat(organisationIdentifier1).isNotEmpty();
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusTest("PENDING,ACTIVE", hmctsAdmin);
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
+    public void persists_and_returns_all_organisations_details_by_active_and_blocked_status() {
+
+        String organisationIdentifier = createOrganisationRequest("ACTIVE");
+        String organisationIdentifier1 = createOrganisationRequest("BLOCKED");
+        assertThat(organisationIdentifier).isNotEmpty();
+        assertThat(organisationIdentifier1).isNotEmpty();
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusTest("PENDING,ACTIVE", hmctsAdmin);
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
     public void persists_and_returns_all_organisations_details_by_active_status() {
 
         Map<String, Object> orgResponse;

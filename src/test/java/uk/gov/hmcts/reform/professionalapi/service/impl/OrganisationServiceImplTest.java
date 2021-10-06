@@ -322,7 +322,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void test_retrieve_an_organisations_by_status() {
-        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name());
     }
 
 
@@ -420,7 +420,7 @@ public class OrganisationServiceImplTest {
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name());
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
@@ -454,7 +454,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void test_retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
-        sut.findByOrganisationStatus(OrganisationStatus.PENDING);
+        sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());
     }
 
     @Test
@@ -465,7 +465,7 @@ public class OrganisationServiceImplTest {
         when(organisationRepository.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.PENDING);
+                = sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING);

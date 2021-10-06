@@ -189,7 +189,7 @@ public abstract class SuperController {
 
                 //Received request to retrieve organisation with status
                 organisationResponse =
-                        organisationService.findByOrganisationStatus(valueOf(orgStatus.toUpperCase()));
+                        organisationService.findByOrganisationStatus(orgStatus.toUpperCase());
             } else {
                 log.error("{}:: Invalid Request param for status field", loggingComponentName);
                 throw new InvalidRequest("400");

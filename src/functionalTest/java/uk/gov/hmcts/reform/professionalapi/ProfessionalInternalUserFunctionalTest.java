@@ -243,6 +243,28 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
+
+    public void findActiveAndBlockedOrganisationsByInternalUserShouldBeSuccess() {
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient
+                .retrieveOrganisationDetailsByStatus("ACTIVE,BLOCKED", hmctsAdmin);
+        assertThat(response.get("organisations")).isNotNull();
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        //assert Organiastion has Active status
+        //assert Organiastion has Blocked status
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
+    }
+
+    public void findPendingAndBlockedOrganisationsByInternalUserShouldBeSuccess() {
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient
+                .retrieveOrganisationDetailsByStatus("PENDING,BLOCKED", hmctsAdmin);
+        assertThat(response.get("organisations")).isNotNull();
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        //assert Organiastion has Pending status
+        //assert Organiastion has Blocked status
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
+    }
     
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");

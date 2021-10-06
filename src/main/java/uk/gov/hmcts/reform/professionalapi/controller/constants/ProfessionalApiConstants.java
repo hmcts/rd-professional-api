@@ -21,6 +21,8 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MESSAGE_403_FORBIDDEN = "403 Forbidden";
     public static final int ZERO_INDEX = 0;
     public static final int ONE = 1;
+    public static final String COMMA = ",";
+    public static final String REG_EXP_COMMA_DILIMETER = ",(?!\\\\s)";
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     public static final String PUI_USER_MANAGER = "pui-user-manager";
@@ -57,5 +59,9 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MSG_NO_PBA_FOUND = "No PBAs associated with given email";
     public static final String PBA_STATUS_MESSAGE_ACCEPTED = "Edited by Admin";
     public static final String PBA_STATUS_MESSAGE_AUTO_ACCEPTED = "Auto approved by Admin";
+
+    public static final String BAD_REQUEST_STR = "Bad Request - ";
+    public static final String EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED = BAD_REQUEST_STR
+            + "Invalid status(es): %s  passed.";
 
 }

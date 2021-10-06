@@ -26,7 +26,7 @@ public interface OrganisationService {
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
-    OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status);
+    OrganisationsDetailResponse findByOrganisationStatus(String status);
 
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
 

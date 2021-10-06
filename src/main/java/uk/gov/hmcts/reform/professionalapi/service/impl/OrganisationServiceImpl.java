@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.checkIfValidOrgStatusesAndReturnList;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
@@ -372,14 +374,20 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
+    public OrganisationsDetailResponse findByOrganisationStatus(String status) {
+        List<Organisation> organisations = new ArrayList<>();
 
-        List<Organisation> organisations = null;
-        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
+        List<String> statuses = checkIfValidOrgStatusesAndReturnList(status, EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED);
 
-            organisations = getOrganisationByStatus(status);
+        if (doesListContainActiveStatus(statuses)) {
 
-        } else if (ACTIVE.name().equalsIgnoreCase(status.name())) {
+        }
+
+        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status)) {
+
+            organisations.addAll(getOrganisationByStatus(OrganisationStatus.valueOf(status)));
+
+        } else if (ACTIVE.name().equalsIgnoreCase(status)) {
 
             organisations = retrieveActiveOrganisationDetails();
         }
@@ -456,6 +464,10 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
         return organisationRepository.findByStatus(status);
+    }
+
+    public boolean doesListContainActiveStatus(List<String> statuses) {
+        return statuses.stream().anyMatch(status -> status.equalsIgnoreCase(ACTIVE.name()));
     }
 
 }

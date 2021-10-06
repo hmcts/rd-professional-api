@@ -218,7 +218,7 @@ public class OrganisationInternalControllerTest {
     public void test_RetrieveOrganisationByStatusWithIdNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class)))
+        when(organisationServiceMock.findByOrganisationStatus(any(String.class)))
                 .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING");
@@ -227,12 +227,12 @@ public class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .findByOrganisationStatus(OrganisationStatus.PENDING);
+                .findByOrganisationStatus(OrganisationStatus.PENDING.name());
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_RetrieveOrganisationThrows400WhenStatusInvalid() {
-        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class)))
+        when(organisationServiceMock.findByOrganisationStatus(any(String.class)))
                 .thenReturn(organisationsDetailResponse);
 
         organisationInternalController.retrieveOrganisations(null, "this is not a status");
