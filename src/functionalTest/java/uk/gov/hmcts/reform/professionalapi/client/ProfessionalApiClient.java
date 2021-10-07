@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,9 +26,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -574,6 +577,16 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
+    public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .status("REVIEW")
+                .statusMessage(statusMessage)
+                .build();
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
+    }
+
     public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier,
                                                      HttpStatus expectedStatus) {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
@@ -650,7 +663,7 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String, Object> editPbaAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId, String hmctsAdmin) {
+    public Map<String, Object> editPbaAccountsByOrgId(PbaRequest pbaEditRequest, String orgId, String hmctsAdmin) {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(pbaEditRequest)
@@ -859,5 +872,56 @@ public class ProfessionalApiClient {
                 .statusCode(expectedStatus.value());
 
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
+    }
+
+    public void deletePaymentAccountsOfOrganisation(PbaRequest deletePbaRequest,
+                                                    RequestSpecification requestSpecification,
+                                                    HttpStatus expectedStatus) {
+        Response response = requestSpecification
+                .body(deletePbaRequest)
+                .delete("/refdata/external/v1/organisations/pba")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: Delete PBA of organisation status response: {}",
+                loggingComponentName, response.getStatusCode());
+    }
+
+    public Object findOrganisationsByPbaStatus(HttpStatus expectedStatus, PbaStatus pbaStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .get("/refdata/internal/v1/organisations/pba/" + pbaStatus.toString())
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        if (expectedStatus.is2xxSuccessful()) {
+            return Arrays.asList(response.getBody().as(OrganisationsWithPbaStatusResponse[].class));
+        } else {
+            return response.getBody().as(ErrorResponse.class);
+        }
+    }
+
+    public ResponseBody addPaymentAccountsOfOrganisation(PbaRequest pbaRequest,
+                                                         RequestSpecification requestSpecification,
+                                                         HttpStatus expectedStatus) {
+        Response response = requestSpecification
+                .body(pbaRequest)
+                .post("/refdata/external/v1/organisations/pba")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: Add PBA of organisation status response: {}",
+                loggingComponentName, response.getStatusCode());
+
+        return response.body();
     }
 }

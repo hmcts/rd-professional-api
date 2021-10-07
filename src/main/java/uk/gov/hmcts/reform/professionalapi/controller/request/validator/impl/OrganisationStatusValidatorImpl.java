@@ -46,14 +46,15 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
 
     private void validateOrganisationStatus(OrganisationStatus inputRequestOrganisationStatus,
                                             OrganisationStatus existingStatus, String inputOrganisationIdentifier) {
-        if (existingStatus == DELETED) {
+        if (existingStatus.isDeleted()) {
             String errorMessage = "{}:: Cannot amend status since existing organisation status is DELETED for "
                     .concat("organisationIdentifier: ") + inputOrganisationIdentifier;
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
-        } else if (inputRequestOrganisationStatus == PENDING
-                && existingStatus == ACTIVE) {
-            String errorMessage = "{}:: Cannot amend status to PENDING since existing organisation"
+        } else if ((inputRequestOrganisationStatus.isPending()
+                || inputRequestOrganisationStatus.isReview())
+                && existingStatus.isActive()) {
+            String errorMessage = "{}:: Cannot amend status to PENDING/REVIEW since existing organisation"
                     .concat(" status is ACTIVE for organisationIdentifier: ") + inputOrganisationIdentifier;
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -23,7 +24,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -66,7 +67,8 @@ public class PaymentAccountServiceImplTest {
     private List<SuperUser> superUsers = new ArrayList<>();
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
     private Set<String> pbas = new HashSet<>();
-    private PbaEditRequest pbaEditRequest = new PbaEditRequest();
+    private PbaRequest pbaEditRequest = new PbaRequest();
+    private PbaRequest pbaDeleteRequest = new PbaRequest();
 
     @Before
     public void setUp() {
@@ -82,6 +84,7 @@ public class PaymentAccountServiceImplTest {
         paymentAccounts.add(paymentAccount);
         pbas.add("PBA0000001");
         pbaEditRequest.setPaymentAccounts(pbas);
+        pbaDeleteRequest.setPaymentAccounts(pbas);
         userAccountMaps.add(userAccountMapMock);
 
         paymentAccount.setId(UUID.randomUUID());
@@ -169,6 +172,13 @@ public class PaymentAccountServiceImplTest {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
         verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
+    }
+
+    @Test
+    public void testDeletePaymentAccountsFromOrganisationTest() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
+        sut.deletePaymentsOfOrganisation(pbaDeleteRequest, organisation);
+        verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
     }
 
     @Test

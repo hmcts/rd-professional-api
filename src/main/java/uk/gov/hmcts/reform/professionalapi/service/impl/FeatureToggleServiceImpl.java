@@ -40,13 +40,17 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
         launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("OrganisationMfaStatusController.retrieveMfaStatusByUserId", "prd-mfa-flag");
         launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus", "prd-mfa-flag");
+        launchDarklyMap.put("OrganisationExternalController.deletePaymentAccountsOfOrganisation",
+                "rd-professional-multi-pba");
+        launchDarklyMap.put("OrganisationInternalController.retrieveOrgByPbaStatus", "rd-professional-multi-pba");
+        launchDarklyMap.put("OrganisationExternalController.addPaymentAccountsToOrganisation",
+                "rd-professional-multi-pba");
     }
 
     @Override
     public boolean isFlagEnabled(String serviceName, String flagName) {
         LDUser user = new LDUser.Builder(userName)
             .firstName(userName)
-            .custom("servicename", serviceName)
             .custom("environment", environment)
             .build();
 

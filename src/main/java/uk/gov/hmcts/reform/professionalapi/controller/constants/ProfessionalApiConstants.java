@@ -60,6 +60,9 @@ public class ProfessionalApiConstants {
     public static final String PBA_STATUS_MESSAGE_ACCEPTED = "Edited by Admin";
     public static final String PBA_STATUS_MESSAGE_AUTO_ACCEPTED = "Auto approved by Admin";
 
+    public static final String ERROR_MSG_PARTIAL_SUCCESS = "Some of the PBAs successfully added to organisation";
+    public static final String ADD_PBA_REQUEST_EMPTY = "PBA request is empty";
+
     public static final String BAD_REQUEST_STR = "Bad Request - ";
     public static final String EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED = BAD_REQUEST_STR
             + "Invalid status(es) passed : %s";

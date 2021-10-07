@@ -14,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ADD_PBA_REQUEST_EMPTY;
 
 @Component
 @Slf4j
@@ -32,12 +35,12 @@ public class PaymentAccountValidator {
     public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
         if (!CollectionUtils.isEmpty(paymentAccounts)) {
             paymentAccounts.removeIf(String::isBlank);
-            checkPbaNumberIsValid(paymentAccounts);
+            checkPbaNumberIsValid(paymentAccounts, true);
             checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
         }
     }
 
-    public static void checkPbaNumberIsValid(Set<String> paymentAccounts) {
+    public static String checkPbaNumberIsValid(Set<String> paymentAccounts, boolean throwException) {
         String invalidPbas = paymentAccounts.stream()
                 .filter(pbaAccount -> {
                     if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
@@ -49,17 +52,18 @@ public class PaymentAccountValidator {
                     }
                     return true;
                 })
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(","));
 
-        if (!StringUtils.isEmpty(invalidPbas)) {
+        if (throwException && !StringUtils.isEmpty(invalidPbas)) {
             throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric "
                     .concat("characters. The following PBAs entered are invalid: " + invalidPbas));
+        } else {
+            return invalidPbas;
         }
     }
 
-
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
-        Set<String> upperCasePbas = paymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+        Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
 
         List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
         List<String> uniquePBas = new ArrayList<>();
@@ -77,4 +81,22 @@ public class PaymentAccountValidator {
         }
     }
 
+    public Set<String> getDuplicatePbas(Set<String> paymentAccounts) {
+        Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
+        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
+        return paymentAccountsInDatabase.stream().map(PaymentAccount::getPbaNumber).collect(Collectors.toSet());
+    }
+
+    private Set<String> getUpperCasePbas(Set<String> paymentAccounts) {
+        return paymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+    }
+
+
+    public void isPbaRequestEmptyOrNull(PbaRequest pbaRequest) {
+        if (pbaRequest.getPaymentAccounts() == null
+                || CollectionUtils.isEmpty(pbaRequest.getPaymentAccounts())
+                || pbaRequest.getPaymentAccounts().stream().allMatch(s -> (s == null || s.trim().equals("")))) {
+            throw new InvalidRequest(ADD_PBA_REQUEST_EMPTY);
+        }
+    }
 }
