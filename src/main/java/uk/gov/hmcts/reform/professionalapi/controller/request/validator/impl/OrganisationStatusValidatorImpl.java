@@ -85,7 +85,7 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
 
     public static boolean areInvalidValidOrgStatuses(List<String> statusList) {
         List<String> validOrgStatuses = Stream.of(OrganisationStatus.values()).map(Enum::name).collect(toList());
-        return 0 != (statusList.stream().filter(s -> (s.isBlank() || !validOrgStatuses.contains(s.toUpperCase()))).count());
+        return statusList.stream().anyMatch(s -> (s.isBlank() || !validOrgStatuses.contains(s.toUpperCase())));
     }
 
     public static boolean doesListContainActiveStatus(List<String> statuses) {
@@ -94,6 +94,6 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
 
     public static List<OrganisationStatus> getOrgStatusEnumsExcludingActiveStatus(List<String> statuses) {
         statuses.remove(ACTIVE.name());
-        return statuses.stream().map(status -> OrganisationStatus.valueOf(status)).collect(toList());
+        return statuses.stream().map(OrganisationStatus::valueOf).collect(toList());
     }
 }
