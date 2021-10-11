@@ -34,7 +34,7 @@ public interface OrganisationService {
 
     List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses);
 
-    public List<Organisation> getOrganisationByStatus(OrganisationStatus status);
+    List<Organisation> getOrganisationByStatus(OrganisationStatus status);
 
     void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation, boolean pbasValidated,
                                      boolean isEditPba);
