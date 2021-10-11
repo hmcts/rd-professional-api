@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 
 import io.swagger.annotations.ApiOperation;
@@ -126,9 +128,16 @@ public class OrganisationExternalController extends SuperController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-            @ApiParam(hidden = true) @OrgId String extOrgIdentifier) {
+            @ApiParam(hidden = true) @OrgId String extOrgIdentifier,
+            @ApiParam(name = "pbaStatus") @RequestParam(value = "pbaStatus", required = false) String pbaStatus) {
 
-        return retrieveOrganisationOrById(extOrgIdentifier);
+        boolean isPendingPbaRequired = false;
+
+        if (!isBlank(pbaStatus)) {
+            isPendingPbaRequired = pbaStatus.equalsIgnoreCase(PENDING.name());
+        }
+
+        return retrieveOrganisationOrById(extOrgIdentifier, isPendingPbaRequired);
     }
 
     @ApiOperation(
@@ -349,16 +358,18 @@ public class OrganisationExternalController extends SuperController {
                 organisation, extOrgIdentifier);
         return ResponseEntity
                 .status(200)
-                .body(new OrganisationPbaResponse(organisation, false));
+                .body(new OrganisationPbaResponse(organisation, false, false, true));
     }
 
 
-    protected ResponseEntity<OrganisationEntityResponse> retrieveOrganisationOrById(String id) {
+    protected ResponseEntity<OrganisationEntityResponse> retrieveOrganisationOrById(
+            String id, boolean isPendingPbaRequired) {
+        //Received request to retrieve External organisation with ID
 
         OrganisationEntityResponse organisationResponse = null;
-        //Received request to retrieve External organisation with ID
-        organisationResponse =
-                organisationService.retrieveOrganisation(id);
+
+        organisationResponse = organisationService.retrieveOrganisation(id, isPendingPbaRequired);
+
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
