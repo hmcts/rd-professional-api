@@ -139,7 +139,7 @@ public class OrganisationExternalControllerTest {
                 "soMeone@somewhere.com", organisation);
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
                 "some-email-address", organisation);
-        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+        organisationEntityResponse = new OrganisationEntityResponse(organisation, false, false, true);
 
 
         prdEnumList = new ArrayList<>();
@@ -191,14 +191,14 @@ public class OrganisationExternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         String id = UUID.randomUUID().toString().substring(0, 7);
-        when(organisationServiceMock.retrieveOrganisation(id)).thenReturn(organisationEntityResponse);
+        when(organisationServiceMock.retrieveOrganisation(id, false)).thenReturn(organisationEntityResponse);
 
-        ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id);
+        ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id, "");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveOrganisation(eq(id));
+        verify(organisationServiceMock, times(1)).retrieveOrganisation(eq(id), any(boolean.class));
     }
 
     @Test
