@@ -600,6 +600,16 @@ public class ProfessionalApiClient {
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
     }
 
+    public void updateOrganisationToBlocked(String organisationIdentifier, String statusMessage, String role) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .status("BLOCKED")
+                .statusMessage(statusMessage)
+                .build();
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
+    }
+
     public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier,
                                                      HttpStatus expectedStatus) {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();

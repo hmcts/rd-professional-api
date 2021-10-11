@@ -115,6 +115,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
+        findPendingAndBlockedOrganisationsByInternalUserShouldBeSuccess();
+        findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
     }
 
     public void retrieveOrganisationPbaScenarios() {
@@ -252,25 +254,33 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
-    public void findActiveAndBlockedOrganisationsByInternalUserShouldBeSuccess() {
+    public void findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus("ACTIVE,BLOCKED", hmctsAdmin);
+                .retrieveOrganisationDetailsByStatus("ACTIVE,PENDING", hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
-        //assert Organiastion has Active status
-        //assert Organiastion has Blocked status
+        assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
+        assertThat(response.get("organisations").toString()).contains("status=PENDING");
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
     public void findPendingAndBlockedOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+
+        Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) createOrgResponse.get("organisationIdentifier");
+        String statusMessage = "BLOCKED ORG";
+
+        professionalApiClient.updateOrganisationToBlocked(orgIdentifier, statusMessage, hmctsAdmin);
+
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus("PENDING,BLOCKED", hmctsAdmin);
+
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
-        //assert Organiastion has Pending status
-        //assert Organiastion has Blocked status
+        assertThat(response.get("organisations").toString()).contains("status=PENDING");
+        assertThat(response.get("organisations").toString()).contains("status=BLOCKED");
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
     
