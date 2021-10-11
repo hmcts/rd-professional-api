@@ -562,13 +562,15 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), CREATED);
 
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdWithPbaStatusExternal(OK,
+                "PENDING", professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
 
         var paymentAccounts = (List<String>) response.get("paymentAccount");
+        var pendingPaymentAccounts = (List<String>) response.get("pendingPaymentAccount");
 
         addPaymentAccounts.addAll(organisationCreationRequest.getPaymentAccount());
         addPaymentAccounts = addPaymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+        addPaymentAccounts.addAll(pendingPaymentAccounts);
 
         assertThat(paymentAccounts).hasSameElementsAs(addPaymentAccounts);
         log.info("addPbaOfExistingOrganisationShouldBeSuccess :: END");
