@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
-import com.sun.tools.rngom.digested.DZeroOrMorePattern;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -10,22 +8,15 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
-import static org.codehaus.groovy.runtime.InvokerHelper.escapeBackslashes;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.COMMA;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.REG_EXP_COMMA_DILIMETER;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.*;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 
 @Component
 @Slf4j
@@ -94,7 +85,7 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     }
 
     public static List<OrganisationStatus> getOrgStatusEnumsExcludingActiveStatus(List<String> statuses) {
-        statuses.remove(ACTIVE.name());
+        statuses.removeIf(ACTIVE.name()::equalsIgnoreCase);
         return statuses.stream().map(OrganisationStatus::valueOf).collect(toList());
     }
 }
