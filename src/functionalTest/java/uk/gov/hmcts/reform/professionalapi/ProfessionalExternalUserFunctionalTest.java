@@ -565,11 +565,11 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdWithPbaStatusExternal(OK,
                 "PENDING", professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
 
-        var paymentAccounts = (List<String>) response.get("paymentAccount");
-        var pendingPaymentAccounts = (List<String>) response.get("pendingPaymentAccount");
-
         addPaymentAccounts.addAll(organisationCreationRequest.getPaymentAccount());
         addPaymentAccounts = addPaymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+
+        var pendingPaymentAccounts = (List<String>) response.get("pendingPaymentAccount");
+        var paymentAccounts = (List<String>) response.get("paymentAccount");
         addPaymentAccounts.addAll(pendingPaymentAccounts);
 
         assertThat(paymentAccounts).hasSameElementsAs(addPaymentAccounts);
