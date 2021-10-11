@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.BLOCKED;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.DELETED;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -24,6 +28,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -54,7 +60,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
 
         List<String> accounts = ((List<String>)  orgResponse.get("paymentAccount"));
-        assertThat(accounts.get(0)).isEqualTo("PBA1234567");
+        assertThat(accounts.size()).isZero();
 
         Map<String, Object> contactInfo = ((List<Map<String, Object>>) orgResponse.get("contactInformation")).get(0);
         assertThat(contactInfo.get("addressLine1")).isEqualTo("addressLine1");
@@ -79,6 +85,24 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
+    }
+
+    @Test
+    public void return_organisation_payload_with_200_status_code_with_pending_pbas() {
+        String organisationIdentifier = createOrganisationRequest("PENDING");
+        String userId = updateOrgAndInviteUser(organisationIdentifier, puiCaseManager);
+
+        List<PaymentAccount> orgPbas = paymentAccountRepository.findByPbaNumber("PBA1234567");
+        PaymentAccount pendingPba = orgPbas.get(0);
+        pendingPba.setPbaStatus(PbaStatus.PENDING);
+        paymentAccountRepository.save(pendingPba);
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveExternalOrganisationWithPendingPbas(userId, "PENDING",
+                puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
+        assertThat(response.get("pendingPaymentAccount")).isNotNull();
     }
 
     @Test
@@ -129,17 +153,18 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> orgResponse1 = professionalReferenceDataClient
                 .createOrganisation(someMinimalOrganisationRequest()
                 .build());
-        Map<String, Object> orgResponse2 = professionalReferenceDataClient
-                .createOrganisation(someMinimalOrganisationRequest()
-                .name("some-other-org-name")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someoneElse@somewhere.com")
-                        .build())
-                .contactInformation(contactInfoList2)
-                .paymentAccount(paymentAccounts2ndOrg)
-                .build());
+        String activeOrgResponse2 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest()
+                        .name("some-other-org-name")
+                        .status("ACTIVE")
+                        .superUser(aUserCreationRequest()
+                                .firstName("some-fname")
+                                .lastName("some-lname")
+                                .email("someoneElse@somewhere.com")
+                                .build())
+                        .contactInformation(contactInfoList2)
+                        .paymentAccount(paymentAccounts2ndOrg)
+                        .build());
         Map<String, Object> orgResponse3 = professionalReferenceDataClient
                 .createOrganisation(someMinimalOrganisationRequest()
                 .name("some-other-org-nam3")
@@ -156,37 +181,39 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(3);
 
-        Map<String, Object> organisation1 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
-        Map<String, Object> organisation2 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
-        Map<String, Object> organisation3 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(2);
+        Map<String, Object> pendingOrganisation1 =
+                ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+        Map<String, Object> pendingOrganisation2 =
+                ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
+        Map<String, Object> activeOrganisation = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(2);
 
-        Map<String, Object> contactInfo1 = ((List<Map<String, Object>>) organisation1.get("contactInformation")).get(0);
-        Map<String, Object> contactInfo2 = ((List<Map<String, Object>>) organisation2.get("contactInformation")).get(0);
+        Map<String, Object> contactInfo1 =
+                ((List<Map<String, Object>>) pendingOrganisation1.get("contactInformation")).get(0);
+        Map<String, Object> contactInfo2 =
+                ((List<Map<String, Object>>) pendingOrganisation2.get("contactInformation")).get(0);
         Map<String, Object> contactInfo3First
-                = ((List<Map<String, Object>>) organisation3.get("contactInformation")).get(0);
-        Map<String, Object> contactInfo3Second
-                = ((List<Map<String, Object>>) organisation3.get("contactInformation")).get(1);
+                = ((List<Map<String, Object>>) activeOrganisation.get("contactInformation")).get(0);
 
-        assertThat(organisation1.get("name")).isEqualTo("some-org-name");
-        assertThat(organisation2.get("name")).isEqualTo("some-other-org-name");
-        assertThat(organisation3.get("name")).isEqualTo("some-other-org-nam3");
-        assertThat(organisation1.get("paymentAccount")).asList().size().isEqualTo(0);
-        assertThat(organisation2.get("paymentAccount")).asList().size().isEqualTo(3);
-        assertThat(organisation3.get("paymentAccount")).asList().size().isEqualTo(4);
-        assertThat(organisation1.get("contactInformation")).asList().size().isEqualTo(1);
-        assertThat(organisation2.get("contactInformation")).asList().size().isEqualTo(1);
-        assertThat(organisation3.get("contactInformation")).asList().size().isEqualTo(3);
+        assertThat(pendingOrganisation1.get("name")).isEqualTo("some-org-name");
+        assertThat(pendingOrganisation1.get("contactInformation")).asList().size().isEqualTo(1);
+        assertThat(pendingOrganisation1.get("paymentAccount")).asList().size().isEqualTo(0);
 
-        assertThat(organisation2.get("paymentAccount").toString()).isEqualTo(paymentAccounts2ndOrg.toString());
-        assertThat(organisation3.get("paymentAccount").toString()).isEqualTo(paymentAccounts3rdOrg.toString());
+        assertThat(pendingOrganisation2.get("name")).isEqualTo("some-other-org-nam3");
+        assertThat(pendingOrganisation2.get("contactInformation")).asList().size().isEqualTo(3);
+        assertThat(pendingOrganisation2.get("paymentAccount")).asList().size().isEqualTo(0);
+
+        assertThat(activeOrganisation.get("name")).isEqualTo("some-other-org-name");
+        assertThat(activeOrganisation.get("paymentAccount")).asList().size().isEqualTo(3);
+        assertThat(activeOrganisation.get("contactInformation")).asList().size().isEqualTo(1);
+
+        assertThat(activeOrganisation.get("paymentAccount").toString()).isEqualTo(paymentAccounts2ndOrg.toString());
 
         assertThat(contactInfo1.get("addressLine1")).isEqualTo("addressLine1");
-        assertThat(contactInfo2.get("addressLine1")).isEqualTo("SECOND org");
-        assertThat(contactInfo3First.get("addressLine1")).isEqualTo("THIRD org");
-        assertThat(contactInfo3Second.get("addressLine1")).isEqualTo("THIRD org 2nd address");
+        assertThat(contactInfo2.get("addressLine1")).isEqualTo("THIRD org");
+        assertThat(contactInfo3First.get("addressLine1")).isEqualTo("SECOND org");
 
-        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo2.get("dxAddress")).get(0);
-        Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo2.get("dxAddress")).get(1);
+        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo3First.get("dxAddress")).get(0);
+        Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo3First.get("dxAddress")).get(1);
 
         assertThat(dxAddress.get("dxNumber")).isEqualTo("NI 1234567890");
         assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange1");
@@ -246,28 +273,130 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     public void persists_and_returns_all_organisations_details_by_pending_and_active_status() {
 
         String organisationIdentifier = createOrganisationRequest("PENDING");
-        String organisationIdentifier1 = createOrganisationRequest("ACTIVE");
+        String organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+
         assertThat(organisationIdentifier).isNotEmpty();
         assertThat(organisationIdentifier1).isNotEmpty();
+
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .retrieveAllOrganisationDetailsByStatusTest("PENDING,ACTIVE", hmctsAdmin);
+
         assertThat(orgResponse.get("organisations")).isNotNull();
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+        assertThat(orgResponse.get("organisations").toString()).contains("status=PENDING");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=ACTIVE");
+
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
+    public void persists_and_returns_all_organisations_details_by_pending_and_active_status_with_accepted_PBA_only() {
+
+        Set<String> paymentAccounts = Set.of("PBA0000001", "PBA0000002", "PBA0000003");
+
+        String organisationIdentifier = createOrganisationRequest("PENDING");
+        String organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10))
+                        .paymentAccount(paymentAccounts).build());
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        assertThat(organisationIdentifier1).isNotEmpty();
+
+        List<PaymentAccount> paymentAccountList = paymentAccountRepository.findByPbaNumberIn(paymentAccounts);
+
+        PaymentAccount pba = paymentAccountList.get(0);
+        pba.setPbaStatus(PbaStatus.PENDING);
+        paymentAccountRepository.save(pba);
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusTest("PENDING,ACTIVE", hmctsAdmin);
+
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+        assertThat(orgResponse.get("organisations").toString()).contains("status=PENDING");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=ACTIVE");
+
+        assertThat(orgResponse.get("http_status").toString()).contains("OK");
     }
 
     @Test
     public void persists_and_returns_all_organisations_details_by_active_and_blocked_status() {
 
-        String organisationIdentifier = createOrganisationRequest("ACTIVE");
-        String organisationIdentifier1 = createOrganisationRequest("BLOCKED");
+        String organisationIdentifier = createOrganisationRequest("BLOCKED");
+        String organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+
         assertThat(organisationIdentifier).isNotEmpty();
         assertThat(organisationIdentifier1).isNotEmpty();
+
+        Organisation org = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        org.setStatus(BLOCKED);
+        organisationRepository.save(org);
+
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .retrieveAllOrganisationDetailsByStatusTest("PENDING,ACTIVE", hmctsAdmin);
+                .retrieveAllOrganisationDetailsByStatusTest("BLOCKED,ACTIVE", hmctsAdmin);
+
         assertThat(orgResponse.get("organisations")).isNotNull();
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+        assertThat(orgResponse.get("organisations").toString()).contains("status=ACTIVE");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=BLOCKED");
+        assertThat(orgResponse.get("http_status").toString()).contains("OK");
+    }
+
+    @Test
+    public void persists_and_returns_all_organisations_details_by_active_pending_review_blocked_deleted_status() {
+
+        String organisationIdentifier = createOrganisationRequest("PENDING");
+        String organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String organisationIdentifier2 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("REVIEW").sraId(randomAlphabetic(10)).build());
+        String organisationIdentifier3 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("BLOCKED").sraId(randomAlphabetic(10)).build());
+        String organisationIdentifier4 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("DELETED").sraId(randomAlphabetic(10)).build());
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        assertThat(organisationIdentifier1).isNotEmpty();
+        assertThat(organisationIdentifier2).isNotEmpty();
+        assertThat(organisationIdentifier3).isNotEmpty();
+        assertThat(organisationIdentifier4).isNotEmpty();
+
+        Organisation org2 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier2);
+        org2.setStatus(REVIEW);
+        organisationRepository.save(org2);
+        Organisation org3 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier3);
+        org3.setStatus(BLOCKED);
+        organisationRepository.save(org3);
+        Organisation org4 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier4);
+        org4.setStatus(DELETED);
+        organisationRepository.save(org4);
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusTest("PENDING,ACTIVE,BLOCKED,REVIEW,DELETED", hmctsAdmin);
+
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(5);
+        assertThat(orgResponse.get("organisations").toString()).contains("status=ACTIVE");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=PENDING");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=BLOCKED");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=REVIEW");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=DELETED");
+        assertThat(orgResponse.get("http_status").toString()).contains("OK");
+    }
+
+    @Test
+    public void get_organisations_details_by_invalid_status_param_returns_400() {
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusTest("INVALID,ACTIVE", hmctsAdmin);
+
+        assertThat(orgResponse.get("http_status").toString()).contains("400");
     }
 
     @Test
