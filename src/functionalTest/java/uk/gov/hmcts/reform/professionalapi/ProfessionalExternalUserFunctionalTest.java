@@ -553,11 +553,11 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiFinanceManager));
 
-        Set<String> addPaymentAccounts =  new HashSet<>();
-        addPaymentAccounts.add("PBA".concat(RandomStringUtils.randomAlphanumeric(7)));
+        Set<String> paymentAccountsToAdd =  new HashSet<>();
+        paymentAccountsToAdd.add("PBA".concat(RandomStringUtils.randomAlphanumeric(7)));
 
         PbaRequest pbaRequest = new PbaRequest();
-        pbaRequest.setPaymentAccounts(addPaymentAccounts);
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
         ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), CREATED);
@@ -565,14 +565,16 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdWithPbaStatusExternal(OK,
                 "PENDING", professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
 
-        addPaymentAccounts.addAll(organisationCreationRequest.getPaymentAccount());
-        addPaymentAccounts = addPaymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+        paymentAccountsToAdd.addAll(organisationCreationRequest.getPaymentAccount());
+        paymentAccountsToAdd = paymentAccountsToAdd.stream().map(String::toUpperCase).collect(Collectors.toSet());
 
         var pendingPaymentAccounts = (List<String>) response.get("pendingPaymentAccount");
-        var paymentAccounts = (List<String>) response.get("paymentAccount");
-        addPaymentAccounts.addAll(pendingPaymentAccounts);
+        var acceptedPaymentAccounts = (List<String>) response.get("paymentAccount");
+        List<String> allStatusPaymentAccounts = new ArrayList<>();
+        allStatusPaymentAccounts.addAll(pendingPaymentAccounts);
+        allStatusPaymentAccounts.addAll(acceptedPaymentAccounts);
 
-        assertThat(paymentAccounts).hasSameElementsAs(addPaymentAccounts);
+        assertThat(paymentAccountsToAdd).hasSameElementsAs(allStatusPaymentAccounts);
         log.info("addPbaOfExistingOrganisationShouldBeSuccess :: END");
     }
 }
