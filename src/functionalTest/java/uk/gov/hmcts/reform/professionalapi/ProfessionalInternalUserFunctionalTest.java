@@ -115,7 +115,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
-        findPendingAndBlockedOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
     }
 
@@ -262,25 +261,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
         assertThat(response.get("organisations").toString()).contains("status=PENDING");
-        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
-    }
-
-    public void findPendingAndBlockedOrganisationsByInternalUserShouldBeSuccess() {
-        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-
-        Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation();
-        String orgIdentifier = (String) createOrgResponse.get("organisationIdentifier");
-        String statusMessage = "BLOCKED ORG";
-
-        professionalApiClient.updateOrganisationToBlocked(orgIdentifier, statusMessage, hmctsAdmin);
-
-        Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus("PENDING,BLOCKED", hmctsAdmin);
-
-        assertThat(response.get("organisations")).isNotNull();
-        assertThat(response.size()).isGreaterThanOrEqualTo(1);
-        assertThat(response.get("organisations").toString()).contains("status=PENDING");
-        assertThat(response.get("organisations").toString()).contains("status=BLOCKED");
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
     

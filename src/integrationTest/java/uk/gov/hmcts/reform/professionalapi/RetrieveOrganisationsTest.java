@@ -292,6 +292,32 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
+    public void persists_and_returns_all_organisations_details_by_pending_and_blocked_status() {
+
+        String organisationIdentifier = createOrganisationRequest("PENDING");
+        String organisationIdentifier1 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("BLOCKED").sraId(randomAlphabetic(10)).build());
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        assertThat(organisationIdentifier1).isNotEmpty();
+
+        Organisation blockedOrg = organisationRepository.findByOrganisationIdentifier(organisationIdentifier1);
+        blockedOrg.setStatus(BLOCKED);
+        organisationRepository.save(blockedOrg);
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusTest("PENDING,BLOCKED", hmctsAdmin);
+
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+        assertThat(orgResponse.get("organisations").toString()).contains("status=PENDING");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=BLOCKED");
+
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
     public void persists_and_returns_all_organisations_details_by_pending_and_active_status_with_accepted_PBA_only() {
 
         Set<String> paymentAccounts = Set.of("PBA0000001", "PBA0000002", "PBA0000003");
