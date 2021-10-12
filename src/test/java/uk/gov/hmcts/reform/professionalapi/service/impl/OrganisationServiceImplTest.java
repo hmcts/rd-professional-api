@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
@@ -69,6 +70,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -517,6 +519,41 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
+    public void test_retrieveAllOrganisations_withEmptyUsers() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        organisations.add(organisationMock);
+
+        when(organisationRepository.findAll()).thenReturn(organisations);
+        when(organisationMock.getUsers()).thenReturn(new ArrayList<>());
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+        verify(organisationRepository, times(1)).findAll();
+    }
+
+
+    @Test
+    public void test_retrieveAllOrganisations_withBlockedOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        organisations.add(organisationMock);
+
+        when(organisationRepository.findAll()).thenReturn(organisations);
+        when(organisationMock.getStatus()).thenReturn(REVIEW);
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+        verify(organisationRepository, times(1)).findAll();
+    }
+
+    @Test
     public void test_retrieveAnOrganisationByOrgId() {
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
@@ -563,6 +600,16 @@ public class OrganisationServiceImplTest {
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
         sut.createOrganisationFrom(organisationCreationRequest);
+    }
+
+    @Test
+    public void test_updateStatusAndMessage() {
+        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+        PbaStatus pbaStatusMock = mock(PbaStatus.class);
+        sut.updateStatusAndMessage(paymentAccountMock, pbaStatusMock, "statusMessage");
+
+        verify(paymentAccountMock, times(1)).setPbaStatus(pbaStatusMock);
+        verify(paymentAccountMock, times(1)).setStatusMessage("statusMessage");
     }
 
     @Test
