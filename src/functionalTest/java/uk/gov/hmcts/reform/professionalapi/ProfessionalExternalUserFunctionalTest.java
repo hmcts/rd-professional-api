@@ -539,7 +539,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
-        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
+        professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
 
         log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
@@ -559,7 +559,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
-        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
+        professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), CREATED);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdWithPbaStatusExternal(OK,
