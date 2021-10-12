@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import io.restassured.specification.RequestSpecification;
-import io.restassured.response.ResponseBody;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
