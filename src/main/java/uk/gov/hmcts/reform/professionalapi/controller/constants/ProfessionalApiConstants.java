@@ -5,7 +5,6 @@ public class ProfessionalApiConstants {
     private ProfessionalApiConstants() {
     }
 
-
     public static final String EMAIL_REGEX = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
             + "[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
@@ -73,5 +72,7 @@ public class ProfessionalApiConstants {
 
     public static final String LOG_TWO_ARG_PLACEHOLDER = "{}:: {}";
 
+    public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
+    public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
 
 }
