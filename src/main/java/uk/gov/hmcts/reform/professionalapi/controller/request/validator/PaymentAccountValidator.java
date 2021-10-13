@@ -21,9 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBAS_ENTERED_ARE_INVALID;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
-
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ADD_PBA_REQUEST_EMPTY;
 
 @Component
@@ -49,7 +46,7 @@ public class PaymentAccountValidator {
     public static String checkPbaNumberIsValid(Set<String> paymentAccounts, boolean throwException) {
         String invalidPbas = paymentAccounts.stream()
                 .filter(PaymentAccountValidator::isPbaInvalid)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(","));
 
         if (throwException && !StringUtils.isEmpty(invalidPbas)) {
             throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric "
@@ -107,6 +104,7 @@ public class PaymentAccountValidator {
             throw new InvalidRequest(ADD_PBA_REQUEST_EMPTY);
         }
     }
+
     public void checkUpdatePbaRequestIsValid(UpdatePbaRequest updatePbaRequest) {
         if (isEmpty(updatePbaRequest.getPbaRequestList())) {
             throw new InvalidRequest("No PBAs have been sent in the request");

@@ -164,7 +164,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
                 .thenReturn(organisationMock);
-        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any());
+        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
         doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any());
         doNothing().when(paymentAccountValidatorMock).checkPbaNumberIsValid(any(), any());
         doNothing().when(paymentAccountValidatorMock).getDuplicatePbas(any());

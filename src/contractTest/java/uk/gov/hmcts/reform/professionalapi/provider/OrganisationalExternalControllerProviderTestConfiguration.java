@@ -66,7 +66,4 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
     protected MfaStatusServiceImpl mfaStatusService() {
         return new MfaStatusServiceImpl();
     }
-
-    @MockBean
-    protected PaymentAccountRepository paymentAccountRepository;
 }
