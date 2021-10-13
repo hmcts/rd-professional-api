@@ -30,7 +30,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -207,9 +207,9 @@ public class PaymentAccountServiceImplTest {
         when(paymentAccount.getPbaStatus()).thenReturn(PENDING);
         when(paymentAccount.getOrganisation()).thenReturn(organisation);
 
-        List<PbaRequest> pbaRequestList = new ArrayList<>();
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
-        pbaRequestList.add(new PbaRequest(pbaNumber, ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest(pbaNumber, ACCEPTED.name(), ""));
 
         when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
 
@@ -231,10 +231,10 @@ public class PaymentAccountServiceImplTest {
         when(paymentAccount.getPbaStatus()).thenReturn(PENDING);
         when(paymentAccount.getOrganisation()).thenReturn(organisation);
 
-        List<PbaRequest> pbaRequestList = new ArrayList<>();
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
-        pbaRequestList.add(new PbaRequest(pbaNumber, ACCEPTED.name(), ""));
-        pbaRequestList.add(new PbaRequest("PBA123", ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest(pbaNumber, ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA123", ACCEPTED.name(), ""));
 
         when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
 
@@ -252,9 +252,9 @@ public class PaymentAccountServiceImplTest {
     @Test
     public void testUpdatePaymentAccountsForAnOrganisation_422_failure_scenario() {
         String orgId = UUID.randomUUID().toString();
-        List<PbaRequest> pbaRequestList = new ArrayList<>();
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
-        pbaRequestList.add(new PbaRequest("PBA1234567", ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA1234567", ACCEPTED.name(), ""));
 
         UpdatePbaStatusResponse response = sut.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, orgId);
 

@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.PbaUpdateStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -148,7 +148,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public UpdatePbaStatusResponse updatePaymentAccountsStatusForAnOrganisation(
-            List<PbaRequest> pbaRequestList, String orgId) {
+            List<PbaUpdateRequest> pbaRequestList, String orgId) {
 
         Set<String> pbasFromRequest = new HashSet<>();
         List<PaymentAccount> pbasFromDb = new ArrayList<>();
@@ -184,7 +184,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     private List<PbaUpdateStatusResponse> getInvalidPbaRequests(
-            List<PbaRequest> pbaRequestList, Set<String> pbasFromRequest) {
+            List<PbaUpdateRequest> pbaRequestList, Set<String> pbasFromRequest) {
 
         List<PbaUpdateStatusResponse> invalidPbaResponses = new ArrayList<>();
 
@@ -245,7 +245,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public List<PbaUpdateStatusResponse> acceptOrRejectPbas(
-            List<PaymentAccount> pbasFromDb, List<PbaRequest> pbaRequestList,
+            List<PaymentAccount> pbasFromDb, List<PbaUpdateRequest> pbaRequestList,
             List<PbaUpdateStatusResponse> invalidPbaResponses) {
 
         List<PaymentAccount> pbasToSave = new ArrayList<>();
@@ -307,7 +307,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                 null, null, HttpStatus.OK.value());
     }
 
-    public String getStatusMessageFromRequest(PbaRequest pba) {
+    public String getStatusMessageFromRequest(PbaUpdateRequest pba) {
         return pba.getStatusMessage() == null ? "" : pba.getStatusMessage();
     }
 }

@@ -49,7 +49,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
@@ -413,7 +413,7 @@ public abstract class SuperController {
         return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
     }
 
-    public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaRequest> pbaRequestList, String orgId) {
+    public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {
 
         return paymentAccountService.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, orgId);
     }

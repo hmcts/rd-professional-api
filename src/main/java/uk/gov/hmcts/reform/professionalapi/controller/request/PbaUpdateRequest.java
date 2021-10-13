@@ -7,14 +7,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PbaRequest {
+public class PbaUpdateRequest {
 
     String pbaNumber;
     String status;
     String statusMessage;
 
     @JsonCreator
-    public PbaRequest(
+    public PbaUpdateRequest(
             @JsonProperty("pbaNumber") String pbaNumber,
             @JsonProperty("status") String status,
             @JsonProperty("statusMessage") String statusMessage) {

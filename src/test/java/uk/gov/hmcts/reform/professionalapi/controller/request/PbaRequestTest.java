@@ -8,7 +8,7 @@ public class PbaRequestTest {
 
     @Test
     public void testPbaRequest() {
-        PbaRequest pbaRequest = new PbaRequest("pbaNumber", "status", "statusMessage");
+        PbaUpdateRequest pbaRequest = new PbaUpdateRequest("pbaNumber", "status", "statusMessage");
 
         assertThat(pbaRequest.getPbaNumber()).isEqualTo("pbaNumber");
         assertThat(pbaRequest.getStatus()).isEqualTo("status");

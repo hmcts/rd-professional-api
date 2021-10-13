@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -37,9 +37,9 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(asList(
-                new PbaRequest(pba1, ACCEPTED.name(), null),
-                new PbaRequest(pba2, REJECTED.name(), ""),
-                new PbaRequest(pba3, ACCEPTED.name(), null)));
+                new PbaUpdateRequest(pba1, ACCEPTED.name(), null),
+                new PbaUpdateRequest(pba2, REJECTED.name(), ""),
+                new PbaUpdateRequest(pba3, ACCEPTED.name(), null)));
 
         Map<String, Object> updatePbaResponse =
                 professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
@@ -65,9 +65,9 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(asList(
-                new PbaRequest("PBA123", ACCEPTED.name(), ""),
-                new PbaRequest(pba2, "INVALID STATUS", ""),
-                new PbaRequest(pba3, ACCEPTED.name(), "")));
+                new PbaUpdateRequest("PBA123", ACCEPTED.name(), ""),
+                new PbaUpdateRequest(pba2, "INVALID STATUS", ""),
+                new PbaUpdateRequest(pba3, ACCEPTED.name(), "")));
 
         Map<String, Object> updatePbaResponse =
                 professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
@@ -105,13 +105,13 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(asList(
-                new PbaRequest("PBA1234567", ACCEPTED.name(), ""),
-                new PbaRequest(pba3, ACCEPTED.name(), ""),
-                new PbaRequest("PBA123", ACCEPTED.name(), ""),
-                new PbaRequest(pba2, "INVALID STATUS", ""),
-                new PbaRequest("", ACCEPTED.name(), ""),
-                new PbaRequest("PBA1122334", ACCEPTED.name(), ""),
-                new PbaRequest("PBA1239999", null, "")));
+                new PbaUpdateRequest("PBA1234567", ACCEPTED.name(), ""),
+                new PbaUpdateRequest(pba3, ACCEPTED.name(), ""),
+                new PbaUpdateRequest("PBA123", ACCEPTED.name(), ""),
+                new PbaUpdateRequest(pba2, "INVALID STATUS", ""),
+                new PbaUpdateRequest("", ACCEPTED.name(), ""),
+                new PbaUpdateRequest("PBA1122334", ACCEPTED.name(), ""),
+                new PbaUpdateRequest("PBA1239999", null, "")));
 
         Map<String, Object> updatePbaResponse =
                 professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);

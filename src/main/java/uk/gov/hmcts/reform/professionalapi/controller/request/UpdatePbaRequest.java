@@ -11,6 +11,6 @@ import java.util.List;
 public class UpdatePbaRequest {
 
     @JsonProperty("pbaNumbers")
-    List<PbaRequest> pbaRequestList;
+    List<PbaUpdateRequest> pbaRequestList;
 
 }

@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -462,9 +462,9 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
 
         String orgPba = pbaList.get(0);
 
-        List<PbaRequest> pbaRequestList = new ArrayList<>();
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
-        pbaRequestList.add(new PbaRequest(orgPba, PbaStatus.REJECTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest(orgPba, PbaStatus.REJECTED.name(), ""));
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(pbaRequestList);
@@ -496,12 +496,12 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                 superUserEmail.toLowerCase(), hmctsAdmin);
         List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
 
-        List<PbaRequest> pbaRequestList = new ArrayList<>();
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
-        pbaList.forEach(pba -> pbaRequestList.add(new PbaRequest(pba, PbaStatus.REJECTED.name(), "")));
+        pbaList.forEach(pba -> pbaRequestList.add(new PbaUpdateRequest(pba, PbaStatus.REJECTED.name(), "")));
 
-        pbaRequestList.add(new PbaRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
-        pbaRequestList.add(new PbaRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(pbaRequestList);
@@ -524,10 +524,10 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = false)
     public void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: STARTED");
-        List<PbaRequest> pbaRequestList = new ArrayList<>();
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
-        pbaRequestList.add(new PbaRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
-        pbaRequestList.add(new PbaRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(pbaRequestList);

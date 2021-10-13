@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
@@ -90,7 +90,7 @@ public class PaymentAccountValidatorTest {
     public void testUpdatePbasThrows400WhenPbaRequestsContainsNullPbaRequest() {
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(
-                asList(null, new PbaRequest("PBA1234567", "PENDING", "")));
+                asList(null, new PbaUpdateRequest("PBA1234567", "PENDING", "")));
 
         paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
     }
