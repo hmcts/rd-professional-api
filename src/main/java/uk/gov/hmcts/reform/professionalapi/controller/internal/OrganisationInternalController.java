@@ -45,12 +45,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
@@ -232,11 +234,10 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<Object> editPaymentAccountsByOrgId(
-            @Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
-            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
-                    message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+    public ResponseEntity<Object> editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaRequest pbaEditRequest,
+                                                     @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+                                                             message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+                                                     @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("{}:: Received request to edit payment accounts by organisation Id...", loggingComponentName);
 
@@ -478,6 +479,48 @@ public class OrganisationInternalController extends SuperController {
         }
 
         return mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest, organisation);
+    }
+
+    @ApiOperation(
+            value = "Retrieves the list of organisations with particular PBA status",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "",
+                    response = OrganisationsWithPbaStatusResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "PBA status is not valid"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = ""
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = ""
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @GetMapping(
+            path = "/pba/{status}",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<Object> retrieveOrgByPbaStatus(@PathVariable("status") @NotBlank String pbaStatus) {
+
+        log.info("{}:: Received request to retrieve organisations by pba status::", loggingComponentName);
+        return organisationService.getOrganisationsByPbaStatus(pbaStatus.toUpperCase());
     }
 
     @ApiOperation(

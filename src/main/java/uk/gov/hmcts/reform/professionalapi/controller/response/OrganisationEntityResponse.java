@@ -15,6 +15,8 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @JsonProperty
     private OrganisationStatus status;
     @JsonProperty
+    private String statusMessage;
+    @JsonProperty
     private String sraId;
     @JsonProperty
     private Boolean sraRegulated;
@@ -41,6 +43,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
                 ? "" : organisation.getOrganisationIdentifier();
         this.name = organisation.getName();
         this.status = organisation.getStatus();
+        this.statusMessage = organisation.getStatusMessage();
         this.sraId = organisation.getSraId();
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();

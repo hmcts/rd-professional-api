@@ -20,9 +20,9 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 public class PaymentAccountValidatorTest {
 
     @Mock
-    private PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
+    private PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
 
-    PaymentAccountValidator paymentAccountValidator = new PaymentAccountValidator(paymentAccountRepository);
+    PaymentAccountValidator paymentAccountValidator = new PaymentAccountValidator(paymentAccountRepositoryMock);
 
     @Before
     public void setUp() {
@@ -35,7 +35,7 @@ public class PaymentAccountValidatorTest {
         pbas.add("PBA1234567");
         pbas.add("pba1234567");
         pbas.add("PbA1234567");
-        PaymentAccountValidator.checkPbaNumberIsValid(pbas);
+        PaymentAccountValidator.checkPbaNumberIsValid(pbas, true);
     }
 
     @Test
@@ -43,25 +43,25 @@ public class PaymentAccountValidatorTest {
         Set<String> pbaNumber = new HashSet<>();
         pbaNumber.add("abc1234567");
 
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber, true))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
         pbaNumber.clear();
         pbaNumber.add("pba123456");
 
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber, true))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
         pbaNumber.clear();
         pbaNumber.add("1234");
 
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber, true))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
         pbaNumber.clear();
         pbaNumber.add("wewdfd");
 
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber, true))
                 .isExactlyInstanceOf(InvalidRequest.class);
     }
 

@@ -24,13 +24,9 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySp
 
 import feign.FeignException;
 import feign.Response;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
@@ -79,6 +76,31 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RestController
 @Slf4j
@@ -219,6 +241,11 @@ public abstract class SuperController {
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
+
+        if (isBlank(organisationCreationRequest.getStatus())) {
+            throw new InvalidRequest("Mandatory field status is missing");
+        }
+
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
         String orgId = removeEmptySpaces(organisationIdentifier);
@@ -235,7 +262,8 @@ public abstract class SuperController {
 
         SuperUser superUser = existingOrganisation.getUsers().get(0);
         ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
-        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
+        if ((existingOrganisation.getStatus().isPending() || existingOrganisation.getStatus().isReview())
+                && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             //Organisation is getting activated
 
@@ -403,6 +431,36 @@ public abstract class SuperController {
                     showDeleted, returnRoles, status);
         }
         return responseEntity;
+    }
+
+    protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
+                                                            String orgId, String userId) {
+        Set<String> paymentAccounts = deletePbaRequest.getPaymentAccounts();
+        if (ObjectUtils.isEmpty(deletePbaRequest.getPaymentAccounts())) {
+            throw new InvalidRequest("No PBA number passed in the request");
+        }
+
+        if (paymentAccounts.contains(null) || paymentAccounts.contains(EMPTY)) {
+            throw new InvalidRequest("Invalid PBA number passed in the request");
+        }
+
+        //check if user status is 'ACTIVE'
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+
+        //if the organisation is present, check if it is 'ACTIVE'
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
+
+        //check if organisation is present in the database and that it has payment accounts associated
+        checkOrganisationAndPbaExists(existingOrganisation);
+
+        //check the pba account number format, remove any blank strings passed
+        //And check if pba belongs to the organisation
+        paymentAccountValidator.validatePaymentAccounts(deletePbaRequest.getPaymentAccounts(), orgId);
+
+        //delete the passed pba account numbers from the organisation
+        paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
     }
 
     protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
