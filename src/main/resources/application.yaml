@@ -34,7 +34,7 @@ spring:
         registration:
           oidc:
             client-id: microservicekey-rd-professional-api
-            client-secret: ${PROFESSIONAL_API_S2S_SECRET:}
+            client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
@@ -92,7 +92,7 @@ security:
 ### dependency configuration
 idam:
   s2s-auth:
-    totp_secret: ${PROFESSIONAL_API_S2S_SECRET:}
+    totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
@@ -115,7 +115,7 @@ prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 allowedStatus: ACTIVE
 
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-pr-581.service.core-compute-preview.internal}
 
 feign:
   allow:

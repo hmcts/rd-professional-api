@@ -29,9 +29,6 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
     @MockBean
     protected OrganisationService organisationService;
 
-    @MockBean
-    protected PaymentAccountRepository paymentAccountRepository;
-
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
@@ -66,4 +63,7 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
     protected MfaStatusServiceImpl mfaStatusService() {
         return new MfaStatusServiceImpl();
     }
+
+    @MockBean
+    protected PaymentAccountRepository paymentAccountRepository;
 }
