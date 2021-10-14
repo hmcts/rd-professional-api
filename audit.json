@@ -157,5 +157,9 @@
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10_GET" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_PUT" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10_GET" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_PUT" : "ignore"
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_PUT" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_DELETE" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_DELETE" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/_POST" : "ignore"
 }
