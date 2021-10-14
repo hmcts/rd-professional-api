@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import io.restassured.specification.RequestSpecification;
-import io.restassured.response.ResponseBody;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -539,7 +538,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
-        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
+        professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
 
         log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
@@ -553,24 +552,28 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiFinanceManager));
 
-        Set<String> addPaymentAccounts =  new HashSet<>();
-        addPaymentAccounts.add("PBA".concat(RandomStringUtils.randomAlphanumeric(7)));
+        Set<String> paymentAccountsToAdd =  new HashSet<>();
+        paymentAccountsToAdd.add("PBA".concat(RandomStringUtils.randomAlphanumeric(7)));
 
         PbaRequest pbaRequest = new PbaRequest();
-        pbaRequest.setPaymentAccounts(addPaymentAccounts);
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
 
-        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
+        professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), CREATED);
 
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdWithPbaStatusExternal(OK,
+                "PENDING", professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
 
-        var paymentAccounts = (List<String>) response.get("paymentAccount");
+        paymentAccountsToAdd.addAll(organisationCreationRequest.getPaymentAccount());
+        paymentAccountsToAdd = paymentAccountsToAdd.stream().map(String::toUpperCase).collect(Collectors.toSet());
 
-        addPaymentAccounts.addAll(organisationCreationRequest.getPaymentAccount());
-        addPaymentAccounts = addPaymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+        var pendingPaymentAccounts = (List<String>) response.get("pendingPaymentAccount");
+        var acceptedPaymentAccounts = (List<String>) response.get("paymentAccount");
+        List<String> allStatusPaymentAccounts = new ArrayList<>();
+        allStatusPaymentAccounts.addAll(pendingPaymentAccounts);
+        allStatusPaymentAccounts.addAll(acceptedPaymentAccounts);
 
-        assertThat(paymentAccounts).hasSameElementsAs(addPaymentAccounts);
+        assertThat(paymentAccountsToAdd).hasSameElementsAs(allStatusPaymentAccounts);
         log.info("addPbaOfExistingOrganisationShouldBeSuccess :: END");
     }
 }

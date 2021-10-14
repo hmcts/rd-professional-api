@@ -199,30 +199,24 @@ public abstract class SuperController {
         Object organisationResponse = null;
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-            organisationResponse =
-                    organisationService.retrieveAllOrganisations();
+
+            organisationResponse = organisationService.retrieveAllOrganisations();
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
                 || (isNotEmpty(orgStatus) && isNotEmpty(orgId))) {
             //Received request to retrieve organisation with ID
 
             organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-            organisationResponse =
-                    organisationService.retrieveOrganisation(orgId);
+            organisationResponse = organisationService.retrieveOrganisation(orgId, false);
 
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
+            //Received request to retrieve organisation with status
 
-            if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
-
-                //Received request to retrieve organisation with status
-                organisationResponse =
-                        organisationService.findByOrganisationStatus(valueOf(orgStatus.toUpperCase()));
-            } else {
-                log.error("{}:: Invalid Request param for status field", loggingComponentName);
-                throw new InvalidRequest("400");
-            }
+            organisationResponse = organisationService.findByOrganisationStatus(orgStatus.toUpperCase());
         }
+
         log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
+
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
@@ -237,7 +231,7 @@ public abstract class SuperController {
 
         return ResponseEntity
                 .status(200)
-                .body(new OrganisationPbaResponse(organisation, false));
+                .body(new OrganisationPbaResponse(organisation, false, false, true));
     }
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,

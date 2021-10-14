@@ -117,6 +117,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
+        findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
     }
 
     public void retrieveOrganisationPbaScenarios() {
@@ -251,6 +252,17 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
+    }
+
+    public void findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess() {
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient
+                .retrieveOrganisationDetailsByStatus("ACTIVE,PENDING", hmctsAdmin);
+        assertThat(response.get("organisations")).isNotNull();
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
+        assertThat(response.get("organisations").toString()).contains("status=PENDING");
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 

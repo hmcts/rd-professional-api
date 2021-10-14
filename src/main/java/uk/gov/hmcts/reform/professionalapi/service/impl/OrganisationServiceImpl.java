@@ -7,6 +7,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.doesListContainActiveStatus;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.getOrgStatusEnumsExcludingActiveStatus;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.validateAndReturnStatusList;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
@@ -348,7 +351,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         resultingOrganisations.addAll(pendingOrganisations);
         resultingOrganisations.addAll(updatedActiveOrganisations);
 
-        return new OrganisationsDetailResponse(resultingOrganisations, true);
+        return new OrganisationsDetailResponse(resultingOrganisations, true, false, false);
     }
 
     @Override
@@ -390,7 +393,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier) {
+    public OrganisationEntityResponse retrieveOrganisation(
+            String organisationIdentifier, boolean isPendingPbaRequired) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
             throw new EmptyResultDataAccessException(ONE);
@@ -400,27 +404,29 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
         }
-        return new OrganisationEntityResponse(organisation, true);
+
+        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
     }
 
     @Override
-    public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
+    public OrganisationsDetailResponse findByOrganisationStatus(String status) {
+        List<Organisation> organisations = new ArrayList<>();
 
-        List<Organisation> organisations = null;
-        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
+        List<String> statuses = new ArrayList<>(validateAndReturnStatusList(status));
 
-            organisations = getOrganisationByStatus(status);
-
-        } else if (ACTIVE.name().equalsIgnoreCase(status.name())) {
-
+        if (doesListContainActiveStatus(statuses)) {
             organisations = retrieveActiveOrganisationDetails();
         }
 
+        List<OrganisationStatus> enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
+
+        organisations.addAll(getOrganisationByStatuses(enumStatuses));
+
         if (CollectionUtils.isEmpty(organisations)) {
             throw new EmptyResultDataAccessException(ONE);
-
         }
-        return new OrganisationsDetailResponse(organisations, true);
+
+        return new OrganisationsDetailResponse(organisations, true, false, false);
     }
 
     @Override
@@ -486,6 +492,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
+    public List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses) {
+        return organisationRepository.findByStatusIn(enumStatuses);
+    }
+
     public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
         return organisationRepository.findByStatus(status);
     }
@@ -501,16 +511,17 @@ public class OrganisationServiceImpl implements OrganisationService {
         LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
                 .stream()
                 .collect(Collectors.groupingBy(
-                        Organisation::getOrganisationIdentifier,LinkedHashMap::new, Collectors.toList()));
+                        Organisation::getOrganisationIdentifier, LinkedHashMap::new, Collectors.toList()));
 
         var organisationsWithPbaStatusResponses = new ArrayList<OrganisationsWithPbaStatusResponse>();
 
-        orgPbaMap.forEach((k,v) -> organisationsWithPbaStatusResponses.add(
+        orgPbaMap.forEach((k, v) -> organisationsWithPbaStatusResponses.add(
                 new OrganisationsWithPbaStatusResponse(k, v.get(0).getStatus(),
-                v.get(0).getPaymentAccounts()
-                       .stream()
-                       .filter(paymentAccount -> paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
-                       .collect(Collectors.toList()))));
+                        v.get(0).getPaymentAccounts()
+                                .stream()
+                                .filter(paymentAccount ->
+                                        paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
+                                .collect(Collectors.toList()))));
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -534,7 +545,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaRequest);
 
         if (!isEmpty(pbaRequest.getPaymentAccounts())) {
-            addPbaAccountToOrganisation(pbaRequest.getPaymentAccounts(), organisation.get(), false, false);
+            addPbaAccountToOrganisation(
+                    pbaRequest.getPaymentAccounts(), organisation.get(), false, false);
         }
         return getResponse(unsuccessfulPbas.getLeft(),
                 unsuccessfulPbas.getRight(), pbaRequest.getPaymentAccounts());

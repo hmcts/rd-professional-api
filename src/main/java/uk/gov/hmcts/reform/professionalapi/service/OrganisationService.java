@@ -21,16 +21,18 @@ public interface OrganisationService {
 
     OrganisationsDetailResponse retrieveAllOrganisations();
 
-    OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier);
+    OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
                                             String organisationIdentifier);
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
-    OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status);
+    OrganisationsDetailResponse findByOrganisationStatus(String status);
 
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
+
+    List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses);
 
     List<Organisation> getOrganisationByStatus(OrganisationStatus status);
 

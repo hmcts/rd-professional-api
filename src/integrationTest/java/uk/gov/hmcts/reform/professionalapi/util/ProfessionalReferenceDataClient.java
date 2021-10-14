@@ -91,6 +91,10 @@ public class ProfessionalReferenceDataClient {
         return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
     }
 
+    public Map<String, Object> retrieveExternalOrganisationWithPendingPbas(String id, String pbaStatus, String role) {
+        return getRequestForExternal(APP_EXT_BASE_PATH + "?pbaStatus=" + pbaStatus, role, id);
+    }
+
     public Map<String, Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
     }
