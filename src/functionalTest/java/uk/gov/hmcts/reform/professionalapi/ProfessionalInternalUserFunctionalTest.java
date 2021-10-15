@@ -93,7 +93,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
-
+ 
     }
 
     public void createOrganisationScenario() {
