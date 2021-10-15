@@ -8,6 +8,16 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
+import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.REG_EXP_COMMA_DILIMETER;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+
 @Component
 @Slf4j
 public class OrganisationStatusValidatorImpl implements OrganisationIdentifierValidator {
@@ -40,5 +50,42 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> validateAndReturnStatusList(String statuses) {
+        List<String> statusList = null;
+        if (isBlank(statuses)) {
+            throwInvalidOrgStatus("null or empty");
+        } else {
+            //ignore leading and trailing commas by removing them
+            statuses = statuses.trim().replaceAll(",$|^,", "");
+            // get all statuses mentioned in
+            statusList = asList(statuses.split(REG_EXP_COMMA_DILIMETER));
+            statusList.replaceAll(String::trim);
+            if (areInvalidValidOrgStatuses(statusList)) {
+                throwInvalidOrgStatus(statuses);
+            }
+        }
+        statusList.replaceAll(String::toUpperCase);
+        return statusList;
+    }
+
+    public static List<String> throwInvalidOrgStatus(String statuses) {
+        throw new InvalidRequest(String.format(EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED, statuses));
+    }
+
+    public static boolean areInvalidValidOrgStatuses(List<String> statusList) {
+        List<String> validOrgStatuses = Stream.of(OrganisationStatus.values()).map(Enum::name).collect(toList());
+        return statusList.stream().anyMatch(s -> (s.isBlank() || !validOrgStatuses.contains(s.toUpperCase())));
+    }
+
+    public static boolean doesListContainActiveStatus(List<String> statuses) {
+        return statuses.stream().anyMatch(status -> status.equalsIgnoreCase(ACTIVE.name()));
+    }
+
+    public static List<OrganisationStatus> getOrgStatusEnumsExcludingActiveStatus(List<String> statuses) {
+        statuses.removeIf(ACTIVE.name()::equalsIgnoreCase);
+        return statuses.stream().map(OrganisationStatus::valueOf).collect(toList());
     }
 }

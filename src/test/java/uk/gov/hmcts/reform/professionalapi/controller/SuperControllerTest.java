@@ -108,7 +108,7 @@ public class SuperControllerTest {
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation),
-                false);
+                false, false, true);
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
                 "lastName", IdamStatus.ACTIVE.name(), null, null);
 

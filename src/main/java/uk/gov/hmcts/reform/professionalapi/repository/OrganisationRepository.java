@@ -27,6 +27,8 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     List<Organisation> findByStatus(OrganisationStatus status);
 
+    List<Organisation> findByStatusIn(List<OrganisationStatus> statuses);
+
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
 

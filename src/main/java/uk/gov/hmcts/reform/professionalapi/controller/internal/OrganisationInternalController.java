@@ -144,7 +144,7 @@ public class OrganisationInternalController extends SuperController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> retrieveOrganisations(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-            @ApiParam(name = "id", required = false) @RequestParam(value = "id", required = false) String id,
+            @ApiParam(name = "id") @RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status) {
 
         return retrieveAllOrganisationOrById(id, status);

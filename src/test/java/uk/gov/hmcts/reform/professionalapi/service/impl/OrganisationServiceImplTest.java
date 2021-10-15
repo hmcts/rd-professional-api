@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
@@ -68,6 +70,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -346,7 +349,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void test_retrieve_an_organisations_by_status() {
-        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name());
     }
 
 
@@ -357,7 +360,7 @@ public class OrganisationServiceImplTest {
         String testOrganisationId = testOrganisation.getOrganisationIdentifier();
 
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
-        sut.retrieveOrganisation(testOrganisationId);
+        sut.retrieveOrganisation(testOrganisationId, false);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -405,7 +408,7 @@ public class OrganisationServiceImplTest {
                 .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                         null)).body(body, Charset.defaultCharset()).status(200).build());
 
-        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier);
+        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier, false);
 
         assertThat(organisationEntityResponse).isNotNull();
         verify(organisationRepository, times(1))
@@ -444,7 +447,7 @@ public class OrganisationServiceImplTest {
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name());
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
@@ -456,7 +459,7 @@ public class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
 
-        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier);
+        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier, false);
 
         assertThat(organisationEntityResponse).isNotNull();
 
@@ -470,7 +473,7 @@ public class OrganisationServiceImplTest {
     public void test_retrieveAnOrganisationByUuidNotFound() {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
 
-        sut.retrieveOrganisation(organisationIdentifier);
+        sut.retrieveOrganisation(organisationIdentifier, false);
 
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(any(String.class));
@@ -478,7 +481,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void test_retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
-        sut.findByOrganisationStatus(OrganisationStatus.PENDING);
+        sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());
     }
 
     @Test
@@ -486,13 +489,19 @@ public class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
-        when(organisationRepository.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
+        when(organisationRepository.findByStatusIn(asList(OrganisationStatus.PENDING))).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.PENDING);
+                = sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());
 
         assertThat(organisationDetailResponse).isNotNull();
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING);
+        verify(organisationRepository, times(1))
+                .findByStatusIn(asList(OrganisationStatus.PENDING));
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void test_RetrieveOrganisationThrows400WhenStatusInvalid() {
+        sut.findByOrganisationStatus("this is not a status");
     }
 
     @Test
@@ -502,6 +511,41 @@ public class OrganisationServiceImplTest {
         organisations.add(organisation);
 
         when(organisationRepository.findAll()).thenReturn(organisations);
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+        verify(organisationRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void test_retrieveAllOrganisations_withEmptyUsers() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        organisations.add(organisationMock);
+
+        when(organisationRepository.findAll()).thenReturn(organisations);
+        when(organisationMock.getUsers()).thenReturn(new ArrayList<>());
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+        verify(organisationRepository, times(1)).findAll();
+    }
+
+
+    @Test
+    public void test_retrieveAllOrganisations_withBlockedOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        organisations.add(organisationMock);
+
+        when(organisationRepository.findAll()).thenReturn(organisations);
+        when(organisationMock.getStatus()).thenReturn(REVIEW);
 
         OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
 
@@ -556,6 +600,16 @@ public class OrganisationServiceImplTest {
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
         sut.createOrganisationFrom(organisationCreationRequest);
+    }
+
+    @Test
+    public void test_updateStatusAndMessage() {
+        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+        PbaStatus pbaStatusMock = mock(PbaStatus.class);
+        sut.updateStatusAndMessage(paymentAccountMock, pbaStatusMock, "statusMessage");
+
+        verify(paymentAccountMock, times(1)).setPbaStatus(pbaStatusMock);
+        verify(paymentAccountMock, times(1)).setStatusMessage("statusMessage");
     }
 
     @Test

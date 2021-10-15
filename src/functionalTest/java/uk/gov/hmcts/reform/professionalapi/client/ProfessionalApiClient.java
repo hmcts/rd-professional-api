@@ -518,6 +518,19 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> retrieveOrganisationByOrgIdWithPbaStatusExternal(HttpStatus status, String pbaStatus,
+                                                                   RequestSpecification requestSpecification) {
+
+        Response response = requestSpecification
+            .get("/refdata/external/v1/organisations?pbaStatus=" + pbaStatus)
+            .andReturn();
+        log.info("{}:: find org by orgId (External): {}", loggingComponentName, response.statusCode());
+        response.then()
+            .assertThat()
+            .statusCode(status.value());
+        return response.body().as(Map.class);
+    }
+
 
     public Map<String, Object> searchOrganisationUsersByReturnRolesParamExternal(HttpStatus status,
                                                       RequestSpecification requestSpecification,
@@ -581,6 +594,16 @@ public class ProfessionalApiClient {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
                 .status("REVIEW")
+                .statusMessage(statusMessage)
+                .build();
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
+    }
+
+    public void updateOrganisationToBlocked(String organisationIdentifier, String statusMessage, String role) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .status("BLOCKED")
                 .statusMessage(statusMessage)
                 .build();
 
