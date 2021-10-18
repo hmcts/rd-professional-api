@@ -38,6 +38,10 @@ spring:
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
+  cache:
+    cache-names: token
+    caffeine:
+      spec: maximumSize=50,expireAfterWrite=1m
 
 ### database configuration
   datasource:
