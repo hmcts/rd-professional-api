@@ -43,12 +43,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
@@ -407,7 +409,7 @@ public class OrganisationInternalController extends SuperController {
             @ApiParam(hidden = true) @UserId String userId) {
 
         Optional<Organisation> organisation = Optional.ofNullable(organisationService
-                    .getOrganisationByOrgIdentifier(organisationIdentifier));
+                .getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (organisation.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
@@ -462,7 +464,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<Object> updateOrgMfaStatus(@Valid @NotNull @RequestBody MfaUpdateRequest mfaUpdateRequest,
                                                      @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
-                                                     message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+                                                             message = ORG_ID_VALIDATION_ERROR_MESSAGE)
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("{}:: Received request to update organisation mfa preference::", loggingComponentName);
@@ -475,7 +477,7 @@ public class OrganisationInternalController extends SuperController {
             throw new InvalidRequest(ORG_NOT_ACTIVE);
         }
 
-        return mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest,organisation);
+        return mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest, organisation);
     }
 
     @ApiOperation(
@@ -518,5 +520,67 @@ public class OrganisationInternalController extends SuperController {
 
         log.info("{}:: Received request to retrieve organisations by pba status::", loggingComponentName);
         return organisationService.getOrganisationsByPbaStatus(pbaStatus.toUpperCase());
+    }
+
+    @ApiOperation(
+            value = "Review (Accept or Reject) an Organisation's registered PBAs ",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "Success: The requested PBAs have been successfully Updated - OR - "
+                    + "Partial Success: Some of the requested PBAs have been successfully Updated"
+                            + " and the invalid ones returned with individual error message",
+                    response = UpdatePbaStatusResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request was provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No Organisation found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 422,
+                    message = "All requested PBAs failed to update"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @PutMapping(
+            path = "/{orgId}/pba/status",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    @ResponseBody
+    @Secured("prd-admin")
+    public ResponseEntity<Object> updateAnOrganisationsRegisteredPbas(
+            @Valid @NotNull @RequestBody UpdatePbaRequest updatePbaRequest,
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        //Received request to update an Organisation's PBAs
+
+        paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
+
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
+
+        UpdatePbaStatusResponse updatePbaStatusResponse =
+                updateAnOrganisationsPbas(updatePbaRequest.getPbaRequestList(), organisationIdentifier);
+
+        return ResponseEntity
+                .status(updatePbaStatusResponse.getStatusCode())
+                .body(updatePbaStatusResponse);
     }
 }

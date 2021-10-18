@@ -71,7 +71,7 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
     public PaymentAccountService paymentAccountService() {
         return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
             emf, professionalUserRepository, organisationService(),
-            userAccountMapService);
+            userAccountMapService, paymentAccountRepository);
     }
 
     @Bean

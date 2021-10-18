@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -1027,12 +1028,9 @@ public class OrganisationServiceImplTest {
         paymentAccount.setPbaNumber("PBA1234568");
         List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(paymentAccount);
-        when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(paymentAccounts);
+        when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(Optional.of(paymentAccount));
 
-        ResponseEntity<Object> responseEntity = ResponseEntity
-                .status(200)
-                .body(new AddPbaResponse());
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest,
+        ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest,
                 UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID().toString());
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());

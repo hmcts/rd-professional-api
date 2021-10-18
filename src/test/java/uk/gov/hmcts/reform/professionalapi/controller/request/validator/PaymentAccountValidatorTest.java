@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.mockito.Mockito.mock;
 
@@ -12,6 +13,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
 public class PaymentAccountValidatorTest {
@@ -75,4 +78,20 @@ public class PaymentAccountValidatorTest {
         paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "");
     }
 
+    @Test(expected = InvalidRequest.class)
+    public void testUpdatePbasThrows400WhenPbaRequestIsEmpty() {
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(null);
+
+        paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testUpdatePbasThrows400WhenPbaRequestsContainsNullPbaRequest() {
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(
+                asList(null, new PbaUpdateRequest("PBA1234567", "PENDING", "")));
+
+        paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
+    }
 }

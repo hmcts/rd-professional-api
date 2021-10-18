@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,9 +16,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ADD_PBA_REQUEST_EMPTY;
 
 @Component
@@ -42,16 +45,7 @@ public class PaymentAccountValidator {
 
     public static String checkPbaNumberIsValid(Set<String> paymentAccounts, boolean throwException) {
         String invalidPbas = paymentAccounts.stream()
-                .filter(pbaAccount -> {
-                    if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
-                        Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
-                        Matcher matcher = pattern.matcher(pbaAccount);
-                        if (matcher.matches()) {
-                            return false;
-                        }
-                    }
-                    return true;
-                })
+                .filter(PaymentAccountValidator::isPbaInvalid)
                 .collect(Collectors.joining(","));
 
         if (throwException && !StringUtils.isEmpty(invalidPbas)) {
@@ -60,6 +54,17 @@ public class PaymentAccountValidator {
         } else {
             return invalidPbas;
         }
+    }
+
+    public static boolean isPbaInvalid(String pbaAccount) {
+        if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
+            Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
+            Matcher matcher = pattern.matcher(pbaAccount);
+            if (matcher.matches()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
@@ -99,4 +104,13 @@ public class PaymentAccountValidator {
             throw new InvalidRequest(ADD_PBA_REQUEST_EMPTY);
         }
     }
+
+    public void checkUpdatePbaRequestIsValid(UpdatePbaRequest updatePbaRequest) {
+        if (isEmpty(updatePbaRequest.getPbaRequestList())) {
+            throw new InvalidRequest("No PBAs have been sent in the request");
+        } else if (updatePbaRequest.getPbaRequestList().stream().anyMatch(Objects::isNull)) {
+            throw new InvalidRequest("null values not allowed in Update PBA Request");
+        }
+    }
+
 }

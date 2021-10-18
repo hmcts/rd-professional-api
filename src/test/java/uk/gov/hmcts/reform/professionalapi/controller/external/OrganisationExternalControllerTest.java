@@ -331,7 +331,7 @@ public class OrganisationExternalControllerTest {
         verify(professionalUserServiceMock, times(1))
                 .checkUserStatusIsActiveByUserId(anyString());
         verify(organisationIdentifierValidatorImplMock, times(1))
-                .validateOrganisationIsActive(any(Organisation.class));
+                .validateOrganisationIsActive(any(Organisation.class), any(HttpStatus.class));
         verify(paymentAccountServiceMock, times(1))
                 .deletePaymentsOfOrganisation(any(PbaRequest.class), any(Organisation.class));
 

@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
+
+import java.util.List;
 
 public interface PaymentAccountService {
 
@@ -11,4 +15,8 @@ public interface PaymentAccountService {
     PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaRequest pbaEditRequest);
 
     void deletePaymentsOfOrganisation(PbaRequest deletePbaRequest, Organisation organisation);
+
+    UpdatePbaStatusResponse updatePaymentAccountsStatusForAnOrganisation(
+            List<PbaUpdateRequest> pbaRequestList, String orgId);
+
 }

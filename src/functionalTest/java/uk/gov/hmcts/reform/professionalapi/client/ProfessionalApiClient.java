@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -698,6 +699,23 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> updatePbas(
+            UpdatePbaRequest updatePbaRequest, String orgId, String hmctsAdmin, HttpStatus status) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(updatePbaRequest)
+                .put("/refdata/internal/v1/organisations/" + orgId + "/pba/status")
+                .andReturn();
+
+        log.info("{}:: Update pba response: {}", loggingComponentName, response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
 
         return response.body().as(Map.class);
     }

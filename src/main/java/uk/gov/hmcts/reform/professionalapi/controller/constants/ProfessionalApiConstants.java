@@ -5,7 +5,6 @@ public class ProfessionalApiConstants {
     private ProfessionalApiConstants() {
     }
 
-
     public static final String EMAIL_REGEX = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
             + "[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
@@ -66,5 +65,20 @@ public class ProfessionalApiConstants {
     public static final String BAD_REQUEST_STR = "Bad Request - ";
     public static final String EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED = BAD_REQUEST_STR
             + "Invalid status(es) passed : %s";
+
+    public static final String ERROR_MSG_PARTIAL_SUCCESS_UPDATE = "Some of the PBAs updated successfully";
+    public static final String ERROR_MSG_PBA_NOT_PENDING = "PBA is not in Pending status";
+    public static final String ERROR_MSG_PBA_NOT_IN_ORG = "PBA is not associated with the Organisation";
+    public static final String ERROR_MSG_PBA_MISSING = "Mandatory field PBA number is missing";
+    public static final String ERROR_MSG_STATUS_MISSING = "Mandatory field Status missing";
+    public static final String ERROR_MSG_STATUS_INVALID = "Value for Status field is invalid";
+    public static final String ERROR_MSG_PBA_INVALID_FORMAT =
+            "PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters";
+    public static final String ERROR_MSG_PBAS_ENTERED_ARE_INVALID = ". The following PBAs entered are invalid: ";
+
+    public static final String LOG_TWO_ARG_PLACEHOLDER = "{}:: {}";
+
+    public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
+    public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
 
 }
