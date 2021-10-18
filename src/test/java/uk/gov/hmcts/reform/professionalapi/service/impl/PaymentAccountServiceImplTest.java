@@ -273,4 +273,22 @@ public class PaymentAccountServiceImplTest {
         assertThat(response.getPartialSuccessMessage()).isNull();
         assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage()).contains(ERROR_MSG_PBA_NOT_IN_ORG);
     }
+
+    @Test
+    public void testUpdatePBAsInDb() {
+        PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
+        PaymentAccount paymentAccount1 = new PaymentAccount("PBA7654321");
+
+        List<PaymentAccount> pbasToDelete = new ArrayList<>();
+        pbasToDelete.add(paymentAccount);
+
+        List<PaymentAccount> pbasToSave = new ArrayList<>();
+        pbasToSave.add(paymentAccount1);
+
+        sut.updatePBAsInDb(pbasToSave, pbasToDelete);
+
+        verify(paymentAccountRepositoryMock, times(1)).saveAll(pbasToSave);
+        verify(paymentAccountRepositoryMock, times(1)).deleteAll(pbasToDelete);
+
+    }
 }

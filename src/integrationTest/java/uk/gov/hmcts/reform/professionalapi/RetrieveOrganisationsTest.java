@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
@@ -90,10 +91,14 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void return_organisation_payload_with_200_status_code_with_pending_pbas() {
         String organisationIdentifier = createOrganisationRequest("PENDING");
-        String userId = updateOrgAndInviteUser(organisationIdentifier, puiCaseManager);
+        assertThat(organisationIdentifier).isNotNull();
 
-        List<PaymentAccount> orgPbas = paymentAccountRepository.findByPbaNumber("PBA1234567");
-        PaymentAccount pendingPba = orgPbas.get(0);
+        String userId = updateOrgAndInviteUser(organisationIdentifier, puiCaseManager);
+        assertThat(userId).isNotNull();
+
+        Optional<PaymentAccount> orgPbas = paymentAccountRepository.findByPbaNumber("PBA1234567");
+        assertThat(orgPbas).isPresent();
+        PaymentAccount pendingPba = orgPbas.get();
         pendingPba.setPbaStatus(PbaStatus.PENDING);
         paymentAccountRepository.save(pendingPba);
 
