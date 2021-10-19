@@ -28,7 +28,7 @@ public class OrganisationsWithPbaStatusResponseTest {
 
         assertEquals("ABCDEFG7", organisations.getOrganisationIdentifier());
         assertEquals(1, organisations.getPbaNumbers().size());
-        assertEquals(OrganisationStatus.ACTIVE, organisations.getOrganisationStatus());
+        assertEquals(OrganisationStatus.ACTIVE, organisations.getStatus());
     }
 
     @Test
@@ -42,12 +42,12 @@ public class OrganisationsWithPbaStatusResponseTest {
         List<FetchPbaByStatusResponse> pbaResponse = new ArrayList<>();
 
         OrganisationsWithPbaStatusResponse organisations = new OrganisationsWithPbaStatusResponse();
-        organisations.setOrganisationStatus(OrganisationStatus.ACTIVE);
+        organisations.setStatus(OrganisationStatus.ACTIVE);
         organisations.setPbaNumbers(pbaResponse);
         organisations.setOrganisationIdentifier("ABCDEFG7");
 
         assertEquals("ABCDEFG7", organisations.getOrganisationIdentifier());
         assertEquals(0, organisations.getPbaNumbers().size());
-        assertEquals(OrganisationStatus.ACTIVE, organisations.getOrganisationStatus());
+        assertEquals(OrganisationStatus.ACTIVE, organisations.getStatus());
     }
 }

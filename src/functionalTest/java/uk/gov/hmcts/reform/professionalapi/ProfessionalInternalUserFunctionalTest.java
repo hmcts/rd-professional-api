@@ -504,7 +504,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
 
         assertNotNull(orgsResponse);
         assertThat(orgsResponse.size()).isPositive();
-        assertThat(orgsResponse.stream()).allMatch(org -> org.getOrganisationStatus().isActive());
+        assertThat(orgsResponse.stream()).allMatch(org -> org.getStatus().isActive());
 
         var pbaByStatusResponses = new ArrayList<FetchPbaByStatusResponse>();
         orgsResponse.forEach(org -> pbaByStatusResponses.addAll(org.getPbaNumbers()));
