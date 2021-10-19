@@ -19,7 +19,7 @@ public class OrganisationsWithPbaStatusResponse {
     private String organisationIdentifier;
 
     @JsonProperty
-    private OrganisationStatus organisationStatus;
+    private OrganisationStatus status;
 
     @JsonProperty
     private List<FetchPbaByStatusResponse> pbaNumbers;
@@ -28,7 +28,7 @@ public class OrganisationsWithPbaStatusResponse {
                                               List<PaymentAccount> paymentAccounts) {
 
         this.organisationIdentifier = organisationIdentifier;
-        this.organisationStatus = organisationStatus;
+        this.status = organisationStatus;
         this.pbaNumbers = paymentAccounts
                 .stream()
                 .map(FetchPbaByStatusResponse::new)
