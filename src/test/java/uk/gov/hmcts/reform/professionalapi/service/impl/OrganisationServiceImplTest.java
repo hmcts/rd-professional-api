@@ -205,7 +205,7 @@ public class OrganisationServiceImplTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", "statusMessage",
                 "sra-id", "false", "number01", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
@@ -326,6 +326,8 @@ public class OrganisationServiceImplTest {
         organisationCreationRequest.setStatus("ACTIVE");
 
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationRepository.save(any(Organisation.class))).thenReturn(organisationMock);
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
         OrganisationResponse organisationResponse = sut.updateOrganisation(organisationCreationRequest,
                 organisationIdentifier);
@@ -335,6 +337,7 @@ public class OrganisationServiceImplTest {
         verify(organisationMock, times(1)).setName((organisationCreationRequest.getName()));
         verify(organisationMock, times(1))
                 .setStatus((OrganisationStatus.valueOf(organisationCreationRequest.getStatus())));
+        verify(organisationMock, times(1)).setStatusMessage((organisationCreationRequest.getStatusMessage()));
         verify(organisationMock, times(1)).setSraId((organisationCreationRequest.getSraId()));
         verify(organisationMock, times(1))
                 .setCompanyNumber(organisationCreationRequest.getCompanyNumber());
@@ -1045,19 +1048,14 @@ public class OrganisationServiceImplTest {
     @Test(expected = ResourceNotFoundException.class)
     public void test_addPaymentAccountsToOrganisationEmpty() {
         var pbas = new HashSet<String>();
-        var set = Set.of("PBA0000001");
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(pbas);
-        AddPbaResponse addPbaResponse = new AddPbaResponse();
-        ResponseEntity<Object> responseEntity = ResponseEntity
-                .status(200)
-                .body(addPbaResponse);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
 
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNotNull();
     }
 
