@@ -208,7 +208,7 @@ public class OrganisationServiceImplTest {
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "number01", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
-        deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
+        deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
@@ -299,7 +299,7 @@ public class OrganisationServiceImplTest {
 
         sut.addDefaultMfaStatusToOrganisation(organisationMock);
 
-        verify(organisationMock,times(1)).setOrganisationMfaStatus(any(OrganisationMfaStatus.class));
+        verify(organisationMock, times(1)).setOrganisationMfaStatus(any(OrganisationMfaStatus.class));
     }
 
     @Test
@@ -663,7 +663,7 @@ public class OrganisationServiceImplTest {
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         when(userAttributeServiceMock.addUserAttributesToSuperUser(professionalUser, userAttributes
-                )).thenReturn(attributes);
+        )).thenReturn(attributes);
 
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
@@ -733,7 +733,7 @@ public class OrganisationServiceImplTest {
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
 
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.STATUS_CODE_204);
@@ -814,7 +814,7 @@ public class OrganisationServiceImplTest {
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(500).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
+        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
@@ -840,7 +840,7 @@ public class OrganisationServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(404).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
+        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
@@ -903,7 +903,7 @@ public class OrganisationServiceImplTest {
         organisation.setContactInformations(contactInformations);
 
         PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE");
-        UserAttribute userAttribute = new UserAttribute(professionalUser,prdEnum);
+        UserAttribute userAttribute = new UserAttribute(professionalUser, prdEnum);
         userAttributes.add(userAttribute);
         professionalUser.setUserAttributes(userAttributes);
 
@@ -934,6 +934,11 @@ public class OrganisationServiceImplTest {
         assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);
 
         verify(organisationRepository, times(1)).findByPbaStatus(ACCEPTED);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void test_getOrganisationsByPbaStatus_invalidPbaStatus_throws400() {
+        sut.getOrganisationsByPbaStatus("I N V A L I D");
     }
 
     private List<Organisation> getOrgsWithPbaSetup() {
@@ -1074,7 +1079,7 @@ public class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
-        AddPbaResponse response = (AddPbaResponse)responseEntity.getBody();
+        AddPbaResponse response = (AddPbaResponse) responseEntity.getBody();
 
         assertThat(response).isNotNull();
         assertThat(response.getReason()).isNotNull();

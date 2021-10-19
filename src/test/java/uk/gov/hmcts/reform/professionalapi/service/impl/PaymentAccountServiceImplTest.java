@@ -160,6 +160,9 @@ public class PaymentAccountServiceImplTest {
         verify(entityManagerMock, times(1)).getTransaction();
         verify(entityManagerMock, times(2)).find(any(), any());
         verify(entityManagerMock, times(2)).remove(any());
+        verify(entityManagerMock, times(1)).close();
+        verify(entityTransactionMock, times(1)).begin();
+        verify(entityTransactionMock, times(1)).commit();
     }
 
     @Test
