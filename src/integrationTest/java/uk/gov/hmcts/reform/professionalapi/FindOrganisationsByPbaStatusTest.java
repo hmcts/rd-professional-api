@@ -60,21 +60,49 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_400_when_invalid_pba_status() throws JsonProcessingException {
+    public void get_request_success_when_pba_status_lower_case() throws JsonProcessingException {
+        var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>) professionalReferenceDataClient
+                .findOrganisationsByPbaStatus("accepted", hmctsAdmin, Boolean.FALSE);
 
+        validatePbaResponse(orgPbaResponse, 2, PbaStatus.ACCEPTED);
+    }
+
+    @Test
+    public void get_request_success_when_pba_status_upper_case() throws JsonProcessingException {
+        var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>) professionalReferenceDataClient
+                .findOrganisationsByPbaStatus("ACCEPTED", hmctsAdmin, Boolean.FALSE);
+
+        validatePbaResponse(orgPbaResponse, 2, PbaStatus.ACCEPTED);
+    }
+
+    @Test
+    public void get_request_returns_400_when_empty_pba_status() throws JsonProcessingException {
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-                .findOrganisationsByPbaStatus("Invalid Status", hmctsAdmin, Boolean.FALSE);
+                .findOrganisationsByPbaStatus("\"\"", hmctsAdmin, Boolean.FALSE);
 
         validateInvalidRequestErrorResponse(errorResponseMap);
     }
 
     @Test
-    public void get_request_returns_400_when_null_pba_status() throws JsonProcessingException {
-
+    public void get_request_returns_400_when_pba_status_with_space() throws JsonProcessingException {
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-                .findOrganisationsByPbaStatus(null, hmctsAdmin, Boolean.FALSE);
+                .findOrganisationsByPbaStatus("\" \"", hmctsAdmin, Boolean.FALSE);
 
         validateInvalidRequestErrorResponse(errorResponseMap);
+    }
+
+    @Test
+    public void get_request_returns_400_when_invalid_pba_status() throws JsonProcessingException {
+        Map<String, Object> invalidStatusErrorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+                .findOrganisationsByPbaStatus("Invalid Status", hmctsAdmin, Boolean.FALSE);
+        Map<String, Object> nullStatusErrorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+                .findOrganisationsByPbaStatus(null, hmctsAdmin, Boolean.FALSE);
+        Map<String, Object> specialCharErrorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+                .findOrganisationsByPbaStatus("*", hmctsAdmin, Boolean.FALSE);
+
+        validateInvalidRequestErrorResponse(invalidStatusErrorResponseMap);
+        validateInvalidRequestErrorResponse(nullStatusErrorResponseMap);
+        validateInvalidRequestErrorResponse(specialCharErrorResponseMap);
     }
 
     @Test

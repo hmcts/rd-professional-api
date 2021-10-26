@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
@@ -41,8 +42,8 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
                 new PbaUpdateRequest(pba2, REJECTED.name(), ""),
                 new PbaUpdateRequest(pba3, ACCEPTED.name(), null)));
 
-        Map<String, Object> updatePbaResponse =
-                professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
+        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
+                .updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin, null);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNull();
@@ -69,8 +70,8 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
                 new PbaUpdateRequest(pba2, "INVALID STATUS", ""),
                 new PbaUpdateRequest(pba3, ACCEPTED.name(), "")));
 
-        Map<String, Object> updatePbaResponse =
-                professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
+        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
+                .updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin, null);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("200");
@@ -113,8 +114,8 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
                 new PbaUpdateRequest("PBA1122334", ACCEPTED.name(), ""),
                 new PbaUpdateRequest("PBA1239999", null, "")));
 
-        Map<String, Object> updatePbaResponse =
-                professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
+        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
+                .updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin, null);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("422");
@@ -148,7 +149,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         String orgId = (String) createOrganisationResponse.get(ORG_IDENTIFIER);
 
         Map<String, Object> updatePbaResponse = professionalReferenceDataClient
-                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin);
+                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin, null);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("400");
@@ -159,7 +160,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         String orgId = setUpData();
 
         Map<String, Object> updatePbaResponse = professionalReferenceDataClient
-                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin);
+                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin, null);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("400");
@@ -167,8 +168,9 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     public void update_pba_account_numbers_with_non_prdAdmin_role_403_failure_scenario() {
-        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
-                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), UUID.randomUUID().toString(), puiUserManager);
+        Map<String, Object> updatePbaResponse =
+                professionalReferenceDataClient.updatePaymentsAccountsByOrgId(new UpdatePbaRequest(),
+                        UUID.randomUUID().toString(), puiUserManager, null);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("403");
@@ -205,5 +207,221 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         });
 
         return orgId;
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_null_request_body() {
+        String orgId = setUpData();
+
+        validateUpdatePaymentsAccountsResponse(orgId, null, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_empty_json_object() {
+        String orgId = setUpData();
+        String pbaRequestBodyEmptyObject = "{}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmptyObject, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_empty_request_body() {
+        String orgId = setUpData();
+        String pbaRequestBodyEmpty = "";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmpty, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_request_body_with_space() {
+        String orgId = setUpData();
+        String pbaRequestBodyWithSpace = " ";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyWithSpace, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_request_body_with_spec_char() {
+        String orgId = setUpData();
+        String pbaRequestBodyWithSpecialChar = "*";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyWithSpecialChar, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_array_empty() {
+        String orgId = setUpData();
+        String pbaRequestBodyEmptyArray = "{\"pbaNumbers\": []}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmptyArray, HttpStatus.BAD_REQUEST,
+                "No PBAs have been sent in the request");
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_misspelled() {
+        String orgId = setUpData();
+        String pbaRequestBodyMisspelledField = "{\"fghdghdhg\": [\"PBA0000120\"]}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyMisspelledField, HttpStatus.BAD_REQUEST,
+                "No PBAs have been sent in the request");
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_array_missing() {
+        String orgId = setUpData();
+        String pbaRequestBodyNoPbaArray = "{\"pbaNumbers\":}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyNoPbaArray, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_empty() {
+        String orgId = setUpData();
+        String pbaRequestBodyEmptyPba = "{\"pbaNumbers\": \"\"}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmptyPba, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_null() {
+        String orgId = setUpData();
+        String pbaRequestBodyPbaNull = "{\"pbaNumbers\": null}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyPbaNull, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_spec_char() {
+        String orgId = setUpData();
+        String pbaRequestBodyPbaWithSpecialChar = "{\"pbaNumbers\": \"*\"}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyPbaWithSpecialChar, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_space() {
+        String orgId = setUpData();
+        String pbaRequestBodyPbaWithSpace = "{\"pbaNumbers\": \"  \"}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyPbaWithSpace, HttpStatus.BAD_REQUEST, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_422_when_empty_status() {
+        String orgId = setUpData();
+        String pbaRequestBodyEmptyStatus = "{\"pbaNumbers\":"
+                                            + "["
+                                            + "{"
+                                            + "\"pbaNumber\":\"PBA2345678\","
+                                            + "\"status\": \"\","
+                                            + "\"statusMessage\":\"\""
+                                            + "}"
+                                            + "]"
+                                            + "}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmptyStatus, HttpStatus.UNPROCESSABLE_ENTITY,
+                "Mandatory field Status missing");
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_422_when_status_field_misspelled() {
+        String orgId = setUpData();
+        String pbaRequestBodyMisspelledField = "{\"pbaNumbers\":"
+                                                + "["
+                                                + "{"
+                                                + "\"pbaNumber\":\"PBA2345678\","
+                                                + "\"sstaattuuss\":\"ACCEPTED\","
+                                                + "\"statusMessage\":\"\""
+                                                + "}"
+                                                + "]"
+                                                + "}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyMisspelledField, HttpStatus.UNPROCESSABLE_ENTITY,
+                "Mandatory field Status missing");
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_422_when_status_with_special_char() {
+        String orgId = setUpData();
+        String pbaRequestBodyStatusWithSpecChar = "{\"pbaNumbers\":"
+                                                + "["
+                                                + "{"
+                                                + "\"pbaNumber\":\"PBA2345678\","
+                                                + "\"status\": \"*\","
+                                                + "\"statusMessage\":\"\""
+                                                + "}"
+                                                + "]"
+                                                + "}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpecChar, HttpStatus.UNPROCESSABLE_ENTITY,
+                "Value for Status field is invalid");
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_422_when_status_with_space() {
+        String orgId = setUpData();
+        String pbaRequestBodyStatusWithSpace = "{\"pbaNumbers\":"
+                                                + "["
+                                                + "{"
+                                                + "\"pbaNumber\":\"PBA2345678\","
+                                                + "\"status\": \"  \","
+                                                + "\"statusMessage\":\"\""
+                                                + "}"
+                                                + "]"
+                                                + "}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpace, HttpStatus.UNPROCESSABLE_ENTITY,
+                "Value for Status field is invalid");
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_200_when_status_lowercase() {
+        String orgId = setUpData();
+        String pbaRequestBodyStatusLowercase = "{\"pbaNumbers\":"
+                                                + "["
+                                                + "{"
+                                                + "\"pbaNumber\":\"PBA2345678\","
+                                                + "\"status\":\"accepted\","
+                                                + "\"statusMessage\":\"\""
+                                                + "}"
+                                                + "]"
+                                                + "}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusLowercase, HttpStatus.OK, null);
+    }
+
+    @Test
+    public void test_updatePaymentsAccounts_should_return_200_when_status_uppercase() {
+        String orgId = setUpData();
+        String pbaRequestBodyUppercase = "{\"pbaNumbers\":"
+                                        + "["
+                                        + "{"
+                                        + "\"pbaNumber\":\"PBA2345678\","
+                                        + "\"status\":\"ACCEPTED\","
+                                        + "\"statusMessage\":\"\""
+                                        + "}"
+                                        + "]"
+                                        + "}";
+
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyUppercase, HttpStatus.OK, null);
+    }
+
+    private void validateUpdatePaymentsAccountsResponse(String orgId, String requestBody,
+                                        HttpStatus expectedStatus, String expectedMessage) {
+        Map<String, Object> pbaResponse =
+                professionalReferenceDataClient.updatePaymentsAccountsByOrgId(null, orgId, hmctsAdmin,
+                        requestBody);
+
+        if (expectedStatus == HttpStatus.OK) {
+            assertThat(pbaResponse).containsEntry("http_status", "200 OK");
+        } else if (expectedStatus == HttpStatus.BAD_REQUEST) {
+            assertThat(pbaResponse).containsEntry("http_status", "400");
+        } else if (expectedStatus == HttpStatus.UNPROCESSABLE_ENTITY) {
+            assertThat(pbaResponse).containsEntry("http_status", "422");
+        }
+
+        if (nonNull(expectedMessage)) {
+            assertThat(pbaResponse.get("response_body").toString()).contains(expectedMessage);
+        }
     }
 }
