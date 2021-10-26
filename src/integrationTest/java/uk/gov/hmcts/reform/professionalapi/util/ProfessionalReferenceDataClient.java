@@ -488,12 +488,12 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> updatePaymentsAccountsByOrgId(UpdatePbaRequest updatePbaRequest, String orgId,
-                                                             String hmctsAdmin, String rawRequestBody) {
+                                                             String hmctsAdmin, String requestBody) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pba/status";
 
         try {
-            HttpEntity<?> requestEntity = new HttpEntity<>(isNull(updatePbaRequest) ? rawRequestBody : updatePbaRequest,
+            HttpEntity<?> requestEntity = new HttpEntity<>(isNull(updatePbaRequest) ? requestBody : updatePbaRequest,
                     getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
 
