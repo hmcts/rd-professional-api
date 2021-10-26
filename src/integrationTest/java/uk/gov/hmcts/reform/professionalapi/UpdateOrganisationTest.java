@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -126,8 +127,13 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
     }
 
     @Test
-    public void can_update_organisation_status_from_review_to_active_should_returns_status_200() {
+    public void can_update_organisation_status_uppercase_active_should_returns_status_200() {
         updateAndValidateOrganisation(createOrganisationRequest(), "ACTIVE", "Company approved", 200);
+    }
+
+    @Test
+    public void can_update_organisation_status_lowercase_active_should_returns_status_200() {
+        updateAndValidateOrganisation(createOrganisationRequest(), "active", "Company approved", 200);
     }
 
     @Test
@@ -136,6 +142,42 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", null, 200);
         updateAndValidateOrganisation(organisationIdentifier,"REVIEW", null, 400);
     }
+
+    @Test
+    public void can_not_update_organisation_status_empty_returns_status_400() {
+        updateAndValidateOrganisation(createOrganisationRequest(), StringUtils.EMPTY, "empty status", 400);
+    }
+
+    @Test
+    public void can_not_update_organisation_status_null_returns_status_400() {
+        updateAndValidateOrganisation(createOrganisationRequest(),null, "null status", 400);
+    }
+
+    @Test
+    public void can_not_update_organisation_status_empty_space_returns_status_400() {
+        updateAndValidateOrganisation(createOrganisationRequest()," ", "empty space status", 400);
+    }
+
+    @Test
+    public void can_not_update_organisation_status_special_char_returns_status_400() {
+        updateAndValidateOrganisation(createOrganisationRequest(),"@status*", "special character status", 400);
+    }
+
+    @Test
+    public void can_not_update_organisation_without_status_returns_status_200() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
+                .statusMessage("statusMessage")
+                .build();
+
+        Map<String, Object> responseForOrganisationUpdate =
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin,
+                        organisationIdentifier);
+
+        assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
+    }
+
 
     @Test
     public void entities_other_than_organisation_should_remain_unchanged_if_updated_and_should_returns_status_200() {
@@ -169,7 +211,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
     @Test
     public void fields_other_than_organisation_should_override_if_same_and_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", null,
+        updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", null,
                 200);
     }
 
@@ -225,7 +267,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
         if (httpStatus == 200) {
             assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
-            assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.valueOf(status));
+            assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.valueOf(status.toUpperCase()));
             if (nonNull(statusMessage)) {
                 assertThat(persistedOrganisation.getStatusMessage()).isEqualTo(statusMessage);
             }

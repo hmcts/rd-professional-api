@@ -467,12 +467,12 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> editPaymentsAccountsByOrgId(PbaRequest pbaEditRequest, String orgId,
-                                                           String hmctsAdmin) {
+                                                           String hmctsAdmin, String requestBody) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pbas";
 
         try {
-            HttpEntity<PbaRequest> requestEntity = new HttpEntity<>(pbaEditRequest,
+            HttpEntity<?> requestEntity = new HttpEntity<>(isNull(pbaEditRequest) ? requestBody : pbaEditRequest,
                     getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
 
@@ -488,12 +488,12 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> updatePaymentsAccountsByOrgId(UpdatePbaRequest updatePbaRequest, String orgId,
-                                                             String hmctsAdmin) {
+                                                             String hmctsAdmin, String rawRequestBody) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pba/status";
 
         try {
-            HttpEntity<UpdatePbaRequest> requestEntity = new HttpEntity<>(updatePbaRequest,
+            HttpEntity<?> requestEntity = new HttpEntity<>(isNull(updatePbaRequest) ? rawRequestBody : updatePbaRequest,
                     getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
 
@@ -639,6 +639,8 @@ public class ProfessionalReferenceDataClient {
         if (status.is2xxSuccessful()) {
             return Arrays.asList(objectMapper.convertValue(
                     responseEntity.getBody(), OrganisationsWithPbaStatusResponse[].class));
+        } else if (status.value() == HttpStatus.METHOD_NOT_ALLOWED.value()) {
+            return responseEntity.getBody();
         } else {
             return getErrorResponseMap(responseEntity, status);
         }
