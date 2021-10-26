@@ -310,16 +310,16 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     public void test_updatePaymentsAccounts_should_return_422_when_empty_status() {
         String orgId = setUpData();
         String pbaRequestBodyEmptyStatus = "{\"pbaNumbers\":"
-                                + "["
-                                + "{"
-                                + "\"pbaNumber\":\"PBA2345678\","
-                                + "\"status\": \"\","
-                                + "\"statusMessage\":\"\""
-                                + "}"
-                                + "]"
-                                + "}";
+                                            + "["
+                                            + "{"
+                                            + "\"pbaNumber\":\"PBA2345678\","
+                                            + "\"status\": \"\","
+                                            + "\"statusMessage\":\"\""
+                                            + "}"
+                                            + "]"
+                                            + "}";
 
-        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmptyStatus, HttpStatus.METHOD_NOT_ALLOWED,
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmptyStatus, HttpStatus.UNPROCESSABLE_ENTITY,
                 "Mandatory field Status missing");
     }
 
@@ -327,16 +327,16 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     public void test_updatePaymentsAccounts_should_return_422_when_status_field_misspelled() {
         String orgId = setUpData();
         String pbaRequestBodyMisspelledField = "{\"pbaNumbers\":"
-                                + "["
-                                + "{"
-                                + "\"pbaNumber\":\"PBA2345678\","
-                                + "\"sstaattuuss\":\"ACCEPTED\","
-                                + "\"statusMessage\":\"\""
-                                + "}"
-                                + "]"
-                                + "}";
+                                                + "["
+                                                + "{"
+                                                + "\"pbaNumber\":\"PBA2345678\","
+                                                + "\"sstaattuuss\":\"ACCEPTED\","
+                                                + "\"statusMessage\":\"\""
+                                                + "}"
+                                                + "]"
+                                                + "}";
 
-        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyMisspelledField, HttpStatus.METHOD_NOT_ALLOWED,
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyMisspelledField, HttpStatus.UNPROCESSABLE_ENTITY,
                 "Mandatory field Status missing");
     }
 
@@ -344,16 +344,16 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     public void test_updatePaymentsAccounts_should_return_422_when_status_with_special_char() {
         String orgId = setUpData();
         String pbaRequestBodyStatusWithSpecChar = "{\"pbaNumbers\":"
-                                + "["
-                                + "{"
-                                + "\"pbaNumber\":\"PBA2345678\","
-                                + "\"status\": \"*\","
-                                + "\"statusMessage\":\"\""
-                                + "}"
-                                + "]"
-                                + "}";
+                                                + "["
+                                                + "{"
+                                                + "\"pbaNumber\":\"PBA2345678\","
+                                                + "\"status\": \"*\","
+                                                + "\"statusMessage\":\"\""
+                                                + "}"
+                                                + "]"
+                                                + "}";
 
-        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpecChar, HttpStatus.METHOD_NOT_ALLOWED,
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpecChar, HttpStatus.UNPROCESSABLE_ENTITY,
                 "Value for Status field is invalid");
     }
 
@@ -361,16 +361,16 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     public void test_updatePaymentsAccounts_should_return_422_when_status_with_space() {
         String orgId = setUpData();
         String pbaRequestBodyStatusWithSpace = "{\"pbaNumbers\":"
-                                + "["
-                                + "{"
-                                + "\"pbaNumber\":\"PBA2345678\","
-                                + "\"status\": \"  \","
-                                + "\"statusMessage\":\"\""
-                                + "}"
-                                + "]"
-                                + "}";
+                                                + "["
+                                                + "{"
+                                                + "\"pbaNumber\":\"PBA2345678\","
+                                                + "\"status\": \"  \","
+                                                + "\"statusMessage\":\"\""
+                                                + "}"
+                                                + "]"
+                                                + "}";
 
-        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpace, HttpStatus.METHOD_NOT_ALLOWED,
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpace, HttpStatus.UNPROCESSABLE_ENTITY,
                 "Value for Status field is invalid");
     }
 
@@ -378,14 +378,14 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     public void test_updatePaymentsAccounts_should_return_200_when_status_lowercase() {
         String orgId = setUpData();
         String pbaRequestBodyStatusLowercase = "{\"pbaNumbers\":"
-                + "["
-                + "{"
-                + "\"pbaNumber\":\"PBA2345678\","
-                + "\"status\":\"accepted\","
-                + "\"statusMessage\":\"\""
-                + "}"
-                + "]"
-                + "}";
+                                                + "["
+                                                + "{"
+                                                + "\"pbaNumber\":\"PBA2345678\","
+                                                + "\"status\":\"accepted\","
+                                                + "\"statusMessage\":\"\""
+                                                + "}"
+                                                + "]"
+                                                + "}";
 
         validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusLowercase, HttpStatus.OK, null);
     }
@@ -394,14 +394,14 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     public void test_updatePaymentsAccounts_should_return_200_when_status_uppercase() {
         String orgId = setUpData();
         String pbaRequestBodyUppercase = "{\"pbaNumbers\":"
-                + "["
-                + "{"
-                + "\"pbaNumber\":\"PBA2345678\","
-                + "\"status\":\"ACCEPTED\","
-                + "\"statusMessage\":\"\""
-                + "}"
-                + "]"
-                + "}";
+                                        + "["
+                                        + "{"
+                                        + "\"pbaNumber\":\"PBA2345678\","
+                                        + "\"status\":\"ACCEPTED\","
+                                        + "\"statusMessage\":\"\""
+                                        + "}"
+                                        + "]"
+                                        + "}";
 
         validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyUppercase, HttpStatus.OK, null);
     }
@@ -416,7 +416,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
             assertThat(pbaResponse).containsEntry("http_status", "200 OK");
         } else if (expectedStatus == HttpStatus.BAD_REQUEST) {
             assertThat(pbaResponse).containsEntry("http_status", "400");
-        } else if (expectedStatus == HttpStatus.METHOD_NOT_ALLOWED) {
+        } else if (expectedStatus == HttpStatus.UNPROCESSABLE_ENTITY) {
             assertThat(pbaResponse).containsEntry("http_status", "422");
         }
 

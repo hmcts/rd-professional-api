@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -77,21 +76,19 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_405_when_empty_pba_status() throws JsonProcessingException {
-        String errorResponse = (String) professionalReferenceDataClient
-                .findOrganisationsByPbaStatus(StringUtils.EMPTY, hmctsAdmin, Boolean.FALSE);
+    public void get_request_returns_400_when_empty_pba_status() throws JsonProcessingException {
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+                .findOrganisationsByPbaStatus("\"\"", hmctsAdmin, Boolean.FALSE);
 
-        assertNotNull(errorResponse);
-        assertThat(errorResponse).contains("405").contains("Method Not Allowed");
+        validateInvalidRequestErrorResponse(errorResponseMap);
     }
 
     @Test
-    public void get_request_returns_405_when_pba_status_with_space() throws JsonProcessingException {
-        String errorResponse = (String) professionalReferenceDataClient
-                .findOrganisationsByPbaStatus(" ", hmctsAdmin, Boolean.FALSE);
+    public void get_request_returns_400_when_pba_status_with_space() throws JsonProcessingException {
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+                .findOrganisationsByPbaStatus("\" \"", hmctsAdmin, Boolean.FALSE);
 
-        assertNotNull(errorResponse);
-        assertThat(errorResponse).contains("405").contains("Method Not Allowed");
+        validateInvalidRequestErrorResponse(errorResponseMap);
     }
 
     @Test

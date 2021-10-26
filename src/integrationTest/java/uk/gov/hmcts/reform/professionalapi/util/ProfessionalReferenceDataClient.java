@@ -639,8 +639,6 @@ public class ProfessionalReferenceDataClient {
         if (status.is2xxSuccessful()) {
             return Arrays.asList(objectMapper.convertValue(
                     responseEntity.getBody(), OrganisationsWithPbaStatusResponse[].class));
-        } else if (status.value() == HttpStatus.METHOD_NOT_ALLOWED.value()) {
-            return responseEntity.getBody();
         } else {
             return getErrorResponseMap(responseEntity, status);
         }
