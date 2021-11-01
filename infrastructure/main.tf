@@ -29,23 +29,23 @@ resource "azurerm_key_vault_secret" "professional_s2s_secret" {
   key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 }
 
-# resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
-#   name          = join("-", [var.component, "POSTGRES-HOST"])
-#   value         = module.db-professional-ref-data.host_name
-#   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
-# }
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  name          = join("-", [var.component, "POSTGRES-HOST"])
+  value         = module.db-professional-ref-data-v11.host_name
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
 
-# resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
-#   name          = join("-", [var.component, "POSTGRES-PORT"])
-#   value         = "5432"
-#   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
-# }
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name          = join("-", [var.component, "POSTGRES-PORT"])
+  value         = "5432"
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
 
-# resource "azurerm_key_vault_secret" "POSTGRES-USER" {
-#   name          = join("-", [var.component, "POSTGRES-USER"])
-#   value         = module.db-professional-ref-data.user_name
-#   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
-# }
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  name          = join("-", [var.component, "POSTGRES-USER"])
+  value         = module.db-professional-ref-data-v11.user_name
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   name         = join("-", [var.component, "POSTGRES-PASS"])
@@ -53,11 +53,11 @@ resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 }
 
-# resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
-#   name          = join("-", [var.component, "POSTGRES-DATABASE"])
-#   value         = module.db-professional-ref-data.postgresql_database
-#   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
-# }
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name          = join("-", [var.component, "POSTGRES-DATABASE"])
+  value         = module.db-professional-ref-data-v11.postgresql_database
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
 
 resource "azurerm_resource_group" "rg" {
   name     = join("-", [var.product, var.component, var.env])
