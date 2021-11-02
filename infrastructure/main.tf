@@ -80,4 +80,5 @@ module "db-professional-ref-data" {
   postgresql_user = "dbrefdata"
   database_name   = "dbrefdata"
   common_tags     = var.common_tags
+  postgresql_version = "9.6"
 }
