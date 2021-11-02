@@ -16,7 +16,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.5.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.1.1'
-    id 'org.springframework.boot' version '2.4.9'
+    id 'org.springframework.boot' version '2.4.12'
     id "org.flywaydb.flyway" version "7.0.2"
     id 'au.com.dius.pact' version '4.1.7'// do not change, otherwise serenity report fails
 }
@@ -35,7 +35,7 @@ def versions = [
         reformS2sClient    : '4.0.0',
         serenity           : '2.0.76',
         sonarPitest        : '0.5',
-        springBoot         : '2.4.9',
+        springBoot         : '2.4.12',
         springfoxSwagger   : '2.9.2',
         pact_version       : '4.1.7',
         launchDarklySdk    : "5.2.2"
