@@ -2,3 +2,6 @@ java:
     # Don't modify below here
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  environment:
+    POSTGRES_HOST: rd-professional-api-postgres-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
+    POSTGRES_USERNAME: dbrefdata@rd-professional-api-postgres-db-v11-{{ .Values.global.environment }}
