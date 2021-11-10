@@ -25,8 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -90,7 +88,6 @@ class ProfessionalExternalUserControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @MockitoSettings(strictness = Strictness.WARN)
     @Test
     void test_FindUsersByOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
@@ -120,7 +117,7 @@ class ProfessionalExternalUserControllerTest {
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
-        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
+        lenient().doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
                 any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
@@ -137,7 +134,6 @@ class ProfessionalExternalUserControllerTest {
                 .findProfessionalUsersByOrganisation(organisation, "true", true, "");
     }
 
-    @MockitoSettings(strictness = Strictness.WARN)
     @Test
     void test_FindUsersByOrganisationWithPuiCaseManager() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
@@ -167,11 +163,8 @@ class ProfessionalExternalUserControllerTest {
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
-        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
+        lenient().doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
                 any(OrganisationStatus.class), any(String.class));
-        doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
@@ -186,7 +179,6 @@ class ProfessionalExternalUserControllerTest {
                         "");
     }
 
-    @MockitoSettings(strictness = Strictness.WARN)
     @Test
     void testFindUsersByOrganisationWithoutRoles() throws Exception {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
@@ -220,10 +212,9 @@ class ProfessionalExternalUserControllerTest {
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
-        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
+        lenient().doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
                 any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
