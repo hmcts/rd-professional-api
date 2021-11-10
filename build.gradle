@@ -38,7 +38,9 @@ def versions = [
         springBoot         : '2.4.12',
         springfoxSwagger   : '2.9.2',
         pact_version       : '4.1.7',
-        launchDarklySdk    : "5.2.2"
+        launchDarklySdk    : "5.2.2",
+        junit           : '5.8.1',
+        junitPlatform   : '1.8.1'
 ]
 
 
@@ -71,6 +73,14 @@ compileJava {
 compileTestJava {
 
     options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
 }
 
 sourceSets {
@@ -136,7 +146,7 @@ configurations {
     integrationTestImplementation.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
     functionalTestImplementation.extendsFrom testCompile
-    functionalTestRuntime.extendsFrom testRuntime
+    functionalTestRuntimeOnly.extendsFrom testRuntime
     contractTestImplementation.extendsFrom testCompile
     contractTestRuntimeOnly.extendsFrom testRuntime
     pactTestImplementation.extendsFrom testCompile
@@ -160,7 +170,6 @@ pmd {
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
-    finalizedBy aggregate
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
@@ -236,6 +245,7 @@ jacocoTestReport {
 }
 
 pitest {
+    junit5PluginVersion = '0.12'
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
@@ -278,7 +288,8 @@ repositories {
         url "https://jitpack.io/"
     }
 
-    jcenter()
+    jcenter() //Builds will no longer be able to resolve artifacts from JCenter after February 1st, 2022
+    mavenCentral()
 }
 
 dependencies {
@@ -353,25 +364,44 @@ dependencies {
         exclude group: "org.hamcrest", module: "hamcrest-library"
     }
 
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+    testImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
+    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
+
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.6.28'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.3.3'
+    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
+
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
     testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: '4.2.0'
 
     testImplementation group: 'com.h2database', name: 'h2'
-    testImplementation "com.github.tomakehurst:wiremock:2.19.0"
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.6.28'
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
+
+    testImplementation('com.github.tomakehurst:wiremock:2.27.2') {
+        exclude group: 'com.github.jknack'
+    }
+
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
+        exclude group: 'junit', module: 'junit'
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
     testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
-    testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 
-    testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
-    testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+    testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5', {
+        exclude group: 'junit', module: 'junit'
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: '3.0.2'
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: '3.0.2'
     testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-    testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
     testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
@@ -387,12 +417,33 @@ dependencies {
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
 
-    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
-    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
-    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
-    contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
-    contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.2.14'
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.2.14'
+
+    functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
+    functionalTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+    functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+    functionalTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
+    functionalTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
+
+    smokeTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+    smokeTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+    smokeTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+    smokeTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
+    smokeTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
+
+    integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+    integrationTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+    integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+    integrationTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
+    integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
+
+    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+    contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+    contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+    contractTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
+    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
+    contractTestImplementation('org.scala-lang:scala-library:2.12.5')
 
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
