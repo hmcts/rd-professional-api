@@ -36,7 +36,9 @@ class SmokeTest {
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .get("/")
                 .andReturn();
+
         log.info("Response::" + response);
+
         if (null != response && response.statusCode() == 200) {
             assertThat(response.body().asString())
                     .contains("Welcome to the System Reference Data API");
