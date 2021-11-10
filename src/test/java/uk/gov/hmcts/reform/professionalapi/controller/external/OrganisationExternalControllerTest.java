@@ -26,10 +26,12 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -65,9 +67,8 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-
-
-public class OrganisationExternalControllerTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationExternalControllerTest {
 
     @InjectMocks
     private OrganisationExternalController organisationExternalController;
@@ -105,8 +106,8 @@ public class OrganisationExternalControllerTest {
 
     private List<PrdEnum> prdEnumList;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         organisationServiceMock = mock(OrganisationService.class);
         organisationIdentifierValidatorImplMock = mock(OrganisationIdentifierValidatorImpl.class);
@@ -146,7 +147,7 @@ public class OrganisationExternalControllerTest {
         userRoles.add("pui-user-manager");
 
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles,false);
+                "some@email.com", userRoles, false);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
@@ -162,10 +163,9 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_CreateOrganisation() {
+    void test_CreateOrganisation() {
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
                 .thenReturn(organisationResponse);
-        when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
         ResponseEntity<?> actual = organisationExternalController
                 .createOrganisationUsingExternalController(organisationCreationRequest);
@@ -180,7 +180,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_RetrieveOrganisationByIdentifier() {
+    void test_RetrieveOrganisationByIdentifier() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         String id = UUID.randomUUID().toString().substring(0, 7);
@@ -195,7 +195,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_RetrievePaymentAccountByUserEmail() {
+    void test_RetrievePaymentAccountByUserEmail() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
 
@@ -218,7 +218,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testRetrievePaymentAccountByUserEmailFromHeader() {
+    void testRetrievePaymentAccountByUserEmailFromHeader() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         List<String> authorities = new ArrayList<>();
@@ -241,15 +241,13 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_InviteUserToOrganisation() throws JsonProcessingException {
+    void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
-                .thenReturn(professionalUser);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
@@ -277,7 +275,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_retrieveOrganisationsByStatusWithMinimalInfo_should_return_200_with_response() {
+    void test_retrieveOrganisationsByStatusWithMinimalInfo_should_return_200_with_response() {
         ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation1);
@@ -297,7 +295,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_retrieveAllOrganisationsByStatus_should_return_404_when_no_active_orgs_found() {
+    void test_retrieveAllOrganisationsByStatus_should_return_404_when_no_active_orgs_found() {
         ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
         when(organisationServiceMock.getOrganisationByStatus(any())).thenReturn(new ArrayList<>());
         Throwable raisedException = catchThrowable(() -> organisationExternalController
