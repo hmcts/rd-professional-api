@@ -62,7 +62,8 @@ class OrganisationIdentifierValidatorImplTest {
         organisation.setPaymentAccounts(new ArrayList<>());
 
         assertThrows(EmptyResultDataAccessException.class, () ->
-                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString()));
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
+                        organisation, UUID.randomUUID().toString()));
     }
 
     @Test
@@ -70,19 +71,22 @@ class OrganisationIdentifierValidatorImplTest {
         organisation.setPaymentAccounts(singletonList(paymentAccount));
 
         assertThrows(AccessDeniedException.class, () ->
-                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString()));
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
+                        organisation, UUID.randomUUID().toString()));
     }
 
     @Test
     void test_shouldThrowEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
         assertThrows(EmptyResultDataAccessException.class, () ->
-                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString()));
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
+                        organisation, UUID.randomUUID().toString()));
     }
 
     @Test
     void shouldThrowEmptyResultDataAccessExceptionWhenOrganisationIsNull() {
         assertThrows(EmptyResultDataAccessException.class, () ->
-                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(null, UUID.randomUUID().toString()));
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
+                        null, UUID.randomUUID().toString()));
     }
 
     @Test
