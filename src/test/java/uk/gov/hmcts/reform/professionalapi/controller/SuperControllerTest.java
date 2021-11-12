@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -15,15 +17,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -61,7 +67,8 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class SuperControllerTest {
+@ExtendWith(MockitoExtension.class)
+class SuperControllerTest {
 
     @InjectMocks
     private SuperController superController = mock(SuperController.class, CALLS_REAL_METHODS);
@@ -92,8 +99,8 @@ public class SuperControllerTest {
     private List<PrdEnum> prdEnumList;
     private List<String> jurisdEnumIds;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
@@ -132,7 +139,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void test_createOrganisationFrom() {
+    void test_createOrganisationFrom() {
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
@@ -148,7 +155,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void test_retrieveAllOrganisationOrById() {
+    void test_retrieveAllOrganisationOrById() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         when(organisationServiceMock.retrieveAllOrganisations()).thenReturn(organisationsDetailResponse);
@@ -163,7 +170,7 @@ public class SuperControllerTest {
 
 
     @Test
-    public void test_retrievePaymentAccountByEmail() {
+    void test_retrievePaymentAccountByEmail() {
         String email = "some-email@test.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
@@ -181,7 +188,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void test_InviteUserToOrganisation() throws JsonProcessingException {
+    void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -216,27 +223,30 @@ public class SuperControllerTest {
         verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
     }
 
-    @Test(expected = HttpClientErrorException.class)
-    public void test_checkUserAlreadyExist() {
+    @Test
+    void test_checkUserAlreadyExist() {
         String email = "test@email.com";
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(email)).thenReturn(professionalUser);
 
-        superController.checkUserAlreadyExist(email);
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress(email);
-    }
-
-    @Test(expected = Test.None.class)
-    public void test_checkUserAlreadyExistThrowsHttpClientErrorException() {
-        String email = "test@email.com";
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(email)).thenReturn(null);
-
-        superController.checkUserAlreadyExist(email);
+        assertThrows(HttpClientErrorException.class, () ->
+                superController.checkUserAlreadyExist(email));
 
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress(email);
     }
 
     @Test
-    public void test_checkOrganisationIsActive() {
+    void test_checkUserAlreadyExistThrowsHttpClientErrorException() {
+        String email = "test@email.com";
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(email)).thenReturn(null);
+
+        assertDoesNotThrow(() ->
+                superController.checkUserAlreadyExist(email));
+
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress(email);
+    }
+
+    @Test
+    void test_checkOrganisationIsActive() {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
 
@@ -251,7 +261,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void test_ReInviteUserToOrganisation() throws JsonProcessingException {
+    void test_ReInviteUserToOrganisation() throws JsonProcessingException {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
@@ -289,7 +299,7 @@ public class SuperControllerTest {
 
 
     @Test
-    public void test_ReInviteUserToOrganisation_when_up_fails() throws JsonProcessingException {
+    void test_ReInviteUserToOrganisation_when_up_fails() throws JsonProcessingException {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -324,7 +334,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void test_ReInviteUserToOrganisation_when_user_does_not_exists() {
+    void test_ReInviteUserToOrganisation_when_user_does_not_exists() {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -346,7 +356,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void test_ReinviteDoesntHappenwhenToggleOff() throws JsonProcessingException {
+    void test_ReinviteDoesntHappenwhenToggleOff() throws JsonProcessingException {
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", false);
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -383,7 +393,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void test_ReInviteUserToOrganisation_when_user_does_not_exists_in_organisation() {
+    void test_ReInviteUserToOrganisation_when_user_does_not_exists_in_organisation() {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -405,7 +415,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void testModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
+    void testModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
         roleAdditionResponse.setIdamMessage("some nessage");
@@ -431,19 +441,20 @@ public class SuperControllerTest {
                 userId, Optional.of("EXUI"));
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void testGetUserEmailThrows400WhenEmailIsNull() {
+    @Test
+    void testGetUserEmailThrows400WhenEmailIsNull() {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(null);
 
-        superController.getUserEmail(null);
+        assertThrows(InvalidRequest.class, () ->
+                superController.getUserEmail(null));
 
         verify(httpRequest, times(1)).getHeader(null);
     }
 
     @Test
-    public void testGetUserEmailUsesParamEmailWhenHeaderEmailNull() {
+    void testGetUserEmailUsesParamEmailWhenHeaderEmailNull() {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         String email = "adil@praveen.com";
 
@@ -456,7 +467,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void testGetUserEmailFromHeader() {
+    void testGetUserEmailFromHeader() {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         String email = "adil@praveen.com";
 
