@@ -8,12 +8,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class OrganisationTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationTest {
 
     @Test
-    public void test_creates_organisation_correctly() {
+    void test_creates_organisation_correctly() {
         List<ContactInformation> contactInformations = new ArrayList<>();
 
         Organisation organisation = new Organisation("some-name", OrganisationStatus.ACTIVE,
@@ -39,7 +42,7 @@ public class OrganisationTest {
     }
 
     @Test
-    public void test_adds_users_correctly() {
+    void test_adds_users_correctly() {
         SuperUser superUser = new SuperUser();
         Organisation organisation = new Organisation();
         organisation.addProfessionalUser(superUser);
@@ -48,7 +51,7 @@ public class OrganisationTest {
     }
 
     @Test
-    public void test_adds_payment_account_correctly() {
+    void test_adds_payment_account_correctly() {
         PaymentAccount paymentAccount = new PaymentAccount();
         Organisation organisation = new Organisation();
         organisation.addPaymentAccount(paymentAccount);
@@ -57,7 +60,7 @@ public class OrganisationTest {
     }
 
     @Test
-    public void test_adds_contact_information_correctly() {
+    void test_adds_contact_information_correctly() {
         ContactInformation contactInformation = new ContactInformation();
         Organisation organisation = new Organisation();
         organisation.addContactInformation(contactInformation);
@@ -67,7 +70,7 @@ public class OrganisationTest {
     }
 
     @Test
-    public void test_adds_organisation_mfa_status_correctly() {
+    void test_adds_organisation_mfa_status_correctly() {
         OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
         Organisation organisation = new Organisation();
         organisation.setOrganisationMfaStatus(organisationMfaStatus);

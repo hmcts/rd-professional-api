@@ -4,12 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class UserAccountMapTest {
+@ExtendWith(MockitoExtension.class)
+class UserAccountMapTest {
 
     @Test
-    public void test_creates_user_account_map_correctly() {
+    void test_creates_user_account_map_correctly() {
         UserAccountMap noOrgUserAccountMap = new UserAccountMap();
         assertThat(noOrgUserAccountMap).isNotNull();
         assertThat(noOrgUserAccountMap.getDefaulted()).isFalse();

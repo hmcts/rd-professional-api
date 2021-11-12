@@ -8,12 +8,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class PaymentAccountTest {
+@ExtendWith(MockitoExtension.class)
+class PaymentAccountTest {
 
     @Test
-    public void test_can_set_organisation() {
+    void test_can_set_organisation() {
         Organisation organisation = new Organisation();
         PaymentAccount paymentAccount = new PaymentAccount();
         List<UserAccountMap> userAccountMap = new ArrayList<>();
