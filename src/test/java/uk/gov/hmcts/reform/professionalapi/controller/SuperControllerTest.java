@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -140,9 +141,6 @@ class SuperControllerTest {
 
     @Test
     void test_createOrganisationFrom() {
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
-        when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
-
         ResponseEntity<?> actual = superController.createOrganisationFrom(organisationCreationRequest);
 
         assertThat(actual).isNotNull();
@@ -195,9 +193,8 @@ class SuperControllerTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
+        lenient().when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
                 .thenReturn(professionalUser);
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
@@ -269,7 +266,7 @@ class SuperControllerTest {
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        lenient().when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
@@ -306,7 +303,7 @@ class SuperControllerTest {
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        lenient().when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
         ErrorResponse errorDetails = new ErrorResponse("errorMessage", "errorDescription",
@@ -364,10 +361,8 @@ class SuperControllerTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
+        lenient().when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
                 .thenReturn(professionalUser);
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
-        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
@@ -449,8 +444,6 @@ class SuperControllerTest {
 
         assertThrows(InvalidRequest.class, () ->
                 superController.getUserEmail(null));
-
-        verify(httpRequest, times(1)).getHeader(null);
     }
 
     @Test

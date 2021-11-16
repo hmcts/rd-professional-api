@@ -5,10 +5,11 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -39,9 +40,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +53,6 @@ import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -73,9 +74,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
-public class RefDataUtilTest {
+class RefDataUtilTest {
 
     private PaymentAccount paymentAccount;
     private Organisation organisation;
@@ -87,8 +88,8 @@ public class RefDataUtilTest {
     private UserProfileFeignClient userProfileFeignClient;
     private JsonFeignResponseUtil jsonFeignResponseUtil;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         paymentAccount = new PaymentAccount("PBA1234567");
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -109,7 +110,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_shouldReturnPaymentAccountsFromUserAccountMap() {
+    void test_shouldReturnPaymentAccountsFromUserAccountMap() {
         List<UserAccountMap> userAccountMaps = new ArrayList<>();
         userAccountMaps.add(userAccountMap);
 
@@ -119,7 +120,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_shouldReturnPaymentAccountsFromUserAccountMa_WhenUserAccountMapIdPaymentAccountIsEmpty() {
+    void test_shouldReturnPaymentAccountsFromUserAccountMa_WhenUserAccountMapIdPaymentAccountIsEmpty() {
         UserAccountMapId userAccountMapId = new UserAccountMapId(null, null);
         UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
 
@@ -132,7 +133,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_shouldReturnPaymentAccountsFromUserAccountMapWhenListIsEmpty() {
+    void test_shouldReturnPaymentAccountsFromUserAccountMapWhenListIsEmpty() {
         List<UserAccountMap> userAccountMaps = new ArrayList<>();
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
@@ -141,7 +142,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_shouldReturnPaymentAccountFromUserMap() {
+    void test_shouldReturnPaymentAccountFromUserMap() {
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
         userMapPaymentAccount.add(paymentAccount);
 
@@ -155,7 +156,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_shouldReturnPaymentAccountFromOrganisationUser() {
+    void test_shouldReturnPaymentAccountFromOrganisationUser() {
         List<PaymentAccount> paymentAccountsEntity = new ArrayList<>();
         paymentAccountsEntity.add(paymentAccount);
 
@@ -166,26 +167,27 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_removeEmptyWhiteSpaces() {
+    void test_removeEmptyWhiteSpaces() {
         assertThat(RefDataUtil.removeEmptySpaces(" Test ")).isEqualTo("Test");
         assertThat(RefDataUtil.removeEmptySpaces(null)).isNull();
         assertThat(RefDataUtil.removeEmptySpaces(" Te  st ")).isEqualTo("Te st");
     }
 
     @Test
-    public void test_removeAllWhiteSpaces() {
+    void test_removeAllWhiteSpaces() {
         assertThat(RefDataUtil.removeAllSpaces(" T e s t    1 ")).isEqualTo("Test1");
         assertThat(RefDataUtil.removeAllSpaces(null)).isNull();
     }
 
-    @Test(expected = AccessDeniedException.class)
-    public void test_shouldReturnTrueValidateOrgIdentifier() {
+    @Test
+    void test_shouldReturnTrueValidateOrgIdentifier() {
         String uuid = UUID.randomUUID().toString();
-        RefDataUtil.validateOrgIdentifier(uuid, UUID.randomUUID().toString());
+        assertThrows(AccessDeniedException.class,() ->
+                RefDataUtil.validateOrgIdentifier(uuid, UUID.randomUUID().toString()));
     }
 
     @Test
-    public void test_mapUserInfoCorrectly_with_roles() {
+    void test_mapUserInfoCorrectly_with_roles() {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -205,7 +207,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_mapUserInfo_without_roles() {
+    void test_mapUserInfo_without_roles() {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -226,7 +228,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_filterUsersByStatus() {
+    void test_filterUsersByStatus() {
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -263,7 +265,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_filterUsersByStatusWithoutRoles() {
+    void test_filterUsersByStatusWithoutRoles() {
         ProfessionalUsersResponseWithoutRoles professionalUsersResponse
                 = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -302,8 +304,8 @@ public class RefDataUtilTest {
                 .isEqualTo(professionalUsersResponse1);
     }
 
-    @Test(expected = ExternalApiException.class)
-    public void test_filterUsersByStatusWhenStatusCodeIsNot200() {
+    @Test
+    void test_filterUsersByStatusWhenStatusCodeIsNot200() {
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -329,19 +331,13 @@ public class RefDataUtilTest {
         ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header,
                 HttpStatus.BAD_REQUEST);
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse1
-                = (ProfessionalUsersEntityResponse) RefDataUtil.filterUsersByStatus(realResponseEntity,
-                "Active");
-        assertThat(professionalUsersEntityResponse1).isNotNull();
+        assertThrows(ExternalApiException.class, () ->
+                RefDataUtil.filterUsersByStatus(realResponseEntity, "Active"));
 
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(3);
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(0)).isEqualTo(professionalUsersResponse);
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(1)).isEqualTo(professionalUsersResponse1);
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(2)).isEqualTo(professionalUsersResponse2);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void test_filterUsersByStatusWhereNoUsersFoundThrowsResourceNotFoundException() {
+    @Test
+    void test_filterUsersByStatusWhereNoUsersFoundThrowsResourceNotFoundException() {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         professionalUsersEntityResponse.setUserProfiles(userProfiles);
@@ -351,11 +347,12 @@ public class RefDataUtilTest {
         ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header,
                 HttpStatus.OK);
 
-        RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
+        assertThrows(ResourceNotFoundException.class,() ->
+                RefDataUtil.filterUsersByStatus(realResponseEntity, "Active"));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void test_filterUsersByStatusWhereNoUsersFoundWithoutRolesThrowsResourceNotFoundException() {
+    @Test
+    void test_filterUsersByStatusWhereNoUsersFoundWithoutRolesThrowsResourceNotFoundException() {
         ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
                 = new ProfessionalUsersEntityResponseWithoutRoles();
         List<ProfessionalUsersResponseWithoutRoles> userProfiles = new ArrayList<>();
@@ -366,11 +363,12 @@ public class RefDataUtilTest {
         ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
                 header, HttpStatus.OK);
 
-        RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
+        assertThrows(ResourceNotFoundException.class,() ->
+                RefDataUtil.filterUsersByStatus(realResponseEntity, "Active"));
     }
 
     @Test
-    public void test_shouldGenerateResponseEntityWithHeaderFromPage() {
+    void test_shouldGenerateResponseEntityWithHeaderFromPage() {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.add("fakeHeader", "fakeValue");
 
@@ -397,7 +395,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_shouldGenerateResponseEntityWithHeaderFromPageWhenResponseEntityIsNull() {
+    void test_shouldGenerateResponseEntityWithHeaderFromPageWhenResponseEntityIsNull() {
         Page pageMock = mock(Page.class);
         when(pageMock.getTotalElements()).thenReturn(1L);
         when(pageMock.getTotalPages()).thenReturn(2);
@@ -418,7 +416,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_shouldCreatePageableObject() {
+    void test_shouldCreatePageableObject() {
         Integer page = 0;
         Integer size = 5;
         Sort sort = mock(Sort.class);
@@ -430,7 +428,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_shouldCreatePageableObjectWithDefaultPageSize() {
+    void test_shouldCreatePageableObjectWithDefaultPageSize() {
         Integer page = 0;
         Sort sort = mock(Sort.class);
 
@@ -441,7 +439,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_getShowDeletedValue() {
+    void test_getShowDeletedValue() {
         assertThat(RefDataUtil.getShowDeletedValue("True")).isEqualTo("true");
         assertThat(RefDataUtil.getShowDeletedValue("true")).isEqualTo("true");
         assertThat(RefDataUtil.getShowDeletedValue("TRUE")).isEqualTo("true");
@@ -454,14 +452,14 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_getReturnRolesValue() {
+    void test_getReturnRolesValue() {
         assertThat(RefDataUtil.getReturnRolesValue(Boolean.TRUE)).isEqualTo(Boolean.TRUE);
         assertThat(RefDataUtil.getReturnRolesValue(Boolean.FALSE)).isEqualTo(Boolean.FALSE);
         assertThat(RefDataUtil.getReturnRolesValue(null)).isEqualTo(Boolean.TRUE);
     }
 
     @Test
-    public void test_privateConstructor() throws Exception {
+    void test_privateConstructor() throws Exception {
         Constructor<RefDataUtil> constructor = RefDataUtil.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
@@ -469,7 +467,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_updateUserDetailsForActiveOrganisation_entity_reponse_null() {
+    void test_updateUserDetailsForActiveOrganisation_entity_reponse_null() {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
 
@@ -481,7 +479,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_updateUserDetailsForActiveOrganisation_entity_reponse_empty() {
+    void test_updateUserDetailsForActiveOrganisation_entity_reponse_empty() {
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -513,7 +511,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_updateUserDetailsForActiveOrganisation() {
+    void test_updateUserDetailsForActiveOrganisation() {
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -562,7 +560,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_GetSingleUserIdFromUserProfile() throws Exception {
+    void test_GetSingleUserIdFromUserProfile() throws Exception {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -594,26 +592,24 @@ public class RefDataUtilTest {
         verify(responseMock, times(1)).close();
     }
 
-    @Test(expected = ExternalApiException.class)
-    public void test_GetSingleUserIdFromUserProfile_WithFeignException() throws Exception {
+    @Test
+    void test_GetSingleUserIdFromUserProfile_WithFeignException() throws Exception {
         FeignException feignExceptionMock = mock(FeignException.class);
         when(feignExceptionMock.status()).thenReturn(500);
 
         when(userProfileFeignClient.getUserProfileById(any())).thenThrow(feignExceptionMock);
 
-        ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
+        assertThrows(ExternalApiException.class, () ->
+                RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
                 "lastName", "some@email.com", new Organisation("name",
                 OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
-                "companyUrl")), userProfileFeignClient, Boolean.TRUE);
-        assertThat(result).isNotNull();
-        assertThat(result.getFirstName()).isEqualTo("firstName");
-        assertThat(result.getLastName()).isEqualTo("lastName");
-        assertThat(result.getEmailAddress()).isEqualTo("some@email.com");
+                "companyUrl")), userProfileFeignClient, Boolean.TRUE));
+
         verify(userProfileFeignClient, times(1)).getUserProfileById(any());
     }
 
     @Test
-    public void test_GetSingleUserIdFromUserProfile_WhenResponseIs300() throws Exception {
+    void test_GetSingleUserIdFromUserProfile_WhenResponseIs300() throws Exception {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -639,7 +635,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() throws Exception {
+    void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() throws Exception {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -662,7 +658,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_getMultipleUserProfilesFromUp() throws JsonProcessingException {
+    void test_getMultipleUserProfilesFromUp() throws JsonProcessingException {
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
         activeOrganisationDetails.put("someId", organisation);
 
@@ -694,7 +690,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_getMultipleUserProfilesFromUp_ResponseStatusIs300() throws JsonProcessingException {
+    void test_getMultipleUserProfilesFromUp_ResponseStatusIs300() throws JsonProcessingException {
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
         activeOrganisationDetails.put("someId", organisation);
 
@@ -719,8 +715,8 @@ public class RefDataUtilTest {
     }
 
 
-    @Test(expected = ExternalApiException.class)
-    public void test_GetSingleUserIdFromUserProfileForException() throws Exception {
+    @Test
+    void test_GetSingleUserIdFromUserProfileForException() throws Exception {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -737,19 +733,20 @@ public class RefDataUtilTest {
         when(response.status()).thenReturn(realResponse.status());
         when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
 
-        ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
+        assertThrows(ExternalApiException.class, () ->
+                RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
                 "lastName", "emailAddress", new Organisation("name",
                 OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
-                "companyUrl")), userProfileFeignClient, Boolean.TRUE);
-        assertThat(result).isNotNull();
+                "companyUrl")), userProfileFeignClient, Boolean.TRUE));
+
         verify(userProfileFeignClient, times(1)).getUserProfileById(any());
         verify(response, times(1)).body();
-        verify(response, times(2)).status();
+        verify(response, times(3)).status();
         verify(response, times(1)).close();
     }
 
     @Test
-    public void test_mapUserInfo_without_rolesTrue() {
+    void test_mapUserInfo_without_rolesTrue() {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
         ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
@@ -773,7 +770,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_findUserProfileStatusByEmail() {
+    void test_findUserProfileStatusByEmail() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -797,7 +794,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_findUserProfileStatusByEmail_WithResponse400() {
+    void test_findUserProfileStatusByEmail_WithResponse400() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -816,8 +813,8 @@ public class RefDataUtilTest {
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
-    @Test(expected = ExternalApiException.class)
-    public void test_findUserProfileStatusByEmail_Returns500_WhenExternalApiException() {
+    @Test
+    void test_findUserProfileStatusByEmail_Returns500_WhenExternalApiException() {
         FeignException feignException = mock(FeignException.class);
         when(feignException.status()).thenReturn(500);
 
@@ -831,14 +828,13 @@ public class RefDataUtilTest {
 
         when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenThrow(feignException);
 
-        NewUserResponse newUserResponse = RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com",
-                userProfileFeignClient);
-        assertThat(newUserResponse).isNotNull();
+        assertThrows(ExternalApiException.class, () ->
+                RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com", userProfileFeignClient));
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
     @Test
-    public void test_getUserIdFromUserProfile() throws JsonProcessingException {
+    void test_getUserIdFromUserProfile() throws JsonProcessingException {
         SuperUser superUser = new SuperUser("fName", "lName", "someone@email.com",
                 organisation);
         List<SuperUser> users = Arrays.asList(superUser);
@@ -867,7 +863,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_setOrgIdInGetUserResponse_with_roles_response() {
+    void test_setOrgIdInGetUserResponse_with_roles_response() {
         List<ProfessionalUsersResponse> professionalUsersResponses = new ArrayList<>();
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
         professionalUsersResponses.add(professionalUsersResponse);
@@ -882,7 +878,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_setOrgIdInGetUserResponse_without_roles_response() {
+    void test_setOrgIdInGetUserResponse_without_roles_response() {
         List<ProfessionalUsersResponseWithoutRoles> professionalUsersEntityResponsesWithoutRoles = new ArrayList<>();
         ProfessionalUsersResponseWithoutRoles professionalUsersResponseWithoutRoles
                 = new ProfessionalUsersResponseWithoutRoles(professionalUser);
@@ -902,7 +898,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void verifyUserHasSystemRole() {
+    void verifyUserHasSystemRole() {
         List<String> roles = new ArrayList<>();
         roles.add(PRD_AAC_SYSTEM);
         assertTrue(isSystemRoleUser(roles));
@@ -914,7 +910,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void delete_UserProfile_204() throws JsonProcessingException {
+    void delete_UserProfile_204() throws JsonProcessingException {
 
 
         Map<String, Collection<String>> header = new HashMap<>();
@@ -937,7 +933,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void delete_UserProfile_500() throws JsonProcessingException {
+    void delete_UserProfile_500() throws JsonProcessingException {
 
 
         Map<String, Collection<String>> header = new HashMap<>();
@@ -959,14 +955,14 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void testCheckOrganisationExists() {
+    void testCheckOrganisationExists() {
         assertThat(catchThrowable(() -> RefDataUtil.checkOrganisationAndPbaExists(null)))
                 .isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(ERROR_MSG_NO_ORGANISATION_FOUND);
     }
 
     @Test
-    public void testCheckPbaExists() {
+    void testCheckPbaExists() {
         assertThat(catchThrowable(() -> RefDataUtil.checkOrganisationAndPbaExists(organisation)))
                 .isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(ERROR_MSG_NO_PBA_FOUND);
