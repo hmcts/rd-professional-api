@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,10 +16,10 @@ import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class PaymentAccountRepositoryTest extends BaseRepository {
+class PaymentAccountRepositoryTest extends BaseRepository {
 
     @Test
-    public void test_findAll() {
+    void test_findAll() {
         List<PaymentAccount> paymentAccounts = paymentAccountRepository.findAll();
 
         assertThat(paymentAccounts).hasSize(1);
@@ -28,7 +28,7 @@ public class PaymentAccountRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void findByIdTest() {
+    void findByIdTest() {
         Optional<PaymentAccount> paymentAcc = paymentAccountRepository.findById(paymentAccount.getId());
 
         assertThat(paymentAcc).contains(paymentAccount);
@@ -36,7 +36,7 @@ public class PaymentAccountRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findByPbaNumber() {
+    void test_findByPbaNumber() {
         List<PaymentAccount> paymentAccounts = paymentAccountRepository.findByPbaNumber(paymentAccount.getPbaNumber());
 
         assertThat(paymentAccounts).hasSize(1);
@@ -45,7 +45,7 @@ public class PaymentAccountRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findByPbaNumberIn() {
+    void test_findByPbaNumberIn() {
         Set<String> pbaNumbers = new HashSet<>();
         pbaNumbers.add(paymentAccount.getPbaNumber());
 
