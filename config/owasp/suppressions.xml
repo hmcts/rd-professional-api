@@ -15,7 +15,7 @@
         <cve>CVE-2007-1651</cve>
         <cve>CVE-2007-1652</cve>
     </suppress>
-    <suppress>
+    <suppress until="2022-05-16">
         <notes><![CDATA[
    file name: lang-tag-1.4.4.jar
    ]]></notes>
