@@ -9,8 +9,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
-public class UserAttributeServiceImplTest {
+class UserAttributeServiceImplTest {
 
     private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
@@ -39,8 +39,8 @@ public class UserAttributeServiceImplTest {
     private UserAttribute userAttribute = new UserAttribute(professionalUser, anEnum);
     private List<UserAttribute> userAttributes =  new ArrayList<>();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         anEnum = new PrdEnum(prdEnumIdMock, "pui-user-manager", "SIDAM_ROLE");
         userAttributes.add(userAttribute);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
@@ -49,7 +49,7 @@ public class UserAttributeServiceImplTest {
     }
 
     @Test
-    public void test_adds_user_attributes_to_user_correctly() {
+    void test_adds_user_attributes_to_user_correctly() {
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
 
         userAttributeServiceMock.addUserAttributesToUser(professionalUser, userRoles, prdEnums);

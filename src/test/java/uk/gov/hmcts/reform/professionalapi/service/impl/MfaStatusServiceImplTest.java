@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -23,13 +23,15 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
-@RunWith(MockitoJUnitRunner.class)
-public class MfaStatusServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class MfaStatusServiceImplTest {
 
     @InjectMocks
     private MfaStatusServiceImpl mfaStatusService;
@@ -47,19 +49,19 @@ public class MfaStatusServiceImplTest {
     private OrganisationMfaStatus orgMfaStatus;
 
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         orgMfaStatus = new OrganisationMfaStatus();
         mfaStatusResponse = new MfaStatusResponse();
         mfaStatusResponse.setMfa(MFAStatus.EMAIL.toString());
 
-        when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(professionalUser);
-        when(organisation.isOrganisationStatusActive()).thenReturn(true);
-        when(professionalUser.getOrganisation()).thenReturn(organisation);
+        lenient().when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(professionalUser);
+        lenient().when(organisation.isOrganisationStatusActive()).thenReturn(true);
+        lenient().when(professionalUser.getOrganisation()).thenReturn(organisation);
     }
 
     @Test
-    public void test_findMfaStatusByUserId() {
+    void test_findMfaStatusByUserId() {
         when(organisation.getOrganisationMfaStatus()).thenReturn(orgMfaStatus);
 
         ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity = mfaStatusService
@@ -74,27 +76,30 @@ public class MfaStatusServiceImplTest {
         verify(organisation, times(1)).getOrganisationMfaStatus();
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void test_findMfaStatusByUserId_shouldReturn400_whenEmptyUserID() {
-        mfaStatusService.findMfaStatusByUserId(StringUtils.EMPTY);
-    }
-
-    @Test(expected = ResourceNotFoundException.class)
-    public void test_findMfaStatusByUserId_shouldReturn404_whenUserNotFound() {
-        when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(null);
-
-        mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString());
-    }
-
-    @Test(expected = InvalidRequest.class)
-    public void test_findMfaStatusByUserId_shouldReturn400_whenInactiveOrg() {
-        when(organisation.isOrganisationStatusActive()).thenReturn(false);
-
-        mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString());
+    @Test
+    void test_findMfaStatusByUserId_shouldReturn400_whenEmptyUserID() {
+        assertThrows(InvalidRequest.class, () ->
+                mfaStatusService.findMfaStatusByUserId(StringUtils.EMPTY));
     }
 
     @Test
-    public void test_updateOrgMfaStatus() {
+    void test_findMfaStatusByUserId_shouldReturn404_whenUserNotFound() {
+        when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    void test_findMfaStatusByUserId_shouldReturn400_whenInactiveOrg() {
+        when(organisation.isOrganisationStatusActive()).thenReturn(false);
+
+        assertThrows(InvalidRequest.class, () ->
+                mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    void test_updateOrgMfaStatus() {
         MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(MFAStatus.EMAIL);
         when(organisation.getOrganisationMfaStatus()).thenReturn(new OrganisationMfaStatus());
 

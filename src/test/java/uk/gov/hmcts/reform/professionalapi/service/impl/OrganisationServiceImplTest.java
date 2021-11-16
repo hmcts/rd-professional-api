@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,10 +31,12 @@ import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
 import org.hibernate.exception.ConstraintViolationException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import org.springframework.http.HttpStatus;
@@ -81,7 +84,8 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 
-public class OrganisationServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationServiceImplTest {
 
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
@@ -138,8 +142,8 @@ public class OrganisationServiceImplTest {
     @InjectMocks
     private OrganisationServiceImpl sut;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         MockitoAnnotations.openMocks(this);
 
         sut.setOrganisationRepository(organisationRepository);
@@ -188,7 +192,7 @@ public class OrganisationServiceImplTest {
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
                 "sra-id", "false", "number01", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
-        deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
+        deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
@@ -207,7 +211,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_SavesAnOrganisation() {
+    void test_SavesAnOrganisation() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"),
                 "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"),
@@ -232,7 +236,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_SavesOrganisationWithInvalidRequest() {
+    void test_SavesOrganisationWithInvalidRequest() {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.save(any(Organisation.class))).thenThrow(ConstraintViolationException.class);
 
@@ -246,7 +250,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_addPbaAccountToOrganisation() {
+    void test_addPbaAccountToOrganisation() {
         Organisation organisationMock = mock(Organisation.class);
         Set<String> paymentAccounts = new HashSet<>();
         String pbaNumber = "PBA1234567";
@@ -258,7 +262,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_addSuperUserToOrganisation() {
+    void test_addSuperUserToOrganisation() {
         Organisation organisationMock = mock(Organisation.class);
 
         sut.addSuperUserToOrganisation(superUserCreationRequest, organisationMock);
@@ -267,16 +271,16 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_addDefaultMfaStatusToOrganisation() {
+    void test_addDefaultMfaStatusToOrganisation() {
         Organisation organisationMock = mock(Organisation.class);
 
         sut.addDefaultMfaStatusToOrganisation(organisationMock);
 
-        verify(organisationMock,times(1)).setOrganisationMfaStatus(any(OrganisationMfaStatus.class));
+        verify(organisationMock, times(1)).setOrganisationMfaStatus(any(OrganisationMfaStatus.class));
     }
 
     @Test
-    public void test_setNewContactInformationFromRequest() {
+    void test_setNewContactInformationFromRequest() {
         ContactInformation contactInformationMock = mock(ContactInformation.class);
         Organisation organisationMock = mock(Organisation.class);
 
@@ -294,7 +298,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_UpdatesAnOrganisationVerifySetMethodsAreCalled() {
+    void test_UpdatesAnOrganisationVerifySetMethodsAreCalled() {
         Organisation organisationMock = mock(Organisation.class);
 
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
@@ -320,24 +324,26 @@ public class OrganisationServiceImplTest {
     }
 
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_retrieve_an_organisations_by_status() {
-        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+    @Test
+    void test_retrieve_an_organisations_by_status() {
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                sut.findByOrganisationStatus(OrganisationStatus.ACTIVE));
     }
 
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_throwsEmptyResultDataAccessException() {
+    @Test
+    void test_throwsEmptyResultDataAccessException() {
         Organisation testOrganisation = new Organisation();
         testOrganisation.setId(UUID.randomUUID());
         String testOrganisationId = testOrganisation.getOrganisationIdentifier();
 
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
-        sut.retrieveOrganisation(testOrganisationId);
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                sut.retrieveOrganisation(testOrganisationId));
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_RetrieveAllOrganisationsThrowExceptionWhenOrganisationEmpty() throws JsonProcessingException {
+    @Test
+    void test_RetrieveAllOrganisationsThrowExceptionWhenOrganisationEmpty() throws JsonProcessingException {
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
 
@@ -349,17 +355,13 @@ public class OrganisationServiceImplTest {
         when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        OrganisationsDetailResponse organisationsDetailResponse = sut.retrieveAllOrganisations();
 
-        assertThat(organisationsDetailResponse).isNull();
-
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING);
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                sut.retrieveAllOrganisations());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void test_RetrieveAnOrganisationsByOrgIdentifier() throws Exception {
+    void test_RetrieveAnOrganisationsByOrgIdentifier() throws Exception {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
@@ -389,7 +391,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_RetrieveAnOrganisationsByWhenStatusActive() throws Exception {
+    void test_RetrieveAnOrganisationsByWhenStatusActive() throws Exception {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
@@ -427,7 +429,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_retrieveAnOrganisation() {
+    void test_retrieveAnOrganisation() {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
@@ -442,23 +444,25 @@ public class OrganisationServiceImplTest {
         verify(organisationMock, times(1)).setUsers(anyList());
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_retrieveAnOrganisationByUuidNotFound() {
+    @Test
+    void test_retrieveAnOrganisationByUuidNotFound() {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
 
-        sut.retrieveOrganisation(organisationIdentifier);
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                sut.retrieveOrganisation(organisationIdentifier));
 
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(any(String.class));
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
-        sut.findByOrganisationStatus(OrganisationStatus.PENDING);
+    @Test
+    void test_retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                sut.findByOrganisationStatus(OrganisationStatus.PENDING));
     }
 
     @Test
-    public void test_retrieveAnPendingOrganisation() {
+    void test_retrieveAnPendingOrganisation() {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
@@ -472,7 +476,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_retrieveAllOrganisations() {
+    void test_retrieveAllOrganisations() {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
         organisations.add(organisation);
@@ -486,7 +490,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_retrieveAnOrganisationByOrgId() {
+    void test_retrieveAnOrganisationByOrgId() {
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
         Organisation organisation = sut.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -497,16 +501,17 @@ public class OrganisationServiceImplTest {
     }
 
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_ThrowsExceptionWhenOrganisationEmpty() {
+    @Test
+    void test_ThrowsExceptionWhenOrganisationEmpty() {
         when(organisationRepository.findAll()).thenReturn(new ArrayList<>());
 
-        sut.retrieveAllOrganisations();
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                sut.retrieveAllOrganisations());
     }
 
 
-    @Test(expected = InvalidRequest.class)
-    public void test_throwInvalidRequestWhenInvalidPbaIsPassed() {
+    @Test
+    void test_throwInvalidRequestWhenInvalidPbaIsPassed() {
         Set<String> paymentAccountList = new HashSet<>();
         String pbaNumber = "GBA1234567";
         paymentAccountList.add(pbaNumber);
@@ -515,11 +520,12 @@ public class OrganisationServiceImplTest {
                 "sra-id", "false", "company-number", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
-        sut.createOrganisationFrom(organisationCreationRequest);
+        assertThrows(InvalidRequest.class, () ->
+                sut.createOrganisationFrom(organisationCreationRequest));
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void test_throwInvalidRequestWhenNullSuperUserEmailIsPassed() {
+    @Test
+    void test_throwInvalidRequestWhenNullSuperUserEmailIsPassed() {
         Set<String> paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
         paymentAccountList.add(pbaNumber);
@@ -531,11 +537,12 @@ public class OrganisationServiceImplTest {
                 "sra-id", "false", "company-number", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
-        sut.createOrganisationFrom(organisationCreationRequest);
+        assertThrows(InvalidRequest.class, () ->
+                sut.createOrganisationFrom(organisationCreationRequest));
     }
 
     @Test
-    public void test_AllAttributesAddedToSuperUser() {
+    void test_AllAttributesAddedToSuperUser() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"),
                 "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"),
@@ -567,7 +574,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_FakeAttributesNotAdded() {
+    void test_FakeAttributesNotAdded() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "FAKE"),
                 "pui-fake-manager", "FAKE_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(1, "FAKE_ROLE"),
@@ -584,7 +591,7 @@ public class OrganisationServiceImplTest {
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         when(userAttributeServiceMock.addUserAttributesToSuperUser(professionalUser, userAttributes
-                )).thenReturn(attributes);
+        )).thenReturn(attributes);
 
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
@@ -593,14 +600,12 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_AddContactInformationToOrganisation() {
+    void test_AddContactInformationToOrganisation() {
         ContactInformationCreationRequest contactInformationCreationRequest
                 = new ContactInformationCreationRequest("addressLine-1", "addressLine-2",
                 "addressLine-3", "townCity", "county", "country",
                 "postCode", dxAddressRequests);
         contactInformationCreationRequests.add(contactInformationCreationRequest);
-        Organisation organisation = new Organisation("some-org-name", OrganisationStatus.ACTIVE,
-                "PENDING", "Test", Boolean.TRUE, "Demo");
 
         sut.addContactInformationToOrganisation(contactInformationCreationRequests, this.organisation);
 
@@ -621,7 +626,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testDeletePendingOrganisation() {
+    void testDeletePendingOrganisation() {
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.PENDING);
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
@@ -632,7 +637,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testDeleteActiveOrganisationWithOrgAdminPending() throws Exception {
+    void testDeleteActiveOrganisationWithOrgAdminPending() throws Exception {
 
 
         NewUserResponse newUserResponse = new NewUserResponse();
@@ -654,7 +659,7 @@ public class OrganisationServiceImplTest {
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
 
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.STATUS_CODE_204);
@@ -666,7 +671,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testDeleteActiveOrganisationWithOrgAdminActiveGives400WithMessage() throws Exception {
+    void testDeleteActiveOrganisationWithOrgAdminActiveGives400WithMessage() throws Exception {
 
 
         NewUserResponse newUserResponse = new NewUserResponse();
@@ -701,7 +706,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testDeleteActiveOrganisationWithMultiUsersGives400WithMessage() throws Exception {
+    void testDeleteActiveOrganisationWithMultiUsersGives400WithMessage() {
 
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(2);
@@ -718,7 +723,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testDeleteActiveOrganisationGives500WithMessageWhenUpDown() throws Exception {
+    void testDeleteActiveOrganisationGives500WithMessageWhenUpDown() throws Exception {
 
 
         NewUserResponse newUserResponse = new NewUserResponse();
@@ -735,7 +740,7 @@ public class OrganisationServiceImplTest {
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(500).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
+        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
@@ -747,7 +752,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testDeleteActiveOrganisationWithNoUserProfileinUpGives500WithMessage() throws Exception {
+    void testDeleteActiveOrganisationWithNoUserProfileinUpGives500WithMessage() throws Exception {
 
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setIdamStatus(" ");
@@ -761,7 +766,7 @@ public class OrganisationServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(404).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
+        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
@@ -773,10 +778,8 @@ public class OrganisationServiceImplTest {
         verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
     }
 
-    @Test(expected = ExternalApiException.class)
-    public void testDeleteActiveOrganisationThrowsExceptionWhenUpServiceDown() throws Exception {
-
-
+    @Test
+    void testDeleteActiveOrganisationThrowsExceptionWhenUpServiceDown() throws Exception {
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setIdamStatus("PENDING");
         ObjectMapper mapper = new ObjectMapper();
@@ -792,11 +795,9 @@ public class OrganisationServiceImplTest {
                 .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "Error while invoking UP"));
 
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
+        assertThrows(ExternalApiException.class, () ->
+                deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789"));
 
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Error while invoking UP");
         verify(organisationRepository, times(0)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
@@ -805,7 +806,8 @@ public class OrganisationServiceImplTest {
 
     private Organisation getDeleteOrganisation(OrganisationStatus status) {
 
-        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisation);
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
@@ -823,8 +825,9 @@ public class OrganisationServiceImplTest {
         contactInformations.add(contactInformation);
         organisation.setContactInformations(contactInformations);
 
-        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE");
-        UserAttribute userAttribute = new UserAttribute(professionalUser,prdEnum);
+        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"),
+                "pui-user-manager", "SIDAM_ROLE");
+        UserAttribute userAttribute = new UserAttribute(professionalUser, prdEnum);
         userAttributes.add(userAttribute);
         professionalUser.setUserAttributes(userAttributes);
 
