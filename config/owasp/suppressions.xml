@@ -15,7 +15,7 @@
         <cve>CVE-2007-1651</cve>
         <cve>CVE-2007-1652</cve>
     </suppress>
-    <suppress>
+    <suppress until="2022-05-16">
         <notes><![CDATA[
    file name: lang-tag-1.4.4.jar
    ]]></notes>
@@ -26,7 +26,7 @@
         <cve>CVE-2020-29245</cve>
         <cve>CVE-2020-23171</cve>
     </suppress>
-    <suppress until="2021-11-16">
+    <suppress until="2022-05-16">
         <notes><![CDATA[
    file name: jakarta.el-3.0.3.jar
    ]]></notes>
