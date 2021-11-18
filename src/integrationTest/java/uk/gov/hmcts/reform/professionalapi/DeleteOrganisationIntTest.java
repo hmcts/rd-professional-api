@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -19,12 +19,12 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
-public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
+class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
 
     private String orgIdentifier;
 
     @Test
-    public void returns_204_when_delete_minimal_pending_organisation_successfully() {
+    void returns_204_when_delete_minimal_pending_organisation_successfully() {
 
         Map<String, Object> deleteResponse = deleteOrganization();
 
@@ -37,7 +37,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void return_forbidden_when_no_role_associated_with_end_point_to_delete_pending_organisation() {
+    void return_forbidden_when_no_role_associated_with_end_point_to_delete_pending_organisation() {
 
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
 
@@ -51,7 +51,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void return_404_when_un_known_org_identifier_in_the_request_to_delete_pending_organisation() {
+    void return_404_when_un_known_org_identifier_in_the_request_to_delete_pending_organisation() {
 
         Map<String, Object> deleteResponse =
             professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, "O12DEF3");
@@ -59,7 +59,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void return_400_when_invalid_org_identifier_in_the_request_to_delete_pending_organisation() {
+    void return_400_when_invalid_org_identifier_in_the_request_to_delete_pending_organisation() {
 
         Map<String, Object> deleteResponse =
             professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, "O12DEF");
@@ -67,7 +67,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void returns_400_with_error_msg_when_delete_active_organisation_with_active_user_profile() {
+    void returns_400_with_error_msg_when_delete_active_organisation_with_active_user_profile() {
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
         String orgIdentifier = createAndActivateOrganisation();
 
@@ -80,7 +80,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void returns_204_when_delete_active_organisation_with_one_pending_user_profile() {
+    void returns_204_when_delete_active_organisation_with_one_pending_user_profile() {
 
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
         String orgIdentifier = createAndActivateOrganisation();
@@ -92,7 +92,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void returns_400_when_delete_active_organisation_with_more_than_one__user_profile() {
+    void returns_400_when_delete_active_organisation_with_more_than_one__user_profile() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -114,7 +114,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void returns_404_when_delete_active_organisation_with_external_endpoint() {
+    void returns_404_when_delete_active_organisation_with_external_endpoint() {
 
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
         String orgIdentifier = createAndActivateOrganisation();

@@ -11,8 +11,8 @@ import java.io.FileOutputStream;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.Application;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Integration")})
 @SpringBootTest(classes = Application.class, webEnvironment = MOCK)
-public class SwaggerPublisher {
+class SwaggerPublisher {
 
     private static final Logger LOG = getLogger(SwaggerPublisher.class);
 
@@ -39,13 +39,13 @@ public class SwaggerPublisher {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
-    public void shouldGenerateDocs() throws Exception {
+    void shouldGenerateDocs() throws Exception {
 
         LOG.info("Generating Swagger Docs");
 

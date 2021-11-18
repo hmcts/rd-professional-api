@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -16,10 +16,10 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
-public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void update_mfa_status_of_an_active_organisation_with_prd_admin_role_should_return_200() {
+    void update_mfa_status_of_an_active_organisation_with_prd_admin_role_should_return_200() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(createMfaUpdateRequest(), getOrganisationId(), hmctsAdmin);
 
@@ -27,7 +27,7 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    public void update_mfa_status_with_bad_request_should_return_400() {
+    void update_mfa_status_with_bad_request_should_return_400() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(null, getOrganisationId(), hmctsAdmin);
 
@@ -35,7 +35,7 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    public void update_mfa_status_with_invalid_mfa_should_return_400() {
+    void update_mfa_status_with_invalid_mfa_should_return_400() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(null, getOrganisationId(), hmctsAdmin);
 
@@ -44,7 +44,7 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    public void update_mfa_status_when_organisation_not_active_should_return_400() {
+    void update_mfa_status_when_organisation_not_active_should_return_400() {
         String pendingOrganisationId = createOrganisationRequest();
         updateOrganisation(pendingOrganisationId, hmctsAdmin, "PENDING");
 
@@ -57,7 +57,7 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    public void update_mfa_status_when_organisation_not_found_should_return_404() {
+    void update_mfa_status_when_organisation_not_found_should_return_404() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(createMfaUpdateRequest(), "ABCDEF7", hmctsAdmin);
 
@@ -67,21 +67,21 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    public void update_mfa_status_with_invalid_user_roles_should_return_403() {
+    void update_mfa_status_with_invalid_user_roles_should_return_403() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(createMfaUpdateRequest(), getOrganisationId(), "Invalid Role");
         assertThat(updateResponse).containsEntry("http_status", "403");
     }
 
     @Test
-    public void update_mfa_status_returns_401_when_invalid_authentication() {
+    void update_mfa_status_returns_401_when_invalid_authentication() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatusUnauthorised(createMfaUpdateRequest(), getOrganisationId(), hmctsAdmin);
         assertThat(updateResponse).containsEntry("http_status", "401");
     }
 
     @Test
-    public void returns_launchDarkly_forbidden_when_update_mfa_status_with_invalid_flag() {
+    void returns_launchDarkly_forbidden_when_update_mfa_status_with_invalid_flag() {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus",
                 "test-update-mfa-flag");

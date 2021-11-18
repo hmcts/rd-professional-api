@@ -8,17 +8,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
+class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void test_editPaymentAccountsShouldReturn200() {
+    void test_editPaymentAccountsShouldReturn200() {
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("PBA0000001");
         newPaymentAccounts.add("PBA0000003");
@@ -49,7 +49,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
+    void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
         PbaEditRequest pbaEditRequest = new PbaEditRequest();
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("PBA0000003");
@@ -61,7 +61,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed() {
+    void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed() {
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("this-is-invalid");
 
@@ -77,7 +77,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
 
     @Test
-    public void test_editPaymentAccountsShouldDeleteAllAccountsIfEmptyListIsSent() {
+    void test_editPaymentAccountsShouldDeleteAllAccountsIfEmptyListIsSent() {
 
         Set<String> newPaymentAccounts = new HashSet<>();
         PbaEditRequest pbaEditRequest = new PbaEditRequest();
@@ -99,7 +99,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsSldRtn400IfPaymentAccountBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
+    void test_editPaymentAccountsSldRtn400IfPaymentAccountBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
         Set<String> existingPaymentAccounts = new HashSet<>();
         existingPaymentAccounts.add("PBA0000003");
         existingPaymentAccounts.add("PBA0000004");
@@ -129,7 +129,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed_WithPbaInErrorMessage() {
+    void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed_WithPbaInErrorMessage() {
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("this-is-invalid");
 
