@@ -9,7 +9,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -28,7 +27,6 @@ import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 
 import java.io.IOException;
@@ -40,13 +38,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -69,9 +65,10 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.util.serenity5.SerenityTest;
 
 @Configuration
-@RunWith(SpringIntegrationSerenityRunner.class)
+@SerenityTest
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
         "USER_PROFILE_URL:http://127.0.0.1:8091"})
@@ -104,20 +101,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     public ProfessionalUserServiceImpl professionalUserServiceImpl;
 
-    @ClassRule
-    public static WireMockRule s2sService = new WireMockRule(wireMockConfig().port(8990));
+    @RegisterExtension
+    public static WireMockExtension s2sService = new WireMockExtension(8990);
 
+    @RegisterExtension
+    public static WireMockExtension userProfileService = new WireMockExtension(8091, new ExternalTransformer());
 
-    @ClassRule
-    public static WireMockRule userProfileService = new WireMockRule(wireMockConfig().port(8091)
-            .extensions(new MultipleUsersResponseTransformer()));
+    @RegisterExtension
+    public static WireMockExtension sidamService = new WireMockExtension(5000, new ExternalTransformer());
 
-    @ClassRule
-    public static WireMockRule sidamService = new WireMockRule(wireMockConfig().port(5000)
-            .extensions(ExternalTransformer.class));
-
-    @ClassRule
-    public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
+    @RegisterExtension
+    public static WireMockExtension mockHttpServerForOidc = new WireMockExtension(7000);
 
     @Value("${prd.security.roles.hmcts-admin}")
     protected String hmctsAdmin;
@@ -165,13 +159,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @MockBean
     protected FeatureToggleServiceImpl featureToggleService;
 
-    @Before
+    @BeforeEach
     public void setUpClient() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
         when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
     }
 
-    @Before
+    @BeforeEach
     public void setupIdamStubs() throws Exception {
 
         s2sService.stubFor(get(urlEqualTo("/details"))
@@ -197,7 +191,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "  \"uid\": \"%s\","
                                 + "  \"forename\": \"Super\","
                                 + "  \"surname\": \"User\","
-                                + "  \"email\": \"super.user@hmcts.net\","
+                                + "  \"email\": \"dummy@email.com\","
                                 + "  \"accountStatus\": \"active\","
                                 + "  \"roles\": ["
                                 + "  \"%s\""
@@ -212,7 +206,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody(getDynamicJwksResponse())));
     }
 
-    @Before
+    @BeforeEach
     public void userProfileGetUserWireMock() {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
@@ -220,14 +214,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withStatus(200)
                         .withBody("{"
                                 + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
-                                + "  \"firstName\": \"prashanth\","
-                                + "  \"lastName\": \"rao\","
-                                + "  \"email\": \"super.user@hmcts.net\","
+                                + "  \"firstName\": \"donatello\","
+                                + "  \"lastName\": \"raphael\","
+                                + "  \"email\": \"dummy@email.com\","
                                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
                                 + "}")));
     }
 
-    @After
+    @AfterEach
     public void cleanupTestData() {
         dxAddressRepository.deleteAll();
         contactInformationRepository.deleteAll();
@@ -380,9 +374,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"Prashanth\","
+                + "  \"firstName\": \"donatello\","
                 + "  \"lastName\": \"R\","
-                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"email\": \"dummy@email.com\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-organisation-manager\""
@@ -392,9 +386,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + "  {"
                 + "  \"userIdentifier\":\" %s" + "\","
-                + "  \"firstName\": \"Shreedhar\","
+                + "  \"firstName\": \"michelangelo\","
                 + "  \"lastName\": \"L\","
-                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"email\": \"dummy@email.com\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-case-manager\""
@@ -404,9 +398,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + " {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"Adil\","
+                + "  \"firstName\": \"leonardo\","
                 + "  \"lastName\": \"O\","
-                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"email\": \"dummy@email.com\","
                 + "  \"idamStatus\": \"DELETED\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"404\","
@@ -430,9 +424,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"Prashanth\","
+                + "  \"firstName\": \"donatello\","
                 + "  \"lastName\": \"R\","
-                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"email\": \"dummy@email.com\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
@@ -440,9 +434,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"Shreedhar\","
+                + "  \"firstName\": \"michelangelo\","
                 + "  \"lastName\": \"L\","
-                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"email\": \"dummy@email.com\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
@@ -450,9 +444,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + " {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"Adil\","
+                + "  \"firstName\": \"leonardo\","
                 + "  \"lastName\": \"O\","
-                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"email\": \"dummy@email.com\","
                 + "  \"idamStatus\": \"" + IdamStatus.PENDING + "\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
@@ -493,9 +487,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"Adil\","
+                + "  \"firstName\": \"leonardo\","
                 + "  \"lastName\": \"O\","
-                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"email\": \"dummy@email.com\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-organisation-manager\","
