@@ -98,7 +98,7 @@ withNightlyPipeline(type, product, component) {
                 allowMissing         : true,
                 alwaysLinkToLastBuild: true,
                 keepAll              : true,
-                reportDir            : "build/reports/pitest/**",
+                reportDir            : "build/reports/pitest/**/",
                 reportFiles          : "index.html",
                 reportName           : "Mutation Test Report"
         ]
