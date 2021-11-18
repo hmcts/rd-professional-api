@@ -73,6 +73,17 @@ withNightlyPipeline(type, product, component) {
 
     after('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/**/*'
+
+        publishHTML target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "target/site/serenity/",
+                reportFiles          : "index.html",
+                reportName           : "Functional Tests Report"
+        ]
+
         print "calling delete script for nightly"
         withSubscription(subscription) {
             withTeamSecrets(config, params.ENVIRONMENT) {
@@ -80,6 +91,17 @@ withNightlyPipeline(type, product, component) {
             }
         }
         print "completed delete script for nightly"
+    }
+
+    after('mutationTest') {
+        publishHTML target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/pitest/**",
+                reportFiles          : "index.html",
+                reportName           : "Mutation Test Report"
+        ]
     }
 
     after('fortify-scan') {
