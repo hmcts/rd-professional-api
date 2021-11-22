@@ -68,24 +68,162 @@ withPipeline(type, product, component) {
         env.execution_environment = "aat"
     }
 
-    after('integrationTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+    after('sonarscan') {
+
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/test",
+            reportFiles          : "index.html",
+            reportName           : "Unit Tests Report"
+        ]
+
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/integration",
+            reportFiles          : "index.html",
+            reportName           : "Integration Test Report"
+        ]
     }
 
-    after('integrationTest:aat') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+   after('smoketest:preview') {
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/smoke",
+            reportFiles          : "index.html",
+            reportName           : "Smoke Test Report"
+        ]
     }
+
+   after('smoketest:aat') {
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/smoke",
+            reportFiles          : "index.html",
+            reportName           : "Smoke Test Report"
+        ]
+   }
+
+   after('functionalTest:aat') {
+       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+       publishHTML target: [
+           allowMissing         : true,
+           alwaysLinkToLastBuild: true,
+           keepAll              : true,
+           reportDir            : "target/site/serenity/",
+           reportFiles          : "index.html",
+           reportName           : "Functional Tests Report"
+       ]
+   }
 
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-    }
-
-    after('functionalTest:aat') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "target/site/serenity/",
+            reportFiles          : "index.html",
+            reportName           : "Functional Tests Report"
+        ]
     }
 
     after('pact-provider-verification') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
+        publishHTML target: [
+                     allowMissing         : true,
+                     alwaysLinkToLastBuild: true,
+                     keepAll              : true,
+                    reportDir            : "build/reports/tests/runProviderPactVerification",
+                    reportFiles          : "index.html",
+                    reportName           : "Contract Tests Report"
+                ]
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
+    }
+
+    after('sonarscan') {
+
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/test",
+            reportFiles          : "index.html",
+            reportName           : "Unit Tests Report"
+        ]
+
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/integration",
+            reportFiles          : "index.html",
+            reportName           : "Integration Test Report"
+        ]
+    }
+
+   after('smoketest:preview') {
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/smoke",
+            reportFiles          : "index.html",
+            reportName           : "Smoke Test Report"
+        ]
+    }
+
+   after('smoketest:aat') {
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/smoke",
+            reportFiles          : "index.html",
+            reportName           : "Smoke Test Report"
+        ]
+   }
+
+   after('functionalTest:aat') {
+       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+       publishHTML target: [
+           allowMissing         : true,
+           alwaysLinkToLastBuild: true,
+           keepAll              : true,
+           reportDir            : "target/site/serenity/",
+           reportFiles          : "index.html",
+           reportName           : "Functional Tests Report"
+       ]
+   }
+
+    after('functionalTest:preview') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "target/site/serenity/",
+            reportFiles          : "index.html",
+            reportName           : "Functional Tests Report"
+        ]
+    }
+
+    after('pact-provider-verification') {
+        publishHTML target: [
+                     allowMissing         : true,
+                     alwaysLinkToLastBuild: true,
+                     keepAll              : true,
+                    reportDir            : "build/reports/tests/runProviderPactVerification",
+                    reportFiles          : "index.html",
+                    reportName           : "Contract Tests Report"
+                ]
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 
     onMaster() {
