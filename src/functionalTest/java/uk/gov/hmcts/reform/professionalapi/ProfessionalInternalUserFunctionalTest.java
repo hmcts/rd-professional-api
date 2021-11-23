@@ -17,8 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
@@ -29,10 +31,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
+import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
+import uk.gov.hmcts.reform.professionalapi.util.serenity5.SerenityTest;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,11 +42,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@RunWith(CustomSerenityRunner.class)
+@SerenityTest
+@SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
 @SuppressWarnings("unchecked")
-public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest {
+class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest {
 
     String intActiveOrgId;
     String superUserEmail;
@@ -53,7 +56,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     OrganisationCreationRequest organisationCreationRequest;
 
     @Test
-    public void testInternalUserScenario() {
+    @DisplayName("PRD Internal Test Scenarios")
+    void testInternalUserScenario() {
         setUpTestData();
         createOrganisationScenario();
         inviteUserScenarios();
@@ -223,7 +227,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         professionalApiClient.createOrganisation();
         Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(finalResponse.get("organisations")).isNotNull();
-        Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+        Assertions.assertThat(finalResponse.size()).isPositive();
         log.info("findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
@@ -231,7 +235,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         log.info("findActiveOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name(), hmctsAdmin);
-        assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.size()).isPositive();
         log.info("findActiveOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
@@ -240,7 +244,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
-        assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.size()).isPositive();
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
     
@@ -406,8 +410,9 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = true)
-    public void updateOrgMfaScenario() {
+    void updateOrgMfaScenario() {
         setUpTestData();
         updateOrgMfaShouldBeSuccess();
     }
@@ -426,14 +431,16 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, OK);
 
         Map<String, Object> findOrgMfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
-        assertThat(findOrgMfaStatusResponse.get("mfa")).isEqualTo(status.toString());
+        assertThat(findOrgMfaStatusResponse).containsEntry("mfa", status.toString());
 
         log.info("updateOrgMFAShouldBeSuccess :: END");
     }
 
     @Test
+    @DisplayName("Update Organisation's MFA should return 403 when toggled off")
+    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = false)
-    public void updateOrgMfaShouldReturn403WhenToggledOff() throws IOException {
+    void updateOrgMfaShouldReturn403WhenToggledOff() {
         log.info("updateOrgMFAShouldReturn403 :: STARTED");
 
         setUpTestData();
