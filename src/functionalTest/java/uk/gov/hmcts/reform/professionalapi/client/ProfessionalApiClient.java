@@ -70,7 +70,7 @@ public class ProfessionalApiClient {
         String s2sToken, IdamOpenIdClient idamOpenIdClient) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
-        this.idamOpenIdClient = idamOpenIdClient;
+        ProfessionalApiClient.idamOpenIdClient = idamOpenIdClient;
     }
 
     public IdamOpenIdClient getidamOpenIdClient() {
