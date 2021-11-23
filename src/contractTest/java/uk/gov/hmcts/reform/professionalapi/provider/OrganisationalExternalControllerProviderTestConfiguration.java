@@ -32,8 +32,8 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
     @Primary
     public PaymentAccountService paymentAccountService() {
         return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
-            emf, professionalUserRepository, organisationService,
-            userAccountMapService);
+                emf, professionalUserRepository, organisationService,
+                userAccountMapService);
     }
 
     @Bean

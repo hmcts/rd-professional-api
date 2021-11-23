@@ -31,10 +31,10 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWith
 @Provider("referenceData_organisationalInternal")
 @Import(OrganisationalInternalControllerProviderTestConfiguration.class)
 public class OrganisationalInternalControllerProviderTest extends MockMvcProviderTest {
+
     @Autowired
     OrganisationRepository organisationRepository;
 
@@ -67,6 +68,11 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     MappingJackson2HttpMessageConverter httpMessageConverter;
+
+    public static final String ORG_NAME = "Org-Name";
+    public static final String SRA_ID = "sra-id";
+    public static final String COMPANY_NUMBER = "companyN";
+    public static final String COMPANY_URL = "www.org.com";
 
     @Override
     void setController() {
@@ -94,42 +100,42 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @State("Active organisations exists for a logged in user")
     public void setActiveOrganisationsForLoggedInUser() throws IOException {
 
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
-            "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(Arrays.asList(organisation));
+        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(asList(organisation));
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
-            "email@org.com", organisation);
+                "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUserProfiles().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-            false);
+                false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
-            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
     }
 
     @State("User invited to Organisation")
     public void setUpUserForInviteToOrganisation() throws IOException {
 
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-            "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
         organisation.setOrganisationIdentifier("UTVC86X");
 
         ProfessionalUser pu = new ProfessionalUser("firstName", "lastName",
-            "email@org.com", organisation);
+                "email@org.com", organisation);
         when(professionalUserService
-            .findProfessionalUserByEmailAddress(anyString())).thenReturn(pu);
+                .findProfessionalUserByEmailAddress(anyString())).thenReturn(pu);
 
-        when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(Arrays.asList("role"));
+        when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(asList("role"));
 
         UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
 
@@ -137,19 +143,19 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
-            .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
-                .status(201).build());
+                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                        .status(201).build());
     }
 
     @State("An Organisation exists for update")
     public void setUpOrganisationForUpdate() {
 
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-            "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
-        Organisation updatedOrganisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-            "companyN", false, "www.org.com");
+        Organisation updatedOrganisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
@@ -160,15 +166,15 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @State("An Organisation with PBA accounts exists")
     public void setUpOrganisationForPBAsUpdate() {
 
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-            "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
         when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
-            any(PbaEditRequest.class)))
-            .thenReturn(new PbaResponse("200", "Success"));
+                any(PbaEditRequest.class)))
+                .thenReturn(new PbaResponse("200", "Success"));
     }
 
     //MFA put api test
@@ -179,7 +185,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
-            "some-email-address", organisation);
+                "some-email-address", organisation);
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
@@ -188,8 +194,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     }
 
     private Organisation getOrganisation() {
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-            "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
         ContactInformation contactInformation = new ContactInformation();
@@ -197,7 +203,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         contactInformation.setAddressLine2("addressLine2");
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
-        organisation.setContactInformations(Arrays.asList(contactInformation));
+        organisation.setContactInformations(asList(contactInformation));
         return organisation;
     }
 

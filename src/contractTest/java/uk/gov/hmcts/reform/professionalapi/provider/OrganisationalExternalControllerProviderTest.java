@@ -69,18 +69,18 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
-            "firstName", "lastName", IdamStatus.ACTIVE);
+                "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
-            .thenReturn(Response.builder()
-                .request(mock(Request.class))
-                .body(body, Charset.defaultCharset()).status(200).build());
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(200).build());
 
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
-            .thenReturn(UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).build());
+                .thenReturn(UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).build());
 
         when(professionalUserRepositoryMock.findByEmailAddress(ORGANISATION_EMAIL)).thenReturn(professionalUser);
 

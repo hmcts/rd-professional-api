@@ -45,11 +45,11 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @Bean
     protected ProfessionalUserService professionalUserService() {
         return new ProfessionalUserServiceImpl(organisationRepository,
-            professionalUserRepository,
-            userAttributeRepository,
-            prdEnumRepository,
-            userAttributeService,
-            userProfileFeignClient);
+                professionalUserRepository,
+                userAttributeRepository,
+                prdEnumRepository,
+                userAttributeService,
+                userProfileFeignClient);
     }
 
     @MockBean
@@ -71,8 +71,8 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @Primary
     public PaymentAccountService paymentAccountService() {
         return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
-            emf, professionalUserRepository, organisationService,
-            userAccountMapService);
+                emf, professionalUserRepository, organisationService,
+                userAccountMapService);
     }
 
     @Bean
