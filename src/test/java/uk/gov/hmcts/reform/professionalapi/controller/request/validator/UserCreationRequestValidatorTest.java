@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
@@ -30,8 +30,10 @@ class UserCreationRequestValidatorTest {
 
     @Test
     void test_validateRolesThrows400WhenVerifiedRolesIsEmpty() {
+        List<String> emptyList = emptyList();
+
         assertThrows(InvalidRequest.class, () ->
-                validateRoles(emptyList()));
+                validateRoles(emptyList));
     }
 
     @Test

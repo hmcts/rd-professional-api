@@ -76,8 +76,10 @@ class ProfessionalUserReqValidatorTest {
     void test_validateModifyRolesRequestThrows400ForInvalidAddRoleName() {
         userProfileUpdatedData.setRolesAdd((singleton(new RoleName(""))));
 
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(InvalidRequest.class, () ->
-                profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString()));
+                profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, uuid));
     }
 
     @Test
@@ -85,8 +87,10 @@ class ProfessionalUserReqValidatorTest {
         userProfileUpdatedData.setRolesAdd((singleton(new RoleName("pui-user-manager"))));
         userProfileUpdatedData.setRolesDelete((singleton(new RoleName(""))));
 
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(InvalidRequest.class, () ->
-                profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString()));
+                profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, uuid));
     }
 
     @Test

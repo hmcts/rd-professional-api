@@ -11,10 +11,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 @ExtendWith(MockitoExtension.class)
-public class GetUserProfileResponseTest {
+class GetUserProfileResponseTest {
 
     @Test
-    public void test_GetUserProfileResponseTest() {
+    void test_GetUserProfileResponseTest() {
         UserProfile userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com",
                 "fName", "lName", IdamStatus.PENDING);
 

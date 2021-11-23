@@ -123,8 +123,9 @@ class OrganisationCreationRequestValidatorTest {
 
     @Test
     void test_isOrganisationActive_Empty() {
+        Organisation organisation = new Organisation();
         assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.isOrganisationActive(new Organisation()));
+                organisationCreationRequestValidator.isOrganisationActive(organisation));
     }
 
     @Test

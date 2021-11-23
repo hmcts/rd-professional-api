@@ -104,6 +104,7 @@ class ProfessionalUserServiceImplTest {
     private List<PrdEnum> prdEnums = new ArrayList<>();
     private List<String> userRoles = new ArrayList<>();
     ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    Optional<String> emptyOptional = Optional.of("");
 
     @BeforeEach
     void setup() {
@@ -262,8 +263,10 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
+        String uuid = UUID.randomUUID().toString();
+
         ResponseEntity<Object> response = professionalUserService.modifyRolesForUser(userProfileUpdatedData,
-                UUID.randomUUID().toString(), Optional.of(""));
+                uuid, Optional.of(""));
 
         ModifyUserRolesResponse modifyUserRolesResponseFromTest = (ModifyUserRolesResponse) response.getBody();
         assertThat(modifyUserRolesResponseFromTest).isNotNull();
@@ -293,16 +296,18 @@ class ProfessionalUserServiceImplTest {
         roles.add(roleName2);
         userProfileUpdatedData.setRolesAdd(roles);
 
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(ExternalApiException.class, () ->
-                professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(),
-                Optional.of("")));
+                professionalUserService.modifyRolesForUser(userProfileUpdatedData, uuid,
+                emptyOptional));
 
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(feignExceptionMock, times(2)).status();
 
         assertThrows(ExternalApiException.class, () ->
-                professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(),
-                Optional.of("")));
+                professionalUserService.modifyRolesForUser(userProfileUpdatedData, uuid,
+                emptyOptional));
 
         verify(userProfileFeignClient, times(2)).modifyUserRoles(any(), any(), any());
         verify(feignExceptionMock, times(4)).status();
@@ -608,8 +613,9 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
+        String email = professionalUser.getEmailAddress();
         assertThrows(EmptyResultDataAccessException.class, () ->
-                professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress()));
+                professionalUserService.findUserStatusByEmailAddress(email));
 
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
@@ -625,15 +631,14 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString()))
                 .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
-        final Throwable raisedException = catchThrowable(() -> professionalUserService
-                .findUserStatusByEmailAddress(professionalUser.getEmailAddress()));
+        String email = professionalUser.getEmailAddress();
 
         assertThrows(ExternalApiException.class,() ->
-                professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress()));
+                professionalUserService.findUserStatusByEmailAddress(email));
 
-        verify(professionalUserRepository, times(2))
+        verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(2)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
     @SneakyThrows
@@ -652,6 +657,7 @@ class ProfessionalUserServiceImplTest {
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();
+
         assertDoesNotThrow(() ->
                 professionalUserService.checkUserStatusIsActiveByUserId(userId));
         verify(professionalUserRepository, times(1)).findByUserIdentifier(any(String.class));
@@ -662,8 +668,10 @@ class ProfessionalUserServiceImplTest {
     void test_checkUserStatusIsActiveByUserId_Throws403_WhenNoUserFoundWithGivenId() {
         when(professionalUserRepository.findByUserIdentifier(any(String.class))).thenReturn(null);
 
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(AccessDeniedException.class, () ->
-                professionalUserService.checkUserStatusIsActiveByUserId(UUID.randomUUID().toString()));
+                professionalUserService.checkUserStatusIsActiveByUserId(uuid));
 
         verify(professionalUserRepository, times(1)).findByUserIdentifier(any(String.class));
     }
@@ -683,7 +691,9 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
+
         String userId = UUID.randomUUID().toString();
+
         assertThrows(AccessDeniedException.class, () ->
                 professionalUserService.checkUserStatusIsActiveByUserId(userId));
     }
@@ -725,9 +735,11 @@ class ProfessionalUserServiceImplTest {
     void callModifyRolesForUser(HttpStatus status) {
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
 
+        String uuid = UUID.randomUUID().toString();
+
         Throwable thrown
                 = catchThrowable(() ->  professionalUserService.modifyRolesForUser(new UserProfileUpdatedData(),
-                UUID.randomUUID().toString(), Optional.of("")));
+                uuid, Optional.of("")));
         assertThat(thrown)
                 .isInstanceOf(ExternalApiException.class)
                 .hasMessageContaining(ERROR_MESSAGE_UP_FAILED);

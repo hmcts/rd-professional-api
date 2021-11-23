@@ -64,8 +64,10 @@ class MfaStatusServiceImplTest {
     void test_findMfaStatusByUserId() {
         when(organisation.getOrganisationMfaStatus()).thenReturn(orgMfaStatus);
 
+        String uuid = UUID.randomUUID().toString();
+
         ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity = mfaStatusService
-                .findMfaStatusByUserId(UUID.randomUUID().toString());
+                .findMfaStatusByUserId(uuid);
 
         assertThat(mfaStatusResponseEntity).isNotNull();
         assertThat(mfaStatusResponseEntity.getBody()).isNotNull();
@@ -86,16 +88,20 @@ class MfaStatusServiceImplTest {
     void test_findMfaStatusByUserId_shouldReturn404_whenUserNotFound() {
         when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(null);
 
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(ResourceNotFoundException.class, () ->
-                mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString()));
+                mfaStatusService.findMfaStatusByUserId(uuid));
     }
 
     @Test
     void test_findMfaStatusByUserId_shouldReturn400_whenInactiveOrg() {
         when(organisation.isOrganisationStatusActive()).thenReturn(false);
 
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(InvalidRequest.class, () ->
-                mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString()));
+                mfaStatusService.findMfaStatusByUserId(uuid));
     }
 
     @Test

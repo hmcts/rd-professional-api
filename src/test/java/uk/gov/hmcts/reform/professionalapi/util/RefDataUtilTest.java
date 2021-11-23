@@ -129,7 +129,7 @@ class RefDataUtilTest {
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
         assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isGreaterThan(0);
+        assertThat(paymentAccounts.size()).isPositive();
     }
 
     @Test
@@ -182,8 +182,9 @@ class RefDataUtilTest {
     @Test
     void test_shouldReturnTrueValidateOrgIdentifier() {
         String uuid = UUID.randomUUID().toString();
+        String uuid2 = UUID.randomUUID().toString();
         assertThrows(AccessDeniedException.class,() ->
-                RefDataUtil.validateOrgIdentifier(uuid, UUID.randomUUID().toString()));
+                RefDataUtil.validateOrgIdentifier(uuid, uuid2));
     }
 
     @Test
@@ -599,11 +600,13 @@ class RefDataUtilTest {
 
         when(userProfileFeignClient.getUserProfileById(any())).thenThrow(feignExceptionMock);
 
-        assertThrows(ExternalApiException.class, () ->
-                RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
+        ProfessionalUser user = new ProfessionalUser("firstName",
                 "lastName", "some@email.com", new Organisation("name",
                 OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
-                "companyUrl")), userProfileFeignClient, Boolean.TRUE));
+                "companyUrl"));
+
+        assertThrows(ExternalApiException.class, () ->
+                RefDataUtil.getSingleUserIdFromUserProfile(user, userProfileFeignClient, Boolean.TRUE));
 
         verify(userProfileFeignClient, times(1)).getUserProfileById(any());
     }
@@ -733,11 +736,13 @@ class RefDataUtilTest {
         when(response.status()).thenReturn(realResponse.status());
         when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
 
-        assertThrows(ExternalApiException.class, () ->
-                RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
+        ProfessionalUser user = new ProfessionalUser("firstName",
                 "lastName", "emailAddress", new Organisation("name",
                 OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
-                "companyUrl")), userProfileFeignClient, Boolean.TRUE));
+                "companyUrl"));
+
+        assertThrows(ExternalApiException.class, () ->
+                RefDataUtil.getSingleUserIdFromUserProfile(user, userProfileFeignClient, Boolean.TRUE));
 
         verify(userProfileFeignClient, times(1)).getUserProfileById(any());
         verify(response, times(1)).body();

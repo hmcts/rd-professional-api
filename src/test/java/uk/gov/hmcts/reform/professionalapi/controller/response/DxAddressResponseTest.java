@@ -8,10 +8,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 
 @ExtendWith(MockitoExtension.class)
-public class DxAddressResponseTest {
+class DxAddressResponseTest {
 
     @Test
-    public void test_DxAddress() {
+    void test_DxAddress() {
         final String expectDxNumber = "01234567";
         final String expectDxExchange = "DX 1234";
         final DxAddress dxAddress = new DxAddress();

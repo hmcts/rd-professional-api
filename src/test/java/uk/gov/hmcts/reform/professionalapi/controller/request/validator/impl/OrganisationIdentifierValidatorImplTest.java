@@ -61,32 +61,40 @@ class OrganisationIdentifierValidatorImplTest {
     void test_shouldThrowAEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
         organisation.setPaymentAccounts(new ArrayList<>());
 
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
-                        organisation, UUID.randomUUID().toString()));
+                        organisation, uuid));
     }
 
     @Test
     void test_shouldThrowAAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
         organisation.setPaymentAccounts(singletonList(paymentAccount));
 
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(AccessDeniedException.class, () ->
                 organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
-                        organisation, UUID.randomUUID().toString()));
+                        organisation, uuid));
     }
 
     @Test
     void test_shouldThrowEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
-                        organisation, UUID.randomUUID().toString()));
+                        organisation, uuid));
     }
 
     @Test
     void shouldThrowEmptyResultDataAccessExceptionWhenOrganisationIsNull() {
+        String uuid = UUID.randomUUID().toString();
+
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
-                        null, UUID.randomUUID().toString()));
+                        null, uuid));
     }
 
     @Test
