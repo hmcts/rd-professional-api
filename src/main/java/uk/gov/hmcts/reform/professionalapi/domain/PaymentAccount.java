@@ -52,6 +52,9 @@ public class PaymentAccount implements Serializable {
     @JoinColumn(name = "ORGANISATION_ID")
     private Organisation organisation;
 
+    @Column(name = "ORGANISATION_ID", insertable = false, updatable = false)
+    private UUID organisationId;
+
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
