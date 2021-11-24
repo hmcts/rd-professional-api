@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Use
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
@@ -67,12 +68,15 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @MockBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
+    @MockBean
+    PaymentAccountRepository paymentAccountRepository;
+
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
         return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
             emf, professionalUserRepository, organisationService,
-            userAccountMapService);
+            userAccountMapService, paymentAccountRepository);
     }
 
     @Bean

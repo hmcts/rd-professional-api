@@ -22,10 +22,12 @@ public class OrganisationTest {
         organisation.setCreated(LocalDateTime.now());
         organisation.setContactInformations(contactInformations);
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
+        organisation.setStatusMessage("statusMessage");
 
         assertThat(organisation.isOrganisationStatusActive()).isTrue();
         assertThat(organisation.getName()).isEqualTo("some-name");
         assertThat(organisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
+        assertThat(organisation.getStatusMessage()).isEqualTo("statusMessage");
         assertThat(organisation.getSraId()).isEqualTo("sra-id");
         assertThat(organisation.getCompanyNumber()).isEqualTo("company-number");
         assertThat(organisation.getSraRegulated()).isEqualTo(Boolean.FALSE);
