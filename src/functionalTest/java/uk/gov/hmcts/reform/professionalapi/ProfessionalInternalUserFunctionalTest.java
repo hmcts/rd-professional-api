@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -11,6 +14,7 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +28,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
@@ -64,6 +73,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         reinviteUserScenarios();
         editPbaScenarios();
         deleteOrganisationScenarios();
+        updateOrgStatusScenarios();
     }
 
     public void setUpTestData() {
@@ -107,6 +117,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
+        findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
     }
 
     public void retrieveOrganisationPbaScenarios() {
@@ -174,7 +185,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
         log.info("inviteUserWithDuplicateUserShouldReturnConflict :: END");
     }
-    
+
     public void findUsersByInternalUserWithRolesShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithRolesShouldReturnSuccess :: STARTED");
         validateRetrievedUsers(professionalApiClient
@@ -243,7 +254,18 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
-    
+
+    public void findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess() {
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient
+                .retrieveOrganisationDetailsByStatus("ACTIVE,PENDING", hmctsAdmin);
+        assertThat(response.get("organisations")).isNotNull();
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
+        assertThat(response.get("organisations").toString()).contains("status=PENDING");
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
+    }
+
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
@@ -277,7 +299,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                 .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, intActiveOrgId,
                         invitedUserId);
         assertThat(modifiedUserResponse).isNotNull().hasSize(3);
-        assertThat(((Map)modifiedUserResponse.get("roleAdditionResponse")).get("idamStatusCode")).isEqualTo("201");
+        assertThat(((Map) modifiedUserResponse.get("roleAdditionResponse")).get("idamStatusCode")).isEqualTo("201");
         List<String> rolesToValidate = new ArrayList<>();
         rolesToValidate.add(puiUserManager);
         rolesToValidate.add(puiOrgManager);
@@ -299,7 +321,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                 .modifyUserToExistingUserForPrdAdmin(
                         HttpStatus.OK, userProfileUpdatedData, intActiveOrgId, invitedUserId);
         assertThat(modifiedUserResponse).isNotNull().hasSize(3);
-        assertThat(((Map)((List)modifiedUserResponse.get("roleDeletionResponse")).get(0)).get("idamStatusCode"))
+        assertThat(((Map) ((List) modifiedUserResponse.get("roleDeletionResponse")).get(0)).get("idamStatusCode"))
                 .isEqualTo("204");
         List<String> rolesToValidate = new ArrayList<>();
         rolesToValidate.add(puiUserManager);
@@ -354,14 +376,14 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         paymentAccountsEdit.add(oldPba);
         paymentAccountsEdit.add(pba1);
         paymentAccountsEdit.add(pba2);
-        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        PbaRequest pbaEditRequest = new PbaRequest();
         pbaEditRequest.setPaymentAccounts(paymentAccountsEdit);
         Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(
                 pbaEditRequest, intActiveOrgId, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();
 
         Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
-        assertThat((List)org.get("paymentAccount")).contains(oldPba.toUpperCase())
+        assertThat((List) org.get("paymentAccount")).contains(oldPba.toUpperCase())
                 .contains(pba1.toUpperCase())
                 .contains(pba2.toUpperCase());
         log.info("editPaymentAccountsShouldReturnSuccess :: END");
@@ -444,5 +466,152 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
 
         log.info("updateOrgMFAShouldReturn403 :: END");
+    }
+
+    public void  updateOrgStatusScenarios() {
+        updateOrgStatusShouldBeSuccess();
+    }
+
+    public void updateOrgStatusShouldBeSuccess() {
+        log.info("updateOrgStatusShouldBeSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        String statusMessage = "Company in review";
+
+        professionalApiClient.updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+
+        Map<String, Object> orgResponse = professionalApiClient
+                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+        assertEquals(REVIEW.toString(), orgResponse.get("status"));
+        assertEquals(statusMessage, orgResponse.get("statusMessage"));
+
+        log.info("updateOrgStatusShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = true)
+    public void retrieveOrgsByPbaStatusScenario() {
+        setUpTestData();
+        findOrganisationByPbaStatusShouldBeSuccessWithPbas();
+    }
+
+    public void findOrganisationByPbaStatusShouldBeSuccessWithPbas() {
+        log.info("findOrganisationByPbaStatusShouldBeSuccess :: STARTED");
+
+        var orgsResponse = (List<OrganisationsWithPbaStatusResponse>)
+                professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
+
+        assertNotNull(orgsResponse);
+        assertThat(orgsResponse.size()).isPositive();
+        assertThat(orgsResponse.stream()).allMatch(org -> org.getStatus().isActive());
+
+        var pbaByStatusResponses = new ArrayList<FetchPbaByStatusResponse>();
+        orgsResponse.forEach(org -> pbaByStatusResponses.addAll(org.getPbaNumbers()));
+
+        assertThat(pbaByStatusResponses.size()).isPositive();
+        assertThat(pbaByStatusResponses.stream()).allMatch(pba -> pba.getStatus().equals("ACCEPTED"));
+        assertThat(pbaByStatusResponses).allMatch(pba -> nonNull(pba.getDateAccepted()));
+
+        log.info("findOrganisationByPbaStatusShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = false)
+    public void findOrganisationByPbaStatusShouldReturn403WhenToggledOff() throws IOException {
+        log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: STARTED");
+
+        professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
+
+        log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: END");
+
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
+    public void updatePaymentAccountsShouldReturnSuccess() {
+        log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
+        setUpTestData();
+
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
+                superUserEmail.toLowerCase(), hmctsAdmin);
+
+        List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
+
+        String orgPba = pbaList.get(0);
+
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaUpdateRequest(orgPba, PbaStatus.REJECTED.name(), ""));
+
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(pbaRequestList);
+
+        Map<String, Object> updatePbaResponse =
+                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
+
+        assertThat(updatePbaResponse).isNotNull();
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNull();
+
+        Map<String, Object> orgResponse1 = professionalApiClient.retrievePaymentAccountsByEmail(
+                superUserEmail.toLowerCase(), hmctsAdmin);
+
+        List<String> updatedPbaList =
+                (List) ((Map) orgResponse1.get("organisationEntityResponse")).get("paymentAccount");
+
+        assertThat(updatedPbaList).doesNotContain(orgPba);
+
+        log.info("updatePaymentAccountsShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
+    public void updatePaymentAccountsShouldReturnPartialSuccess() {
+        log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
+        setUpTestData();
+
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
+                superUserEmail.toLowerCase(), hmctsAdmin);
+        List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
+
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
+
+        pbaList.forEach(pba -> pbaRequestList.add(new PbaUpdateRequest(pba, PbaStatus.REJECTED.name(), "")));
+
+        pbaRequestList.add(new PbaUpdateRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
+
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(pbaRequestList);
+
+        Map<String, Object> updatePbaResponse =
+                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
+
+        assertThat(updatePbaResponse).isNotNull();
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNotNull();
+        assertThat(updatePbaResponse.get("message")).hasToString("Some of the PBAs updated successfully");
+        List pbaResponses = (List) updatePbaResponse.get("pbaUpdateStatusResponses");
+        assertThat(pbaResponses.size()).isEqualTo(2);
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
+                .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
+
+        log.info("updatePaymentAccountsShouldReturnPartialSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = false)
+    public void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
+        log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: STARTED");
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaUpdateRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
+
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(pbaRequestList);
+
+        professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
+
+        log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: END");
     }
 }
