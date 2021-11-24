@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_MFA_LD_FLAG;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTI_PBA_LD_FLAG;
+
 @Service
 public class FeatureToggleServiceImpl implements FeatureToggleService {
 
@@ -38,15 +41,24 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
     @PostConstruct
     public void mapServiceToFlag() {
         launchDarklyMap = new HashMap<>();
-        launchDarklyMap.put("OrganisationMfaStatusController.retrieveMfaStatusByUserId", "prd-mfa-flag");
-        launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus", "prd-mfa-flag");
+        launchDarklyMap.put("OrganisationMfaStatusController.retrieveMfaStatusByUserId",
+                PRD_MFA_LD_FLAG);
+        launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus",
+                PRD_MFA_LD_FLAG);
+        launchDarklyMap.put("OrganisationExternalController.deletePaymentAccountsOfOrganisation",
+                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
+        launchDarklyMap.put("OrganisationInternalController.retrieveOrgByPbaStatus",
+                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
+        launchDarklyMap.put("OrganisationExternalController.addPaymentAccountsToOrganisation",
+                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
+        launchDarklyMap.put("OrganisationInternalController.updateAnOrganisationsRegisteredPbas",
+                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
     }
 
     @Override
     public boolean isFlagEnabled(String serviceName, String flagName) {
         LDUser user = new LDUser.Builder(userName)
             .firstName(userName)
-            .custom("servicename", serviceName)
             .custom("environment", environment)
             .build();
 

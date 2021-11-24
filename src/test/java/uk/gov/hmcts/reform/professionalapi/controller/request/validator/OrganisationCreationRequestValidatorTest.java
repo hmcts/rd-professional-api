@@ -52,7 +52,7 @@ public class OrganisationCreationRequestValidatorTest {
         userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
                 .email("test@email.com").build();
         organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
-                "true", "12345678", "www.company.com", userCreationRequest,
+                "true", null, "12345678", "www.company.com", userCreationRequest,
                 new HashSet<>(), null);
     }
 
@@ -123,7 +123,7 @@ public class OrganisationCreationRequestValidatorTest {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("");
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
-                "true", "", "", null, paymentAccounts,
+                "true", null,"", "", null, paymentAccounts,
                 null);
         organisationCreationRequestValidator.validateOrganisationRequest(orgReq);
     }
@@ -300,7 +300,7 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = InvalidRequest.class)
     public void test_should_validate_company_no_length_and_throw_if_length_more_than_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null,"",
                 "true", "123456789", "", null, new HashSet<>(),
                 null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
@@ -308,7 +308,7 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test
     public void test_should_validate_company_no_length_and_not_throw_if_length_is_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null, "",
                 "true", "12345678", "", null, new HashSet<>(),
                 null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);

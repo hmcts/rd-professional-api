@@ -15,7 +15,7 @@ public class OrganisationsDetailResponseTest {
                 "companyN", false, "www.org.com");
 
         OrganisationsDetailResponse organisationsDetailResponseResponse
-                = new OrganisationsDetailResponse(singletonList(organisation), false);
+                = new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
 
         assertThat(organisationsDetailResponseResponse).isNotNull();
     }
