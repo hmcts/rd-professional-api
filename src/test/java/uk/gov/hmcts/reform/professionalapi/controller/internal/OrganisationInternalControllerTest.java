@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -16,6 +17,7 @@ import feign.Response;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,12 +40,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -53,9 +57,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -79,6 +85,8 @@ public class OrganisationInternalControllerTest {
     private ProfessionalUserService professionalUserServiceMock;
     private MfaStatusService mfaStatusServiceMock;
     private OrganisationIdentifierValidatorImpl orgIdValidatorMock;
+    private UpdateOrganisationRequestValidator updateOrganisationRequestValidatorMock;
+    private OrganisationStatusValidatorImpl organisationStatusValidatorMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -105,12 +113,16 @@ public class OrganisationInternalControllerTest {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
         organisationResponse = new OrganisationResponse(organisation);
-        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
-        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+        organisationsDetailResponse =
+                new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
+        organisationEntityResponse =
+                new OrganisationEntityResponse(organisation, false, false, true);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
         organisationResponse = new OrganisationResponse(organisation);
-        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
-        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+        organisationsDetailResponse =
+                new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
+        organisationEntityResponse =
+                new OrganisationEntityResponse(organisation, false, false, true);
 
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
@@ -122,6 +134,8 @@ public class OrganisationInternalControllerTest {
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         mfaStatusServiceMock = mock(MfaStatusService.class);
         orgIdValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
+        updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
+        organisationStatusValidatorMock = mock(OrganisationStatusValidatorImpl.class);
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
         prdEnumList.add(anEnum2);
@@ -129,7 +143,7 @@ public class OrganisationInternalControllerTest {
 
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
-        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
 
@@ -138,7 +152,7 @@ public class OrganisationInternalControllerTest {
         organisationResponse = new OrganisationResponse(organisation);
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
-        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+        organisationEntityResponse = new OrganisationEntityResponse(organisation, false, false, true);
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
@@ -185,7 +199,7 @@ public class OrganisationInternalControllerTest {
     public void test_RetrieveOrganisationByIdWithStatusNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveOrganisation(any(String.class)))
+        when(organisationServiceMock.retrieveOrganisation(any(String.class), any(boolean.class)))
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController
@@ -195,14 +209,15 @@ public class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisation(organisation.getOrganisationIdentifier());
+                .retrieveOrganisation(organisation.getOrganisationIdentifier(), false);
     }
 
     @Test
     public void test_RetrieveOrganisationByIdWithStatusNotNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveOrganisation(any(String.class))).thenReturn(organisationEntityResponse);
+        when(organisationServiceMock.retrieveOrganisation(any(String.class), any(boolean.class)))
+                .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
                 .getOrganisationIdentifier(), "PENDING");
@@ -211,14 +226,14 @@ public class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisation(organisation.getOrganisationIdentifier());
+                .retrieveOrganisation(organisation.getOrganisationIdentifier(), false);
     }
 
     @Test
     public void test_RetrieveOrganisationByStatusWithIdNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class)))
+        when(organisationServiceMock.findByOrganisationStatus(any(String.class)))
                 .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING");
@@ -227,15 +242,7 @@ public class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .findByOrganisationStatus(OrganisationStatus.PENDING);
-    }
-
-    @Test(expected = InvalidRequest.class)
-    public void test_RetrieveOrganisationThrows400WhenStatusInvalid() {
-        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class)))
-                .thenReturn(organisationsDetailResponse);
-
-        organisationInternalController.retrieveOrganisations(null, "this is not a status");
+                .findByOrganisationStatus(OrganisationStatus.PENDING.name());
     }
 
     @Test
@@ -291,7 +298,7 @@ public class OrganisationInternalControllerTest {
 
         Set<String> pbas = new HashSet<>();
         pbas.add("PBA0000001");
-        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        PbaRequest pbaEditRequest = new PbaRequest();
         pbaEditRequest.setPaymentAccounts(pbas);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
@@ -402,4 +409,43 @@ public class OrganisationInternalControllerTest {
         verify(orgIdValidatorMock, times(1)).validateOrganisationExistsWithGivenOrgId(orgId);
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
     }
+  
+    @Test
+    public void testUpdateOrganisation() {
+        organisationCreationRequest.setStatusMessage("Company in review");
+        organisationCreationRequest.setStatus(OrganisationStatus.REVIEW.toString());
+        SuperUser superUser = new SuperUser();
+        organisation.setUsers(Collections.singletonList(superUser));
+        String orgId = "AK57L4T";
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
+                .thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserById(any())).thenReturn(professionalUser);
+
+        ResponseEntity<Object> response = organisationInternalController
+                .updatesOrganisation(organisationCreationRequest, orgId, null);
+
+        assertNotNull(response);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserById(any());
+    }
+
+    @Test
+    public void testRetrieveOrgByPbaStatus() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.OK).build();
+        PbaStatus pbaStatus = PbaStatus.ACCEPTED;
+        when(organisationServiceMock.getOrganisationsByPbaStatus(pbaStatus.toString())).thenReturn(responseEntity);
+
+        ResponseEntity<Object> response = organisationInternalController.retrieveOrgByPbaStatus(pbaStatus.toString());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+                .getOrganisationsByPbaStatus(pbaStatus.toString());
+    }
+
 }
