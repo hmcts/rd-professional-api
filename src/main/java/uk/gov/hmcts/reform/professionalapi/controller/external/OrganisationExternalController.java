@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 
 import io.swagger.annotations.ApiOperation;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -40,6 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -123,9 +128,16 @@ public class OrganisationExternalController extends SuperController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-            @ApiParam(hidden = true) @OrgId String extOrgIdentifier) {
+            @ApiParam(hidden = true) @OrgId String extOrgIdentifier,
+            @ApiParam(name = "pbaStatus") @RequestParam(value = "pbaStatus", required = false) String pbaStatus) {
 
-        return retrieveOrganisationOrById(extOrgIdentifier);
+        boolean isPendingPbaRequired = false;
+
+        if (!isBlank(pbaStatus)) {
+            isPendingPbaRequired = pbaStatus.equalsIgnoreCase(PENDING.name());
+        }
+
+        return retrieveOrganisationOrById(extOrgIdentifier, isPendingPbaRequired);
     }
 
     @ApiOperation(
@@ -283,6 +295,56 @@ public class OrganisationExternalController extends SuperController {
         return retrieveAllOrganisationsByStatus(status, address);
     }
 
+    @ApiOperation(
+            value = "Deletes the provided list of payment accounts from the organisation.",
+            notes = "**IDAM Roles to access API** : \n - pui-finance-manager",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 204,
+                    message = "Successfully deleted the list of provided payment accounts from the organisation."
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request Error: One of the below reasons: \n"
+                            + "- Organisation is not ACTIVE.\n"
+                            + "- No payment accounts passed to be deleted in the request body.\n"
+                            + "- Passed payment account numbers are in an invalid format."
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied for either invalid permissions or user is pending"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Resource Not Found Error: The payment accounts are not associated "
+                            + "with users organisation"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @DeleteMapping(path = "/pba")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Secured({"pui-finance-manager"})
+    public void deletePaymentAccountsOfOrganisation(
+            @Valid @NotNull @RequestBody PbaRequest deletePbaRequest,
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
+
+        deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, organisationIdentifier, userId);
+
+    }
+
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email,
                                                                                         String extOrgIdentifier) {
         validateEmail(email);
@@ -296,18 +358,71 @@ public class OrganisationExternalController extends SuperController {
                 organisation, extOrgIdentifier);
         return ResponseEntity
                 .status(200)
-                .body(new OrganisationPbaResponse(organisation, false));
+                .body(new OrganisationPbaResponse(organisation, false, false, true));
     }
 
 
-    protected ResponseEntity<OrganisationEntityResponse> retrieveOrganisationOrById(String id) {
+    protected ResponseEntity<OrganisationEntityResponse> retrieveOrganisationOrById(
+            String id, boolean isPendingPbaRequired) {
+        //Received request to retrieve External organisation with ID
 
         OrganisationEntityResponse organisationResponse = null;
-        //Received request to retrieve External organisation with ID
-        organisationResponse =
-                organisationService.retrieveOrganisation(id);
+
+        organisationResponse = organisationService.retrieveOrganisation(id, isPendingPbaRequired);
+
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
     }
+
+    @ApiOperation(
+            value = "Add multiple PBAs associated with their organisation",
+            notes = "**IDAM Roles to access API** :\n pui-finance-manager",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "All PBAs got added successfully or Partial success",
+                    response = AddPbaResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "PBA number invalid or Duplicate PBA or Organisation is not active"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "S2S unauthorised"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @PostMapping(
+            path = "/pba",
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured("pui-finance-manager")
+    public ResponseEntity<Object> addPaymentAccountsToOrganisation(
+            @Valid @NotNull @RequestBody PbaRequest pbaRequest,
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
+
+        log.info("Received request to add payment accounts to organisation Id");
+
+        return organisationService.addPaymentAccountsToOrganisation(pbaRequest, organisationIdentifier, userId);
+
+    }
+
 }

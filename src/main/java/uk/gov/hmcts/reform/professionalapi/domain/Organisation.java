@@ -74,6 +74,9 @@ public class Organisation implements Serializable {
     @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
 
+    @Column(name = "STATUS_MESSAGE")
+    private String statusMessage;
+
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;

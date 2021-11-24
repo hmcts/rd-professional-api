@@ -14,7 +14,7 @@ public class OrganisationEntityResponseTest {
                 "companyN", false, "www.org.com");
 
         OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(organisation,
-                false);
+                false, false, true);
 
         assertThat(organisationEntityResponse).isNotNull();
     }
@@ -23,7 +23,7 @@ public class OrganisationEntityResponseTest {
     public void test_OrganisationEntityResponse_organisation_null() {
 
         OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(null,
-                false);
+                false, false, true);
 
         assertThat(organisationEntityResponse).isNotNull();
         assertThat(organisationEntityResponse.getName()).isNull();
