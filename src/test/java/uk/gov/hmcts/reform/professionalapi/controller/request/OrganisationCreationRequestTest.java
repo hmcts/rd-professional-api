@@ -16,7 +16,7 @@ public class OrganisationCreationRequestTest {
     public void has_mandatory_fields_specified_not_null() {
 
         OrganisationCreationRequest organisationCreationRequest =
-                new OrganisationCreationRequest(null, null, null, "false",
+                new OrganisationCreationRequest(null, null, null, null, "false",
                         null, null, null, null,
                         null);
 
@@ -30,14 +30,16 @@ public class OrganisationCreationRequestTest {
     public void test_OrganisationCreationRequest() {
 
         OrganisationCreationRequest organisationCreationRequest =
-                new OrganisationCreationRequest("test", "PENDING", "sra-id", "false",
+                new OrganisationCreationRequest("test", "PENDING", null, "sra-id", "false",
                         "number02", "company-url", null, null,
                         null);
 
         organisationCreationRequest.setStatus("ACTIVE");
+        organisationCreationRequest.setStatusMessage("In review");
 
         assertThat(organisationCreationRequest.getName()).isEqualTo("test");
         assertThat(organisationCreationRequest.getStatus()).isEqualTo("ACTIVE");
+        assertThat(organisationCreationRequest.getStatusMessage()).isEqualTo("In review");
         assertThat(organisationCreationRequest.getSraId()).isEqualTo("sra-id");
         assertThat(organisationCreationRequest.getSraRegulated()).isEqualTo("false");
     }
@@ -46,6 +48,7 @@ public class OrganisationCreationRequestTest {
     public void test_OrganisationCreationRequestBuilder() {
         String name = "name";
         String status = "status";
+        String statusMessage = "statusMessage";
         String sraId = "sraId";
         String sraRegulated = "sraRegulated";
         String companyNumber = "companyNumber";
@@ -55,6 +58,7 @@ public class OrganisationCreationRequestTest {
                 .anOrganisationCreationRequest()
                 .name(name)
                 .status(status)
+                .statusMessage(statusMessage)
                 .sraId(sraId)
                 .sraRegulated(sraRegulated)
                 .companyNumber(companyNumber)
@@ -63,6 +67,7 @@ public class OrganisationCreationRequestTest {
 
         assertThat(organisationCreationRequest.getName()).isEqualTo(name);
         assertThat(organisationCreationRequest.getStatus()).isEqualTo(status);
+        assertThat(organisationCreationRequest.getStatusMessage()).isEqualTo(statusMessage);
         assertThat(organisationCreationRequest.getSraId()).isEqualTo(sraId);
         assertThat(organisationCreationRequest.getSraRegulated()).isEqualTo(sraRegulated);
         assertThat(organisationCreationRequest.getCompanyNumber()).isEqualTo(companyNumber);
