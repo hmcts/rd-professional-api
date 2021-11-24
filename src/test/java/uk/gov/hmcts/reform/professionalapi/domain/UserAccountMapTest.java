@@ -17,6 +17,7 @@ public class UserAccountMapTest {
         UserAccountMapId userAccountMapId = new UserAccountMapId();
         UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
         assertThat(userAccountMap.getUserAccountMapId()).isEqualTo(userAccountMapId);
+        assertThat(userAccountMap.getDefaulted()).isFalse();
 
         UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
         when(userAccountMapMock.getDefaulted()).thenReturn(true);
