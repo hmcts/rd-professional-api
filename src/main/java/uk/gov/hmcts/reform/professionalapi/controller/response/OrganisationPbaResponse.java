@@ -10,9 +10,12 @@ public class OrganisationPbaResponse {
     @JsonProperty
     private final OrganisationEntityResponse organisationEntityResponse;
 
-    public OrganisationPbaResponse(Organisation organisation, Boolean isRequiredAllEntities) {
+    public OrganisationPbaResponse(
+            Organisation organisation, Boolean isRequiredContactInfo,
+            Boolean isRequiredPendingPbas, Boolean isRequiredAllPbas) {
 
-        this.organisationEntityResponse = new OrganisationEntityResponse(organisation, isRequiredAllEntities);
+        this.organisationEntityResponse = new OrganisationEntityResponse(organisation, isRequiredContactInfo,
+                        isRequiredPendingPbas, isRequiredAllPbas);
     }
 
 }
