@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -23,12 +22,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.springframework.http.HttpStatus.OK;
+import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 
 @ExtendWith(MockitoExtension.class)
 class MfaStatusServiceImplTest {
@@ -53,7 +56,7 @@ class MfaStatusServiceImplTest {
     void setUp() {
         orgMfaStatus = new OrganisationMfaStatus();
         mfaStatusResponse = new MfaStatusResponse();
-        mfaStatusResponse.setMfa(MFAStatus.EMAIL.toString());
+        mfaStatusResponse.setMfa(EMAIL.toString());
 
         lenient().when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(professionalUser);
         lenient().when(organisation.isOrganisationStatusActive()).thenReturn(true);
@@ -106,11 +109,18 @@ class MfaStatusServiceImplTest {
 
     @Test
     void test_updateOrgMfaStatus() {
-        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(MFAStatus.EMAIL);
-        when(organisation.getOrganisationMfaStatus()).thenReturn(new OrganisationMfaStatus());
+        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(EMAIL);
+        OrganisationMfaStatus organisationMfaStatus = mock(OrganisationMfaStatus.class);
+        when(organisation.getOrganisationMfaStatus()).thenReturn(organisationMfaStatus);
+        when(organisationMfaStatus.getMfaStatus()).thenReturn(EMAIL);
 
-        mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest, organisation);
-        verify(organisation, times(1)).getOrganisationMfaStatus();
-        assertEquals(organisation.getOrganisationMfaStatus().getMfaStatus(),mfaUpdateRequest.getMfa());
+        ResponseEntity<Object> response = mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest, organisation);
+
+        assertNotNull(response);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        assertEquals(organisation.getOrganisationMfaStatus().getMfaStatus(), mfaUpdateRequest.getMfa());
+
+        verify(organisation, times(2)).getOrganisationMfaStatus();
+        verify(organisationMfaStatus, times(1)).setMfaStatus(EMAIL);
     }
 }

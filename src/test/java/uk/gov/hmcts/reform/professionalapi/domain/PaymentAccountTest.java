@@ -37,5 +37,7 @@ class PaymentAccountTest {
         assertThat(paymentAccount.getPbaNumber()).isNotNull();
         assertThat(paymentAccount.getPbaStatus()).isNotNull();
         assertThat(paymentAccount.getStatusMessage()).isNotNull();
+        assertThat(paymentAccount.getStatusMessage()).isNotEmpty();
+        assertThat(paymentAccount.getStatusMessage()).isEqualTo(PBA_STATUS_MESSAGE_ACCEPTED);
     }
 }
