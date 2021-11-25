@@ -498,7 +498,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = true)
-    public void retrieveOrgsByPbaStatusScenario() {
+    void retrieveOrgsByPbaStatusScenario() {
         setUpTestData();
         findOrganisationByPbaStatusShouldBeSuccessWithPbas();
     }
@@ -525,7 +525,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = false)
-    public void findOrganisationByPbaStatusShouldReturn403WhenToggledOff() throws IOException {
+    void findOrganisationByPbaStatusShouldReturn403WhenToggledOff() {
         log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: STARTED");
 
         professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
@@ -536,7 +536,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
-    public void updatePaymentAccountsShouldReturnSuccess() {
+    void updatePaymentAccountsShouldReturnSuccess() {
         log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
         setUpTestData();
 
@@ -573,7 +573,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
-    public void updatePaymentAccountsShouldReturnPartialSuccess() {
+    void updatePaymentAccountsShouldReturnPartialSuccess() {
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
         setUpTestData();
 
@@ -607,7 +607,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = false)
-    public void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
+    void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: STARTED");
         List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 

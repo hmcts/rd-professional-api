@@ -472,9 +472,10 @@ class SuperControllerTest {
         verify(httpRequest, times(2)).getHeader("UserEmail");
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void testUpdateOrganisationWithMissingStatus() {
+    @Test
+    void testUpdateOrganisationWithMissingStatus() {
         organisationCreationRequest.setStatus(null);
-        superController.updateOrganisationById(organisationCreationRequest, "orgId");
+        assertThrows(InvalidRequest.class,() ->
+                superController.updateOrganisationById(organisationCreationRequest, "orgId"));
     }
 }

@@ -132,20 +132,15 @@ class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    void test_validateOrganisationIsActiveThrows404WhenOrganisationIsNotActive() {
-        assertThrows(EmptyResultDataAccessException.class, () ->
-                organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation));
-    }
-
-    @Test(expected = InvalidRequest.class)
-    public void test_validateOrganisationIsActiveThrows400WhenOrganisationIsNotActive() {
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, BAD_REQUEST);
+    void test_validateOrganisationIsActiveThrows400WhenOrganisationIsNotActive() {
+        assertThrows(InvalidRequest.class,() ->
+                organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, BAD_REQUEST));
     }
 
     @Test
     void test_validateOrganisationIsActiveDoesNotThrow404WhenOrganisationIsActive() {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         assertDoesNotThrow(() ->
-                organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation), NOT_FOUND);
+                organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND));
     }
 }

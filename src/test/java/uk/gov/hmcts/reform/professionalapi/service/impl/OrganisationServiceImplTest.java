@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -505,9 +506,10 @@ class OrganisationServiceImplTest {
                 .findByStatusIn(asList(OrganisationStatus.PENDING));
     }
 
-    @Test(expected = InvalidRequest.class)
+    @Test
     void test_RetrieveOrganisationThrows400WhenStatusInvalid() {
-        sut.findByOrganisationStatus("this is not a status");
+        assertThrows(InvalidRequest.class,() ->
+                sut.findByOrganisationStatus("this is not a status"));
     }
 
     @Test
@@ -533,7 +535,6 @@ class OrganisationServiceImplTest {
         organisations.add(organisationMock);
 
         when(organisationRepository.findAll()).thenReturn(organisations);
-        when(organisationMock.getUsers()).thenReturn(new ArrayList<>());
 
         OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
 
@@ -918,6 +919,7 @@ class OrganisationServiceImplTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void test_getOrganisationsByPbaStatus() {
 
         List<Organisation> organisations = getOrgsWithPbaSetup();
@@ -939,9 +941,10 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(1)).findByPbaStatus(ACCEPTED);
     }
 
-    @Test(expected = InvalidRequest.class)
+    @Test
     void test_getOrganisationsByPbaStatus_invalidPbaStatus_throws400() {
-        sut.getOrganisationsByPbaStatus("I N V A L I D");
+        assertThrows(InvalidRequest.class,() ->
+                sut.getOrganisationsByPbaStatus("I N V A L I D"));
     }
 
     private List<Organisation> getOrgsWithPbaSetup() {
@@ -1045,7 +1048,7 @@ class OrganisationServiceImplTest {
 
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     void test_addPaymentAccountsToOrganisationEmpty() {
         var pbas = new HashSet<String>();
         PbaRequest pbaRequest = new PbaRequest();
@@ -1055,8 +1058,8 @@ class OrganisationServiceImplTest {
         String userId = UUID.randomUUID().toString();
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
 
-        ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
-        assertThat(responseEntity.getBody()).isNotNull();
+        assertThrows(ResourceNotFoundException.class,() ->
+                sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
     }
 
     @Test

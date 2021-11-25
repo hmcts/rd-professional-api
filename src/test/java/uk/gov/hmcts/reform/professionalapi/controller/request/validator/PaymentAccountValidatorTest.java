@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashSet;
@@ -84,20 +85,22 @@ class PaymentAccountValidatorTest {
         paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "");
     }
 
-    @Test(expected = InvalidRequest.class)
+    @Test
     void testUpdatePbasThrows400WhenPbaRequestIsEmpty() {
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(null);
 
-        paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
+        assertThrows(InvalidRequest.class,() ->
+                paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest));
     }
 
-    @Test(expected = InvalidRequest.class)
+    @Test
     void testUpdatePbasThrows400WhenPbaRequestsContainsNullPbaRequest() {
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(
                 asList(null, new PbaUpdateRequest("PBA1234567", "PENDING", "")));
 
-        paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
+        assertThrows(InvalidRequest.class,() ->
+                paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest));
     }
 }
