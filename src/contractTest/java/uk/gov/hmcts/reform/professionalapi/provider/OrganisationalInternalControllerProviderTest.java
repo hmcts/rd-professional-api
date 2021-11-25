@@ -11,18 +11,22 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -30,13 +34,18 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
@@ -47,6 +56,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     OrganisationRepository organisationRepository;
+
+    @Autowired
+    PaymentAccountRepository paymentAccountRepository;
 
     @Autowired
     ProfessionalUserService professionalUserService;
@@ -68,6 +80,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     MappingJackson2HttpMessageConverter httpMessageConverter;
+
+    @Autowired
+    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
 
     public static final String ORG_NAME = "Org-Name";
     public static final String SRA_ID = "sra-id";
@@ -104,7 +119,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(asList(organisation));
+        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(List.of(organisation));
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -135,7 +150,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(professionalUserService
                 .findProfessionalUserByEmailAddress(anyString())).thenReturn(pu);
 
-        when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(asList("role"));
+        when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(List.of("role"));
 
         UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
 
@@ -173,8 +188,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
         when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
-                any(PbaEditRequest.class)))
-                .thenReturn(new PbaResponse("200", "Success"));
+            any(PbaRequest.class)))
+            .thenReturn(new PbaResponse("200", "Success"));
     }
 
     //MFA put api test
@@ -182,6 +197,21 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationForMfaUpdate() {
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(getOrgWithMfaStatus());
     }
+
+    @State("Update an Organisation's PBA accounts")
+    public void setUpOrganisationForUpdatingPBAs() {
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
+                "companyN", false, "www.org.com");
+
+        PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
+        paymentAccount.setOrganisation(organisation);
+
+        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
+        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+        when(paymentAccountRepository.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
+        when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
+    }
+
 
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
@@ -203,7 +233,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         contactInformation.setAddressLine2("addressLine2");
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
-        organisation.setContactInformations(asList(contactInformation));
+        organisation.setContactInformations(List.of(contactInformation));
         return organisation;
     }
 
@@ -212,5 +242,27 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
         return userProfileCreationResponse;
+    }
+
+    @State("Organisations with payment accounts exist for given Pba status")
+    public void setUpOrganisationWithStatusForGivenPbaStatus() {
+        Organisation organisation = getOrganisationWithPbaStatus();
+        when(organisationRepository.findByPbaStatus(any())).thenReturn(List.of(organisation));
+    }
+
+    private Organisation getOrganisationWithPbaStatus() {
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA12345");
+        paymentAccount.setStatusMessage("Approved");
+        paymentAccount.setPbaStatus(PbaStatus.ACCEPTED);
+        paymentAccount.setCreated(LocalDateTime.now());
+        paymentAccount.setLastUpdated(LocalDateTime.now());
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
+                "companyN", false, "www.org.com");
+        organisation.setSraRegulated(true);
+        organisation.setOrganisationIdentifier("org1");
+        organisation.setPaymentAccounts(Collections.singletonList(paymentAccount));
+
+        return organisation;
     }
 }

@@ -1,13 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS_UPDATE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_NOT_IN_ORG;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,8 +32,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -43,6 +52,7 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentAccountServiceImplTest {
+
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final UserProfileFeignClient userProfileFeignClientMock = mock(UserProfileFeignClient.class);
@@ -68,7 +78,8 @@ class PaymentAccountServiceImplTest {
     private List<SuperUser> superUsers = new ArrayList<>();
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
     private Set<String> pbas = new HashSet<>();
-    private PbaEditRequest pbaEditRequest = new PbaEditRequest();
+    private PbaRequest pbaEditRequest = new PbaRequest();
+    private PbaRequest pbaDeleteRequest = new PbaRequest();
 
     @BeforeEach
     void setUp() {
@@ -76,14 +87,15 @@ class PaymentAccountServiceImplTest {
         organisationService.setPaymentAccountValidator(paymentAccountValidatorMock);
         organisationService.setPaymentAccountRepository(paymentAccountRepositoryMock);
 
-        sut = new PaymentAccountServiceImpl(
-                applicationConfigurationMock, userProfileFeignClientMock, entityManagerFactoryMock,
-                professionalUserRepositoryMock, organisationService, userAccountMapServiceMock);
+        sut = new PaymentAccountServiceImpl(applicationConfigurationMock, userProfileFeignClientMock,
+                entityManagerFactoryMock, professionalUserRepositoryMock, organisationService,
+                userAccountMapServiceMock, paymentAccountRepositoryMock);
 
         superUsers.add(superUser);
         paymentAccounts.add(paymentAccount);
         pbas.add("PBA0000001");
         pbaEditRequest.setPaymentAccounts(pbas);
+        pbaDeleteRequest.setPaymentAccounts(pbas);
         userAccountMaps.add(userAccountMapMock);
 
         paymentAccount.setId(UUID.randomUUID());
@@ -174,6 +186,13 @@ class PaymentAccountServiceImplTest {
     }
 
     @Test
+    void testDeletePaymentAccountsFromOrganisationTest() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
+        sut.deletePaymentsOfOrganisation(pbaDeleteRequest, organisation);
+        verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
+    }
+
+    @Test
     void testAddUserAndPaymentAccountsToUserAccountMapTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.addUserAndPaymentAccountsToUserAccountMap(organisation);
@@ -190,5 +209,89 @@ class PaymentAccountServiceImplTest {
         assertThat(sut.generateListOfAccountsToDelete(prefU, paymentAccounts)).isNotNull();
         listUserMap = sut.generateListOfAccountsToDelete(prefU, paymentAccounts);
         assertThat(listUserMap.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
+    }
+
+    @Test
+    void testUpdatePaymentAccountsForAnOrganisation_200_success_scenario() {
+        String pbaNumber = "PBA1234567";
+
+        PaymentAccount paymentAccount = mock(PaymentAccount.class);
+        when(paymentAccount.getPbaNumber()).thenReturn(pbaNumber);
+        when(paymentAccount.getPbaStatus()).thenReturn(PENDING);
+        when(paymentAccount.getOrganisation()).thenReturn(organisation);
+
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaUpdateRequest(pbaNumber, ACCEPTED.name(), ""));
+
+        when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
+
+        UpdatePbaStatusResponse response = sut
+                .updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getPartialSuccessMessage()).isNull();
+        assertThat(response.getPbaUpdateStatusResponses()).isNull();
+    }
+
+    @Test
+    void testUpdatePaymentAccountsForAnOrganisation_200_partial_success_scenario() {
+        String pbaNumber = "PBA1234567";
+
+        PaymentAccount paymentAccount = mock(PaymentAccount.class);
+        when(paymentAccount.getPbaNumber()).thenReturn(pbaNumber);
+        when(paymentAccount.getPbaStatus()).thenReturn(PENDING);
+        when(paymentAccount.getOrganisation()).thenReturn(organisation);
+
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaUpdateRequest(pbaNumber, ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA123", ACCEPTED.name(), ""));
+
+        when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
+
+        UpdatePbaStatusResponse response = sut
+                .updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getPartialSuccessMessage()).contains(ERROR_MSG_PARTIAL_SUCCESS_UPDATE);
+        assertThat(response.getPbaUpdateStatusResponses().get(0).getPbaNumber()).contains("PBA123");
+        assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage())
+                .contains(ERROR_MSG_PBA_INVALID_FORMAT);
+    }
+
+    @Test
+    void testUpdatePaymentAccountsForAnOrganisation_422_failure_scenario() {
+        String orgId = UUID.randomUUID().toString();
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaUpdateRequest("PBA1234567", ACCEPTED.name(), ""));
+
+        UpdatePbaStatusResponse response = sut.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, orgId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(422);
+        assertThat(response.getPartialSuccessMessage()).isNull();
+        assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage()).contains(ERROR_MSG_PBA_NOT_IN_ORG);
+    }
+
+    @Test
+    void testUpdatePBAsInDb() {
+        PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
+        PaymentAccount paymentAccount1 = new PaymentAccount("PBA7654321");
+
+        List<PaymentAccount> pbasToDelete = new ArrayList<>();
+        pbasToDelete.add(paymentAccount);
+
+        List<PaymentAccount> pbasToSave = new ArrayList<>();
+        pbasToSave.add(paymentAccount1);
+
+        sut.updatePBAsInDb(pbasToSave, pbasToDelete);
+
+        verify(paymentAccountRepositoryMock, times(1)).saveAll(pbasToSave);
+        verify(paymentAccountRepositoryMock, times(1)).deleteAll(pbasToDelete);
+
     }
 }

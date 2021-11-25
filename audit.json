@@ -161,5 +161,22 @@
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_DELETE" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/_POST" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_DELETE" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/_POST" : "ignore"
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/_POST" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_DELETE" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations?pbaStatus=pbaStatus_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/pba/status_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_POST" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/pba/status_PUT" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_DELETE" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations?pbaStatus=pbaStatus_GET" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_DELETE" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations?pbaStatus=pbaStatus_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_DELETE" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations?pbaStatus=pbaStatus_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_POST" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_DELETE" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations?pbaStatus=pbaStatus_GET" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_POST" : "ignore"
 }

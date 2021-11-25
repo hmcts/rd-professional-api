@@ -54,7 +54,7 @@ class OrganisationCreationRequestValidatorTest {
         userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
                 .email("test@email.com").build();
         organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
-                "true", "12345678", "www.company.com", userCreationRequest,
+                "true", null, "12345678", "www.company.com", userCreationRequest,
                 new HashSet<>(), null);
     }
 
@@ -133,7 +133,7 @@ class OrganisationCreationRequestValidatorTest {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("");
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
-                "true", "", "", null, paymentAccounts,
+                "true", null,"", "", null, paymentAccounts,
                 null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validateOrganisationRequest(orgReq));
@@ -296,7 +296,7 @@ class OrganisationCreationRequestValidatorTest {
 
     @Test
     void test_should_validate_company_no_length_and_throw_if_length_more_than_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null,"",
                 "true", "123456789", "", null, new HashSet<>(),
                 null);
         assertThrows(InvalidRequest.class, () ->
@@ -305,7 +305,7 @@ class OrganisationCreationRequestValidatorTest {
 
     @Test
     void test_should_validate_company_no_length_and_not_throw_if_length_is_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null, "",
                 "true", "12345678", "", null, new HashSet<>(),
                 null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);

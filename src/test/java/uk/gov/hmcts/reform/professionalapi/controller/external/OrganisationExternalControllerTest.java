@@ -1,20 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference.EN;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
-import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
@@ -34,7 +19,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -42,11 +26,14 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -59,6 +46,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -66,6 +54,30 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+import java.util.Set;
+
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference.EN;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
+import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationExternalControllerTest {
@@ -94,6 +106,7 @@ class OrganisationExternalControllerTest {
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
     RefDataUtil refDataUtilMock;
+    private PaymentAccountValidator paymentAccountValidator;
 
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -118,6 +131,7 @@ class OrganisationExternalControllerTest {
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
         userInfoMock = mock(UserInfo.class);
+        paymentAccountValidator = mock(PaymentAccountValidator.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -133,7 +147,7 @@ class OrganisationExternalControllerTest {
                 "soMeone@somewhere.com", organisation);
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
                 "some-email-address", organisation);
-        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+        organisationEntityResponse = new OrganisationEntityResponse(organisation, false, false, true);
 
 
         prdEnumList = new ArrayList<>();
@@ -150,7 +164,7 @@ class OrganisationExternalControllerTest {
                 "some@email.com", userRoles, false);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
-        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
         userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
@@ -184,14 +198,14 @@ class OrganisationExternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         String id = UUID.randomUUID().toString().substring(0, 7);
-        when(organisationServiceMock.retrieveOrganisation(id)).thenReturn(organisationEntityResponse);
+        when(organisationServiceMock.retrieveOrganisation(id, false)).thenReturn(organisationEntityResponse);
 
-        ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id);
+        ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id, "");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveOrganisation(eq(id));
+        verify(organisationServiceMock, times(1)).retrieveOrganisation(eq(id), any(boolean.class));
     }
 
     @Test
@@ -303,5 +317,69 @@ class OrganisationExternalControllerTest {
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessageStartingWith("No Organisations found");
         verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());
+    }
+
+    @Test
+    void testDeletePaymentAccounts() {
+        PbaRequest deletePbaRequest = new PbaRequest();
+        var accountsToDelete = new HashSet<String>();
+        accountsToDelete.add("PBA1234567");
+        deletePbaRequest.setPaymentAccounts(accountsToDelete);
+        doNothing().when(organisationServiceMock).deletePaymentsOfOrganisation(accountsToDelete, organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisationExternalController
+                .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId);
+
+        verify(professionalUserServiceMock, times(1))
+                .checkUserStatusIsActiveByUserId(anyString());
+        verify(organisationIdentifierValidatorImplMock, times(1))
+                .validateOrganisationIsActive(any(Organisation.class), any(HttpStatus.class));
+        verify(paymentAccountServiceMock, times(1))
+                .deletePaymentsOfOrganisation(any(PbaRequest.class), any(Organisation.class));
+
+    }
+
+    @Test(expected = InvalidRequest.class)
+    void test_deletePaymentAccounts_NoPaymentAccountsPassed() {
+        PbaRequest deletePbaRequest = new PbaRequest();
+        var accountsToDelete = new HashSet<String>();
+        deletePbaRequest.setPaymentAccounts(accountsToDelete);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisationExternalController
+                .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId);
+
+    }
+
+    @Test
+    void test_addPaymentAccountsToOrganisation() throws JsonProcessingException {
+        Set<String> pbas = new HashSet<>();
+        pbas.add("PBA0000001");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        addPbaResponse.setMessage("");
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        when(organisationServiceMock.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId))
+                .thenReturn(responseEntity);
+
+        ResponseEntity<?> actual = organisationExternalController
+                .addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+                .addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+
     }
 }

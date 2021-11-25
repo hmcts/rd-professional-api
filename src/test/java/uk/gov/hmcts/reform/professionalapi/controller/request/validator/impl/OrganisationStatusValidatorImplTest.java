@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationStatusValidatorImplTest {
@@ -46,5 +48,46 @@ class OrganisationStatusValidatorImplTest {
         organisation.setStatus(OrganisationStatus.DELETED);
         assertThrows(InvalidRequest.class, () ->
                 organisationStatusValidatorImpl.validate(organisation, OrganisationStatus.ACTIVE, orgId));
+    }
+
+    @Test
+    void test_validateAndReturnStatusList_allvalid() {
+        List<String> validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+                "ACTIVE,REVIEW");
+        assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
+
+        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+                "  , ACTIVE,REVIEW,");
+        assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
+
+        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+                " ACTIVE , REVIEW ");
+        assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
+
+        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+                " AcTiVe , rEvIeW ");
+        assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
+    }
+
+    @Test
+    void test_validateAndReturnStatusList_null_empty_check() {
+        String errorMessage = BAD_REQUEST_STR + "Invalid status(es) passed : " + "null or empty";
+        verifyException(null, errorMessage);
+        verifyException("", errorMessage);
+        verifyException(" ", errorMessage);
+    }
+
+    @Test
+    void test_validateAndReturnStatusList_invalid_status_check() {
+        String errorMessage = BAD_REQUEST_STR + "Invalid status(es) passed : ";
+        verifyException("ACTIV,REVIEW ", errorMessage + "ACTIV,REVIEW");
+        verifyException("ACTIVE,,REVIEW", errorMessage + "ACTIVE,,REVIEW");
+        verifyException("null", errorMessage + "null");
+    }
+
+    void verifyException(String status, String message) {
+        Assertions.assertThatThrownBy(() -> organisationStatusValidatorImpl.validateAndReturnStatusList(status))
+                .isExactlyInstanceOf(InvalidRequest.class)
+                .hasMessage(message);
     }
 }

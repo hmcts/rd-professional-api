@@ -25,4 +25,12 @@ class OrganisationStatusTest {
         assertThat(organisationStatus.isActive()).isFalse();
         assertThat(organisationStatus.isPending()).isTrue();
     }
+
+    @Test
+    public void test_shouldReturnTrueWhenReviewisPassed() {
+        OrganisationStatus organisationStatus = OrganisationStatus.REVIEW;
+
+        assertThat(organisationStatus.isActive()).isFalse();
+        assertThat(organisationStatus.isReview()).isTrue();
+    }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -15,15 +16,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentAccountValidatorTest {
 
     @Mock
-    private PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
+    private PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
 
-    PaymentAccountValidator paymentAccountValidator = new PaymentAccountValidator(paymentAccountRepository);
+    PaymentAccountValidator paymentAccountValidator = new PaymentAccountValidator(paymentAccountRepositoryMock);
 
     @BeforeEach
     void setUp() {
@@ -37,7 +40,7 @@ class PaymentAccountValidatorTest {
         pbas.add("pba1234567");
         pbas.add("PbA1234567");
         assertDoesNotThrow(() ->
-                PaymentAccountValidator.checkPbaNumberIsValid(pbas));
+                PaymentAccountValidator.checkPbaNumberIsValid(pbas, true));
     }
 
     @Test
@@ -45,25 +48,25 @@ class PaymentAccountValidatorTest {
         Set<String> pbaNumber = new HashSet<>();
         pbaNumber.add("abc1234567");
 
-        assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber, true))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
         pbaNumber.clear();
         pbaNumber.add("pba123456");
 
-        assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber, true))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
         pbaNumber.clear();
         pbaNumber.add("1234");
 
-        assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber, true))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
         pbaNumber.clear();
         pbaNumber.add("wewdfd");
 
-        assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber, true))
                 .isExactlyInstanceOf(InvalidRequest.class);
     }
 
@@ -79,5 +82,22 @@ class PaymentAccountValidatorTest {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(pba);
         paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "");
+    }
+
+    @Test(expected = InvalidRequest.class)
+    void testUpdatePbasThrows400WhenPbaRequestIsEmpty() {
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(null);
+
+        paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    void testUpdatePbasThrows400WhenPbaRequestsContainsNullPbaRequest() {
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(
+                asList(null, new PbaUpdateRequest("PBA1234567", "PENDING", "")));
+
+        paymentAccountValidator.checkUpdatePbaRequestIsValid(updatePbaRequest);
     }
 }

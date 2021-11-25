@@ -25,7 +25,7 @@ class UserAttributeServiceImplTest {
     private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final PrdEnumServiceImpl prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
-    private final UserAttributeServiceImpl userAttributeServiceMock
+    private final UserAttributeServiceImpl sut
             = new UserAttributeServiceImpl(userAttributeRepositoryMock, prdEnumRepositoryMock, prdEnumServiceMock);
 
     private final PrdEnumId prdEnumIdMock = new PrdEnumId(1, "PRD_ROLE");
@@ -52,9 +52,35 @@ class UserAttributeServiceImplTest {
     void test_adds_user_attributes_to_user_correctly() {
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
 
-        userAttributeServiceMock.addUserAttributesToUser(professionalUser, userRoles, prdEnums);
+        sut.addUserAttributesToUser(professionalUser, userRoles, prdEnums);
 
         assertThat(professionalUser.getUserAttributes()).isNotNull();
         verify(userAttributeRepositoryMock, times(1)).saveAll(any());
+    }
+
+    @Test
+    public void test_adds_super_user_attributes_to_user_correctly() {
+        List<UserAttribute> userAttributes = new ArrayList<>();
+        userAttributes.add(new UserAttribute(professionalUser, prdEnums.get(0)));
+
+        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
+
+        List<UserAttribute> userAttributeResponse = sut.addUserAttributesToSuperUser(professionalUser, userAttributes);
+
+        assertThat(userAttributeResponse).isNotNull();
+        assertThat(professionalUser.getUserAttributes()).isNotNull();
+        verify(userAttributeRepositoryMock, times(1)).saveAll(any());
+    }
+
+    @Test
+    public void test_isValidEnumType() {
+        boolean response = sut.isValidEnumType("SIDAM_ROLE");
+        assertThat(response).isTrue();
+
+        boolean response1 = sut.isValidEnumType("ADMIN_ROLE");
+        assertThat(response1).isTrue();
+
+        boolean response2 = sut.isValidEnumType("INVALID_ROLE");
+        assertThat(response2).isFalse();
     }
 }

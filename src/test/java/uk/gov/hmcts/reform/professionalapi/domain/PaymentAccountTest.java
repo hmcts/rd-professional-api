@@ -29,6 +29,7 @@ class PaymentAccountTest {
         paymentAccount.setPbaNumber("some-pba-number");
         paymentAccount.setPbaStatus(ACCEPTED);
         paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED);
+        paymentAccount.setOrganisationId(UUID.randomUUID());
 
         assertThat(paymentAccount.getOrganisation()).isSameAs(organisation);
         assertThat(paymentAccount.getLastUpdated()).isNotNull();
@@ -37,6 +38,7 @@ class PaymentAccountTest {
         assertThat(paymentAccount.getPbaNumber()).isNotNull();
         assertThat(paymentAccount.getPbaStatus()).isNotNull();
         assertThat(paymentAccount.getStatusMessage()).isNotNull();
+        assertThat(paymentAccount.getOrganisationId()).isNotNull();
         assertThat(paymentAccount.getStatusMessage()).isNotEmpty();
         assertThat(paymentAccount.getStatusMessage()).isEqualTo(PBA_STATUS_MESSAGE_ACCEPTED);
     }

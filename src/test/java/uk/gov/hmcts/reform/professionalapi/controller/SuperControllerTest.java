@@ -116,7 +116,7 @@ class SuperControllerTest {
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation),
-                false);
+                false, false, true);
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
                 "lastName", IdamStatus.ACTIVE.name(), null, null);
 
@@ -132,8 +132,8 @@ class SuperControllerTest {
                 "some@email.com", userRoles, false);
         UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
-        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id",
-                "false", "number02", "company-url", userCreationRequest,
+        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
+                "sra-id", "false", "number02", "company-url", userCreationRequest,
                 null, null);
 
         MockitoAnnotations.openMocks(this);
@@ -470,5 +470,11 @@ class SuperControllerTest {
         assertThat(email).isEqualTo(superController.getUserEmailFromHeader());
 
         verify(httpRequest, times(2)).getHeader("UserEmail");
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testUpdateOrganisationWithMissingStatus() {
+        organisationCreationRequest.setStatus(null);
+        superController.updateOrganisationById(organisationCreationRequest, "orgId");
     }
 }

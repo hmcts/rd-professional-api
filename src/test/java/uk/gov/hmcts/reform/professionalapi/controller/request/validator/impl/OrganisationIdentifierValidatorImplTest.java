@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -134,10 +137,15 @@ class OrganisationIdentifierValidatorImplTest {
                 organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation));
     }
 
+    @Test(expected = InvalidRequest.class)
+    public void test_validateOrganisationIsActiveThrows400WhenOrganisationIsNotActive() {
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, BAD_REQUEST);
+    }
+
     @Test
     void test_validateOrganisationIsActiveDoesNotThrow404WhenOrganisationIsActive() {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         assertDoesNotThrow(() ->
-                organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation));
+                organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation), NOT_FOUND);
     }
 }

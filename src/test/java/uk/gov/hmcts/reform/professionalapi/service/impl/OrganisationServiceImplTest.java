@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,20 +13,24 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import feign.Request;
 import feign.Response;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,12 +43,14 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
-
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -56,13 +63,17 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -71,18 +82,22 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.doNothing;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationServiceImplTest {
@@ -142,6 +157,9 @@ class OrganisationServiceImplTest {
     @InjectMocks
     private OrganisationServiceImpl sut;
 
+    private final ProfessionalUserService professionalUserServiceMock
+            = mock(ProfessionalUserService.class);
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -189,7 +207,7 @@ class OrganisationServiceImplTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", "statusMessage",
                 "sra-id", "false", "number01", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
@@ -262,6 +280,13 @@ class OrganisationServiceImplTest {
     }
 
     @Test
+    void test_deletePbaAccountFromOrganisation() {
+        doNothing().when(paymentAccountRepositoryMock).delete(any(PaymentAccount.class));
+        sut.deletePaymentsOfOrganisation(paymentAccountList, organisation);
+        verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
+    }
+
+    @Test
     void test_addSuperUserToOrganisation() {
         Organisation organisationMock = mock(Organisation.class);
 
@@ -300,8 +325,11 @@ class OrganisationServiceImplTest {
     @Test
     void test_UpdatesAnOrganisationVerifySetMethodsAreCalled() {
         Organisation organisationMock = mock(Organisation.class);
+        organisationCreationRequest.setStatus("ACTIVE");
 
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationRepository.save(any(Organisation.class))).thenReturn(organisationMock);
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
         OrganisationResponse organisationResponse = sut.updateOrganisation(organisationCreationRequest,
                 organisationIdentifier);
@@ -311,6 +339,7 @@ class OrganisationServiceImplTest {
         verify(organisationMock, times(1)).setName((organisationCreationRequest.getName()));
         verify(organisationMock, times(1))
                 .setStatus((OrganisationStatus.valueOf(organisationCreationRequest.getStatus())));
+        verify(organisationMock, times(1)).setStatusMessage((organisationCreationRequest.getStatusMessage()));
         verify(organisationMock, times(1)).setSraId((organisationCreationRequest.getSraId()));
         verify(organisationMock, times(1))
                 .setCompanyNumber(organisationCreationRequest.getCompanyNumber());
@@ -327,7 +356,7 @@ class OrganisationServiceImplTest {
     @Test
     void test_retrieve_an_organisations_by_status() {
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.findByOrganisationStatus(OrganisationStatus.ACTIVE));
+                sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name()));
     }
 
 
@@ -339,7 +368,7 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.retrieveOrganisation(testOrganisationId));
+                sut.retrieveOrganisation(testOrganisationId, false));
     }
 
     @Test
@@ -383,7 +412,7 @@ class OrganisationServiceImplTest {
                 .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                         null)).body(body, Charset.defaultCharset()).status(200).build());
 
-        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier);
+        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier, false);
 
         assertThat(organisationEntityResponse).isNotNull();
         verify(organisationRepository, times(1))
@@ -422,7 +451,7 @@ class OrganisationServiceImplTest {
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name());
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
@@ -434,7 +463,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
 
-        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier);
+        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier, false);
 
         assertThat(organisationEntityResponse).isNotNull();
 
@@ -449,7 +478,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
 
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.retrieveOrganisation(organisationIdentifier));
+                sut.retrieveOrganisation(organisationIdentifier, false));
 
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(any(String.class));
@@ -458,7 +487,7 @@ class OrganisationServiceImplTest {
     @Test
     void test_retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.findByOrganisationStatus(OrganisationStatus.PENDING));
+                sut.findByOrganisationStatus(OrganisationStatus.PENDING.name()));
     }
 
     @Test
@@ -466,13 +495,19 @@ class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
-        when(organisationRepository.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
+        when(organisationRepository.findByStatusIn(asList(OrganisationStatus.PENDING))).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.PENDING);
+                = sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());
 
         assertThat(organisationDetailResponse).isNotNull();
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING);
+        verify(organisationRepository, times(1))
+                .findByStatusIn(asList(OrganisationStatus.PENDING));
+    }
+
+    @Test(expected = InvalidRequest.class)
+    void test_RetrieveOrganisationThrows400WhenStatusInvalid() {
+        sut.findByOrganisationStatus("this is not a status");
     }
 
     @Test
@@ -482,6 +517,41 @@ class OrganisationServiceImplTest {
         organisations.add(organisation);
 
         when(organisationRepository.findAll()).thenReturn(organisations);
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+        verify(organisationRepository, times(1)).findAll();
+    }
+
+    @Test
+    void test_retrieveAllOrganisations_withEmptyUsers() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        organisations.add(organisationMock);
+
+        when(organisationRepository.findAll()).thenReturn(organisations);
+        when(organisationMock.getUsers()).thenReturn(new ArrayList<>());
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+        verify(organisationRepository, times(1)).findAll();
+    }
+
+
+    @Test
+    void test_retrieveAllOrganisations_withBlockedOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        organisations.add(organisationMock);
+
+        when(organisationRepository.findAll()).thenReturn(organisations);
+        when(organisationMock.getStatus()).thenReturn(REVIEW);
 
         OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
 
@@ -516,7 +586,7 @@ class OrganisationServiceImplTest {
         String pbaNumber = "GBA1234567";
         paymentAccountList.add(pbaNumber);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "company-number", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
@@ -533,12 +603,22 @@ class OrganisationServiceImplTest {
         superUserCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 null);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "company-number", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
         assertThrows(InvalidRequest.class, () ->
                 sut.createOrganisationFrom(organisationCreationRequest));
+    }
+
+    @Test
+    void test_updateStatusAndMessage() {
+        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+        PbaStatus pbaStatusMock = mock(PbaStatus.class);
+        sut.updateStatusAndMessage(paymentAccountMock, pbaStatusMock, "statusMessage");
+
+        verify(paymentAccountMock, times(1)).setPbaStatus(pbaStatusMock);
+        verify(paymentAccountMock, times(1)).setStatusMessage("statusMessage");
     }
 
     @Test
@@ -825,8 +905,7 @@ class OrganisationServiceImplTest {
         contactInformations.add(contactInformation);
         organisation.setContactInformations(contactInformations);
 
-        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"),
-                "pui-user-manager", "SIDAM_ROLE");
+        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE");
         UserAttribute userAttribute = new UserAttribute(professionalUser, prdEnum);
         userAttributes.add(userAttribute);
         professionalUser.setUserAttributes(userAttributes);
@@ -837,5 +916,174 @@ class OrganisationServiceImplTest {
         organisation.addPaymentAccount(paymentAccount);
         return organisation;
     }
+
+    @Test
+    void test_getOrganisationsByPbaStatus() {
+
+        List<Organisation> organisations = getOrgsWithPbaSetup();
+        when(organisationRepository.findByPbaStatus(ACCEPTED)).thenReturn(organisations);
+
+        ResponseEntity<Object> responseEntity = sut.getOrganisationsByPbaStatus(ACCEPTED.toString());
+
+        assertNotNull(responseEntity);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertNotNull(responseEntity.getBody());
+
+        var orgsWithPbas = (List<OrganisationsWithPbaStatusResponse>) responseEntity.getBody();
+        assertThat(orgsWithPbas.size()).isEqualTo(2);
+        assertThat(orgsWithPbas.get(0).getOrganisationIdentifier()).isEqualTo("ABCDEFG1");
+        assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);
+        assertThat(orgsWithPbas.get(1).getOrganisationIdentifier()).isEqualTo("ABCDEFG2");
+        assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);
+
+        verify(organisationRepository, times(1)).findByPbaStatus(ACCEPTED);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    void test_getOrganisationsByPbaStatus_invalidPbaStatus_throws400() {
+        sut.getOrganisationsByPbaStatus("I N V A L I D");
+    }
+
+    private List<Organisation> getOrgsWithPbaSetup() {
+        PaymentAccount pba1 = new PaymentAccount();
+        pba1.setPbaStatus(ACCEPTED);
+        pba1.setPbaNumber("PBA123456");
+        pba1.setCreated(LocalDateTime.now());
+        pba1.setLastUpdated(LocalDateTime.now());
+
+        PaymentAccount pba2 = new PaymentAccount();
+        pba2.setPbaStatus(PENDING);
+        pba2.setPbaNumber("PBA123457");
+        pba1.setCreated(LocalDateTime.now());
+        pba1.setLastUpdated(LocalDateTime.now());
+
+        List<PaymentAccount> pbas = new ArrayList<>();
+        pbas.add(pba1);
+        pbas.add(pba2);
+
+        String orgId1 = "ABCDEFG1";
+        Organisation org1 = new Organisation();
+        org1.setStatus(OrganisationStatus.ACTIVE);
+        org1.setOrganisationIdentifier(orgId1);
+        org1.setPaymentAccounts(pbas);
+
+        String orgId2 = "ABCDEFG2";
+        Organisation org2 = new Organisation();
+        org2.setStatus(OrganisationStatus.ACTIVE);
+        org2.setOrganisationIdentifier(orgId2);
+        org2.setPaymentAccounts(pbas);
+
+        List<Organisation> orgs = new ArrayList<>();
+        orgs.add(org1);
+        orgs.add(org2);
+
+        return orgs;
+    }
+
+
+    @Test
+    void test_addPaymentAccountsToOrganisation() {
+        var pbas = new HashSet<String>();
+        pbas.add("PBA0000001");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+    }
+
+    @Test
+    void test_addPaymentAccountsToOrganisation_pba_invalid() {
+        var pbas = new HashSet<String>();
+        pbas.add("PBA00000012");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNotNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+    }
+
+    @Test
+    void test_addPaymentAccountsToOrganisation_pbaDb_NoMatch() {
+        var pbas = new HashSet<String>();
+        pbas.add("PBA00000012");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA1234568");
+        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(paymentAccount);
+        when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(Optional.of(paymentAccount));
+
+        ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest,
+                UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID().toString());
+        assertThat(responseEntity.getBody()).isNotNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    void test_addPaymentAccountsToOrganisationEmpty() {
+        var pbas = new HashSet<String>();
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
+
+        ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNotNull();
+    }
+
+    @Test
+    void test_addPaymentAccountsToOrganisation_pba_valid_And_invalid() {
+        var pbas = new HashSet<String>();
+        pbas.add("PBA0000001");
+        pbas.add("test");
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        AddPbaResponse response = (AddPbaResponse) responseEntity.getBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getReason()).isNotNull();
+        assertThat(response.getMessage()).isEqualTo(ERROR_MSG_PARTIAL_SUCCESS);
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+    }
+
 
 }

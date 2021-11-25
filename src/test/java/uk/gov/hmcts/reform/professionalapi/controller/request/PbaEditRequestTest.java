@@ -14,7 +14,7 @@ class PbaEditRequestTest {
 
     @Test
     void test_pbaEditRequestBuilder() {
-        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        PbaRequest pbaEditRequest = new PbaRequest();
         pbaEditRequest.setPaymentAccounts(singleton(pbaNumber));
         assertThat(pbaEditRequest.getPaymentAccounts()).isEqualTo(singleton(pbaNumber));
     }

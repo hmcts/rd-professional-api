@@ -28,9 +28,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @Slf4j
@@ -89,6 +91,10 @@ public class ProfessionalReferenceDataClient {
         return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
     }
 
+    public Map<String, Object> retrieveExternalOrganisationWithPendingPbas(String id, String pbaStatus, String role) {
+        return getRequestForExternal(APP_EXT_BASE_PATH + "?pbaStatus=" + pbaStatus, role, id);
+    }
+
     public Map<String, Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
     }
@@ -104,14 +110,14 @@ public class ProfessionalReferenceDataClient {
                     responseEntity.getBody(), expectedClass));
         } else {
             Map<String, Object> errorResponseMap = new HashMap<>();
-            errorResponseMap.put("response_body",  objectMapper.readValue(
+            errorResponseMap.put("response_body", objectMapper.readValue(
                     responseEntity.getBody().toString(), ErrorResponse.class));
             errorResponseMap.put("http_status", status);
             return errorResponseMap;
         }
     }
 
-    public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
+    public Map<String, Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
     }
 
@@ -242,7 +248,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private Map<String, Object> getRequestToGetEmailFromHeader(String uriPath, String role,String userId,
+    private Map<String, Object> getRequestToGetEmailFromHeader(String uriPath, String role, String userId,
                                                                Object... params) {
 
         ResponseEntity<Map> responseEntity;
@@ -313,7 +319,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     private Map<String, Object> getRequestForExternalRoles(
-            String uriPath,String role, String userId, Object... params) {
+            String uriPath, String role, String userId, Object... params) {
 
         ResponseEntity<Map> responseEntity;
 
@@ -409,7 +415,7 @@ public class ProfessionalReferenceDataClient {
         if (responseEntity.hasBody()) {
             response = objectMapper
                     .convertValue(
-                         responseEntity.getBody(), Map.class);
+                            responseEntity.getBody(), Map.class);
         }
 
         response.put("http_status", responseEntity.getStatusCode().toString());
@@ -460,13 +466,13 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId,
-                                                           String hmctsAdmin) {
+    public Map<String, Object> editPaymentsAccountsByOrgId(PbaRequest pbaEditRequest, String orgId,
+                                                           String hmctsAdmin, String requestBody) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pbas";
 
         try {
-            HttpEntity<PbaEditRequest> requestEntity = new HttpEntity<>(pbaEditRequest,
+            HttpEntity<?> requestEntity = new HttpEntity<>(isNull(pbaEditRequest) ? requestBody : pbaEditRequest,
                     getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
 
@@ -477,6 +483,46 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
+
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> updatePaymentsAccountsByOrgId(UpdatePbaRequest updatePbaRequest, String orgId,
+                                                             String hmctsAdmin, String requestBody) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pba/status";
+
+        try {
+            HttpEntity<?> requestEntity = new HttpEntity<>(isNull(updatePbaRequest) ? requestBody : updatePbaRequest,
+                    getMultipleAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> deletePaymentsAccountsByOrgId(PbaRequest pbaDeleteRequest, String supportedRole,
+                                                             String userId) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/pba";
+
+        try {
+            HttpEntity<PbaRequest> requestEntity = new HttpEntity<>(pbaDeleteRequest,
+                    getMultipleAuthHeaders(supportedRole, userId));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
 
         return getResponse(responseEntity);
     }
@@ -503,7 +549,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> updateOrgMfaStatusUnauthorised(MfaUpdateRequest mfaUpdateRequest, String orgId,
-                                                  String hmctsAdmin) {
+                                                              String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/mfa";
 
@@ -578,5 +624,72 @@ public class ProfessionalReferenceDataClient {
         Map<String, Object> deleteOrganisationResponse = new HashMap<>();
         deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         return deleteOrganisationResponse;
+    }
+
+    public Object findOrganisationsByPbaStatus(String pbaStatus, String role, boolean isUnauthorised)
+            throws JsonProcessingException {
+
+        ResponseEntity<Object> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/pba/" + pbaStatus;
+
+        responseEntity = getRequestForInternalWithGivenResponseType(urlPath, role,
+                OrganisationsWithPbaStatusResponse[].class, isUnauthorised);
+
+        HttpStatus status = responseEntity.getStatusCode();
+        if (status.is2xxSuccessful()) {
+            return Arrays.asList(objectMapper.convertValue(
+                    responseEntity.getBody(), OrganisationsWithPbaStatusResponse[].class));
+        } else {
+            return getErrorResponseMap(responseEntity, status);
+        }
+    }
+
+    private Map<String, Object> getErrorResponseMap(ResponseEntity<Object> responseEntity, HttpStatus status)
+            throws JsonProcessingException {
+        Map<String, Object> errorResponseMap = new HashMap<>();
+        String body = (String) responseEntity.getBody();
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(body)) {
+            errorResponseMap.put("response_body",  objectMapper.readValue(
+                    body, ErrorResponse.class));
+        } else {
+            errorResponseMap.put("response_body", null);
+        }
+        errorResponseMap.put("http_status", status);
+
+        return errorResponseMap;
+    }
+
+    private ResponseEntity<Object> getRequestForInternalWithGivenResponseType(
+            String uriPath, String role, Class clasz, Boolean isUnauthorised) {
+
+        ResponseEntity<Object> responseEntity;
+        try {
+            HttpEntity<?> request = new HttpEntity<>(
+                    isUnauthorised ? getInvalidAuthHeaders(role) : (getMultipleAuthHeaders(role)));
+            responseEntity = restTemplate.exchange(uriPath, HttpMethod.GET, request, clasz);
+        } catch (HttpStatusCodeException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
+        }
+        return responseEntity;
+    }
+
+    public Map<String, Object> addPaymentsAccountsByOrgId(PbaRequest pbaRequest, String supportedRole,
+                                                             String userId) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/pba";
+
+        try {
+            HttpEntity<PbaRequest> requestEntity = new HttpEntity<>(pbaRequest,
+                    getMultipleAuthHeaders(supportedRole, userId));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.POST, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
     }
 }

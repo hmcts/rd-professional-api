@@ -32,7 +32,7 @@ class OrganisationPbaResponseTest {
 
     @Test
     void test_GetOrganisationPbaResponse() throws Exception {
-        OrganisationPbaResponse sut = new OrganisationPbaResponse(organisation, true);
+        OrganisationPbaResponse sut = new OrganisationPbaResponse(organisation, true, false, true);
         assertThat(sut.getOrganisationEntityResponse()).isNotNull();
     }
 }
