@@ -82,9 +82,3 @@ module "db-professional-ref-data-v11" {
   common_tags        = var.common_tags
   postgresql_version = "11"
 }
-
-resource "azurerm_key_vault_secret" "POSTGRES-PASS-v11" {
-  name          = join("-", [var.component, "POSTGRES-PASS-v11"])
-  value         = module.db-professional-ref-data-v11.postgresql_password
-  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
-}
