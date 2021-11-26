@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.professionalapi;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -498,6 +498,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void retrieveOrgsByPbaStatusScenario() {
         setUpTestData();
         findOrganisationByPbaStatusShouldBeSuccessWithPbas();
@@ -525,6 +526,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void findOrganisationByPbaStatusShouldReturn403WhenToggledOff() {
         log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: STARTED");
 
@@ -536,6 +538,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnSuccess() {
         log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
         setUpTestData();
@@ -573,6 +576,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnPartialSuccess() {
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
         setUpTestData();
@@ -607,6 +611,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: STARTED");
         List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();

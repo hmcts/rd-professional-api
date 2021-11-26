@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.BAD_REQUEST_STR;
 
 import org.junit.jupiter.api.BeforeEach;

@@ -4,21 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
 class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
 
     private String orgIdentifier;
@@ -33,7 +30,7 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> orgResponse = professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifier,
             hmctsAdmin);
 
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("http_status").toString()).contains("404");
     }
 
     @Test
