@@ -27,7 +27,7 @@ class OrganisationStatusTest {
     }
 
     @Test
-    public void test_shouldReturnTrueWhenReviewisPassed() {
+    void test_shouldReturnTrueWhenReviewisPassed() {
         OrganisationStatus organisationStatus = OrganisationStatus.REVIEW;
 
         assertThat(organisationStatus.isActive()).isFalse();

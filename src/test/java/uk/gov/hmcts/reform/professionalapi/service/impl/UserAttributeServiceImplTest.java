@@ -59,7 +59,7 @@ class UserAttributeServiceImplTest {
     }
 
     @Test
-    public void test_adds_super_user_attributes_to_user_correctly() {
+    void test_adds_super_user_attributes_to_user_correctly() {
         List<UserAttribute> userAttributes = new ArrayList<>();
         userAttributes.add(new UserAttribute(professionalUser, prdEnums.get(0)));
 
@@ -73,7 +73,7 @@ class UserAttributeServiceImplTest {
     }
 
     @Test
-    public void test_isValidEnumType() {
+    void test_isValidEnumType() {
         boolean response = sut.isValidEnumType("SIDAM_ROLE");
         assertThat(response).isTrue();
 
