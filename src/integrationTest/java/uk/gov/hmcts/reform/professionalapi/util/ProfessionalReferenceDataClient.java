@@ -20,7 +20,7 @@ import org.springframework.http.HttpMethod;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -254,7 +254,7 @@ public class ProfessionalReferenceDataClient {
         ResponseEntity<Map> responseEntity;
         HttpHeaders httpHeaders = null;
         try {
-            if (StringUtils.isEmpty(userId)) {
+            if (ObjectUtils.isEmpty(userId)) {
                 httpHeaders = getMultipleAuthHeaders(role);
             } else {
                 httpHeaders = getMultipleAuthHeaders(role, userId);
