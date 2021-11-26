@@ -356,8 +356,10 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_retrieve_an_organisations_by_status() {
+        String status = OrganisationStatus.ACTIVE.name();
+
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name()));
+                sut.findByOrganisationStatus(status));
     }
 
 
@@ -487,8 +489,10 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
+        String status = OrganisationStatus.PENDING.name();
+
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.findByOrganisationStatus(OrganisationStatus.PENDING.name()));
+                sut.findByOrganisationStatus(status));
     }
 
     @Test
