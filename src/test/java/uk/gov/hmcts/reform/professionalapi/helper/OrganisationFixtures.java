@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import java.util.Set;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
 public class OrganisationFixtures {
 
@@ -56,30 +56,30 @@ public class OrganisationFixtures {
         paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
-            .name("some-org-name")
-            .status("PENDING")
-            .sraId("sra-id")
-            .sraRegulated("false")
-            .companyUrl("company -url")
-            .companyNumber(randomAlphabetic(8))
-            .paymentAccount(paymentAccounts)
-            .superUser(aUserCreationRequest()
-                .firstName("some-fname")
-                .lastName("some-lname")
-                .email("someone@somewhere.com")
-                .build())
-            .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .country("country")
-                .county("county")
-                .townCity("town-city")
-                .postCode("some-post-code")
-                    .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                        .dxNumber("DX 1234567890")
-                        .dxExchange("dxExchange").build()))
-                .build()));
+                .name("some-org-name")
+                .status("PENDING")
+                .sraId("sra-id")
+                .sraRegulated("false")
+                .companyUrl("company -url")
+                .companyNumber(randomAlphabetic(8))
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()));
     }
 
     public static OrganisationCreationRequest
@@ -88,29 +88,29 @@ public class OrganisationFixtures {
         paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
-            .name("some-org-name1")
-            .status("ACTIVE")
-            .sraId("sra-id1")
-            .sraRegulated("true")
-            .companyUrl("company-url1")
-            .companyNumber(randomAlphabetic(8))
+                .name("some-org-name1")
+                .status("ACTIVE")
+                .sraId("sra-id1")
+                .sraRegulated("true")
+                .companyUrl("company-url1")
+                .companyNumber(randomAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
-                .firstName("somefname")
-                .lastName("somelname")
-                .email("someone1@somewhere.com")
-                .build())
-            .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("addressLine3")
-                .addressLine2("addressLine4")
-                .addressLine3("addressLine5")
-                .country("some-country1")
-                .county("some-county1")
-                .townCity("som1-town-city")
-                .postCode("som1-post-code")
-                    .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                        .dxNumber("NI 1234567890")
-                        .dxExchange("dxExchange1").build()))
-                .build()));
+                        .firstName("somefname")
+                        .lastName("somelname")
+                        .email("someone1@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine3")
+                        .addressLine2("addressLine4")
+                        .addressLine3("addressLine5")
+                        .country("some-country1")
+                        .county("some-county1")
+                        .townCity("som1-town-city")
+                        .postCode("som1-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("NI 1234567890")
+                                .dxExchange("dxExchange1").build()))
+                        .build()));
     }
 }

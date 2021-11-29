@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class UserAttributeTest {
+@ExtendWith(MockitoExtension.class)
+class UserAttributeTest {
 
     @Test
-    public void test_creates_user_attribute_correctly() {
+    void test_creates_user_attribute_correctly() {
         PrdEnum prdEnum = new PrdEnum();
         ProfessionalUser professionalUser = new ProfessionalUser();
 

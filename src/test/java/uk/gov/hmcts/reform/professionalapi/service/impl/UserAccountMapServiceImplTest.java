@@ -8,13 +8,13 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 
-public class UserAccountMapServiceImplTest {
+class UserAccountMapServiceImplTest {
 
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
     private UserAccountMapServiceImpl sut =
@@ -23,7 +23,7 @@ public class UserAccountMapServiceImplTest {
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
     @Test
-    public void test_persistedUserAccountMap() {
+    void test_persistedUserAccountMap() {
         PaymentAccount pba = new PaymentAccount("PBA1234567");
         paymentAccounts.add(0, pba);
 

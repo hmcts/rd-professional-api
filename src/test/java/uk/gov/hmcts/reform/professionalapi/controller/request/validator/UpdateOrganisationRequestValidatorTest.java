@@ -6,12 +6,15 @@ import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class UpdateOrganisationRequestValidatorTest {
+@ExtendWith(MockitoExtension.class)
+class UpdateOrganisationRequestValidatorTest {
 
     @Test
-    public void test_UpdateOrganisationRequestValidator() {
+    void test_UpdateOrganisationRequestValidator() {
 
         List<OrganisationIdentifierValidator> updateOrganisationRequestValidatorList = new ArrayList<>();
         updateOrganisationRequestValidatorList.add(mock(OrganisationIdentifierValidator.class));

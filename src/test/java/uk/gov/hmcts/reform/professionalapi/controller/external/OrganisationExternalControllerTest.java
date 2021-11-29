@@ -4,10 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-import org.junit.Before;
-import org.junit.Test;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -46,21 +55,16 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
 import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -70,9 +74,8 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
 
-
-
-public class OrganisationExternalControllerTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationExternalControllerTest {
 
     @InjectMocks
     private OrganisationExternalController organisationExternalController;
@@ -111,8 +114,8 @@ public class OrganisationExternalControllerTest {
 
     private List<PrdEnum> prdEnumList;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         organisationServiceMock = mock(OrganisationService.class);
         organisationIdentifierValidatorImplMock = mock(OrganisationIdentifierValidatorImpl.class);
@@ -153,7 +156,7 @@ public class OrganisationExternalControllerTest {
         userRoles.add("pui-user-manager");
 
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles,false);
+                "some@email.com", userRoles, false);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
@@ -169,10 +172,9 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_CreateOrganisation() {
+    void test_CreateOrganisation() {
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
                 .thenReturn(organisationResponse);
-        when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
         ResponseEntity<?> actual = organisationExternalController
                 .createOrganisationUsingExternalController(organisationCreationRequest);
@@ -187,7 +189,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_RetrieveOrganisationByIdentifier() {
+    void test_RetrieveOrganisationByIdentifier() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         String id = UUID.randomUUID().toString().substring(0, 7);
@@ -202,7 +204,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_RetrievePaymentAccountByUserEmail() {
+    void test_RetrievePaymentAccountByUserEmail() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
 
@@ -225,7 +227,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testRetrievePaymentAccountByUserEmailFromHeader() {
+    void testRetrievePaymentAccountByUserEmailFromHeader() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         List<String> authorities = new ArrayList<>();
@@ -248,15 +250,13 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_InviteUserToOrganisation() throws JsonProcessingException {
+    void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
-                .thenReturn(professionalUser);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
@@ -284,7 +284,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_retrieveOrganisationsByStatusWithMinimalInfo_should_return_200_with_response() {
+    void test_retrieveOrganisationsByStatusWithMinimalInfo_should_return_200_with_response() {
         ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation1);
@@ -304,7 +304,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void test_retrieveAllOrganisationsByStatus_should_return_404_when_no_active_orgs_found() {
+    void test_retrieveAllOrganisationsByStatus_should_return_404_when_no_active_orgs_found() {
         ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
         when(organisationServiceMock.getOrganisationByStatus(any())).thenReturn(new ArrayList<>());
         Throwable raisedException = catchThrowable(() -> organisationExternalController
@@ -315,12 +315,11 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testDeletePaymentAccounts() {
+    void testDeletePaymentAccounts() {
         PbaRequest deletePbaRequest = new PbaRequest();
         var accountsToDelete = new HashSet<String>();
         accountsToDelete.add("PBA1234567");
         deletePbaRequest.setPaymentAccounts(accountsToDelete);
-        doNothing().when(organisationServiceMock).deletePaymentsOfOrganisation(accountsToDelete, organisation);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
@@ -337,20 +336,21 @@ public class OrganisationExternalControllerTest {
 
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void test_deletePaymentAccounts_NoPaymentAccountsPassed() {
+    @Test
+    void test_deletePaymentAccounts_NoPaymentAccountsPassed() {
         PbaRequest deletePbaRequest = new PbaRequest();
         var accountsToDelete = new HashSet<String>();
         deletePbaRequest.setPaymentAccounts(accountsToDelete);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
-        organisationExternalController
-                .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId);
+        assertThrows(InvalidRequest.class,() ->
+                organisationExternalController
+                .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId));
 
     }
 
     @Test
-    public void test_addPaymentAccountsToOrganisation() throws JsonProcessingException {
+    void test_addPaymentAccountsToOrganisation() throws JsonProcessingException {
         Set<String> pbas = new HashSet<>();
         pbas.add("PBA0000001");
         PbaRequest pbaRequest = new PbaRequest();

@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
@@ -13,7 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class OrganisationMinimalInfoResponseTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationMinimalInfoResponseTest {
 
     String name = "Organisation Name";
     String organisationIdentifier = UUID.randomUUID().toString();
@@ -21,8 +24,8 @@ public class OrganisationMinimalInfoResponseTest {
     List<ContactInformation> contactInformations = Arrays.asList(contactInformation);
     Organisation organisationMock = mock(Organisation.class);
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         contactInformation.setAddressLine1("addressLine1");
         when(organisationMock.getName()).thenReturn(name);
         when(organisationMock.getOrganisationIdentifier()).thenReturn(organisationIdentifier);
@@ -30,7 +33,7 @@ public class OrganisationMinimalInfoResponseTest {
     }
 
     @Test
-    public void testOrganisationMinimalInfoResponse_WithAddressTrue() {
+    void testOrganisationMinimalInfoResponse_WithAddressTrue() {
         OrganisationMinimalInfoResponse response = new OrganisationMinimalInfoResponse(organisationMock, true);
         assertThat(response.getName()).isEqualTo(name);
         assertThat(response.getOrganisationIdentifier()).isEqualTo(organisationIdentifier);
@@ -39,7 +42,7 @@ public class OrganisationMinimalInfoResponseTest {
     }
 
     @Test
-    public void testOrganisationMinimalInfoResponse_WithAddressFalse() {
+    void testOrganisationMinimalInfoResponse_WithAddressFalse() {
         OrganisationMinimalInfoResponse response = new OrganisationMinimalInfoResponse(organisationMock, false);
         assertThat(response.getName()).isEqualTo(name);
         assertThat(response.getOrganisationIdentifier()).isEqualTo(organisationIdentifier);

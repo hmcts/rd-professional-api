@@ -32,9 +32,9 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -84,23 +84,23 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         ProfessionalUser professionalUser = setUpProfessionalUser();
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
-            "firstName", "lastName", IdamStatus.ACTIVE);
+                "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
-            .thenReturn(Response.builder()
-                .request(mock(Request.class))
-                .body(body, Charset.defaultCharset()).status(200).build());
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(200).build());
 
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress("joe.bloggs@mailnesia.com"))
-            .thenReturn(professionalUser);
+                .thenReturn(professionalUser);
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
-            .thenReturn(organisation);
+                .thenReturn(organisation);
 
 
         setUpUserProfileClientInteraction();
@@ -110,20 +110,20 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
-            "firstName", "lastName", IdamStatus.ACTIVE);
+                "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
-            .thenReturn(Response.builder()
-                .request(mock(Request.class))
-                .body(body, Charset.defaultCharset()).status(200).build());
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(200).build());
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(
-            setUpProfessionalUser());
+                setUpProfessionalUser());
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
-            .thenReturn(organisation);
+                .thenReturn(organisation);
 
     }
 
@@ -133,8 +133,8 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         ProfessionalUser professionalUser = setUpProfessionalUser();
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress("joe.bloggs@mailnesia.com"))
-            .thenReturn(professionalUser);
-        when(organisationRepository.findByStatus(ACTIVE)).thenReturn(Arrays.asList(organisation));
+                .thenReturn(professionalUser);
+        when(organisationRepository.findByStatus(ACTIVE)).thenReturn(asList(organisation));
 
     }
 
@@ -148,8 +148,8 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         String bodyUp = mapper.writeValueAsString(userProfileCreationResponse);
 
         when(userProfileFeignClientMock.createUserProfile(any(UserProfileCreationRequest.class)))
-            .thenReturn(Response.builder().request(mock(Request.class)).body(bodyUp, Charset.defaultCharset())
-                .status(201).build());
+                .thenReturn(Response.builder().request(mock(Request.class)).body(bodyUp, Charset.defaultCharset())
+                        .status(201).build());
     }
 
 
@@ -165,8 +165,8 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         PaymentAccount pa = new PaymentAccount();
         pa.setPbaNumber("pbaNumber");
 
-        organisation.setPaymentAccounts(Arrays.asList(pa));
-        organisation.setUsers(Arrays.asList(su));
+        organisation.setPaymentAccounts(asList(pa));
+        organisation.setUsers(asList(su));
 
         ProfessionalUser pu = new ProfessionalUser();
         pu.setEmailAddress(ORGANISATION_EMAIL);
@@ -198,7 +198,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         contactInformation.setAddressLine2("addressLine2");
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
-        organisation.setContactInformations(Arrays.asList(contactInformation));
+        organisation.setContactInformations(asList(contactInformation));
     }
 
 }

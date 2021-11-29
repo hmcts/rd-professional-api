@@ -10,19 +10,20 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.serenity5.SerenityTest;
 
-
+@SerenityTest
 @Slf4j
-public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void ac1_modify_status_of_active_user_for_an_active_organisation_with_prd_admin_role_should_return_200() {
+    void ac1_modify_status_of_active_user_for_an_active_organisation_with_prd_admin_role_should_return_200() {
 
         //create and update organisation
         String organisationIdentifier = createOrganisationRequest();
@@ -62,7 +63,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
 
 
     @Test
-    public void ac2_modify_status_of_active_user_should_return_400_when_up_fails_with_400() {
+    void ac2_modify_status_of_active_user_should_return_400_when_up_fails_with_400() {
 
         //create and update organisation
         String organisationIdentifier = createOrganisationRequest();

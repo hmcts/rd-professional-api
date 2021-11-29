@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     private NewUserCreationRequest userCreationRequest;
     List<String> userRoles;
@@ -25,8 +25,8 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
     @Value(("${resendInviteEnabled}"))
     protected boolean resendInviteEnabled;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         if (resendInviteEnabled) {
             userRoles = new ArrayList<>();
             userRoles.add("pui-user-manager");
@@ -37,7 +37,7 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
 
     // AC1: resend invite to a given user
     @Test
-    public void should_return_201_when_user_reinvited() {
+    void should_return_201_when_user_reinvited() {
         if (resendInviteEnabled) {
             userProfileCreateUserWireMock(HttpStatus.CREATED);
 
@@ -58,7 +58,7 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
 
     // AC3: resend invite to a given user who does not exist
     @Test
-    public void should_return_404_when_user_doesnt_exists() throws Exception {
+    void should_return_404_when_user_doesnt_exists() throws Exception {
 
         if (resendInviteEnabled) {
             NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
@@ -73,7 +73,7 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
 
     // AC4: resend invite to a given user who is not in the 'Pending' state
     @Test
-    public void should_return_400_when_user_reinvited_is_not_pending() {
+    void should_return_400_when_user_reinvited_is_not_pending() {
 
         if (resendInviteEnabled) {
             userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -98,7 +98,7 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
 
     // AC8: resend invite to a given user who was last invited less than 1 hour before
     @Test
-    public void should_return_429_when_user_reinvited_within_one_hour() {
+    void should_return_429_when_user_reinvited_within_one_hour() {
 
         if (resendInviteEnabled) {
             userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -125,7 +125,7 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
 
     // AC9: invited more than an hour ago but has recently activated their account
     @Test
-    public void should_return_409_when_reinvited_user_gets_active_in_sidam_but_pending_in_up() {
+    void should_return_409_when_reinvited_user_gets_active_in_sidam_but_pending_in_up() {
 
         if (resendInviteEnabled) {
             userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -151,7 +151,7 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
 
     // should not allow re invite of user who is not in organisation
     @Test
-    public void should_return_403_when_reinvited_user_not_present_in_organisation() {
+    void should_return_403_when_reinvited_user_not_present_in_organisation() {
 
         if (resendInviteEnabled) {
             userProfileCreateUserWireMock(HttpStatus.CREATED);

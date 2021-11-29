@@ -4,8 +4,8 @@ import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
@@ -61,7 +61,7 @@ public class BaseRepository {
     public PrdEnum prdEnum;
     public OrganisationMfaStatus organisationMfaStatus;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         organisation = new Organisation("some-name", OrganisationStatus.ACTIVE, "sra-id",
                 "companyN", Boolean.FALSE, "company-url");
@@ -106,7 +106,7 @@ public class BaseRepository {
         organisationMfaStatusRepository.save(organisationMfaStatus);
     }
 
-    @After
+    @AfterEach
     public void cleanupTestData() {
         dxAddressRepository.deleteAll();
         contactInformationRepository.deleteAll();

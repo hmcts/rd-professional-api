@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
@@ -23,11 +23,11 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @Slf4j
-public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
+class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
 
     @Test
-    public void get_request_with_valid_user_id_returns_mfa_status() {
+    void get_request_with_valid_user_id_returns_mfa_status() {
         Map<String, Object> response = createOrganization();
 
         assertThat(response).containsEntry("http_status", "200 OK");
@@ -36,14 +36,14 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void returns_404_when_user_identifier_not_found() {
+    void returns_404_when_user_identifier_not_found() {
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(UUID.randomUUID().toString());
         assertThat(response).containsEntry("http_status", "404");
         assertThat(response.get("response_body").toString()).contains(NO_USER_FOUND);
     }
 
     @Test
-    public void returns_400_when_organisation_not_active() {
+    void returns_400_when_organisation_not_active() {
         String pendingOrganisationId = createOrganisationRequest();
         updateOrganisation(pendingOrganisationId, hmctsAdmin, "PENDING");
         Organisation pendingOrganisation = organisationRepository.findByOrganisationIdentifier(pendingOrganisationId);
@@ -62,14 +62,14 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void returns_400_when_user_id_not_present() {
+    void returns_400_when_user_id_not_present() {
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(StringUtils.EMPTY);
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString()).contains(EMPTY_USER_ID);
     }
 
     @Test
-    public void returns_LaunchDarkly_Forbidden_when_retrieve_mfa_status_with_invalid_flag() {
+    void returns_LaunchDarkly_Forbidden_when_retrieve_mfa_status_with_invalid_flag() {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("OrganisationMfaStatusController.retrieveMfaStatusByUserId",
                 "test-get-mfa-flag");

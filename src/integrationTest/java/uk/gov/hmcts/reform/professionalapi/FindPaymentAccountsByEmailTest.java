@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.util.Pair;
@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImp
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest {
+class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
     PaymentAccountServiceImpl paymentAccountService;
@@ -33,7 +33,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     ApplicationConfiguration configuration;
 
     @Test
-    public void get_request_returns_correct_payment_accounts_associated_with_email() {
+    void get_request_returns_correct_payment_accounts_associated_with_email() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Set<String> paymentAccounts = new HashSet<>();
@@ -71,7 +71,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void returns_multiple_correct_payment_accounts_associated_with_email() {
+    void returns_multiple_correct_payment_accounts_associated_with_email() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Set<String> paymentAccounts = new HashSet<>();
@@ -110,7 +110,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void returns_404_organisation_user_accounts_associated_with_email_and_no_payment_account() {
+    void returns_404_organisation_user_accounts_associated_with_email_and_no_payment_account() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -142,7 +142,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void return_404_when_organisation_status_pending_for_pba_user_email_address() {
+    void return_404_when_organisation_status_pending_for_pba_user_email_address() {
 
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
@@ -169,7 +169,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void returns_404_when_email_not_found() {
+    void returns_404_when_email_not_found() {
 
         Map<String, Object> response = professionalReferenceDataClient
                 .findPaymentAccountsByEmailFromHeader("wrong@email.com", hmctsAdmin);
@@ -178,7 +178,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void get_request_returns_correct_payment_accounts_associated_with_email_fromHeader_internal() {
+    void get_request_returns_correct_payment_accounts_associated_with_email_fromHeader_internal() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Set<String> paymentAccounts = new HashSet<>();
@@ -216,7 +216,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void returns_404_when_unkown_email_not_found_fromDb() {
+    void returns_404_when_unkown_email_not_found_fromDb() {
 
         Map<String, Object> response =
                 professionalReferenceDataClient.findPaymentAccountsByEmailFromHeader("wrong@email.com", hmctsAdmin);
@@ -225,7 +225,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void returns_400_whenEmailIsNullInBothHeaderAndParam() {
+    void returns_400_whenEmailIsNullInBothHeaderAndParam() {
 
         Map<String, Object> response =
                 professionalReferenceDataClient.findPaymentAccountsByEmailFromHeader("", hmctsAdmin);
@@ -235,7 +235,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
 
 
     @Test
-    public void get_request_returns_correct_payment_accounts_associated_with_email_fromHeader_external() {
+    void get_request_returns_correct_payment_accounts_associated_with_email_fromHeader_external() {
         String userId = settingUpOrganisation(puiUserManager);
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .findPaymentAccountsByEmailFromHeaderForExternalUsers("someone@somewhere.com", puiUserManager, userId);
@@ -245,7 +245,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void get_request_returns_404_when_unknown_email_passed_in_header_external() {
+    void get_request_returns_404_when_unknown_email_passed_in_header_external() {
         String userId = settingUpOrganisation(puiUserManager);
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .findPaymentAccountsByEmailFromHeaderForExternalUsers("dummy23@dummy.com", puiUserManager, userId);
@@ -254,7 +254,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     }
 
     @Test
-    public void get_request_returns_404_when_organisation_doesnt_have_pba_email_passed_in_header_external() {
+    void get_request_returns_404_when_organisation_doesnt_have_pba_email_passed_in_header_external() {
         Pair<String,String> userInfo = settingUpMinimalFieldOrganisation(puiUserManager);
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .findPaymentAccountsByEmailFromHeaderForExternalUsers(userInfo.getFirst(), puiUserManager,
@@ -269,8 +269,8 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         Map<String, Object> activeOrganisation = (Map<String, Object>) orgResponse.get("organisationEntityResponse");
 
         Map<String, Object> superUser = ((Map<String, Object>) activeOrganisation.get("superUser"));
-        assertThat(superUser.get("firstName")).isEqualTo("prashanth");
-        assertThat(superUser.get("lastName")).isEqualTo("rao");
-        assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");
+        assertThat(superUser.get("firstName")).isEqualTo("donatello");
+        assertThat(superUser.get("lastName")).isEqualTo("raphael");
+        assertThat(superUser.get("email")).isEqualTo("dummy@email.com");
     }
 }

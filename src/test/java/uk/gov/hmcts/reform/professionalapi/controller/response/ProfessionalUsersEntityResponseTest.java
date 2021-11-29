@@ -5,18 +5,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
-public class ProfessionalUsersEntityResponseTest {
+@ExtendWith(MockitoExtension.class)
+class ProfessionalUsersEntityResponseTest {
 
     private ProfessionalUsersEntityResponse sut;
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_ProfessionalUsersEntityResponse() throws Exception {
+    void test_ProfessionalUsersEntityResponse() throws Exception {
         final String dummyFirstName = "Joe";
         final String dummyLastName = "Bloggs";
         final String dummyEmail = "joe.bloggs@email.com";

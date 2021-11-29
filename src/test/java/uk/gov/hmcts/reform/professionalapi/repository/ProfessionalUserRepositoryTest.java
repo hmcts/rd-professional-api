@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class ProfessionalUserRepositoryTest extends BaseRepository {
+class ProfessionalUserRepositoryTest extends BaseRepository {
 
     @Test
-    public void test_findAll() {
+    void test_findAll() {
         List<ProfessionalUser> professionalUsers = professionalUserRepository.findAll();
 
         assertThat(professionalUsers).hasSize(1);
@@ -26,7 +26,7 @@ public class ProfessionalUserRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findById() {
+    void test_findById() {
         Optional<ProfessionalUser> profUser = professionalUserRepository.findById(professionalUser.getId());
 
         assertThat(profUser).contains(professionalUser);
@@ -34,7 +34,7 @@ public class ProfessionalUserRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findByEmailAddress() {
+    void test_findByEmailAddress() {
         ProfessionalUser profUser = professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress());
 
         assertThat(profUser).isEqualTo(professionalUser);
@@ -42,7 +42,7 @@ public class ProfessionalUserRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findByOrganisation() {
+    void test_findByOrganisation() {
         List<ProfessionalUser> profUser = professionalUserRepository.findByOrganisation(professionalUser
                 .getOrganisation());
 
@@ -51,7 +51,7 @@ public class ProfessionalUserRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findByUserIdentifier() {
+    void test_findByUserIdentifier() {
         ProfessionalUser profUser = professionalUserRepository.findByUserIdentifier(professionalUser
                 .getUserIdentifier());
 

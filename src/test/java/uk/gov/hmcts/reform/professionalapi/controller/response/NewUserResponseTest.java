@@ -3,13 +3,17 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
-public class NewUserResponseTest {
+@ExtendWith(MockitoExtension.class)
+class NewUserResponseTest {
 
     private String userIdentifier = UUID.randomUUID().toString();
     private ProfessionalUser professionalUser;
@@ -17,8 +21,8 @@ public class NewUserResponseTest {
     private NewUserResponse newUserResponse;
     private UserProfileCreationResponse userProfileCreationResponse;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
@@ -30,21 +34,21 @@ public class NewUserResponseTest {
     }
 
     @Test
-    public void test_getUserIdentifier() {
+    void test_getUserIdentifier() {
         assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier);
     }
 
     @Test
-    public void test_userIdentifier_with_setter() {
+    void test_userIdentifier_with_setter() {
         newUserResponse.setUserIdentifier(userIdentifier);
         newUserResponse.setIdamStatus("ACTIVE");
 
         assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier);
         assertThat(newUserResponse.getIdamStatus()).isEqualTo("ACTIVE");
     }
-  
+
     @Test
-    public void test_NewUserResponse_with_constructor() {
+    void test_NewUserResponse_with_constructor() {
         newUserResponse = new NewUserResponse(userProfileCreationResponse);
         assertThat(newUserResponse.getUserIdentifier()).isEqualTo("ACM1QR");
     }
