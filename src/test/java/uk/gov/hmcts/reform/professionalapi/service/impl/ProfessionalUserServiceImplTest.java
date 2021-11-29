@@ -96,8 +96,8 @@ public class ProfessionalUserServiceImplTest {
     private final SuperUser superUser = new SuperUser("some-fname", "some-lname",
             "some-super-email", organisation);
 
-    private List<PrdEnum> prdEnums = new ArrayList<>();
-    private List<String> userRoles = new ArrayList<>();
+    private final List<PrdEnum> prdEnums = new ArrayList<>();
+    private final List<String> userRoles = new ArrayList<>();
     ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Before

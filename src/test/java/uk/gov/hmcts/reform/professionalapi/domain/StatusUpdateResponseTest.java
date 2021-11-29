@@ -6,11 +6,10 @@ import org.junit.Test;
 
 public class StatusUpdateResponseTest {
 
-    private String idamStatusCode = "Coded";
-    private String idamMessage = "Message";
-
     @Test
     public void test_updateStatusResponse() {
+        String idamStatusCode = "Coded";
+        String idamMessage = "Message";
         StatusUpdateResponse statusUpdateResponse = new StatusUpdateResponse(idamStatusCode, idamMessage);
 
         assertThat(statusUpdateResponse.getIdamStatusCode()).isEqualTo(idamStatusCode);

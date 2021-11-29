@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -17,6 +16,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +62,6 @@ public class PaymentAccountServiceImplTest {
     private final EntityManager entityManagerMock = mock(EntityManager.class);
     private final EntityTransaction entityTransactionMock = mock(EntityTransaction.class);
 
-    private OrganisationServiceImpl organisationService;
     private PaymentAccountServiceImpl sut;
 
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
@@ -72,15 +71,15 @@ public class PaymentAccountServiceImplTest {
             "some-email-address", organisation);
 
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
-    private List<SuperUser> superUsers = new ArrayList<>();
-    private List<PaymentAccount> paymentAccounts = new ArrayList<>();
-    private Set<String> pbas = new HashSet<>();
-    private PbaRequest pbaEditRequest = new PbaRequest();
-    private PbaRequest pbaDeleteRequest = new PbaRequest();
+    private final List<SuperUser> superUsers = new ArrayList<>();
+    private final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+    private final Set<String> pbas = new HashSet<>();
+    private final PbaRequest pbaEditRequest = new PbaRequest();
+    private final PbaRequest pbaDeleteRequest = new PbaRequest();
 
     @Before
     public void setUp() {
-        organisationService = new OrganisationServiceImpl();
+        OrganisationServiceImpl organisationService = new OrganisationServiceImpl();
         organisationService.setPaymentAccountValidator(paymentAccountValidatorMock);
         organisationService.setPaymentAccountRepository(paymentAccountRepositoryMock);
 
@@ -224,7 +223,8 @@ public class PaymentAccountServiceImplTest {
 
         pbaRequestList.add(new PbaUpdateRequest(pbaNumber, ACCEPTED.name(), ""));
 
-        when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
+        when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(
+                Collections.singletonList(paymentAccount));
 
         UpdatePbaStatusResponse response = sut
                 .updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
@@ -249,7 +249,8 @@ public class PaymentAccountServiceImplTest {
         pbaRequestList.add(new PbaUpdateRequest(pbaNumber, ACCEPTED.name(), ""));
         pbaRequestList.add(new PbaUpdateRequest("PBA123", ACCEPTED.name(), ""));
 
-        when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
+        when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(
+                Collections.singletonList(paymentAccount));
 
         UpdatePbaStatusResponse response = sut
                 .updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());

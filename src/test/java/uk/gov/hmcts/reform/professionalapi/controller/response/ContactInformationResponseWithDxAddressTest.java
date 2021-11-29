@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class ContactInformationResponseWithDxAddressTest {
 
     @Test
     public void testGetContactInformationResponse() {
-        List<DxAddress> dxAddressList = Arrays.asList(new DxAddress());
+        List<DxAddress> dxAddressList = Collections.singletonList(new DxAddress());
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);

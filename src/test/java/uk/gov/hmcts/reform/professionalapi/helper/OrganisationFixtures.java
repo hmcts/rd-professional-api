@@ -7,7 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCr
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 import java.util.Set;
@@ -19,7 +19,7 @@ public class OrganisationFixtures {
     private OrganisationFixtures() {
     }
 
-    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
+    public OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
 
         return anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -29,7 +29,7 @@ public class OrganisationFixtures {
                         .lastName("some-lname")
                         .email(randomAlphanumeric(7).concat("@hmcts.net"))
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build()));
     }
 
@@ -45,7 +45,7 @@ public class OrganisationFixtures {
                         .lastName(" some-         lname  ")
                         .email(" someone@somewhere.com ")
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build()));
 
 
@@ -68,18 +68,18 @@ public class OrganisationFixtures {
                 .lastName("some-lname")
                 .email("someone@somewhere.com")
                 .build())
-            .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .country("country")
-                .county("county")
-                .townCity("town-city")
-                .postCode("some-post-code")
-                    .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                        .dxNumber("DX 1234567890")
-                        .dxExchange("dxExchange").build()))
-                .build()));
+            .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                    .addressLine1("addressLine1")
+                    .addressLine2("addressLine2")
+                    .addressLine3("addressLine3")
+                    .country("country")
+                    .county("county")
+                    .townCity("town-city")
+                    .postCode("some-post-code")
+                    .dxAddress(Collections.singletonList(dxAddressCreationRequest()
+                            .dxNumber("DX 1234567890")
+                            .dxExchange("dxExchange").build()))
+                    .build()));
     }
 
     public static OrganisationCreationRequest
@@ -100,17 +100,17 @@ public class OrganisationFixtures {
                 .lastName("somelname")
                 .email("someone1@somewhere.com")
                 .build())
-            .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("addressLine3")
-                .addressLine2("addressLine4")
-                .addressLine3("addressLine5")
-                .country("some-country1")
-                .county("some-county1")
-                .townCity("som1-town-city")
-                .postCode("som1-post-code")
-                    .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                        .dxNumber("NI 1234567890")
-                        .dxExchange("dxExchange1").build()))
-                .build()));
+            .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                    .addressLine1("addressLine3")
+                    .addressLine2("addressLine4")
+                    .addressLine3("addressLine5")
+                    .country("some-country1")
+                    .county("some-county1")
+                    .townCity("som1-town-city")
+                    .postCode("som1-post-code")
+                    .dxAddress(Collections.singletonList(dxAddressCreationRequest()
+                            .dxNumber("NI 1234567890")
+                            .dxExchange("dxExchange1").build()))
+                    .build()));
     }
 }

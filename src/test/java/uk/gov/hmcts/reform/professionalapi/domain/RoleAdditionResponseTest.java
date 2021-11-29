@@ -6,11 +6,10 @@ import org.junit.Test;
 
 public class RoleAdditionResponseTest {
 
-    private String idamStatusCode = "Code";
-    private String idamMessage = "Message";
-
     @Test
     public void test_addRoleResponse() {
+        String idamStatusCode = "Code";
+        String idamMessage = "Message";
         RoleAdditionResponse addRoleResponse = new RoleAdditionResponse(idamStatusCode, idamMessage);
 
         assertThat(addRoleResponse.getIdamStatusCode()).isEqualTo(idamStatusCode);

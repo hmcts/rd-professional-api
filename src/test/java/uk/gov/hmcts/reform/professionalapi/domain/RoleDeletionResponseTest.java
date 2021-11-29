@@ -6,12 +6,11 @@ import org.junit.Test;
 
 public class RoleDeletionResponseTest {
 
-    private String roleName = "Role";
-    private String idamStatusCode = "Code";
-    private String idamMessage = "Message";
-
     @Test
     public void test_deleteRoleResponse() {
+        String roleName = "Role";
+        String idamStatusCode = "Code";
+        String idamMessage = "Message";
         RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse(roleName, idamStatusCode, idamMessage);
 
         assertThat(deleteRoleResponse.getRoleName()).isEqualTo(roleName);

@@ -60,6 +60,7 @@ public class PaymentAccountValidator {
         if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
             Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
             Matcher matcher = pattern.matcher(pbaAccount);
+            //address
             if (matcher.matches()) {
                 return false;
             }

@@ -86,19 +86,15 @@ public class OrganisationExternalControllerTest {
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PrdEnumRepository prdEnumRepository;
-    private UserCreationRequest userCreationRequest;
     private Organisation organisation;
     private Organisation organisation1;
     private ProfessionalUser professionalUser;
     private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
-    private UserProfileCreationRequest userProfileCreationRequest;
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
-    private Response response;
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
     RefDataUtil refDataUtilMock;
-    private PaymentAccountValidator paymentAccountValidator;
 
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -123,7 +119,7 @@ public class OrganisationExternalControllerTest {
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
         userInfoMock = mock(UserInfo.class);
-        paymentAccountValidator = mock(PaymentAccountValidator.class);
+        PaymentAccountValidator paymentAccountValidator = mock(PaymentAccountValidator.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -154,15 +150,15 @@ public class OrganisationExternalControllerTest {
 
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
                 "some@email.com", userRoles,false);
-        userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
+        UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
-        userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
+        UserProfileCreationRequest userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
                 "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles,
                 false);
-        response = Response.builder().status(200).reason("OK").body(mock(Response.Body.class))
+        Response response = Response.builder().status(200).reason("OK").body(mock(Response.Body.class))
                 .request(mock(Request.class)).build();
 
         MockitoAnnotations.openMocks(this);

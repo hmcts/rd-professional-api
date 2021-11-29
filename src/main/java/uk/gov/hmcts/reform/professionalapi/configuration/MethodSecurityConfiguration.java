@@ -18,7 +18,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 public class MethodSecurityConfiguration extends GlobalMethodSecurityConfiguration {
 
     protected AccessDecisionManager accessDecisionManager() {
-        List<AccessDecisionVoter<? extends Object>> decisionVoters
+        List<AccessDecisionVoter<?>> decisionVoters
                 = new ArrayList<AccessDecisionVoter<? extends Object>>();
         ExpressionBasedPreInvocationAdvice expressionAdvice = new ExpressionBasedPreInvocationAdvice();
         expressionAdvice.setExpressionHandler(getExpressionHandler());

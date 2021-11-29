@@ -15,7 +15,7 @@ import org.junit.Test;
 
 public class ContactInformationCreationRequestTest {
 
-    private List<DxAddressCreationRequest> dxAddresses = new ArrayList<>();
+    private final List<DxAddressCreationRequest> dxAddresses = new ArrayList<>();
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 

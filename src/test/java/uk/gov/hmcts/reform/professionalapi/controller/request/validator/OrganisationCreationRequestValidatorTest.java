@@ -42,14 +42,13 @@ public class OrganisationCreationRequestValidatorTest {
     private RequestValidator validator2;
 
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
-    private UserCreationRequest userCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
     private Exception myException;
 
     @Before
     public void setup() {
         organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
-        userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
+        UserCreationRequest userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
                 .email("test@email.com").build();
         organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
                 "true", null, "12345678", "www.company.com", userCreationRequest,

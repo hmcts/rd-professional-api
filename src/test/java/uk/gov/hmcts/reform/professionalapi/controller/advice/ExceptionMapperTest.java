@@ -30,6 +30,8 @@ public class ExceptionMapperTest {
     @InjectMocks
     private ExceptionMapper exceptionMapper;
 
+    //tests may produce null pointers, needed for mutations?
+
     @Test
     public void test_handle_empty_result_exception() {
         EmptyResultDataAccessException emptyResultDataAccessException = new EmptyResultDataAccessException(1);

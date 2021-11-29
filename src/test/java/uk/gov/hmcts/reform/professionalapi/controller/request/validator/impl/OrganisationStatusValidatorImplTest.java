@@ -48,19 +48,19 @@ public class OrganisationStatusValidatorImplTest {
 
     @Test
     public void test_validateAndReturnStatusList_allvalid() {
-        List<String> validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+        List<String> validStatuses = OrganisationStatusValidatorImpl.validateAndReturnStatusList(
                 "ACTIVE,REVIEW");
         assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
 
-        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+        validStatuses = OrganisationStatusValidatorImpl.validateAndReturnStatusList(
                 "  , ACTIVE,REVIEW,");
         assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
 
-        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+        validStatuses = OrganisationStatusValidatorImpl.validateAndReturnStatusList(
                 " ACTIVE , REVIEW ");
         assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
 
-        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+        validStatuses = OrganisationStatusValidatorImpl.validateAndReturnStatusList(
                 " AcTiVe , rEvIeW ");
         assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
     }
@@ -82,7 +82,7 @@ public class OrganisationStatusValidatorImplTest {
     }
 
     public void verifyException(String status, String message) {
-        Assertions.assertThatThrownBy(() -> organisationStatusValidatorImpl.validateAndReturnStatusList(status))
+        Assertions.assertThatThrownBy(() -> OrganisationStatusValidatorImpl.validateAndReturnStatusList(status))
                 .isExactlyInstanceOf(InvalidRequest.class)
                 .hasMessage(message);
     }

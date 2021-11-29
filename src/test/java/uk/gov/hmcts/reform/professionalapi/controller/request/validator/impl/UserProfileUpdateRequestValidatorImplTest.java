@@ -15,23 +15,23 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 public class UserProfileUpdateRequestValidatorImplTest {
 
-    private String email = "test@test.com";
-    private String firstName = "fname";
-    private String lastName = "lname";
-    private String puiOrganisationManager = "pui-organisation-manager";
-    private String puiCaseManager = "pui-case-manager";
-    private String puiFinanceManager = "pui-finance-manager";
+    private final String email = "test@test.com";
+    private final String firstName = "fname";
+    private final String lastName = "lname";
 
-    private Set<RoleName> rolesData = new HashSet<>();
-    private Set<RoleName> rolesToDeleteData = new HashSet<>();
+    private final Set<RoleName> rolesData = new HashSet<>();
+    private final Set<RoleName> rolesToDeleteData = new HashSet<>();
     private RoleName roleName1;
     private RoleName roleName2;
     private RoleName roleToDeleteName;
 
     @Before
     public void setUp() {
+        String puiCaseManager = "pui-case-manager";
         roleName1 = new RoleName(puiCaseManager);
+        String puiOrganisationManager = "pui-organisation-manager";
         roleName2 = new RoleName(puiOrganisationManager);
+        String puiFinanceManager = "pui-finance-manager";
         roleToDeleteName = new RoleName(puiFinanceManager);
 
         rolesData.add(roleName1);

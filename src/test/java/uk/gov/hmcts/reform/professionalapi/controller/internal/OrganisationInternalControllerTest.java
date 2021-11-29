@@ -81,12 +81,9 @@ public class OrganisationInternalControllerTest {
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
-    private PaymentAccountValidator paymentAccountValidatorMock;
     private ProfessionalUserService professionalUserServiceMock;
     private MfaStatusService mfaStatusServiceMock;
     private OrganisationIdentifierValidatorImpl orgIdValidatorMock;
-    private UpdateOrganisationRequestValidator updateOrganisationRequestValidatorMock;
-    private OrganisationStatusValidatorImpl organisationStatusValidatorMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -96,7 +93,6 @@ public class OrganisationInternalControllerTest {
     private final PrdEnum anEnum1 = new PrdEnum(prdEnumId1, "PROBATE", "JURISD_ID");
     private final PrdEnum anEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "JURISD_ID");
     private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, "pui-case-manager", "PRD_ROLE");
-    private UserCreationRequest userCreationRequest;
     private PrdEnumServiceImpl prdEnumServiceMock;
     private List<PrdEnum> prdEnumList;
 
@@ -128,20 +124,20 @@ public class OrganisationInternalControllerTest {
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
-        paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
+        PaymentAccountValidator paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         mfaStatusServiceMock = mock(MfaStatusService.class);
         orgIdValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
-        updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
-        organisationStatusValidatorMock = mock(OrganisationStatusValidatorImpl.class);
+        UpdateOrganisationRequestValidator updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
+        OrganisationStatusValidatorImpl organisationStatusValidatorMock = mock(OrganisationStatusValidatorImpl.class);
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
         prdEnumList.add(anEnum2);
         prdEnumList.add(anEnum3);
 
-        userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
+        UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",

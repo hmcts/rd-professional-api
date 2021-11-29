@@ -108,7 +108,7 @@ public class FeatureConditionEvaluationTest {
             .preHandle(httpRequest, httpServletResponse, handlerMethod);
     }
 
-    public static String generateDummyS2SToken(String serviceName) {
+    public String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
             .setSubject(serviceName)
             .setIssuedAt(new Date())

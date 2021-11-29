@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,6 +26,7 @@ import feign.Response;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -134,21 +134,18 @@ public class OrganisationServiceImplTest {
     private final PaymentAccountValidator paymentAccountValidator
             = new PaymentAccountValidator(paymentAccountRepositoryMock);
 
-    private UserAttribute userAttribute = new UserAttribute();
+    private final UserAttribute userAttribute = new UserAttribute();
     private UserCreationRequest superUserCreationRequest;
-    private DxAddressCreationRequest dxAddressRequest;
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
 
-    private List<Organisation> organisations;
     private List<ContactInformationCreationRequest> contactInformationCreationRequests;
     private List<DxAddressCreationRequest> dxAddressRequests;
     private List<PaymentAccount> paymentAccounts;
     private List<UserAccountMap> userAccountMaps;
-    private List<String> userRoles = new ArrayList<>();
-    private List<PrdEnum> prdEnums = new ArrayList<>();
+    private final List<String> userRoles = new ArrayList<>();
+    private final List<PrdEnum> prdEnums = new ArrayList<>();
     private List<UserAttribute> userAttributes;
-    private List<String> jurisdictionIds;
     Set<String> paymentAccountList;
     private DeleteOrganisationResponse deleteOrganisationResponse;
 
@@ -181,12 +178,12 @@ public class OrganisationServiceImplTest {
 
         contactInformationCreationRequests = new ArrayList<>();
         dxAddressRequests = new ArrayList<>();
-        organisations = new ArrayList<>();
+        List<Organisation> organisations = new ArrayList<>();
         paymentAccounts = new ArrayList<>();
         paymentAccounts.add(paymentAccount);
         userAttributes = new ArrayList<>();
         userAccountMaps = new ArrayList<>();
-        jurisdictionIds = new ArrayList<>();
+        List<String> jurisdictionIds = new ArrayList<>();
         jurisdictionIds.add("PROBATE");
 
         organisation.setId(UUID.randomUUID());
@@ -196,7 +193,7 @@ public class OrganisationServiceImplTest {
         superUserCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some-email");
 
-        dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
+        DxAddressCreationRequest dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
         dxAddressRequests.add(dxAddressRequest);
 
         contactInformationCreationRequest = new ContactInformationCreationRequest("addressLine-1",
@@ -493,14 +490,14 @@ public class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
-        when(organisationRepository.findByStatusIn(asList(OrganisationStatus.PENDING))).thenReturn(organisations);
+        when(organisationRepository.findByStatusIn(Collections.singletonList(OrganisationStatus.PENDING))).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse
                 = sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1))
-                .findByStatusIn(asList(OrganisationStatus.PENDING));
+                .findByStatusIn(Collections.singletonList(OrganisationStatus.PENDING));
     }
 
     @Test(expected = InvalidRequest.class)

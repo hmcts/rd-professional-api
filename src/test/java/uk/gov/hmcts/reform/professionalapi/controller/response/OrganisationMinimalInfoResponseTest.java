@@ -5,7 +5,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ public class OrganisationMinimalInfoResponseTest {
     String name = "Organisation Name";
     String organisationIdentifier = UUID.randomUUID().toString();
     ContactInformation contactInformation = new ContactInformation();
-    List<ContactInformation> contactInformations = Arrays.asList(contactInformation);
+    List<ContactInformation> contactInformations = Collections.singletonList(contactInformation);
     Organisation organisationMock = mock(Organisation.class);
 
     @Before

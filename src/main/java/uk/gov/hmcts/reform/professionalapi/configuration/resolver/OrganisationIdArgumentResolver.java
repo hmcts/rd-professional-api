@@ -52,7 +52,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
         HttpServletRequest request
                 = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         String userId;
-        String orgId = null;
+        String orgId = "";
         ProfessionalUser professionalUser;
         Organisation organisation;
 

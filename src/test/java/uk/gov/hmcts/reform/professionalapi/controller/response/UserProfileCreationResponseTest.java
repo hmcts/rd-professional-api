@@ -10,8 +10,8 @@ import org.springframework.http.HttpStatus;
 
 public class UserProfileCreationResponseTest {
 
-    private UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-    private String testUuid = UUID.randomUUID().toString();
+    private final UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+    private final String testUuid = UUID.randomUUID().toString();
 
     @Test
     public void test_has_mandatory_fields_specified_not_null() {

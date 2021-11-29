@@ -103,9 +103,7 @@ public class RefDataUtil {
 
     public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
 
-        List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
-
-        paymentAccountsFromOrg.addAll(paymentAccounts);
+        List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>(paymentAccounts);
         return paymentAccounts;
     }
 
@@ -305,15 +303,15 @@ public class RefDataUtil {
         HttpHeaders headers = new HttpHeaders();
 
         final StringBuilder pageInformation = new StringBuilder();
-        pageInformation.append("totalElements = " + page.getTotalElements());
+        pageInformation.append("totalElements = ").append(page.getTotalElements());
         pageInformation.append(",");
-        pageInformation.append("totalPages = " + page.getTotalPages());
+        pageInformation.append("totalPages = ").append(page.getTotalPages());
         pageInformation.append(",");
-        pageInformation.append("currentPage = " + pageable.getPageNumber());
+        pageInformation.append("currentPage = ").append(pageable.getPageNumber());
         pageInformation.append(",");
-        pageInformation.append("size = " + pageable.getPageSize());
+        pageInformation.append("size = ").append(pageable.getPageSize());
         pageInformation.append(",");
-        pageInformation.append("sortedBy = " + pageable.getSort());
+        pageInformation.append("sortedBy = ").append(pageable.getSort());
 
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());
@@ -357,6 +355,7 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) requireNonNull(responseResponseEntity.getBody());
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
+                assert errorResponse != null;
                 log.error("{}:: Response from UserProfileByEmail service call {}",
                         loggingComponentName, errorResponse.getErrorDescription());
                 newUserResponse = new NewUserResponse();

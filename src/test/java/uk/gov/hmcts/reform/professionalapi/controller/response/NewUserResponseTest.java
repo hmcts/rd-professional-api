@@ -11,17 +11,15 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class NewUserResponseTest {
 
-    private String userIdentifier = UUID.randomUUID().toString();
-    private ProfessionalUser professionalUser;
-    private Organisation organisation;
+    private final String userIdentifier = UUID.randomUUID().toString();
     private NewUserResponse newUserResponse;
     private UserProfileCreationResponse userProfileCreationResponse;
 
     @Before
     public void setUp() {
-        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
-        professionalUser = new ProfessionalUser("some-fname", "some-lname",
+        ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
         professionalUser.setUserIdentifier(userIdentifier);
         newUserResponse = new NewUserResponse(professionalUser);

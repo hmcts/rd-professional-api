@@ -12,8 +12,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class ProfessionalUsersEntityResponseTest {
 
-    private ProfessionalUsersEntityResponse sut;
-
     @Test
     @SuppressWarnings("unchecked")
     public void test_ProfessionalUsersEntityResponse() throws Exception {
@@ -27,7 +25,7 @@ public class ProfessionalUsersEntityResponseTest {
         List<ProfessionalUsersResponse> professionalUsers = new ArrayList<>();
         professionalUsers.add(professionalResponse);
 
-        sut = new ProfessionalUsersEntityResponse();
+        ProfessionalUsersEntityResponse sut = new ProfessionalUsersEntityResponse();
         sut.setUserProfiles(professionalUsers);
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);

@@ -7,11 +7,10 @@ import org.junit.Test;
 
 public class PbaEditRequestTest {
 
-    private String pbaNumber = "PBA0000001";
-
     @Test
     public void test_pbaEditRequestBuilder() {
         PbaRequest pbaEditRequest = new PbaRequest();
+        String pbaNumber = "PBA0000001";
         pbaEditRequest.setPaymentAccounts(singleton(pbaNumber));
         assertThat(pbaEditRequest.getPaymentAccounts()).isEqualTo(singleton(pbaNumber));
     }

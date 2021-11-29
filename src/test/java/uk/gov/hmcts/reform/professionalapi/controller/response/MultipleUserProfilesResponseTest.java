@@ -14,15 +14,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 public class MultipleUserProfilesResponseTest {
 
     private UserProfile userProfile;
-    private GetUserProfileResponse getUserProfileResponse;
-    private List<UserProfile> userProfiles = new ArrayList<>();
-    private List<GetUserProfileResponse> getUserProfileResponses = new ArrayList<>();
+    private final List<UserProfile> userProfiles = new ArrayList<>();
+    private final List<GetUserProfileResponse> getUserProfileResponses = new ArrayList<>();
 
     @Before
     public void setUp() {
         userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com", "fName",
                 "lName", IdamStatus.PENDING);
-        getUserProfileResponse = new GetUserProfileResponse();
+        GetUserProfileResponse getUserProfileResponse = new GetUserProfileResponse();
         userProfiles.add(userProfile);
         getUserProfileResponses.add(getUserProfileResponse);
     }

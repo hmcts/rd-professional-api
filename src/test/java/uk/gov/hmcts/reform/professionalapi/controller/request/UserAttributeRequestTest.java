@@ -12,7 +12,7 @@ import org.junit.Test;
 public class UserAttributeRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    private String puiUserManager = "pui-user-manager";
+    private final String puiUserManager = "pui-user-manager";
 
     @Test
     public void test_has_mandatory_fields_specified_not_null() {

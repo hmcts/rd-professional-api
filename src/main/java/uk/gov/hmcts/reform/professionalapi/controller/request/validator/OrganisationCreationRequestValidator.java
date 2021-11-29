@@ -184,7 +184,7 @@ public class OrganisationCreationRequestValidator {
     }
 
     @Value("${loggingComponentName}")
-    public static void setLoggingComponentName(String loggingComponentName) {
+    public void setLoggingComponentName(String loggingComponentName) {
         OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
     }
 

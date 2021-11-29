@@ -25,12 +25,11 @@ public class OrganisationMfaStatusControllerTest {
 
     @Mock
     private MfaStatusService mfaStatusServiceMock;
-    private ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity;
 
     @Test
     public void test_retrieveMfaStatusByUserId() {
 
-        mfaStatusResponseEntity = ResponseEntity.status(HttpStatus.OK).body(new MfaStatusResponse());
+        ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity = ResponseEntity.status(HttpStatus.OK).body(new MfaStatusResponse());
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String id = UUID.randomUUID().toString();
 

@@ -80,12 +80,10 @@ public class RefDataUtilTest {
     private PaymentAccount paymentAccount;
     private Organisation organisation;
     private ProfessionalUser professionalUser;
-    private UserAccountMapId userAccountMapId;
     private UserAccountMap userAccountMap;
     private UserProfile profile;
     private GetUserProfileResponse getUserProfileResponse;
     private UserProfileFeignClient userProfileFeignClient;
-    private JsonFeignResponseUtil jsonFeignResponseUtil;
 
     @Before
     public void setUp() {
@@ -95,7 +93,7 @@ public class RefDataUtilTest {
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
         professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
-        userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
+        UserAccountMapId userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         userAccountMap = new UserAccountMap(userAccountMapId);
         profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName",
                 "lastName", IdamStatus.ACTIVE);
@@ -105,7 +103,7 @@ public class RefDataUtilTest {
         getUserProfileResponse.setIdamMessage("BAD REQUEST");
         paymentAccount.setId(UUID.randomUUID());
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-        jsonFeignResponseUtil = mock(JsonFeignResponseUtil.class);
+        JsonFeignResponseUtil jsonFeignResponseUtil = mock(JsonFeignResponseUtil.class);
     }
 
     @Test

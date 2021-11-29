@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 @AllArgsConstructor
 public class UserProfile {
 
-    private String idamId;
-    private String email;
-    private String firstName;
-    private String lastName;
-    private IdamStatus idamStatus;
+    private final String idamId;
+    private final String email;
+    private final String firstName;
+    private final String lastName;
+    private final IdamStatus idamStatus;
 }

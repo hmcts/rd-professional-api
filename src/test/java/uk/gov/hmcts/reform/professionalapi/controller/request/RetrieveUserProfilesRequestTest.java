@@ -9,7 +9,7 @@ import org.junit.Test;
 public class RetrieveUserProfilesRequestTest {
 
     private RetrieveUserProfilesRequest retrieveUserProfilesRequest;
-    private String userId = UUID.randomUUID().toString();
+    private final String userId = UUID.randomUUID().toString();
 
     @Test
     public void test_RetrieveUserProfilesRequestSetter() {
