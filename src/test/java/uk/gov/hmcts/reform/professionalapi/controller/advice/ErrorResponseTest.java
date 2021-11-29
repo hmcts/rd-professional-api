@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class ErrorResponseTest {
+@ExtendWith(MockitoExtension.class)
+class ErrorResponseTest {
 
     @Test
-    public void test_ErrorResponse() {
+    void test_ErrorResponse() {
         String expectMsg = "msg";
         String expectDesc = "desc";
         String expectTs = "time";
@@ -25,7 +28,7 @@ public class ErrorResponseTest {
     }
 
     @Test
-    public void test_NoArgsConstructor() {
+    void test_NoArgsConstructor() {
         ErrorResponse errorResponse = new ErrorResponse();
         assertThat(errorResponse).isNotNull();
     }

@@ -4,15 +4,19 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
-import org.junit.Test;
 
-public class RetrieveUserProfilesRequestTest {
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class RetrieveUserProfilesRequestTest {
 
     private RetrieveUserProfilesRequest retrieveUserProfilesRequest;
     private String userId = UUID.randomUUID().toString();
 
     @Test
-    public void test_RetrieveUserProfilesRequestSetter() {
+    void test_RetrieveUserProfilesRequestSetter() {
         retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(null);
         retrieveUserProfilesRequest.setUserIds(singletonList(userId));
 
@@ -21,7 +25,7 @@ public class RetrieveUserProfilesRequestTest {
     }
 
     @Test
-    public void test_test_RetrieveUserProfilesRequestBuilder() {
+    void test_test_RetrieveUserProfilesRequestBuilder() {
         retrieveUserProfilesRequest = RetrieveUserProfilesRequest.aRetrieveUserProfilesRequest()
                 .userIds(singletonList(userId)).build();
 

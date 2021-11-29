@@ -5,16 +5,19 @@ import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
+import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
+import uk.gov.hmcts.reform.professionalapi.util.serenity5.SerenityTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,11 +46,12 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
-@RunWith(CustomSerenityRunner.class)
+@SerenityTest
+@SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
 @SuppressWarnings("unchecked")
-public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest {
+class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest {
 
     String pumBearerToken;
     String pcmBearerToken;
@@ -65,7 +69,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     String lastName = "lastName";
 
     @Test
-    public void testExternalUserScenario() {
+    @DisplayName("PRD External Test Scenarios")
+    void testExternalUserScenario() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
         inviteUserScenarios();
@@ -313,7 +318,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(FORBIDDEN,
                 professionalApiClient.getMultipleAuthHeaders(systemUserBearerToken));
         assertThat(response.get("errorMessage")).isNotNull();
-        assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
+        assertThat(response).containsEntry("errorMessage", "9 : Access Denied");
         log.info("findOrgByUnknownUserShouldReturnForbidden :: END");
     }
 
@@ -347,7 +352,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                 professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
                         professionalApiClient.getMultipleAuthHeaders(pumBearerToken), OK, ACTIVE, true);
 
-        assertThat(responseList.size()).isGreaterThanOrEqualTo(1);
+        assertThat(responseList.size()).isPositive();
         OrganisationMinimalInfoResponse org = responseList.get(0);
         assertThat(org.getName()).isNotNull();
         assertThat(org.getOrganisationIdentifier()).isNotNull();
@@ -363,7 +368,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                                 Arrays.asList(caseworker, citizen), firstName, lastName, generateRandomEmail())), OK,
                         ACTIVE, true);
 
-        assertThat(responseList.size()).isGreaterThanOrEqualTo(1);
+        assertThat(responseList.size()).isPositive();
         log.info("findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess :: END");
     }
 
@@ -420,6 +425,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(professionalUsersResponse.get("roles")).isNotNull();
 
         List<String> modifiedRoles = (List<String>) professionalUsersResponse.get("roles");
+        assertThat(modifiedRoles).isNotEmpty();
         assertThat(modifiedRoles).doesNotContain(puiOrgManager);
         log.info("deleteRolesByPumShouldBeSuccess :: STARTED");
     }
@@ -429,9 +435,9 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForExternal(FORBIDDEN,
                 addRoleRequest(puiOrgManager),
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), superUserId);
-        assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("9 : Access Denied");
-        assertThat(modifiedUserResponse.get("errorDescription"))
-                .isEqualTo("User status must be Active to perform this operation");
+        assertThat(modifiedUserResponse).containsEntry("errorMessage", "9 : Access Denied");
+        assertThat(modifiedUserResponse)
+                .containsEntry("errorDescription", "User status must be Active to perform this operation");
         log.info("addRolesByPendingExtUserShouldReturnForbidden :: END");
     }
 
@@ -461,8 +467,10 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
+    @DisplayName("MFA Scenarios")
+    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationMfaStatusController.retrieveMfaStatusByUserId", withFeature = true)
-    public void findMFAScenario() {
+    void findMFAScenario() {
         setUpOrgTestData();
         findMFAByUserIDShouldBeSuccess();
     }
@@ -470,7 +478,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     public void findMFAByUserIDShouldBeSuccess() {
         log.info("findMFAByUserIDShouldBeSuccess :: STARTED");
         Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
-        assertThat(mfaStatusResponse.get("mfa")).isEqualTo("EMAIL");
+        assertThat(mfaStatusResponse).containsEntry("mfa", "EMAIL");
         log.info("findMFAByUserIDShouldBeSuccess :: END");
     }
 
@@ -490,7 +498,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
-    public void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
         setUpOrgTestData();
@@ -507,7 +516,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
-    public void deletePbaOfExistingOrganisationShouldBeSuccess() {
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
 
         setUpOrgTestData();
@@ -529,7 +539,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
-    public void addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
         setUpOrgTestData();
@@ -546,7 +557,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
-    public void addPbaOfExistingOrganisationShouldBeSuccess() {
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void addPbaOfExistingOrganisationShouldBeSuccess() {
         log.info("addPaymentAccountsToOrganisation :: STARTED");
 
         setUpOrgTestData();

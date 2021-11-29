@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
@@ -18,14 +18,14 @@ import java.util.UUID;
 import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.REJECTED;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     Set<String> paymentAccounts = new HashSet<>();
     String pba1 = "PBA2345678";
@@ -33,7 +33,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     String pba3 = "PBA4567890";
 
     @Test
-    public void update_pba_account_numbers_for_an_organisation_200_success_scenario() {
+    void update_pba_account_numbers_for_an_organisation_200_success_scenario() {
         String orgId = setUpData();
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
@@ -61,7 +61,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void update_pba_account_numbers_for_an_organisation_200_partial_success_scenario() {
+    void update_pba_account_numbers_for_an_organisation_200_partial_success_scenario() {
         String orgId = setUpData();
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
@@ -93,7 +93,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void update_pba_account_numbers_for_an_organisation_422_failure_scenario() {
+    void update_pba_account_numbers_for_an_organisation_422_failure_scenario() {
         final String orgId = setUpData();
 
         createOrganisationRequest();
@@ -140,7 +140,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void update_pba_account_numbers_for_a_pending_organisation_400_failure_scenario() {
+    void update_pba_account_numbers_for_a_pending_organisation_400_failure_scenario() {
         Map<String, Object> createOrganisationResponse =
                 professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
 
@@ -156,7 +156,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void update_pba_account_numbers_with_empty_pba_request_400_failure_scenario() {
+    void update_pba_account_numbers_with_empty_pba_request_400_failure_scenario() {
         String orgId = setUpData();
 
         Map<String, Object> updatePbaResponse = professionalReferenceDataClient
@@ -167,7 +167,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void update_pba_account_numbers_with_non_prdAdmin_role_403_failure_scenario() {
+    void update_pba_account_numbers_with_non_prdAdmin_role_403_failure_scenario() {
         Map<String, Object> updatePbaResponse =
                 professionalReferenceDataClient.updatePaymentsAccountsByOrgId(new UpdatePbaRequest(),
                         UUID.randomUUID().toString(), puiUserManager, null);
@@ -176,7 +176,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         assertThat(updatePbaResponse.get("http_status")).asString().contains("403");
     }
 
-    public String setUpData() {
+    String setUpData() {
         paymentAccounts.addAll(asList(pba1, pba2, pba3));
 
         OrganisationCreationRequest organisationCreationRequest =
@@ -210,14 +210,14 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_null_request_body() {
+    void test_updatePaymentsAccounts_should_return_400_when_null_request_body() {
         String orgId = setUpData();
 
         validateUpdatePaymentsAccountsResponse(orgId, null, HttpStatus.BAD_REQUEST, null);
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_empty_json_object() {
+    void test_updatePaymentsAccounts_should_return_400_when_empty_json_object() {
         String orgId = setUpData();
         String pbaRequestBodyEmptyObject = "{}";
 
@@ -225,7 +225,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_empty_request_body() {
+    void test_updatePaymentsAccounts_should_return_400_when_empty_request_body() {
         String orgId = setUpData();
         String pbaRequestBodyEmpty = "";
 
@@ -233,7 +233,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_request_body_with_space() {
+    void test_updatePaymentsAccounts_should_return_400_when_request_body_with_space() {
         String orgId = setUpData();
         String pbaRequestBodyWithSpace = " ";
 
@@ -241,7 +241,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_request_body_with_spec_char() {
+    void test_updatePaymentsAccounts_should_return_400_when_request_body_with_spec_char() {
         String orgId = setUpData();
         String pbaRequestBodyWithSpecialChar = "*";
 
@@ -249,7 +249,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_array_empty() {
+    void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_array_empty() {
         String orgId = setUpData();
         String pbaRequestBodyEmptyArray = "{\"pbaNumbers\": []}";
 
@@ -258,7 +258,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_misspelled() {
+    void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_misspelled() {
         String orgId = setUpData();
         String pbaRequestBodyMisspelledField = "{\"fghdghdhg\": [\"PBA0000120\"]}";
 
@@ -267,7 +267,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_array_missing() {
+    void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_array_missing() {
         String orgId = setUpData();
         String pbaRequestBodyNoPbaArray = "{\"pbaNumbers\":}";
 
@@ -275,7 +275,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_empty() {
+    void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_empty() {
         String orgId = setUpData();
         String pbaRequestBodyEmptyPba = "{\"pbaNumbers\": \"\"}";
 
@@ -283,7 +283,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_null() {
+    void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_null() {
         String orgId = setUpData();
         String pbaRequestBodyPbaNull = "{\"pbaNumbers\": null}";
 
@@ -291,7 +291,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_spec_char() {
+    void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_spec_char() {
         String orgId = setUpData();
         String pbaRequestBodyPbaWithSpecialChar = "{\"pbaNumbers\": \"*\"}";
 
@@ -299,7 +299,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_space() {
+    void test_updatePaymentsAccounts_should_return_400_when_pbaNumbers_space() {
         String orgId = setUpData();
         String pbaRequestBodyPbaWithSpace = "{\"pbaNumbers\": \"  \"}";
 
@@ -307,7 +307,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_422_when_empty_status() {
+    void test_updatePaymentsAccounts_should_return_422_when_empty_status() {
         String orgId = setUpData();
         String pbaRequestBodyEmptyStatus = "{\"pbaNumbers\":"
                                             + "["
@@ -324,7 +324,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_422_when_status_field_misspelled() {
+    void test_updatePaymentsAccounts_should_return_422_when_status_field_misspelled() {
         String orgId = setUpData();
         String pbaRequestBodyMisspelledField = "{\"pbaNumbers\":"
                                                 + "["
@@ -341,7 +341,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_422_when_status_with_special_char() {
+    void test_updatePaymentsAccounts_should_return_422_when_status_with_special_char() {
         String orgId = setUpData();
         String pbaRequestBodyStatusWithSpecChar = "{\"pbaNumbers\":"
                                                 + "["
@@ -358,7 +358,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_422_when_status_with_space() {
+    void test_updatePaymentsAccounts_should_return_422_when_status_with_space() {
         String orgId = setUpData();
         String pbaRequestBodyStatusWithSpace = "{\"pbaNumbers\":"
                                                 + "["
@@ -375,7 +375,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_200_when_status_lowercase() {
+    void test_updatePaymentsAccounts_should_return_200_when_status_lowercase() {
         String orgId = setUpData();
         String pbaRequestBodyStatusLowercase = "{\"pbaNumbers\":"
                                                 + "["
@@ -391,7 +391,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_updatePaymentsAccounts_should_return_200_when_status_uppercase() {
+    void test_updatePaymentsAccounts_should_return_200_when_status_uppercase() {
         String orgId = setUpData();
         String pbaRequestBodyUppercase = "{\"pbaNumbers\":"
                                         + "["

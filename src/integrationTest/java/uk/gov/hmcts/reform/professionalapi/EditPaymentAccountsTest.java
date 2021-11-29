@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -16,10 +16,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
+class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void test_editPaymentAccountsShouldReturn200() {
+    void test_editPaymentAccountsShouldReturn200() {
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("PBA0000001");
         newPaymentAccounts.add("PBA0000003");
@@ -50,7 +50,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
+    void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
         PbaRequest pbaEditRequest = new PbaRequest();
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("PBA0000003");
@@ -62,7 +62,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed() {
+    void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed() {
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("this-is-invalid");
 
@@ -78,7 +78,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
 
     @Test
-    public void test_editPaymentAccountsShouldDeleteAllAccountsIfEmptyListIsSent() {
+    void test_editPaymentAccountsShouldDeleteAllAccountsIfEmptyListIsSent() {
 
         Set<String> newPaymentAccounts = new HashSet<>();
         PbaRequest pbaEditRequest = new PbaRequest();
@@ -100,7 +100,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsSldRtn400IfPaymentAccountBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
+    void test_editPaymentAccountsSldRtn400IfPaymentAccountBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
         Set<String> existingPaymentAccounts = new HashSet<>();
         existingPaymentAccounts.add("PBA0000003");
         existingPaymentAccounts.add("PBA0000004");
@@ -130,7 +130,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed_WithPbaInErrorMessage() {
+    void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed_WithPbaInErrorMessage() {
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("this-is-invalid");
 
@@ -162,7 +162,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccounts_should_return_200_when_paymentAccounts_array_empty() {
+    void test_editPaymentAccounts_should_return_200_when_paymentAccounts_array_empty() {
         String orgId = createActiveOrganisationAndPbaEditRequest();
         String paymentAccountEmptyPbaArray = "{\"paymentAccounts\": []}";
 
@@ -171,7 +171,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccounts_should_return_200_when_paymentAccounts_misspelled() {
+    void test_editPaymentAccounts_should_return_200_when_paymentAccounts_misspelled() {
         String orgId = createActiveOrganisationAndPbaEditRequest();
         String paymentAccountMisspelled = "{\"paymentAccount\": [\"PBA0000001\"]}";
 
@@ -180,7 +180,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccounts_should_return_200_when_pbas_empty() {
+    void test_editPaymentAccounts_should_return_200_when_pbas_empty() {
         String orgId = createActiveOrganisationAndPbaEditRequest();
         String paymentAccountEmptyPbas = "{\"paymentAccounts\": [\"\"]}";
 
@@ -189,7 +189,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccounts_should_return_200_when_pbas_null() {
+    void test_editPaymentAccounts_should_return_200_when_pbas_null() {
         String orgId = createActiveOrganisationAndPbaEditRequest();
         String paymentAccountNullPbas = "{\"paymentAccounts\": null}";
 
@@ -198,7 +198,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccounts_should_return_200_when_lowercase_pbas() {
+    void test_editPaymentAccounts_should_return_200_when_lowercase_pbas() {
         String orgId = createActiveOrganisationAndPbaEditRequest();
         String paymentAccountPbasWithSpace = "{\"paymentAccounts\": [\"pba0000001\"]}";
 
@@ -207,7 +207,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccounts_should_return_400_when_paymentAccounts_array_missing() {
+    void test_editPaymentAccounts_should_return_400_when_paymentAccounts_array_missing() {
         String orgId = createActiveOrganisationAndPbaEditRequest();
         String paymentAccountMissingArray = "{\"paymentAccounts\": }";
 
@@ -215,7 +215,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccounts_should_return_400_when_pbas_with_special_characters() {
+    void test_editPaymentAccounts_should_return_400_when_pbas_with_special_characters() {
         String orgId = createActiveOrganisationAndPbaEditRequest();
         String paymentAccountSpecialCharsPbas = "{\"paymentAccounts\": [\"*\"]}";
 
@@ -223,7 +223,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccounts_should_return_400_when_pbas_with_empty_space() {
+    void test_editPaymentAccounts_should_return_400_when_pbas_with_empty_space() {
         String orgId = createActiveOrganisationAndPbaEditRequest();
         String paymentAccountPbasWithSpace = "{\"paymentAccounts\": [\"  \" , \" PBA0000001\"]}";
 

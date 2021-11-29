@@ -33,12 +33,16 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
 
     @MockBean
     OrganisationRepository organisationRepository;
+
     @MockBean
     PaymentAccountRepository paymentAccountRepository;
+
     @MockBean
     DxAddressRepository dxAddressRepository;
+
     @MockBean
     ContactInformationRepository contactInformationRepository;
+
     @MockBean
     PrdEnumRepository prdEnumRepository;
 
