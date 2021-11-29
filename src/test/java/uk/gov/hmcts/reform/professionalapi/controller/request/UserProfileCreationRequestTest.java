@@ -7,16 +7,19 @@ import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSION
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class UserProfileCreationRequestTest {
+@ExtendWith(MockitoExtension.class)
+class UserProfileCreationRequestTest {
 
     private final String email = "some@hmcts.net";
     private final String firstName = "fName";
     private final String lastName = "lName";
 
     @Test
-    public void test_has_mandatory_fields_specified_not_null() {
+    void test_has_mandatory_fields_specified_not_null() {
         List<String> roles = asList("pui-user-manager", "pui-organisation-manager");
 
         UserProfileCreationRequest userProfileCreationRequest = new UserProfileCreationRequest(email, firstName,
@@ -36,7 +39,7 @@ public class UserProfileCreationRequestTest {
     }
 
     @Test
-    public void test_BuilderMethod() {
+    void test_BuilderMethod() {
         List<String> roles = asList("aRole");
 
         UserProfileCreationRequest userProfileCreationRequest

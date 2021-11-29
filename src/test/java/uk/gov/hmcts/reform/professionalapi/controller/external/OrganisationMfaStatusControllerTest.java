@@ -7,18 +7,18 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
-@RunWith(MockitoJUnitRunner.class)
-public class OrganisationMfaStatusControllerTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationMfaStatusControllerTest {
 
     @InjectMocks
     private OrganisationMfaStatusController orgMfaStatusExternalController;
@@ -27,7 +27,7 @@ public class OrganisationMfaStatusControllerTest {
     private MfaStatusService mfaStatusServiceMock;
 
     @Test
-    public void test_retrieveMfaStatusByUserId() {
+    void test_retrieveMfaStatusByUserId() {
 
         ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity = ResponseEntity.status(HttpStatus.OK).body(new MfaStatusResponse());
         final HttpStatus expectedHttpStatus = HttpStatus.OK;

@@ -1,19 +1,23 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
-public class UserProfileUpdateRequestValidatorImplTest {
+@ExtendWith(MockitoExtension.class)
+class UserProfileUpdateRequestValidatorImplTest {
 
     private final String email = "test@test.com";
     private final String firstName = "fname";
@@ -25,22 +29,21 @@ public class UserProfileUpdateRequestValidatorImplTest {
     private RoleName roleName2;
     private RoleName roleToDeleteName;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         String puiCaseManager = "pui-case-manager";
         roleName1 = new RoleName(puiCaseManager);
         String puiOrganisationManager = "pui-organisation-manager";
         roleName2 = new RoleName(puiOrganisationManager);
         String puiFinanceManager = "pui-finance-manager";
         roleToDeleteName = new RoleName(puiFinanceManager);
-
         rolesData.add(roleName1);
         rolesData.add(roleName2);
         rolesToDeleteData.add(roleToDeleteName);
     }
 
     @Test
-    public void test_ValidateRequestIfBothStatusAndRoleArePresent() {
+    void test_ValidateRequestIfBothStatusAndRoleArePresent() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
 
@@ -55,7 +58,7 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
-    public void test_ValidateRequestForStatus() {
+    void test_ValidateRequestForStatus() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 IdamStatus.ACTIVE.name(), null, null);
 
@@ -69,7 +72,7 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
-    public void test_ValidateRequestForRoles() {
+    void test_ValidateRequestForRoles() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 null, rolesData, rolesToDeleteData);
 
@@ -82,12 +85,13 @@ public class UserProfileUpdateRequestValidatorImplTest {
         assertThat(actualModifyProfileData.getRolesDelete()).containsOnly(roleToDeleteName);
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void test_ThrowErrorIfValidateRequestIsEmpty() {
+    @Test
+    void test_ThrowErrorIfValidateRequestIsEmpty() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 null, null, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
-        sut.validateRequest(userProfileUpdatedData);
+        assertThrows(InvalidRequest.class, () ->
+                sut.validateRequest(userProfileUpdatedData));
     }
 }

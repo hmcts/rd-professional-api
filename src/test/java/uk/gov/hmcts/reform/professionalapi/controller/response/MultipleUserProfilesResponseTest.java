@@ -6,19 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
-public class MultipleUserProfilesResponseTest {
+@ExtendWith(MockitoExtension.class)
+class MultipleUserProfilesResponseTest {
 
     private UserProfile userProfile;
     private final List<UserProfile> userProfiles = new ArrayList<>();
     private final List<GetUserProfileResponse> getUserProfileResponses = new ArrayList<>();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com", "fName",
                 "lName", IdamStatus.PENDING);
         GetUserProfileResponse getUserProfileResponse = new GetUserProfileResponse();
@@ -27,7 +30,7 @@ public class MultipleUserProfilesResponseTest {
     }
 
     @Test
-    public void test_multipleUserProfileResponse() {
+    void test_multipleUserProfileResponse() {
         MultipleUserProfilesResponse multipleUserProfilesResponse = new MultipleUserProfilesResponse(userProfiles,
                 true);
         assertThat(multipleUserProfilesResponse.getUserProfiles().size()).isEqualTo(1);
@@ -36,7 +39,7 @@ public class MultipleUserProfilesResponseTest {
     }
 
     @Test
-    public void test_MultipleUserProfilesResponseSetter() {
+    void test_MultipleUserProfilesResponseSetter() {
         MultipleUserProfilesResponse multipleUserProfilesResponse = new MultipleUserProfilesResponse(userProfiles,
                 true);
 

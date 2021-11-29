@@ -3,8 +3,9 @@ package uk.gov.hmcts.reform.professionalapi;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -13,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -29,8 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
-public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
+class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
     OrganisationRepository organisationRepository;
@@ -42,8 +42,8 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     private UserCreationRequestValidator userCreationRequestValidator;
     List<String> userRoles;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         userCreationRequest = aNewUserCreationRequest()
@@ -55,7 +55,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void post_request_adds_new_user_to_an_active_organisation() {
+    void post_request_adds_new_user_to_an_active_organisation() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
@@ -92,7 +92,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void post_request_adds_new_user_with_caa_roles_to_an_active_organisation() {
+    void post_request_adds_new_user_with_caa_roles_to_an_active_organisation() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         userRoles.add(puiCaa);
         userRoles.add(caseworkerCaa);
@@ -128,7 +128,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void should_return_400_when_UP_fails_while_adding_new_user_to_an_active_organisation() {
+    void should_return_400_when_UP_fails_while_adding_new_user_to_an_active_organisation() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
@@ -158,7 +158,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void should_return_404_when_adding_new_user_to_an_pending_organisation() {
+    void should_return_404_when_adding_new_user_to_an_pending_organisation() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
@@ -180,7 +180,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void returns_404_when_organisation_identifier_not_found() {
+    void returns_404_when_organisation_identifier_not_found() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -192,7 +192,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void returns_400_when_organisation_identifier_invalid() {
+    void returns_400_when_organisation_identifier_invalid() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -204,15 +204,16 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
 
-    @Test(expected = InvalidRequest.class)
-    public void add_new_user_without_roles_returns_400_bad_request() {
+    @Test
+    void add_new_user_without_roles_returns_400_bad_request() {
         List<String> noUserRoles = new ArrayList<>();
 
-        userCreationRequestValidator.validateRoles(noUserRoles);
+        assertThrows(InvalidRequest.class, () ->
+                userCreationRequestValidator.validateRoles(noUserRoles));
     }
 
     @Test
-    public void should_return_400_when_mandatory_fields_are_blank_while_adding_new_user() {
+    void should_return_400_when_mandatory_fields_are_blank_while_adding_new_user() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
@@ -261,7 +262,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void should_return_400_when_mandatory_fields_are_null_while_adding_new_user() {
+    void should_return_400_when_mandatory_fields_are_null_while_adding_new_user() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
@@ -316,7 +317,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void validate_email_for_invite_user_successfully() {
+    void validate_email_for_invite_user_successfully() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
@@ -345,7 +346,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void validate_invalid_email_for_invite_user_and_throw_exception() {
+    void validate_invalid_email_for_invite_user_and_throw_exception() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
@@ -371,7 +372,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void should_return_409_when_same_invited_new_user_is_super_user_of_pending_org() {
+    void should_return_409_when_same_invited_new_user_is_super_user_of_pending_org() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
@@ -403,7 +404,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void super_user_can_have_caa_roles_fpla_or_iac_roles_not_puiCaa_caseworkerCaa() {
+    void super_user_can_have_caa_roles_fpla_or_iac_roles_not_puiCaa_caseworkerCaa() {
         userProfileCreateUserWireMockWithExtraRoles();
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");

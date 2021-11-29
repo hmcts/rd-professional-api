@@ -1,20 +1,23 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
-public class UserProfileCreationResponseTest {
+@ExtendWith(MockitoExtension.class)
+class UserProfileCreationResponseTest {
 
     private final UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
     private final String testUuid = UUID.randomUUID().toString();
 
     @Test
-    public void test_has_mandatory_fields_specified_not_null() {
+    void test_has_mandatory_fields_specified_not_null() {
         userProfileCreationResponse.setIdamId(testUuid);
         userProfileCreationResponse.setIdamRegistrationResponse(201);
 
@@ -23,7 +26,7 @@ public class UserProfileCreationResponseTest {
     }
 
     @Test
-    public void test_isUserCreated() {
+    void test_isUserCreated() {
         userProfileCreationResponse.setIdamRegistrationResponse(HttpStatus.CREATED.value());
 
         assertTrue(userProfileCreationResponse.isUserCreated());

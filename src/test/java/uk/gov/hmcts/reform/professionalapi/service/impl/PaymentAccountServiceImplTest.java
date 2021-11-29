@@ -25,9 +25,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -48,7 +50,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-public class PaymentAccountServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class PaymentAccountServiceImplTest {
 
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
@@ -77,8 +80,8 @@ public class PaymentAccountServiceImplTest {
     private final PbaRequest pbaEditRequest = new PbaRequest();
     private final PbaRequest pbaDeleteRequest = new PbaRequest();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         OrganisationServiceImpl organisationService = new OrganisationServiceImpl();
         organisationService.setPaymentAccountValidator(paymentAccountValidatorMock);
         organisationService.setPaymentAccountRepository(paymentAccountRepositoryMock);
@@ -102,7 +105,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testRetrievePaymentAccountsByPbaEmail() {
+    void testRetrievePaymentAccountsByPbaEmail() {
         Organisation organisationMock = mock(Organisation.class);
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
@@ -124,23 +127,20 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testReturnEmptyOrganisationWhenUnKnownEmail() {
+    void testReturnEmptyOrganisationWhenUnKnownEmail() {
         Organisation  response = sut.findPaymentAccountsByEmail("some-email@gmail.com");
         assertThat(response).isNull();
         verify(professionalUserRepositoryMock, times(1)).findByEmailAddress(anyString());
     }
 
     @Test
-    public void testEditPaymentAccountsByOrganisationIdentifier() {
+    void testEditPaymentAccountsByOrganisationIdentifier() {
 
         Organisation organisationMock = mock(Organisation.class);
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
-        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
-        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
-        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
         when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
@@ -165,7 +165,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testDeleteUserAccountMapsAndPaymentAccounts() {
+    void testDeleteUserAccountMapsAndPaymentAccounts() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
         when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
@@ -178,21 +178,21 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testAddPaymentAccountsToOrganisationTest() {
+    void testAddPaymentAccountsToOrganisationTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
         verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
     }
 
     @Test
-    public void testDeletePaymentAccountsFromOrganisationTest() {
+    void testDeletePaymentAccountsFromOrganisationTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.deletePaymentsOfOrganisation(pbaDeleteRequest, organisation);
         verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
     }
 
     @Test
-    public void testAddUserAndPaymentAccountsToUserAccountMapTest() {
+    void testAddUserAndPaymentAccountsToUserAccountMapTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.addUserAndPaymentAccountsToUserAccountMap(organisation);
         assertThat(sut.addUserAndPaymentAccountsToUserAccountMap(organisation)).isNotNull();
@@ -201,7 +201,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testGenerateListOfAccountsToDelete() {
+    void testGenerateListOfAccountsToDelete() {
         ProfessionalUser prefU = new ProfessionalUser("Con", "Hal",
                 "email@gmail.com", organisation);
         List<UserAccountMapId> listUserMap = new ArrayList<>();
@@ -211,7 +211,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testUpdatePaymentAccountsForAnOrganisation_200_success_scenario() {
+    void testUpdatePaymentAccountsForAnOrganisation_200_success_scenario() {
         String pbaNumber = "PBA1234567";
 
         PaymentAccount paymentAccount = mock(PaymentAccount.class);
@@ -236,7 +236,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testUpdatePaymentAccountsForAnOrganisation_200_partial_success_scenario() {
+    void testUpdatePaymentAccountsForAnOrganisation_200_partial_success_scenario() {
         String pbaNumber = "PBA1234567";
 
         PaymentAccount paymentAccount = mock(PaymentAccount.class);
@@ -264,7 +264,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testUpdatePaymentAccountsForAnOrganisation_422_failure_scenario() {
+    void testUpdatePaymentAccountsForAnOrganisation_422_failure_scenario() {
         String orgId = UUID.randomUUID().toString();
         List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
@@ -279,7 +279,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void testUpdatePBAsInDb() {
+    void testUpdatePBAsInDb() {
         PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
         PaymentAccount paymentAccount1 = new PaymentAccount("PBA7654321");
 

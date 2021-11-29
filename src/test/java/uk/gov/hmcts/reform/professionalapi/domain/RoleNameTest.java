@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class RoleNameTest {
+@ExtendWith(MockitoExtension.class)
+class RoleNameTest {
 
     @Test
-    public void test_should_hold_values_after_creation() {
+    void test_should_hold_values_after_creation() {
         RoleName roleName = new RoleName();
         String PUI_CASE_MANAGER = "pui-case-manager";
         roleName.setName(PUI_CASE_MANAGER);

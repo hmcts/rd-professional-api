@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,19 +13,18 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Request;
-import feign.Response;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -46,9 +47,8 @@ import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
-
-
-public class ProfessionalExternalUserControllerTest {
+@ExtendWith(MockitoExtension.class)
+class ProfessionalExternalUserControllerTest {
 
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
@@ -62,14 +62,13 @@ public class ProfessionalExternalUserControllerTest {
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
 
-
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
         professionalUser = new ProfessionalUser("fName", "lName", "user@test.com",
@@ -90,7 +89,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    public void test_FindUsersByOrganisation() {
+    void test_FindUsersByOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
                 "emailAddress", organisation);
@@ -118,7 +117,7 @@ public class ProfessionalExternalUserControllerTest {
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
-        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
+        lenient().doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
                 any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
@@ -136,7 +135,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    public void test_FindUsersByOrganisationWithPuiCaseManager() {
+    void test_FindUsersByOrganisationWithPuiCaseManager() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
                 "emailAddress", organisation);
@@ -158,17 +157,14 @@ public class ProfessionalExternalUserControllerTest {
                 .thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
-        when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_CASE_MANAGER))
+        when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER))
                 .thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
-        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
+        lenient().doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
                 any(OrganisationStatus.class), any(String.class));
-        doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
@@ -180,11 +176,11 @@ public class ProfessionalExternalUserControllerTest {
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(organisation, "true", true,
-                        "Active");
+                        "");
     }
 
     @Test
-    public void testFindUsersByOrganisationWithoutRoles() throws Exception {
+    void testFindUsersByOrganisationWithoutRoles() throws Exception {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
                 "emailAddress", organisation);
@@ -209,17 +205,16 @@ public class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
+        lenient().when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(professionalUsersEntityResponse);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
-        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
+        lenient().doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
                 any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
@@ -243,7 +238,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    public void test_FindUserStatusByEmail() throws JsonProcessingException {
+    void test_FindUserStatusByEmail() throws JsonProcessingException {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
 
@@ -258,8 +253,6 @@ public class ProfessionalExternalUserControllerTest {
         ResponseEntity<NewUserResponse> responseEntity1 = new ResponseEntity<NewUserResponse>(newUserResponse,
                 HttpStatus.OK);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(professionalUserServiceMock.findUserStatusByEmailAddress(email))
                 .thenReturn(responseEntity1);
 
@@ -275,7 +268,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    public void test_FindUserStatusByEmailFromHeader() throws JsonProcessingException {
+    void test_FindUserStatusByEmailFromHeader() throws JsonProcessingException {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
 
@@ -305,12 +298,14 @@ public class ProfessionalExternalUserControllerTest {
 
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void test_FindUserStatusByEmailFromHeaderThrows400WhenEmailIsInvalid() {
+    @Test
+    void test_FindUserStatusByEmailFromHeaderThrows400WhenEmailIsInvalid() {
         String email = "some-email";
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(email);
-        professionalExternalUserController.findUserStatusByEmail(email);
+
+        assertThrows(InvalidRequest.class, () ->
+                professionalExternalUserController.findUserStatusByEmail(email));
     }
 
 

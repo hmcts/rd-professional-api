@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -10,9 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
@@ -22,15 +26,16 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
-public class OrganisationIdentifierValidatorImplTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationIdentifierValidatorImplTest {
 
     private Organisation organisation;
     private PaymentAccount paymentAccount;
     private final OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl
             = new OrganisationIdentifierValidatorImpl(mock(OrganisationService.class));
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         organisation = new Organisation("Company", OrganisationStatus.PENDING, "SraId",
                 "12345678", false, "www.company.com");
         organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
@@ -38,7 +43,7 @@ public class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    public void test_Validate() {
+    void test_Validate() {
         Organisation dummyOrganisation = new Organisation("dummyName", OrganisationStatus.ACTIVE, "sraId",
                 "12345678", Boolean.FALSE, "dummySite.com");
 
@@ -48,49 +53,67 @@ public class OrganisationIdentifierValidatorImplTest {
                 dummyOrganisation.getOrganisationIdentifier());
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_shouldCheckOrganisationDoesNotExist() {
-        organisationIdentifierValidatorImpl.validate(null, null,
-                null);
+    @Test
+    void test_shouldCheckOrganisationDoesNotExist() {
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                organisationIdentifierValidatorImpl.validate(null, null,
+                        null));
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_shouldThrowAEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
+    @Test
+    void test_shouldThrowAEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
         organisation.setPaymentAccounts(new ArrayList<>());
 
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
+        String uuid = UUID.randomUUID().toString();
+
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
+                        organisation, uuid));
     }
 
-    @Test(expected = AccessDeniedException.class)
-    public void test_shouldThrowAAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
+    @Test
+    void test_shouldThrowAAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
         organisation.setPaymentAccounts(singletonList(paymentAccount));
 
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
+        String uuid = UUID.randomUUID().toString();
+
+        assertThrows(AccessDeniedException.class, () ->
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
+                        organisation, uuid));
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_shouldThrowEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
+    @Test
+    void test_shouldThrowEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
+        String uuid = UUID.randomUUID().toString();
+
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
+                        organisation, uuid));
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void shouldThrowEmptyResultDataAccessExceptionWhenOrganisationIsNull() {
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(null, UUID.randomUUID().toString());
+    @Test
+    void shouldThrowEmptyResultDataAccessExceptionWhenOrganisationIsNull() {
+        String uuid = UUID.randomUUID().toString();
+
+        assertThrows(EmptyResultDataAccessException.class, () ->
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
+                        null, uuid));
     }
 
-    @Test(expected = Test.None.class)
-    public void test_shouldTNothrowExceptionWhenOrganisationIsNotNull() {
+    @Test
+    void test_shouldTNothrowExceptionWhenOrganisationIsNotNull() {
         PaymentAccount pba = new PaymentAccount("PBA1234567");
         List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(pba);
 
         organisation.setPaymentAccounts(paymentAccounts);
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation,
-                organisation.getOrganisationIdentifier());
+        assertDoesNotThrow(() ->
+                organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation,
+                        organisation.getOrganisationIdentifier()));
     }
 
     @Test
-    public void test_ifUserRoleExistsReturnsTrueForExistingRole() {
+    void test_ifUserRoleExistsReturnsTrueForExistingRole() {
 
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_FINANCE_MANAGER);
@@ -100,7 +123,7 @@ public class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    public void test_ifUserRoleExistsReturnsFalseForNonExistingRole() {
+    void test_ifUserRoleExistsReturnsFalseForNonExistingRole() {
 
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_FINANCE_MANAGER);
@@ -108,19 +131,16 @@ public class OrganisationIdentifierValidatorImplTest {
         assertThat(result).isFalse();
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_validateOrganisationIsActiveThrows404WhenOrganisationIsNotActive() {
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND);
+    @Test
+    void test_validateOrganisationIsActiveThrows400WhenOrganisationIsNotActive() {
+        assertThrows(InvalidRequest.class,() ->
+                organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, BAD_REQUEST));
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void test_validateOrganisationIsActiveThrows400WhenOrganisationIsNotActive() {
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, BAD_REQUEST);
-    }
-
-    @Test(expected = Test.None.class)
-    public void test_validateOrganisationIsActiveDoesNotThrow404WhenOrganisationIsActive() {
+    @Test
+    void test_validateOrganisationIsActiveDoesNotThrow404WhenOrganisationIsActive() {
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND);
+        assertDoesNotThrow(() ->
+                organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND));
     }
 }

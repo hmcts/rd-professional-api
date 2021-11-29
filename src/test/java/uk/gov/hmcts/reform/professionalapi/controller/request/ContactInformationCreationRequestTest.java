@@ -11,16 +11,19 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class ContactInformationCreationRequestTest {
+@ExtendWith(MockitoExtension.class)
+class ContactInformationCreationRequestTest {
 
     private final List<DxAddressCreationRequest> dxAddresses = new ArrayList<>();
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void test_has_mandatory_fields_specified_not_null() {
+    void test_has_mandatory_fields_specified_not_null() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 null, null, null, null, null, null,
                 null, null);
@@ -31,7 +34,7 @@ public class ContactInformationCreationRequestTest {
     }
 
     @Test
-    public void test_creates_contact_information_creation_request_correctly() {
+    void test_creates_contact_information_creation_request_correctly() {
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-address",
                 "some-exchange");
 
@@ -53,7 +56,7 @@ public class ContactInformationCreationRequestTest {
     }
 
     @Test
-    public void test_creates_contact_information_creation_request_correctly_when_optional_values_are_null() {
+    void test_creates_contact_information_creation_request_correctly_when_optional_values_are_null() {
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-address",
                 "some-exchange");
 
@@ -74,7 +77,7 @@ public class ContactInformationCreationRequestTest {
     }
 
     @Test
-    public void test_creates_contact_information_creation_request_correctly_without_dx_address() {
+    void test_creates_contact_information_creation_request_correctly_without_dx_address() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 "some-address1", "some-address2", "some-address3",
                 "some-town-city", "some-county", "some-country",
@@ -91,7 +94,7 @@ public class ContactInformationCreationRequestTest {
     }
 
     @Test
-    public void test_contactInformationCreationRequestBuilder() {
+    void test_contactInformationCreationRequestBuilder() {
         String dxNumber = "dxNumber";
         String dxExchange = "dxExchange";
         String addressLine1 = "addressLine1";

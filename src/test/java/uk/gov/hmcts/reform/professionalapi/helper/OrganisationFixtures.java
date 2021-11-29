@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Set;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
-
 public class OrganisationFixtures {
 
     private OrganisationFixtures() {
@@ -88,12 +87,12 @@ public class OrganisationFixtures {
         paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
-            .name("some-org-name1")
-            .status("ACTIVE")
-            .sraId("sra-id1")
-            .sraRegulated("true")
-            .companyUrl("company-url1")
-            .companyNumber(randomAlphabetic(8))
+                .name("some-org-name1")
+                .status("ACTIVE")
+                .sraId("sra-id1")
+                .sraRegulated("true")
+                .companyUrl("company-url1")
+                .companyNumber(randomAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                 .firstName("somefname")

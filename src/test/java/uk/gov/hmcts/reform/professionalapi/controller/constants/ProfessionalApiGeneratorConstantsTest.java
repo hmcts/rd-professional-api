@@ -1,17 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.controller.constants;
 
-import static org.junit.Assert.assertTrue;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ProfessionalApiGeneratorConstantsTest {
+class ProfessionalApiGeneratorConstantsTest {
 
     @Test
-    public void privateConstructorTest() throws Exception {
+    void privateConstructorTest() throws Exception {
         Constructor<ProfessionalApiConstants> constructor = ProfessionalApiConstants.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);

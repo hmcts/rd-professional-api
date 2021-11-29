@@ -3,18 +3,20 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-
-public class ContactInformationTest {
+@ExtendWith(MockitoExtension.class)
+class ContactInformationTest {
 
     private ContactInformation contactInformation;
     private final Organisation organisation = new Organisation();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces("some-address1"));
         contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces("some-address2"));
@@ -27,13 +29,13 @@ public class ContactInformationTest {
     }
 
     @Test
-    public void test_creates_contact_information_correctly() {
+    void test_creates_contact_information_correctly() {
         assertThat(contactInformation.getId()).isNull();
         assertThat(contactInformation.getOrganisation()).isEqualTo(organisation);
     }
 
     @Test
-    public void test_adds_dx_address_into_ContactInformation_Correctly() {
+    void test_adds_dx_address_into_ContactInformation_Correctly() {
         DxAddress dxAddress = new DxAddress();
 
         contactInformation.addDxAddress(dxAddress);

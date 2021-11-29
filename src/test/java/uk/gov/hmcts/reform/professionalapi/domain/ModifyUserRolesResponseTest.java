@@ -4,12 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class ModifyUserRolesResponseTest {
+@ExtendWith(MockitoExtension.class)
+class ModifyUserRolesResponseTest {
 
     @Test
-    public void test_should_Return_User_profile_Response() {
+    void test_should_Return_User_profile_Response() {
         ModifyUserRolesResponse userProfileRolesResponse = new ModifyUserRolesResponse();
         userProfileRolesResponse.setRoleAdditionResponse(addRolesForUser());
         userProfileRolesResponse.setRoleDeletionResponse(deleteRolesForUser());
@@ -21,7 +24,7 @@ public class ModifyUserRolesResponseTest {
     }
 
     @Test
-    public void test_modifyUserRolesResponse() {
+    void test_modifyUserRolesResponse() {
         StatusUpdateResponse statusUpdateResponse = new StatusUpdateResponse();
         statusUpdateResponse.setIdamMessage("updateMessage");
 

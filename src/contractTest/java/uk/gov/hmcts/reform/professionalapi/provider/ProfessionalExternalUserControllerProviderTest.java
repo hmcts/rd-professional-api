@@ -91,12 +91,12 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         setupInteractionsForProfessionalUser();
         when(organisationServiceMock.getOrganisationByOrgIdentifier("someOrganisationIdentifier"))
-            .thenReturn(organisation);
+                .thenReturn(organisation);
 
         List<ProfessionalUser> users = new ArrayList<>();
 
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
-            "email@org.com", organisation);
+                "email@org.com", organisation);
         profile.setIdamStatus(IdamStatus.ACTIVE);
         profile.setRoles(Arrays.asList("pui-user-manager", " pui-case-manager"));
 
@@ -108,11 +108,11 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.setUserProfiles(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-            false);
+                false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
         when(userProfileFeignClientMock.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
-            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
     }
 
     private ProfessionalUser setupInteractionsForProfessionalUser() throws JsonProcessingException {
@@ -130,9 +130,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         String body = objectMapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
-            .thenReturn(Response.builder()
-                .request(mock(Request.class))
-                .body(body, Charset.defaultCharset()).status(200).build());
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(200).build());
 
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setUserIdentifier("a123dfgr46");
@@ -140,7 +140,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         String newUserResponseBody = objectMapper.writeValueAsString(newUserResponse);
 
         when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
-            .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
+                .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
 
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
@@ -148,7 +148,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
 
         when(professionalUserRepositoryMock.findByOrganisation(organisation))
-            .thenReturn(Arrays.asList(professionalUser));
+                .thenReturn(Arrays.asList(professionalUser));
 
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
@@ -160,14 +160,14 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         String bodyModifyUserRoles = objectMapper.writeValueAsString(modifyUserRolesResponse);
 
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
-            .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+                .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
 
         return professionalUser;
     }
 
     private UserProfile getUserProfile() {
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
-            "firstName", "lastName", IdamStatus.ACTIVE);
+                "firstName", "lastName", IdamStatus.ACTIVE);
         return profile;
     }
 

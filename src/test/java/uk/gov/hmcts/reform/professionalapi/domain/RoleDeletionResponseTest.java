@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class RoleDeletionResponseTest {
+@ExtendWith(MockitoExtension.class)
+class RoleDeletionResponseTest {
 
     @Test
-    public void test_deleteRoleResponse() {
+    void test_deleteRoleResponse() {
         String roleName = "Role";
         String idamStatusCode = "Code";
         String idamMessage = "Message";

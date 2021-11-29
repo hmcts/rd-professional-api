@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class StatusUpdateResponseTest {
+@ExtendWith(MockitoExtension.class)
+class StatusUpdateResponseTest {
 
     @Test
-    public void test_updateStatusResponse() {
+    void test_updateStatusResponse() {
         String idamStatusCode = "Coded";
         String idamMessage = "Message";
         StatusUpdateResponse statusUpdateResponse = new StatusUpdateResponse(idamStatusCode, idamMessage);
