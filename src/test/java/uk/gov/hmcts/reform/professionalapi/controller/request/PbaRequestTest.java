@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PbaRequestTest {
+class PbaRequestTest {
 
     @Test
-    public void testPbaRequest() {
+    void testPbaRequest() {
         PbaUpdateRequest pbaRequest = new PbaUpdateRequest("pbaNumber", "status", "statusMessage");
 
         assertThat(pbaRequest.getPbaNumber()).isEqualTo("pbaNumber");

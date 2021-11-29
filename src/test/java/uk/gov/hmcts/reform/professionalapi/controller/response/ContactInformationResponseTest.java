@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ContactInformationResponseTest {
+@ExtendWith(MockitoExtension.class)
+class ContactInformationResponseTest {
 
     final String expectAddress1 = "apt 1";
     final String expectAddress2 = "London Bridge Rd";
@@ -16,7 +19,7 @@ public class ContactInformationResponseTest {
     final String expectTownCity = "London";
 
     @Test
-    public void testGetContactInformationResponse() {
+    void testGetContactInformationResponse() {
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);

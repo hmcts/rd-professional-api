@@ -7,12 +7,15 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 
 import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class ProfessionalApiGeneratorTest {
+@ExtendWith(MockitoExtension.class)
+class ProfessionalApiGeneratorTest {
 
     @Test
-    public void test_shouldReturnValidUuid() {
+    void test_shouldReturnValidUuid() {
         UUID userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
 
         assertThat(userIdentifier).isNotNull();
@@ -20,7 +23,7 @@ public class ProfessionalApiGeneratorTest {
     }
 
     @Test
-    public void test_generateUniqueAlphanumericId() {
+    void test_generateUniqueAlphanumericId() {
         String uniqueAlphanumericString
                 = ProfessionalApiGenerator.generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
 
