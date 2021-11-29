@@ -2,17 +2,20 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
-public class ProfessionalUsersResponseTest {
+@ExtendWith(MockitoExtension.class)
+class ProfessionalUsersResponseTest {
 
     private final String expectEmailAddress = "dummy@email.com";
     private final String expectFirstName = "Bob";
     private final String expectLastName = "Smith";
 
     @Test
-    public void test_professionalUsers() throws NoSuchFieldException, IllegalAccessException {
+    void test_professionalUsers() throws NoSuchFieldException, IllegalAccessException {
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser(expectFirstName, expectLastName,
                 expectEmailAddress, null));

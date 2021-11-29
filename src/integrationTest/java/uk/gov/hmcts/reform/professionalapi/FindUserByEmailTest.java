@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
+class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void search_returns_valid_user_with_organisation_status_as_active() {
+    void search_returns_valid_user_with_organisation_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -40,7 +40,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_user_manager() {
+    void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_user_manager() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -65,7 +65,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_case_manager() {
+    void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_case_manager() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -90,7 +90,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_finance_manager() {
+    void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_finance_manager() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -116,7 +116,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void find_usr_status_by_usr_email_address_for_organisation_status_as_active_with_pui_organisation_manager() {
+    void find_usr_status_by_usr_email_address_for_organisation_status_as_active_with_pui_organisation_manager() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -141,7 +141,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void find_usr_status_by_usr_email_address_for_org_status_as_active_with_caseworker_publiclaw_courtadmin() {
+    void find_usr_status_by_usr_email_address_for_org_status_as_active_with_caseworker_publiclaw_courtadmin() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -168,7 +168,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
 
     @Test
-    public void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_org_status_as_active() {
+    void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_org_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -191,7 +191,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void shld_give_bad_request_4_invalid_email_to_find_usr_status_by_usr_email_id_for_org_status_as_active() {
+    void shld_give_bad_request_4_invalid_email_to_find_usr_status_by_usr_email_id_for_org_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
