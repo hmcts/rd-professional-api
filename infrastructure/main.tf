@@ -69,20 +69,6 @@ resource "azurerm_resource_group" "rg" {
   }
 }
 
-module "db-professional-ref-data" {
-  source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product         = var.product
-  component       = var.component
-  name            = join("-", [var.product, var.component, "postgres-db"])
-  location        = var.location
-  subscription    = var.subscription
-  env             = var.env
-  postgresql_user = "dbrefdata"
-  database_name   = "dbrefdata"
-  common_tags     = var.common_tags
-  postgresql_version = "9.6"
-}
-
 module "db-professional-ref-data-v11" {
   source             = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product            = var.product
@@ -95,10 +81,4 @@ module "db-professional-ref-data-v11" {
   database_name      = "dbrefdata"
   common_tags        = var.common_tags
   postgresql_version = "11"
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES-PASS-v11" {
-  name          = join("-", [var.component, "POSTGRES-PASS-v11"])
-  value         = module.db-professional-ref-data-v11.postgresql_password
-  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 }
