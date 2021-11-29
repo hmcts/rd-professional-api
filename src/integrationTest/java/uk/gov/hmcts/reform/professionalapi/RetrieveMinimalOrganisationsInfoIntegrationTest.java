@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PEND
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 @SuppressWarnings("unchecked")
-public class RetrieveMinimalOrganisationsInfoIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class RetrieveMinimalOrganisationsInfoIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     private static final String STATUS_PARAM_INVALID_MESSAGE =
         "Invalid status param provided, only Active status is allowed";
@@ -52,7 +52,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
 
     @Test
     //AC:1
-    public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active()
+    void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active()
         throws JsonProcessingException {
 
         Map<String, String> launchDarklyMap = new HashMap<>();
@@ -90,7 +90,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     /*
     sample integration test for launch darkly flag testing. Currently no flag available.
     @Test
-    public void returns_launchDarkly_forbidden_when_retrieve_organisations_info_with_invalid_flag()
+    void returns_launchDarkly_forbidden_when_retrieve_organisations_info_with_invalid_flag()
         throws JsonProcessingException {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("OrganisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional",
@@ -106,7 +106,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     */
 
     @Test
-    public void should_retrieve_organisations_info_without_address_with_200_for_status_active_null_address_param()
+    void should_retrieve_organisations_info_without_address_with_200_for_status_active_null_address_param()
         throws JsonProcessingException {
 
         setUpTestData();
@@ -137,7 +137,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     }
 
     @Test
-    public void should_retrieve_organisations_info_without_address_with_200_for_status_active_false_address_param()
+    void should_retrieve_organisations_info_without_address_with_200_for_status_active_false_address_param()
         throws JsonProcessingException {
 
         setUpTestData();
@@ -168,7 +168,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
 
     @Test
     //AC:3
-    public void shouldFailTo_retrieve_orgInfo_with403_withIncorrect_roles_and_status_active()
+    void shouldFailTo_retrieve_orgInfo_with403_withIncorrect_roles_and_status_active()
         throws JsonProcessingException {
 
         inviteUser(false);
@@ -181,7 +181,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
 
     @Test
     //AC:5
-    public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_pending()
+    void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_pending()
         throws JsonProcessingException {
 
 
@@ -196,7 +196,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
 
     @Test
     //AC:6
-    public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_not_passed()
+    void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_not_passed()
         throws JsonProcessingException {
 
         inviteUser(false);
@@ -207,7 +207,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
 
     }
 
-    public void validateErrorResponse(Map<String, Object> errorResponseMap, HttpStatus expectedStatus,
+    void validateErrorResponse(Map<String, Object> errorResponseMap, HttpStatus expectedStatus,
                                       String expectedErrorMessage, String expectedErrorDescription) {
         assertThat(errorResponseMap.get("http_status")).isEqualTo(expectedStatus);
         ErrorResponse errorResponse = (ErrorResponse) errorResponseMap.get("response_body");
@@ -215,7 +215,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         assertThat(errorResponse.getErrorMessage()).isEqualTo(expectedErrorMessage);
     }
 
-    public void setUpTestData() {
+    void setUpTestData() {
         createActiveOrganisation1();
         createActiveOrganisation2();
         createPendingOrganisation1();
@@ -225,7 +225,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         inviteUser(true);
     }
 
-    public void inviteUser(boolean useExistingOrg) {
+    void inviteUser(boolean useExistingOrg) {
 
         if (!useExistingOrg) {
             createActiveOrganisation1();
@@ -238,7 +238,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
     }
 
-    public String createActiveOrganisation1() {
+    String createActiveOrganisation1() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String orgName1 = randomAlphabetic(7);
         orgIdentifier1 = createAndActivateOrganisationWithGivenRequest(
@@ -252,7 +252,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         return orgIdentifier1;
     }
 
-    public String createActiveOrganisation2() {
+    String createActiveOrganisation2() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String orgName2 = randomAlphabetic(7);
         orgIdentifier2 = createAndActivateOrganisationWithGivenRequest(
@@ -266,7 +266,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         return orgIdentifier2;
     }
 
-    public void createPendingOrganisation1() {
+    void createPendingOrganisation1() {
         String orgName3 = randomAlphabetic(7);
         orgIdentifier3 = createOrganisationRequestWithRequest(
             someMinimalOrganisationRequest().name(orgName3).sraId(randomAlphabetic(10)).build());
@@ -278,7 +278,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         pendingOrgs.add(organisationEntityResponse3);
     }
 
-    public void createPendingOrganisation2() {
+    void createPendingOrganisation2() {
         String orgName4 = randomAlphabetic(7);
         orgIdentifier4 = createOrganisationRequestWithRequest(
             someMinimalOrganisationRequest().name(orgName4).sraId(randomAlphabetic(10)).build());
@@ -289,7 +289,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         pendingOrgs.add(organisationEntityResponse4);
     }
 
-    public void createActiveOrganisation3WithAddressRequiredFalse() {
+    void createActiveOrganisation3WithAddressRequiredFalse() {
         String orgName5 = randomAlphabetic(7);
         orgIdentifier5 = createAndActivateOrganisationWithGivenRequest(
             someMinimalOrganisationRequest().name(orgName5).sraId(randomAlphabetic(10)).build());
@@ -301,7 +301,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         noAddressOrgs.add(organisationEntityResponse5);
     }
 
-    public void createActiveOrganisation4WithAddressRequiredFalse() {
+    void createActiveOrganisation4WithAddressRequiredFalse() {
         String orgName6 = randomAlphabetic(7);
         orgIdentifier6 = createAndActivateOrganisationWithGivenRequest(
             someMinimalOrganisationRequest().name(orgName6).sraId(randomAlphabetic(10)).build());
@@ -314,7 +314,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         noAddressOrgs.add(organisationEntityResponse6);
     }
 
-    public List<String> getValidRoleList() {
+    List<String> getValidRoleList() {
         if (CollectionUtils.isEmpty(validRoles)) {
             validRoles = new ArrayList<>();
             validRoles.add(puiUserManager);

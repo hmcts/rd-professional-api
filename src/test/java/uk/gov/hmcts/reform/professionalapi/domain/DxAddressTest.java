@@ -4,12 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class DxAddressTest {
+@ExtendWith(MockitoExtension.class)
+class DxAddressTest {
 
     @Test
-    public void test_creates_dx_address_correctly() {
+    void test_creates_dx_address_correctly() {
         ContactInformation contactInformation = new ContactInformation();
         DxAddress dxAddress = new DxAddress("DX 1234567890", "some-exchange", contactInformation);
         dxAddress.setLastUpdated(LocalDateTime.now());

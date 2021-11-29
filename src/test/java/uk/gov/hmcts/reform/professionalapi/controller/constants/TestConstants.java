@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.constants;
 public class TestConstants {
 
     private TestConstants() {
-
     }
 
     public static final String PUI_USER_MANAGER = "pui-user-manager";

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.repository;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -15,10 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class OrganisationMfaStatusRepositoryTest extends BaseRepository {
+class OrganisationMfaStatusRepositoryTest extends BaseRepository {
 
     @Test
-    public void test_findAll() {
+    void test_findAll() {
         List<OrganisationMfaStatus> organisationMfaStatuses = organisationMfaStatusRepository.findAll();
 
         assertThat(organisationMfaStatuses).hasSize(1);
@@ -28,7 +28,7 @@ public class OrganisationMfaStatusRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findById() {
+    void test_findById() {
         Optional<OrganisationMfaStatus> orgMfaStatus
                 = organisationMfaStatusRepository.findById(organisationMfaStatus.getOrganisationId());
 

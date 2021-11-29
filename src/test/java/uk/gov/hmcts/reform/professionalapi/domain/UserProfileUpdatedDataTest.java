@@ -4,12 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class UserProfileUpdatedDataTest {
+@ExtendWith(MockitoExtension.class)
+class UserProfileUpdatedDataTest {
 
     @Test
-    public void test_should_add_roles_add_when_modified() {
+    void test_should_add_roles_add_when_modified() {
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
         Set<RoleName> rolesAdd = new HashSet<>();

@@ -1,15 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 
-public class ContactInformationResponseWithDxAddressTest {
+@ExtendWith(MockitoExtension.class)
+class ContactInformationResponseWithDxAddressTest {
 
     final String expectAddress1 = "apt 1";
     final String expectAddress2 = "London Bridge Rd";
@@ -20,8 +23,8 @@ public class ContactInformationResponseWithDxAddressTest {
     final String expectTownCity = "London";
 
     @Test
-    public void testGetContactInformationResponse() {
-        List<DxAddress> dxAddressList = Arrays.asList(new DxAddress());
+    void testGetContactInformationResponse() {
+        List<DxAddress> dxAddressList = singletonList(new DxAddress());
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);
@@ -46,7 +49,7 @@ public class ContactInformationResponseWithDxAddressTest {
     }
 
     @Test
-    public void testGetContactInformationResponseWithDxAddress() {
+    void testGetContactInformationResponseWithDxAddress() {
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);
         contactInformation.setAddressLine2(expectAddress2);

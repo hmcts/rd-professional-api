@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MfaUpdateRequestTest {
+@ExtendWith(MockitoExtension.class)
+class MfaUpdateRequestTest {
 
     @Test
-    public void testMfaUpdateRequest() {
+    void testMfaUpdateRequest() {
 
         MFAStatus statusPhone = MFAStatus.PHONE;
         MFAStatus statusNone = MFAStatus.NONE;
