@@ -53,6 +53,8 @@ public class ExceptionMapper {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
+
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
             EmptyResultDataAccessException ex) {
@@ -177,7 +179,6 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
         log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
         String errorDescription = getRootException(ex).getLocalizedMessage();
 

@@ -142,8 +142,8 @@ public abstract class SuperController {
     @Autowired
     protected JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    private final String SRA_REGULATED_FALSE = "false";
-    private final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
+    private static final String SRA_REGULATED_FALSE = "false";
+    private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
 
 
     protected ResponseEntity<OrganisationResponse> createOrganisationFrom(
