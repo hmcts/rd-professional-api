@@ -142,6 +142,7 @@ class OrganisationServiceImplTest {
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
 
+    private List<Organisation> organisations;
     private List<ContactInformationCreationRequest> contactInformationCreationRequests;
     private List<DxAddressCreationRequest> dxAddressRequests;
     private List<PaymentAccount> paymentAccounts;
@@ -181,7 +182,7 @@ class OrganisationServiceImplTest {
 
         contactInformationCreationRequests = new ArrayList<>();
         dxAddressRequests = new ArrayList<>();
-        List<Organisation> organisations = new ArrayList<>();
+        organisations = new ArrayList<>();
         paymentAccounts = new ArrayList<>();
         paymentAccounts.add(paymentAccount);
         userAttributes = new ArrayList<>();
@@ -497,7 +498,8 @@ class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
-        when(organisationRepository.findByStatusIn(Collections.singletonList(OrganisationStatus.PENDING))).thenReturn(organisations);
+        when(organisationRepository.findByStatusIn(
+                Collections.singletonList(OrganisationStatus.PENDING))).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse
                 = sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());

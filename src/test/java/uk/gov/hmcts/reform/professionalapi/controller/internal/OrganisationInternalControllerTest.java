@@ -132,7 +132,8 @@ class OrganisationInternalControllerTest {
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         mfaStatusServiceMock = mock(MfaStatusService.class);
         orgIdValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
-        UpdateOrganisationRequestValidator updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
+        UpdateOrganisationRequestValidator updateOrganisationRequestValidatorMock =
+                mock(UpdateOrganisationRequestValidator.class);
         OrganisationStatusValidatorImpl organisationStatusValidatorMock = mock(OrganisationStatusValidatorImpl.class);
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
