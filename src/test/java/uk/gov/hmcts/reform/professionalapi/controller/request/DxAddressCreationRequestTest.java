@@ -8,16 +8,19 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 
-public class DxAddressCreationRequestTest {
+@ExtendWith(MockitoExtension.class)
+class DxAddressCreationRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void test_has_mandatory_fields_specified_not_null() {
+    void test_has_mandatory_fields_specified_not_null() {
 
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest(null,
                 null);
@@ -28,7 +31,7 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void test_creates_dx_address_creation_request_correctly() {
+    void test_creates_dx_address_creation_request_correctly() {
 
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-number",
                 "some-exchange");
@@ -38,7 +41,7 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void test_does_not_create_dx_address_creation_request_when_number_does_not_have_a_space() {
+    void test_does_not_create_dx_address_creation_request_when_number_does_not_have_a_space() {
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX12345678901",
                 "some-exchange");
 
@@ -50,7 +53,7 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void test_does_not_create_dx_address_creation_request_when_number_does_not_start_with_dx_or_ni() {
+    void test_does_not_create_dx_address_creation_request_when_number_does_not_start_with_dx_or_ni() {
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("AB 1345678901",
                 "some-exchange");
 
@@ -61,7 +64,7 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void test_does_not_create_dx_address_creation_request_when_number_contains_non_numerical_digits() {
+    void test_does_not_create_dx_address_creation_request_when_number_contains_non_numerical_digits() {
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX 123456789Z",
                 "some-exchange");
 
@@ -72,7 +75,7 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void test_does_not_create_dx_address_creation_request_when_number_does_not_have_10_digits() {
+    void test_does_not_create_dx_address_creation_request_when_number_does_not_have_10_digits() {
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX 123456789",
                 "some-exchange");
 
@@ -83,7 +86,7 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void test_buildMethod() {
+    void test_buildMethod() {
         String dxExchange = "dxExchange";
         String dxNumber = "dxExchange";
 

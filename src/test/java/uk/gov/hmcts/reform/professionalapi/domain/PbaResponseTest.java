@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class PbaResponseTest {
+@ExtendWith(MockitoExtension.class)
+class PbaResponseTest {
 
     @Test
-    public void test_pbaResponseNoArgsConstructor() {
+    void test_pbaResponseNoArgsConstructor() {
         PbaResponse pbaResponse = new PbaResponse();
 
         String success = "Success";
@@ -21,7 +24,7 @@ public class PbaResponseTest {
     }
 
     @Test
-    public void test_pbaResponseAllArgsConstructor() {
+    void test_pbaResponseAllArgsConstructor() {
         String success = "Success";
         String statusCode = "200";
 

@@ -5,7 +5,6 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
-import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,17 +14,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.rest.SerenityRest;
 import org.assertj.core.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContext;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.AbstractTestExecutionListener;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
@@ -37,14 +33,13 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
+import javax.annotation.PostConstruct;
+
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
-@TestExecutionListeners(listeners = {
-    AuthorizationFunctionalTest.class,
-    DependencyInjectionTestExecutionListener.class})
-public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
+public class AuthorizationFunctionalTest {
 
     @Value("${s2s-url}")
     protected String s2sUrl;
@@ -108,14 +103,10 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static NewUserCreationRequest bearerTokenUser;
 
 
-    @Override
-    public void beforeTestClass(TestContext testContext) {
-        testContext.getApplicationContext()
-            .getAutowireCapableBeanFactory()
-            .autowireBean(this);
-
-        RestAssured.useRelaxedHTTPSValidation();
-        RestAssured.defaultParser = Parser.JSON;
+    @PostConstruct
+    public void beforeTestClass() {
+        SerenityRest.useRelaxedHTTPSValidation();
+        SerenityRest.setDefaultParser(Parser.JSON);
 
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
@@ -131,7 +122,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         professionalApiClient = new ProfessionalApiClient(
             professionalApiUrl,
             s2sToken, idamOpenIdClient);
-
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
@@ -310,10 +300,10 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public void validateSingleOrgResponse(Map<String, Object> response, String status) {
 
-        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        Assertions.assertThat(response.size()).isPositive();
         assertThat(response.get("organisationIdentifier")).isNotNull();
         assertThat(response.get("name")).isNotNull();
-        assertThat(response.get("status")).isEqualTo(status);
+        assertThat(response).containsEntry("status", status);
         assertThat(response.get("sraId")).isNotNull();
         assertThat(response.get("sraRegulated")).isNotNull();
         assertThat(response.get("companyNumber")).isNotNull();

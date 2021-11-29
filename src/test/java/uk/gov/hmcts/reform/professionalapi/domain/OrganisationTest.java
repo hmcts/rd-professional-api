@@ -1,19 +1,25 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class OrganisationTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationTest {
 
     @Test
-    public void test_creates_organisation_correctly() {
+    void test_creates_organisation_correctly() {
         List<ContactInformation> contactInformations = new ArrayList<>();
 
         Organisation organisation = new Organisation("some-name", OrganisationStatus.ACTIVE,
@@ -41,7 +47,7 @@ public class OrganisationTest {
     }
 
     @Test
-    public void test_adds_users_correctly() {
+    void test_adds_users_correctly() {
         SuperUser superUser = new SuperUser();
         Organisation organisation = new Organisation();
         organisation.addProfessionalUser(superUser);
@@ -50,16 +56,24 @@ public class OrganisationTest {
     }
 
     @Test
-    public void test_adds_payment_account_correctly() {
+    void test_adds_payment_account_correctly() {
         PaymentAccount paymentAccount = new PaymentAccount();
         Organisation organisation = new Organisation();
         organisation.addPaymentAccount(paymentAccount);
+        organisation.setId(UUID.randomUUID());
+        organisation.setSraRegulated(false);
 
         assertThat(organisation.getPaymentAccounts()).containsExactly(paymentAccount);
+        assertThat(organisation.getId()).isNotNull();
+        assertFalse(organisation.getSraRegulated());
+
+        organisation.setSraRegulated(true);
+        assertTrue(organisation.getSraRegulated());
+
     }
 
     @Test
-    public void test_adds_contact_information_correctly() {
+    void test_adds_contact_information_correctly() {
         ContactInformation contactInformation = new ContactInformation();
         Organisation organisation = new Organisation();
         organisation.addContactInformation(contactInformation);
@@ -69,7 +83,7 @@ public class OrganisationTest {
     }
 
     @Test
-    public void test_adds_organisation_mfa_status_correctly() {
+    void test_adds_organisation_mfa_status_correctly() {
         OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
         Organisation organisation = new Organisation();
         organisation.setOrganisationMfaStatus(organisationMfaStatus);

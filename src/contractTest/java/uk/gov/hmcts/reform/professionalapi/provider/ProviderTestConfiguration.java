@@ -45,7 +45,6 @@ public class ProviderTestConfiguration {
     ProfessionalUserRepository professionalUserRepository;
     @MockBean
     UserAccountMapService userAccountMapService;
-
     @MockBean
     protected PrdEnumService prdEnumService;
     @MockBean
@@ -95,10 +94,10 @@ public class ProviderTestConfiguration {
                 .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .configure(FAIL_ON_UNKNOWN_PROPERTIES,false)
-                .configure(READ_ENUMS_USING_TO_STRING,true)
-                .configure(WRITE_ENUMS_USING_TO_STRING,true)
-        .configure(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE,true);
+                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(READ_ENUMS_USING_TO_STRING, true)
+                .configure(WRITE_ENUMS_USING_TO_STRING, true)
+                .configure(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE, true);
     }
 
     @Bean
@@ -135,6 +134,5 @@ public class ProviderTestConfiguration {
     public MappingJackson2HttpMessageConverter newJsonConvert() {
         return new MappingJackson2HttpMessageConverter(new ObjectMapper());
     }
-
 
 }

@@ -13,7 +13,6 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import com.mifmif.common.regex.Generex;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.rest.SerenityRest;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 
 
@@ -71,7 +71,7 @@ public class IdamOpenIdClient {
 
         for (int i = 0; i < 5; i++) {
             log.info("SIDAM createUser retry attempt : " + i + 1);
-            createdUserResponse = RestAssured
+            createdUserResponse = SerenityRest
                     .given()
                     .relaxedHTTPSValidation()
                     .baseUri(testConfig.getIdamApiUrl())
@@ -114,7 +114,7 @@ public class IdamOpenIdClient {
 
         String serializedUser = gson.toJson(user);
         log.info("serializedUser: " + serializedUser);
-        Response createdUserResponse = RestAssured
+        Response createdUserResponse = SerenityRest
                 .given()
                 .relaxedHTTPSValidation()
                 .baseUri(testConfig.getIdamApiUrl())
@@ -180,7 +180,7 @@ public class IdamOpenIdClient {
         tokenParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
-        Response openIdTokenResponse = RestAssured
+        Response openIdTokenResponse = SerenityRest
                 .given()
                 .relaxedHTTPSValidation()
                 .baseUri(testConfig.getIdamApiUrl())
@@ -200,7 +200,7 @@ public class IdamOpenIdClient {
     }
 
     @AllArgsConstructor
-    class User {
+    static class User {
         private String email;
         private String forename;
         private String id;
@@ -211,24 +211,24 @@ public class IdamOpenIdClient {
     }
 
     @AllArgsConstructor
-    class Role {
+    static class Role {
         private String code;
     }
 
     @AllArgsConstructor
-    class Group {
-        private String code;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    class AuthorizationResponse {
+    static class Group {
         private String code;
     }
 
     @Getter
     @AllArgsConstructor
-    class BearerTokenResponse {
+    static class AuthorizationResponse {
+        private String code;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    static class BearerTokenResponse {
         @SerializedName("access_token")
         private String accessToken;
     }

@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class FailedPbaReasonTest {
+class FailedPbaReasonTest {
 
     @Test
-    public void test_failedPbaReasonNoArgsConstructor() {
+    void test_failedPbaReasonNoArgsConstructor() {
         FailedPbaReason failedPbaReason = new FailedPbaReason();
 
         Set<String> duplicatePaymentAccounts = new HashSet<>();
@@ -30,7 +30,7 @@ public class FailedPbaReasonTest {
     }
 
     @Test
-    public void test_failedPbaReasonAllArgsConstructor() {
+    void test_failedPbaReasonAllArgsConstructor() {
 
 
         Set<String> duplicatePaymentAccounts = new HashSet<>();

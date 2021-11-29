@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 
-public class OrganisationsWithPbaStatusResponseTest {
+class OrganisationsWithPbaStatusResponseTest {
 
     @Test
-    public void testOrganisationsWithPbaStatusResponse() {
+    void testOrganisationsWithPbaStatusResponse() {
         PaymentAccount pba1 = new PaymentAccount();
         pba1.setPbaStatus(ACCEPTED);
         pba1.setPbaNumber("PBA123456");
@@ -32,7 +32,7 @@ public class OrganisationsWithPbaStatusResponseTest {
     }
 
     @Test
-    public void testOrganisationsWithPbaStatusResponseSetter() {
+    void testOrganisationsWithPbaStatusResponseSetter() {
         PaymentAccount pba1 = new PaymentAccount();
         pba1.setPbaStatus(ACCEPTED);
         pba1.setPbaNumber("PBA123456");
