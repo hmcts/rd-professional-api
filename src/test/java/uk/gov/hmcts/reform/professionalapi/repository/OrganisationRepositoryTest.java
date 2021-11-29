@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class OrganisationRepositoryTest extends BaseRepository {
+class OrganisationRepositoryTest extends BaseRepository {
 
     @Test
-    public void test_findAll() {
+    void test_findAll() {
         List<Organisation> organisations = organisationRepository.findAll();
 
         assertThat(organisations).hasSize(1);
@@ -27,7 +27,7 @@ public class OrganisationRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findByOrganisationIdentifier() {
+    void test_findByOrganisationIdentifier() {
         Organisation org = organisationRepository.findByOrganisationIdentifier(organisation
                 .getOrganisationIdentifier());
 
@@ -36,7 +36,7 @@ public class OrganisationRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findByStatus() {
+    void test_findByStatus() {
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
         assertThat(activeOrganisations).hasSize(1);
@@ -46,14 +46,14 @@ public class OrganisationRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findByName() {
+    void test_findByName() {
         Organisation org = organisationRepository.findByName(organisation.getName());
         assertThat(org).isEqualTo(organisation);
         assertThat(org.getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
     }
 
     @Test
-    public void test_findByCompanyNumber() {
+    void test_findByCompanyNumber() {
         Organisation org = organisationRepository.findByCompanyNumber(organisation.getCompanyNumber());
         assertThat(org).isEqualTo(organisation);
         assertThat(org.getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());

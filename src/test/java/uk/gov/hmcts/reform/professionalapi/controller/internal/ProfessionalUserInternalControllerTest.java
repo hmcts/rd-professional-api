@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,15 +11,19 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -38,7 +43,8 @@ import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
-public class ProfessionalUserInternalControllerTest {
+@ExtendWith(MockitoExtension.class)
+class ProfessionalUserInternalControllerTest {
 
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
@@ -56,9 +62,9 @@ public class ProfessionalUserInternalControllerTest {
     @Mock
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setUp() {
+    void setUp() {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
@@ -80,16 +86,16 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void testFindUsersByOrganisation_for_prd_admin() {
+    void testFindUsersByOrganisation_for_prd_admin() {
         testFindUsersByOrganisation(prdAdminRoles);
     }
 
     @Test
-    public void testFindUsersByOrganisation_for_system_user() {
+    void testFindUsersByOrganisation_for_system_user() {
         testFindUsersByOrganisation(systemUserRoles);
     }
 
-    public void testFindUsersByOrganisation(List<String> userRoles) {
+    void testFindUsersByOrganisation(List<String> userRoles) {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser =
                 new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
@@ -106,9 +112,9 @@ public class ProfessionalUserInternalControllerTest {
                         any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
-                .thenReturn(new UserInfo("","", "", "", "", userRoles));
+                .thenReturn(new UserInfo("", "", "", "", "", userRoles));
 
-        doNothing().when(organisationIdentifierValidatorMock)
+        lenient().doNothing().when(organisationIdentifierValidatorMock)
                 .validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
@@ -129,7 +135,7 @@ public class ProfessionalUserInternalControllerTest {
 
 
     @Test
-    public void testFindUsersByOrganisationwithoutRoles() {
+    void testFindUsersByOrganisationwithoutRoles() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
                 "emailAddress", organisation);
@@ -145,9 +151,9 @@ public class ProfessionalUserInternalControllerTest {
                 any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
-                .thenReturn(new UserInfo("","", "", "", "", prdAdminRoles));
+                .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
 
-        doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
+        lenient().doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
                 any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
@@ -166,7 +172,7 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void testFindUsersByOrganisationwithoutRolesDefaultNull() {
+    void testFindUsersByOrganisationwithoutRolesDefaultNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
                 "emailAddress", organisation);
@@ -182,9 +188,9 @@ public class ProfessionalUserInternalControllerTest {
                 any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
-                .thenReturn(new UserInfo("","", "", "", "", prdAdminRoles));
+                .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
 
-        doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
+        lenient().doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
                 any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
@@ -203,7 +209,7 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void test_ModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
+    void test_ModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();

@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class DeleteOrganisationResponseTest {
+@ExtendWith(MockitoExtension.class)
+class DeleteOrganisationResponseTest {
 
     @Test
-    public void test_DeleteOrganisationResponseTest() {
+    void test_DeleteOrganisationResponseTest() {
 
         final int statusCode = 204;
         final String message = "successfully deleted";

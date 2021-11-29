@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -21,10 +21,10 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 
 @Slf4j
-public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void ac1_modify_roles_of_active_users_for_an_active_organisation_with_prd_admin_role_should_return_200() {
+    void ac1_modify_roles_of_active_users_for_an_active_organisation_with_prd_admin_role_should_return_200() {
 
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
@@ -53,7 +53,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void ac3_modify_roles_of_active_users_for_an_with_prd_admin_role_should_return_400() {
+    void ac3_modify_roles_of_active_users_for_an_with_prd_admin_role_should_return_400() {
 
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
@@ -88,7 +88,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void ac4_modify_roles_of_active_users_with_other_role_should_return_403() {
+    void ac4_modify_roles_of_active_users_with_other_role_should_return_403() {
 
         updateUserProfileRolesMock(HttpStatus.OK);
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
@@ -101,7 +101,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void ac5_modify_roles_of_active_users_for_an_active_organisation_with_pui_user_mgr_role_should_rtn_200() {
+    void ac5_modify_roles_of_active_users_for_an_active_organisation_with_pui_user_mgr_role_should_rtn_200() {
 
         updateUserProfileRolesMock(HttpStatus.OK);
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
@@ -113,7 +113,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void modify_roles_of_pending_user_for_an_active_organisation_should_rtn_400() {
+    void modify_roles_of_pending_user_for_an_active_organisation_should_rtn_400() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
@@ -143,7 +143,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void modify_roles_of_unknown_user_for_an_active_organisation_with_pui_user_mgr_role_should_rtn_404() {
+    void modify_roles_of_unknown_user_for_an_active_organisation_with_pui_user_mgr_role_should_rtn_404() {
 
         updateUserProfileRolesMock(HttpStatus.NOT_FOUND);
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
@@ -158,7 +158,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     //TODO review validation with biz requirements
     //@Test
-    public void ac6_modify_roles_of_active_users_for_with_pui_user_manager_role_should_return_400_for_bad_request() {
+    void ac6_modify_roles_of_active_users_for_with_pui_user_manager_role_should_return_400_for_bad_request() {
 
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
@@ -176,7 +176,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void ac8_modify_roles_of_active_users_for_with_pui_user_manager_role_should_rtn_500_for_Internal_server() {
+    void ac8_modify_roles_of_active_users_for_with_pui_user_manager_role_should_rtn_500_for_Internal_server() {
 
         updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
@@ -188,7 +188,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void ac9_modify_roles_with_prd_admin_role_should_return_500_internal_server_error() {
+    void ac9_modify_roles_with_prd_admin_role_should_return_500_internal_server_error() {
 
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
@@ -218,7 +218,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void ac10_modify_roles_of_active_users_for_an_organisation_with_invalid_org_id_should_return_400() {
+    void ac10_modify_roles_of_active_users_for_an_organisation_with_invalid_org_id_should_return_400() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
         userProfileCreateUserWireMock(HttpStatus.CREATED);

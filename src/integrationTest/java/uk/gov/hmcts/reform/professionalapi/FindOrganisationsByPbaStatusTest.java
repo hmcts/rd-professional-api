@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants;
@@ -18,21 +17,21 @@ import java.util.Set;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 @SuppressWarnings("unchecked")
-public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegrationTest {
+class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegrationTest {
 
-    @Before
-    public void setUpTestData() {
+    @BeforeEach
+    void setUpTestData() {
         setUpTestDataForPba();
     }
 
     @Test
-    public void get_request_returns_organisations_with_accepted_pba_status() throws JsonProcessingException {
+    void get_request_returns_organisations_with_accepted_pba_status() throws JsonProcessingException {
         var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>)
                 professionalReferenceDataClient.findOrganisationsByPbaStatus(
                         PbaStatus.ACCEPTED.toString(), hmctsAdmin, Boolean.FALSE);
@@ -41,7 +40,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_organisations_with_pending_pba_status() throws JsonProcessingException {
+    void get_request_returns_organisations_with_pending_pba_status() throws JsonProcessingException {
         var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>)
                 professionalReferenceDataClient.findOrganisationsByPbaStatus(
                         PbaStatus.PENDING.toString(), hmctsAdmin, Boolean.FALSE);
@@ -51,7 +50,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
 
 
     @Test
-    public void get_request_returns_no_organisations_for_given_pba_status() throws JsonProcessingException {
+    void get_request_returns_no_organisations_for_given_pba_status() throws JsonProcessingException {
         var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>)
                 professionalReferenceDataClient.findOrganisationsByPbaStatus(
                         PbaStatus.REJECTED.toString(), hmctsAdmin, Boolean.FALSE);
@@ -60,7 +59,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_success_when_pba_status_lower_case() throws JsonProcessingException {
+    void get_request_success_when_pba_status_lower_case() throws JsonProcessingException {
         var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus("accepted", hmctsAdmin, Boolean.FALSE);
 
@@ -68,7 +67,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_success_when_pba_status_upper_case() throws JsonProcessingException {
+    void get_request_success_when_pba_status_upper_case() throws JsonProcessingException {
         var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus("ACCEPTED", hmctsAdmin, Boolean.FALSE);
 
@@ -76,7 +75,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_400_when_empty_pba_status() throws JsonProcessingException {
+    void get_request_returns_400_when_empty_pba_status() throws JsonProcessingException {
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus("\"\"", hmctsAdmin, Boolean.FALSE);
 
@@ -84,7 +83,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_400_when_pba_status_with_space() throws JsonProcessingException {
+    void get_request_returns_400_when_pba_status_with_space() throws JsonProcessingException {
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus("\" \"", hmctsAdmin, Boolean.FALSE);
 
@@ -92,7 +91,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_400_when_invalid_pba_status() throws JsonProcessingException {
+    void get_request_returns_400_when_invalid_pba_status() throws JsonProcessingException {
         Map<String, Object> invalidStatusErrorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus("Invalid Status", hmctsAdmin, Boolean.FALSE);
         Map<String, Object> nullStatusErrorResponseMap = (Map<String, Object>) professionalReferenceDataClient
@@ -106,7 +105,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_400_when_multiple_pba_status() throws JsonProcessingException {
+    void get_request_returns_400_when_multiple_pba_status() throws JsonProcessingException {
 
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED + "," + PbaStatus.PENDING, hmctsAdmin,
@@ -116,7 +115,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_403_when_invalid_role() throws JsonProcessingException {
+    void get_request_returns_403_when_invalid_role() throws JsonProcessingException {
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED.toString(), "prd-role", Boolean.FALSE);
         ErrorResponse errorResponse = (ErrorResponse) errorResponseMap.get("response_body");
@@ -126,7 +125,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_401_when_unauthorised() throws JsonProcessingException {
+    void get_request_returns_401_when_unauthorised() throws JsonProcessingException {
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED.toString(), hmctsAdmin, Boolean.TRUE);
 
