@@ -109,7 +109,11 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     public void validateOrganisationExistsAndActive(String orgId) {
-        validateOrganisationExistsWithGivenOrgId(orgId);
-        validateOrganisationIsActive(organisationService.getOrganisationByOrgIdentifier(orgId), BAD_REQUEST);
+        Organisation org = organisationService.getOrganisationByOrgIdentifier(orgId);
+        if (null == org) {
+            log.error(LOG_TWO_ARG_PLACEHOLDER, loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
+        }
+        validateOrganisationIsActive(org, BAD_REQUEST);
     }
 }
