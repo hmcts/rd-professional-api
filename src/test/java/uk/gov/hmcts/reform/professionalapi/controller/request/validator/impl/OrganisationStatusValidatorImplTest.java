@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.BAD_REQUEST_STR;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,19 +54,19 @@ class OrganisationStatusValidatorImplTest {
 
     @Test
     void test_validateAndReturnStatusList_allvalid() {
-        List<String> validStatuses = OrganisationStatusValidatorImpl.validateAndReturnStatusList(
+        List<String> validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
                 "ACTIVE,REVIEW");
         assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
 
-        validStatuses = OrganisationStatusValidatorImpl.validateAndReturnStatusList(
+        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
                 "  , ACTIVE,REVIEW,");
         assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
 
-        validStatuses = OrganisationStatusValidatorImpl.validateAndReturnStatusList(
+        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
                 " ACTIVE , REVIEW ");
         assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
 
-        validStatuses = OrganisationStatusValidatorImpl.validateAndReturnStatusList(
+        validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
                 " AcTiVe , rEvIeW ");
         assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
     }
@@ -88,7 +88,7 @@ class OrganisationStatusValidatorImplTest {
     }
 
     void verifyException(String status, String message) {
-        assertThatThrownBy(() -> OrganisationStatusValidatorImpl.validateAndReturnStatusList(status))
+        Assertions.assertThatThrownBy(() -> organisationStatusValidatorImpl.validateAndReturnStatusList(status))
                 .isExactlyInstanceOf(InvalidRequest.class)
                 .hasMessage(message);
     }

@@ -31,7 +31,7 @@ class OrganisationIdentifierValidatorImplTest {
 
     private Organisation organisation;
     private PaymentAccount paymentAccount;
-    private final OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl
             = new OrganisationIdentifierValidatorImpl(mock(OrganisationService.class));
 
     @BeforeEach

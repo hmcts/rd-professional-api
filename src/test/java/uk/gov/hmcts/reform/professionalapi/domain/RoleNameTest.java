@@ -12,6 +12,9 @@ class RoleNameTest {
     private static final  String PUI_USER_MANAGER = "pui-user-manager";
     private static final String PUI_CASE_MANAGER = "pui-case-manager";
 
+    private static final  String PUI_USER_MANAGER = "pui-user-manager";
+    private static final String PUI_CASE_MANAGER = "pui-case-manager";
+
     @Test
     void test_should_hold_values_after_creation() {
         RoleName roleName = new RoleName();

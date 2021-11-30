@@ -9,11 +9,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class RoleDeletionResponseTest {
 
+    private final String roleName = "Role";
+    private final String idamStatusCode = "Code";
+    private final String idamMessage = "Message";
+
     @Test
     void test_deleteRoleResponse() {
-        String roleName = "Role";
-        String idamStatusCode = "Code";
-        String idamMessage = "Message";
         RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse(roleName, idamStatusCode, idamMessage);
 
         assertThat(deleteRoleResponse.getRoleName()).isEqualTo(roleName);

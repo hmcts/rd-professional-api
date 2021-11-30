@@ -72,7 +72,7 @@ import javax.servlet.http.HttpServletRequest;
 class SuperControllerTest {
 
     @InjectMocks
-    private final SuperController superController = mock(SuperController.class, CALLS_REAL_METHODS);
+    private SuperController superController = mock(SuperController.class, CALLS_REAL_METHODS);
 
     private OrganisationsDetailResponse organisationsDetailResponse;
     private OrganisationService organisationServiceMock;

@@ -10,11 +10,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUsersResponseTest {
 
+    private final String expectEmailAddress = "dummy@email.com";
+    private final String expectFirstName = "Bob";
+    private final String expectLastName = "Smith";
+
     @Test
     void test_professionalUsers() throws NoSuchFieldException, IllegalAccessException {
-        String expectEmailAddress = "dummy@email.com";
-        String expectFirstName = "Bob";
-        String expectLastName = "Smith";
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser(expectFirstName, expectLastName,
                 expectEmailAddress, null));

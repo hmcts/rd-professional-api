@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUsersEntityResponseTest {
 
+    private ProfessionalUsersEntityResponse sut;
+
     @Test
     @SuppressWarnings("unchecked")
     void test_ProfessionalUsersEntityResponse() throws Exception {
@@ -28,7 +30,7 @@ class ProfessionalUsersEntityResponseTest {
         List<ProfessionalUsersResponse> professionalUsers = new ArrayList<>();
         professionalUsers.add(professionalResponse);
 
-        ProfessionalUsersEntityResponse sut = new ProfessionalUsersEntityResponse();
+        sut = new ProfessionalUsersEntityResponse();
         sut.setUserProfiles(professionalUsers);
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);

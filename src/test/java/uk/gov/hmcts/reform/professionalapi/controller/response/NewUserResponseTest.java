@@ -15,9 +15,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 @ExtendWith(MockitoExtension.class)
 class NewUserResponseTest {
 
+    private final String userIdentifier = UUID.randomUUID().toString();
     private ProfessionalUser professionalUser;
     private Organisation organisation;
-    private final String userIdentifier = UUID.randomUUID().toString();
     private NewUserResponse newUserResponse;
     private UserProfileCreationResponse userProfileCreationResponse;
 

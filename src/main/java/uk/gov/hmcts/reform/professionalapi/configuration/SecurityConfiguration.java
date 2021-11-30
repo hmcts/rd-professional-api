@@ -42,10 +42,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${oidc.issuer}")
     private String issuerOverride;
 
-    private final ServiceAuthFilter serviceAuthFilter;
+    private  ServiceAuthFilter serviceAuthFilter;
     List<String> anonymousPaths;
 
-    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+    private JwtAuthenticationConverter jwtAuthenticationConverter;
 
     public List<String> getAnonymousPaths() {
         return anonymousPaths;

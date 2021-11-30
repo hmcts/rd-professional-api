@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 class PaymentAccountValidatorTest {
 
     @Mock
-    private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
+    private PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
 
     PaymentAccountValidator paymentAccountValidator = new PaymentAccountValidator(paymentAccountRepositoryMock);
 

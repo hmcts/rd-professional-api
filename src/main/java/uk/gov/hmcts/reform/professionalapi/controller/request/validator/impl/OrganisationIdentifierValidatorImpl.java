@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 @Slf4j
 public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifierValidator {
 
-    private final OrganisationService organisationService;
+    private OrganisationService organisationService;
 
     @Value("${loggingComponentName}")
     protected String loggingComponentName;

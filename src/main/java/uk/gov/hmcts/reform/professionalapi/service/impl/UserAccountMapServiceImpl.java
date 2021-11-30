@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 @Slf4j
 public class UserAccountMapServiceImpl implements UserAccountMapService {
 
-    private final UserAccountMapRepository userAccountMapRepository;
+    private UserAccountMapRepository userAccountMapRepository;
 
     public UserAccountMapServiceImpl(UserAccountMapRepository userAccountMapRepository) {
         this.userAccountMapRepository = userAccountMapRepository;

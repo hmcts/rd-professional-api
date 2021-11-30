@@ -15,7 +15,6 @@ class PbaAccountCreationRequestTest {
     private final String pbaNumber = "123456";
     private final String pbaNumber1 = "987654";
 
-
     @BeforeEach
     void setUp() {
         pbaAccountCreationRequest = new PbaAccountCreationRequest(pbaNumber);

@@ -21,7 +21,7 @@ public class IdamRepository {
     private String loggingComponentName;
 
     private final IdamClient idamClient;
-    private final CacheManager cacheManager;
+    private CacheManager cacheManager;
 
     @Autowired
     public IdamRepository(IdamClient idamClient, CacheManager cacheManager) {

@@ -9,10 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class RoleAdditionResponseTest {
 
+    private final String idamStatusCode = "Code";
+    private final String idamMessage = "Message";
+
     @Test
     void test_addRoleResponse() {
-        String idamStatusCode = "Code";
-        String idamMessage = "Message";
         RoleAdditionResponse addRoleResponse = new RoleAdditionResponse(idamStatusCode, idamMessage);
 
         assertThat(addRoleResponse.getIdamStatusCode()).isEqualTo(idamStatusCode);

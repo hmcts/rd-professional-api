@@ -22,7 +22,7 @@ public class UserAccountMap implements Serializable {
     private UserAccountMapId  userAccountMapId;
 
     @Column(name = "DEFAULTED")
-    private final Boolean defaulted = false;
+    private Boolean defaulted = false;
 
     public UserAccountMap(UserAccountMapId  userAccountMapId) {
 

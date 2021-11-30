@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,7 +28,6 @@ import feign.Response;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -139,6 +139,7 @@ class OrganisationServiceImplTest {
 
     private final UserAttribute userAttribute = new UserAttribute();
     private UserCreationRequest superUserCreationRequest;
+    private DxAddressCreationRequest dxAddressRequest;
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
 
@@ -150,6 +151,7 @@ class OrganisationServiceImplTest {
     private final List<String> userRoles = new ArrayList<>();
     private final List<PrdEnum> prdEnums = new ArrayList<>();
     private List<UserAttribute> userAttributes;
+    private List<String> jurisdictionIds;
     Set<String> paymentAccountList;
     private DeleteOrganisationResponse deleteOrganisationResponse;
 
@@ -187,7 +189,7 @@ class OrganisationServiceImplTest {
         paymentAccounts.add(paymentAccount);
         userAttributes = new ArrayList<>();
         userAccountMaps = new ArrayList<>();
-        List<String> jurisdictionIds = new ArrayList<>();
+        jurisdictionIds = new ArrayList<>();
         jurisdictionIds.add("PROBATE");
 
         organisation.setId(UUID.randomUUID());
@@ -197,7 +199,7 @@ class OrganisationServiceImplTest {
         superUserCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some-email");
 
-        DxAddressCreationRequest dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
+        dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
         dxAddressRequests.add(dxAddressRequest);
 
         contactInformationCreationRequest = new ContactInformationCreationRequest("addressLine-1",
@@ -498,15 +500,14 @@ class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
-        when(organisationRepository.findByStatusIn(
-                Collections.singletonList(OrganisationStatus.PENDING))).thenReturn(organisations);
+        when(organisationRepository.findByStatusIn(asList(OrganisationStatus.PENDING))).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse
                 = sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1))
-                .findByStatusIn(Collections.singletonList(OrganisationStatus.PENDING));
+                .findByStatusIn(asList(OrganisationStatus.PENDING));
     }
 
     @Test

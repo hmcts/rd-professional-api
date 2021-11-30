@@ -15,14 +15,15 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 @ExtendWith(MockitoExtension.class)
 class OrganisationPbaResponseTest {
 
+    private ProfessionalUser professionalUser;
     private Organisation organisation;
-    private final ArrayList<SuperUser> users = new ArrayList<>();
+    private ArrayList<SuperUser> users = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
-        ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
+        professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
 
         users.add(professionalUser.toSuperUser());

@@ -13,8 +13,8 @@ import org.springframework.http.HttpStatus;
 @ExtendWith(MockitoExtension.class)
 class UserProfileCreationResponseTest {
 
-    private final UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-    private final String testUuid = UUID.randomUUID().toString();
+    private UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+    private String testUuid = UUID.randomUUID().toString();
 
     @Test
     void test_has_mandatory_fields_specified_not_null() {

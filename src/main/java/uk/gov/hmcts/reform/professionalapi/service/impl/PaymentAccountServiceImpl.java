@@ -65,10 +65,10 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     @Autowired
     EntityManagerFactory emf;
 
-    private final ProfessionalUserRepository professionalUserRepository;
-    private final OrganisationService organisationService;
-    private final UserAccountMapService userAccountMapService;
-    private final PaymentAccountRepository paymentAccountRepository;
+    private ProfessionalUserRepository professionalUserRepository;
+    private OrganisationService organisationService;
+    private UserAccountMapService userAccountMapService;
+    private PaymentAccountRepository paymentAccountRepository;
 
     public Organisation findPaymentAccountsByEmail(String email) {
 

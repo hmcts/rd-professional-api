@@ -156,7 +156,7 @@ class OrganisationExternalControllerTest {
         userRoles.add("pui-user-manager");
 
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles, false);
+                "some@email.com", userRoles,false);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,

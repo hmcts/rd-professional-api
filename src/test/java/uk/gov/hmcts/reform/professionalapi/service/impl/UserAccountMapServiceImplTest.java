@@ -17,10 +17,10 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 class UserAccountMapServiceImplTest {
 
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
-    private final UserAccountMapServiceImpl sut =
+    private UserAccountMapServiceImpl sut =
             new UserAccountMapServiceImpl(userAccountMapRepositoryMock);
-    private final ProfessionalUser persistedSuperUser = new ProfessionalUser();
-    private final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+    private ProfessionalUser persistedSuperUser = new ProfessionalUser();
+    private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
     @Test
     void test_persistedUserAccountMap() {
