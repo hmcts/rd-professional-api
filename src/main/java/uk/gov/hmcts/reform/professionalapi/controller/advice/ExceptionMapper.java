@@ -53,7 +53,7 @@ public class ExceptionMapper {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
-    private final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
+    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
