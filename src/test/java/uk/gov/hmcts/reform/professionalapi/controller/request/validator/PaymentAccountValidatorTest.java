@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
 public class PaymentAccountValidatorTest {
@@ -67,7 +68,7 @@ public class PaymentAccountValidatorTest {
 
     @Test(expected = Test.None.class)
     public void test_CheckPbasAreUniqueWithOrgId() {
-        paymentAccountValidator.checkPbasAreUniqueWithOrgId(singleton("PBA1234567"), "");
+        paymentAccountValidator.checkPbasAreUniqueWithOrgId(singleton("PBA1234567"), mock(Organisation.class));
     }
 
     @Test
@@ -75,7 +76,7 @@ public class PaymentAccountValidatorTest {
         String pba = "PBA1234567";
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(pba);
-        paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "");
+        paymentAccountValidator.validatePaymentAccounts(paymentAccounts, mock(Organisation.class), false);
     }
 
     @Test(expected = InvalidRequest.class)

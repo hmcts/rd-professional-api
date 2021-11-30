@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
@@ -35,11 +36,15 @@ public class PaymentAccountValidator {
         this.paymentAccountRepository = paymentAccountRepository;
     }
 
-    public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
+    public void validatePaymentAccounts(Set<String> paymentAccounts, Organisation org, boolean isDeletePba) {
         if (!CollectionUtils.isEmpty(paymentAccounts)) {
             paymentAccounts.removeIf(String::isBlank);
             checkPbaNumberIsValid(paymentAccounts, true);
-            checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
+            if (isDeletePba) {
+                checkPbasBelongToOrganisation(paymentAccounts, org);
+            } else {
+                checkPbasAreUniqueWithOrgId(paymentAccounts, org);
+            }
         }
     }
 
@@ -67,7 +72,7 @@ public class PaymentAccountValidator {
         return true;
     }
 
-    public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
+    public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, Organisation org) {
         Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
 
         List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
@@ -75,7 +80,7 @@ public class PaymentAccountValidator {
 
         paymentAccountsInDatabase.forEach(pbaInDb -> upperCasePbas.forEach(pba -> {
             if (pbaInDb.getPbaNumber().equals(pba) && !pbaInDb.getOrganisation().getOrganisationIdentifier()
-                    .equals(orgId)) {
+                    .equals(org.getOrganisationIdentifier())) {
                 uniquePBas.add(pba);
             }
         }));
@@ -83,6 +88,26 @@ public class PaymentAccountValidator {
         if (!uniquePBas.isEmpty()) {
             throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", uniquePBas)
                     .concat(" belongs to another Organisation"));
+        }
+    }
+
+    public void checkPbasBelongToOrganisation(Set<String> paymentAccounts, Organisation org) {
+        Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
+        List<String> orgPbas = new ArrayList<>();
+
+        org.getPaymentAccounts().forEach(pba -> orgPbas.add(pba.getPbaNumber()));
+
+        List<String> nonOrgPbas = new ArrayList<>();
+
+        upperCasePbas.forEach(pba -> {
+            if (!orgPbas.contains(pba)) {
+                nonOrgPbas.add(pba);
+            }
+        });
+
+        if (!nonOrgPbas.isEmpty()) {
+            throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", nonOrgPbas)
+                    .concat(" does not belong to this Organisation"));
         }
     }
 
@@ -114,3 +139,4 @@ public class PaymentAccountValidator {
     }
 
 }
+
