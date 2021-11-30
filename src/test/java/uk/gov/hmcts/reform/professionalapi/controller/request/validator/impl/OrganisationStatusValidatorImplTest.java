@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.BAD_REQUEST_STR;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,7 +88,7 @@ class OrganisationStatusValidatorImplTest {
     }
 
     void verifyException(String status, String message) {
-        Assertions.assertThatThrownBy(() -> organisationStatusValidatorImpl.validateAndReturnStatusList(status))
+        assertThatThrownBy(() -> organisationStatusValidatorImpl.validateAndReturnStatusList(status))
                 .isExactlyInstanceOf(InvalidRequest.class)
                 .hasMessage(message);
     }
