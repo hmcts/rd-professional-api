@@ -12,8 +12,6 @@ class PbaEditRequestTest {
 
     private final String pbaNumber = "PBA0000001";
 
-    private String pbaNumber = "PBA0000001";
-
     @Test
     void test_pbaEditRequestBuilder() {
         PbaRequest pbaEditRequest = new PbaRequest();
