@@ -7,15 +7,17 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-
-public class UserCreationRequestTest {
+@ExtendWith(MockitoExtension.class)
+class UserCreationRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void test_hasMandatoryFieldsSpecifiedNotNull() {
+    void test_hasMandatoryFieldsSpecifiedNotNull() {
         UserCreationRequest userCreationRequest = new UserCreationRequest(null, null,
                 "some@email.com");
 
@@ -25,7 +27,7 @@ public class UserCreationRequestTest {
     }
 
     @Test
-    public void test_ThatUserCreationIsChangedByBuilder() {
+    void test_ThatUserCreationIsChangedByBuilder() {
         String firstName2 = "Jane";
         String lastName2 = "Doe";
         String email2 = "jane.doe@email.com";

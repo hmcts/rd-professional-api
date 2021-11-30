@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -16,11 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
-public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_deletePaymentAccountsShouldReturn204() {
+    void test_deletePaymentAccountsShouldReturn204() {
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add("PBA0000001");
         paymentAccountsToDelete.add("PBA0000003");
@@ -47,7 +47,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow403IfUserIsNotActive() {
+    void test_deletePaymentAccountsShouldThrow403IfUserIsNotActive() {
         PbaRequest pbaDeleteRequest = new PbaRequest();
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add("PBA0000003");
@@ -63,7 +63,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow400IfNoPbaIsPassed() {
+    void test_deletePaymentAccountsShouldThrow400IfNoPbaIsPassed() {
         Set<String> paymentAccountsToDelete = new HashSet<>();
 
         PbaRequest pbaDeleteRequest = new PbaRequest();
@@ -79,7 +79,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow400IfInvalidRequestBodyPassed() {
+    void test_deletePaymentAccountsShouldThrow400IfInvalidRequestBodyPassed() {
 
         PbaRequest pbaDeleteRequest = new PbaRequest();
         pbaDeleteRequest.setPaymentAccounts(null);
@@ -94,7 +94,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow400IfNullIsPassedAsPba() {
+    void test_deletePaymentAccountsShouldThrow400IfNullIsPassedAsPba() {
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add(null);
 
@@ -111,7 +111,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow400IfEmptyValuePassedAsPba() {
+    void test_deletePaymentAccountsShouldThrow400IfEmptyValuePassedAsPba() {
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add(StringUtils.EMPTY);
 
@@ -128,7 +128,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow400IfPassedPbasContainsNull() {
+    void test_deletePaymentAccountsShouldThrow400IfPassedPbasContainsNull() {
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add("PBA0000001");
         paymentAccountsToDelete.add(null);
@@ -146,7 +146,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsSldRtn400IfPbaBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
+    void test_deletePaymentAccountsSldRtn400IfPbaBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
         Set<String> existingPaymentAccounts = new HashSet<>();
         existingPaymentAccounts.add("PBA0000002");
         existingPaymentAccounts.add("PBA0000009");
@@ -177,7 +177,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow400IfInvalidPbaIsPassed_WithPbaInErrorMessage() {
+    void test_deletePaymentAccountsShouldThrow400IfInvalidPbaIsPassed_WithPbaInErrorMessage() {
         Set<String> accountsToDelete = new HashSet<>();
         accountsToDelete.add("this-is-invalid");
 

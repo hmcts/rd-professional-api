@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -25,13 +25,13 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ADD_PBA_REQUEST_EMPTY;
 
-public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_all_PaymentAccounts_Success_ShouldReturn_201() {
+    void test_all_PaymentAccounts_Success_ShouldReturn_201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000002");
 
@@ -58,7 +58,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_PartialSuccess_Dupl_ShouldReturn_201() {
+    void test_add_PaymentAccounts_PartialSuccess_Dupl_ShouldReturn_201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000001");
         paymentAccountsToAdd.add("PBA0000002");
@@ -95,7 +95,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_PartialSuccess_Invl_Dup_ShouldReturn_201() {
+    void test_add_PaymentAccounts_PartialSuccess_Invl_Dup_ShouldReturn_201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("invalid-test01");
         paymentAccountsToAdd.add("invalid-test02");
@@ -133,7 +133,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_PartialSuccess_Invl_ShouldReturn_201() {
+    void test_add_PaymentAccounts_PartialSuccess_Invl_ShouldReturn_201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("invalid-test01");
         paymentAccountsToAdd.add("invalid-test02");
@@ -168,7 +168,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    public void test_add_PaymentAccounts_Failure_Invl_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Invl_ShouldThrow_400() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("invalid-test01");
         paymentAccountsToAdd.add("invalid-test02");
@@ -190,7 +190,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    public void test_add_PaymentAccounts_Failure_Dup_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Dup_ShouldThrow_400() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000001");
         paymentAccountsToAdd.add("PBA0000003");
@@ -211,7 +211,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    public void test_addPaymentAccounts_Failure_UserIsNotActive_ShouldThrow_400() {
+    void test_addPaymentAccounts_Failure_UserIsNotActive_ShouldThrow_400() {
         PbaRequest pbaRequest = new PbaRequest();
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000003");
@@ -228,7 +228,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_PartialSuccess_InvlDup_ShouldReturn_201() {
+    void test_add_PaymentAccounts_PartialSuccess_InvlDup_ShouldReturn_201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("invalid-test01");
         paymentAccountsToAdd.add("invalid-test02");
@@ -324,7 +324,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_Has_Single_Null_PBA_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Single_Null_PBA_ShouldThrow_400() {
 
         String request = "{\n"
                 + "    \"paymentAccounts\": [\n"
@@ -348,7 +348,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_has_Empty_Request_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_has_Empty_Request_ShouldThrow_400() {
 
         String request = "{\n"
                 + "    \"paymentAccounts\": [\n"
@@ -371,7 +371,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_has_Empty_Payload_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_has_Empty_Payload_ShouldThrow_400() {
 
         String request = "{\n"
                 + "}";
@@ -392,7 +392,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Success_Has_Null_Value_also_PBA_ShouldReturn_201() {
+    void test_add_PaymentAccounts_Success_Has_Null_Value_also_PBA_ShouldReturn_201() {
 
         String request = "{\n"
                 + "    \"paymentAccounts\": [\n"
@@ -435,7 +435,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_Has_Misspelled_payload_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Misspelled_payload_ShouldThrow_400() {
 
         String request = "{\n"
                 + "    \"paymentBccounts\": [\n"
@@ -461,7 +461,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_Has_Misspelled02_payload_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Misspelled02_payload_ShouldThrow_400() {
 
         String request = "{\n"
                 + "    \"PaymentAccounts\": [\n"
@@ -483,7 +483,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_Has_Single_empty_PBA_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Single_empty_PBA_ShouldThrow_400() {
 
         String request = "{\n"
                 + "    \"paymentAccounts\": [\n"
@@ -506,7 +506,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_PartialSuccess_Dupl_And_null_ShouldReturn_201() {
+    void test_add_PaymentAccounts_PartialSuccess_Dupl_And_null_ShouldReturn_201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000001");
         paymentAccountsToAdd.add("PBA0000002");
@@ -552,7 +552,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_Has_Single_emptySpace_PBA_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Single_emptySpace_PBA_ShouldThrow_400() {
 
         String request = "{\n"
                 + "    \"paymentAccounts\": [\n"
@@ -575,7 +575,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_add_PaymentAccounts_Failure_Dupl_And_null_02_ShouldReturn_400() {
+    void test_add_PaymentAccounts_Failure_Dupl_And_null_02_ShouldReturn_400() {
         String request = "{\n"
                 + "    \"paymentAccounts\": [\n"
                 + "       \"PBAKQNROCB8\",\n"

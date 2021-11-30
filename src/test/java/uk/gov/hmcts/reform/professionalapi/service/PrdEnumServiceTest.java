@@ -6,12 +6,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
-public class PrdEnumServiceTest {
+class PrdEnumServiceTest {
 
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
 
@@ -19,7 +19,7 @@ public class PrdEnumServiceTest {
 
 
     @Test
-    public void test_RetrievesPrdEnumsCorrectly() {
+    void test_RetrievesPrdEnumsCorrectly() {
         List<PrdEnum> prdEnums = prdEnumService.findAllPrdEnums();
 
         verify(prdEnumRepositoryMock, times(1)).findByEnabled("YES");

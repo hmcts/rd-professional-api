@@ -46,11 +46,11 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @Bean
     protected ProfessionalUserService professionalUserService() {
         return new ProfessionalUserServiceImpl(organisationRepository,
-            professionalUserRepository,
-            userAttributeRepository,
-            prdEnumRepository,
-            userAttributeService,
-            userProfileFeignClient);
+                professionalUserRepository,
+                userAttributeRepository,
+                prdEnumRepository,
+                userAttributeService,
+                userProfileFeignClient);
     }
 
     @MockBean

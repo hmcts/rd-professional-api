@@ -1,17 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 
-public class FetchPbaByStatusResponseTest {
+class FetchPbaByStatusResponseTest {
 
     @Test
-    public void testFetchPbaByStatusResponse() {
+    void testFetchPbaByStatusResponse() {
         FetchPbaByStatusResponse pba = new FetchPbaByStatusResponse();
         pba.setPbaNumber("PBA123446");
         pba.setStatus(ACCEPTED.toString());
@@ -27,7 +27,7 @@ public class FetchPbaByStatusResponseTest {
     }
 
     @Test
-    public void testFetchPbaByStatusResponseNoArgs() {
+    void testFetchPbaByStatusResponseNoArgs() {
         PaymentAccount paymentAccount = new PaymentAccount();
         LocalDateTime time = LocalDateTime.now();
         paymentAccount.setPbaStatus(ACCEPTED);

@@ -6,14 +6,17 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class OrganisationCreationRequestTest {
+@ExtendWith(MockitoExtension.class)
+class OrganisationCreationRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    void has_mandatory_fields_specified_not_null() {
 
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest(null, null, null, null, "false",
@@ -27,7 +30,7 @@ public class OrganisationCreationRequestTest {
     }
 
     @Test
-    public void test_OrganisationCreationRequest() {
+    void test_OrganisationCreationRequest() {
 
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest("test", "PENDING", null, "sra-id", "false",
@@ -45,7 +48,7 @@ public class OrganisationCreationRequestTest {
     }
 
     @Test
-    public void test_OrganisationCreationRequestBuilder() {
+    void test_OrganisationCreationRequestBuilder() {
         String name = "name";
         String status = "status";
         String statusMessage = "statusMessage";

@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang.RandomStringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -29,10 +29,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
+class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void persists_and_returns_valid_minimal_organisation() {
+    void persists_and_returns_valid_minimal_organisation() {
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
@@ -78,7 +78,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_400_when_mandatory_data_not_present() {
+    void returns_400_when_mandatory_data_not_present() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name(null)
                 .superUser(aUserCreationRequest()
@@ -98,7 +98,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_400_when_email_not_valid() {
+    void returns_400_when_email_not_valid() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("somename")
                 .superUser(aUserCreationRequest()
@@ -118,7 +118,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_400_when_email_minus_not_valid() {
+    void returns_400_when_email_minus_not_valid() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
                 .superUser(aUserCreationRequest()
@@ -138,7 +138,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_200_when_email_has_underscore() {
+    void returns_200_when_email_has_underscore() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
                 .superUser(aUserCreationRequest()
@@ -157,7 +157,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_200_when_email_has_apostrophe() {
+    void returns_200_when_email_has_apostrophe() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
                 .superUser(aUserCreationRequest()
@@ -176,7 +176,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_500_when_database_constraint_violated() {
+    void returns_500_when_database_constraint_violated() {
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
@@ -189,7 +189,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
 
     @Test
-    public void whiteSpaceRemovalTest() {
+    void whiteSpaceRemovalTest() {
         OrganisationCreationRequest organisationCreationRequest = whiteSpaceTrimOrganisationRequest().build();
 
         Map<String, Object> response =
@@ -224,7 +224,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_400_when_sraid_is_duplicate() {
+    void returns_400_when_sraid_is_duplicate() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id")
@@ -248,7 +248,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void persists_and_returns_400_company_number_is_not_unique() {
+    void persists_and_returns_400_company_number_is_not_unique() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -281,7 +281,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_200_when_company_number_length_less_than_8() {
+    void returns_200_when_company_number_length_less_than_8() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
                 .companyNumber("123456")
@@ -300,7 +300,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_400_when_company_number_length_greater_than_8() {
+    void returns_400_when_company_number_length_greater_than_8() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
                 .companyNumber("123456789")
@@ -319,7 +319,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_200_when_valid_email_is_passed() {
+    void returns_200_when_valid_email_is_passed() {
 
         String[] emails = new String[] {"v.greeny@ashfords.co.uk", "j.johnson@timms-law.com"};
 
@@ -338,7 +338,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void return_400_invalid_organisation_with_invalid_email() {
+    void return_400_invalid_organisation_with_invalid_email() {
         String prefix = UUID.randomUUID().toString();
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
@@ -359,7 +359,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_200_when_MFA_default_value() {
+    void returns_200_when_MFA_default_value() {
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);

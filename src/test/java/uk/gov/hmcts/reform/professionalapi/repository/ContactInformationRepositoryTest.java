@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class ContactInformationRepositoryTest extends BaseRepository {
+class ContactInformationRepositoryTest extends BaseRepository {
 
     @Test
-    public void test_findAll() {
+    void test_findAll() {
         List<ContactInformation> contactInformationList = contactInformationRepository.findAll();
 
         assertThat(contactInformationList).hasSize(1);
@@ -26,7 +26,7 @@ public class ContactInformationRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void test_findById() {
+    void test_findById() {
         Optional<ContactInformation> contactInfo = contactInformationRepository.findById(contactInformation.getId());
 
         assertThat(contactInfo).contains(contactInformation);

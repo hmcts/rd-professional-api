@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -21,11 +21,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
-public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabledIntegrationTest {
+class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void persists_and_returns_a_single_pba_account_number_for_an_organisation() {
+    void persists_and_returns_a_single_pba_account_number_for_an_organisation() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
@@ -55,7 +54,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
     }
 
     @Test
-    public void persists_and_returns_multiple_pba_account_numbers_for_an_organisation() {
+    void persists_and_returns_multiple_pba_account_numbers_for_an_organisation() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
         paymentAccounts.add("PBA2345678");
@@ -89,7 +88,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
     }
 
     @Test
-    public void still_persists_organisation_when_payment_accounts_list_is_empty() {
+    void still_persists_organisation_when_payment_accounts_list_is_empty() {
         Set<String> paymentAccounts = new HashSet<>();
 
         OrganisationCreationRequest organisationCreationRequest =
@@ -122,7 +121,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
     }
 
     @Test
-    public void still_persists_organisation_when_payment_accounts_list_is_null() {
+    void still_persists_organisation_when_payment_accounts_list_is_null() {
 
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
@@ -149,7 +148,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
     }
 
     @Test
-    public void returns_400_when_a_null_pba_number_is_received() {
+    void returns_400_when_a_null_pba_number_is_received() {
         cleanupTestData();
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(null);
@@ -173,7 +172,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
     }
 
     @Test
-    public void persists_and_returns_a_multiple_pba_accounts_number_for_multiple_organisations() {
+    void persists_and_returns_a_multiple_pba_accounts_number_for_multiple_organisations() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
