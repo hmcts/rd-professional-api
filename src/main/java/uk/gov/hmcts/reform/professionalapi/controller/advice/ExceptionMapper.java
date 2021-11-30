@@ -53,7 +53,7 @@ public class ExceptionMapper {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
-    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
+    private final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
@@ -169,7 +169,7 @@ public class ExceptionMapper {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());
     }
 
-    private static Throwable getRootException(Throwable exception) {
+    private Throwable getRootException(Throwable exception) {
         Throwable rootException = exception;
         while (rootException.getCause() != null) {
             rootException = rootException.getCause();

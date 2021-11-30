@@ -11,7 +11,7 @@ import lombok.Getter;
 public class UserAttributeRequest {
 
     @JsonProperty
-    private List<String> userRoles;
+    private final List<String> userRoles;
 
     @JsonCreator
     public UserAttributeRequest(
