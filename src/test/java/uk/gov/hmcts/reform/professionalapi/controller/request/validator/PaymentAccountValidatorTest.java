@@ -75,7 +75,7 @@ class PaymentAccountValidatorTest {
     @Test
     void test_CheckPbasAreUniqueWithOrgId() {
         assertDoesNotThrow(() ->
-                paymentAccountValidator.checkPbasAreUniqueWithOrgId(singleton("PBA1234567"), mock(Organisation.class));
+                paymentAccountValidator.checkPbasAreUniqueWithOrgId(singleton("PBA1234567"), mock(Organisation.class)));
     }
 
     @Test
