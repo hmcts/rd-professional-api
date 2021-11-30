@@ -173,7 +173,7 @@ class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
         assertThat(pbaResponse).containsEntry("http_status", "400");
         assertThat(pbaResponse.get("response_body").toString())
                 .contains("The PBA numbers you have entered: PBA0000002 "
-                + "does not belong to this Organisation");
+                + "do not belong to this Organisation");
     }
 
     @Test

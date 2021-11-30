@@ -107,7 +107,7 @@ public class PaymentAccountValidator {
 
         if (!nonOrgPbas.isEmpty()) {
             throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", nonOrgPbas)
-                    .concat(" does not belong to this Organisation"));
+                    .concat(" do not belong to this Organisation"));
         }
     }
 
