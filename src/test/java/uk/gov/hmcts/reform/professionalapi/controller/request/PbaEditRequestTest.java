@@ -10,10 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PbaEditRequestTest {
 
+    private final String pbaNumber = "PBA0000001";
+
     @Test
     void test_pbaEditRequestBuilder() {
         PbaRequest pbaEditRequest = new PbaRequest();
-        String pbaNumber = "PBA0000001";
         pbaEditRequest.setPaymentAccounts(singleton(pbaNumber));
         assertThat(pbaEditRequest.getPaymentAccounts()).isEqualTo(singleton(pbaNumber));
     }

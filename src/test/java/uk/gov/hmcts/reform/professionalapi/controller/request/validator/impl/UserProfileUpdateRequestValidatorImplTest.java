@@ -22,6 +22,9 @@ class UserProfileUpdateRequestValidatorImplTest {
     private final String email = "test@test.com";
     private final String firstName = "fname";
     private final String lastName = "lname";
+    private final String puiOrganisationManager = "pui-organisation-manager";
+    private final String puiCaseManager = "pui-case-manager";
+    private final String puiFinanceManager = "pui-finance-manager";
 
     private final Set<RoleName> rolesData = new HashSet<>();
     private final Set<RoleName> rolesToDeleteData = new HashSet<>();
@@ -31,12 +34,10 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     @BeforeEach
     void setUp() {
-        String puiCaseManager = "pui-case-manager";
         roleName1 = new RoleName(puiCaseManager);
-        String puiOrganisationManager = "pui-organisation-manager";
         roleName2 = new RoleName(puiOrganisationManager);
-        String puiFinanceManager = "pui-finance-manager";
         roleToDeleteName = new RoleName(puiFinanceManager);
+
         rolesData.add(roleName1);
         rolesData.add(roleName2);
         rolesToDeleteData.add(roleToDeleteName);

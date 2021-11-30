@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 class MultipleUserProfilesResponseTest {
 
     private UserProfile userProfile;
+    private GetUserProfileResponse getUserProfileResponse;
     private final List<UserProfile> userProfiles = new ArrayList<>();
     private final List<GetUserProfileResponse> getUserProfileResponses = new ArrayList<>();
 
@@ -24,7 +25,7 @@ class MultipleUserProfilesResponseTest {
     void setUp() {
         userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com", "fName",
                 "lName", IdamStatus.PENDING);
-        GetUserProfileResponse getUserProfileResponse = new GetUserProfileResponse();
+        getUserProfileResponse = new GetUserProfileResponse();
         userProfiles.add(userProfile);
         getUserProfileResponses.add(getUserProfileResponse);
     }

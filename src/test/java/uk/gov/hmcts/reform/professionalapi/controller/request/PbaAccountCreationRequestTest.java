@@ -13,6 +13,8 @@ class PbaAccountCreationRequestTest {
 
     private PbaAccountCreationRequest pbaAccountCreationRequest;
     private final String pbaNumber = "123456";
+    private final String pbaNumber1 = "987654";
+
 
     @BeforeEach
     void setUp() {
@@ -28,7 +30,6 @@ class PbaAccountCreationRequestTest {
     @Test
     void test_ThatPbaAccountCreationIsChangedByBuilder() {
         System.out.println(pbaNumber);
-        String pbaNumber1 = "987654";
         PbaAccountCreationRequest testPbaAccountCreationRequest = aPbaPaymentAccount().pbaNumber(pbaNumber1).build();
         assertThat(testPbaAccountCreationRequest.getPbaNumber()).isEqualTo(pbaNumber1);
     }

@@ -23,7 +23,6 @@ class ContactInformationResponseWithDxAddressTest {
     final String expectTownCity = "London";
 
     @Test
-
     void testGetContactInformationResponse() {
         List<DxAddress> dxAddressList = singletonList(new DxAddress());
 

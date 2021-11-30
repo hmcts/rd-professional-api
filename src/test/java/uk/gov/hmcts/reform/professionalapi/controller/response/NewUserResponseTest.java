@@ -15,15 +15,17 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 @ExtendWith(MockitoExtension.class)
 class NewUserResponseTest {
 
+    private ProfessionalUser professionalUser;
+    private Organisation organisation;
     private final String userIdentifier = UUID.randomUUID().toString();
     private NewUserResponse newUserResponse;
     private UserProfileCreationResponse userProfileCreationResponse;
 
     @BeforeEach
     void setUp() {
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
-        ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
+        professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
         professionalUser.setUserIdentifier(userIdentifier);
         newUserResponse = new NewUserResponse(professionalUser);
