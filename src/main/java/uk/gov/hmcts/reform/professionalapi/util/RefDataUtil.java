@@ -103,7 +103,9 @@ public class RefDataUtil {
 
     public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
 
-        List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>(paymentAccounts);
+        List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
+
+        paymentAccountsFromOrg.addAll(paymentAccounts);
         return paymentAccounts;
     }
 
@@ -355,7 +357,6 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) requireNonNull(responseResponseEntity.getBody());
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                assert errorResponse != null;
                 log.error("{}:: Response from UserProfileByEmail service call {}",
                         loggingComponentName, errorResponse.getErrorDescription());
                 newUserResponse = new NewUserResponse();
