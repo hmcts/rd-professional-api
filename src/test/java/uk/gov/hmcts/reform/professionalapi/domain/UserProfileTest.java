@@ -4,13 +4,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 
-public class UserProfileTest {
+@ExtendWith(MockitoExtension.class)
+class UserProfileTest {
 
     @Test
-    public void test_UserProfile() {
+    void test_UserProfile() {
         String id = UUID.randomUUID().toString();
         String email = "test@email.com";
         String firstName = "fName";

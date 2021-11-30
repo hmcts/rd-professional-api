@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class ProfessionalUserTest {
+@ExtendWith(MockitoExtension.class)
+class ProfessionalUserTest {
 
     @Test
-    public void test_creates_professional_user_correctly() {
+    void test_creates_professional_user_correctly() {
         List<String> roles = new ArrayList<>();
         roles.add("pui-user-manager");
 
@@ -40,7 +43,7 @@ public class ProfessionalUserTest {
     }
 
     @Test
-    public void test_toSuperUser() {
+    void test_toSuperUser() {
         Organisation organisation = new Organisation();
         ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "some-email-address", organisation);

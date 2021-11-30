@@ -8,13 +8,16 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 
-public class PrdEnumServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class PrdEnumServiceImplTest {
 
     private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
     private final PrdEnumId prdEnumId = new PrdEnumId(1, "SIDAM_ROLE");
@@ -24,8 +27,8 @@ public class PrdEnumServiceImplTest {
     private PrdEnumServiceImpl prdEnumService;
 
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         prdEnumService = new PrdEnumServiceImpl(prdEnumRepository);
         PrdEnum anEnum = new PrdEnum(prdEnumId, "PUI_USER_MANAGER", "SIDAM_ROLE");
         PrdEnum anEnumTwo2 = new PrdEnum(prdEnumId2, "caseworker", "CCD_ROLE");
@@ -34,7 +37,7 @@ public class PrdEnumServiceImplTest {
     }
 
     @Test
-    public void test_gets_user_roles_of_user_correctly_other_than_role_type() {
+    void test_gets_user_roles_of_user_correctly_other_than_role_type() {
         when(prdEnumRepository.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
@@ -46,7 +49,7 @@ public class PrdEnumServiceImplTest {
     }
 
     @Test
-    public void test_gets_no_user_roles_of_user_by_admin_role_type() {
+    void test_gets_no_user_roles_of_user_by_admin_role_type() {
 
         List<PrdEnum> prdEnums = new ArrayList<>();
         PrdEnum anEnum = new PrdEnum(prdEnumId3, "PRD-ADMIN", "ADMIN_ROLE");
