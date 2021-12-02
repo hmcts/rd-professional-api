@@ -32,7 +32,7 @@ public class IntegrationTestOidcSecurityConfig extends ContextCleanupListener {
 
     private ClientRegistration clientRegistration() {
         return ClientRegistration.withRegistrationId("oidc")
-                .redirectUriTemplate("{baseUrl}/{action}/oauth2/code/{registrationId}")
+                .redirectUri("{baseUrl}/{action}/oauth2/code/{registrationId}")
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .scope("read:user")
                 .authorizationUri("http://0.0.0.0:6000/o/authorize")

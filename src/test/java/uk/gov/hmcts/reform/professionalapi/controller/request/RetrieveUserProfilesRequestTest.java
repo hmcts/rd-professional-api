@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class RetrieveUserProfilesRequestTest {
 
     private RetrieveUserProfilesRequest retrieveUserProfilesRequest;
-    private String userId = UUID.randomUUID().toString();
+    private final String userId = UUID.randomUUID().toString();
 
     @Test
     void test_RetrieveUserProfilesRequestSetter() {

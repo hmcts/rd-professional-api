@@ -14,9 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class UserProfileCreationRequestTest {
 
-    private String email = "some@hmcts.net";
-    private String firstName = "fName";
-    private String lastName = "lName";
+    private final String email = "some@hmcts.net";
+    private final String firstName = "fName";
+    private final String lastName = "lName";
 
     @Test
     void test_has_mandatory_fields_specified_not_null() {

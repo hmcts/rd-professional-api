@@ -12,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PbaAccountCreationRequestTest {
 
     private PbaAccountCreationRequest pbaAccountCreationRequest;
-    private String pbaNumber = "123456";
-    private String pbaNumber1 = "987654";
+    private final String pbaNumber = "123456";
+    private final String pbaNumber1 = "987654";
 
     @BeforeEach
     void setUp() {
