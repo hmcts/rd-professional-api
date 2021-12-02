@@ -29,7 +29,7 @@ import org.springframework.web.filter.GenericFilterBean;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterBean {
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
