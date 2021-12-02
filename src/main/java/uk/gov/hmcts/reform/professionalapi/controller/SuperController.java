@@ -432,7 +432,8 @@ public abstract class SuperController {
 
         //check the pba account number format, remove any blank strings passed
         //And check if pba belongs to the organisation
-        paymentAccountValidator.validatePaymentAccounts(deletePbaRequest.getPaymentAccounts(), orgId);
+        paymentAccountValidator.validatePaymentAccounts(
+                deletePbaRequest.getPaymentAccounts(), existingOrganisation, true);
 
         //delete the passed pba account numbers from the organisation
         paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
