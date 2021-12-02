@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,7 +75,7 @@ class PaymentAccountValidatorTest {
     @Test
     void test_CheckPbasAreUniqueWithOrgId() {
         assertDoesNotThrow(() ->
-                paymentAccountValidator.checkPbasAreUniqueWithOrgId(singleton("PBA1234567"), ""));
+                paymentAccountValidator.checkPbasAreUniqueWithOrgId(singleton("PBA1234567"), mock(Organisation.class)));
     }
 
     @Test
@@ -82,7 +83,7 @@ class PaymentAccountValidatorTest {
         String pba = "PBA1234567";
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(pba);
-        paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "");
+        paymentAccountValidator.validatePaymentAccounts(paymentAccounts, mock(Organisation.class), false);
     }
 
     @Test
