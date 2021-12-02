@@ -246,7 +246,8 @@ public class OrganisationInternalController extends SuperController {
         if (organisation.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
-        paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
+        paymentAccountValidator.validatePaymentAccounts(
+                pbaEditRequest.getPaymentAccounts(), organisation.get(), false);
 
         PbaResponse response = paymentAccountService
                 .editPaymentAccountsByOrganisation(organisation.get(), pbaEditRequest);
