@@ -23,7 +23,7 @@ class PrdEnumServiceImplTest {
     private final PrdEnumId prdEnumId = new PrdEnumId(1, "SIDAM_ROLE");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(5, "CCD_ROLE");
     private final PrdEnumId prdEnumId3 = new PrdEnumId(4, "ADMIN_ROLE");
-    private List<PrdEnum> prdEnums = new ArrayList<>();
+    private final List<PrdEnum> prdEnums = new ArrayList<>();
     private PrdEnumServiceImpl prdEnumService;
 
 

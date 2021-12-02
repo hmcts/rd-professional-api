@@ -169,7 +169,7 @@ public class ExceptionMapper {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());
     }
 
-    private static Throwable getRootException(Throwable exception) {
+    private Throwable getRootException(Throwable exception) {
         Throwable rootException = exception;
         while (rootException.getCause() != null) {
             rootException = rootException.getCause();
