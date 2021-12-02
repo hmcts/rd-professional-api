@@ -29,7 +29,6 @@ class OrganisationMfaStatusControllerTest {
 
     @Test
     void test_retrieveMfaStatusByUserId() {
-
         mfaStatusResponseEntity = ResponseEntity.status(HttpStatus.OK).body(new MfaStatusResponse());
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String id = UUID.randomUUID().toString();

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 public class ContactInformationResponseWithDxAddress extends ContactInformationResponse {
 
     @JsonProperty
-    private List<DxAddressResponse> dxAddress;
+    private final List<DxAddressResponse> dxAddress;
 
     public ContactInformationResponseWithDxAddress(ContactInformation contactInfo) {
         this.addressLine1 = contactInfo.getAddressLine1();

@@ -18,8 +18,8 @@ class MultipleUserProfilesResponseTest {
 
     private UserProfile userProfile;
     private GetUserProfileResponse getUserProfileResponse;
-    private List<UserProfile> userProfiles = new ArrayList<>();
-    private List<GetUserProfileResponse> getUserProfileResponses = new ArrayList<>();
+    private final List<UserProfile> userProfiles = new ArrayList<>();
+    private final List<GetUserProfileResponse> getUserProfileResponses = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
