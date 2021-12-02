@@ -9,9 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class RoleDeletionResponseTest {
 
-    private String roleName = "Role";
-    private String idamStatusCode = "Code";
-    private String idamMessage = "Message";
+    private final String roleName = "Role";
+    private final String idamStatusCode = "Code";
+    private final String idamMessage = "Message";
 
     @Test
     void test_deleteRoleResponse() {

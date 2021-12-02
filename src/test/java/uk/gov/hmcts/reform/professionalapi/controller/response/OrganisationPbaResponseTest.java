@@ -17,7 +17,7 @@ class OrganisationPbaResponseTest {
 
     private ProfessionalUser professionalUser;
     private Organisation organisation;
-    private ArrayList<SuperUser> users = new ArrayList<>();
+    private final ArrayList<SuperUser> users = new ArrayList<>();
 
     @BeforeEach
     void setUp() {

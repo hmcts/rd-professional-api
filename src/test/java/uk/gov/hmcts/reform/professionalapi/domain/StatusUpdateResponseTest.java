@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StatusUpdateResponseTest {
 
-    private String idamStatusCode = "Coded";
-    private String idamMessage = "Message";
+    private final String idamStatusCode = "Coded";
+    private final String idamMessage = "Message";
 
     @Test
     void test_updateStatusResponse() {

@@ -51,7 +51,6 @@ public class JsonFeignResponseUtil {
             }
         });
 
-
         return responseEntityHeaders;
     }
 }

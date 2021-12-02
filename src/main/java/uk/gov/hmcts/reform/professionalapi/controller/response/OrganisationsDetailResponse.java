@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 public class OrganisationsDetailResponse {
 
     @JsonProperty
-    private List<OrganisationEntityResponse> organisations;
+    private final List<OrganisationEntityResponse> organisations;
 
     public OrganisationsDetailResponse(
             List<Organisation> organisations, Boolean isRequiredContactInfo,

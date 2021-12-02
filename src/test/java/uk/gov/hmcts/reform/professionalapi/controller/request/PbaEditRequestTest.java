@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PbaEditRequestTest {
 
-    private String pbaNumber = "PBA0000001";
+    private final String pbaNumber = "PBA0000001";
 
     @Test
     void test_pbaEditRequestBuilder() {

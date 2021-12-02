@@ -33,11 +33,11 @@ class UserAttributeServiceImplTest {
             null, null, null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname", "some@hmcts.net", organisation);
-    private List<String> userRoles = new ArrayList<>();
-    private List<PrdEnum> prdEnums = new ArrayList<>();
+    private final List<String> userRoles = new ArrayList<>();
+    private final List<PrdEnum> prdEnums = new ArrayList<>();
     private PrdEnum anEnum;
-    private UserAttribute userAttribute = new UserAttribute(professionalUser, anEnum);
-    private List<UserAttribute> userAttributes =  new ArrayList<>();
+    private final UserAttribute userAttribute = new UserAttribute(professionalUser, anEnum);
+    private final List<UserAttribute> userAttributes =  new ArrayList<>();
 
     @BeforeEach
     void setUp() {

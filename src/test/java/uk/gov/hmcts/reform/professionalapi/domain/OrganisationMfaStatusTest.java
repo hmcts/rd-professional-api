@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 class OrganisationMfaStatusTest {
 
     private OrganisationMfaStatus organisationMfaStatus;
-    private Organisation organisation = new Organisation();
+    private final Organisation organisation = new Organisation();
 
     @BeforeEach
     void setUp() {

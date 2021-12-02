@@ -75,11 +75,11 @@ class PaymentAccountServiceImplTest {
             "some-email-address", organisation);
 
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
-    private List<SuperUser> superUsers = new ArrayList<>();
-    private List<PaymentAccount> paymentAccounts = new ArrayList<>();
-    private Set<String> pbas = new HashSet<>();
-    private PbaRequest pbaEditRequest = new PbaRequest();
-    private PbaRequest pbaDeleteRequest = new PbaRequest();
+    private final List<SuperUser> superUsers = new ArrayList<>();
+    private final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+    private final Set<String> pbas = new HashSet<>();
+    private final PbaRequest pbaEditRequest = new PbaRequest();
+    private final PbaRequest pbaDeleteRequest = new PbaRequest();
 
     @BeforeEach
     void setUp() {
