@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class RoleAdditionResponseTest {
 
-    private String idamStatusCode = "Code";
-    private String idamMessage = "Message";
+    private final String idamStatusCode = "Code";
+    private final String idamMessage = "Message";
 
     @Test
     void test_addRoleResponse() {

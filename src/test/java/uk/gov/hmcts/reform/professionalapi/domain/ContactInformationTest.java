@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 class ContactInformationTest {
 
     private ContactInformation contactInformation;
-    private Organisation organisation = new Organisation();
+    private final Organisation organisation = new Organisation();
 
     @BeforeEach
     void setUp() {
