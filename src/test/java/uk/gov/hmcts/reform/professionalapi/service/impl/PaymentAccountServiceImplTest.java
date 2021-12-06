@@ -315,12 +315,12 @@ class PaymentAccountServiceImplTest {
 
     @Test
     void testAcceptOrRejectPbas() {
-        List<PaymentAccount> pbasFromDb = new ArrayList<>();
         PaymentAccount paymentAccount = mock(PaymentAccount.class);
         when(paymentAccount.getPbaNumber()).thenReturn("PBA1234567");
         when(paymentAccount.getPbaStatus()).thenReturn(PENDING);
         PaymentAccount paymentAccount1 = new PaymentAccount("PBA7654321");
         paymentAccount1.setPbaStatus(ACCEPTED);
+        List<PaymentAccount> pbasFromDb = new ArrayList<>();
         pbasFromDb.add(paymentAccount);
         pbasFromDb.add(paymentAccount1);
 

@@ -741,7 +741,8 @@ class ProfessionalUserServiceImplTest {
 
         when(professionalUser.getUserIdentifier()).thenReturn(UUID.randomUUID().toString());
 
-        RetrieveUserProfilesRequest response = professionalUserService.generateRetrieveUserProfilesRequest(professionalUsers);
+        RetrieveUserProfilesRequest response =
+                professionalUserService.generateRetrieveUserProfilesRequest(professionalUsers);
 
         assertThat(response).isNotNull();
         verify(professionalUser, times(1)).getUserIdentifier();
