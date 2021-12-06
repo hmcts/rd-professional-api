@@ -122,7 +122,7 @@ class OrganisationServiceImplTest {
     private final Organisation organisation = new Organisation("some-org-name", null,
             "PENDING", null, null, null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
-            "some-lname", "some@hmcts.net", organisation);
+            "some-lname", "test@test.com", organisation);
     private final PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
     private final ContactInformation contactInformation = new ContactInformation();
     private final DxAddress dxAddress = new DxAddress("dx-number", "dx-exchange",
