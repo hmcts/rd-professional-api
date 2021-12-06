@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
 
@@ -20,7 +21,6 @@ import org.springframework.http.HttpMethod;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -254,7 +254,7 @@ public class ProfessionalReferenceDataClient {
         ResponseEntity<Map> responseEntity;
         HttpHeaders httpHeaders = null;
         try {
-            if (StringUtils.isEmpty(userId)) {
+            if (isEmpty(userId)) {
                 httpHeaders = getMultipleAuthHeaders(role);
             } else {
                 httpHeaders = getMultipleAuthHeaders(role, userId);

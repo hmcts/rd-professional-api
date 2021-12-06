@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class ContactInformationResponseWithDxAddressTest {
 
     @Test
     void testGetContactInformationResponse() {
-        List<DxAddress> dxAddressList = singletonList(new DxAddress());
+        List<DxAddress> dxAddressList = Arrays.asList(new DxAddress());
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);

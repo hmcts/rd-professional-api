@@ -138,7 +138,7 @@ class OrganisationServiceImplTest {
     private final PaymentAccountValidator paymentAccountValidator
             = new PaymentAccountValidator(paymentAccountRepositoryMock);
 
-    private UserAttribute userAttribute = new UserAttribute();
+    private final UserAttribute userAttribute = new UserAttribute();
     private UserCreationRequest superUserCreationRequest;
     private DxAddressCreationRequest dxAddressRequest;
     private ContactInformationCreationRequest contactInformationCreationRequest;
@@ -149,8 +149,8 @@ class OrganisationServiceImplTest {
     private List<DxAddressCreationRequest> dxAddressRequests;
     private List<PaymentAccount> paymentAccounts;
     private List<UserAccountMap> userAccountMaps;
-    private List<String> userRoles = new ArrayList<>();
-    private List<PrdEnum> prdEnums = new ArrayList<>();
+    private final List<String> userRoles = new ArrayList<>();
+    private final List<PrdEnum> prdEnums = new ArrayList<>();
     private List<UserAttribute> userAttributes;
     private List<String> jurisdictionIds;
     Set<String> paymentAccountList;

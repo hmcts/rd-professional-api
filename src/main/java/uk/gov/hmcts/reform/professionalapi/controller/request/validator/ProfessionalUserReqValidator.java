@@ -29,7 +29,7 @@ public class ProfessionalUserReqValidator {
         }
     }
 
-    public static void validateUserStatus(String status) {
+    public void validateUserStatus(String status) {
         try {
             IdamStatus.valueOf(status.toUpperCase());
         } catch (Exception ex) {
