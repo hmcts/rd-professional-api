@@ -96,7 +96,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@test.com"))
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
@@ -132,7 +132,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
         ProfessionalUser professionalUser = setUpProfessionalUser();
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@test.com"))
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
         when(organisationRepository.findByStatus(ACTIVE)).thenReturn(asList(organisation));
 
