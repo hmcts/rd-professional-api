@@ -534,8 +534,8 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get(ORG_IDENTIFIER)).isEqualTo(orgIdentifierResponse);
 
         Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
-        assertThat(superUser.get("firstName")).isEqualTo("donatello");
-        assertThat(superUser.get("lastName")).isEqualTo("raphael");
+        assertThat(superUser.get("firstName")).isEqualTo("testFn");
+        assertThat(superUser.get("lastName")).isEqualTo("testLn");
         assertThat(superUser.get("email")).isEqualTo("dummy@email.com");
 
     }
