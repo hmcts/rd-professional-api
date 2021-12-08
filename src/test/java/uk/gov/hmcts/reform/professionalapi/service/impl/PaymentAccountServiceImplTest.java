@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS_UPDATE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_NOT_IN_ORG;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_INVALID;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.PbaUpdateStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -205,7 +206,7 @@ class PaymentAccountServiceImplTest {
     void testGenerateListOfAccountsToDelete() {
         ProfessionalUser prefU = new ProfessionalUser("Con", "Hal",
                 "email@gmail.com", organisation);
-        List<UserAccountMapId> listUserMap = new ArrayList<>();
+        List<UserAccountMapId> listUserMap;
         assertThat(sut.generateListOfAccountsToDelete(prefU, paymentAccounts)).isNotNull();
         listUserMap = sut.generateListOfAccountsToDelete(prefU, paymentAccounts);
         assertThat(listUserMap.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
@@ -267,14 +268,14 @@ class PaymentAccountServiceImplTest {
         String orgId = UUID.randomUUID().toString();
         List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
-        pbaRequestList.add(new PbaUpdateRequest("PBA1234567", ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaUpdateRequest("PBA1234567", "REJUCTED", ""));
 
         UpdatePbaStatusResponse response = sut.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, orgId);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(422);
         assertThat(response.getPartialSuccessMessage()).isNull();
-        assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage()).contains(ERROR_MSG_PBA_NOT_IN_ORG);
+        assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage()).contains(ERROR_MSG_STATUS_INVALID);
     }
 
     @Test
@@ -292,6 +293,48 @@ class PaymentAccountServiceImplTest {
 
         verify(paymentAccountRepositoryMock, times(1)).saveAll(pbasToSave);
         verify(paymentAccountRepositoryMock, times(1)).deleteAll(pbasToDelete);
+    }
 
+    @Test
+    void testGetStatusMessageFromRequest_StatusMessageNull() {
+        PbaUpdateRequest pbaUpdateRequest = new PbaUpdateRequest("PBA123", "ACCEPTED", null);
+
+        String message = sut.getStatusMessageFromRequest(pbaUpdateRequest);
+
+        assertThat(message).isEmpty();
+    }
+
+    @Test
+    void testGetStatusMessageFromRequest_StatusMessageNotNull() {
+        PbaUpdateRequest pbaUpdateRequest = new PbaUpdateRequest("PBA123", "ACCEPTED", "MESSAGE");
+
+        String message = sut.getStatusMessageFromRequest(pbaUpdateRequest);
+
+        assertThat(message).isEqualTo("MESSAGE");
+    }
+
+    @Test
+    void testAcceptOrRejectPbas() {
+        PaymentAccount paymentAccount = mock(PaymentAccount.class);
+        when(paymentAccount.getPbaNumber()).thenReturn("PBA1234567");
+        when(paymentAccount.getPbaStatus()).thenReturn(PENDING);
+        PaymentAccount paymentAccount1 = new PaymentAccount("PBA7654321");
+        paymentAccount1.setPbaStatus(ACCEPTED);
+        List<PaymentAccount> pbasFromDb = new ArrayList<>();
+        pbasFromDb.add(paymentAccount);
+        pbasFromDb.add(paymentAccount1);
+
+        List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
+        PbaUpdateRequest pbaUpdateRequest = new PbaUpdateRequest("PBA1234567", "ACCEPTED", "ACCEPTED STATUS");
+        pbaRequestList.add(pbaUpdateRequest);
+        PbaUpdateRequest pbaUpdateRequest1 = new PbaUpdateRequest("PBA7654321", "REJECTED", "");
+        pbaRequestList.add(pbaUpdateRequest1);
+
+        List<PbaUpdateStatusResponse> response = sut.acceptOrRejectPbas(pbasFromDb, pbaRequestList, new ArrayList<>());
+
+        assertThat(response).isNotNull();
+        verify(paymentAccount, times(1)).setPbaStatus(ACCEPTED);
+        verify(paymentAccount, times(1)).setStatusMessage("ACCEPTED STATUS");
+        verify(paymentAccountRepositoryMock, times(1)).deleteAll(any());
     }
 }
