@@ -97,13 +97,8 @@ public class PaymentAccountValidator {
 
         org.getPaymentAccounts().forEach(pba -> orgPbas.add(pba.getPbaNumber()));
 
-        List<String> nonOrgPbas = new ArrayList<>();
-
-        upperCasePbas.forEach(pba -> {
-            if (!orgPbas.contains(pba)) {
-                nonOrgPbas.add(pba);
-            }
-        });
+        List<String> nonOrgPbas =
+                upperCasePbas.stream().filter(pba -> !orgPbas.contains(pba)).collect(Collectors.toList());
 
         if (!nonOrgPbas.isEmpty()) {
             throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", nonOrgPbas)
