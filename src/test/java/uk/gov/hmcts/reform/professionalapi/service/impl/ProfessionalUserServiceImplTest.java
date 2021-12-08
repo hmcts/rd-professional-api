@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -730,6 +731,21 @@ class ProfessionalUserServiceImplTest {
         callModifyRolesForUser(HttpStatus.BAD_REQUEST);
         verify(feignExceptionMock, times(2)).status();
 
+    }
+
+    @Test
+    void test_generateRetrieveUserProfilesRequest() {
+        List<ProfessionalUser> professionalUsers = new ArrayList<>();
+        ProfessionalUser professionalUser = mock(ProfessionalUser.class);
+        professionalUsers.add(professionalUser);
+
+        when(professionalUser.getUserIdentifier()).thenReturn(UUID.randomUUID().toString());
+
+        RetrieveUserProfilesRequest response =
+                professionalUserService.generateRetrieveUserProfilesRequest(professionalUsers);
+
+        assertThat(response).isNotNull();
+        verify(professionalUser, times(1)).getUserIdentifier();
     }
 
     void callModifyRolesForUser(HttpStatus status) {
