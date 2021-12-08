@@ -14,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
@@ -277,7 +278,21 @@ class OrganisationServiceImplTest {
 
         sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock, false, true);
 
-        verify(organisationMock, times(1)).addPaymentAccount(any(PaymentAccount.class));
+        sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock, false, false);
+
+        verify(organisationMock, times(2)).addPaymentAccount(any(PaymentAccount.class));
+    }
+
+    @Test
+    void test_updatePaymentAccounts() {
+        List<PaymentAccount> pbas = new ArrayList<>();
+        PaymentAccount pba = mock(PaymentAccount.class);
+        pbas.add(pba);
+
+        sut.updatePaymentAccounts(pbas);
+
+        verify(pba, times(1)).setPbaStatus(ACCEPTED);
+        verify(pba, times(1)).setStatusMessage(PBA_STATUS_MESSAGE_AUTO_ACCEPTED);
     }
 
     @Test

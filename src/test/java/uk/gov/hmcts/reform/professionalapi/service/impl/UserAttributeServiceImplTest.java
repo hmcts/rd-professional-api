@@ -67,7 +67,7 @@ class UserAttributeServiceImplTest {
 
         List<UserAttribute> userAttributeResponse = sut.addUserAttributesToSuperUser(professionalUser, userAttributes);
 
-        assertThat(userAttributeResponse).isNotNull();
+        assertThat(userAttributeResponse).isNotNull().isNotEmpty();
         assertThat(professionalUser.getUserAttributes()).isNotNull();
         verify(userAttributeRepositoryMock, times(1)).saveAll(any());
     }

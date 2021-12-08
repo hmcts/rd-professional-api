@@ -180,7 +180,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return professionalUsers;
     }
 
-    private RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(List<ProfessionalUser> professionalUsers) {
+    public RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(List<ProfessionalUser> professionalUsers) {
         List<String> usersId = new ArrayList<>();
 
         professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
