@@ -26,7 +26,7 @@ public class OrganisationFixtures {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(randomAlphanumeric(7).concat("@hmcts.net"))
+                        .email(randomAlphanumeric(7).concat("@test.com"))
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build()));
