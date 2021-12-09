@@ -20,9 +20,9 @@ class ProfessionalUsersEntityResponseTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_ProfessionalUsersEntityResponse() throws Exception {
-        final String dummyFirstName = "Joe";
-        final String dummyLastName = "Bloggs";
-        final String dummyEmail = "joe.bloggs@email.com";
+        final String dummyFirstName = "testFn";
+        final String dummyLastName = "testLn";
+        final String dummyEmail = "test@test.com";
 
         ProfessionalUser professionalUser = new ProfessionalUser(dummyFirstName, dummyLastName, dummyEmail,
                 new Organisation());

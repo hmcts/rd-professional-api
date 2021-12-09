@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class UserProfileCreationRequestTest {
 
-    private final String email = "some@hmcts.net";
+    private final String email = "test@test.com";
     private final String firstName = "fName";
     private final String lastName = "lName";
 
@@ -25,9 +25,9 @@ class UserProfileCreationRequestTest {
         UserProfileCreationRequest userProfileCreationRequest = new UserProfileCreationRequest(email, firstName,
                 lastName, EN, PROFESSIONAL, EXTERNAL, roles, false);
 
-        userProfileCreationRequest.setEmail("somebody@hmcts.net");
+        userProfileCreationRequest.setEmail("test@test.com");
 
-        assertThat(userProfileCreationRequest.getEmail()).isEqualTo("somebody@hmcts.net");
+        assertThat(userProfileCreationRequest.getEmail()).isEqualTo("test@test.com");
         assertThat(userProfileCreationRequest.getFirstName()).isEqualTo(firstName);
         assertThat(userProfileCreationRequest.getLastName()).isEqualTo(lastName);
         assertThat(userProfileCreationRequest.getLanguagePreference()).isEqualTo(EN);
