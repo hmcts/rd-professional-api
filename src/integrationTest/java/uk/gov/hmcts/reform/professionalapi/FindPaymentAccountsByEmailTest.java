@@ -269,8 +269,8 @@ class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest
         Map<String, Object> activeOrganisation = (Map<String, Object>) orgResponse.get("organisationEntityResponse");
 
         Map<String, Object> superUser = ((Map<String, Object>) activeOrganisation.get("superUser"));
-        assertThat(superUser.get("firstName")).isEqualTo("donatello");
-        assertThat(superUser.get("lastName")).isEqualTo("raphael");
+        assertThat(superUser.get("firstName")).isEqualTo("testFn");
+        assertThat(superUser.get("lastName")).isEqualTo("testLn");
         assertThat(superUser.get("email")).isEqualTo("dummy@email.com");
     }
 }
