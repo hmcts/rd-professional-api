@@ -96,7 +96,7 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
         HashMap professionalUsersResponse = professionalUsersResponses.get(2);
 
         assertThat(professionalUsersResponse.get(USER_IDENTIFIER)).isNotNull();
-        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("leonardo");
+        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("testFn");
         assertThat(professionalUsersResponse.get("lastName")).isEqualTo("O");
         assertThat(professionalUsersResponse.get("email")).isEqualTo("dummy@email.com");
         assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo("DELETED");

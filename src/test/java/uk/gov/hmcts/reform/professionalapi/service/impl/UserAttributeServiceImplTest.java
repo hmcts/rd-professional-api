@@ -32,7 +32,7 @@ class UserAttributeServiceImplTest {
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
             null, null, null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
-            "some-lname", "some@hmcts.net", organisation);
+            "some-lname", "test@test.com", organisation);
     private final List<String> userRoles = new ArrayList<>();
     private final List<PrdEnum> prdEnums = new ArrayList<>();
     private PrdEnum anEnum;
