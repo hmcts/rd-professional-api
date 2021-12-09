@@ -449,7 +449,7 @@ class SuperControllerTest {
     @Test
     void testGetUserEmailUsesParamEmailWhenHeaderEmailNull() {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        String email = "adil@praveen.com";
+        String email = "test@test.com";
 
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(null);

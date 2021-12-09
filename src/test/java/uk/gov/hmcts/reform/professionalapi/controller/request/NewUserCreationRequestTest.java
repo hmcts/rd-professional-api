@@ -30,9 +30,9 @@ class NewUserCreationRequestTest {
 
     @Test
     void test_newUserCreationBuilder() {
-        String testFirstName = "Jane";
-        String testLastName = "Doe";
-        String testEmail = "jane.doe@email.com";
+        String testFirstName = "testFn";
+        String testLastName = "testLn";
+        String testEmail = "test@test.com";
         List<String> testRoles = new ArrayList<>();
         testRoles.add("a role");
 

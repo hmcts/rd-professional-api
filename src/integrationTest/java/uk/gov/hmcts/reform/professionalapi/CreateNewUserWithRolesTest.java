@@ -338,7 +338,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(orgIdentifierResponse,
-                        inviteUserCreationRequest("a.adison@email.com", userRoles), hmctsAdmin,
+                        inviteUserCreationRequest("test@test.com", userRoles), hmctsAdmin,
                         userIdentifier);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("201 CREATED");
