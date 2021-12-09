@@ -28,9 +28,9 @@ class UserCreationRequestTest {
 
     @Test
     void test_ThatUserCreationIsChangedByBuilder() {
-        String firstName2 = "Jane";
-        String lastName2 = "Doe";
-        String email2 = "jane.doe@email.com";
+        String firstName2 = "testFn";
+        String lastName2 = "testLn";
+        String email2 = "test@test.com";
 
         UserCreationRequest testUserCreationRequest = UserCreationRequest.aUserCreationRequest()
                 .firstName(firstName2)
