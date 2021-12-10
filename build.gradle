@@ -40,7 +40,8 @@ def versions = [
         pact_version       : '4.1.7',
         launchDarklySdk    : "5.2.2",
         junit           : '5.8.1',
-        junitPlatform   : '1.8.1'
+        junitPlatform   : '1.8.1',
+        log4j              : '2.15.0'
 ]
 
 
@@ -337,14 +338,16 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '7.10.0'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
-
     implementation group: 'com.google.guava', name: 'guava', version: '30.0-jre'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
     implementation group:"org.yaml", name: "snakeyaml", version:"1.27"
+    
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
+    implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
