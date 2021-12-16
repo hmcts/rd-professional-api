@@ -404,7 +404,7 @@ dependencies {
     testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: '3.0.2'
     testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: '3.0.2'
     testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-    testImplementation 'io.github.openfeign:feign-jackson:11.2'
+    testImplementation 'io.github.openfeign:feign-jackson:11.7'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.0.2'
