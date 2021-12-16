@@ -378,7 +378,7 @@ dependencies {
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: '4.2.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: '4.4.0'
 
     testImplementation group: 'com.h2database', name: 'h2'
 
