@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.6")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.34")
     }
 }
 
@@ -305,7 +305,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.2'
 
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.5'
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
     implementation(group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
@@ -373,12 +373,12 @@ dependencies {
     testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.11.2'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.2.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.3.3'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: '4.2.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: '4.4.0'
 
     testImplementation group: 'com.h2database', name: 'h2'
 
@@ -402,14 +402,14 @@ dependencies {
     }
 
     testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: '3.0.2'
-    testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: '3.0.2'
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: '3.1.10'
     testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-    testImplementation 'io.github.openfeign:feign-jackson:11.2'
+    testImplementation 'io.github.openfeign:feign-jackson:11.7'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.0.2'
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
 
-    testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.15'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.9'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.15'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.15'
     testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
@@ -419,7 +419,7 @@ dependencies {
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
 
-    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.2.14'
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.3.2'
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.2.14'
 
     functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
