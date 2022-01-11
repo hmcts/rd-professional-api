@@ -29,7 +29,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 public class ContactInformation implements Serializable {
 
-    @Column(name="uprn")
+    @Column(name = "uprn")
     @Size(max = 14)
     private String uprn;
 
