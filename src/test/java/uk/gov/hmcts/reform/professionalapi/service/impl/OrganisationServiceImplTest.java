@@ -328,6 +328,7 @@ class OrganisationServiceImplTest {
         sut.setNewContactInformationFromRequest(contactInformationMock, contactInformationCreationRequest,
                 organisationMock);
 
+        verify(contactInformationMock, times(1)).setUprn(any(String.class));
         verify(contactInformationMock, times(1)).setAddressLine1(any(String.class));
         verify(contactInformationMock, times(1)).setAddressLine2(any(String.class));
         verify(contactInformationMock, times(1)).setAddressLine3(any(String.class));

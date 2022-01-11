@@ -196,6 +196,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
         List<ContactInformation> contactInformations = persistedOrganisation.getContactInformations();
         ContactInformation contactInformation = contactInformations.get(0);
+        assertThat(contactInformation.getUprn()).isEqualTo("uprn");
         assertThat(contactInformation.getAddressLine1()).isEqualTo("addressLine1");
         assertThat(contactInformation.getAddressLine2()).isEqualTo("addressLine2");
         assertThat(contactInformation.getAddressLine3()).isEqualTo("addressLine3");

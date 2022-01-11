@@ -21,6 +21,7 @@ class ContactInformationResponseWithDxAddressTest {
     final String expectCounty = "City of London";
     final String expectCountry = "England";
     final String expectTownCity = "London";
+    final String uprn = "uprn";
 
     @Test
     void testGetContactInformationResponse() {
@@ -35,6 +36,7 @@ class ContactInformationResponseWithDxAddressTest {
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
         contactInformation.setDxAddresses(dxAddressList);
+        contactInformation.setUprn(uprn);
 
         ContactInformationResponseWithDxAddress sut = new ContactInformationResponseWithDxAddress(contactInformation);
 
@@ -46,11 +48,13 @@ class ContactInformationResponseWithDxAddressTest {
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
         assertThat(sut.getDxAddress()).isNotEmpty();
+        assertThat(sut.getUprn()).isEqualTo(uprn);
     }
 
     @Test
     void testGetContactInformationResponseWithDxAddress() {
         ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn(uprn);
         contactInformation.setAddressLine1(expectAddress1);
         contactInformation.setAddressLine2(expectAddress2);
         contactInformation.setAddressLine3(expectAddress3);
@@ -61,6 +65,7 @@ class ContactInformationResponseWithDxAddressTest {
 
         ContactInformationResponseWithDxAddress sut = new ContactInformationResponseWithDxAddress(contactInformation);
 
+        assertThat(sut.getUprn()).isEqualTo(uprn);
         assertThat(sut.getAddressLine1()).isEqualTo(expectAddress1);
         assertThat(sut.getAddressLine2()).isEqualTo(expectAddress2);
         assertThat(sut.getAddressLine3()).isEqualTo(expectAddress3);
