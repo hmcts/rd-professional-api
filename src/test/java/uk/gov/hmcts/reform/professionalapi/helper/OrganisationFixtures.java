@@ -74,6 +74,7 @@ public class OrganisationFixtures {
                 .country("country")
                 .county("county")
                 .townCity("town-city")
+                .uprn("uprn")
                 .postCode("some-post-code")
                     .dxAddress(Arrays.asList(dxAddressCreationRequest()
                         .dxNumber("DX 1234567890")
