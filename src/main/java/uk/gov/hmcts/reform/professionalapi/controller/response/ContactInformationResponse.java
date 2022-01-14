@@ -5,10 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @NoArgsConstructor
 @Getter
 public class ContactInformationResponse {
 
+    @JsonProperty
+    protected UUID addressId;
+    @JsonProperty
+    protected String uprn;
+    @JsonProperty
+    protected LocalDateTime created;
     @JsonProperty
     protected String addressLine1;
     @JsonProperty
@@ -25,6 +34,9 @@ public class ContactInformationResponse {
     protected String postCode;
 
     public ContactInformationResponse(ContactInformation contactInfo) {
+        this.addressId = contactInfo.getId();
+        this.uprn = "";
+        this.created = contactInfo.getCreated();
         this.addressLine1 = contactInfo.getAddressLine1();
         this.addressLine2 = contactInfo.getAddressLine2();
         this.addressLine3 = contactInfo.getAddressLine3();
