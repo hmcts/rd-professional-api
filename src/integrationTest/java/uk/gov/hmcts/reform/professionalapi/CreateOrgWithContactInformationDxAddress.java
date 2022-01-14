@@ -397,7 +397,8 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
                         .lastName(" some-lname ")
                         .email(" someone@somewhere.com ")
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1(" addressLine1 ")
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().uprn("uprn")
+                        .addressLine1(" addressLine1 ")
                         .addressLine2(" ad  2 ").addressLine3(" ad3 ")
                         .country(" Ireland ")
                         .county(" Laois ")
@@ -429,6 +430,7 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
 
         List<ContactInformation> contactInformation = persistedOrganisation.getContactInformations();
 
+        assertThat(contactInformation.get(0).getUprn()).isEqualTo("uprn");
         assertThat(contactInformation.get(0).getAddressLine1()).isEqualTo("addressLine1");
         assertThat(contactInformation.get(0).getAddressLine2()).isEqualTo("ad 2");
         assertThat(contactInformation.get(0).getAddressLine3()).isEqualTo("ad3");

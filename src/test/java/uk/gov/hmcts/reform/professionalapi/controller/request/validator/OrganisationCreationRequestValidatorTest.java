@@ -148,7 +148,7 @@ class OrganisationCreationRequestValidatorTest {
     @Test
     void test_requestContactInformation() {
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("", null, null,
+                = new ContactInformationCreationRequest(null,"", null, null,
                 null, null, null, null, null);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
@@ -164,7 +164,7 @@ class OrganisationCreationRequestValidatorTest {
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                = new ContactInformationCreationRequest("A","A", "A", "A", "A",
                 "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
@@ -179,7 +179,7 @@ class OrganisationCreationRequestValidatorTest {
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                = new ContactInformationCreationRequest("A","A", "A", "A", "A",
                 "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
@@ -191,7 +191,7 @@ class OrganisationCreationRequestValidatorTest {
         List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
         dxList1.add(dxRequest1);
         ContactInformationCreationRequest contactInfoCreateRequest1
-                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                = new ContactInformationCreationRequest("A","A", "A", "A", "A",
                 "A", "A", "A", dxList1);
         List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
         contactList1.add(contactInfoCreateRequest1);
@@ -207,7 +207,7 @@ class OrganisationCreationRequestValidatorTest {
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("A", "A", "A",
+                = new ContactInformationCreationRequest("A","A", "A", "A",
                 "A", "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
@@ -220,7 +220,7 @@ class OrganisationCreationRequestValidatorTest {
         List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
         dxList1.add(dxRequest1);
         ContactInformationCreationRequest contactInfoCreateRequest1
-                = new ContactInformationCreationRequest("A", "A", "A",
+                = new ContactInformationCreationRequest("A","A", "A", "A",
                 "A", "A", "A", "A", dxList1);
         List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
         contactList1.add(contactInfoCreateRequest1);
@@ -236,7 +236,7 @@ class OrganisationCreationRequestValidatorTest {
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("A", "A", "A",
+                = new ContactInformationCreationRequest("A","A", "A", "A",
                 "A", "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
