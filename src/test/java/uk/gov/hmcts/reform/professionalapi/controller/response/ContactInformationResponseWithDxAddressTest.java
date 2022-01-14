@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +22,7 @@ class ContactInformationResponseWithDxAddressTest {
     final String expectCounty = "City of London";
     final String expectCountry = "England";
     final String expectTownCity = "London";
+    final LocalDateTime created = LocalDateTime.now();
 
     @Test
     void testGetContactInformationResponse() {
@@ -34,6 +36,7 @@ class ContactInformationResponseWithDxAddressTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
+        contactInformation.setCreated(created);
         contactInformation.setDxAddresses(dxAddressList);
 
         ContactInformationResponseWithDxAddress sut = new ContactInformationResponseWithDxAddress(contactInformation);
@@ -46,6 +49,7 @@ class ContactInformationResponseWithDxAddressTest {
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
         assertThat(sut.getDxAddress()).isNotEmpty();
+        assertThat(sut.getCreated()).isEqualTo(created);
     }
 
     @Test
@@ -58,6 +62,7 @@ class ContactInformationResponseWithDxAddressTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
+        contactInformation.setCreated(created);
 
         ContactInformationResponseWithDxAddress sut = new ContactInformationResponseWithDxAddress(contactInformation);
 
@@ -68,6 +73,7 @@ class ContactInformationResponseWithDxAddressTest {
         assertThat(sut.getCounty()).isEqualTo(expectCounty);
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
+        assertThat(sut.getCreated()).isEqualTo(created);
         assertThat(sut.getDxAddress()).isEmpty();
     }
 }
