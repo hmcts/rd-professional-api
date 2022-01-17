@@ -34,15 +34,15 @@ public class ContactInformationResponse {
     protected String postCode;
 
     public ContactInformationResponse(ContactInformation contactInfo) {
-        this.addressId = contactInfo.getId();
-        this.uprn = contactInfo.getUprn();
-        this.created = contactInfo.getCreated();
         this.addressLine1 = contactInfo.getAddressLine1();
         this.addressLine2 = contactInfo.getAddressLine2();
         this.addressLine3 = contactInfo.getAddressLine3();
         this.townCity = contactInfo.getTownCity();
         this.county = contactInfo.getCounty();
         this.country = contactInfo.getCountry();
+        this.addressId = contactInfo.getId();
+        this.uprn = contactInfo.getUprn();
+        this.created = contactInfo.getCreated();
         this.postCode = contactInfo.getPostCode();
     }
 }
