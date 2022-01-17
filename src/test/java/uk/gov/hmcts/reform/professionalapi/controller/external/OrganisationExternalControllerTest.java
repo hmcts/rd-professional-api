@@ -26,6 +26,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -35,10 +37,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -69,10 +75,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference.EN;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationExternalControllerTest {
@@ -376,5 +384,49 @@ class OrganisationExternalControllerTest {
         verify(organisationServiceMock, times(1))
                 .addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
 
+    }
+
+    @Test
+    void should_add_contact_informations_to_organisation() {
+
+        //Create contractinformation requests
+         List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
+         List<DxAddressCreationRequest> dxAddressRequests = new ArrayList<>();
+
+        DxAddressCreationRequest dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
+        dxAddressRequests.add(dxAddressRequest);
+
+        ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest("uprn","addressLine-1",
+                "addressLine-2", "addressLine-3", "townCity", "county",
+                "country", "postCode", dxAddressRequests);
+
+        contactInformationCreationRequests.add(contactInformationCreationRequest);
+        List <ContactInformationResponseWithDxAddress> result = new ArrayList<>();
+       // ContactInformationResponseWithDxAddress contactInformationResponseWithDxAddress = new ContactInformationResponseWithDxAddress();
+
+
+        final String orgUUId = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        ContactInformationEntityResponse contactInformationEntityResponse = new ContactInformationEntityResponse();
+        contactInformationEntityResponse.setContactInformationsResponse(result);
+
+        when(organisationServiceMock.addContactInformationsToOrganisation(contactInformationCreationRequests,orgUUId))
+                .thenReturn(contactInformationEntityResponse);
+
+        Organisation organisationMock = mock(Organisation.class);
+        //organisationMock.setId(orgUUId);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgUUId)).thenReturn(organisationMock);
+
+
+        ResponseEntity<?> actual = organisationExternalController
+                .addContactInformationsToOrganisation(contactInformationCreationRequests,orgUUId);
+        verify(organisationServiceMock,times(1)).getOrganisationByOrgIdentifier(anyString());
+
+       // verify(organisationCreationRequestValidatorMock, times(1))
+                //.validate(any(OrganisationCreationRequest.class));
+       // verify(organisationServiceMock, times(1))
+       //         .createOrganisationFrom(organisationCreationRequest);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 }

@@ -57,6 +57,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -268,6 +270,31 @@ public class OrganisationServiceImpl implements OrganisationService {
         return contactInformation;
     }
 
+
+    public ContactInformation createContactInformation(ContactInformationCreationRequest contactInfo) {
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
+        contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
+        contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
+        contactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
+        contactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
+        contactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
+        contactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
+        //contactInformation.setOrganisation(organisation);
+        //CreatedxAddress entity
+        List<DxAddressCreationRequest> dxAddressCreationRequest = contactInfo.getDxAddress();
+
+        List<DxAddress> dxAddresses = new ArrayList<>();
+        dxAddressCreationRequest.forEach(dxAdd -> {
+            DxAddress dxAddress = new DxAddress(
+                    RefDataUtil.removeEmptySpaces(dxAdd.getDxNumber()),
+                    RefDataUtil.removeEmptySpaces(dxAdd.getDxExchange()),
+                    contactInformation);
+            dxAddresses.add(dxAddress);
+        });
+        contactInformation.getDxAddresses().addAll(dxAddresses);
+        return contactInformation;
+    }
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
                                                   ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
@@ -551,6 +578,36 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
         return getResponse(unsuccessfulPbas.getLeft(),
                 unsuccessfulPbas.getRight(), pbaRequest.getPaymentAccounts());
+
+    }
+
+    @Override
+    public ContactInformationEntityResponse addContactInformationsToOrganisation(List<ContactInformationCreationRequest> contactInformationCreationRequests, String organisationIdentifier) {
+        Optional<Organisation> organisation = Optional.ofNullable(
+                getOrganisationByOrgIdentifier(organisationIdentifier));
+
+        if (organisation.isEmpty()) {
+            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
+        }
+
+        validateOrganisationIsActive(organisation.get());
+        List<ContactInformation> contactInformations = contactInformationCreationRequests.stream().
+                map(this::createContactInformation).
+                collect(Collectors.toList());
+        List<ContactInformation> contactInformationsResult = contactInformationRepository.saveAll(contactInformations);
+
+        //Save contactInformation and then dxAddress
+        List <ContactInformationResponseWithDxAddress> result = contactInformationsResult.stream()
+                .map(ContactInformationResponseWithDxAddress::new).collect(Collectors.toList());
+
+        return createContactInformationEntityResponse(result);
+    }
+
+    private ContactInformationEntityResponse createContactInformationEntityResponse( List <ContactInformationResponseWithDxAddress> contactInfomations){
+        ContactInformationEntityResponse contactInformationEntityResponse = new ContactInformationEntityResponse();
+        contactInformationEntityResponse.setContactInformationsResponse(contactInfomations);
+        return contactInformationEntityResponse;
 
     }
 

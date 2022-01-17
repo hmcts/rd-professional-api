@@ -59,6 +59,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -1106,6 +1108,40 @@ class OrganisationServiceImplTest {
         assertThat(response.getReason()).isNotNull();
         assertThat(response.getMessage()).isEqualTo(ERROR_MSG_PARTIAL_SUCCESS);
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+    }
+
+    @Test
+    void should_add_contact_informations_to_organisation() {
+        Organisation organisationMock = mock(Organisation.class);
+        final String orgUUId = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        //organisationMock.setId(orgUUId);
+        when(organisationRepository.findByOrganisationIdentifier(orgUUId)).thenReturn(organisationMock);
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+
+        //Create contractinformation requests
+
+        dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
+        dxAddressRequests.add(dxAddressRequest);
+
+        contactInformationCreationRequest = new ContactInformationCreationRequest("uprn","addressLine-1",
+                "addressLine-2", "addressLine-3", "townCity", "county",
+                "country", "postCode", dxAddressRequests);
+
+        contactInformationCreationRequests.add(contactInformationCreationRequest);
+
+
+
+        //  OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier, false);
+        ContactInformationEntityResponse result = sut.addContactInformationsToOrganisation(contactInformationCreationRequests, orgUUId);
+        assertThat(result).isNotNull();
+        //  List <ContactInformationResponseWithDxAddress> addContactInformationsToOrganisation
+
+        verify(organisationRepository, times(1))
+                .findByOrganisationIdentifier(orgUUId);
+        verify(contactInformationRepositoryMock, times(1)).saveAll(anyList());
+       // verify(dxAddressRepositoryMock, times(2)).save(any(DxAddress.class));
+        //verify(organisationMock, times(2)).getStatus();
+        //verify(organisationMock, times(1)).setUsers(anyList());
     }
 
 

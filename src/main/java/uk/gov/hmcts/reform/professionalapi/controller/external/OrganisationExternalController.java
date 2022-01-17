@@ -13,10 +13,13 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 import java.util.List;
+import java.util.Optional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -34,9 +37,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -423,6 +429,62 @@ public class OrganisationExternalController extends SuperController {
 
         return organisationService.addPaymentAccountsToOrganisation(pbaRequest, organisationIdentifier, userId);
 
+    }
+
+    @ApiOperation(
+            value = "Adds contact informations(address details) to organisation",
+            notes = "**IDAM Roles to access API**: \n No role restriction",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "The Organisation Identifier of the created Organisation",
+                    response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request has been provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @PostMapping(
+            path = "/{orgId}/addresses",
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    public ResponseEntity<ContactInformationEntityResponse> addContactInformationsToOrganisation(
+            @Valid @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        //Received request to create a new organisation for external user
+       // return createOrganisationFrom(organisationCreationRequest);
+        Optional<Organisation> organisation = Optional.ofNullable(organisationService
+                .getOrganisationByOrgIdentifier(organisationIdentifier));
+
+        if (organisation.isEmpty()) {
+            throw new EmptyResultDataAccessException(1);
+        }
+      //TODO apply business validation
+
+        ContactInformationEntityResponse contactInformationsResponse = organisationService.
+                addContactInformationsToOrganisation(contactInformationCreationRequests, organisationIdentifier);
+
+        //Received response to create a new organisation
+        return ResponseEntity
+                .status(201)
+                .body(contactInformationsResponse);
     }
 
 }

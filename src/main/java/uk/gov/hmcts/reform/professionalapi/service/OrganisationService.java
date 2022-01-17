@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -47,4 +50,8 @@ public interface OrganisationService {
 
     ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaRequest pbaRequest,
                                                             String organisationIdentifier, String userId);
+    ContactInformationEntityResponse addContactInformationsToOrganisation(List<ContactInformationCreationRequest> contactInformationCreationRequest,
+                                                                          String organisationIdentifier);
+
+
 }
