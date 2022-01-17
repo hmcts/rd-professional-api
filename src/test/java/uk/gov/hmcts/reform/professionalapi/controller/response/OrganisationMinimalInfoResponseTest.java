@@ -27,7 +27,6 @@ class OrganisationMinimalInfoResponseTest {
     @BeforeEach
     void setUp() {
         contactInformation.setAddressLine1("addressLine1");
-        contactInformation.setUprn("");
         when(organisationMock.getName()).thenReturn(name);
         when(organisationMock.getOrganisationIdentifier()).thenReturn(organisationIdentifier);
         when(organisationMock.getContactInformation()).thenReturn(contactInformations);
@@ -40,8 +39,6 @@ class OrganisationMinimalInfoResponseTest {
         assertThat(response.getOrganisationIdentifier()).isEqualTo(organisationIdentifier);
         assertThat(response.getContactInformation().get(0).getAddressLine1())
                 .isEqualTo(contactInformations.get(0).getAddressLine1());
-        assertThat(response.getContactInformation().get(0).getUprn())
-                .isEqualTo(contactInformations.get(0).getUprn());
     }
 
     @Test

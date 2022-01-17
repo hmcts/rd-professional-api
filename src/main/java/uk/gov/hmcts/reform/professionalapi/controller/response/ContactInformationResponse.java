@@ -8,9 +8,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 @NoArgsConstructor
 @Getter
 public class ContactInformationResponse {
-
-    @JsonProperty
-    protected String uprn;
     @JsonProperty
     protected String addressLine1;
     @JsonProperty
@@ -27,7 +24,6 @@ public class ContactInformationResponse {
     protected String postCode;
 
     public ContactInformationResponse(ContactInformation contactInfo) {
-        this.uprn = contactInfo.getUprn();
         this.addressLine1 = contactInfo.getAddressLine1();
         this.addressLine2 = contactInfo.getAddressLine2();
         this.addressLine3 = contactInfo.getAddressLine3();
