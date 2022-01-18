@@ -406,8 +406,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
         }
-        if (!organisation.getContactInformation().isEmpty() &&
-                organisation.getContactInformation().size() > 1) {
+        if (!organisation.getContactInformation().isEmpty()
+                && organisation.getContactInformation().size() > 1) {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
