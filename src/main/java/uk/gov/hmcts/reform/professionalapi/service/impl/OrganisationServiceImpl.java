@@ -256,9 +256,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     public ContactInformation setNewContactInformationFromRequest(ContactInformation contactInformation,
                                                                   ContactInformationCreationRequest contactInfo,
                                                                   Organisation organisation) {
-        String uprn = RefDataUtil.removeEmptySpaces(contactInfo.getUprn());
-        if (!uprn.trim().isEmpty()) {
-            contactInformation.setUprn(uprn);
+        if (!StringUtils.isBlank(contactInfo.getUprn())) {
+            contactInformation.setUprn(RefDataUtil.removeEmptySpaces(contactInfo.getUprn()));
         }
         contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
         contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
