@@ -397,7 +397,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationEntityResponse retrieveOrganisation(
             String organisationIdentifier, boolean isPendingPbaRequired) {
-        List<ContactInformation> sortedContactInfoByCreatedDate;
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
             throw new EmptyResultDataAccessException(ONE);
@@ -407,13 +406,9 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
         }
-        if (!organisation.getContactInformation().isEmpty() && organisation.getContactInformation().size() > 1) {
-            sortedContactInfoByCreatedDate = organisation.getContactInformation()
-                    .stream()
-                    .sorted(Comparator.comparing(ContactInformation::getCreated))
-            .collect(Collectors.toList());
-
-            organisation.setContactInformations(sortedContactInfoByCreatedDate);
+        if (!organisation.getContactInformation().isEmpty() &&
+                organisation.getContactInformation().size() > 1) {
+            sortContactInfoByCreatedDateAsc(organisation);
         }
 
         return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
@@ -615,6 +610,15 @@ public class OrganisationServiceImpl implements OrganisationService {
             log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }
+    }
+
+    private void sortContactInfoByCreatedDateAsc(Organisation organisation) {
+        List<ContactInformation> sortedContactInfoByCreatedDate = organisation.getContactInformation()
+                .stream()
+                .sorted(Comparator.comparing(ContactInformation::getCreated))
+                .collect(Collectors.toList());
+
+        organisation.setContactInformations(sortedContactInfoByCreatedDate);
     }
 
 }
