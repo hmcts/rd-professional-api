@@ -19,6 +19,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -464,12 +466,19 @@ public class OrganisationExternalController extends SuperController {
     )
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
+    @Secured({"pui-organisation-manager"})
     public ResponseEntity<ContactInformationEntityResponse> addContactInformationsToOrganisation(
             @Valid @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
+        organisationCreationRequestValidator.validateContactInformationRequests(contactInformationCreationRequests);
+
         //Received request to create a new organisation for external user
        // return createOrganisationFrom(organisationCreationRequest);
+
+        if(StringUtils.isEmpty(organisationIdentifier)){
+            throw new ResourceNotFoundException("Organisation does not exist");
+        }
         Optional<Organisation> organisation = Optional.ofNullable(organisationService
                 .getOrganisationByOrgIdentifier(organisationIdentifier));
 

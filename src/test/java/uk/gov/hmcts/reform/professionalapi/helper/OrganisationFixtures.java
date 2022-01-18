@@ -7,10 +7,14 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCr
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import java.util.List;
 import java.util.Set;
+
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
 public class OrganisationFixtures {
@@ -112,5 +116,44 @@ public class OrganisationFixtures {
                         .dxNumber("NI 1234567890")
                         .dxExchange("dxExchange1").build()))
                 .build()));
+    }
+
+    public static List<ContactInformationCreationRequest> getContactInformationList() {
+        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>() ;
+        contactInformationCreationRequests.add(
+                aContactInformationCreationRequest()
+                        .uprn("uprn1")
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .uprn("uprn")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567891")
+                                .dxExchange("dxExchange").build()))
+                        .build()
+        );
+        contactInformationCreationRequests.add(
+                aContactInformationCreationRequest()
+                        .uprn("uprn2")
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .uprn("uprn")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567892")
+                                .dxExchange("dxExchange").build()))
+                        .build()
+        );
+
+    return contactInformationCreationRequests;
+
     }
 }

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -692,4 +694,13 @@ public class ProfessionalReferenceDataClient {
 
         return getResponse(responseEntity);
     }
+
+    public Map<String, Object> addContactInformationsToOrganisation(List<ContactInformationCreationRequest> contactInformationCreationRequests,
+                                                                    String orgIdentifierResponse, String supportedRole, String userId) {
+        ///{orgId}/addresses
+        StringBuilder addContactsInfoURL = new StringBuilder(baseUrl);
+        addContactsInfoURL.append("/").append(orgIdentifierResponse).append("/").append("addresses");
+        return postRequest(addContactsInfoURL.toString(), contactInformationCreationRequests, supportedRole, userId);
+    }
+
 }

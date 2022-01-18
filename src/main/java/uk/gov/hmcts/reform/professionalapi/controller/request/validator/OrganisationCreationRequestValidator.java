@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
@@ -186,6 +187,21 @@ public class OrganisationCreationRequestValidator {
     @Value("${loggingComponentName}")
     public static void setLoggingComponentName(String loggingComponentName) {
         OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
+    }
+
+    public void validateContactInformationRequests(List<ContactInformationCreationRequest> contactInformationCreationRequests) {
+
+        Optional<List<ContactInformationCreationRequest>> infoList = Optional.ofNullable(contactInformationCreationRequests);
+        if(infoList.isPresent()&&infoList.get().isEmpty()){
+            throw new ResourceNotFoundException("Request is empty");
+        }
+        requestContactInformation(contactInformationCreationRequests);
+
+       // requestValues(request.getName(), request.getSraId(), request.getCompanyNumber(), request.getCompanyUrl());
+        //requestSuperUserValidateAccount(request.getSuperUser());
+
+        //requestPaymentAccount(request.getPaymentAccount());
+        //requestContactInformation(request.getContactInformation());
     }
 
 }

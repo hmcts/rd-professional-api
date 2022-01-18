@@ -271,8 +271,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
-    public ContactInformation createContactInformation(ContactInformationCreationRequest contactInfo) {
+    public ContactInformation createContactInformation(ContactInformationCreationRequest contactInfo, Organisation organisation) {
         ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn(RefDataUtil.removeEmptySpaces(contactInfo.getUprn()));
         contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
         contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
         contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
@@ -280,7 +281,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         contactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
         contactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
         contactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
-        //contactInformation.setOrganisation(organisation);
+        contactInformation.setOrganisation(organisation);
         //CreatedxAddress entity
         List<DxAddressCreationRequest> dxAddressCreationRequest = contactInfo.getDxAddress();
 
@@ -582,6 +583,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    @Transactional
     public ContactInformationEntityResponse addContactInformationsToOrganisation(List<ContactInformationCreationRequest> contactInformationCreationRequests, String organisationIdentifier) {
         Optional<Organisation> organisation = Optional.ofNullable(
                 getOrganisationByOrgIdentifier(organisationIdentifier));
@@ -593,7 +595,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         validateOrganisationIsActive(organisation.get());
         List<ContactInformation> contactInformations = contactInformationCreationRequests.stream().
-                map(this::createContactInformation).
+                //map(this::createContactInformation).
+                map(contact->this.createContactInformation(contact,organisation.get())).
                 collect(Collectors.toList());
         List<ContactInformation> contactInformationsResult = contactInformationRepository.saveAll(contactInformations);
 
