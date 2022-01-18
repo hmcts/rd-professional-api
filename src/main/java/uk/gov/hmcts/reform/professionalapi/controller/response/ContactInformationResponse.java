@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 @NoArgsConstructor
 @Getter
 public class ContactInformationResponse {
+
     @JsonProperty
     protected String addressLine1;
     @JsonProperty

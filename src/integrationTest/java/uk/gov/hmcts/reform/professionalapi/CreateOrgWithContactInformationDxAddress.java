@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -407,6 +408,28 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
                                 .dxNumber("DX 1234567890")
                                 .dxExchange("dxExchange").build()))
+                        .build(),
+                        aContactInformationCreationRequest().uprn("uprn1")
+                        .addressLine1(" addressLine2 ")
+                        .addressLine2(" ad  3 ").addressLine3(" ad4 ")
+                        .country(" switzerland ")
+                        .county(" Germany ")
+                        .postCode(" W127BE ")
+                        .townCity(" London ")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 2234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build(),
+                        aContactInformationCreationRequest().uprn("   ")
+                        .addressLine1(" addressLine3 ")
+                        .addressLine2(" ad  5 ").addressLine3(" ad6 ")
+                        .country(" Paris ")
+                        .county(" egypt ")
+                        .postCode(" W127CE ")
+                        .townCity(" London ")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 3234567890")
+                                .dxExchange("dxExchange").build()))
                         .build()))
                 .build();
         Map<String, Object> response =
@@ -416,7 +439,7 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
+        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(3);
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
         assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id");
         assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url");
@@ -438,6 +461,8 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
         assertThat(contactInformation.get(0).getCounty()).isEqualTo("Laois");
         assertThat(contactInformation.get(0).getPostCode()).isEqualTo("W127AE");
         assertThat(contactInformation.get(0).getTownCity()).isEqualTo("Dublin");
+        assertThat(contactInformation.get(1).getUprn()).isEqualTo("uprn1");
+        Assert.assertNull(contactInformation.get(2).getUprn());
     }
 
     @Test
