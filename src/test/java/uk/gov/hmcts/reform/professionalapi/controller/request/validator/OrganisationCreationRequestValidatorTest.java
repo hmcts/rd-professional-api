@@ -304,6 +304,30 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
+    void test_should_validate_uprn_and_throw_if_length_more_than_14() {
+        ContactInformationCreationRequest contactInfoCreateRequest
+                = new ContactInformationCreationRequest("777777777777777","abc", "abc", null,
+                null, null, null, null, null);
+        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
+        contactList.add(contactInfoCreateRequest);
+
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.requestContactInformation(contactList));
+    }
+
+    @Test
+    void test_should_validate_uprn_and_not_throw_if_length_is_14() {
+        ContactInformationCreationRequest contactInfoCreateRequest
+                = new ContactInformationCreationRequest("77777777777777",null, null, null,
+                null, null, null, null, null);
+        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
+        contactList.add(contactInfoCreateRequest);
+
+        assertDoesNotThrow(() ->
+                organisationCreationRequestValidator.requestContactInformation(contactList));
+    }
+
+    @Test
     void test_should_validate_company_no_length_and_not_throw_if_length_is_8() {
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null, "",
                 "true", "12345678", "", null, new HashSet<>(),

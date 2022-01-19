@@ -149,6 +149,9 @@ public class OrganisationCreationRequestValidator {
                         if (null != contactInformation.getDxAddress()) {
                             contactInformation.getDxAddress().forEach(this::isDxAddressValid);
                         }
+                        if (null != contactInformation.getUprn() && contactInformation.getUprn().length() > 14) {
+                            throw new InvalidRequest("Uprn must not be greater than 14 characters long");
+                        }
                     });
 
         }

@@ -17,7 +17,6 @@ class ContactInformationResponseTest {
     final String expectCounty = "City of London";
     final String expectCountry = "England";
     final String expectTownCity = "London";
-    final String uprn = "uprn";
 
     @Test
     void testGetContactInformationResponse() {
@@ -30,7 +29,6 @@ class ContactInformationResponseTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
-        contactInformation.setUprn(uprn);
         ContactInformationResponse sut = new ContactInformationResponse(contactInformation);
 
         assertThat(sut.getAddressLine1()).isEqualTo(expectAddress1);
@@ -40,6 +38,5 @@ class ContactInformationResponseTest {
         assertThat(sut.getCounty()).isEqualTo(expectCounty);
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
-        assertThat(sut.getUprn()).isEqualTo(uprn);
     }
 }
