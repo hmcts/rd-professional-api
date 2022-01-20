@@ -1110,11 +1110,11 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_sortContactInfoByCreatedDateAsc() {
-        ContactInformation contactInformation = new ContactInformation();
+        var contactInformation = new ContactInformation();
         contactInformation.setCountry("TestCountry");
         contactInformation.setCreated(LocalDateTime.now());
 
-        ContactInformation contactInformation1 = new ContactInformation();
+        var contactInformation1 = new ContactInformation();
         contactInformation1.setCountry("TestAnotherCountry");
         contactInformation1.setCreated(LocalDateTime.now());
         organisation.setContactInformations(List.of(contactInformation1, contactInformation));

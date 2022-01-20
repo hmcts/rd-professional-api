@@ -343,8 +343,7 @@ public class AuthorizationFunctionalTest {
     }
 
     private void verifyContactInfoCreatedDateSorting(Object contactInformation) {
-        var contactInformationResponse=
-                (List<HashMap>) contactInformation;
+        var contactInformationResponse = (List<HashMap>) contactInformation;
         assertEquals("addressLine1", contactInformationResponse.get(0).get("addressLine1"));
         assertEquals("addressLine2", contactInformationResponse.get(0).get("addressLine2"));
         assertEquals("addressLine3", contactInformationResponse.get(0).get("addressLine3"));
