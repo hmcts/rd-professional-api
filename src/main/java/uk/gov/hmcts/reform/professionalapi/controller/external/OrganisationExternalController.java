@@ -14,6 +14,7 @@ import io.swagger.annotations.Authorization;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,6 +25,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,11 +42,13 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -468,32 +472,50 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<ContactInformationEntityResponse> addContactInformationsToOrganisation(
-            @Valid @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
+            @NotNull @RequestBody List<@Valid ContactInformationCreationRequest> contactInformationCreationRequests,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
-        organisationCreationRequestValidator.validateContactInformationRequests(contactInformationCreationRequests);
-
-        //Received request to create a new organisation for external user
-       // return createOrganisationFrom(organisationCreationRequest);
-
-        if(StringUtils.isEmpty(organisationIdentifier)){
-            throw new ResourceNotFoundException("Organisation does not exist");
+        if(StringUtils.isEmpty(organisationIdentifier)||StringUtils.equals(organisationIdentifier,"null")){
+            throw new InvalidRequest("Organisation id is missing");
         }
-        Optional<Organisation> organisation = Optional.ofNullable(organisationService
-                .getOrganisationByOrgIdentifier(organisationIdentifier));
+        ContactInformationEntityResponse contactInformationsResponse = null;
+        boolean validAddresses = true;
 
-        if (organisation.isEmpty()) {
-            throw new EmptyResultDataAccessException(1);
+        List<ContactInformationValidationResponse> contactInfoValidations = organisationCreationRequestValidator.validate(contactInformationCreationRequests);
+        List<ContactInformationValidationResponse> result = null;
+        if(contactInfoValidations !=null && !contactInfoValidations.isEmpty()) {
+            result = contactInfoValidations.stream().
+                    filter(contactInfoValidation -> !contactInfoValidation.isValidAddress()).collect(Collectors.toList());
         }
-      //TODO apply business validation
+        if(result!= null && !result.isEmpty()){
+            contactInformationsResponse = new ContactInformationEntityResponse();
+            contactInformationsResponse.setContactInfoValidations(contactInfoValidations);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(contactInformationsResponse);
+        } else {
+            //Received request to create a new organisation for external user
+            // return createOrganisationFrom(organisationCreationRequest);
 
-        ContactInformationEntityResponse contactInformationsResponse = organisationService.
-                addContactInformationsToOrganisation(contactInformationCreationRequests, organisationIdentifier);
 
-        //Received response to create a new organisation
-        return ResponseEntity
-                .status(201)
-                .body(contactInformationsResponse);
+            Optional<Organisation> organisation = Optional.ofNullable(organisationService
+                    .getOrganisationByOrgIdentifier(organisationIdentifier));
+
+            if (organisation.isEmpty()) {
+                throw new ResourceNotFoundException("Organisation does not exist");
+            }
+            //TODO apply business validation
+
+             contactInformationsResponse = organisationService.
+                    addContactInformationsToOrganisation(contactInformationCreationRequests, organisationIdentifier);
+
+            //Received response to create a new organisation
+            return ResponseEntity
+                    .status(201)
+                    .body(contactInformationsResponse);
+        }
+
+
     }
 
 }

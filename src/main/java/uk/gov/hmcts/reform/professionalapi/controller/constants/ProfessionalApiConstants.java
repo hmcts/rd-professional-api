@@ -75,10 +75,12 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MSG_PBA_INVALID_FORMAT =
             "PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters";
     public static final String ERROR_MSG_PBAS_ENTERED_ARE_INVALID = ". The following PBAs entered are invalid: ";
+    public static final String ERROR_MSG_CONTACT_INFO_IS_MISSING = " is missing";
 
     public static final String LOG_TWO_ARG_PLACEHOLDER = "{}:: {}";
 
     public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
     public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
+    public static final String RD_PROFESSIONAL_ADD_CONTACTS_INFO_TO_ORG = "rd-professional-add-contacts-info-org";
 
 }

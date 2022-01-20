@@ -4,16 +4,19 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_CONTACT_INFO_IS_MISSING;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -25,8 +28,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 @Component
 @Slf4j
@@ -35,6 +42,10 @@ public class OrganisationCreationRequestValidator {
     private final List<RequestValidator> validators;
 
     private static String loggingComponentName;
+
+    @Autowired
+    private Validator validator;
+
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -60,6 +71,40 @@ public class OrganisationCreationRequestValidator {
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
 
     }
+
+    public List<ContactInformationValidationResponse> validate(List<ContactInformationCreationRequest> contactInformationCreationRequests) {
+        validateContactInformationRequests(contactInformationCreationRequests);
+        Optional<List<ContactInformationCreationRequest>> infoList = Optional.ofNullable(contactInformationCreationRequests);
+        if(infoList.isPresent()&&infoList.get().isEmpty()){
+            throw new ResourceNotFoundException("Request is empty");
+        }
+
+        return validateConstraintValidation(contactInformationCreationRequests);
+
+    }
+    private List<ContactInformationValidationResponse> validateConstraintValidation(List<ContactInformationCreationRequest> contactInformationCreationRequests){
+        List<ContactInformationValidationResponse> contactInformationValidationResponses = new ArrayList<>();
+            contactInformationCreationRequests.forEach(contactInfo->{
+                ContactInformationValidationResponse.ContactInformationValidationResponseBuilder contactInfoBuilder = ContactInformationValidationResponse.aContactInformationValidationResponse();
+
+                Set<ConstraintViolation<ContactInformationCreationRequest>> constraintViolation = validator.validate(contactInfo);
+            if (!constraintViolation.isEmpty()) {
+                constraintViolation.forEach(constraintViolationError->{
+                    contactInformationValidationResponses.add( contactInfoBuilder.uprn(contactInfo.getUprn())
+                            .validAddress(false).errorDescription(constraintViolationError.getPropertyPath().toString().concat(ERROR_MSG_CONTACT_INFO_IS_MISSING)).build());
+
+                });
+
+
+            }else{
+                contactInformationValidationResponses.add( contactInfoBuilder.uprn(contactInfo.getUprn())
+                        .validAddress(true).build());
+
+            }
+
+        });
+            return contactInformationValidationResponses;
+     }
 
     public static boolean contains(String status) {
         for (OrganisationStatus type : OrganisationStatus.values()) {
@@ -195,7 +240,8 @@ public class OrganisationCreationRequestValidator {
         if(infoList.isPresent()&&infoList.get().isEmpty()){
             throw new ResourceNotFoundException("Request is empty");
         }
-        requestContactInformation(contactInformationCreationRequests);
+        //throw new InvalidRequest("Empty input value" + value);
+       // requestContactInformation(contactInformationCreationRequests);
 
        // requestValues(request.getName(), request.getSraId(), request.getCompanyNumber(), request.getCompanyUrl());
         //requestSuperUserValidateAccount(request.getSuperUser());
