@@ -14,6 +14,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_PBA_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_ADDRESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_IDS_DOES_NOT_MATCH;
 
 import feign.FeignException;
 import feign.Response;
@@ -24,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiC
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -432,4 +437,30 @@ public class RefDataUtil {
             throw new ResourceNotFoundException(ERROR_MSG_NO_PBA_FOUND);
         }
     }
+
+    public static void checkOrganisationAndMoreThanRequiredAddressExists(
+            Organisation organisation, Set<String> addressIds) {
+        if (isNull(organisation)) {
+            throw new ResourceNotFoundException(ERROR_MSG_ORG_NOT_EXIST);
+        } else if ((CollectionUtils.isEmpty(organisation.getContactInformation()))
+                || (organisation.getContactInformation().size() <= addressIds.size())) {
+            throw new InvalidRequest(ERROR_MSG_ORG_ADDRESS);
+        }
+    }
+
+    public static void matchAddressIdsWithOrgContactInformationIds(Organisation organisation, Set<String> addressIds) {
+        Set<String> matchAddressList = addressIds.stream()
+                .filter(addressId -> organisation.getContactInformation().stream()
+                .anyMatch(contactInformation -> contactInformation.getId().toString().equals(addressId)))
+                .collect(Collectors.toSet());
+
+        if (addressIds.size() != matchAddressList.size()) {
+            throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH);
+        }
+
+
+
+    }
+
+
 }

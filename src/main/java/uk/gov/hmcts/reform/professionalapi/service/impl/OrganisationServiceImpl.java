@@ -609,5 +609,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
+    @Override
+    @Transactional
+    public void deleteMultipleAddressOfGivenOrganisation(Set<String> addressIds) {
+        contactInformationRepository.deleteByAddressId(addressIds);
+    }
+
 }
 

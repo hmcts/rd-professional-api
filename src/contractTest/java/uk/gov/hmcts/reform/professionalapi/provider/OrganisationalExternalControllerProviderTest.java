@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -39,6 +40,7 @@ import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
 @Provider("referenceData_organisationalExternalPbas")
 @Import(OrganisationalExternalControllerProviderTestConfiguration.class)
@@ -80,6 +82,9 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     PaymentAccountValidator paymentAccountValidatorMock;
+
+    @Autowired
+    ContactInformationRepository contactInformationRepositoryMock;
 
     @Override
     void setController() {
@@ -175,5 +180,27 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
         when(paymentAccountRepositoryMock.save(any(PaymentAccount.class))).thenReturn(paymentAccount);
 
+    }
+
+    @State({"Delete Multiple Addresses of an active organisation"})
+    public void toDeleteMultipleAddressesOfOrganisation() throws IOException {
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+                .thenReturn(organisationMock);
+        ContactInformation contactInformation01 = new ContactInformation();
+        contactInformation01.setAddressLine1("addressLine1");
+        contactInformation01.setId(UUID.randomUUID());
+        ContactInformation contactInformation02 = new ContactInformation();
+        contactInformation02.setAddressLine1("addressLine2");
+        contactInformation02.setId(UUID.randomUUID());
+
+        when(organisationMock.getContactInformation()).thenReturn(
+                Arrays.asList(contactInformation01, contactInformation02));
+        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
+        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any());
+
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
+
+        doNothing().when(contactInformationRepositoryMock).deleteByAddressId(anySet());
     }
 }

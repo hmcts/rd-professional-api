@@ -47,4 +47,6 @@ public interface OrganisationService {
 
     ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaRequest pbaRequest,
                                                             String organisationIdentifier, String userId);
+
+    void deleteMultipleAddressOfGivenOrganisation(Set<String> addressIds);
 }

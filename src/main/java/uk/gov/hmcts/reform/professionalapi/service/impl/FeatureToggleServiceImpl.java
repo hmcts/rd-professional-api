@@ -53,6 +53,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
         launchDarklyMap.put("OrganisationInternalController.updateAnOrganisationsRegisteredPbas",
                 RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
+        launchDarklyMap.put("OrganisationExternalController.deleteMultipleAddressesOfOrganisation",
+                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
     }
 
     @Override

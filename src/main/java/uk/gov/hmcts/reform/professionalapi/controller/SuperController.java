@@ -11,6 +11,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_MALFORMED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_ID_MISSING;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
@@ -23,6 +26,8 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRole
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
 
 import feign.FeignException;
 import feign.Response;
@@ -82,6 +87,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 
 @RestController
 @Slf4j
@@ -504,5 +510,39 @@ public abstract class SuperController {
         }
 
         return userEmail;
+    }
+
+    protected void deleteMultipleAddressOfGivenOrganisation(DeleteMultipleAddressRequest deleteRequest,
+                                                            String orgId, String userId) {
+        Set<String> addressIds = deleteRequest.getAddressId();
+
+        if (ObjectUtils.isEmpty(addressIds)) {
+            throw new ResourceNotFoundException(ERROR_MSG_REQUEST_IS_EMPTY);
+        }
+        if (addressIds.contains(null) || addressIds.contains(EMPTY)
+                || addressIds.stream().anyMatch(str -> str.matches(".*\\s.*"))) {
+            throw new InvalidRequest(ERROR_MSG_REQUEST_IS_MALFORMED);
+        }
+
+        if (StringUtils.isEmpty(orgId)) {
+            throw new InvalidRequest(ERROR_MSG_ORG_ID_MISSING);
+        }
+
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+
+        //check if organisation is present in the database and that it has more than required address associated
+        checkOrganisationAndMoreThanRequiredAddressExists(existingOrganisation, addressIds);
+
+        //match address id with organisation contact information id's
+        matchAddressIdsWithOrgContactInformationIds(existingOrganisation, addressIds);
+
+        //if the organisation is present, check if it is 'ACTIVE'
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation, BAD_REQUEST);
+
+        //check if user status is 'ACTIVE'
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+
+        //delete the passed address id numbers from the request
+        organisationService.deleteMultipleAddressOfGivenOrganisation(addressIds);
     }
 }
