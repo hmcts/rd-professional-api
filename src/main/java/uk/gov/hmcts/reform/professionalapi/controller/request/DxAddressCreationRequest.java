@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -15,8 +17,10 @@ public class DxAddressCreationRequest {
 
     @NotNull
     @Pattern(regexp = "^(?:DX|NI) [0-9]{10}+$")
+    @Size(max = 13)
     private final String dxNumber;
     @NotNull
+    @Size(max = 20)
     private final String dxExchange;
 
     @JsonCreator
