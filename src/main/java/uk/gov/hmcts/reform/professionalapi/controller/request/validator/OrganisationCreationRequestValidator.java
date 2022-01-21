@@ -85,20 +85,26 @@ public class OrganisationCreationRequestValidator {
     private List<ContactInformationValidationResponse> validateConstraintValidation(List<ContactInformationCreationRequest> contactInformationCreationRequests){
         List<ContactInformationValidationResponse> contactInformationValidationResponses = new ArrayList<>();
             contactInformationCreationRequests.forEach(contactInfo->{
-                ContactInformationValidationResponse.ContactInformationValidationResponseBuilder contactInfoBuilder = ContactInformationValidationResponse.aContactInformationValidationResponse();
 
                 Set<ConstraintViolation<ContactInformationCreationRequest>> constraintViolation = validator.validate(contactInfo);
             if (!constraintViolation.isEmpty()) {
+
                 constraintViolation.forEach(constraintViolationError->{
-                    contactInformationValidationResponses.add( contactInfoBuilder.uprn(contactInfo.getUprn())
-                            .validAddress(false).errorDescription(constraintViolationError.getPropertyPath().toString().concat(ERROR_MSG_CONTACT_INFO_IS_MISSING)).build());
+                    ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
+                    contactInfoBuilder.setUprn(contactInfo.getUprn());
+                    contactInfoBuilder.setValidAddress(false);
+                    contactInfoBuilder.setErrorDescription(constraintViolationError.getPropertyPath().toString().concat(ERROR_MSG_CONTACT_INFO_IS_MISSING));
+                    contactInformationValidationResponses.add(contactInfoBuilder);
 
                 });
 
 
             }else{
-                contactInformationValidationResponses.add( contactInfoBuilder.uprn(contactInfo.getUprn())
-                        .validAddress(true).build());
+                ContactInformationValidationResponse contactInfoBuilderSuccess = new ContactInformationValidationResponse();
+                contactInfoBuilderSuccess.setUprn(contactInfo.getUprn());
+                contactInfoBuilderSuccess.setValidAddress(true);
+                contactInformationValidationResponses.add(contactInfoBuilderSuccess);
+
 
             }
 

@@ -166,6 +166,59 @@ public class ProfessionalApiClient {
             .contactInformation(contactInfoList);
     }
 
+    public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build());
+      /*  dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456777")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456788")
+                .dxExchange("dxExchange").build());*/
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 1234522222")
+                .dxExchange("dxExchange").build());
+/*
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456333")
+                .dxExchange("dxExchange").build());
+*/
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+                .uprn("uprn1")
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx1)
+                .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+                .uprn("uprn2")
+                .addressLine1("addLine1")
+                .addressLine2("addLine2")
+                .addressLine3("addLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx2)
+                .build());
+
+        return contactInfoList;
+    }
+
+
     public Map<String, Object> createOrganisation() {
         return createOrganisation(createOrganisationRequest().build());
     }
@@ -184,6 +237,25 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> addContactInformationsToOrganisation
+            (List<ContactInformationCreationRequest> createContactInformationCreationRequests, String pomBearerToken,String orgId) {
+        Response response = getMultipleAuthHeaders(pomBearerToken)
+                .body(createContactInformationCreationRequests)
+                .post("/refdata/external/v1/organisations/"+orgId+"/addresses")
+                .andReturn();
+
+        if (response.statusCode() != CREATED.value()) {
+            log.info("{}:: Add contact informations to organisation response: {}", loggingComponentName, response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
 
         return response.body().as(Map.class);
     }
