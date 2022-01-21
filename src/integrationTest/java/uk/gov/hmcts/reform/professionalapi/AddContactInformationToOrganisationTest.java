@@ -20,6 +20,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createContactInformationCreationRequests;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.getContactInformationList;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 
@@ -48,6 +49,16 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     @Test
     void add_contact_informations_to_organisation() {
 
+        Map<String, Object> addContactsToOrgresponse =
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
+
+        assertThat(addContactsToOrgresponse).isNotNull();
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
+    }
+
+    @Test
+    void add_contact_informations_to_organisation_returns_201_when_multiple_dxAddresses() {
+        List<ContactInformationCreationRequest> contactInformationCreationRequests = createContactInformationCreationRequests();
         Map<String, Object> addContactsToOrgresponse =
                 professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
 
