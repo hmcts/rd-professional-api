@@ -71,8 +71,8 @@ public class OrganisationExternalControllerFunctionalTest extends AuthorizationF
 
     @Test
     @DisplayName("Add Contact informations to organisations  Test Scenarios")
-   // @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
-   // @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void testAddContactsInformationsToOrganisationScenarios() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
