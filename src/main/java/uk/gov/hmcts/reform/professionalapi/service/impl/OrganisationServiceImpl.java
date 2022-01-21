@@ -585,26 +585,36 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public ContactInformationEntityResponse addContactInformationsToOrganisation(List<ContactInformationCreationRequest> contactInformationCreationRequests, String organisationIdentifier) {
-        Optional<Organisation> organisation = Optional.ofNullable(
+        Optional<Organisation> organisationOptional = Optional.ofNullable(
                 getOrganisationByOrgIdentifier(organisationIdentifier));
 
-        if (organisation.isEmpty()) {
+
+        if (organisationOptional.isEmpty()) {
             log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
+        Organisation organisation = organisationOptional.get();
+        validateOrganisationIsActive(organisation);
 
-        validateOrganisationIsActive(organisation.get());
-        List<ContactInformation> contactInformations = contactInformationCreationRequests.stream().
-                //map(this::createContactInformation).
-                map(contact->this.createContactInformation(contact,organisation.get())).
-                collect(Collectors.toList());
-        List<ContactInformation> contactInformationsResult = contactInformationRepository.saveAll(contactInformations);
+        addContactInformationToOrganisation(contactInformationCreationRequests, organisation);
 
-        //Save contactInformation and then dxAddress
-        List <ContactInformationResponseWithDxAddress> result = contactInformationsResult.stream()
-                .map(ContactInformationResponseWithDxAddress::new).collect(Collectors.toList());
 
-        return createContactInformationEntityResponse(result);
+//        List<ContactInformation> contactInformations = contactInformationCreationRequests.stream().
+//                //map(this::createContactInformation).
+//                map(contact->this.createContactInformation(contact,organisation.get())).
+//                collect(Collectors.toList());
+//        List<ContactInformation> contactInformationsResult = contactInformationRepository.saveAll(contactInformations);
+
+        //TODO Need to refactor Save contactInformation and then dxAddress
+//        List <ContactInformationResponseWithDxAddress> result = contactInformationsResult.stream()
+//                .map(ContactInformationResponseWithDxAddress::new).collect(Collectors.toList());
+
+        ContactInformationEntityResponse contactInformationEntityResponse = new ContactInformationEntityResponse();
+        contactInformationEntityResponse.setOrganisationIdentifier(organisation.getOrganisationIdentifier());
+        return contactInformationEntityResponse;
+
+        //return createContactInformationEntityResponse(result);
+       // contactInformationEntityResponse.setStatusCode(HttpStatus.CREATED.value());
     }
 
     private ContactInformationEntityResponse createContactInformationEntityResponse( List <ContactInformationResponseWithDxAddress> contactInfomations){

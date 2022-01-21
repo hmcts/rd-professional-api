@@ -23,9 +23,15 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @JsonPropertyOrder({"message"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ContactInformationEntityResponse {
+
     @JsonInclude(NON_NULL)
     @JsonProperty("message")
     private String partialSuccessMessage;
+
+    @JsonInclude(NON_NULL)
+    @JsonProperty("organisationIdentifier")
+    private  String organisationIdentifier;
+
 
     @JsonInclude(NON_NULL)
     @JsonProperty("contactInformationsResponse")
@@ -39,4 +45,5 @@ public class ContactInformationEntityResponse {
     @JsonIgnore
     @JsonProperty("statusCode")
     private int statusCode;
+
 }

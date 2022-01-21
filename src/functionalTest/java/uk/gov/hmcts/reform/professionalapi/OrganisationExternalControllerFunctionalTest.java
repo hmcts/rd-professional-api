@@ -153,7 +153,7 @@ public class OrganisationExternalControllerFunctionalTest extends AuthorizationF
                 .addContactInformationsToOrganisation(createContactInformationCreationRequests,
                         pomBearerToken,extActiveOrgId);
 
-        assertThat(result.get("contactInformationsResponse")).isNotNull();
+        assertThat(result.get("statusCode")).isNotNull();
         log.info("addContactInformationsToOrganisationShouldBeSuccess :: END");
     }
 
