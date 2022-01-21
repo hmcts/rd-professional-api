@@ -464,7 +464,7 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @PostMapping(
-            path = "/{orgId}/addresses",
+            path = "/addresses",
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
@@ -473,7 +473,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<ContactInformationEntityResponse> addContactInformationsToOrganisation(
             @NotNull @RequestBody List<@Valid ContactInformationCreationRequest> contactInformationCreationRequests,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
 
         if(StringUtils.isEmpty(organisationIdentifier)||StringUtils.equals(organisationIdentifier,"null")){
             throw new InvalidRequest("Organisation id is missing");

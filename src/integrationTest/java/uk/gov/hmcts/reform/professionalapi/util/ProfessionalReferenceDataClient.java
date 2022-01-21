@@ -699,7 +699,8 @@ public class ProfessionalReferenceDataClient {
                                                                     String orgIdentifierResponse, String supportedRole, String userId) {
         ///{orgId}/addresses
         StringBuilder addContactsInfoURL = new StringBuilder(baseUrl);
-        addContactsInfoURL.append("/").append(orgIdentifierResponse).append("/").append("addresses");
+        addContactsInfoURL.append("/").append("addresses");
+        //addContactsInfoURL.append("/").append(orgIdentifierResponse).append("/").append("addresses");
         return postRequest(addContactsInfoURL.toString(), contactInformationCreationRequests, supportedRole, userId);
     }
 
