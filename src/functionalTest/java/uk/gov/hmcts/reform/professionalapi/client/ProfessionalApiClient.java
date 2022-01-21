@@ -175,22 +175,21 @@ public class ProfessionalApiClient {
         List<DxAddressCreationRequest> dx1 = new LinkedList<>();
         dx1.add(dxAddressCreationRequest()
                 .dxNumber("DX 1234567890")
-                .dxExchange("dxExchanGe").build());
-      /*  dx1.add(dxAddressCreationRequest()
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
                 .dxNumber("DX 123456777")
                 .dxExchange("dxExchange").build());
         dx1.add(dxAddressCreationRequest()
-                .dxNumber("DX 123456788")
-                .dxExchange("dxExchange").build());*/
+               .dxNumber("DX 123456788")
+                .dxExchange("dxExchange").build());
         List<DxAddressCreationRequest> dx2 = new LinkedList<>();
         dx2.add(dxAddressCreationRequest()
-                .dxNumber("DX 1234567890")
-                .dxExchange("dxExchanGe").build());
-/*
+                .dxNumber("DX 123452222")
+                .dxExchange("dxExchange").build());
         dx2.add(dxAddressCreationRequest()
                 .dxNumber("DX 123456333")
                 .dxExchange("dxExchange").build());
-*/
+
         List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
         contactInfoList.add(aContactInformationCreationRequest()
                 .uprn("uprn1")
