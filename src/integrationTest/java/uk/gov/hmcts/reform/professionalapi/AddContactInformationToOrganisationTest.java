@@ -50,7 +50,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     void add_contact_informations_to_organisation() {
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
@@ -60,27 +60,43 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     void add_contact_informations_to_organisation_returns_201_when_multiple_dxAddresses() {
         List<ContactInformationCreationRequest> contactInformationCreationRequests = createContactInformationCreationRequests();
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
     }
 
     @Test
-    void add_contact_informations_to_organisation_returns_403_when_forbidden_user_role() {
+    void add_contact_informations_to_organisation_returns_201_when_contact_information_dxAddress_list_is_null() {
+
+        contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("country")
+                .county("county")
+                .townCity("town-city")
+                .uprn("uprn")
+                .postCode("some-post-code").dxAddress(null)
+
+                //.dxAddress(Arrays.asList(dxAddressCreationRequest()
+                //       .dxNumber("DX 1234567890")
+                //       .dxExchange("dxExchange").build()))
+                .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiFinanceManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
-        ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
 
-        assertThat(errorResponse.getErrorDescription()).contains("Access is denied");
-        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("403");
+//        ContactInformationEntityResponse errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+
+        // assertThat(errorResponse.getErrorDescription()).contains("Empty contactInformation value");
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
     }
 
     @Test
-    void add_contact_informations_to_organisation_returns_201_when_contact_information_dxAddress_empty_list() {
+    void add_contact_informations_to_organisation_returns_201_when_contact_information_dxAddress_list_is_empty() {
 
         contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
@@ -93,12 +109,12 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .postCode("some-post-code").dxAddress(new ArrayList<>())
 
                 //.dxAddress(Arrays.asList(dxAddressCreationRequest()
-                 //       .dxNumber("DX 1234567890")
-                 //       .dxExchange("dxExchange").build()))
+                //       .dxNumber("DX 1234567890")
+                //       .dxExchange("dxExchange").build()))
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
@@ -109,55 +125,38 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     }
 
     @Test
+    void add_contact_informations_to_organisation_returns_403_when_forbidden_user_role() {
+
+        Map<String, Object> addContactsToOrgresponse =
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiFinanceManager,userId);
+
+        assertThat(addContactsToOrgresponse).isNotNull();
+        ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+
+        assertThat(errorResponse.getErrorDescription()).contains("Access is denied");
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("403");
+    }
+
+
+
+    @Test
     void add_contact_informations_to_organisation_returns_401_when_unauthorised_user() {
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,null,null);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,null,null);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
 
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("401");
     }
-
-    @Test
-    void add_contact_informations_to_organisation_returns_404_when_orgId_is_null() {
-
-        orgId = null;
-        Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
-
-        assertThat(addContactsToOrgresponse).isNotNull();
-        ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
-
-        assertThat(errorResponse.getErrorDescription()).contains("Organisation id is missing");
-        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
-    }
-
-    @Test
-    void add_contact_informations_to_organisation_returns_404_when_orgganisation_is_not_exist() {
-
-        orgId = "JIL0LGV";
-        Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
-
-        assertThat(addContactsToOrgresponse).isNotNull();
-        ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
-
-        assertThat(errorResponse.getErrorDescription()).contains("Organisation does not exist");
-        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("404");
-    }
-
-
-
-
-
+  
     @Test
     void add_contact_informations_to_organisation_returns_404_when_empty_contact_information_list() {
 
         contactInformationCreationRequests = new ArrayList<>();
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
@@ -185,7 +184,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
@@ -213,7 +212,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
@@ -240,7 +239,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,orgId,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 

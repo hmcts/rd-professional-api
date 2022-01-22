@@ -73,7 +73,8 @@ public class OrganisationCreationRequestValidator {
     }
 
     public List<ContactInformationValidationResponse> validate(List<ContactInformationCreationRequest> contactInformationCreationRequests) {
-        validateContactInformationRequests(contactInformationCreationRequests);
+       // validateContactInformationRequests(contactInformationCreationRequests);
+
         Optional<List<ContactInformationCreationRequest>> infoList = Optional.ofNullable(contactInformationCreationRequests);
         if(infoList.isPresent()&&infoList.get().isEmpty()){
             throw new ResourceNotFoundException("Request is empty");
@@ -82,35 +83,24 @@ public class OrganisationCreationRequestValidator {
         return validateConstraintValidation(contactInformationCreationRequests);
 
     }
+
+
     private List<ContactInformationValidationResponse> validateConstraintValidation(List<ContactInformationCreationRequest> contactInformationCreationRequests){
         List<ContactInformationValidationResponse> contactInformationValidationResponses = new ArrayList<>();
-            contactInformationCreationRequests.forEach(contactInfo->{
-
-                Set<ConstraintViolation<ContactInformationCreationRequest>> constraintViolation = validator.validate(contactInfo);
-            if (!constraintViolation.isEmpty()) {
-
-                constraintViolation.forEach(constraintViolationError->{
-                    ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
-                    contactInfoBuilder.setUprn(contactInfo.getUprn());
-                    contactInfoBuilder.setValidAddress(false);
-                    contactInfoBuilder.setErrorDescription(constraintViolationError.getPropertyPath().toString().concat(ERROR_MSG_CONTACT_INFO_IS_MISSING));
-                    contactInformationValidationResponses.add(contactInfoBuilder);
-
+        contactInformationCreationRequests.forEach(contactInfo->{
+            validateContactInformation(contactInfo,contactInformationValidationResponses);
+            //Validate dxAddresses
+            List<DxAddressCreationRequest> dxAddressList = contactInfo.getDxAddress();
+            if(dxAddressList!=null && !dxAddressList.isEmpty()){
+                dxAddressList.forEach(dxAddress->{
+                    validateDxAddressValid(contactInfo,dxAddress,contactInformationValidationResponses);
                 });
-
-
-            }else{
-                ContactInformationValidationResponse contactInfoBuilderSuccess = new ContactInformationValidationResponse();
-                contactInfoBuilderSuccess.setUprn(contactInfo.getUprn());
-                contactInfoBuilderSuccess.setValidAddress(true);
-                contactInformationValidationResponses.add(contactInfoBuilderSuccess);
-
-
             }
 
+
         });
-            return contactInformationValidationResponses;
-     }
+        return contactInformationValidationResponses;
+    }
 
     public static boolean contains(String status) {
         for (OrganisationStatus type : OrganisationStatus.values()) {
@@ -202,6 +192,52 @@ public class OrganisationCreationRequestValidator {
                             contactInformation.getDxAddress().forEach(this::isDxAddressValid);
                         }
                     });
+
+        }
+    }
+
+    public void validateContactInformation(ContactInformationCreationRequest contactInformation, List<ContactInformationValidationResponse> contactInformationValidationResponses) {
+
+
+        try{
+            if (isEmptyValue(contactInformation.getAddressLine1())
+                    || isEmptyValue(contactInformation.getAddressLine2())
+                    || isEmptyValue(contactInformation.getAddressLine3())
+                    || isEmptyValue(contactInformation.getCountry())
+                    || isEmptyValue(contactInformation.getPostCode())
+                    || isEmptyValue(contactInformation.getTownCity())) {
+
+                throw new InvalidRequest("Empty contactInformation value");
+            }else {
+                ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
+                contactInfoBuilder.setUprn(contactInformation.getUprn());
+                contactInfoBuilder.setValidAddress(true);
+                //contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
+                contactInformationValidationResponses.add(contactInfoBuilder);
+            }
+        }catch (InvalidRequest invalidRequest){
+
+            ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
+            contactInfoBuilder.setUprn(contactInformation.getUprn());
+            contactInfoBuilder.setValidAddress(false);
+            contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
+            contactInformationValidationResponses.add(contactInfoBuilder);
+
+        }
+
+    }
+
+    private void validateDxAddressValid(ContactInformationCreationRequest contactInformation, DxAddressCreationRequest dxAddress, List<ContactInformationValidationResponse> contactInformationValidationResponses) {
+
+        try{
+            isDxAddressValid(dxAddress);
+        }catch (InvalidRequest invalidRequest){
+
+            ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
+            contactInfoBuilder.setUprn(contactInformation.getUprn());
+            contactInfoBuilder.setValidAddress(false);
+            contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
+            contactInformationValidationResponses.add(contactInfoBuilder);
 
         }
     }
