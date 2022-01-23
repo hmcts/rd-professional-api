@@ -242,10 +242,10 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> addContactInformationsToOrganisation
-            (List<ContactInformationCreationRequest> createContactInformationCreationRequests, String pomBearerToken,String orgId) {
+            (List<ContactInformationCreationRequest> createContactInformationCreationRequests, String pomBearerToken) {
         Response response = getMultipleAuthHeaders(pomBearerToken)
                 .body(createContactInformationCreationRequests)
-                .post("/refdata/external/v1/organisations/"+orgId+"/addresses")
+                .post("/refdata/external/v1/organisations/addresses")
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
@@ -256,7 +256,9 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(CREATED.value());
 
-        return response.body().as(Map.class);
+        Map<String, Object> hmResponse = new HashMap<>();
+        hmResponse.put("statusCode",response.statusCode());
+        return hmResponse;
     }
 
     public Response createOrganisationWithoutS2SToken(OrganisationCreationRequest

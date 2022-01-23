@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Ignore;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
@@ -188,7 +190,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
-        ContactInformationEntityResponse errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        List<ContactInformationValidationResponse> errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
 
        // assertThat(errorResponse.getErrorDescription()).contains("Empty contactInformation value");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
@@ -204,20 +206,35 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .country("country")
                 .county("county")
                 .townCity("town-city")
-                .uprn("uprn")
+                //.uprn("uprn")
                 .postCode("some-post-code")
                 .dxAddress(Arrays.asList(dxAddressCreationRequest()
                         .dxNumber("this is an invalid dx number")
                         .dxExchange(null).build()))
-                .build());
+                .build(),
+
+                aContactInformationCreationRequest()
+                        .uprn("uprn2")
+                        .addressLine1("")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        //.uprn("uprn")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("this is an invalid dx number")
+                                .dxExchange(null).build()))
+                        .build() );
 
         Map<String, Object> addContactsToOrgresponse =
                 professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
-        ContactInformationEntityResponse errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
-
+        List<ContactInformationValidationResponse> errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        assertThat(errorResponse.size()).isEqualTo(4);
         // assertThat(errorResponse.getErrorDescription()).contains("Empty contactInformation value");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
@@ -243,7 +260,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
-        ContactInformationEntityResponse errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        List<ContactInformationValidationResponse> errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
 
        // assertThat(errorResponse.getErrorDescription()).contains("DX Number (max=13) or DX Exchange (max=20) has invalid length");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
@@ -262,12 +279,13 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
         return errorResponse;
     }
 
-    private ContactInformationEntityResponse get400ErrorResponse(String errorDetails){
+    private List<ContactInformationValidationResponse> get400ErrorResponse(String errorDetails){
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
-        ContactInformationEntityResponse errorResponse=null;
+        List<ContactInformationValidationResponse> errorResponse=null;
         try {
-            errorResponse =  mapper.readValue(errorDetails,ContactInformationEntityResponse.class);
+            errorResponse =  mapper.readValue(errorDetails,new TypeReference<List<ContactInformationValidationResponse>>(){});
+
         } catch (JsonProcessingException e) {
             errorResponse = null;
         }

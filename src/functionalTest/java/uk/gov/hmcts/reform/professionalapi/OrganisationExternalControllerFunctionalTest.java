@@ -151,9 +151,10 @@ public class OrganisationExternalControllerFunctionalTest extends AuthorizationF
         createContactInformationCreationRequests = createContactInformationCreationRequests();
         Map<String, Object> result = professionalApiClient
                 .addContactInformationsToOrganisation(createContactInformationCreationRequests,
-                        pomBearerToken,extActiveOrgId);
+                        pomBearerToken);
 
         assertThat(result.get("statusCode")).isNotNull();
+        assertThat(result.get("statusCode")).isEqualTo(201);
         log.info("addContactInformationsToOrganisationShouldBeSuccess :: END");
     }
 
