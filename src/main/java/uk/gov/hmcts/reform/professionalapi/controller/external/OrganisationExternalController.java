@@ -439,21 +439,27 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Adds contact informations(address details) to organisation",
-            notes = "**IDAM Roles to access API**: \n No role restriction",
+            notes = "**IDAM Roles to access API** :\n pui-organisation-manager",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
+
     )
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "The Organisation Identifier of the created Organisation",
-                    response = OrganisationResponse.class
+                    message = ""
             ),
             @ApiResponse(
                     code = 400,
                     message = "An invalid request has been provided"
             ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+
             @ApiResponse(
                     code = 403,
                     message = "Forbidden Error: Access denied"
@@ -463,6 +469,7 @@ public class OrganisationExternalController extends SuperController {
                     message = "Internal Server Error"
             )
     })
+
     @PostMapping(
             path = "/addresses",
             consumes = APPLICATION_JSON_VALUE,
