@@ -1,25 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -36,6 +23,17 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinim
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application.yml")
@@ -695,8 +693,9 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> addContactInformationsToOrganisation(List<ContactInformationCreationRequest> contactInformationCreationRequests,
-                                                                     String supportedRole, String userId) {
+    public Map<String, Object> addContactInformationsToOrganisation(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests,
+             String supportedRole, String userId) {
 
         StringBuilder addContactsInfoURL = new StringBuilder(baseUrl);
         addContactsInfoURL.append("/").append("addresses");

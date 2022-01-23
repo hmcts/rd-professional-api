@@ -5,16 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +24,16 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWith
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -241,15 +241,19 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> addContactInformationsToOrganisation
-            (List<ContactInformationCreationRequest> createContactInformationCreationRequests, String pomBearerToken) {
+    public Map<String, Object> addContactInformationsToOrganisation(
+
+            List<ContactInformationCreationRequest>
+                    createContactInformationCreationRequests,
+            String pomBearerToken) {
         Response response = getMultipleAuthHeaders(pomBearerToken)
                 .body(createContactInformationCreationRequests)
                 .post("/refdata/external/v1/organisations/addresses")
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
-            log.info("{}:: Add contact informations to organisation response: {}", loggingComponentName, response.asString());
+            log.info("{}:: Add contact informations to organisation response: {}",
+                    loggingComponentName, response.asString());
         }
 
         response.then()
@@ -257,7 +261,7 @@ public class ProfessionalApiClient {
                 .statusCode(CREATED.value());
 
         Map<String, Object> hmResponse = new HashMap<>();
-        hmResponse.put("statusCode",response.statusCode());
+        hmResponse.put("statusCode", response.statusCode());
         return hmResponse;
     }
 

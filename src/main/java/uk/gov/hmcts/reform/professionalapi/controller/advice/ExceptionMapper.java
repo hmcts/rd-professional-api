@@ -169,8 +169,7 @@ public class ExceptionMapper {
     }
 
     @ExceptionHandler(InvalidContactInformations.class)
-    public ResponseEntity<Object> ContactInformationsValidationError(
-            InvalidContactInformations ex) {
+    public ResponseEntity<Object> handleContactInformationException(InvalidContactInformations ex) {
         return  errorDetailsContactInfoResponseEntity(BAD_REQUEST,ex.getContactInfoValidations());
     }
 
@@ -201,7 +200,9 @@ public class ExceptionMapper {
         return new ResponseEntity<>(errorDetails, httpStatus);
     }
 
-    private ResponseEntity<Object> errorDetailsContactInfoResponseEntity(HttpStatus httpStatus, List<ContactInformationValidationResponse> contactInfoValidations) {
+    private ResponseEntity<Object> errorDetailsContactInfoResponseEntity(
+            HttpStatus httpStatus,
+            List<ContactInformationValidationResponse> contactInfoValidations) {
 
         return new ResponseEntity<>(contactInfoValidations, httpStatus);
     }

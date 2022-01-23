@@ -37,6 +37,7 @@ class ContactInformationRepositoryTest extends BaseRepository {
         assertThat(contactInfo.get().getAddressLine1()).isEqualTo(contactInformation.getAddressLine1());
         assertThat(contactInfo.get().getUprn()).isEqualTo(contactInformation.getUprn());
     }
+
     @Test
     void should_add_contactInformations_Test() {
         List<ContactInformation> contactInformations = addContactInformations();
@@ -47,9 +48,8 @@ class ContactInformationRepositoryTest extends BaseRepository {
 
     }
 
-    private List<ContactInformation> addContactInformations(){
+    private List<ContactInformation> addContactInformations() {
 
-        List<ContactInformation> contactInformations = new ArrayList<>();
 
         contactInformation = new ContactInformation();
         contactInformation.setUprn("uprn-1");
@@ -65,6 +65,8 @@ class ContactInformationRepositoryTest extends BaseRepository {
 
         dxAddress = new DxAddress("dx-number", "dx-exchange", contactInformation);
         dxAddress = dxAddressRepository.save(dxAddress);
+
+        List<ContactInformation> contactInformations = new ArrayList<>();
 
         contactInformations.add(contactInformation);
 

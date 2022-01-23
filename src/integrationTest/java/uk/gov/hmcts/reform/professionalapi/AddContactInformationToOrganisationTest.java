@@ -4,13 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -37,14 +35,14 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     @BeforeEach
     public void setUpOrganisationData() {
 
-         organisationCreationRequest = organisationRequestWithAllFields()
+        organisationCreationRequest = organisationRequestWithAllFields()
                 .build();
         orgResponse = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-         orgId = (String) orgResponse.get(ORG_IDENTIFIER);
+        orgId = (String) orgResponse.get(ORG_IDENTIFIER);
 
-         userId = updateOrgAndInviteUser(orgId, puiOrgManager);
-         contactInformationCreationRequests = getContactInformationList();
+        userId = updateOrgAndInviteUser(orgId, puiOrgManager);
+        contactInformationCreationRequests = getContactInformationList();
 
     }
 
@@ -52,7 +50,11 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     void add_contact_informations_to_organisation() {
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                puiOrgManager,
+                                userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
@@ -60,9 +62,13 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
     @Test
     void add_contact_informations_to_organisation_returns_201_when_multiple_dxAddresses() {
-        List<ContactInformationCreationRequest> contactInformationCreationRequests = createContactInformationCreationRequests();
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequests =
+                createContactInformationCreationRequests();
+
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(
+                        contactInformationCreationRequests, puiOrgManager, userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
@@ -79,21 +85,17 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .county("county")
                 .townCity("town-city")
                 .uprn("uprn")
-                .postCode("some-post-code").dxAddress(null)
+                .postCode("some-post-code")
+                .dxAddress(null)
 
-                //.dxAddress(Arrays.asList(dxAddressCreationRequest()
-                //       .dxNumber("DX 1234567890")
-                //       .dxExchange("dxExchange").build()))
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(
+                        contactInformationCreationRequests, puiOrgManager, userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
-//        ContactInformationEntityResponse errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
-
-        // assertThat(errorResponse.getErrorDescription()).contains("Empty contactInformation value");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
     }
 
@@ -110,19 +112,17 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .uprn("uprn")
                 .postCode("some-post-code").dxAddress(new ArrayList<>())
 
-                //.dxAddress(Arrays.asList(dxAddressCreationRequest()
-                //       .dxNumber("DX 1234567890")
-                //       .dxExchange("dxExchange").build()))
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                puiOrgManager,
+                                userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
-//        ContactInformationEntityResponse errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
-
-        // assertThat(errorResponse.getErrorDescription()).contains("Empty contactInformation value");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
     }
 
@@ -130,7 +130,11 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     void add_contact_informations_to_organisation_returns_403_when_forbidden_user_role() {
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiFinanceManager,userId);
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                puiFinanceManager,
+                                userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
@@ -140,12 +144,15 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     }
 
 
-
     @Test
     void add_contact_informations_to_organisation_returns_401_when_unauthorised_user() {
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,null,null);
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                null,
+                                null);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
@@ -158,7 +165,11 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
         contactInformationCreationRequests = new ArrayList<>();
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                puiOrgManager,
+                                userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
         ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
@@ -186,32 +197,35 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                puiOrgManager,
+                                userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
-        List<ContactInformationValidationResponse> errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        List<ContactInformationValidationResponse> errorResponse =
+                get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
 
-       // assertThat(errorResponse.getErrorDescription()).contains("Empty contactInformation value");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
 
     @Test
-    void add_contact_informations_to_organisation_returns_400_when_contact_information_addressLine1_DxNum_DxExchange_missing() {
+    void add_contact_informations_to_org_returns_400_when_contact_info_addrLine1_DxNum_DxEx_missing() {
 
         contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .country("country")
-                .county("county")
-                .townCity("town-city")
-                //.uprn("uprn")
-                .postCode("some-post-code")
-                .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                        .dxNumber("this is an invalid dx number")
-                        .dxExchange(null).build()))
-                .build(),
+                        .addressLine1("")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("this is an invalid dx number")
+                                .dxExchange(null).build()))
+                        .build(),
 
                 aContactInformationCreationRequest()
                         .uprn("uprn2")
@@ -221,21 +235,25 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                         .country("country")
                         .county("county")
                         .townCity("town-city")
-                        //.uprn("uprn")
                         .postCode("some-post-code")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
                                 .dxNumber("this is an invalid dx number")
                                 .dxExchange(null).build()))
-                        .build() );
+                        .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                puiOrgManager,
+                                userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
-        List<ContactInformationValidationResponse> errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        List<ContactInformationValidationResponse> errorResponse =
+                get400ErrorResponse(
+                        addContactsToOrgresponse.get("response_body").toString());
         assertThat(errorResponse.size()).isEqualTo(4);
-        // assertThat(errorResponse.getErrorDescription()).contains("Empty contactInformation value");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
 
@@ -256,35 +274,44 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient.addContactInformationsToOrganisation(contactInformationCreationRequests,puiOrgManager,userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(
+                        contactInformationCreationRequests,
+                        puiOrgManager,
+                        userId);
 
         assertThat(addContactsToOrgresponse).isNotNull();
 
-        List<ContactInformationValidationResponse> errorResponse = get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        List<ContactInformationValidationResponse> errorResponse =
+                get400ErrorResponse(
+                        addContactsToOrgresponse
+                                .get("response_body").toString());
 
-       // assertThat(errorResponse.getErrorDescription()).contains("DX Number (max=13) or DX Exchange (max=20) has invalid length");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
 
     }
 
-    private ErrorResponse get404ErrorResponse(String errorDetails){
+    private ErrorResponse get404ErrorResponse(String errorDetails) {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
-        ErrorResponse errorResponse=null;
+        ErrorResponse errorResponse = null;
         try {
-            errorResponse =  mapper.readValue(errorDetails,ErrorResponse.class);
+            errorResponse = mapper.readValue(errorDetails, ErrorResponse.class);
         } catch (JsonProcessingException e) {
             errorResponse = null;
         }
         return errorResponse;
     }
 
-    private List<ContactInformationValidationResponse> get400ErrorResponse(String errorDetails){
+    private List<ContactInformationValidationResponse> get400ErrorResponse(String errorDetails) {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
-        List<ContactInformationValidationResponse> errorResponse=null;
+        List<ContactInformationValidationResponse> errorResponse = null;
         try {
-            errorResponse =  mapper.readValue(errorDetails,new TypeReference<List<ContactInformationValidationResponse>>(){});
+            errorResponse = mapper
+                    .readValue(
+                            errorDetails,
+                            new TypeReference<List<ContactInformationValidationResponse>>() {
+                            });
 
         } catch (JsonProcessingException e) {
             errorResponse = null;

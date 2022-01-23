@@ -1,31 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static org.apache.logging.log4j.util.Strings.isBlank;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,7 +32,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -56,8 +39,20 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinim
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.apache.logging.log4j.util.Strings.isBlank;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -483,29 +478,24 @@ public class OrganisationExternalController extends SuperController {
             @NotNull @RequestBody List<@Valid ContactInformationCreationRequest> contactInformationCreationRequests,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
 
-        if(StringUtils.isEmpty(organisationIdentifier)||StringUtils.equals(organisationIdentifier,"null")){
+        if (StringUtils.isEmpty(organisationIdentifier) || StringUtils.equals(organisationIdentifier, "null")) {
             throw new InvalidRequest("Organisation id is missing");
         }
         ContactInformationEntityResponse contactInformationsResponse = null;
-        boolean validAddresses = true;
 
-        List<ContactInformationValidationResponse> contactInfoValidations = organisationCreationRequestValidator.validate(contactInformationCreationRequests);
+        List<ContactInformationValidationResponse> contactInfoValidations =
+                organisationCreationRequestValidator.validate(contactInformationCreationRequests);
         List<ContactInformationValidationResponse> result = null;
-        if(contactInfoValidations !=null && !contactInfoValidations.isEmpty()) {
-            result = contactInfoValidations.stream().
-                    filter(contactInfoValidation -> !contactInfoValidation.isValidAddress()).collect(Collectors.toList());
+        if (contactInfoValidations != null && !contactInfoValidations.isEmpty()) {
+            result = contactInfoValidations.stream()
+                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress())
+                            .collect(Collectors.toList());
         }
-        if(result!= null && !result.isEmpty()){
+        if (result != null && !result.isEmpty()) {
             contactInformationsResponse = new ContactInformationEntityResponse();
             contactInformationsResponse.setContactInfoValidations(contactInfoValidations);
-            throw new InvalidContactInformations("Invalid Contact informations",contactInfoValidations);
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body(contactInformationsResponse);
+            throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);
         } else {
-            //Received request to create a new organisation for external user
-            // return createOrganisationFrom(organisationCreationRequest);
-
 
             Optional<Organisation> organisation = Optional.ofNullable(organisationService
                     .getOrganisationByOrgIdentifier(organisationIdentifier));
@@ -513,12 +503,11 @@ public class OrganisationExternalController extends SuperController {
             if (organisation.isEmpty()) {
                 throw new ResourceNotFoundException("Organisation does not exist");
             }
-            //TODO apply business validation
 
-             contactInformationsResponse = organisationService.
-                    addContactInformationsToOrganisation(contactInformationCreationRequests, organisationIdentifier);
+            organisationService.addContactInformationsToOrganisation(
+                    contactInformationCreationRequests,
+                    organisationIdentifier);
 
-            //Received response to create a new organisation
             return ResponseEntity
                     .status(201)
                     .body(null);

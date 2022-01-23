@@ -1,19 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_CONTACT_INFO_IS_MISSING;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +18,19 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformatio
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 @Component
 @Slf4j
@@ -72,11 +69,12 @@ public class OrganisationCreationRequestValidator {
 
     }
 
-    public List<ContactInformationValidationResponse> validate(List<ContactInformationCreationRequest> contactInformationCreationRequests) {
-       // validateContactInformationRequests(contactInformationCreationRequests);
+    public List<ContactInformationValidationResponse> validate(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests) {
 
-        Optional<List<ContactInformationCreationRequest>> infoList = Optional.ofNullable(contactInformationCreationRequests);
-        if(infoList.isPresent()&&infoList.get().isEmpty()){
+        Optional<List<ContactInformationCreationRequest>> infoList =
+                Optional.ofNullable(contactInformationCreationRequests);
+        if (infoList.isPresent() && infoList.get().isEmpty()) {
             throw new ResourceNotFoundException("Request is empty");
         }
 
@@ -85,15 +83,16 @@ public class OrganisationCreationRequestValidator {
     }
 
 
-    private List<ContactInformationValidationResponse> validateConstraintValidation(List<ContactInformationCreationRequest> contactInformationCreationRequests){
+    private List<ContactInformationValidationResponse> validateConstraintValidation(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests) {
         List<ContactInformationValidationResponse> contactInformationValidationResponses = new ArrayList<>();
-        contactInformationCreationRequests.forEach(contactInfo->{
-            validateContactInformation(contactInfo,contactInformationValidationResponses);
-            //Validate dxAddresses
+
+        contactInformationCreationRequests.forEach(contactInfo -> {
+            validateContactInformation(contactInfo, contactInformationValidationResponses);
             List<DxAddressCreationRequest> dxAddressList = contactInfo.getDxAddress();
-            if(dxAddressList!=null && !dxAddressList.isEmpty()){
-                dxAddressList.forEach(dxAddress->{
-                    validateDxAddressValid(contactInfo,dxAddress,contactInformationValidationResponses);
+            if (dxAddressList != null && !dxAddressList.isEmpty()) {
+                dxAddressList.forEach(dxAddress -> {
+                    validateDxAddressValid(contactInfo, dxAddress, contactInformationValidationResponses);
                 });
             }
 
@@ -196,10 +195,11 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
-    public void validateContactInformation(ContactInformationCreationRequest contactInformation, List<ContactInformationValidationResponse> contactInformationValidationResponses) {
+    public void validateContactInformation(
+            ContactInformationCreationRequest contactInformation,
+            List<ContactInformationValidationResponse> contactInformationValidationResponses) {
 
-
-        try{
+        try {
             if (isEmptyValue(contactInformation.getAddressLine1())
                     || isEmptyValue(contactInformation.getAddressLine2())
                     || isEmptyValue(contactInformation.getAddressLine3())
@@ -208,14 +208,13 @@ public class OrganisationCreationRequestValidator {
                     || isEmptyValue(contactInformation.getTownCity())) {
 
                 throw new InvalidRequest("Empty contactInformation value");
-            }else {
+            } else {
                 ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
                 contactInfoBuilder.setUprn(contactInformation.getUprn());
                 contactInfoBuilder.setValidAddress(true);
-                //contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
                 contactInformationValidationResponses.add(contactInfoBuilder);
             }
-        }catch (InvalidRequest invalidRequest){
+        } catch (InvalidRequest invalidRequest) {
 
             ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
             contactInfoBuilder.setUprn(contactInformation.getUprn());
@@ -227,13 +226,17 @@ public class OrganisationCreationRequestValidator {
 
     }
 
-    private void validateDxAddressValid(ContactInformationCreationRequest contactInformation, DxAddressCreationRequest dxAddress, List<ContactInformationValidationResponse> contactInformationValidationResponses) {
+    private void validateDxAddressValid(
+            ContactInformationCreationRequest contactInformation, DxAddressCreationRequest dxAddress,
+            List<ContactInformationValidationResponse> contactInformationValidationResponses) {
 
-        try{
+        try {
             isDxAddressValid(dxAddress);
-        }catch (InvalidRequest invalidRequest){
+        } catch (InvalidRequest invalidRequest) {
 
-            ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
+            ContactInformationValidationResponse contactInfoBuilder =
+                    new ContactInformationValidationResponse();
+
             contactInfoBuilder.setUprn(contactInformation.getUprn());
             contactInfoBuilder.setValidAddress(false);
             contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
@@ -276,20 +279,14 @@ public class OrganisationCreationRequestValidator {
         OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
     }
 
-    public void validateContactInformationRequests(List<ContactInformationCreationRequest> contactInformationCreationRequests) {
+    public void validateContactInformationRequests(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests) {
 
-        Optional<List<ContactInformationCreationRequest>> infoList = Optional.ofNullable(contactInformationCreationRequests);
-        if(infoList.isPresent()&&infoList.get().isEmpty()){
+        Optional<List<ContactInformationCreationRequest>> infoList =
+                Optional.ofNullable(contactInformationCreationRequests);
+        if (infoList.isPresent() && infoList.get().isEmpty()) {
             throw new ResourceNotFoundException("Request is empty");
         }
-        //throw new InvalidRequest("Empty input value" + value);
-       // requestContactInformation(contactInformationCreationRequests);
-
-       // requestValues(request.getName(), request.getSraId(), request.getCompanyNumber(), request.getCompanyUrl());
-        //requestSuperUserValidateAccount(request.getSuperUser());
-
-        //requestPaymentAccount(request.getPaymentAccount());
-        //requestContactInformation(request.getContactInformation());
     }
 
 }

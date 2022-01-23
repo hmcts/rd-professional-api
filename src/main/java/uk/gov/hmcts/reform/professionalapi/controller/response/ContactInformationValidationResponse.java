@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -8,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 

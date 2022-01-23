@@ -4,13 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,8 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -52,7 +44,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -61,8 +52,13 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -389,42 +385,35 @@ class OrganisationExternalControllerTest {
     @Test
     void should_add_contact_informations_to_organisation() {
 
-        //Create contractinformation requests
-         List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
-         List<DxAddressCreationRequest> dxAddressRequests = new ArrayList<>();
+        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
+        List<DxAddressCreationRequest> dxAddressRequests = new ArrayList<>();
 
         DxAddressCreationRequest dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
         dxAddressRequests.add(dxAddressRequest);
 
-        ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest("uprn","addressLine-1",
+        ContactInformationCreationRequest contactInformationCreationRequest =
+                new ContactInformationCreationRequest("uprn", "addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
                 "country", "postCode", dxAddressRequests);
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
-        List <ContactInformationResponseWithDxAddress> result = new ArrayList<>();
-       // ContactInformationResponseWithDxAddress contactInformationResponseWithDxAddress = new ContactInformationResponseWithDxAddress();
-
+        List<ContactInformationResponseWithDxAddress> result = new ArrayList<>();
 
         final String orgUUId = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
         ContactInformationEntityResponse contactInformationEntityResponse = new ContactInformationEntityResponse();
         contactInformationEntityResponse.setContactInformationsResponse(result);
 
-        when(organisationServiceMock.addContactInformationsToOrganisation(contactInformationCreationRequests,orgUUId))
+        when(organisationServiceMock.addContactInformationsToOrganisation(contactInformationCreationRequests, orgUUId))
                 .thenReturn(contactInformationEntityResponse);
 
         Organisation organisationMock = mock(Organisation.class);
-        //organisationMock.setId(orgUUId);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgUUId)).thenReturn(organisationMock);
 
 
         ResponseEntity<?> actual = organisationExternalController
-                .addContactInformationsToOrganisation(contactInformationCreationRequests,orgUUId);
-        verify(organisationServiceMock,times(1)).getOrganisationByOrgIdentifier(anyString());
+                .addContactInformationsToOrganisation(contactInformationCreationRequests, orgUUId);
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(anyString());
 
-       // verify(organisationCreationRequestValidatorMock, times(1))
-                //.validate(any(OrganisationCreationRequest.class));
-       // verify(organisationServiceMock, times(1))
-       //         .createOrganisationFrom(organisationCreationRequest);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);

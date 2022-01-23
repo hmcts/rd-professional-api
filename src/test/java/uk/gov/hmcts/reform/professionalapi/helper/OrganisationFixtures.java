@@ -122,7 +122,7 @@ public class OrganisationFixtures {
     }
 
     public static List<ContactInformationCreationRequest> getContactInformationList() {
-        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>() ;
+        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
         contactInformationCreationRequests.add(
                 aContactInformationCreationRequest()
                         .uprn("uprn1")
@@ -156,7 +156,7 @@ public class OrganisationFixtures {
                         .build()
         );
 
-    return contactInformationCreationRequests;
+        return contactInformationCreationRequests;
 
     }
 
