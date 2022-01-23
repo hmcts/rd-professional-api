@@ -1138,7 +1138,7 @@ class OrganisationServiceImplTest {
 
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(orgUUId);
-        verify(contactInformationRepositoryMock, times(1)).saveAll(anyList());
+        verify(contactInformationRepositoryMock, times(2)).save(any(ContactInformation.class));
        // verify(dxAddressRepositoryMock, times(2)).save(any(DxAddress.class));
         //verify(organisationMock, times(2)).getStatus();
         //verify(organisationMock, times(1)).setUsers(anyList());
