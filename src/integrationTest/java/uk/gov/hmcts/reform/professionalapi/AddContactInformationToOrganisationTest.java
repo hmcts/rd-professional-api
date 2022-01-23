@@ -150,7 +150,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("401");
     }
-  
+
     @Test
     void add_contact_informations_to_organisation_returns_404_when_empty_contact_information_list() {
 

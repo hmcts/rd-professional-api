@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -478,7 +479,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured({"pui-organisation-manager"})
-    public ResponseEntity<ContactInformationEntityResponse> addContactInformationsToOrganisation(
+    public ResponseEntity<Void> addContactInformationsToOrganisation(
             @NotNull @RequestBody List<@Valid ContactInformationCreationRequest> contactInformationCreationRequests,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
 
@@ -497,9 +498,10 @@ public class OrganisationExternalController extends SuperController {
         if(result!= null && !result.isEmpty()){
             contactInformationsResponse = new ContactInformationEntityResponse();
             contactInformationsResponse.setContactInfoValidations(contactInfoValidations);
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(contactInformationsResponse);
+            throw new InvalidContactInformations("Invalid Contact informations",contactInfoValidations);
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body(contactInformationsResponse);
         } else {
             //Received request to create a new organisation for external user
             // return createOrganisationFrom(organisationCreationRequest);
@@ -519,7 +521,7 @@ public class OrganisationExternalController extends SuperController {
             //Received response to create a new organisation
             return ResponseEntity
                     .status(201)
-                    .body(contactInformationsResponse);
+                    .body(null);
         }
 
 
