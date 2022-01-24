@@ -520,7 +520,7 @@ public abstract class SuperController {
             throw new ResourceNotFoundException(ERROR_MSG_REQUEST_IS_EMPTY);
         }
         if (addressIds.contains(null) || addressIds.contains(EMPTY)
-                || addressIds.stream().anyMatch(str -> str.matches(".*\\s.*"))) {
+                || addressIds.stream().anyMatch(str -> StringUtils.isBlank(str))) {
             throw new InvalidRequest(ERROR_MSG_REQUEST_IS_MALFORMED);
         }
 
