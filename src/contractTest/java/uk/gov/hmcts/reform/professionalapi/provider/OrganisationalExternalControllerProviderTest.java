@@ -7,14 +7,16 @@ import feign.Request;
 import feign.Response;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -35,7 +37,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -74,6 +78,9 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @Mock
     private Organisation organisationMock;
+
+    @MockBean
+    public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
 
     @Autowired
     OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
@@ -174,6 +181,17 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
 
         when(paymentAccountRepositoryMock.save(any(PaymentAccount.class))).thenReturn(paymentAccount);
+
+    }
+
+    @State({"Add contact informations to organisation"})
+    public void toAddContactInformationsToOrganisation() {
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+                .thenReturn(organisationMock);
+        doNothing().when(organisationCreationRequestValidatorMock).validate(anyList());
+
+        doNothing().when(organisationServiceMock).addContactInformationsToOrganisation(anyList(), anyString());
 
     }
 }
