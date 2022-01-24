@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
@@ -41,6 +42,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -190,8 +192,14 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
                 .thenReturn(organisationMock);
         doNothing().when(organisationCreationRequestValidatorMock).validate(anyList());
-
         doNothing().when(organisationServiceMock).addContactInformationsToOrganisation(anyList(), anyString());
+
+
+        ResponseEntity<Void> response = ResponseEntity
+                .status(201)
+                .body(null);
+        doReturn(response).when(organisationExternalController.addContactInformationsToOrganisation(anyList(), anyString()));
+
 
     }
 }
