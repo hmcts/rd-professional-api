@@ -1108,5 +1108,13 @@ class OrganisationServiceImplTest {
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
     }
 
+    @Test
+    void testDeleteMultipleAddressOfGivenOrganisation() {
+        var addressId = new HashSet<String>();
+        addressId.add("1234");
+        doNothing().when(contactInformationRepositoryMock).deleteByAddressId(anySet());
+        sut.deleteMultipleAddressOfGivenOrganisation(addressId);
+        verify(contactInformationRepositoryMock, times(1)).deleteByAddressId(anySet());
+    }
 
 }

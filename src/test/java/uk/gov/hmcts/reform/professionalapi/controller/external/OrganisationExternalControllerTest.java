@@ -427,6 +427,56 @@ class OrganisationExternalControllerTest {
         assertThrows(ResourceNotFoundException.class,() ->
                 organisationExternalController
                         .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
+    }
 
+    @Test
+    void test_deleteMultipleAddressesOfOrganisation_NullAddress_Passed() {
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
+        deleteMultipleAddressRequest.setAddressId(null);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(ResourceNotFoundException.class,() ->
+                organisationExternalController
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
+    }
+
+    @Test
+    void test_deleteMultipleAddressesOfOrganisation_nullAddressIdPassed() {
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
+        var addressId = new HashSet<String>();
+        addressId.add(null);
+        deleteMultipleAddressRequest.setAddressId(addressId);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(InvalidRequest.class,() ->
+                organisationExternalController
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
+    }
+
+    @Test
+    void test_deleteMultipleAddressesOfOrganisation_EmptyAddressIdPassed() {
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
+        var addressId = new HashSet<String>();
+        addressId.add("");
+        deleteMultipleAddressRequest.setAddressId(addressId);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(InvalidRequest.class,() ->
+                organisationExternalController
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
+    }
+
+    @Test
+    void test_deleteMultipleAddressesOfOrganisation_NoOrgIdPassed() {
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
+        var addressId = new HashSet<String>();
+        UUID uuid = UUID.randomUUID();
+        String uuidAsString = uuid.toString();
+        addressId.add(uuidAsString);
+        deleteMultipleAddressRequest.setAddressId(addressId);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(InvalidRequest.class,() ->
+                organisationExternalController
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, null, userId));
     }
 }
