@@ -54,6 +54,8 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -375,6 +377,56 @@ class OrganisationExternalControllerTest {
 
         verify(organisationServiceMock, times(1))
                 .addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+    }
+
+    @Test
+    void testDeleteMultipleAddressesOfOrganisation() {
+        var addressId = new HashSet<String>();
+        UUID uuid = UUID.randomUUID();
+        String uuidAsString = uuid.toString();
+        addressId.add(uuidAsString);
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
+        deleteMultipleAddressRequest.setAddressId(addressId);
+
+        ContactInformation contactInformation01 = new ContactInformation();
+        contactInformation01.setAddressLine1("addressLine1");
+        contactInformation01.setId(uuid);
+
+        ContactInformation contactInformation02 = new ContactInformation();
+        contactInformation02.setAddressLine1("addressLine2");
+        contactInformation02.setId(UUID.randomUUID());
+
+        var contactInformations = new ArrayList<ContactInformation>();
+        contactInformations.add(contactInformation01);
+        contactInformations.add(contactInformation02);
+        organisation.setContactInformations(contactInformations);
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisationExternalController
+                .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId);
+
+        verify(professionalUserServiceMock, times(1))
+                .checkUserStatusIsActiveByUserId(anyString());
+        verify(organisationIdentifierValidatorImplMock, times(1))
+                .validateOrganisationIsActive(any(Organisation.class), any(HttpStatus.class));
+        verify(organisationServiceMock, times(1))
+                .deleteMultipleAddressOfGivenOrganisation(addressId);
+
+    }
+
+    @Test
+    void test_deleteMultipleAddressesOfOrganisation_NoAddressIdPassed() {
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
+        var addressId = new HashSet<String>();
+        deleteMultipleAddressRequest.setAddressId(addressId);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(ResourceNotFoundException.class,() ->
+                organisationExternalController
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
 
     }
 }
