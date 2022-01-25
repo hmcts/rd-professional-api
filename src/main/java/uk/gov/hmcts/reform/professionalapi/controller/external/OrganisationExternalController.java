@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -478,9 +476,6 @@ public class OrganisationExternalController extends SuperController {
             @NotNull @RequestBody List<@Valid ContactInformationCreationRequest> contactInformationCreationRequests,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
 
-//        if (StringUtils.isEmpty(organisationIdentifier) || StringUtils.equals(organisationIdentifier, "null")) {
-//            throw new InvalidRequest("Organisation id is missing");
-//        }
         ContactInformationEntityResponse contactInformationsResponse = null;
 
         List<ContactInformationValidationResponse> contactInfoValidations =
