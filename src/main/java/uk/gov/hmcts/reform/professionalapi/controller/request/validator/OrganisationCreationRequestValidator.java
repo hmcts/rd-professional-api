@@ -9,11 +9,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -99,6 +102,28 @@ public class OrganisationCreationRequestValidator {
 
         });
         return contactInformationValidationResponses;
+    }
+
+    public ContactInformationEntityResponse validateContactInformations(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests) {
+
+        ContactInformationEntityResponse contactInformationsResponse = null;
+
+        List<ContactInformationValidationResponse> contactInfoValidations =
+                validate(contactInformationCreationRequests);
+
+        List<ContactInformationValidationResponse> result = null;
+        if (contactInfoValidations != null && !contactInfoValidations.isEmpty()) {
+            result = contactInfoValidations.stream()
+                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress())
+                    .collect(Collectors.toList());
+        }
+        if (result != null && !result.isEmpty()) {
+            contactInformationsResponse = new ContactInformationEntityResponse();
+            contactInformationsResponse.setContactInfoValidations(contactInfoValidations);
+            throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);
+        }
+        return contactInformationsResponse;
     }
 
     public static boolean contains(String status) {

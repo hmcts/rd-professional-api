@@ -25,12 +25,9 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -44,7 +41,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -473,41 +469,27 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<Void> addContactInformationsToOrganisation(
-            @NotNull @RequestBody List<@Valid ContactInformationCreationRequest> contactInformationCreationRequests,
+            @Valid @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
 
-        ContactInformationEntityResponse contactInformationsResponse = null;
 
-        List<ContactInformationValidationResponse> contactInfoValidations =
-                organisationCreationRequestValidator.validate(contactInformationCreationRequests);
-        List<ContactInformationValidationResponse> result = null;
-        if (contactInfoValidations != null && !contactInfoValidations.isEmpty()) {
-            result = contactInfoValidations.stream()
-                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress())
-                            .collect(Collectors.toList());
-        }
-        if (result != null && !result.isEmpty()) {
-            contactInformationsResponse = new ContactInformationEntityResponse();
-            contactInformationsResponse.setContactInfoValidations(contactInfoValidations);
-            throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);
-        } else {
+        organisationCreationRequestValidator.validateContactInformations(contactInformationCreationRequests);
 
-            Optional<Organisation> organisation = Optional.ofNullable(organisationService
-                    .getOrganisationByOrgIdentifier(organisationIdentifier));
 
-            if (organisation.isEmpty()) {
-                throw new ResourceNotFoundException("Organisation does not exist");
-            }
+        Optional<Organisation> organisation = Optional.ofNullable(organisationService
+                .getOrganisationByOrgIdentifier(organisationIdentifier));
 
-            organisationService.addContactInformationsToOrganisation(
-                    contactInformationCreationRequests,
-                    organisationIdentifier);
-
-            return ResponseEntity
-                    .status(201)
-                    .body(null);
+        if (organisation.isEmpty()) {
+            throw new ResourceNotFoundException("Organisation does not exist");
         }
 
+        organisationService.addContactInformationsToOrganisation(
+                contactInformationCreationRequests,
+                organisationIdentifier);
+
+        return ResponseEntity
+                .status(201)
+                .body(null);
 
     }
 

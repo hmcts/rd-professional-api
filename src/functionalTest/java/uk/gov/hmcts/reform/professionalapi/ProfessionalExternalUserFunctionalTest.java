@@ -23,10 +23,10 @@ import uk.gov.hmcts.reform.professionalapi.util.serenity5.SerenityTest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -603,10 +603,10 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         suspendPuiOrgManagerUserScenarios();
     }
+
     public void invitePuiOrgManagerUserScenarios() {
         inviteUserByPuiOrgManagerShouldBeSuccess();
     }
-
 
 
     public void suspendPuiOrgManagerUserScenarios() {
