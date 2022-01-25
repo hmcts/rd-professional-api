@@ -78,10 +78,6 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
     @Mock
     private Organisation organisationMock;
 
-    @MockBean
-    public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
-
-
     @Autowired
     OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
 
