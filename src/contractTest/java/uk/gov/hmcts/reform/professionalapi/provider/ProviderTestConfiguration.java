@@ -17,6 +17,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
@@ -54,6 +55,9 @@ public class ProviderTestConfiguration {
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @MockBean
     protected PaymentAccountValidator paymentAccountValidator;
+
+    @MockBean
+    public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
 
 
     @Value("${prd.security.roles.hmcts-admin:}")
