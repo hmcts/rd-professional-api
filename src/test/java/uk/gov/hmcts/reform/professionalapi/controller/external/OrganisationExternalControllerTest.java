@@ -401,7 +401,6 @@ class OrganisationExternalControllerTest {
 
         final String orgUUId = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
         ContactInformationEntityResponse contactInformationEntityResponse = new ContactInformationEntityResponse();
-        contactInformationEntityResponse.setContactInformationsResponse(result);
 
         when(organisationServiceMock.addContactInformationsToOrganisation(contactInformationCreationRequests, orgUUId))
                 .thenReturn(contactInformationEntityResponse);

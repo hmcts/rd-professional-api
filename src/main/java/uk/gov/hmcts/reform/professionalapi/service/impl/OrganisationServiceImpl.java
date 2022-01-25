@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -267,35 +266,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         return contactInformation;
     }
 
-
-    public ContactInformation createContactInformation(
-            ContactInformationCreationRequest contactInfo,
-            Organisation organisation) {
-
-        ContactInformation contactInformation = new ContactInformation();
-        contactInformation.setUprn(RefDataUtil.removeEmptySpaces(contactInfo.getUprn()));
-        contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
-        contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
-        contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
-        contactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
-        contactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
-        contactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
-        contactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
-        contactInformation.setOrganisation(organisation);
-
-        List<DxAddressCreationRequest> dxAddressCreationRequest = contactInfo.getDxAddress();
-
-        List<DxAddress> dxAddresses = new ArrayList<>();
-        dxAddressCreationRequest.forEach(dxAdd -> {
-            DxAddress dxAddress = new DxAddress(
-                    RefDataUtil.removeEmptySpaces(dxAdd.getDxNumber()),
-                    RefDataUtil.removeEmptySpaces(dxAdd.getDxExchange()),
-                    contactInformation);
-            dxAddresses.add(dxAddress);
-        });
-        contactInformation.getDxAddresses().addAll(dxAddresses);
-        return contactInformation;
-    }
 
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
                                                   ContactInformation contactInformation) {
@@ -610,14 +580,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
-    private ContactInformationEntityResponse createContactInformationEntityResponse(
-            List<ContactInformationResponseWithDxAddress> contactInfomations) {
-        ContactInformationEntityResponse contactInformationEntityResponse =
-                new ContactInformationEntityResponse();
-        contactInformationEntityResponse.setContactInformationsResponse(contactInfomations);
-        return contactInformationEntityResponse;
 
-    }
 
     private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaRequest pbaRequest) {
         Set<String> invalidPaymentAccounts = null;
