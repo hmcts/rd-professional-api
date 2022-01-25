@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
@@ -83,6 +85,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @MockBean
     public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
+
 
     @Autowired
     OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
@@ -188,18 +191,13 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @State({"Add contact informations to organisation"})
     public void toAddContactInformationsToOrganisation() {
-
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
                 .thenReturn(organisationMock);
-        doNothing().when(organisationCreationRequestValidatorMock).validate(anyList());
-        doNothing().when(organisationServiceMock).addContactInformationsToOrganisation(anyList(), anyString());
 
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
 
-        ResponseEntity<Void> response = ResponseEntity
-                .status(201)
-                .body(null);
-        doReturn(response).when(organisationExternalController.addContactInformationsToOrganisation(anyList(), anyString()));
-
+        ContactInformationEntityResponse contactResponse = new ContactInformationEntityResponse();
+        when(organisationServiceMock.addContactInformationsToOrganisation(any(),any())).thenReturn(contactResponse);
 
     }
 }

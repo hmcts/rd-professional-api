@@ -478,9 +478,9 @@ public class OrganisationExternalController extends SuperController {
             @NotNull @RequestBody List<@Valid ContactInformationCreationRequest> contactInformationCreationRequests,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
 
-        if (StringUtils.isEmpty(organisationIdentifier) || StringUtils.equals(organisationIdentifier, "null")) {
-            throw new InvalidRequest("Organisation id is missing");
-        }
+//        if (StringUtils.isEmpty(organisationIdentifier) || StringUtils.equals(organisationIdentifier, "null")) {
+//            throw new InvalidRequest("Organisation id is missing");
+//        }
         ContactInformationEntityResponse contactInformationsResponse = null;
 
         List<ContactInformationValidationResponse> contactInfoValidations =
