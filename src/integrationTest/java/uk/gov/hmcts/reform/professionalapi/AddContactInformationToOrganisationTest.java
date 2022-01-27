@@ -100,10 +100,9 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     }
 
     @Test
-    void add_contact_informations_to_organisation_returns_404_when_contact_information_list_is_empty() {
+    void add_contact_informations_to_organisation_returns_400_when_contact_information_list_is_empty() {
 
-        contactInformationCreationRequests = new ArrayList<>();
-        contactInformationCreationRequests.add(aContactInformationCreationRequest().build());
+        contactInformationCreationRequests = getContactInfoWithEmptyList();
 
         Map<String, Object> addContactsToOrgresponse =
                 professionalReferenceDataClient.addContactInformationsToOrganisation(
@@ -113,6 +112,22 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
+
+    @Test
+    void add_contact_informations_to_organisation_returns_400_when_contact_information_contact_is_empty() {
+
+        contactInformationCreationRequests = getContactInfoWithEmptyContact();
+
+        Map<String, Object> addContactsToOrgresponse =
+                professionalReferenceDataClient.addContactInformationsToOrganisation(
+                        contactInformationCreationRequests, puiOrgManager, userId);
+
+        assertThat(addContactsToOrgresponse).isNotNull();
+
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
+    }
+
+
 
     @Test
     void add_contact_informations_to_organisation_returns_201_when_contact_information_dxAddress_list_is_empty() {
@@ -176,7 +191,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     }
 
     @Test
-    void add_contact_informations_to_organisation_returns_404_when_empty_contact_information_list() {
+    void add_contact_informations_to_organisation_returns_400_when_empty_contact_information_list() {
 
         contactInformationCreationRequests = new ArrayList<>();
         Map<String, Object> addContactsToOrgresponse =
@@ -189,16 +204,47 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
         assertThat(addContactsToOrgresponse).isNotNull();
         ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
 
-        assertThat(errorResponse.getErrorMessage()).contains("Resource not found");
         assertThat(errorResponse.getErrorDescription()).contains("Request is empty");
-        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("404");
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    void add_contact_informations_to_organisation_returns_400_when_contact_information_addressLine1_is_empty() {
+
+        contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
+                .addressLine1("")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("country")
+                .county("county")
+                .townCity("town-city")
+                .uprn("uprn")
+                .postCode("some-post-code")
+                .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                        .dxNumber("DX 1234567890")
+                        .dxExchange("dxExchange").build()))
+                .build());
+
+        Map<String, Object> addContactsToOrgresponse =
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                puiOrgManager,
+                                userId);
+
+        assertThat(addContactsToOrgresponse).isNotNull();
+
+        List<ContactInformationValidationResponse> errorResponse =
+                get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
 
     @Test
     void add_contact_informations_to_organisation_returns_400_when_contact_information_addressLine1_is_missing() {
 
         contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("")
+                //.addressLine1("")
                 .addressLine2("addressLine2")
                 .addressLine3("addressLine3")
                 .country("country")
@@ -268,7 +314,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
         List<ContactInformationValidationResponse> errorResponse =
                 get400ErrorResponse(
                         addContactsToOrgresponse.get("response_body").toString());
-        assertThat(errorResponse.size()).isEqualTo(4);
+        assertThat(errorResponse.size()).isEqualTo(2);
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
 
@@ -333,5 +379,48 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
         }
         return errorResponse;
     }
+
+    private List<ContactInformationCreationRequest> getContactInfoWithEmptyContact() {
+
+        List<ContactInformationCreationRequest> info = null;
+        String emptyBody = "[{}]";
+
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        ErrorResponse errorResponse = null;
+        try {
+
+            info = mapper
+                    .readValue(
+                            emptyBody,
+                            new TypeReference<List<ContactInformationCreationRequest>>() {
+                            });
+        } catch (JsonProcessingException e) {
+            info = null;
+        }
+        return info;
+    }
+
+    private List<ContactInformationCreationRequest> getContactInfoWithEmptyList() {
+
+        List<ContactInformationCreationRequest> info = null;
+        String emptyBody = "[]";
+
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        ErrorResponse errorResponse = null;
+        try {
+
+            info = mapper
+                    .readValue(
+                            emptyBody,
+                            new TypeReference<List<ContactInformationCreationRequest>>() {
+                            });
+        } catch (JsonProcessingException e) {
+            info = null;
+        }
+        return info;
+    }
+
 
 }

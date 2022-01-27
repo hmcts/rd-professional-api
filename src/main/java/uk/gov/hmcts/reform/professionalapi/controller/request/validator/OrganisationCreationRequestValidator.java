@@ -77,7 +77,7 @@ public class OrganisationCreationRequestValidator {
         Optional<List<ContactInformationCreationRequest>> infoList =
                 Optional.ofNullable(contactInformationCreationRequests);
         if (infoList.isPresent() && infoList.get().isEmpty()) {
-            throw new ResourceNotFoundException("Request is empty");
+            throw new InvalidRequest("Request is empty");
         }
 
         return validateConstraintValidation(contactInformationCreationRequests);
@@ -91,13 +91,6 @@ public class OrganisationCreationRequestValidator {
 
         contactInformationCreationRequests.forEach(contactInfo -> {
             validateContactInformation(contactInfo, contactInformationValidationResponses);
-            List<DxAddressCreationRequest> dxAddressList = contactInfo.getDxAddress();
-            if (dxAddressList != null && !dxAddressList.isEmpty()) {
-                dxAddressList.forEach(dxAddress -> {
-                    validateDxAddressValid(contactInfo, dxAddress, contactInformationValidationResponses);
-                });
-            }
-
 
         });
         return contactInformationValidationResponses;
@@ -219,7 +212,10 @@ public class OrganisationCreationRequestValidator {
             List<ContactInformationValidationResponse> contactInformationValidationResponses) {
 
         try {
-            if (isEmptyValue(contactInformation.getAddressLine1())
+
+            if (contactInformation == null) {
+                throw new InvalidRequest("Empty contactInformation value");
+            } else if (isEmptyValue(contactInformation.getAddressLine1())
                     || isEmptyValue(contactInformation.getAddressLine2())
                     || isEmptyValue(contactInformation.getAddressLine3())
                     || isEmptyValue(contactInformation.getCountry())
@@ -227,7 +223,15 @@ public class OrganisationCreationRequestValidator {
                     || isEmptyValue(contactInformation.getTownCity())) {
 
                 throw new InvalidRequest("Empty contactInformation value");
+            } else if (StringUtils.isBlank(contactInformation.getAddressLine1())) {
+                throw new InvalidRequest("AddressLine1 cannot be empty");
             } else {
+                List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
+                if (dxAddressList != null && !dxAddressList.isEmpty()) {
+                    dxAddressList.forEach(dxAddress -> {
+                        isDxAddressValid(dxAddress);
+                    });
+                }
                 ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
                 contactInfoBuilder.setUprn(contactInformation.getUprn());
                 contactInfoBuilder.setValidAddress(true);
