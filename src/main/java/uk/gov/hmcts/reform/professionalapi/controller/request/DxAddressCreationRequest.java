@@ -7,7 +7,6 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 @Getter
 @Builder(builderMethodName = "dxAddressCreationRequest")
@@ -15,10 +14,8 @@ public class DxAddressCreationRequest {
 
     @NotNull
     @Pattern(regexp = "^(?:DX|NI) [0-9]{10}+$")
-    @Size(max = 13)
     private final String dxNumber;
     @NotNull
-    @Size(max = 20)
     private final String dxExchange;
 
     @JsonCreator

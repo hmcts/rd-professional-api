@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExter
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -184,9 +183,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
                 .thenReturn(organisationMock);
 
         when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
-
-        ContactInformationEntityResponse contactResponse = new ContactInformationEntityResponse();
-        when(organisationServiceMock.addContactInformationsToOrganisation(any(),any())).thenReturn(contactResponse);
+        doNothing().when(organisationServiceMock).addContactInformationsToOrganisation(any(),any());
 
     }
 }

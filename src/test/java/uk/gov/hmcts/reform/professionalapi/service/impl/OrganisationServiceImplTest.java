@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -1113,7 +1112,6 @@ class OrganisationServiceImplTest {
         Organisation organisationMock = mock(Organisation.class);
         final String orgUUId = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
         when(organisationRepository.findByOrganisationIdentifier(orgUUId)).thenReturn(organisationMock);
-        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
 
         dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
         dxAddressRequests.add(dxAddressRequest);
@@ -1125,10 +1123,8 @@ class OrganisationServiceImplTest {
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
 
-        ContactInformationEntityResponse result = sut
-                .addContactInformationsToOrganisation(contactInformationCreationRequests,orgUUId);
+        sut.addContactInformationsToOrganisation(contactInformationCreationRequests, orgUUId);
 
-        assertThat(result).isNotNull();
 
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(orgUUId);

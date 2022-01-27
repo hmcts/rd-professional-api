@@ -100,6 +100,21 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     }
 
     @Test
+    void add_contact_informations_to_organisation_returns_404_when_contact_information_list_is_empty() {
+
+        contactInformationCreationRequests = new ArrayList<>();
+        contactInformationCreationRequests.add(aContactInformationCreationRequest().build());
+
+        Map<String, Object> addContactsToOrgresponse =
+                professionalReferenceDataClient.addContactInformationsToOrganisation(
+                        contactInformationCreationRequests, puiOrgManager, userId);
+
+        assertThat(addContactsToOrgresponse).isNotNull();
+
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
     void add_contact_informations_to_organisation_returns_201_when_contact_information_dxAddress_list_is_empty() {
 
         contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()

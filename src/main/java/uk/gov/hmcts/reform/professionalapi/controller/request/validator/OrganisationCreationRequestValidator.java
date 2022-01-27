@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -104,10 +103,8 @@ public class OrganisationCreationRequestValidator {
         return contactInformationValidationResponses;
     }
 
-    public ContactInformationEntityResponse validateContactInformations(
+    public void validateContactInformations(
             List<ContactInformationCreationRequest> contactInformationCreationRequests) {
-
-        ContactInformationEntityResponse contactInformationsResponse = null;
 
         List<ContactInformationValidationResponse> contactInfoValidations =
                 validate(contactInformationCreationRequests);
@@ -119,11 +116,8 @@ public class OrganisationCreationRequestValidator {
                     .collect(Collectors.toList());
         }
         if (result != null && !result.isEmpty()) {
-            contactInformationsResponse = new ContactInformationEntityResponse();
-            contactInformationsResponse.setContactInfoValidations(contactInfoValidations);
             throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);
         }
-        return contactInformationsResponse;
     }
 
     public static boolean contains(String status) {

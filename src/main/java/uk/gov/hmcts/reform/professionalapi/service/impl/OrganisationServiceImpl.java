@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -555,7 +554,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public ContactInformationEntityResponse addContactInformationsToOrganisation(
+    public void addContactInformationsToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequests,
             String organisationIdentifier) {
 
@@ -569,14 +568,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         Organisation organisation = organisationOptional.get();
-        validateOrganisationIsActive(organisation);
 
         addContactInformationToOrganisation(contactInformationCreationRequests, organisation);
 
-
-        ContactInformationEntityResponse contactInformationEntityResponse = new ContactInformationEntityResponse();
-        contactInformationEntityResponse.setOrganisationIdentifier(organisation.getOrganisationIdentifier());
-        return contactInformationEntityResponse;
 
     }
 
