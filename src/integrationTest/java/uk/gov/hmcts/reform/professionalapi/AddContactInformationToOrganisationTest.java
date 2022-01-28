@@ -99,6 +99,34 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
     }
 
+
+    @Test
+    void add_contact_informations_to_organisation_returns_201_when_contact_information_dxAddress_list_is_empty() {
+
+        contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("country")
+                .county("county")
+                .townCity("town-city")
+                .uprn("uprn")
+                .postCode("some-post-code").dxAddress(new ArrayList<>())
+
+                .build());
+
+        Map<String, Object> addContactsToOrgresponse =
+                professionalReferenceDataClient
+                        .addContactInformationsToOrganisation(
+                                contactInformationCreationRequests,
+                                puiOrgManager,
+                                userId);
+
+        assertThat(addContactsToOrgresponse).isNotNull();
+
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
+    }
+
     @Test
     void add_contact_informations_to_organisation_returns_400_when_contact_information_list_is_empty() {
 
@@ -129,32 +157,6 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
 
 
-    @Test
-    void add_contact_informations_to_organisation_returns_201_when_contact_information_dxAddress_list_is_empty() {
-
-        contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .country("country")
-                .county("county")
-                .townCity("town-city")
-                .uprn("uprn")
-                .postCode("some-post-code").dxAddress(new ArrayList<>())
-
-                .build());
-
-        Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient
-                        .addContactInformationsToOrganisation(
-                                contactInformationCreationRequests,
-                                puiOrgManager,
-                                userId);
-
-        assertThat(addContactsToOrgresponse).isNotNull();
-
-        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
-    }
 
     @Test
     void add_contact_informations_to_organisation_returns_403_when_forbidden_user_role() {
@@ -236,6 +238,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
         List<ContactInformationValidationResponse> errorResponse =
                 get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        assertThat(errorResponse.get(0).getErrorDescription()).contains("Empty contactInformation value");
 
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
@@ -268,6 +271,8 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
         List<ContactInformationValidationResponse> errorResponse =
                 get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        assertThat(errorResponse.get(0).getErrorDescription()).contains("AddressLine1 cannot be empty");
+
 
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
@@ -276,7 +281,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
     void add_contact_informations_to_org_returns_400_when_contact_info_addrLine1_DxNum_DxEx_missing() {
 
         contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("")
+                        //.addressLine1("")
                         .addressLine2("addressLine2")
                         .addressLine3("addressLine3")
                         .country("country")
@@ -290,7 +295,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
                 aContactInformationCreationRequest()
                         .uprn("uprn2")
-                        .addressLine1("")
+                        .addressLine1("addressLine1")
                         .addressLine2("addressLine2")
                         .addressLine3("addressLine3")
                         .country("country")
@@ -300,7 +305,47 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
                                 .dxNumber("this is an invalid dx number")
                                 .dxExchange(null).build()))
-                        .build());
+                        .build(),
+                aContactInformationCreationRequest()
+                        .uprn("uprn3")
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("this is an invalid dxExchange").build()))
+                        .build(),
+                aContactInformationCreationRequest()
+                        .uprn("uprn4")
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("")
+                                .dxExchange("this is an invalid dxExchange").build()))
+                        .build(),
+                aContactInformationCreationRequest()
+                        .uprn("uprn5")
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("").build()))
+                        .build()
+        );
 
         Map<String, Object> addContactsToOrgresponse =
                 professionalReferenceDataClient
@@ -314,12 +359,59 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
         List<ContactInformationValidationResponse> errorResponse =
                 get400ErrorResponse(
                         addContactsToOrgresponse.get("response_body").toString());
-        assertThat(errorResponse.size()).isEqualTo(2);
+
+        assertThat(errorResponse.size()).isEqualTo(5);
+        assertThat(errorResponse.get(0).getUprn()).isBlank();
+        assertThat(errorResponse.get(0).getErrorDescription()).contains("AddressLine1 cannot be empty");
+
+        assertThat(errorResponse.get(1).getErrorDescription()).contains("DX Number or DX Exchange cannot be empty");
+        assertThat(errorResponse.get(2).getErrorDescription()).contains(
+                "DX Number (max=13) or DX Exchange (max=20) has invalid length");
+        assertThat(errorResponse.get(3).getErrorDescription()).contains("DX Number or DX Exchange cannot be empty");
+        assertThat(errorResponse.get(4).getErrorDescription()).contains("DX Number or DX Exchange cannot be empty");
+
+
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
     }
 
     @Test
     void add_contact_informations_to_organisation_returns_400_returns_bad_request_when_dx_num_invalid() {
+        contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("country")
+                .county("county")
+                .townCity("town-city")
+                .uprn("uprn")
+                .postCode("some-post-code")
+                .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                        //.dxNumber("this is an invalid dx number")
+                        .dxExchange("dxExchange").build()))
+                .build());
+
+        Map<String, Object> addContactsToOrgresponse =
+                professionalReferenceDataClient.addContactInformationsToOrganisation(
+                        contactInformationCreationRequests,
+                        puiOrgManager,
+                        userId);
+
+        assertThat(addContactsToOrgresponse).isNotNull();
+
+        List<ContactInformationValidationResponse> errorResponse =
+                get400ErrorResponse(
+                        addContactsToOrgresponse
+                                .get("response_body").toString());
+        assertThat(errorResponse.get(0).getErrorDescription())
+                .contains("DX Number or DX Exchange cannot be empty");
+
+
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
+
+    }
+
+    @Test
+    void add_contact_informations_to_organisation_returns_400_returns_bad_request_when_dx_num_len_invalid() {
         contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
                 .addressLine2("addressLine2")
@@ -346,6 +438,9 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 get400ErrorResponse(
                         addContactsToOrgresponse
                                 .get("response_body").toString());
+        assertThat(errorResponse.get(0).getErrorDescription())
+                .contains("DX Number (max=13) or DX Exchange (max=20) has invalid length");
+
 
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
 
