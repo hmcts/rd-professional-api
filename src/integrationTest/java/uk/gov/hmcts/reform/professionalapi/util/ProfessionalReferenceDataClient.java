@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinim
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application.yml")
@@ -692,4 +693,25 @@ public class ProfessionalReferenceDataClient {
 
         return getResponse(responseEntity);
     }
+
+    public Map<String, Object> deleteContactInformationAddressOfOrganisation(DeleteMultipleAddressRequest req,
+                                                                             String supportedRole, String userId) {
+        ResponseEntity<Map> responseEntity = null;
+        var urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/addresses";
+
+        try {
+            HttpEntity<DeleteMultipleAddressRequest> requestEntity = new HttpEntity<>(req,
+                    getMultipleAuthHeaders(supportedRole, userId));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            var statusAndBody = new HashMap<String, Object>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
 }

@@ -408,10 +408,6 @@ class OrganisationExternalControllerTest {
         organisationExternalController
                 .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId);
 
-        verify(professionalUserServiceMock, times(1))
-                .checkUserStatusIsActiveByUserId(anyString());
-        verify(organisationIdentifierValidatorImplMock, times(1))
-                .validateOrganisationIsActive(any(Organisation.class), any(HttpStatus.class));
         verify(organisationServiceMock, times(1))
                 .deleteMultipleAddressOfGivenOrganisation(addressId);
 
@@ -424,7 +420,7 @@ class OrganisationExternalControllerTest {
         deleteMultipleAddressRequest.setAddressId(addressId);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
-        assertThrows(ResourceNotFoundException.class,() ->
+        assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
                         .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
     }
@@ -435,7 +431,7 @@ class OrganisationExternalControllerTest {
         deleteMultipleAddressRequest.setAddressId(null);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
-        assertThrows(ResourceNotFoundException.class,() ->
+        assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
                         .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
     }
@@ -466,17 +462,4 @@ class OrganisationExternalControllerTest {
                         .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
     }
 
-    @Test
-    void test_deleteMultipleAddressesOfOrganisation_NoOrgIdPassed() {
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        var addressId = new HashSet<String>();
-        UUID uuid = UUID.randomUUID();
-        String uuidAsString = uuid.toString();
-        addressId.add(uuidAsString);
-        deleteMultipleAddressRequest.setAddressId(addressId);
-        String userId = UUID.randomUUID().toString();
-        assertThrows(InvalidRequest.class,() ->
-                organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, null, userId));
-    }
 }

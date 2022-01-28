@@ -12,8 +12,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_MALFORMED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_ID_MISSING;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.MALFORMED_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
@@ -517,15 +516,11 @@ public abstract class SuperController {
         Set<String> addressIds = deleteRequest.getAddressId();
 
         if (ObjectUtils.isEmpty(addressIds)) {
-            throw new ResourceNotFoundException(ERROR_MSG_REQUEST_IS_EMPTY);
+            throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);
         }
         if (addressIds.contains(null) || addressIds.contains(EMPTY)
                 || addressIds.stream().anyMatch(str -> StringUtils.isBlank(str))) {
-            throw new InvalidRequest(ERROR_MSG_REQUEST_IS_MALFORMED);
-        }
-
-        if (StringUtils.isEmpty(orgId)) {
-            throw new InvalidRequest(ERROR_MSG_ORG_ID_MISSING);
+            throw new InvalidRequest(MALFORMED_JSON.getErrorMessage());
         }
 
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
@@ -535,12 +530,6 @@ public abstract class SuperController {
 
         //match address id with organisation contact information id's
         matchAddressIdsWithOrgContactInformationIds(existingOrganisation, addressIds);
-
-        //if the organisation is present, check if it is 'ACTIVE'
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation, BAD_REQUEST);
-
-        //check if user status is 'ACTIVE'
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
         //delete the passed address id numbers from the request
         organisationService.deleteMultipleAddressOfGivenOrganisation(addressIds);
