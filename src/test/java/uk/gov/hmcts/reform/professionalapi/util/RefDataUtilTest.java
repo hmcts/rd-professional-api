@@ -1018,6 +1018,6 @@ class RefDataUtilTest {
         assertThat(catchThrowable(() -> RefDataUtil
                 .matchAddressIdsWithOrgContactInformationIds(organisation, Set.of("1"))))
                 .isExactlyInstanceOf(ResourceNotFoundException.class)
-                .hasMessage(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH);
+                .hasMessage(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + "1");
     }
 }

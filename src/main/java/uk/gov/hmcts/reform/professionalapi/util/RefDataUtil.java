@@ -449,13 +449,14 @@ public class RefDataUtil {
     }
 
     public static void matchAddressIdsWithOrgContactInformationIds(Organisation organisation, Set<String> addressIds) {
-        Set<String> matchAddressList = addressIds.stream()
+        Set<String> invalidAddIdsSet = addressIds.stream()
                 .filter(addressId -> organisation.getContactInformation().stream()
-                .anyMatch(contactInformation -> contactInformation.getId().toString().equals(addressId)))
+                        .noneMatch(contactInformation -> contactInformation.getId().toString().equals(addressId)))
                 .collect(Collectors.toSet());
 
-        if (addressIds.size() != matchAddressList.size()) {
-            throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH);
+        if (!invalidAddIdsSet.isEmpty()) {
+            String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(","));
+            throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
 
 
