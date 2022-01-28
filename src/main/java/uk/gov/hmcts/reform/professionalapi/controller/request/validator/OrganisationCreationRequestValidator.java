@@ -212,8 +212,9 @@ public class OrganisationCreationRequestValidator {
             List<ContactInformationValidationResponse> contactInformationValidationResponses) {
 
         try {
-
-            if (contactInformation == null) {
+            Optional<ContactInformationCreationRequest> contactInfoOptional =
+                    Optional.ofNullable(contactInformation);
+            if (!contactInfoOptional.isPresent()) {
                 throw new InvalidRequest("Empty contactInformation value");
             } else if (isEmptyValue(contactInformation.getAddressLine1())
                     || isEmptyValue(contactInformation.getAddressLine2())

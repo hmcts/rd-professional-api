@@ -409,7 +409,6 @@ class OrganisationExternalControllerTest {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgUUId)).thenReturn(organisationMock);
 
-
         ResponseEntity<?> actual = organisationExternalController
                 .addContactInformationsToOrganisation(contactInformationCreationRequests, orgUUId);
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(anyString());
