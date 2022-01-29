@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
@@ -192,7 +193,7 @@ public class OrganisationCreationRequestValidator {
                                 || isEmptyValue(contactInformation.getPostCode())
                                 || isEmptyValue(contactInformation.getTownCity())) {
 
-                            throw new InvalidRequest("Empty contactInformation value");
+                            throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
                         }
                         if (null != contactInformation.getDxAddress()) {
                             contactInformation.getDxAddress().forEach(this::isDxAddressValid);
@@ -210,7 +211,7 @@ public class OrganisationCreationRequestValidator {
             Optional<ContactInformationCreationRequest> contactInfoOptional =
                     Optional.ofNullable(contactInformation);
             if (!contactInfoOptional.isPresent()) {
-                throw new InvalidRequest("Empty contactInformation value");
+                throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
             } else if (isEmptyValue(contactInformation.getAddressLine1())
                     || isEmptyValue(contactInformation.getAddressLine2())
                     || isEmptyValue(contactInformation.getAddressLine3())
@@ -218,7 +219,7 @@ public class OrganisationCreationRequestValidator {
                     || isEmptyValue(contactInformation.getPostCode())
                     || isEmptyValue(contactInformation.getTownCity())) {
 
-                throw new InvalidRequest("Empty contactInformation value");
+                throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
             } else if (StringUtils.isBlank(contactInformation.getAddressLine1())) {
                 throw new InvalidRequest("AddressLine1 cannot be empty");
             } else {

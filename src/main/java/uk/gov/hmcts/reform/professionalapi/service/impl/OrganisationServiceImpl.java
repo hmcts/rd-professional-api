@@ -74,6 +74,7 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_ERROR_BODY_START;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
@@ -534,7 +535,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (organisation.isEmpty()) {
-            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            log.error(LOG_ERROR_BODY_START, loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
 
@@ -563,7 +564,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
         if (organisationOptional.isEmpty()) {
-            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            log.error(LOG_ERROR_BODY_START, loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
 
@@ -624,7 +625,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void validateOrganisationIsActive(Organisation existingOrganisation) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
+            log.error(LOG_ERROR_BODY_START, loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }
     }
