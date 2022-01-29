@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformatio
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,9 +39,6 @@ public class OrganisationCreationRequestValidator {
     private final List<RequestValidator> validators;
 
     private static String loggingComponentName;
-
-    @Autowired
-    private Validator validator;
 
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
@@ -250,24 +245,7 @@ public class OrganisationCreationRequestValidator {
 
     }
 
-    private void validateDxAddressValid(
-            ContactInformationCreationRequest contactInformation, DxAddressCreationRequest dxAddress,
-            List<ContactInformationValidationResponse> contactInformationValidationResponses) {
 
-        try {
-            isDxAddressValid(dxAddress);
-        } catch (InvalidRequest invalidRequest) {
-
-            ContactInformationValidationResponse contactInfoBuilder =
-                    new ContactInformationValidationResponse();
-
-            contactInfoBuilder.setUprn(contactInformation.getUprn());
-            contactInfoBuilder.setValidAddress(false);
-            contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
-            contactInformationValidationResponses.add(contactInfoBuilder);
-
-        }
-    }
 
     public boolean isEmptyValue(String value) {
 
@@ -303,15 +281,7 @@ public class OrganisationCreationRequestValidator {
         OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
     }
 
-    public void validateContactInformationRequests(
-            List<ContactInformationCreationRequest> contactInformationCreationRequests) {
 
-        Optional<List<ContactInformationCreationRequest>> infoList =
-                Optional.ofNullable(contactInformationCreationRequests);
-        if (infoList.isPresent() && infoList.get().isEmpty()) {
-            throw new ResourceNotFoundException("Request is empty");
-        }
-    }
 
 }
 

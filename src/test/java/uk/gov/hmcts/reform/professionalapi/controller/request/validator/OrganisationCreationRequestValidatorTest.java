@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
@@ -351,7 +352,7 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
-    void test_add_contacts_informations_to_0rgs_validation_address_line_is_missing() {
+    void test_add_contacts_informations_to_orgs_validation_address_line_is_missing() {
         List<ContactInformationCreationRequest> contactInformationCreationRequests =
                 Arrays.asList(aContactInformationCreationRequest()
                         //.addressLine1("")
@@ -381,7 +382,7 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
-    void test_add_contacts_informations_to_0rgs_validation_dx_num_is_missing() {
+    void test_add_contacts_informations_to_orgs_valid_dx_address() {
         List<ContactInformationCreationRequest> contactInformationCreationRequests =
                 Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
@@ -392,21 +393,35 @@ class OrganisationCreationRequestValidatorTest {
                         .townCity("town-city")
                         .postCode("some-post-code")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("this is an invalid dx number")
-                                .dxExchange(null).build()))
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
                         .build());
 
+        organisationCreationRequestValidator
+                .validateContactInformations(contactInformationCreationRequests);
 
-        Throwable thrown = catchThrowable(() -> {
-            organisationCreationRequestValidator
-                    .validateContactInformations(contactInformationCreationRequests);
-        });
+        assertTrue(true);
 
+    }
 
-        assertThat(thrown)
-                .isInstanceOf(InvalidContactInformations.class)
-                .hasMessageContaining("Invalid Contact informations");
+    @Test
+    void test_add_contacts_informations_to_orgs_null_dx_address() {
+        List<ContactInformationCreationRequest> contactInformationCreationRequests =
+                Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(new ArrayList<>())
+                        .build());
 
+        organisationCreationRequestValidator
+                .validateContactInformations(contactInformationCreationRequests);
+
+        assertTrue(true);
 
     }
 
