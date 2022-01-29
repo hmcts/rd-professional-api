@@ -36,6 +36,10 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MESSAGE_USER_MUST_BE_ACTIVE = "User status must be Active to perform this "
             .concat("operation");
 
+    public static final String ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION =
+            "Empty contactInformation value";
+    public static final String LOG_ERROR_BODY_START =
+            "{}:: {}";
     public static final int ERROR_CODE_400 = 400;
     public static final int ERROR_CODE_500 = 500;
     public static final int STATUS_CODE_204 = 204;
