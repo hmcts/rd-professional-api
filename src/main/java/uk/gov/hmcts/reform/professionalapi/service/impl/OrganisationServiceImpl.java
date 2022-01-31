@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.Arrays;
 import java.util.stream.Stream;
+import java.util.UUID;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.tuple.Pair;
 import lombok.Setter;
@@ -611,8 +612,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public void deleteMultipleAddressOfGivenOrganisation(Set<String> addressIds) {
-        contactInformationRepository.deleteByAddressId(addressIds);
+    public void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet) {
+        contactInformationRepository.deleteByAddressId(idsSet);
     }
 
 }

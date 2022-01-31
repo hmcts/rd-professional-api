@@ -113,4 +113,64 @@ public class OrganisationFixtures {
                         .dxExchange("dxExchange1").build()))
                 .build()));
     }
+
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder
+        organisationRequestWithMultipleAddressAllFields() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        return anOrganisationCreationRequest()
+                .name("some-org-name")
+                .status("PENDING")
+                .sraId("sra-id")
+                .sraRegulated("false")
+                .companyUrl("company -url")
+                .companyNumber(randomAlphabetic(8))
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country1")
+                        .county("county2")
+                        .townCity("town-city1")
+                        .uprn("uprn1")
+                        .postCode("post-code1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange1").build()))
+                        .build(),
+                        aContactInformationCreationRequest()
+                                .addressLine1("addressLine9")
+                                .addressLine2("addressLine8")
+                                .addressLine3("addressLine7")
+                                .country("country2")
+                                .county("county2")
+                                .townCity("town-city2")
+                                .uprn("uprn2")
+                                .postCode("post-code2")
+                                .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                        .dxNumber("DX 2345678901")
+                                        .dxExchange("dxExchange2").build()))
+                                .build(),
+                        aContactInformationCreationRequest()
+                                .addressLine1("addressLine5")
+                                .addressLine2("addressLine4")
+                                .addressLine3("addressLine3")
+                                .country("country3")
+                                .county("county3")
+                                .townCity("town-city3")
+                                .uprn("uprn3")
+                                .postCode("post-code3")
+                                .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                        .dxNumber("DX 3456789012")
+                                        .dxExchange("dxExchange3").build()))
+                                .build()
+                ));
+    }
 }

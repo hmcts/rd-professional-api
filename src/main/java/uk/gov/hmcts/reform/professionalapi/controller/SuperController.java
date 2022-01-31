@@ -86,6 +86,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.UUID;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 
 @RestController
@@ -512,7 +513,7 @@ public abstract class SuperController {
     }
 
     protected void deleteMultipleAddressOfGivenOrganisation(DeleteMultipleAddressRequest deleteRequest,
-                                                            String orgId, String userId) {
+                                                            String orgId) {
         Set<String> addressIds = deleteRequest.getAddressId();
 
         if (ObjectUtils.isEmpty(addressIds)) {
@@ -532,6 +533,9 @@ public abstract class SuperController {
         matchAddressIdsWithOrgContactInformationIds(existingOrganisation, addressIds);
 
         //delete the passed address id numbers from the request
-        organisationService.deleteMultipleAddressOfGivenOrganisation(addressIds);
+        Set<UUID> idsSet = addressIds.stream()
+                .map(s -> UUID.fromString(s))
+                .collect(Collectors.toSet());
+        organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }
 }

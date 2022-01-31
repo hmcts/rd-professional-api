@@ -8,7 +8,10 @@ import feign.Response;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.UUID;
+import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -56,9 +59,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -381,12 +381,12 @@ class OrganisationExternalControllerTest {
 
     @Test
     void testDeleteMultipleAddressesOfOrganisation() {
-        var addressId = new HashSet<String>();
+        var addressId = new HashSet<UUID>();
         UUID uuid = UUID.randomUUID();
-        String uuidAsString = uuid.toString();
-        addressId.add(uuidAsString);
+        addressId.add(uuid);
+
         var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        deleteMultipleAddressRequest.setAddressId(Collections.singleton(uuid.toString()));
 
         ContactInformation contactInformation01 = new ContactInformation();
         contactInformation01.setAddressLine1("addressLine1");
@@ -403,8 +403,8 @@ class OrganisationExternalControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
 
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
+        String orgId = uuid.toString().substring(0, 7);
+        String userId = uuid.toString();
         organisationExternalController
                 .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId);
 

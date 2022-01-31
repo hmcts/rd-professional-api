@@ -12,6 +12,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 public interface ContactInformationRepository extends JpaRepository<ContactInformation, UUID> {
 
     @Modifying
-    @Query("Delete from contact_information ci where ci.id in (:addressIds)")
-    void deleteByAddressId(Set<String> addressIds);
+    @Query("Delete from contact_information ci where ci.id in (:idsSet)")
+    void deleteByAddressId(Set<UUID> idsSet);
 }

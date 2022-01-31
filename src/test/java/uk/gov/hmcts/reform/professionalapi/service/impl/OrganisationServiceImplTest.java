@@ -1110,10 +1110,10 @@ class OrganisationServiceImplTest {
 
     @Test
     void testDeleteMultipleAddressOfGivenOrganisation() {
-        var addressId = new HashSet<String>();
-        addressId.add("1234");
+        var addressIds = new HashSet<UUID>();
+        addressIds.add(UUID.randomUUID());
         doNothing().when(contactInformationRepositoryMock).deleteByAddressId(anySet());
-        sut.deleteMultipleAddressOfGivenOrganisation(addressId);
+        sut.deleteMultipleAddressOfGivenOrganisation(addressIds);
         verify(contactInformationRepositoryMock, times(1)).deleteByAddressId(anySet());
     }
 

@@ -455,7 +455,7 @@ public class RefDataUtil {
                 .collect(Collectors.toSet());
 
         if (!invalidAddIdsSet.isEmpty()) {
-            String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(","));
+            String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
             throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
 

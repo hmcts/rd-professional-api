@@ -477,7 +477,7 @@ public class OrganisationExternalController extends SuperController {
             @ApiParam(hidden = true) @OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        deleteMultipleAddressOfGivenOrganisation(deleteRequest, organisationIdentifier, userId);
+        deleteMultipleAddressOfGivenOrganisation(deleteRequest, organisationIdentifier);
 
     }
 
