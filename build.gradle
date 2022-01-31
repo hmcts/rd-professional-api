@@ -33,6 +33,7 @@ def versions = [
         lombok          : '1.18.20',
         gradlePitest    : '1.5.1',
         pitest          : '1.7.0',
+        reformLogging   : '5.1.9',
         serenity        : '2.0.76',
         sonarPitest     : '0.5',
         springBoot      : '2.4.12',
@@ -312,8 +313,8 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    implementation 'com.github.hmcts.java-logging:logging:5.1.7'
-    implementation 'com.github.hmcts.java-logging:logging-appinsights:5.1.7'
+    implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
+    implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
     implementation 'com.github.hmcts:properties-volume-spring-boot-starter:0.1.0'
     implementation 'com.github.hmcts:service-auth-provider-java-client:4.0.3'
 
