@@ -592,7 +592,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @DisplayName("Add Contact informations to organisations  Test Scenarios")
     @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void testAddContactsInformationsToOrganisationScenariosShouldBeForbiddenWhenLDOff() {
