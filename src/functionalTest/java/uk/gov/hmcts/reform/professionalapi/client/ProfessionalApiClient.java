@@ -40,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -245,7 +246,8 @@ public class ProfessionalApiClient {
 
             List<ContactInformationCreationRequest>
                     createContactInformationCreationRequests,
-            String pomBearerToken) {
+            String pomBearerToken,
+            HttpStatus httpStatus) {
         Response response = getMultipleAuthHeaders(pomBearerToken)
                 .body(createContactInformationCreationRequests)
                 .post("/refdata/external/v1/organisations/addresses")
@@ -255,13 +257,20 @@ public class ProfessionalApiClient {
             log.info("{}:: Add contact informations to organisation response: {}",
                     loggingComponentName, response.asString());
         }
-
-        response.then()
-                .assertThat()
-                .statusCode(CREATED.value());
-
         Map<String, Object> hmResponse = new HashMap<>();
-        hmResponse.put("statusCode", response.statusCode());
+
+        if (FORBIDDEN.value() == httpStatus.value()) {
+
+            hmResponse.put("statusCode", FORBIDDEN.value());
+
+        } else if (CREATED.value() == httpStatus.value()) {
+            response.then()
+                    .assertThat()
+                    .statusCode(CREATED.value());
+            hmResponse.put("statusCode", CREATED.value());
+        }
+
+
         return hmResponse;
     }
 

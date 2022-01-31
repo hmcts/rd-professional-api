@@ -595,11 +595,32 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @DisplayName("Add Contact informations to organisations  Test Scenarios")
     @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void testAddContactsInformationsToOrganisationScenarios() {
+    void testAddContactsInformationsToOrganisationScenariosShouldBeForbiddenWhenLDOff() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
+
+        log.info("addContactInformationsToOrganisationShouldBeSuccess :: STARTED");
+
+        List<ContactInformationCreationRequest> createContactInformationCreationRequests =
+                createContactInformationCreationRequests();
+        Map<String, Object> result = professionalApiClient
+                .addContactInformationsToOrganisation(createContactInformationCreationRequests,
+                        pomBearerToken,FORBIDDEN);
+
+        assertThat(result.get("statusCode")).isNotNull();
+        assertThat(result.get("statusCode")).isEqualTo(403);
+        log.info("addContactInformationsToOrganisationShouldBeSuccess :: END");
+    }
+
+    @Test
+    @DisplayName("Add Contact informations to organisations  Test Scenarios")
+    @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void testAddContactsInformationsToOrganisationScenariosShouldBeSuccessWhenLDON() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
         invitePuiOrgManagerUserScenarios();
-        addContactInformationsToOrganisationScenario();
+        addContactInformationsToOrganisationScenario(CREATED);
 
         suspendPuiOrgManagerUserScenarios();
     }
@@ -614,19 +635,19 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         suspendUserByPuiOrgManagerShouldBeSuccess();
     }
 
-    public void addContactInformationsToOrganisationScenario() {
-        addContactInformationsToOrganisationShouldBeSuccess();
+    public void addContactInformationsToOrganisationScenario(HttpStatus httpStatus) {
+        addContactInformationsToOrganisationShouldBeSuccess(httpStatus);
     }
 
 
-    public void addContactInformationsToOrganisationShouldBeSuccess() {
+    public void addContactInformationsToOrganisationShouldBeSuccess(HttpStatus httpStatus) {
         log.info("addContactInformationsToOrganisationShouldBeSuccess :: STARTED");
 
         List<ContactInformationCreationRequest> createContactInformationCreationRequests =
                 createContactInformationCreationRequests();
         Map<String, Object> result = professionalApiClient
                 .addContactInformationsToOrganisation(createContactInformationCreationRequests,
-                        pomBearerToken);
+                        pomBearerToken,httpStatus);
 
         assertThat(result.get("statusCode")).isNotNull();
         assertThat(result.get("statusCode")).isEqualTo(201);
