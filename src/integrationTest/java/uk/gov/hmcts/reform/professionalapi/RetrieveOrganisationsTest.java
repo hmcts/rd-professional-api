@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -71,6 +72,9 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(contactInfo.get("country")).isEqualTo("country");
         assertThat(contactInfo.get("townCity")).isEqualTo("town-city");
         assertThat(contactInfo.get("postCode")).isEqualTo("some-post-code");
+        assertThat(contactInfo.get("uprn")).isEqualTo("uprn");
+        assertNotNull(contactInfo.get("addressId"));
+        assertNotNull(contactInfo.get("created"));
 
         Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo.get("dxAddress")).get(0);
         assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
@@ -150,9 +154,16 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         List<ContactInformationCreationRequest> contactInfoList2 = new ArrayList<>();
         List<ContactInformationCreationRequest> contactInfoList3 = new ArrayList<>();
         contactInfoList2.add(aContactInformationCreationRequest().addressLine1("SECOND org")
+                .uprn("uprn")
                 .dxAddress(dxAddresses).build());
-        contactInfoList3.add(aContactInformationCreationRequest().addressLine1("THIRD org").build());
-        contactInfoList3.add(aContactInformationCreationRequest().addressLine1("THIRD org 2nd address").build());
+        contactInfoList3.add(aContactInformationCreationRequest()
+                .addressLine1("THIRD org")
+                .uprn("uprn")
+                .build());
+        contactInfoList3.add(aContactInformationCreationRequest()
+                .addressLine1("THIRD org 2nd address")
+                .uprn("uprn")
+                .build());
         contactInfoList3.add(aContactInformationCreationRequest().addressLine1("THIRD org 3rd address").build());
 
         Map<String, Object> orgResponse1 = professionalReferenceDataClient
@@ -216,6 +227,15 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(contactInfo1.get("addressLine1")).isEqualTo("addressLine1");
         assertThat(contactInfo2.get("addressLine1")).isEqualTo("THIRD org");
         assertThat(contactInfo3First.get("addressLine1")).isEqualTo("SECOND org");
+        assertThat(contactInfo1.get("uprn")).isEqualTo("uprn");
+        assertNotNull(contactInfo1.get("addressId"));
+        assertNotNull(contactInfo1.get("created"));
+        assertThat(contactInfo2.get("uprn")).isEqualTo("uprn");
+        assertNotNull(contactInfo2.get("addressId"));
+        assertNotNull(contactInfo2.get("created"));
+        assertThat(contactInfo3First.get("uprn")).isEqualTo("uprn");
+        assertNotNull(contactInfo3First.get("addressId"));
+        assertNotNull(contactInfo3First.get("created"));
 
         Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo3First.get("dxAddress")).get(0);
         Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo3First.get("dxAddress")).get(1);

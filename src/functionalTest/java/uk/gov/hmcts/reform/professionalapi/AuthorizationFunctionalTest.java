@@ -1,18 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-
 import io.restassured.parsing.Parser;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.assertj.core.api.Assertions;
@@ -33,7 +21,21 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
@@ -311,6 +313,7 @@ public class AuthorizationFunctionalTest {
         assertThat(response.get("superUser")).isNotNull();
         assertThat(response.get("paymentAccount")).isNotNull();
         assertThat(response.get("contactInformation")).isNotNull();
+        verifyContactInfoCreatedDateSorting(response.get("contactInformation"));
 
     }
 
@@ -337,6 +340,24 @@ public class AuthorizationFunctionalTest {
                 }
             }
         });
+    }
+
+    private void verifyContactInfoCreatedDateSorting(Object contactInformation) {
+        var contactInformationResponse = (List<HashMap>) contactInformation;
+        assertEquals("addressLine1", contactInformationResponse.get(0).get("addressLine1"));
+        assertEquals("addressLine2", contactInformationResponse.get(0).get("addressLine2"));
+        assertEquals("addressLine3", contactInformationResponse.get(0).get("addressLine3"));
+        assertEquals("uprn1", contactInformationResponse.get(0).get("uprn"));
+        assertNotNull(contactInformationResponse.get(0).get("created"));
+        assertNotNull(contactInformationResponse.get(0).get("addressId"));
+        assertEquals("addressLine3", contactInformationResponse.get(0).get("addressLine3"));
+        assertEquals("addressLine3", contactInformationResponse.get(0).get("addressLine3"));
+        assertEquals("addLine1", contactInformationResponse.get(1).get("addressLine1"));
+        assertEquals("addLine2", contactInformationResponse.get(1).get("addressLine2"));
+        assertEquals("addLine3", contactInformationResponse.get(1).get("addressLine3"));
+        assertEquals("uprn", contactInformationResponse.get(1).get("uprn"));
+        assertNotNull(contactInformationResponse.get(1).get("created"));
+        assertNotNull(contactInformationResponse.get(1).get("addressId"));
     }
 
 }
