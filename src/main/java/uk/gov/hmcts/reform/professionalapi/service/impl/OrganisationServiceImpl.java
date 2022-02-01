@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -407,6 +408,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
         }
+        if (!organisation.getContactInformation().isEmpty()
+                && organisation.getContactInformation().size() > 1) {
+            sortContactInfoByCreatedDateAsc(organisation);
+        }
 
         return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
     }
@@ -607,6 +612,15 @@ public class OrganisationServiceImpl implements OrganisationService {
             log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }
+    }
+
+    private void sortContactInfoByCreatedDateAsc(Organisation organisation) {
+        List<ContactInformation> sortedContactInfoByCreatedDate = organisation.getContactInformation()
+                .stream()
+                .sorted(Comparator.comparing(ContactInformation::getCreated))
+                .collect(Collectors.toList());
+
+        organisation.setContactInformations(sortedContactInfoByCreatedDate);
     }
 
 }
