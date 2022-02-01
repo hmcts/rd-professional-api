@@ -12,8 +12,8 @@ public class DeleteMultipleAddressRequestTest {
         var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
         deleteMultipleAddressRequest.setAddressId(addressId);
 
-        assertThat(deleteMultipleAddressRequest.getAddressId().size()).isEqualTo(2);
-        assertThat(deleteMultipleAddressRequest.getAddressId().containsAll(addressId));
+        assertThat(deleteMultipleAddressRequest.getAddressId()).hasSize(2);
+        assertThat(deleteMultipleAddressRequest.getAddressId()).containsAll(addressId);
 
     }
 }

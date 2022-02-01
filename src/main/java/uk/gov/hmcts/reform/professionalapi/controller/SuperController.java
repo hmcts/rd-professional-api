@@ -520,7 +520,7 @@ public abstract class SuperController {
             throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);
         }
         if (addressIds.contains(null) || addressIds.contains(EMPTY)
-                || addressIds.stream().anyMatch(str -> StringUtils.isBlank(str))) {
+                || addressIds.stream().anyMatch(StringUtils::isBlank)) {
             throw new InvalidRequest(MALFORMED_JSON.getErrorMessage());
         }
 
@@ -534,7 +534,7 @@ public abstract class SuperController {
 
         //delete the passed address id numbers from the request
         Set<UUID> idsSet = addressIds.stream()
-                .map(s -> UUID.fromString(s))
+                .map(UUID::fromString)
                 .collect(Collectors.toSet());
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }

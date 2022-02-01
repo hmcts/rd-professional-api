@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -964,5 +965,21 @@ public class ProfessionalApiClient {
                 loggingComponentName, response.getStatusCode());
 
         return response.body();
+    }
+
+    public void deleteMultipleAddressesOfOrganisation(DeleteMultipleAddressRequest deleteMultipleAddressRequest,
+                                                    RequestSpecification requestSpecification,
+                                                    HttpStatus expectedStatus) {
+        Response response = requestSpecification
+                .body(deleteMultipleAddressRequest)
+                .delete("/refdata/external/v1/organisations/addresses")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
+                loggingComponentName, response.getStatusCode());
     }
 }

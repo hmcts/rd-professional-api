@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -588,4 +590,24 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(paymentAccountsToAdd).hasSameElementsAs(allStatusPaymentAccounts);
         log.info("addPbaOfExistingOrganisationShouldBeSuccess :: END");
     }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff() {
+        log.info("deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
+
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiFinanceManager));
+
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
+        deleteMultipleAddressRequest.setAddressId(Set.of(UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+
+        professionalApiClient.deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
+
+        log.info("deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff :: END");
+    }
+
 }

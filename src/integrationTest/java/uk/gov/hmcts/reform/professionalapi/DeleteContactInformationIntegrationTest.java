@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -30,7 +29,6 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
     Map<String, Object> orgResponse = null;
     String userId = null;
     String orgId = null;
-    List<ContactInformationCreationRequest> contactInformationCreationRequests = null;
 
     @Autowired
     OrganisationRepository organisationRepository;
