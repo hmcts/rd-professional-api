@@ -1107,6 +1107,7 @@ class OrganisationServiceImplTest {
     }
 
     @Test
+
     void should_add_contact_informations_to_organisation() {
 
         Organisation organisationMock = mock(Organisation.class);
@@ -1129,6 +1130,27 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(orgUUId);
         verify(contactInformationRepositoryMock, times(2)).save(any(ContactInformation.class));
+    }
+
+
+    void test_sortContactInfoByCreatedDateAsc() {
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+
+        var contactInformation1 = new ContactInformation();
+        contactInformation1.setCountry("TestAnotherCountry");
+        contactInformation1.setCreated(LocalDateTime.now());
+        organisation.setContactInformations(List.of(contactInformation1, contactInformation));
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        var organisationEntityResponse =
+                sut.retrieveOrganisation(organisationIdentifier, false);
+
+        assertEquals("TestCountry", organisationEntityResponse.getContactInformation().get(0).getCountry());
+        assertEquals("TestAnotherCountry",
+                organisationEntityResponse.getContactInformation().get(1).getCountry());
     }
 
 

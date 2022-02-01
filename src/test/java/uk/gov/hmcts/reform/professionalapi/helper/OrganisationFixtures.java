@@ -36,7 +36,9 @@ public class OrganisationFixtures {
                         .email(randomAlphanumeric(7).concat("@test.com"))
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1").build()));
+                        .addressLine1("addressLine1")
+                        .uprn("uprn")
+                        .build()));
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder whiteSpaceTrimOrganisationRequest() {

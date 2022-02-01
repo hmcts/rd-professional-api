@@ -2,6 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -105,6 +114,8 @@ public class ProfessionalReferenceDataClient {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
                 APP_EXT_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
         HttpStatus status = responseEntity.getStatusCode();
+        objectMapper.registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
             return Arrays.asList((OrganisationMinimalInfoResponse[]) objectMapper.convertValue(
                     responseEntity.getBody(), expectedClass));

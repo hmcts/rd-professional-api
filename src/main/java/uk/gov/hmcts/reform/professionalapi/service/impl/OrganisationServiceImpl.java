@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -254,7 +255,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     public ContactInformation setNewContactInformationFromRequest(ContactInformation contactInformation,
                                                                   ContactInformationCreationRequest contactInfo,
                                                                   Organisation organisation) {
-        contactInformation.setUprn(RefDataUtil.removeEmptySpaces(contactInfo.getUprn()));
+
+        if (!StringUtils.isBlank(contactInfo.getUprn())) {
+            contactInformation.setUprn(RefDataUtil.removeEmptySpaces(contactInfo.getUprn()));
+        }
         contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
         contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
         contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
@@ -403,6 +407,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             log.debug("{}:: Retrieving organisation", loggingComponentName);
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
+        }
+        if (!organisation.getContactInformation().isEmpty()
+                && organisation.getContactInformation().size() > 1) {
+            sortContactInfoByCreatedDateAsc(organisation);
         }
 
         return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
@@ -628,6 +636,15 @@ public class OrganisationServiceImpl implements OrganisationService {
             log.error(LOG_ERROR_BODY_START, loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }
+    }
+
+    private void sortContactInfoByCreatedDateAsc(Organisation organisation) {
+        List<ContactInformation> sortedContactInfoByCreatedDate = organisation.getContactInformation()
+                .stream()
+                .sorted(Comparator.comparing(ContactInformation::getCreated))
+                .collect(Collectors.toList());
+
+        organisation.setContactInformations(sortedContactInfoByCreatedDate);
     }
 
 }

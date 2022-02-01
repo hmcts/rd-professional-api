@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class ContactInformationResponseWithDxAddressTest {
@@ -23,6 +24,9 @@ class ContactInformationResponseWithDxAddressTest {
     final String expectTownCity = "London";
     final String uprn = "uprn";
 
+    final LocalDateTime created = LocalDateTime.now();
+
+
     @Test
     void testGetContactInformationResponse() {
         List<DxAddress> dxAddressList = Arrays.asList(new DxAddress());
@@ -35,6 +39,7 @@ class ContactInformationResponseWithDxAddressTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
+        contactInformation.setCreated(created);
         contactInformation.setDxAddresses(dxAddressList);
         contactInformation.setUprn(uprn);
 
@@ -49,6 +54,9 @@ class ContactInformationResponseWithDxAddressTest {
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
         assertThat(sut.getDxAddress()).isNotEmpty();
         assertThat(sut.getUprn()).isEqualTo(uprn);
+
+        assertThat(sut.getCreated()).isEqualTo(created);
+
     }
 
     @Test
@@ -62,6 +70,7 @@ class ContactInformationResponseWithDxAddressTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
+        contactInformation.setCreated(created);
 
         ContactInformationResponseWithDxAddress sut = new ContactInformationResponseWithDxAddress(contactInformation);
 
@@ -73,6 +82,7 @@ class ContactInformationResponseWithDxAddressTest {
         assertThat(sut.getCounty()).isEqualTo(expectCounty);
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
+        assertThat(sut.getCreated()).isEqualTo(created);
         assertThat(sut.getDxAddress()).isEmpty();
     }
 }
