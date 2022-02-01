@@ -86,7 +86,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .townCity("town-city")
                 .uprn("uprn")
                 .postCode("some-post-code")
-                .dxAddress(null)
+                //.dxAddress(null)
 
                 .build());
 
@@ -99,9 +99,8 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
     }
 
-
     @Test
-    void add_contact_informations_to_organisation_returns_201_when_contact_information_dxAddress_list_is_empty() {
+    void add_contact_informations_to_organisation_returns_400_when_contact_information_dxAddress_list_is_empty() {
 
         contactInformationCreationRequests = Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
@@ -111,21 +110,24 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                 .county("county")
                 .townCity("town-city")
                 .uprn("uprn")
-                .postCode("some-post-code").dxAddress(new ArrayList<>())
-
+                .postCode("some-post-code")
+                .dxAddress(new ArrayList<>())
                 .build());
 
         Map<String, Object> addContactsToOrgresponse =
-                professionalReferenceDataClient
-                        .addContactInformationsToOrganisation(
-                                contactInformationCreationRequests,
-                                puiOrgManager,
-                                userId);
+                professionalReferenceDataClient.addContactInformationsToOrganisation(
+                        contactInformationCreationRequests, puiOrgManager, userId);
 
-        assertThat(addContactsToOrgresponse).isNotNull();
+        List<ContactInformationValidationResponse> errorResponse =
+                get400ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
+        assertThat(errorResponse.get(0).getErrorDescription()).contains("DX Number or DX Exchange cannot be empty");
 
-        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("201 CREATED");
+        assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
+
     }
+
+
+
 
     @Test
     void add_contact_informations_to_organisation_returns_400_when_contact_information_list_is_empty() {

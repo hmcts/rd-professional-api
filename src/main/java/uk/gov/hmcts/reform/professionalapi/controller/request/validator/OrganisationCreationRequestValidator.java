@@ -224,7 +224,9 @@ public class OrganisationCreationRequestValidator {
                 throw new InvalidRequest("AddressLine1 cannot be empty");
             } else {
                 List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
-                if (dxAddressList != null && !dxAddressList.isEmpty()) {
+                if (dxAddressList != null && dxAddressList.isEmpty()) {
+                    throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
+                } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
                     dxAddressList.forEach(dxAddress -> {
                         isDxAddressValid(dxAddress);
                     });

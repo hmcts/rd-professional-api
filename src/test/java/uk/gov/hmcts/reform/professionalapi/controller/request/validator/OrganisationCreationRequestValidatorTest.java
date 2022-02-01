@@ -415,7 +415,7 @@ class OrganisationCreationRequestValidatorTest {
                         .county("county")
                         .townCity("town-city")
                         .postCode("some-post-code")
-                        .dxAddress(new ArrayList<>())
+                        .dxAddress(null)
                         .build());
 
         organisationCreationRequestValidator
