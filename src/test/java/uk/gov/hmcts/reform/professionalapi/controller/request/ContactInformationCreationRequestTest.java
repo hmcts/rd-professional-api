@@ -26,7 +26,7 @@ class ContactInformationCreationRequestTest {
     void test_has_mandatory_fields_specified_not_null() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 null, null, null, null, null, null,
-                null, null);
+                null, null,null);
 
         Set<ConstraintViolation<ContactInformationCreationRequest>> violations = validator
                 .validate(contactInformationCreationRequest);
@@ -41,10 +41,11 @@ class ContactInformationCreationRequestTest {
         dxAddresses.add(dxAddressCreationRequest);
 
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                "some-address1", "some-address2", "some-address3",
+                "some-uprn","some-address1", "some-address2", "some-address3",
                 "some-town-city", "some-county", "some-country",
                 "some-post-code", dxAddresses);
 
+        assertThat(contactInformationCreationRequest.getUprn()).isEqualTo("some-uprn");
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
         assertThat(contactInformationCreationRequest.getAddressLine2()).isEqualTo("some-address2");
         assertThat(contactInformationCreationRequest.getAddressLine3()).isEqualTo("some-address3");
@@ -63,9 +64,10 @@ class ContactInformationCreationRequestTest {
         dxAddresses.add(dxAddressCreationRequest);
 
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                "some-address1", null, null, null, null,
+                null,"some-address1", null, null, null, null,
                 null, null, null);
 
+        assertThat(contactInformationCreationRequest.getUprn()).isNull();
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
         assertThat(contactInformationCreationRequest.getAddressLine2()).isNull();
         assertThat(contactInformationCreationRequest.getAddressLine3()).isNull();
@@ -79,10 +81,11 @@ class ContactInformationCreationRequestTest {
     @Test
     void test_creates_contact_information_creation_request_correctly_without_dx_address() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                "some-address1", "some-address2", "some-address3",
+                "some-uprn","some-address1", "some-address2", "some-address3",
                 "some-town-city", "some-county", "some-country",
                 "some-post-code", null);
 
+        assertThat(contactInformationCreationRequest.getUprn()).isEqualTo("some-uprn");
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
         assertThat(contactInformationCreationRequest.getAddressLine2()).isEqualTo("some-address2");
         assertThat(contactInformationCreationRequest.getAddressLine3()).isEqualTo("some-address3");
@@ -97,6 +100,7 @@ class ContactInformationCreationRequestTest {
     void test_contactInformationCreationRequestBuilder() {
         String dxNumber = "dxNumber";
         String dxExchange = "dxExchange";
+        String uprn = "uprn";
         String addressLine1 = "addressLine1";
         String addressLine2 = "addressLine2";
         String addressLine3 = "addressLine3";
@@ -107,6 +111,7 @@ class ContactInformationCreationRequestTest {
 
         ContactInformationCreationRequest contactInformationCreationRequest = ContactInformationCreationRequest
                 .aContactInformationCreationRequest()
+                .uprn(uprn)
                 .addressLine1(addressLine1)
                 .addressLine2(addressLine2)
                 .addressLine3(addressLine3)
@@ -117,6 +122,7 @@ class ContactInformationCreationRequestTest {
                 .dxAddress(singletonList(new DxAddressCreationRequest(dxNumber, dxExchange)))
                 .build();
 
+        assertThat(contactInformationCreationRequest.getUprn()).isEqualTo(uprn);
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo(addressLine1);
         assertThat(contactInformationCreationRequest.getAddressLine2()).isEqualTo(addressLine2);
         assertThat(contactInformationCreationRequest.getAddressLine3()).isEqualTo(addressLine3);

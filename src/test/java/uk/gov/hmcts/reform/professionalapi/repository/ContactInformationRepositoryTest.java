@@ -23,6 +23,7 @@ class ContactInformationRepositoryTest extends BaseRepository {
         assertThat(contactInformationList).hasSize(1);
         assertThat(contactInformationList.get(0)).isEqualTo(contactInformation);
         assertThat(contactInformationList.get(0).getAddressLine1()).isEqualTo(contactInformation.getAddressLine1());
+        assertThat(contactInformationList.get(0).getUprn()).isEqualTo(contactInformation.getUprn());
     }
 
     @Test
@@ -31,6 +32,7 @@ class ContactInformationRepositoryTest extends BaseRepository {
 
         assertThat(contactInfo).contains(contactInformation);
         assertThat(contactInfo.get().getAddressLine1()).isEqualTo(contactInformation.getAddressLine1());
+        assertThat(contactInfo.get().getUprn()).isEqualTo(contactInformation.getUprn());
     }
 }
 
