@@ -72,6 +72,7 @@ public class BaseRepository {
         organisationRepository.save(organisation);
 
         contactInformation = new ContactInformation();
+        contactInformation.setUprn(RefDataUtil.removeEmptySpaces("uprn"));
         contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces("some-address1"));
         contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces("some-address2"));
         contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces("some-address3"));
