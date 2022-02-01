@@ -5,10 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @NoArgsConstructor
 @Getter
 public class ContactInformationResponse {
 
+    @JsonProperty
+    protected UUID addressId;
+    @JsonProperty
+    protected String uprn;
+    @JsonProperty
+    protected LocalDateTime created;
     @JsonProperty
     protected String addressLine1;
     @JsonProperty
@@ -31,6 +40,9 @@ public class ContactInformationResponse {
         this.townCity = contactInfo.getTownCity();
         this.county = contactInfo.getCounty();
         this.country = contactInfo.getCountry();
+        this.addressId = contactInfo.getId();
+        this.uprn = contactInfo.getUprn();
+        this.created = contactInfo.getCreated();
         this.postCode = contactInfo.getPostCode();
     }
 }
