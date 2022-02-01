@@ -1128,6 +1128,7 @@ class OrganisationServiceImplTest {
         assertEquals("TestAnotherCountry",
                 organisationEntityResponse.getContactInformation().get(1).getCountry());
     }
+
     @Test
     void testDeleteMultipleAddressOfGivenOrganisation() {
         var addressIds = new HashSet<UUID>();
