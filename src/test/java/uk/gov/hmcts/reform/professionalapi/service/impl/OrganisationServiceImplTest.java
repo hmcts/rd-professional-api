@@ -1108,5 +1108,25 @@ class OrganisationServiceImplTest {
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
     }
 
+    @Test
+    void test_sortContactInfoByCreatedDateAsc() {
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+
+        var contactInformation1 = new ContactInformation();
+        contactInformation1.setCountry("TestAnotherCountry");
+        contactInformation1.setCreated(LocalDateTime.now());
+        organisation.setContactInformations(List.of(contactInformation1, contactInformation));
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        var organisationEntityResponse =
+                sut.retrieveOrganisation(organisationIdentifier, false);
+
+        assertEquals("TestCountry", organisationEntityResponse.getContactInformation().get(0).getCountry());
+        assertEquals("TestAnotherCountry",
+                organisationEntityResponse.getContactInformation().get(1).getCountry());
+    }
 
 }
