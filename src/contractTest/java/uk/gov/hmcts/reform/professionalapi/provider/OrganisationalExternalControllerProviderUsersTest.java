@@ -194,6 +194,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
         organisation.setCompanyUrl(companyUrl);
         ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn("uprn");
         contactInformation.setAddressLine1("addressLine1");
         contactInformation.setAddressLine2("addressLine2");
         contactInformation.setCountry("country");
