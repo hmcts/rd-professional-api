@@ -233,6 +233,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         contactInformation.setAddressLine2("addressLine2");
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
+        contactInformation.setCreated(LocalDateTime.now());
+        contactInformation.setId(UUID.randomUUID());
         organisation.setContactInformations(List.of(contactInformation));
         return organisation;
     }
