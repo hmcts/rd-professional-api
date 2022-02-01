@@ -203,7 +203,7 @@ class OrganisationServiceImplTest {
         dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
         dxAddressRequests.add(dxAddressRequest);
 
-        contactInformationCreationRequest = new ContactInformationCreationRequest("addressLine-1",
+        contactInformationCreationRequest = new ContactInformationCreationRequest("uprn","addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
                 "country", "postCode", dxAddressRequests);
 
@@ -328,6 +328,7 @@ class OrganisationServiceImplTest {
         sut.setNewContactInformationFromRequest(contactInformationMock, contactInformationCreationRequest,
                 organisationMock);
 
+        verify(contactInformationMock, times(1)).setUprn(any(String.class));
         verify(contactInformationMock, times(1)).setAddressLine1(any(String.class));
         verify(contactInformationMock, times(1)).setAddressLine2(any(String.class));
         verify(contactInformationMock, times(1)).setAddressLine3(any(String.class));
@@ -702,7 +703,7 @@ class OrganisationServiceImplTest {
     @Test
     void test_AddContactInformationToOrganisation() {
         ContactInformationCreationRequest contactInformationCreationRequest
-                = new ContactInformationCreationRequest("addressLine-1", "addressLine-2",
+                = new ContactInformationCreationRequest("uprn","addressLine-1", "addressLine-2",
                 "addressLine-3", "townCity", "county", "country",
                 "postCode", dxAddressRequests);
         contactInformationCreationRequests.add(contactInformationCreationRequest);

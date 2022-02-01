@@ -228,6 +228,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
         ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn("uprn");
         contactInformation.setAddressLine1("addressLine1");
         contactInformation.setAddressLine2("addressLine2");
         contactInformation.setCountry("country");
