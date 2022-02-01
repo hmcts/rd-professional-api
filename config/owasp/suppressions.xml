@@ -7,6 +7,7 @@
         <packageUrl regex="true">^pkg:maven*.*$</packageUrl>
         <cve>CVE-2018-1258</cve>
     </suppress>
+<!--False positive CVE-2007-1651 and CVE-2007-1652-->
     <suppress until="2022-07-05">
         <notes><![CDATA[
    file name: oauth2-oidc-sdk-7.1.1.jar
