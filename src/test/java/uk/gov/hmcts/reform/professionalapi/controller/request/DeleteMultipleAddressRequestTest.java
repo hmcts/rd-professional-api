@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DeleteMultipleAddressRequestTest {
+class DeleteMultipleAddressRequestTest {
 
     @Test
     void testDeleteMultipleAddressRequestTest() {
