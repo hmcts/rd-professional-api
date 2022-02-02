@@ -406,7 +406,7 @@ class OrganisationExternalControllerTest {
         String orgId = uuid.toString().substring(0, 7);
         String userId = uuid.toString();
         organisationExternalController
-                .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId);
+                .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId);
 
         verify(organisationServiceMock, times(1))
                 .deleteMultipleAddressOfGivenOrganisation(addressId);
@@ -422,7 +422,7 @@ class OrganisationExternalControllerTest {
         String userId = UUID.randomUUID().toString();
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId));
     }
 
     @Test
@@ -433,7 +433,7 @@ class OrganisationExternalControllerTest {
         String userId = UUID.randomUUID().toString();
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId));
     }
 
     @Test
@@ -446,7 +446,7 @@ class OrganisationExternalControllerTest {
         String userId = UUID.randomUUID().toString();
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId));
     }
 
     @Test
@@ -459,7 +459,7 @@ class OrganisationExternalControllerTest {
         String userId = UUID.randomUUID().toString();
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId, userId));
+                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId));
     }
 
 }
