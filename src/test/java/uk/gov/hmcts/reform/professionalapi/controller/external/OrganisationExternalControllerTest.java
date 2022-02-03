@@ -410,28 +410,6 @@ class OrganisationExternalControllerTest {
     }
 
     @Test
-    void test_deleteMultipleAddressesOfOrganisation_NoAddressIdPassed() {
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
-        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
-
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        assertThrows(InvalidRequest.class,() ->
-                organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId));
-    }
-
-    @Test
-    void test_deleteMultipleAddressesOfOrganisation_nullAddressIdPassed() {
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(null);
-        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
-
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        assertThrows(InvalidRequest.class,() ->
-                organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId));
-    }
-
-    @Test
     void test_deleteMultipleAddressesOfOrganisation_EmptyAddressIdPassed() {
         var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
         var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));

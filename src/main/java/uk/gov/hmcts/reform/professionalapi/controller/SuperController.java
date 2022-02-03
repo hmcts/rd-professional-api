@@ -515,7 +515,7 @@ public abstract class SuperController {
     protected void deleteMultipleAddressOfGivenOrganisation(List<DeleteMultipleAddressRequest> deleteRequest,
                                                             String orgId) {
         Set<String> addressIds = deleteRequest.stream()
-                .map(req -> req.getAddressId())
+                .map(DeleteMultipleAddressRequest::getAddressId)
                 .collect(Collectors.toSet());
 
         if (ObjectUtils.isEmpty(addressIds)) {
