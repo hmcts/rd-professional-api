@@ -601,11 +601,13 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
 
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        deleteMultipleAddressRequest.setAddressId(Set.of(UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+        var deleteMultipleAddressRequest01 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var deleteMultipleAddressRequest02 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var deleteMultipleAddressRequest03 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest01,
+                deleteMultipleAddressRequest02, deleteMultipleAddressRequest03));
 
-        professionalApiClient.deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest,
+        professionalApiClient.deleteMultipleAddressesOfOrganisation(requestArrayList,
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken), FORBIDDEN);
         log.info("deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff :: END");
     }
@@ -618,9 +620,10 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
 
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        deleteMultipleAddressRequest.setAddressId(Set.of(UUID.randomUUID().toString()));
-        professionalApiClient.deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest,
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+
+        professionalApiClient.deleteMultipleAddressesOfOrganisation(requestArrayList,
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken), NOT_FOUND);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
@@ -640,14 +643,16 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
 
-        ArrayList<LinkedHashMap<String, Object>> contactInformations
+        ArrayList<LinkedHashMap<String, Object>> contacts
                 = (ArrayList<LinkedHashMap<String, Object>>)response.get("contactInformation");
-
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        deleteMultipleAddressRequest.setAddressId(contactInformations.stream()
+        List<String> addressId = contacts.stream()
                 .limit(1).map(ci -> ci.get("addressId").toString())
-                .collect(Collectors.toSet()));
-        professionalApiClient.deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest,
+                .collect(Collectors.toList());
+
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(addressId.get(0));
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+
+        professionalApiClient.deleteMultipleAddressesOfOrganisation(requestArrayList,
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken), NO_CONTENT);
 
         Map<String, Object> responseAfterDel = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,

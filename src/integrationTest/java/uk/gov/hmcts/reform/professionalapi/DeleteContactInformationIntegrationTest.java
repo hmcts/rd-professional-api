@@ -12,10 +12,9 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 import java.util.List;
 import java.util.Map;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.MALFORMED_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_ADDRESS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,30 +75,30 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
     void test_delete_contactInformation_empty_request() {
         setUpSingleContactAddOrganisationData();
         var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+
         Map<String, Object> addressResponse =
                 professionalReferenceDataClient
                         .deleteContactInformationAddressOfOrganisation(
-                                deleteMultipleAddressRequest,
+                                requestArrayList,
                                 puiOrgManager,
                                 userId);
         assertThat(addressResponse).isNotNull();
         assertThat(addressResponse).containsEntry("http_status", "400");
         assertThat(addressResponse.get("response_body").toString())
-                .contains(ERROR_MSG_REQUEST_IS_EMPTY);
+                .contains(MALFORMED_JSON.getErrorMessage());
     }
 
     @Test
     @SuppressWarnings("unchecked")
     void test_delete_contactInformation_null_address_request() {
         setUpSingleContactAddOrganisationData();
-        var addressId = new HashSet<String>();
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        addressId.add(null);
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(null);
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
         Map<String, Object> addressResponse =
                 professionalReferenceDataClient
                         .deleteContactInformationAddressOfOrganisation(
-                                deleteMultipleAddressRequest,
+                                requestArrayList,
                                 puiOrgManager,
                                 userId);
         assertThat(addressResponse).isNotNull();
@@ -112,14 +111,13 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
     @SuppressWarnings("unchecked")
     void test_delete_contactInformation_empty_address_request() {
         setUpSingleContactAddOrganisationData();
-        var addressId = new HashSet<String>();
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        addressId.add("");
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+
         Map<String, Object> addressResponse =
                 professionalReferenceDataClient
                         .deleteContactInformationAddressOfOrganisation(
-                                deleteMultipleAddressRequest,
+                                requestArrayList,
                                 puiOrgManager,
                                 userId);
         assertThat(addressResponse).isNotNull();
@@ -132,15 +130,14 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
     @SuppressWarnings("unchecked")
     void test_delete_contactInformation_one_empty_address_request() {
         setUpSingleContactAddOrganisationData();
-        var addressId = new HashSet<String>();
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        addressId.add("test");
-        addressId.add("");
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
+        var deleteMultipleAddressRequest02 = new DeleteMultipleAddressRequest("test");
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest, deleteMultipleAddressRequest02));
+
         Map<String, Object> addressResponse =
                 professionalReferenceDataClient
                         .deleteContactInformationAddressOfOrganisation(
-                                deleteMultipleAddressRequest,
+                                requestArrayList,
                                 puiOrgManager,
                                 userId);
         assertThat(addressResponse).isNotNull();
@@ -153,14 +150,12 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
     @SuppressWarnings("unchecked")
     void test_delete_contactInformation_only_one_address_request() {
         setUpSingleContactAddOrganisationData();
-        var addressId = new HashSet<String>();
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        addressId.add("1234");
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("1234");
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
         Map<String, Object> addressResponse =
                 professionalReferenceDataClient
                         .deleteContactInformationAddressOfOrganisation(
-                                deleteMultipleAddressRequest,
+                                requestArrayList,
                                 puiOrgManager,
                                 userId);
         assertThat(addressResponse).isNotNull();
@@ -173,21 +168,22 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
     @SuppressWarnings("unchecked")
     void test_delete_one_contactInformation_from_org_address() {
         String orgId = setUpMultipleContactAddOrganisationData();
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        List<ContactInformation> contactInformations = contactInformationRepository.findAll();
-        var addressId = contactInformations.stream().limit(1).map(ci -> ci.getId().toString())
-                .collect(Collectors.toSet());
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        List<ContactInformation> contacts = contactInformationRepository.findAll();
+
+        String addressId = contacts.get(0).getId().toString();
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(addressId);
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+
         Map<String, Object> addressResponse =
                 professionalReferenceDataClient
                         .deleteContactInformationAddressOfOrganisation(
-                                deleteMultipleAddressRequest,
+                                requestArrayList,
                                 puiOrgManager,
                                 userId);
         Organisation organisationAfterDeletion = organisationRepository.findByOrganisationIdentifier(orgId);
         assertThat(organisationAfterDeletion.getContactInformation().size()).isEqualTo(2);
         assertThat(organisationAfterDeletion.getContactInformation().stream()
-                .noneMatch(ci -> addressId.contains(ci.getId().toString()))).isTrue();
+                .noneMatch(ci -> addressId.equals(ci.getId().toString()))).isTrue();
         assertThat(addressResponse).isNotNull();
         assertThat(addressResponse).containsEntry("http_status", "204 NO_CONTENT");
     }
@@ -195,19 +191,22 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
     @Test
     @SuppressWarnings("unchecked")
     void test_delete_two_contactInformation_from_org_address() {
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
         String orgId = setUpMultipleContactAddOrganisationData();
-        List<ContactInformation> contactInformations = contactInformationRepository.findAll();
-        deleteMultipleAddressRequest.setAddressId(contactInformations.stream().limit(2).map(ci -> ci.getId().toString())
-                .collect(Collectors.toSet()));
+        List<ContactInformation> contacts = contactInformationRepository.findAll();
+        List<String> addressId = contacts.stream().limit(2).map(ci -> ci.getId().toString())
+                .collect(Collectors.toList());
+
+        var deleteMultipleAddressRequest01 = new DeleteMultipleAddressRequest(addressId.get(0));
+        var deleteMultipleAddressRequest02 = new DeleteMultipleAddressRequest(addressId.get(1));
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest01, deleteMultipleAddressRequest02));
+
         Map<String, Object> addressResponse =
                 professionalReferenceDataClient
                         .deleteContactInformationAddressOfOrganisation(
-                                deleteMultipleAddressRequest,
+                                requestArrayList,
                                 puiOrgManager,
                                 userId);
-        var addressId = contactInformations.stream().limit(2).map(ci -> ci.getId().toString())
-                .collect(Collectors.toSet());
+
         Organisation organisationAfterDeletion = organisationRepository.findByOrganisationIdentifier(orgId);
         assertThat(organisationAfterDeletion.getContactInformation().size()).isEqualTo(1);
         assertThat(organisationAfterDeletion.getContactInformation().stream()
@@ -218,17 +217,22 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
 
     @Test
     @SuppressWarnings("unchecked")
-    void test_delete_three_contactInformation_from_two_org_address() {
+    void test_delete_three_contactInformation_from_org_address() {
         String orgId = setUpMultipleContactAddOrganisationData();
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        List<ContactInformation> contactInformations = contactInformationRepository.findAll();
-        var addressId = contactInformations.stream()
-                .map(ci -> ci.getId().toString()).collect(Collectors.toSet());
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        List<ContactInformation> contacts = contactInformationRepository.findAll();
+        var addressId = contacts.stream()
+                .map(ci -> ci.getId().toString()).collect(Collectors.toList());
+
+        var deleteMultipleAddressRequest01 = new DeleteMultipleAddressRequest(addressId.get(0));
+        var deleteMultipleAddressRequest02 = new DeleteMultipleAddressRequest(addressId.get(1));
+        var deleteMultipleAddressRequest03 = new DeleteMultipleAddressRequest(addressId.get(2));
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest01,
+                deleteMultipleAddressRequest02, deleteMultipleAddressRequest03));
+
         Map<String, Object> addressResponse =
                 professionalReferenceDataClient
                         .deleteContactInformationAddressOfOrganisation(
-                                deleteMultipleAddressRequest,
+                                requestArrayList,
                                 puiOrgManager,
                                 userId);
         Organisation organisationAfterDeletion = organisationRepository.findByOrganisationIdentifier(orgId);

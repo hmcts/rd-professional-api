@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -698,13 +699,13 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> deleteContactInformationAddressOfOrganisation(DeleteMultipleAddressRequest req,
-                                                                             String supportedRole, String userId) {
+    public Map<String, Object> deleteContactInformationAddressOfOrganisation(
+            List<DeleteMultipleAddressRequest> deleteRequest, String supportedRole, String userId) {
         ResponseEntity<Map> responseEntity = null;
         var urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/addresses";
 
         try {
-            HttpEntity<DeleteMultipleAddressRequest> requestEntity = new HttpEntity<>(req,
+            HttpEntity<List<DeleteMultipleAddressRequest>> requestEntity = new HttpEntity<>(deleteRequest,
                     getMultipleAuthHeaders(supportedRole, userId));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
 

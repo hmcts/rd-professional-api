@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.UUID;
-import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -144,7 +143,8 @@ class OrganisationExternalControllerTest {
                 "soMeone@somewhere.com", organisation);
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
                 "some-email-address", organisation);
-        organisationEntityResponse = new OrganisationEntityResponse(organisation, false, false, true);
+        organisationEntityResponse = new OrganisationEntityResponse(
+                organisation, false, false, true);
 
 
         prdEnumList = new ArrayList<>();
@@ -381,32 +381,28 @@ class OrganisationExternalControllerTest {
 
     @Test
     void testDeleteMultipleAddressesOfOrganisation() {
-        var addressId = new HashSet<UUID>();
-        UUID uuid = UUID.randomUUID();
-        addressId.add(uuid);
-
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        deleteMultipleAddressRequest.setAddressId(Collections.singleton(uuid.toString()));
-
         ContactInformation contactInformation01 = new ContactInformation();
         contactInformation01.setAddressLine1("addressLine1");
+        UUID uuid = UUID.randomUUID();
         contactInformation01.setId(uuid);
 
         ContactInformation contactInformation02 = new ContactInformation();
         contactInformation02.setAddressLine1("addressLine2");
         contactInformation02.setId(UUID.randomUUID());
 
-        var contactInformations = new ArrayList<ContactInformation>();
-        contactInformations.add(contactInformation01);
-        contactInformations.add(contactInformation02);
-        organisation.setContactInformations(contactInformations);
+        var contacts = new ArrayList<>(List.of(contactInformation01, contactInformation02));
+        organisation.setContactInformations(contacts);
 
+        var addressId = new HashSet<UUID>();
+        addressId.add(uuid);
+
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(uuid.toString());
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
         when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
 
         String orgId = uuid.toString().substring(0, 7);
-        String userId = uuid.toString();
         organisationExternalController
-                .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId);
+                .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId);
 
         verify(organisationServiceMock, times(1))
                 .deleteMultipleAddressOfGivenOrganisation(addressId);
@@ -415,51 +411,34 @@ class OrganisationExternalControllerTest {
 
     @Test
     void test_deleteMultipleAddressesOfOrganisation_NoAddressIdPassed() {
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        var addressId = new HashSet<String>();
-        deleteMultipleAddressRequest.setAddressId(addressId);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
-        assertThrows(InvalidRequest.class,() ->
-                organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId));
-    }
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
 
-    @Test
-    void test_deleteMultipleAddressesOfOrganisation_NullAddress_Passed() {
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        deleteMultipleAddressRequest.setAddressId(null);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId));
+                        .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId));
     }
 
     @Test
     void test_deleteMultipleAddressesOfOrganisation_nullAddressIdPassed() {
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        var addressId = new HashSet<String>();
-        addressId.add(null);
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(null);
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId));
+                        .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId));
     }
 
     @Test
     void test_deleteMultipleAddressesOfOrganisation_EmptyAddressIdPassed() {
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest();
-        var addressId = new HashSet<String>();
-        addressId.add("");
-        deleteMultipleAddressRequest.setAddressId(addressId);
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
-                        .deleteMultipleAddressesOfOrganisation(deleteMultipleAddressRequest, orgId));
+                        .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId));
     }
 
 }

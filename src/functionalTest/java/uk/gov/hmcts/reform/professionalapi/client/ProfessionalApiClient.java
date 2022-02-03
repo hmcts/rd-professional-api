@@ -969,11 +969,11 @@ public class ProfessionalApiClient {
         return response.body();
     }
 
-    public void deleteMultipleAddressesOfOrganisation(DeleteMultipleAddressRequest deleteMultipleAddressRequest,
+    public void deleteMultipleAddressesOfOrganisation(List<DeleteMultipleAddressRequest> deleteRequest,
                                                     RequestSpecification requestSpecification,
                                                     HttpStatus expectedStatus) {
         Response response = requestSpecification
-                .body(deleteMultipleAddressRequest)
+                .body(deleteRequest)
                 .delete("/refdata/external/v1/organisations/addresses")
                 .andReturn();
 

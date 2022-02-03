@@ -512,9 +512,11 @@ public abstract class SuperController {
         return userEmail;
     }
 
-    protected void deleteMultipleAddressOfGivenOrganisation(DeleteMultipleAddressRequest deleteRequest,
+    protected void deleteMultipleAddressOfGivenOrganisation(List<DeleteMultipleAddressRequest> deleteRequest,
                                                             String orgId) {
-        Set<String> addressIds = deleteRequest.getAddressId();
+        Set<String> addressIds = deleteRequest.stream()
+                .map(req -> req.getAddressId())
+                .collect(Collectors.toSet());
 
         if (ObjectUtils.isEmpty(addressIds)) {
             throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);

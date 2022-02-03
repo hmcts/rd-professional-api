@@ -473,7 +473,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"pui-organisation-manager"})
     public void deleteMultipleAddressesOfOrganisation(
-            @Valid @NotNull @RequestBody DeleteMultipleAddressRequest deleteRequest,
+            @Valid @NotNull @RequestBody List<DeleteMultipleAddressRequest> deleteRequest,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
 
         deleteMultipleAddressOfGivenOrganisation(deleteRequest, organisationIdentifier);
