@@ -83,5 +83,6 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MSG_ORG_NOT_EXIST = "Organisation does not exist";
     public static final String ERROR_MSG_ORG_IDS_DOES_NOT_MATCH = "ids not found or not belonging to org";
     public static final String ERROR_MSG_REQUEST_IS_EMPTY = "Request is empty";
+    public static final String ERROR_MSG_ADDRESS_LIST_IS_EMPTY = "Address list is empty";
 
 }

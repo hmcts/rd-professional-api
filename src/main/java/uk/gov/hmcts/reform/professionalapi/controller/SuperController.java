@@ -12,7 +12,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.MALFORMED_JSON;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
@@ -519,11 +519,11 @@ public abstract class SuperController {
                 .collect(Collectors.toSet());
 
         if (ObjectUtils.isEmpty(addressIds)) {
-            throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);
+            throw new InvalidRequest(ERROR_MSG_ADDRESS_LIST_IS_EMPTY);
         }
         if (addressIds.contains(null) || addressIds.contains(EMPTY)
                 || addressIds.stream().anyMatch(StringUtils::isBlank)) {
-            throw new InvalidRequest(MALFORMED_JSON.getErrorMessage());
+            throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);
         }
 
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
