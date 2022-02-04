@@ -336,8 +336,6 @@ dependencies {
     //Fix for CVE-2021-29425
     implementation 'commons-io:commons-io:2.8.0'
 
-    implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.5'
-
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '7.10.0'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
