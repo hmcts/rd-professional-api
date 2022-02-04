@@ -85,10 +85,8 @@ public class OrganisationCreationRequestValidator {
             List<ContactInformationCreationRequest> contactInformationCreationRequests) {
         List<ContactInformationValidationResponse> contactInformationValidationResponses = new ArrayList<>();
 
-        contactInformationCreationRequests.forEach(contactInfo -> {
-            validateContactInformation(contactInfo, contactInformationValidationResponses);
-
-        });
+        contactInformationCreationRequests.forEach(contactInfo ->
+            validateContactInformation(contactInfo, contactInformationValidationResponses));
         return contactInformationValidationResponses;
     }
 
@@ -230,9 +228,8 @@ public class OrganisationCreationRequestValidator {
                 if (dxAddressList != null && dxAddressList.isEmpty()) {
                     throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
                 } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
-                    dxAddressList.forEach(dxAddress -> {
-                        isDxAddressValid(dxAddress);
-                    });
+                    dxAddressList.forEach(dxAddress ->
+                        isDxAddressValid(dxAddress));
                 }
                 ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
                 contactInfoBuilder.setUprn(contactInformation.getUprn());

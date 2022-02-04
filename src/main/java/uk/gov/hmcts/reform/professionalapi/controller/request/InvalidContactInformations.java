@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 public class InvalidContactInformations  extends RuntimeException implements Serializable {
     private static final long serialVersionUID = -3909103963189618433L;
-    List<ContactInformationValidationResponse> contactInfoValidations;
+    private final List<ContactInformationValidationResponse> contactInfoValidations;
 
     public InvalidContactInformations(
             String message, List<ContactInformationValidationResponse> contactInfoValidations) {
