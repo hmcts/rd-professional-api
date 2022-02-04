@@ -228,8 +228,7 @@ public class OrganisationCreationRequestValidator {
                 if (dxAddressList != null && dxAddressList.isEmpty()) {
                     throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
                 } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
-                    dxAddressList.forEach(dxAddress ->
-                        isDxAddressValid(dxAddress));
+                    dxAddressList.forEach(this::isDxAddressValid);
                 }
                 ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
                 contactInfoBuilder.setUprn(contactInformation.getUprn());

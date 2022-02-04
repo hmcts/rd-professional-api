@@ -43,7 +43,6 @@ class ContactInformationRepositoryTest extends BaseRepository {
     void should_add_contactInformations_Test() {
         List<ContactInformation> contactInformations = addContactInformations();
 
-        assertThat(2).isEqualTo(contactInformations.size());
         assertThat(contactInformations.get(0).getUprn()).isEqualTo("uprn-1");
         assertThat(contactInformations.get(1).getUprn()).isEqualTo("uprn-2");
 
