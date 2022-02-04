@@ -528,11 +528,11 @@ public abstract class SuperController {
 
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
 
-        //check if organisation is present in the database and that it has more than required address associated
-        checkOrganisationAndMoreThanRequiredAddressExists(existingOrganisation, addressIds);
-
         //match address id with organisation contact information id's
         matchAddressIdsWithOrgContactInformationIds(existingOrganisation, addressIds);
+
+        //check if organisation is present in the database and that it has more than required address associated
+        checkOrganisationAndMoreThanRequiredAddressExists(existingOrganisation, addressIds);
 
         //delete the passed address id numbers from the request
         Set<UUID> idsSet = addressIds.stream()
