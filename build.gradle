@@ -305,6 +305,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.2'
 
+
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
@@ -334,6 +335,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     //Fix for CVE-2021-29425
     implementation 'commons-io:commons-io:2.8.0'
+
+    // https://mvnrepository.com/artifact/com.nimbusds/lang-tag
+    implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.5'
 
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '7.10.0'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
