@@ -627,7 +627,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet) {
-        contactInformationRepository.deleteByAddressId(idsSet);
+        contactInformationRepository.deleteByIdIn(idsSet);
     }
 
 }

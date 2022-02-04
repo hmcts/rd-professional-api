@@ -201,6 +201,6 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
         when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
 
-        doNothing().when(contactInformationRepositoryMock).deleteByAddressId(anySet());
+        doNothing().when(contactInformationRepositoryMock).deleteByIdIn(anySet());
     }
 }
