@@ -7,6 +7,7 @@ java:
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     LAUNCH_DARKLY_ENV: "preview"
+    USER_PROFILE_URL: "http://rd-user-profile-api-pr-769.service.core-compute-preview.internal"
   postgresql:
     enabled: true
     postgresqlUsername: dbrefdata
