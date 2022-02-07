@@ -36,6 +36,10 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MESSAGE_USER_MUST_BE_ACTIVE = "User status must be Active to perform this "
             .concat("operation");
 
+    public static final String ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION =
+            "Empty contactInformation value";
+    public static final String LOG_ERROR_BODY_START =
+            "{}:: {}";
     public static final int ERROR_CODE_400 = 400;
     public static final int ERROR_CODE_500 = 500;
     public static final int STATUS_CODE_204 = 204;
@@ -80,5 +84,6 @@ public class ProfessionalApiConstants {
 
     public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
     public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
+    public static final String RD_PROFESSIONAL_ADD_CONTACTS_INFO_TO_ORG = "rd-professional-add-contacts-info-org";
 
 }
