@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -174,6 +174,16 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
 
         when(paymentAccountRepositoryMock.save(any(PaymentAccount.class))).thenReturn(paymentAccount);
+
+    }
+
+    @State({"Add contact informations to organisation"})
+    public void toAddContactInformationsToOrganisation() {
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+                .thenReturn(organisationMock);
+
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
+        doNothing().when(organisationServiceMock).addContactInformationsToOrganisation(any(),any());
 
     }
 }
