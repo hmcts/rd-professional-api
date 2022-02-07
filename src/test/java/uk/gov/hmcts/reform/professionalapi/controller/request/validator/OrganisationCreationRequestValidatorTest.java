@@ -1,22 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -34,6 +18,27 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationCreationRequestValidatorTest {
@@ -369,6 +374,81 @@ class OrganisationCreationRequestValidatorTest {
         verifyResourceNotFoundExceptionThrown(catchThrowable(() ->
                 isInputOrganisationStatusValid(" ", ACTIVE.name())));
     }
+
+    @Test
+    void test_add_contacts_informations_to_orgs_validation_address_line_is_missing() {
+        List<ContactInformationCreationRequest> contactInformationCreationRequests =
+                Arrays.asList(aContactInformationCreationRequest()
+                        //.addressLine1("")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("this is an invalid dx number")
+                                .dxExchange(null).build()))
+                        .build());
+
+
+        Throwable thrown = catchThrowable(() -> {
+            organisationCreationRequestValidator
+                    .validateContactInformations(contactInformationCreationRequests);
+        });
+
+
+        assertThat(thrown)
+                .isInstanceOf(InvalidContactInformations.class)
+                .hasMessageContaining("Invalid Contact informations");
+
+
+    }
+
+    @Test
+    void test_add_contacts_informations_to_orgs_valid_dx_address() {
+        List<ContactInformationCreationRequest> contactInformationCreationRequests =
+                Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build());
+
+        organisationCreationRequestValidator
+                .validateContactInformations(contactInformationCreationRequests);
+
+        assertTrue(true);
+
+    }
+
+    @Test
+    void test_add_contacts_informations_to_orgs_null_dx_address() {
+        List<ContactInformationCreationRequest> contactInformationCreationRequests =
+                Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(null)
+                        .build());
+
+        organisationCreationRequestValidator
+                .validateContactInformations(contactInformationCreationRequests);
+
+        assertTrue(true);
+
+    }
+
 
     void verifyResourceNotFoundExceptionThrown(Throwable raisedException) {
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)

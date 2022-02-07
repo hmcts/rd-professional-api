@@ -1,16 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
-
-import java.util.List;
-import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,13 +8,30 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 @Component
 @Slf4j
@@ -34,6 +40,7 @@ public class OrganisationCreationRequestValidator {
     private final List<RequestValidator> validators;
 
     private static String loggingComponentName;
+
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -58,6 +65,46 @@ public class OrganisationCreationRequestValidator {
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
 
+    }
+
+    public List<ContactInformationValidationResponse> validate(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests) {
+
+        Optional<List<ContactInformationCreationRequest>> infoList =
+                Optional.ofNullable(contactInformationCreationRequests);
+        if (infoList.isPresent() && infoList.get().isEmpty()) {
+            throw new InvalidRequest("Request is empty");
+        }
+
+        return validateConstraintValidation(contactInformationCreationRequests);
+
+    }
+
+
+    private List<ContactInformationValidationResponse> validateConstraintValidation(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests) {
+        List<ContactInformationValidationResponse> contactInformationValidationResponses = new ArrayList<>();
+
+        contactInformationCreationRequests.forEach(contactInfo ->
+            validateContactInformation(contactInfo, contactInformationValidationResponses));
+        return contactInformationValidationResponses;
+    }
+
+    public void validateContactInformations(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests) {
+
+        List<ContactInformationValidationResponse> contactInfoValidations =
+                validate(contactInformationCreationRequests);
+
+        List<ContactInformationValidationResponse> result = null;
+        if (contactInfoValidations != null && !contactInfoValidations.isEmpty()) {
+            result = contactInfoValidations.stream()
+                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress())
+                    .collect(Collectors.toList());
+        }
+        if (result != null && !result.isEmpty()) {
+            throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);
+        }
     }
 
     public static boolean contains(String status) {
@@ -144,7 +191,7 @@ public class OrganisationCreationRequestValidator {
                                 || isEmptyValue(contactInformation.getPostCode())
                                 || isEmptyValue(contactInformation.getTownCity())) {
 
-                            throw new InvalidRequest("Empty contactInformation value");
+                            throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
                         }
                         if (null != contactInformation.getDxAddress()) {
                             contactInformation.getDxAddress().forEach(this::isDxAddressValid);
@@ -156,6 +203,51 @@ public class OrganisationCreationRequestValidator {
 
         }
     }
+
+    public void validateContactInformation(
+            ContactInformationCreationRequest contactInformation,
+            List<ContactInformationValidationResponse> contactInformationValidationResponses) {
+
+        try {
+            Optional<ContactInformationCreationRequest> contactInfoOptional =
+                    Optional.ofNullable(contactInformation);
+            if (!contactInfoOptional.isPresent()) {
+                throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
+            } else if (isEmptyValue(contactInformation.getAddressLine1())
+                    || isEmptyValue(contactInformation.getAddressLine2())
+                    || isEmptyValue(contactInformation.getAddressLine3())
+                    || isEmptyValue(contactInformation.getCountry())
+                    || isEmptyValue(contactInformation.getPostCode())
+                    || isEmptyValue(contactInformation.getTownCity())) {
+
+                throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
+            } else if (StringUtils.isBlank(contactInformation.getAddressLine1())) {
+                throw new InvalidRequest("AddressLine1 cannot be empty");
+            } else {
+                List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
+                if (dxAddressList != null && dxAddressList.isEmpty()) {
+                    throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
+                } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
+                    dxAddressList.forEach(this::isDxAddressValid);
+                }
+                ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
+                contactInfoBuilder.setUprn(contactInformation.getUprn());
+                contactInfoBuilder.setValidAddress(true);
+                contactInformationValidationResponses.add(contactInfoBuilder);
+            }
+        } catch (InvalidRequest invalidRequest) {
+
+            ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
+            contactInfoBuilder.setUprn(contactInformation.getUprn());
+            contactInfoBuilder.setValidAddress(false);
+            contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
+            contactInformationValidationResponses.add(contactInfoBuilder);
+
+        }
+
+    }
+
+
 
     public boolean isEmptyValue(String value) {
 
@@ -190,6 +282,8 @@ public class OrganisationCreationRequestValidator {
     public static void setLoggingComponentName(String loggingComponentName) {
         OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
     }
+
+
 
 }
 
