@@ -1,21 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static org.apache.logging.log4j.util.Strings.isBlank;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +23,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -43,8 +34,19 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinim
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
+
+import static org.apache.logging.log4j.util.Strings.isBlank;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -422,6 +424,72 @@ public class OrganisationExternalController extends SuperController {
         log.info("Received request to add payment accounts to organisation Id");
 
         return organisationService.addPaymentAccountsToOrganisation(pbaRequest, organisationIdentifier, userId);
+
+    }
+
+    @ApiOperation(
+            value = "Adds contact informations(address details) to organisation",
+            notes = "**IDAM Roles to access API** :\n pui-organisation-manager",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = ""
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request has been provided"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+
+    @PostMapping(
+            path = "/addresses",
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured({"pui-organisation-manager"})
+    public ResponseEntity<Void> addContactInformationsToOrganisation(
+            @Valid @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
+
+
+        organisationCreationRequestValidator.validateContactInformations(contactInformationCreationRequests);
+
+
+        Optional<Organisation> organisation = Optional.ofNullable(organisationService
+                .getOrganisationByOrgIdentifier(organisationIdentifier));
+
+        if (organisation.isEmpty()) {
+            throw new ResourceNotFoundException("Organisation does not exist");
+        }
+
+        organisationService.addContactInformationsToOrganisation(
+                contactInformationCreationRequests,
+                organisationIdentifier);
+
+        return ResponseEntity
+                .status(201)
+                .body(null);
 
     }
 
