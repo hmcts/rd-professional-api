@@ -7,10 +7,17 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCr
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang.RandomStringUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
 public class OrganisationFixtures {
@@ -114,5 +121,95 @@ public class OrganisationFixtures {
                         .dxNumber("NI 1234567890")
                         .dxExchange("dxExchange1").build()))
                 .build()));
+    }
+
+    public static List<ContactInformationCreationRequest> getContactInformationList() {
+        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
+        contactInformationCreationRequests.add(
+                aContactInformationCreationRequest()
+                        .uprn("uprn1")
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .uprn("uprn")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567891")
+                                .dxExchange("dxExchange").build()))
+                        .build()
+        );
+        contactInformationCreationRequests.add(
+                aContactInformationCreationRequest()
+                        .uprn("uprn2")
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .uprn("uprn")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567892")
+                                .dxExchange("dxExchange").build()))
+                        .build()
+        );
+
+        return contactInformationCreationRequests;
+
+    }
+
+    public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
+        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
+        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456777")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456788")
+                .dxExchange("dxExchange").build());
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123452222")
+                .dxExchange("dxExchange").build());
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456333")
+                .dxExchange("dxExchange").build());
+
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+                .uprn("uprn1")
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx1)
+                .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+                .uprn("uprn2")
+                .addressLine1("addLine1")
+                .addressLine2("addLine2")
+                .addressLine3("addLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx2)
+                .build());
+
+        return contactInfoList;
     }
 }
