@@ -16,9 +16,11 @@ public class ContactInformationResponseWithDxAddress extends ContactInformationR
     private final List<DxAddressResponse> dxAddress;
 
     public ContactInformationResponseWithDxAddress(ContactInformation contactInfo) {
+
         this.addressId = contactInfo.getId();
         this.uprn = contactInfo.getUprn();
         this.created = contactInfo.getCreated();
+
         this.addressLine1 = contactInfo.getAddressLine1();
         this.addressLine2 = contactInfo.getAddressLine2();
         this.addressLine3 = contactInfo.getAddressLine3();

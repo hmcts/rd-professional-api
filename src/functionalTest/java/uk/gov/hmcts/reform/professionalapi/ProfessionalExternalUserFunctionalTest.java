@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -22,10 +23,10 @@ import uk.gov.hmcts.reform.professionalapi.util.serenity5.SerenityTest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -39,6 +40,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createContactInformationCreationRequests;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus.SUSPENDED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
@@ -587,5 +589,84 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         assertThat(paymentAccountsToAdd).hasSameElementsAs(allStatusPaymentAccounts);
         log.info("addPbaOfExistingOrganisationShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void testAddContactsInformationsToOrganisationScenariosShouldBeForbiddenWhenLDOff() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
+
+        log.info("addContactInformationsToOrganisationShouldBeSuccess :: STARTED");
+
+        List<ContactInformationCreationRequest> createContactInformationCreationRequests =
+                createContactInformationCreationRequests();
+        Map<String, Object> result = professionalApiClient
+                .addContactInformationsToOrganisation(createContactInformationCreationRequests,
+                        pomBearerToken,FORBIDDEN);
+
+        assertThat(result.get("statusCode")).isNotNull();
+        assertThat(result.get("statusCode")).isEqualTo(403);
+        log.info("addContactInformationsToOrganisationShouldBeSuccess :: END");
+    }
+
+    @Test
+    @DisplayName("Add Contact informations to organisations  Test Scenarios")
+    @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void testAddContactsInformationsToOrganisationScenariosShouldBeSuccessWhenLDON() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
+        invitePuiOrgManagerUserScenarios();
+        addContactInformationsToOrganisationScenario(CREATED);
+
+        suspendPuiOrgManagerUserScenarios();
+    }
+
+    public void invitePuiOrgManagerUserScenarios() {
+        inviteUserByPuiOrgManagerShouldBeSuccess();
+    }
+
+
+    public void suspendPuiOrgManagerUserScenarios() {
+
+        suspendUserByPuiOrgManagerShouldBeSuccess();
+    }
+
+    public void addContactInformationsToOrganisationScenario(HttpStatus httpStatus) {
+        addContactInformationsToOrganisationShouldBeSuccess(httpStatus);
+    }
+
+
+    public void addContactInformationsToOrganisationShouldBeSuccess(HttpStatus httpStatus) {
+        log.info("addContactInformationsToOrganisationShouldBeSuccess :: STARTED");
+
+        List<ContactInformationCreationRequest> createContactInformationCreationRequests =
+                createContactInformationCreationRequests();
+        Map<String, Object> result = professionalApiClient
+                .addContactInformationsToOrganisation(createContactInformationCreationRequests,
+                        pomBearerToken,httpStatus);
+
+        assertThat(result.get("statusCode")).isNotNull();
+        assertThat(result.get("statusCode")).isEqualTo(201);
+        log.info("addContactInformationsToOrganisationShouldBeSuccess :: END");
+    }
+
+    public void inviteUserByPuiOrgManagerShouldBeSuccess() {
+        log.info("inviteUserByPuiOrgManagerShouldBeSuccess :: STARTED");
+        Map<String, Object> newUserResponse = professionalApiClient
+                .addNewUserToAnOrganisationExternal(createUserRequest(asList(puiOrgManager)),
+                        professionalApiClient.getMultipleAuthHeaders(pomBearerToken), CREATED);
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        log.info("inviteUserByPuiOrgManagerShouldBeSuccess :: END");
+    }
+
+    public void suspendUserByPuiOrgManagerShouldBeSuccess() {
+        log.info("suspendUserByPuiOrgManagerShouldBeSuccess :: STARTED");
+        UserProfileUpdatedData data = getUserStatusUpdateRequest(SUSPENDED);
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(OK, data, extActiveOrgId, activeUserId);
+        assertThat(searchUserStatus(extActiveOrgId, activeUserId)).isEqualTo(SUSPENDED.name());
+        log.info("suspendUserByPuiOrgManagerShouldBeSuccess :: END");
     }
 }
