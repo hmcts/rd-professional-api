@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +28,11 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 
 import javax.persistence.EntityManagerFactory;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
+
 public class ProviderTestConfiguration {
 
     @MockBean
@@ -50,13 +50,14 @@ public class ProviderTestConfiguration {
     @MockBean
     protected UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     @MockBean
-    protected OrganisationCreationRequestValidator organisationCreationRequestValidator;
-    @MockBean
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @MockBean
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @MockBean
     protected PaymentAccountValidator paymentAccountValidator;
+
+    @MockBean
+    public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
 
 
     @Value("${prd.security.roles.hmcts-admin:}")
