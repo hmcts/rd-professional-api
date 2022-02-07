@@ -85,5 +85,11 @@ public class ProfessionalApiConstants {
     public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
     public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
     public static final String RD_PROFESSIONAL_ADD_CONTACTS_INFO_TO_ORG = "rd-professional-add-contacts-info-org";
+    public static final String RD_PROFESSIONAL_MULTIPLE_ADDRESS = "rd-professional-multiple-address";
+    public static final String ERROR_MSG_ORG_ADDRESS = "Organisation should have at least one address";
+    public static final String ERROR_MSG_ORG_NOT_EXIST = "Organisation does not exist";
+    public static final String ERROR_MSG_ORG_IDS_DOES_NOT_MATCH = "ids not found or not belonging to org";
+    public static final String ERROR_MSG_REQUEST_IS_EMPTY = "Request is empty";
+    public static final String ERROR_MSG_ADDRESS_LIST_IS_EMPTY = "Address list is empty";
 
 }

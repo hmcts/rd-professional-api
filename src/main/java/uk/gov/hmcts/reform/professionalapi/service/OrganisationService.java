@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 import java.util.List;
 import java.util.Set;
-
+import java.util.UUID;
 
 public interface OrganisationService {
 
@@ -51,5 +51,7 @@ public interface OrganisationService {
 
     void addContactInformationsToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest, String organisationIdentifier);
+
+    void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet);
 
 }
