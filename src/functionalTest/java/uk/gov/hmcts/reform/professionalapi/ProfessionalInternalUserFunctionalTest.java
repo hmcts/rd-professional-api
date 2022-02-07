@@ -515,7 +515,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(orgsResponse.size()).isPositive();
         assertThat(orgsResponse.stream()
                 .filter(p -> p.getPbaNumbers().stream()
-                        .anyMatch(r-> r.getStatusMessage() == null || !r.getStatusMessage()
+                        .anyMatch(r -> r.getStatusMessage() == null || !r.getStatusMessage()
                                 .equals(PBA_STATUS_MESSAGE_ACCEPTED))))
                 .allMatch(org -> org.getStatus().isActive());
 
