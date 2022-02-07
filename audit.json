@@ -180,8 +180,8 @@
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations?pbaStatus=pbaStatus_GET" : "ignore",
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pba_POST" : "ignore",
   "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/addresses_POST" : "ignore",
-  "10010_Cookie No HttpOnly Flag_http://http://rd-professional-api-aat.service.core-compute-aat.internal/v1/organisations/addresses_POST" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://http://rd-professional-api-aat.service.core-compute-aat.internal/v1/organisations/addresses_POST" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://http://rd-professional-api-aat.service.core-compute-aat.internal/v1/organisations/addresses_POST" : "ignore",
-  "90033_Loosely Scoped Cookie_http://http://rd-professional-api-aat.service.core-compute-aat.internal/v1/organisations/addresses_POST" : "ignore"
+  "10010_Cookie No HttpOnly Flag_http://rd-professional-api-aat.service.core-compute-aat.internal/v1/organisations/addresses_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/v1/organisations/addresses_POST" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/v1/organisations/addresses_POST" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/v1/organisations/addresses_POST" : "ignore"
 }
