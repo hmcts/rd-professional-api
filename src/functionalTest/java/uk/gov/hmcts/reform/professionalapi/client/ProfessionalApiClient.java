@@ -5,16 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.apache.commons.lang.StringUtils;
@@ -35,11 +25,22 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -168,6 +169,58 @@ public class ProfessionalApiClient {
             .contactInformation(contactInfoList);
     }
 
+    public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456777")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+               .dxNumber("DX 123456788")
+                .dxExchange("dxExchange").build());
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123452222")
+                .dxExchange("dxExchange").build());
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456333")
+                .dxExchange("dxExchange").build());
+
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+                .uprn("uprn1")
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx1)
+                .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+                .uprn("uprn2")
+                .addressLine1("addLine1")
+                .addressLine2("addLine2")
+                .addressLine3("addLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx2)
+                .build());
+
+        return contactInfoList;
+    }
+
+
     public Map<String, Object> createOrganisation() {
         return createOrganisation(createOrganisationRequest().build());
     }
@@ -188,6 +241,39 @@ public class ProfessionalApiClient {
             .statusCode(CREATED.value());
 
         return response.body().as(Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> addContactInformationsToOrganisation(
+
+            List<ContactInformationCreationRequest>
+                    createContactInformationCreationRequests,
+            String pomBearerToken,
+            HttpStatus httpStatus) {
+        Response response = getMultipleAuthHeaders(pomBearerToken)
+                .body(createContactInformationCreationRequests)
+                .post("/refdata/external/v1/organisations/addresses")
+                .andReturn();
+
+        if (response.statusCode() != CREATED.value()) {
+            log.info("{}:: Add contact informations to organisation response: {}",
+                    loggingComponentName, response.asString());
+        }
+        Map<String, Object> hmResponse = new HashMap<>();
+
+        if (FORBIDDEN.value() == httpStatus.value()) {
+
+            hmResponse.put("statusCode", FORBIDDEN.value());
+
+        } else if (CREATED.value() == httpStatus.value()) {
+            response.then()
+                    .assertThat()
+                    .statusCode(CREATED.value());
+            hmResponse.put("statusCode", CREATED.value());
+        }
+
+
+        return hmResponse;
     }
 
     public Response createOrganisationWithoutS2SToken(OrganisationCreationRequest
