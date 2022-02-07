@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -40,7 +39,6 @@ import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
 @Provider("referenceData_organisationalExternalPbas")
 @Import(OrganisationalExternalControllerProviderTestConfiguration.class)
@@ -82,9 +80,6 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     PaymentAccountValidator paymentAccountValidatorMock;
-
-    @Autowired
-    ContactInformationRepository contactInformationRepositoryMock;
 
     @Override
     void setController() {
@@ -182,25 +177,13 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     }
 
-    @State({"Delete Multiple Addresses of an active organisation"})
-    public void toDeleteMultipleAddressesOfOrganisation() throws IOException {
-
+    @State({"Add contact informations to organisation"})
+    public void toAddContactInformationsToOrganisation() {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
                 .thenReturn(organisationMock);
-        ContactInformation contactInformation01 = new ContactInformation();
-        contactInformation01.setAddressLine1("addressLine1");
-        contactInformation01.setId(UUID.randomUUID());
-        ContactInformation contactInformation02 = new ContactInformation();
-        contactInformation02.setAddressLine1("addressLine2");
-        contactInformation02.setId(UUID.randomUUID());
-
-        when(organisationMock.getContactInformation()).thenReturn(
-                Arrays.asList(contactInformation01, contactInformation02));
-        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any());
 
         when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
+        doNothing().when(organisationServiceMock).addContactInformationsToOrganisation(any(),any());
 
-        doNothing().when(contactInformationRepositoryMock).deleteByIdIn(anySet());
     }
 }
