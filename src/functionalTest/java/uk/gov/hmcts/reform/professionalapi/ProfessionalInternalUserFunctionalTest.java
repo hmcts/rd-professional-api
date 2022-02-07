@@ -12,6 +12,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
@@ -512,7 +513,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         assertNotNull(orgsResponse);
         assertThat(orgsResponse.size()).isPositive();
-        assertThat(orgsResponse.stream()).allMatch(org -> org.getStatus().isActive());
+        assertThat(orgsResponse.stream()
+                .filter(p -> p.getPbaNumbers().stream()
+                        .anyMatch(r -> r.getStatusMessage() == null || !r.getStatusMessage()
+                                .equals(PBA_STATUS_MESSAGE_ACCEPTED))))
+                .allMatch(org -> org.getStatus().isActive());
 
         var pbaByStatusResponses = new ArrayList<FetchPbaByStatusResponse>();
         orgsResponse.forEach(org -> pbaByStatusResponses.addAll(org.getPbaNumbers()));
