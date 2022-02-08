@@ -84,7 +84,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -667,7 +666,7 @@ class OrganisationServiceImplTest {
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
         verify(userAttributeServiceMock, times(1))
-                .addUserAttributesToSuperUser(eq(professionalUser), eq(userAttributes));
+                .addUserAttributesToSuperUser(professionalUser,userAttributes);
         verify(professionalUserRepositoryMock, times(1)).save(any(ProfessionalUser.class));
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
@@ -695,7 +694,7 @@ class OrganisationServiceImplTest {
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
         verify(userAttributeServiceMock, times(1))
-                .addUserAttributesToSuperUser(eq(professionalUser), eq(userAttributes));
+                .addUserAttributesToSuperUser(professionalUser, userAttributes);
     }
 
     @Test
@@ -950,11 +949,11 @@ class OrganisationServiceImplTest {
         assertNotNull(responseEntity.getBody());
 
         var orgsWithPbas = (List<OrganisationsWithPbaStatusResponse>) responseEntity.getBody();
-        assertThat(orgsWithPbas.size()).isEqualTo(2);
+        assertThat(orgsWithPbas).hasSize(2);
         assertThat(orgsWithPbas.get(0).getOrganisationIdentifier()).isEqualTo("ABCDEFG1");
-        assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);
+        assertThat(orgsWithPbas.get(0).getPbaNumbers()).hasSize(1);
         assertThat(orgsWithPbas.get(1).getOrganisationIdentifier()).isEqualTo("ABCDEFG2");
-        assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);
+        assertThat(orgsWithPbas.get(0).getPbaNumbers()).hasSize(1);
 
         verify(organisationRepository, times(1)).findByPbaStatus(ACCEPTED);
     }
