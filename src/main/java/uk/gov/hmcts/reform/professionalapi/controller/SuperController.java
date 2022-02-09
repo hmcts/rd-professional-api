@@ -11,6 +11,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
@@ -23,6 +25,8 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRole
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
 
 import feign.FeignException;
 import feign.Response;
@@ -82,6 +86,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.UUID;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 
 @RestController
 @Slf4j
@@ -504,5 +510,34 @@ public abstract class SuperController {
         }
 
         return userEmail;
+    }
+
+    protected void deleteMultipleAddressOfGivenOrganisation(List<DeleteMultipleAddressRequest> deleteRequest,
+                                                            String orgId) {
+        Set<String> addressIds = deleteRequest.stream()
+                .map(DeleteMultipleAddressRequest::getAddressId)
+                .collect(Collectors.toSet());
+
+        if (ObjectUtils.isEmpty(addressIds)) {
+            throw new InvalidRequest(ERROR_MSG_ADDRESS_LIST_IS_EMPTY);
+        }
+        if (addressIds.contains(null) || addressIds.contains(EMPTY)
+                || addressIds.stream().anyMatch(StringUtils::isBlank)) {
+            throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);
+        }
+
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+
+        //match address id with organisation contact information id's
+        matchAddressIdsWithOrgContactInformationIds(existingOrganisation, addressIds);
+
+        //check if organisation is present in the database and that it has more than required address associated
+        checkOrganisationAndMoreThanRequiredAddressExists(existingOrganisation, addressIds);
+
+        //delete the passed address id numbers from the request
+        Set<UUID> idsSet = addressIds.stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toSet());
+        organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }
 }
