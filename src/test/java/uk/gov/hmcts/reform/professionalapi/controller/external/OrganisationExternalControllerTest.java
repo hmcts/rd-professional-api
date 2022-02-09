@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -416,5 +418,45 @@ class OrganisationExternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+    @Test
+    void testDeleteMultipleAddressesOfOrganisation() {
+        ContactInformation contactInformation01 = new ContactInformation();
+        contactInformation01.setAddressLine1("addressLine1");
+        UUID uuid = UUID.randomUUID();
+        contactInformation01.setId(uuid);
+
+        ContactInformation contactInformation02 = new ContactInformation();
+        contactInformation02.setAddressLine1("addressLine2");
+        contactInformation02.setId(UUID.randomUUID());
+
+        var contacts = new ArrayList<>(List.of(contactInformation01, contactInformation02));
+        organisation.setContactInformations(contacts);
+
+        var addressId = new HashSet<UUID>();
+        addressId.add(uuid);
+
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(uuid.toString());
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+
+        String orgId = uuid.toString().substring(0, 7);
+        organisationExternalController
+                .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId);
+
+        verify(organisationServiceMock, times(1))
+                .deleteMultipleAddressOfGivenOrganisation(addressId);
+
+    }
+
+    @Test
+    void test_deleteMultipleAddressesOfOrganisation_EmptyAddressIdPassed() {
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        assertThrows(InvalidRequest.class,() ->
+                organisationExternalController
+                        .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId));
     }
 }
