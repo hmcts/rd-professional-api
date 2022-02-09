@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.CascadeType;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -78,7 +79,8 @@ public class ContactInformation implements Serializable {
     private LocalDateTime created;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(mappedBy = "contactInformation")
+    @OneToMany(mappedBy = "contactInformation", cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<DxAddress> dxAddresses = new ArrayList<>();
 
     public void addDxAddress(DxAddress dxAddress) {
