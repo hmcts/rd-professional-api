@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 
 @TestConfiguration
 public class OrganisationalExternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
@@ -66,4 +67,7 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
 
     @MockBean
     protected PaymentAccountRepository paymentAccountRepository;
+
+    @MockBean
+    ContactInformationRepository contactInformationRepositoryMock;
 }
