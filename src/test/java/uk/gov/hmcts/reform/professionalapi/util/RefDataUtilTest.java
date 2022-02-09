@@ -115,8 +115,8 @@ class RefDataUtilTest {
         userAccountMaps.add(userAccountMap);
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts).isNotEmpty();
+        assertThat(paymentAccounts).isNotNull()
+                                   .isNotEmpty();
     }
 
     @Test
@@ -128,8 +128,8 @@ class RefDataUtilTest {
         userAccountMaps.add(userAccountMap);
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts).isNotEmpty();
+        assertThat(paymentAccounts).isNotNull()
+                                    .isNotEmpty();
     }
 
     @Test
@@ -137,8 +137,8 @@ class RefDataUtilTest {
         List<UserAccountMap> userAccountMaps = new ArrayList<>();
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts).isEmpty();
+        assertThat(paymentAccounts).isNotNull()
+                                   .isEmpty();
     }
 
     @Test
@@ -386,8 +386,8 @@ class RefDataUtilTest {
         HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock,
                 realResponseEntity);
 
-        assertThat(httpHeaders).containsKey("fakeHeader");
-        assertThat(httpHeaders).containsKey("paginationInfo");
+        assertThat(httpHeaders).containsKey("fakeHeader")
+                               .containsKey("paginationInfo");
 
         verify(pageMock, times(1)).getTotalElements();
         verify(pageMock, times(1)).getTotalPages();
@@ -594,7 +594,7 @@ class RefDataUtilTest {
     }
 
     @Test
-    void test_GetSingleUserIdFromUserProfile_WithFeignException() throws Exception {
+    void test_GetSingleUserIdFromUserProfile_WithFeignException() {
         FeignException feignExceptionMock = mock(FeignException.class);
         when(feignExceptionMock.status()).thenReturn(500);
 
@@ -638,7 +638,7 @@ class RefDataUtilTest {
     }
 
     @Test
-    void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() throws Exception {
+    void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -719,7 +719,7 @@ class RefDataUtilTest {
 
 
     @Test
-    void test_GetSingleUserIdFromUserProfileForException() throws Exception {
+    void test_GetSingleUserIdFromUserProfileForException() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
