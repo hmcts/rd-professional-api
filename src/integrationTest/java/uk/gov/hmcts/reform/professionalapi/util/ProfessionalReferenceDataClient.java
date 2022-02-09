@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -712,6 +713,26 @@ public class ProfessionalReferenceDataClient {
         addContactsInfoURL.append("/").append("addresses");
 
         return postRequest(addContactsInfoURL.toString(), contactInformationCreationRequests, supportedRole, userId);
+    }
+
+    public Map<String, Object> deleteContactInformationAddressOfOrganisation(
+            List<DeleteMultipleAddressRequest> deleteRequest, String supportedRole, String userId) {
+        ResponseEntity<Map> responseEntity = null;
+        var urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/addresses";
+
+        try {
+            HttpEntity<List<DeleteMultipleAddressRequest>> requestEntity = new HttpEntity<>(deleteRequest,
+                    getMultipleAuthHeaders(supportedRole, userId));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            var statusAndBody = new HashMap<String, Object>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
     }
 
 }

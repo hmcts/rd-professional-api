@@ -70,6 +70,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -645,6 +646,12 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .collect(Collectors.toList());
 
         organisation.setContactInformations(sortedContactInfoByCreatedDate);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet) {
+        contactInformationRepository.deleteByIdIn(idsSet);
     }
 
 }

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.UUID;
+import java.util.LinkedHashMap;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -668,5 +671,74 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         professionalApiClient.modifyUserToExistingUserForPrdAdmin(OK, data, extActiveOrgId, activeUserId);
         assertThat(searchUserStatus(extActiveOrgId, activeUserId)).isEqualTo(SUSPENDED.name());
         log.info("suspendUserByPuiOrgManagerShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff() {
+        log.info("deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
+
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
+
+        var deleteMultipleAddressRequest01 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var deleteMultipleAddressRequest02 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var deleteMultipleAddressRequest03 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest01,
+                deleteMultipleAddressRequest02, deleteMultipleAddressRequest03));
+
+        professionalApiClient.deleteMultipleAddressesOfOrganisation(requestArrayList,
+                professionalApiClient.getMultipleAuthHeaders(pomBearerToken), FORBIDDEN);
+        log.info("deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void deleteMultipleAddressesOfOrganisationShouldBeFailure() {
+        log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
+
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+
+        professionalApiClient.deleteMultipleAddressesOfOrganisation(requestArrayList,
+                professionalApiClient.getMultipleAuthHeaders(pomBearerToken), NOT_FOUND);
+
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        assertThat(response.get("contactInformation")).asList().hasSize(2);
+        log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void deleteMultipleAddressesOfOrganisationShouldBeSuccess() {
+        log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
+
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+
+        ArrayList<LinkedHashMap<String, Object>> contacts
+                = (ArrayList<LinkedHashMap<String, Object>>)response.get("contactInformation");
+        List<String> addressId = contacts.stream()
+                .limit(1).map(ci -> ci.get("addressId").toString())
+                .collect(Collectors.toList());
+
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(addressId.get(0));
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+
+        professionalApiClient.deleteMultipleAddressesOfOrganisation(requestArrayList,
+                professionalApiClient.getMultipleAuthHeaders(pomBearerToken), NO_CONTENT);
+
+        Map<String, Object> responseAfterDel = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        assertThat(responseAfterDel.get("contactInformation")).asList().hasSize(1);
+        log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: END");
     }
 }
