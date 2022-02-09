@@ -1153,5 +1153,13 @@ class OrganisationServiceImplTest {
                 organisationEntityResponse.getContactInformation().get(1).getCountry());
     }
 
+    @Test
+    void testDeleteMultipleAddressOfGivenOrganisation() {
+        var addressIds = new HashSet<UUID>();
+        addressIds.add(UUID.randomUUID());
+        doNothing().when(contactInformationRepositoryMock).deleteByIdIn(anySet());
+        sut.deleteMultipleAddressOfGivenOrganisation(addressIds);
+        verify(contactInformationRepositoryMock, times(1)).deleteByIdIn(anySet());
+    }
 
 }
