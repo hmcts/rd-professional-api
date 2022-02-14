@@ -207,7 +207,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         assertThat(professionalUsersEntityResponse1.getOrganisationIdentifier())
                 .isEqualTo(organisation.getOrganisationIdentifier());
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(2);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles()).hasSize(2);
         professionalUsersEntityResponse1.getUserProfiles().forEach(userProfile -> {
             assertThat(userProfile.getIdamStatus()).isEqualToIgnoringCase("active");
         });
