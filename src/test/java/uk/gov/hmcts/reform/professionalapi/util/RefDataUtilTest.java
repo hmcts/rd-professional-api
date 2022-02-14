@@ -121,8 +121,8 @@ class RefDataUtilTest {
         userAccountMaps.add(userAccountMap);
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isPositive();
+        assertThat(paymentAccounts).isNotNull()
+                                   .isNotEmpty();
     }
 
     @Test
@@ -134,8 +134,8 @@ class RefDataUtilTest {
         userAccountMaps.add(userAccountMap);
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isPositive();
+        assertThat(paymentAccounts).isNotNull()
+                                    .isNotEmpty();
     }
 
     @Test
@@ -143,8 +143,8 @@ class RefDataUtilTest {
         List<UserAccountMap> userAccountMaps = new ArrayList<>();
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isZero();
+        assertThat(paymentAccounts).isNotNull()
+                                   .isEmpty();
     }
 
     @Test
@@ -158,7 +158,7 @@ class RefDataUtilTest {
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountFromUserMap(userMapPaymentAccount,
                 paymentAccountsEntity);
 
-        assertThat(paymentAccounts.size()).isPositive();
+        assertThat(paymentAccounts).isNotEmpty();
     }
 
     @Test
@@ -168,7 +168,7 @@ class RefDataUtilTest {
 
         if (!paymentAccountsEntity.isEmpty()) {
             List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccount(paymentAccountsEntity);
-            assertThat(paymentAccounts.size()).isPositive();
+            assertThat(paymentAccounts).isNotEmpty();
         }
     }
 
@@ -266,7 +266,7 @@ class RefDataUtilTest {
                 "Active");
         assertThat(professionalUsersEntityResponse1).isNotNull();
 
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(2);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles()).hasSize(2);
         assertThat(professionalUsersEntityResponse1.getUserProfiles().get(0)).isEqualTo(professionalUsersResponse);
         assertThat(professionalUsersEntityResponse1.getUserProfiles().get(1)).isEqualTo(professionalUsersResponse1);
     }
@@ -304,7 +304,7 @@ class RefDataUtilTest {
                 "Active");
         assertThat(professionalUsersEntityResponseWithoutRoles11).isNotNull();
 
-        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().size()).isEqualTo(2);
+        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles()).hasSize(2);
         assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(0))
                 .isEqualTo(professionalUsersResponse);
         assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(1))
@@ -392,8 +392,8 @@ class RefDataUtilTest {
         HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock,
                 realResponseEntity);
 
-        assertThat(httpHeaders.containsKey("fakeHeader")).isTrue();
-        assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
+        assertThat(httpHeaders).containsKey("fakeHeader")
+                               .containsKey("paginationInfo");
 
         verify(pageMock, times(1)).getTotalElements();
         verify(pageMock, times(1)).getTotalPages();
@@ -414,7 +414,7 @@ class RefDataUtilTest {
         HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock,
                 null);
 
-        assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
+        assertThat(httpHeaders).containsKey("paginationInfo");
 
         verify(pageMock, times(1)).getTotalElements();
         verify(pageMock, times(1)).getTotalPages();
@@ -600,7 +600,7 @@ class RefDataUtilTest {
     }
 
     @Test
-    void test_GetSingleUserIdFromUserProfile_WithFeignException() throws Exception {
+    void test_GetSingleUserIdFromUserProfile_WithFeignException() {
         FeignException feignExceptionMock = mock(FeignException.class);
         when(feignExceptionMock.status()).thenReturn(500);
 
@@ -644,7 +644,7 @@ class RefDataUtilTest {
     }
 
     @Test
-    void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() throws Exception {
+    void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -725,7 +725,7 @@ class RefDataUtilTest {
 
 
     @Test
-    void test_GetSingleUserIdFromUserProfileForException() throws Exception {
+    void test_GetSingleUserIdFromUserProfileForException() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);

@@ -28,10 +28,10 @@ class UserProfileUpdatedDataTest {
         userProfileUpdatedData.setRolesAdd(rolesAdd);
         userProfileUpdatedData.setRolesDelete(rolesDelete);
 
-        assertThat(userProfileUpdatedData.getRolesAdd().size()).isEqualTo(2);
-        assertThat(userProfileUpdatedData.getRolesAdd().containsAll(rolesAdd)).isTrue();
-        assertThat(userProfileUpdatedData.getRolesDelete().size()).isEqualTo(2);
-        assertThat(userProfileUpdatedData.getRolesDelete().containsAll(rolesDelete)).isTrue();
+        assertThat(userProfileUpdatedData.getRolesAdd()).hasSize(2);
+        assertThat(userProfileUpdatedData.getRolesAdd()).containsAll(rolesAdd);
+        assertThat(userProfileUpdatedData.getRolesDelete()).hasSize(2);
+        assertThat(userProfileUpdatedData.getRolesDelete()).containsAll(rolesDelete);
         assertThat(userProfileUpdatedData.getEmail()).isEqualTo("test@test.com");
         assertThat(userProfileUpdatedData.getFirstName()).isEqualTo("fname");
         assertThat(userProfileUpdatedData.getLastName()).isEqualTo("lname");
