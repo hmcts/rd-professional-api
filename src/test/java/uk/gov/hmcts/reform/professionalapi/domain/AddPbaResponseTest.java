@@ -30,8 +30,8 @@ class AddPbaResponseTest {
         addPbaResponse.setMessage(success);
         addPbaResponse.setReason(failedPbaReason);
 
-        assertThat(addPbaResponse.getReason().getInvalidPaymentAccounts().size()).isEqualTo(1);
-        assertThat(addPbaResponse.getReason().getDuplicatePaymentAccounts().size()).isEqualTo(1);
+        assertThat(addPbaResponse.getReason().getInvalidPaymentAccounts()).hasSize(1);
+        assertThat(addPbaResponse.getReason().getDuplicatePaymentAccounts()).hasSize(1);
         assertThat(addPbaResponse.getMessage()).isEqualTo(success);
     }
 
@@ -54,8 +54,8 @@ class AddPbaResponseTest {
         String success = "Success";
         AddPbaResponse addPbaResponse = new AddPbaResponse(success, failedPbaReason);
 
-        assertThat(addPbaResponse.getReason().getInvalidPaymentAccounts().size()).isEqualTo(1);
-        assertThat(addPbaResponse.getReason().getDuplicatePaymentAccounts().size()).isEqualTo(1);
+        assertThat(addPbaResponse.getReason().getInvalidPaymentAccounts()).hasSize(1);
+        assertThat(addPbaResponse.getReason().getDuplicatePaymentAccounts()).hasSize(1);
         assertThat(addPbaResponse.getMessage()).isEqualTo(success);
     }
     

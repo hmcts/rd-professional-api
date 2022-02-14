@@ -209,7 +209,7 @@ class SuperControllerTest {
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
-        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -282,7 +282,7 @@ class SuperControllerTest {
                         .status(200).build());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest,
-                professionalUser.getOrganisation().getOrganisationIdentifier(), userId);
+                professionalUser.getOrganisation().getOrganisationIdentifier());
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -317,7 +317,7 @@ class SuperControllerTest {
                 .builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(409).build());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser
-                .getOrganisation().getOrganisationIdentifier(), userId);
+                .getOrganisation().getOrganisationIdentifier());
 
         assertThat(actual).isNotNull();
         assertThat(actual.getBody()).isExactlyInstanceOf(ErrorResponse.class);
@@ -342,7 +342,7 @@ class SuperControllerTest {
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(null);
 
         final Throwable raisedException = catchThrowable(() -> superController
-                .inviteUserToOrganisation(newUserCreationRequest, orgId, UUID.randomUUID().toString()));
+                .inviteUserToOrganisation(newUserCreationRequest, orgId));
 
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class);
 
@@ -376,7 +376,7 @@ class SuperControllerTest {
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
-        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -399,7 +399,7 @@ class SuperControllerTest {
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
         final Throwable raisedException = catchThrowable(() -> superController
-                .inviteUserToOrganisation(newUserCreationRequest, orgId, UUID.randomUUID().toString()));
+                .inviteUserToOrganisation(newUserCreationRequest, orgId));
 
         assertThat(raisedException).isExactlyInstanceOf(AccessDeniedException.class);
 
