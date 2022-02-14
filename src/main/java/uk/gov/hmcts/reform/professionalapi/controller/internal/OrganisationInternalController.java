@@ -357,7 +357,7 @@ public class OrganisationInternalController extends SuperController {
 
         //Received request to add a internal new user to an organisation
 
-        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
+        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
     }
 
     @ApiOperation(

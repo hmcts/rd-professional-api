@@ -34,7 +34,7 @@ class MultipleUserProfilesResponseTest {
     void test_multipleUserProfileResponse() {
         MultipleUserProfilesResponse multipleUserProfilesResponse = new MultipleUserProfilesResponse(userProfiles,
                 true);
-        assertThat(multipleUserProfilesResponse.getUserProfiles().size()).isEqualTo(1);
+        assertThat(multipleUserProfilesResponse.getUserProfiles()).hasSize(1);
         assertThat(multipleUserProfilesResponse.getUserProfiles().get(0).getIdamId()).isEqualTo(userProfile
                 .getIdamId());
     }

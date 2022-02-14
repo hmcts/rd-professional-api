@@ -20,7 +20,7 @@ class RetrieveUserProfilesRequestTest {
         retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(null);
         retrieveUserProfilesRequest.setUserIds(singletonList(userId));
 
-        assertThat(retrieveUserProfilesRequest.getUserIds().size()).isEqualTo(1);
+        assertThat(retrieveUserProfilesRequest.getUserIds()).hasSize(1);
         assertThat(retrieveUserProfilesRequest.getUserIds().get(0)).isEqualTo(userId);
     }
 
@@ -29,7 +29,7 @@ class RetrieveUserProfilesRequestTest {
         retrieveUserProfilesRequest = RetrieveUserProfilesRequest.aRetrieveUserProfilesRequest()
                 .userIds(singletonList(userId)).build();
 
-        assertThat(retrieveUserProfilesRequest.getUserIds().size()).isEqualTo(1);
+        assertThat(retrieveUserProfilesRequest.getUserIds()).hasSize(1);
         assertThat(retrieveUserProfilesRequest.getUserIds().get(0)).isEqualTo(userId);
     }
 }
