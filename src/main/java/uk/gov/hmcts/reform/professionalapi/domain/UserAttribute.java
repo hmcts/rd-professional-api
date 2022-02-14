@@ -10,7 +10,6 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 
 import lombok.Getter;
@@ -33,9 +32,8 @@ public class UserAttribute implements Serializable {
     private ProfessionalUser professionalUser;
 
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "prd_enum_code", referencedColumnName = "enum_code"),
-            @JoinColumn(name = "prd_enum_type", referencedColumnName = "enum_type")})
+    @JoinColumn(name = "prd_enum_code", referencedColumnName = "enum_code")
+    @JoinColumn(name = "prd_enum_type", referencedColumnName = "enum_type")
     private PrdEnum prdEnum;
 
 
