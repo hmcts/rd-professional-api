@@ -25,8 +25,8 @@ class FailedPbaReasonTest {
         failedPbaReason.setDuplicatePaymentAccounts(duplicatePaymentAccounts);
         failedPbaReason.setInvalidPaymentAccounts(invalidPaymentAccounts);
 
-        assertThat(failedPbaReason.getDuplicatePaymentAccounts().size()).isEqualTo(1);
-        assertThat(failedPbaReason.getInvalidPaymentAccounts().size()).isEqualTo(1);
+        assertThat(failedPbaReason.getDuplicatePaymentAccounts()).hasSize(1);
+        assertThat(failedPbaReason.getInvalidPaymentAccounts()).hasSize(1);
     }
 
     @Test
@@ -44,8 +44,8 @@ class FailedPbaReasonTest {
 
         FailedPbaReason failedPbaReason = new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts);
 
-        assertThat(failedPbaReason.getDuplicatePaymentAccounts().size()).isEqualTo(1);
-        assertThat(failedPbaReason.getInvalidPaymentAccounts().size()).isEqualTo(1);
+        assertThat(failedPbaReason.getDuplicatePaymentAccounts()).hasSize(1);
+        assertThat(failedPbaReason.getInvalidPaymentAccounts()).hasSize(1);
     }
 
 
