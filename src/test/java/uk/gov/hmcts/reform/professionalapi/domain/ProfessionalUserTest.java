@@ -33,7 +33,7 @@ class ProfessionalUserTest {
         assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
         assertThat(professionalUser.getUserIdentifier()).isNull();
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
-        assertThat(professionalUser.getRoles().size()).isEqualTo(1);
+        assertThat(professionalUser.getRoles()).hasSize(1);
         assertThat(professionalUser.getRoles().get(0)).isEqualTo("pui-user-manager");
         assertThat(professionalUser.getLastUpdated()).isNotNull();
         assertThat(professionalUser.getCreated()).isNotNull();
