@@ -33,7 +33,7 @@ class UserProfileCreationRequestTest {
         assertThat(userProfileCreationRequest.getLanguagePreference()).isEqualTo(EN);
         assertThat(userProfileCreationRequest.getUserCategory()).isEqualTo(PROFESSIONAL);
         assertThat(userProfileCreationRequest.getUserType()).isEqualTo(EXTERNAL);
-        assertThat(userProfileCreationRequest.getRoles().size()).isEqualTo(2);
+        assertThat(userProfileCreationRequest.getRoles()).hasSize(2);
         assertThat(userProfileCreationRequest.getRoles().get(0)).isEqualTo("pui-user-manager");
         assertThat(userProfileCreationRequest.getRoles().get(1)).isEqualTo("pui-organisation-manager");
     }

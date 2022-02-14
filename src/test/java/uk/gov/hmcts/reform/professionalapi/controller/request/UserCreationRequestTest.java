@@ -23,7 +23,7 @@ class UserCreationRequestTest {
 
         Set<ConstraintViolation<UserCreationRequest>> violations = validator.validate(userCreationRequest);
         
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
