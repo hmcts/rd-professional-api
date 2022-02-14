@@ -40,8 +40,8 @@ class PrdEnumServiceImplTest {
     void test_gets_user_roles_of_user_correctly_other_than_role_type() {
         when(prdEnumRepository.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
-        List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
-        assertThat(roleList.size()).isEqualTo(2);
+        List<String> roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
+        assertThat(roleList).hasSize(2);
         assertThat(roleList.get(0)).isEqualTo("PUI_USER_MANAGER");
         assertThat(roleList.get(1)).isEqualTo("caseworker");
 
@@ -57,8 +57,8 @@ class PrdEnumServiceImplTest {
 
         when(prdEnumRepository.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
-        List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
-        assertThat(roleList.size()).isZero();
+        List<String> roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
+        assertThat(roleList).isEmpty();
         verify(prdEnumRepository, times(1)).findByEnabled("YES");
     }
 }
