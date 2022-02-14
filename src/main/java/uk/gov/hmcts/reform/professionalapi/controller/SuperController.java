@@ -309,7 +309,7 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<Object> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
-                                                              String organisationIdentifier, String userId) {
+                                                              String organisationIdentifier) {
 
         List<String> roles = newUserCreationRequest.getRoles();
         ProfessionalUser professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest,
