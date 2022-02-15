@@ -585,8 +585,10 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(status.value());
-
-
+        if (HttpStatus.UNAUTHORIZED.equals(status)) {
+            response.getHeader("UnAuthorized-Token-Error")
+                    .contains("Authentication Exception");
+        }
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
