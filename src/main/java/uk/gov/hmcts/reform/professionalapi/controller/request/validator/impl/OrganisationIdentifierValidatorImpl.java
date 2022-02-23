@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 
 import java.util.List;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,11 +110,13 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     public void validateOrganisationExistsAndActive(String orgId) {
-        var org = organisationService.getOrganisationByOrgIdentifier(orgId);
-        if (null == org) {
+        var org = Optional.ofNullable(organisationService
+                .getOrganisationByOrgIdentifier(orgId));
+
+        if (org.isEmpty()) {
             log.error(LOG_TWO_ARG_PLACEHOLDER, loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
-        validateOrganisationIsActive(org, BAD_REQUEST);
+        validateOrganisationIsActive(org.get(), BAD_REQUEST);
     }
 }
