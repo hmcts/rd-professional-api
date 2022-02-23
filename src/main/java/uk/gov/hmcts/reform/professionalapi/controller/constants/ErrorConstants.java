@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.constants;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public enum ErrorConstants {
 
     MALFORMED_JSON("1 : Malformed Input Request"),
@@ -25,11 +29,4 @@ public enum ErrorConstants {
 
     private final String errorMessage;
 
-    ErrorConstants(String  errorMessage) {
-        this.errorMessage  = errorMessage;
-    }
-
-    public String getErrorMessage() {
-        return this.errorMessage;
-    }
 }

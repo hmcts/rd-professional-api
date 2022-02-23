@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
@@ -36,14 +36,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
-import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
@@ -136,7 +134,7 @@ public class OrganisationExternalController extends SuperController {
 
         boolean isPendingPbaRequired = false;
 
-        if (!isBlank(pbaStatus)) {
+        if (StringUtils.isNotEmpty(pbaStatus)) {
             isPendingPbaRequired = pbaStatus.equalsIgnoreCase(PENDING.name());
         }
 
@@ -184,7 +182,7 @@ public class OrganisationExternalController extends SuperController {
     public ResponseEntity<OrganisationPbaResponse>
         retrievePaymentAccountByEmail(@ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
-        String userEmail = getUserEmailFromHeader();
+        var userEmail = getUserEmailFromHeader();
         return retrievePaymentAccountByUserEmail(userEmail, orgId);
     }
 
@@ -351,11 +349,11 @@ public class OrganisationExternalController extends SuperController {
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email,
                                                                                         String extOrgIdentifier) {
         validateEmail(email);
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
+        var organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
 
         checkOrganisationAndPbaExists(organisation);
 
-        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
+        var userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
 
         organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(userInfo.getRoles(),
                 organisation, extOrgIdentifier);
@@ -369,9 +367,7 @@ public class OrganisationExternalController extends SuperController {
             String id, boolean isPendingPbaRequired) {
         //Received request to retrieve External organisation with ID
 
-        OrganisationEntityResponse organisationResponse = null;
-
-        organisationResponse = organisationService.retrieveOrganisation(id, isPendingPbaRequired);
+        var organisationResponse = organisationService.retrieveOrganisation(id, isPendingPbaRequired);
 
         return ResponseEntity
                 .status(200)
@@ -477,7 +473,7 @@ public class OrganisationExternalController extends SuperController {
         organisationCreationRequestValidator.validateContactInformations(contactInformationCreationRequests);
 
 
-        Optional<Organisation> organisation = Optional.ofNullable(organisationService
+        var organisation = Optional.ofNullable(organisationService
                 .getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (organisation.isEmpty()) {

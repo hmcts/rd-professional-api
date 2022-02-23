@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
@@ -16,6 +15,7 @@ import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -112,17 +112,14 @@ public class ProfessionalExternalUserController extends SuperController {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
-        ResponseEntity<Object> profUsersEntityResponse;
-
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
                 .getRoles(), PUI_USER_MANAGER)) {
-            status = isBlank(status) ? ACTIVE : status;
+            status = StringUtils.isEmpty(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
-        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
                 page, size);
-        return profUsersEntityResponse;
     }
 
     @ApiOperation(
@@ -223,7 +220,7 @@ public class ProfessionalExternalUserController extends SuperController {
     public ResponseEntity<NewUserResponse> findUserStatusByEmail(
             @RequestParam(value = "email", required = false) String email) {
 
-        String userEmail = getUserEmail(email);
+        var userEmail = getUserEmail(email);
         validateEmail(userEmail);
         return professionalUserService.findUserStatusByEmailAddress(userEmail.toLowerCase());
     }
