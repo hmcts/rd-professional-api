@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -42,6 +41,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
+import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
@@ -134,7 +134,7 @@ public class OrganisationExternalController extends SuperController {
 
         boolean isPendingPbaRequired = false;
 
-        if (StringUtils.isNotEmpty(pbaStatus)) {
+        if (!isBlank(pbaStatus)) {
             isPendingPbaRequired = pbaStatus.equalsIgnoreCase(PENDING.name());
         }
 
