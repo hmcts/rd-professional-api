@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -36,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -72,7 +70,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     public Organisation findPaymentAccountsByEmail(String email) {
 
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
+        var user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
         Organisation organisation = null;
         List<PaymentAccount> paymentAccountsEntity;
 
@@ -90,13 +88,13 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     @Override
     @Transactional
     public PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaRequest pbaEditRequest) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
+        var em = emf.createEntityManager();
+        var transaction = em.getTransaction();
         transaction.begin();
 
         deleteUserAccountMapsAndPaymentAccounts(em, organisation);
         addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-        PbaResponse pbaResponse = addUserAndPaymentAccountsToUserAccountMap(organisation);
+        var pbaResponse = addUserAndPaymentAccountsToUserAccountMap(organisation);
 
         transaction.commit();
         em.close();
@@ -109,7 +107,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public void deleteUserAccountMapsAndPaymentAccounts(EntityManager em, Organisation organisation) {
-        List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
+        var paymentAccount = organisation.getPaymentAccounts();
 
         /** Please note:
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
@@ -128,8 +126,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation) {
-        List<PaymentAccount> paymentAccounts = organisation.getPaymentAccounts();
-        SuperUser superUser = organisation.getUsers().get(0);
+        var paymentAccounts = organisation.getPaymentAccounts();
+        var superUser = organisation.getUsers().get(0);
 
         /** Please note:
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
@@ -155,7 +153,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     public UpdatePbaStatusResponse updatePaymentAccountsStatusForAnOrganisation(
             List<PbaUpdateRequest> pbaRequestList, String orgId) {
 
-        Set<String> pbasFromRequest = new HashSet<>();
+        var pbasFromRequest = new HashSet<String>();
         List<PaymentAccount> pbasFromDb = new ArrayList<>();
 
         //Get PBAs from request
@@ -191,7 +189,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     private List<PbaUpdateStatusResponse> getInvalidPbaRequests(
             List<PbaUpdateRequest> pbaRequestList, Set<String> pbasFromRequest) {
 
-        List<PbaUpdateStatusResponse> invalidPbaResponses = new ArrayList<>();
+        var invalidPbaResponses = new ArrayList<PbaUpdateStatusResponse>();
 
         pbaRequestList.forEach(pba -> {
             //check pba is present
@@ -253,8 +251,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
             List<PaymentAccount> pbasFromDb, List<PbaUpdateRequest> pbaRequestList,
             List<PbaUpdateStatusResponse> invalidPbaResponses) {
 
-        List<PaymentAccount> pbasToSave = new ArrayList<>();
-        List<PaymentAccount> pbasToDelete = new ArrayList<>();
+        var pbasToSave = new ArrayList<PaymentAccount>();
+        var pbasToDelete = new ArrayList<PaymentAccount>();
 
         pbasFromDb.forEach(pba -> pbaRequestList.forEach(pba1 -> {
             if (null != pba1.getPbaNumber() && pba1.getPbaNumber().equals(pba.getPbaNumber())) {
