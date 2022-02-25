@@ -22,7 +22,4 @@ public class PbaAccountResponse {
         this.pbaNumber = paymentAccount.getPbaNumber();
     }
 
-    public String getPbaNumber() {
-        return pbaNumber;
-    }
 }
