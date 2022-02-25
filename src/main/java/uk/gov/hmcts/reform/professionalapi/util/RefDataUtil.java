@@ -6,7 +6,6 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
-import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -30,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -76,29 +76,19 @@ public class RefDataUtil {
     private static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
-
-        List<PaymentAccount> userMapPaymentAccount;
-
-        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
+        return userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
                 .getPaymentAccount()).collect(toList());
-
-        return userMapPaymentAccount;
     }
 
 
     public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount,
                                                                     List<PaymentAccount> paymentAccountsEntity) {
-
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
-
+        var paymentAccounts = new ArrayList<PaymentAccount>();
         if (!paymentAccountsEntity.isEmpty()) {
-
             paymentAccountsEntity.forEach(paymentAccount -> {
                 for (PaymentAccount usrMapPaymentAccount : userMapPaymentAccount) {
                     if (usrMapPaymentAccount.getId().equals(paymentAccount.getId())) {
-
                         paymentAccounts.add(paymentAccount);
-
                     }
                 }
             });
@@ -107,9 +97,7 @@ public class RefDataUtil {
     }
 
     public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
-
-        List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
-
+        var paymentAccountsFromOrg = new ArrayList<PaymentAccount>();
         paymentAccountsFromOrg.addAll(paymentAccounts);
         return paymentAccounts;
     }
@@ -117,8 +105,7 @@ public class RefDataUtil {
     public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users,
                                                            UserProfileFeignClient userProfileFeignClient,
                                                            Boolean isRequiredRoles) {
-
-        List<SuperUser> userProfileDtls = new ArrayList<>();
+        var userProfileDtls = new ArrayList<SuperUser>();
         ProfessionalUser professionalUser = null;
         for (SuperUser user : users) {
             professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient,
@@ -229,7 +216,7 @@ public class RefDataUtil {
 
     public static String removeEmptySpaces(String value) {
         String modValue = value;
-        if (isNotBlank(modValue)) {
+        if (StringUtils.isNotBlank(modValue)) {
             modValue = value.trim().replaceAll("\\s+", " ");
         }
         return modValue;
@@ -237,7 +224,7 @@ public class RefDataUtil {
 
     public static String removeAllSpaces(String value) {
         String modValue = value;
-        if (isNotBlank(modValue)) {
+        if (StringUtils.isNotBlank(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
         }
         return modValue;
@@ -449,7 +436,7 @@ public class RefDataUtil {
     }
 
     public static void matchAddressIdsWithOrgContactInformationIds(Organisation organisation, Set<String> addressIds) {
-        Set<String> invalidAddIdsSet = addressIds.stream()
+        var invalidAddIdsSet = addressIds.stream()
                 .filter(addressId -> organisation.getContactInformation().stream()
                         .noneMatch(contactInformation -> contactInformation.getId().toString().equals(addressId)))
                 .collect(Collectors.toSet());
