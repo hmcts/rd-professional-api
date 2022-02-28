@@ -10,10 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DeleteUserProfileRequestTest {
+class DeleteUserProfilesRequestTest {
 
     @Test
-    void test_DeleteUserProfileRequest() {
+    void test_DeleteUserProfilesRequest() {
 
         Set<String> userIds = new HashSet<>();
         userIds.add(UUID.randomUUID().toString());
@@ -24,8 +24,12 @@ class DeleteUserProfileRequestTest {
         Set<String> userIds1 = new HashSet<>();
         userIds1.add(UUID.randomUUID().toString());
         delUserProfileRequest.setUserIds(userIds1);
-        assertThat(delUserProfileRequest.getUserIds()).containsAll(userIds);
+        assertThat(delUserProfileRequest.getUserIds()).containsAll(userIds1);
 
+        DeleteUserProfilesRequest deleteUserProfilesRequest1 =
+                DeleteUserProfilesRequest.aDeleteUserProfilesRequest().userIds(userIds).build();
+
+        assertThat(deleteUserProfilesRequest1.getUserIds()).containsAll(userIds);
     }
 
 }
