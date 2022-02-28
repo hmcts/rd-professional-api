@@ -167,6 +167,20 @@ class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
+    void update_pba_account_numbers_with_non_existent_org_404_failure_scenario() {
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(asList(
+                new PbaUpdateRequest(pba1, ACCEPTED.name(), null),
+                new PbaUpdateRequest(pba2, ACCEPTED.name(), null)));
+
+        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
+                .updatePaymentsAccountsByOrgId(updatePbaRequest, "UHE5J8K", hmctsAdmin, null);
+
+        assertThat(updatePbaResponse).isNotNull();
+        assertThat(updatePbaResponse.get("http_status")).asString().contains("404");
+    }
+
+    @Test
     void update_pba_account_numbers_with_non_prdAdmin_role_403_failure_scenario() {
         Map<String, Object> updatePbaResponse =
                 professionalReferenceDataClient.updatePaymentsAccountsByOrgId(new UpdatePbaRequest(),
