@@ -6,6 +6,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -29,7 +30,6 @@ import java.util.stream.Collectors;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -216,7 +216,7 @@ public class RefDataUtil {
 
     public static String removeEmptySpaces(String value) {
         String modValue = value;
-        if (StringUtils.isNotBlank(modValue)) {
+        if (isNotBlank(modValue)) {
             modValue = value.trim().replaceAll("\\s+", " ");
         }
         return modValue;
@@ -224,7 +224,7 @@ public class RefDataUtil {
 
     public static String removeAllSpaces(String value) {
         String modValue = value;
-        if (StringUtils.isNotBlank(modValue)) {
+        if (isNotBlank(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
         }
         return modValue;
