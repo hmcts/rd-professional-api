@@ -113,6 +113,18 @@ class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest 
     }
 
     @Test
+    void modify_roles_of_active_users_for_an_active_organisation_with_already_assigned_role_rtn_412() {
+
+        updateUserProfileRolesMock(HttpStatus.PRECONDITION_FAILED);
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
+        String userIdentifier = settingUpOrganisation(puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("412");
+    }
+
+    @Test
     void modify_roles_of_pending_user_for_an_active_organisation_should_rtn_400() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
