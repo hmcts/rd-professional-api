@@ -24,6 +24,11 @@ class DxAddressResponseTest {
         assertThat(sut.getDxNumber()).isEqualTo(expectDxNumber);
     }
 
+    @Test
+    void test_DxAddress_noArgsConstructor() {
+        DxAddressResponse sut = new DxAddressResponse();
 
+        assertThat(sut).isNotNull();
+    }
 
 }
