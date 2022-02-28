@@ -317,7 +317,7 @@ public class OrganisationExternalController extends SuperController {
                             + "- Organisation is not ACTIVE.\n"
                             + "- No payment accounts passed to be deleted in the request body.\n"
                             + "- Passed payment account numbers are in an invalid format.\n"
-                            + "-The payment accounts are not associated with users organisation"
+                            + "- The payment accounts are not associated with users organisation"
             ),
             @ApiResponse(
                     code = 401,
