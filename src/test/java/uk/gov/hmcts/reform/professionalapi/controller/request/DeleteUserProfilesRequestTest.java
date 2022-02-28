@@ -20,6 +20,12 @@ class DeleteUserProfileRequestTest {
         DeleteUserProfilesRequest delUserProfileRequest = new DeleteUserProfilesRequest(userIds);
         assertThat(delUserProfileRequest.getUserIds()).containsAll(userIds);
         assertThat(delUserProfileRequest.getUserIds()).hasSize(1);
+
+        Set<String> userIds1 = new HashSet<>();
+        userIds1.add(UUID.randomUUID().toString());
+        delUserProfileRequest.setUserIds(userIds1);
+        assertThat(delUserProfileRequest.getUserIds()).containsAll(userIds);
+
     }
 
 }
