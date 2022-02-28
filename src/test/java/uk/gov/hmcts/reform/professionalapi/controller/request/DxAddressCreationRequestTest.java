@@ -27,7 +27,7 @@ class DxAddressCreationRequestTest {
 
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator.validate(dxAddressCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
@@ -48,7 +48,7 @@ class DxAddressCreationRequestTest {
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
 
     }
 
@@ -60,7 +60,7 @@ class DxAddressCreationRequestTest {
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
 
     @Test
@@ -71,7 +71,7 @@ class DxAddressCreationRequestTest {
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
 
     @Test
@@ -82,7 +82,7 @@ class DxAddressCreationRequestTest {
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations).hasSize(1);
     }
 
     @Test

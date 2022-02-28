@@ -1,6 +1,8 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.34")
@@ -31,8 +33,7 @@ def versions = [
         lombok          : '1.18.20',
         gradlePitest    : '1.5.1',
         pitest          : '1.7.0',
-        reformLogging   : '5.1.7',
-        reformS2sClient : '4.0.0',
+        reformLogging   : '5.1.9',
         serenity        : '2.0.76',
         sonarPitest     : '0.5',
         springBoot      : '2.4.12',
@@ -283,13 +284,9 @@ project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 project.tasks['sonarqube'].group = "Verification"
 
 repositories {
-
-    maven {
-        url "https://jitpack.io/"
-    }
-
-    jcenter() //Builds will no longer be able to resolve artifacts from JCenter after February 1st, 2022
+    mavenLocal()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -304,6 +301,8 @@ dependencies {
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.2'
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.15'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
 
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
@@ -316,16 +315,16 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-    implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-    implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-    implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: versions.reformS2sClient
+    implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
+    implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
+    implementation 'com.github.hmcts:properties-volume-spring-boot-starter:0.1.0'
+    implementation 'com.github.hmcts:service-auth-provider-java-client:4.0.3'
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.3'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.11.3'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-    implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
+    implementation 'com.github.hmcts:idam-java-client:2.0.1'
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
@@ -349,6 +348,8 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -469,7 +470,7 @@ dependencyManagement {
     dependencies {
         // CVE-2021-25122
         // CVE-2021-42340
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.58') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'

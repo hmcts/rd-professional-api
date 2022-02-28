@@ -245,7 +245,7 @@ public class OrganisationExternalController extends SuperController {
         //Received request to add a new user to an organisation for external
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
-        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
+        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
 
     }
 
