@@ -43,4 +43,17 @@ class FetchPbaByStatusResponseTest {
         assertEquals(time.toString(), pba.getDateCreated());
         assertEquals(time.toString(), pba.getDateAccepted());
     }
+
+    @Test
+    void testFetchPbaByStatusResponseAllArgs() {
+
+        FetchPbaByStatusResponse pba = new FetchPbaByStatusResponse("status", "statusMessage",
+                "dateCreated", "dateAccepted");
+
+        assertEquals("status", pba.getStatus());
+        assertEquals("statusMessage", pba.getStatusMessage());
+        assertEquals("dateCreated", pba.getDateCreated());
+        assertEquals("dateAccepted", pba.getDateAccepted());
+
+    }
 }
