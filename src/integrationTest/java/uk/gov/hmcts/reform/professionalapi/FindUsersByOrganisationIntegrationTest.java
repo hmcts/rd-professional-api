@@ -276,7 +276,7 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
     }
 
     @Test
-    void retrieve_active_users_for_an_organisation_with_invalid_bearer_token_should_return_403() {
+    void retrieve_active_users_for_an_organisation_with_invalid_bearer_token_should_return_401() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithoutAuthHeaders(
                 createAndActivateOrganisation(), "True", null);
         assertThat(response.get("http_status")).isEqualTo("401");
