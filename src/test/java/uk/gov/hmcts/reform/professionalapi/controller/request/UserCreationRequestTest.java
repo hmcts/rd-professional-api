@@ -42,4 +42,20 @@ class UserCreationRequestTest {
         assertThat(testUserCreationRequest.getLastName()).isEqualTo(lastName2);
         assertThat(testUserCreationRequest.getEmail()).isEqualTo(email2);
     }
+
+    @Test
+    void test_ThatUserCreationIsChangedBySetter() {
+        String firstName2 = "testFn";
+        String lastName2 = "testLn";
+        String email2 = "test@test.com";
+
+        UserCreationRequest testUserCreationRequest =
+                new UserCreationRequest(firstName2, lastName2, "email");
+
+        testUserCreationRequest.setEmail(email2);
+
+        assertThat(testUserCreationRequest.getFirstName()).isEqualTo(firstName2);
+        assertThat(testUserCreationRequest.getLastName()).isEqualTo(lastName2);
+        assertThat(testUserCreationRequest.getEmail()).isEqualTo(email2);
+    }
 }
