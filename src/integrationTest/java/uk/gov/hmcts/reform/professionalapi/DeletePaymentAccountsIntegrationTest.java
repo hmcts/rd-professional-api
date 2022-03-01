@@ -111,6 +111,23 @@ class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
+    void test_deletePaymentAccountsShouldThrow400IfPbaIsPassedThatDoesNotBelongToOrganisation() {
+        Set<String> paymentAccountsToDelete = new HashSet<>();
+        paymentAccountsToDelete.add("PBA6655443");
+
+        PbaRequest pbaDeleteRequest = new PbaRequest();
+        pbaDeleteRequest.setPaymentAccounts(paymentAccountsToDelete);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> response = professionalReferenceDataClient.deletePaymentsAccountsByOrgId(pbaDeleteRequest,
+                puiFinanceManager, userId);
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("The PBA numbers you have entered: PBA6655443 do not belong to this Organisation");
+    }
+
+    @Test
     void test_deletePaymentAccountsShouldThrow400IfEmptyValuePassedAsPba() {
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add(StringUtils.EMPTY);
