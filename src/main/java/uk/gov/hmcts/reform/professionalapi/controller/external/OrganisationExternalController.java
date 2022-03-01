@@ -316,7 +316,8 @@ public class OrganisationExternalController extends SuperController {
                     message = "Bad Request Error: One of the below reasons: \n"
                             + "- Organisation is not ACTIVE.\n"
                             + "- No payment accounts passed to be deleted in the request body.\n"
-                            + "- Passed payment account numbers are in an invalid format."
+                            + "- Passed payment account numbers are in an invalid format.\n"
+                            + "- The payment accounts are not associated with users organisation"
             ),
             @ApiResponse(
                     code = 401,
@@ -328,8 +329,8 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "Resource Not Found Error: The payment accounts are not associated "
-                            + "with users organisation"
+                    message = "Resource Not Found Error: The Organisation does not exist"
+                            + " to delete Payment Accounts from"
             ),
             @ApiResponse(
                     code = 500,
