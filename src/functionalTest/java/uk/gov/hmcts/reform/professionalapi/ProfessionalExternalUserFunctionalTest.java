@@ -696,7 +696,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void deleteMultipleAddressesOfOrganisationShouldBeFailure() {
+    void deleteMultipleAddressesOfOrganisationShouldBe404Failure() {
         log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: STARTED");
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));

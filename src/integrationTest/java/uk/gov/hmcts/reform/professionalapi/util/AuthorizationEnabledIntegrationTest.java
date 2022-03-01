@@ -552,6 +552,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "  \"timeStamp\": \"23:10\""
                     + "}";
             returnHttpStatus = 404;
+        } else if (status.value() == 412) {
+            body = "{"
+                    + "  \"errorMessage\": \"412\","
+                    + "  \"errorDescription\": \"One or more of the Roles provided is already assigned to the User\","
+                    + "  \"timeStamp\": \"11:11\""
+                    + "}";
+            returnHttpStatus = 412;
         } else if (status.is5xxServerError()) {
 
             body = "{"
