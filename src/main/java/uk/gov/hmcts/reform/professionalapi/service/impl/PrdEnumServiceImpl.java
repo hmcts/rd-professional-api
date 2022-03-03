@@ -37,9 +37,9 @@ public class PrdEnumServiceImpl implements PrdEnumService {
     }
 
     public List<String> getPrdEnumByEnumType(String enumType) {
-        List<String> ignoreEnumList = Arrays.asList(enumType.split(","));
-        List<String> enumNameList = new ArrayList<>();
-        List<PrdEnum> prdEnumList = findAllPrdEnums();
+        var ignoreEnumList = Arrays.asList(enumType.split(","));
+        var enumNameList = new ArrayList<String>();
+        var prdEnumList = findAllPrdEnums();
         prdEnumList.forEach(prdEnum -> {
             if (!ignoreEnumList.contains(prdEnum.getPrdEnumId().getEnumType())) {
                 enumNameList.add(prdEnum.getEnumName());
