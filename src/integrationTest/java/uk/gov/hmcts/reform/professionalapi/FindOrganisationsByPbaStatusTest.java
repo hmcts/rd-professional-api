@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -141,12 +142,14 @@ class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegrationTe
 
     public void createActiveOrganisation1() {
         Set<String> paymentAccountsOrg1 = new HashSet<>();
+        UserCreationRequest superUser1 = new UserCreationRequest("fname","lname",
+                "email@xyz.com");
         paymentAccountsOrg1.add("PBA1234568");
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String orgName1 = randomAlphabetic(7);
         createAndActivateOrganisationWithGivenRequest(
                 someMinimalOrganisationRequest().name(orgName1).sraId(randomAlphabetic(10))
-                        .paymentAccount(paymentAccountsOrg1).build());
+                        .paymentAccount(paymentAccountsOrg1).superUser(superUser1).build());
     }
 
     public void createActiveOrganisation2() {
@@ -172,9 +175,11 @@ class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegrationTe
     private void validatePbaResponse(List<OrganisationsWithPbaStatusResponse> orgPbaResponse, int expectedOrgsize,
                                      PbaStatus expectedPbaStatus) {
         assertThat(orgPbaResponse).isNotNull().hasSize(expectedOrgsize);
+        orgPbaResponse.forEach(org -> assertNotNull((org.getOrganisationName())));
         orgPbaResponse.forEach(org -> assertNotNull((org.getPbaNumbers())));
         orgPbaResponse.forEach(org -> assertTrue(org.getPbaNumbers().stream()
                 .allMatch(pba -> pba.getStatus().equalsIgnoreCase(expectedPbaStatus.toString()))));
+        orgPbaResponse.forEach(org -> assertThat(org.getSuperUser()).hasSizeGreaterThan(0));
         if (expectedPbaStatus.equals(PbaStatus.ACCEPTED)) {
             orgPbaResponse.forEach(org -> org.getPbaNumbers().forEach(pba -> assertNotNull(pba.getDateAccepted())));
         } else if (expectedPbaStatus.equals(PbaStatus.PENDING)) {

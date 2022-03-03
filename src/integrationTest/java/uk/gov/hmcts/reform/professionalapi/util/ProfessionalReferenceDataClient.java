@@ -648,6 +648,7 @@ public class ProfessionalReferenceDataClient {
                 OrganisationsWithPbaStatusResponse[].class, isUnauthorised);
 
         HttpStatus status = responseEntity.getStatusCode();
+        objectMapper.registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
             return Arrays.asList(objectMapper.convertValue(
                     responseEntity.getBody(), OrganisationsWithPbaStatusResponse[].class));

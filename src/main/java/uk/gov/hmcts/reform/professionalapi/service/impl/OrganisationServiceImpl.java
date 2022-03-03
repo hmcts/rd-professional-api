@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -530,7 +531,9 @@ public class OrganisationServiceImpl implements OrganisationService {
                                 .stream()
                                 .filter(paymentAccount ->
                                         paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
-                                .collect(Collectors.toList()))));
+                                .map(FetchPbaByStatusResponse::new).collect(Collectors.toList()),
+                        v.get(0).getName(),
+                        v.get(0).getUsers())));
 
         return ResponseEntity
                 .status(HttpStatus.OK)
