@@ -38,14 +38,14 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     private void validateOrganisationStatus(OrganisationStatus inputRequestOrganisationStatus,
                                             OrganisationStatus existingStatus, String inputOrganisationIdentifier) {
         if (existingStatus.isDeleted()) {
-            String errorMessage = "{}:: Cannot amend status since existing organisation status is DELETED for "
+            var errorMessage = "{}:: Cannot amend status since existing organisation status is DELETED for "
                     .concat("organisationIdentifier: ") + inputOrganisationIdentifier;
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
         } else if ((inputRequestOrganisationStatus.isPending()
                 || inputRequestOrganisationStatus.isReview())
                 && existingStatus.isActive()) {
-            String errorMessage = "{}:: Cannot amend status to PENDING/REVIEW since existing organisation"
+            var errorMessage = "{}:: Cannot amend status to PENDING/REVIEW since existing organisation"
                     .concat(" status is ACTIVE for organisationIdentifier: ") + inputOrganisationIdentifier;
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
@@ -76,7 +76,7 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     }
 
     public static boolean areInvalidValidOrgStatuses(List<String> statusList) {
-        List<String> validOrgStatuses = Stream.of(OrganisationStatus.values()).map(Enum::name).collect(toList());
+        var validOrgStatuses = Stream.of(OrganisationStatus.values()).map(Enum::name).collect(toList());
         return statusList.stream().anyMatch(s -> (s.isBlank() || !validOrgStatuses.contains(s.toUpperCase())));
     }
 
