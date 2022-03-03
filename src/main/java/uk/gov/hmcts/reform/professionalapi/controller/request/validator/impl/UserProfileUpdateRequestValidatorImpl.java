@@ -13,7 +13,7 @@ public class UserProfileUpdateRequestValidatorImpl implements UserProfileUpdateR
     @Override
     public UserProfileUpdatedData validateRequest(UserProfileUpdatedData userProfileUpdatedData) {
 
-        UserProfileUpdatedData validatedData = new UserProfileUpdatedData();
+        var validatedData = new UserProfileUpdatedData();
 
         //if required fields are empty
         if (null == userProfileUpdatedData.getRolesAdd() && null == userProfileUpdatedData

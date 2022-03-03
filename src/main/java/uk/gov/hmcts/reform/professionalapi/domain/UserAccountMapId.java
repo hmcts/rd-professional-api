@@ -6,12 +6,14 @@ import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserAccountMapId implements Serializable {
 
     @ManyToOne
@@ -23,12 +25,5 @@ public class UserAccountMapId implements Serializable {
     @JoinColumn(name = "PAYMENT_ACCOUNT_ID", insertable = false,
             updatable = false, nullable = false)
     private PaymentAccount paymentAccount;
-
-    public UserAccountMapId(ProfessionalUser professionalUser, PaymentAccount paymentAccount) {
-
-        this.professionalUser = professionalUser;
-        this.paymentAccount = paymentAccount;
-
-    }
 
 }
