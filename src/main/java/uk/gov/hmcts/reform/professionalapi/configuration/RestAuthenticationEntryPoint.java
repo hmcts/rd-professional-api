@@ -20,14 +20,14 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authenticationException) throws IOException {
 
-        ObjectMapper mapper = new ObjectMapper();
-        ErrorResponse errorResponse = new ErrorResponse(
+        var mapper = new ObjectMapper();
+        var errorResponse = new ErrorResponse(
             authenticationException.getMessage(),
             "Authentication Exception",
             LocalDateTime.now().toString()
         );
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        String errorMessage = mapper.writeValueAsString(errorResponse);
+        var errorMessage = mapper.writeValueAsString(errorResponse);
         response.setHeader("UnAuthorized-Token-Error", errorMessage);
         log.error(errorMessage);
 
