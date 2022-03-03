@@ -76,29 +76,19 @@ public class RefDataUtil {
     private static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
-
-        List<PaymentAccount> userMapPaymentAccount;
-
-        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
+        return userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
                 .getPaymentAccount()).collect(toList());
-
-        return userMapPaymentAccount;
     }
 
 
     public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount,
                                                                     List<PaymentAccount> paymentAccountsEntity) {
-
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
-
+        var paymentAccounts = new ArrayList<PaymentAccount>();
         if (!paymentAccountsEntity.isEmpty()) {
-
             paymentAccountsEntity.forEach(paymentAccount -> {
                 for (PaymentAccount usrMapPaymentAccount : userMapPaymentAccount) {
                     if (usrMapPaymentAccount.getId().equals(paymentAccount.getId())) {
-
                         paymentAccounts.add(paymentAccount);
-
                     }
                 }
             });
@@ -107,9 +97,7 @@ public class RefDataUtil {
     }
 
     public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
-
-        List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
-
+        var paymentAccountsFromOrg = new ArrayList<PaymentAccount>();
         paymentAccountsFromOrg.addAll(paymentAccounts);
         return paymentAccounts;
     }
@@ -117,8 +105,7 @@ public class RefDataUtil {
     public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users,
                                                            UserProfileFeignClient userProfileFeignClient,
                                                            Boolean isRequiredRoles) {
-
-        List<SuperUser> userProfileDtls = new ArrayList<>();
+        var userProfileDtls = new ArrayList<SuperUser>();
         ProfessionalUser professionalUser = null;
         for (SuperUser user : users) {
             professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient,
@@ -449,7 +436,7 @@ public class RefDataUtil {
     }
 
     public static void matchAddressIdsWithOrgContactInformationIds(Organisation organisation, Set<String> addressIds) {
-        Set<String> invalidAddIdsSet = addressIds.stream()
+        var invalidAddIdsSet = addressIds.stream()
                 .filter(addressId -> organisation.getContactInformation().stream()
                         .noneMatch(contactInformation -> contactInformation.getId().toString().equals(addressId)))
                 .collect(Collectors.toSet());

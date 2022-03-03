@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,13 +8,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class DeleteOrganisationResponse {
 
     private int statusCode;
     private String message;
 
-    public DeleteOrganisationResponse(int statusCode, String message) {
-        this.statusCode = statusCode;
-        this.message = message;
-    }
 }
