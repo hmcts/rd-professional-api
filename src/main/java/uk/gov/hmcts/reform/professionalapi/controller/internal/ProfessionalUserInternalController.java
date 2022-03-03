@@ -96,7 +96,7 @@ public class ProfessionalUserInternalController extends SuperController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size
     ) {
-        String status = EMPTY;
+        var status = EMPTY;
         if (isSystemRoleUser(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles())) {
             status = ACTIVE;
         }

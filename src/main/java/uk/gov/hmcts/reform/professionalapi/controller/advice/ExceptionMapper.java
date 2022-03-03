@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import javax.validation.ConstraintViolationException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -174,7 +173,7 @@ public class ExceptionMapper {
     }
 
     private String getTimeStamp() {
-        return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());
+        return (LocalDateTime.now()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.SSS"));
     }
 
     private Throwable getRootException(Throwable exception) {

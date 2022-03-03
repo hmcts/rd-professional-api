@@ -20,7 +20,4 @@ public class PbaAccountCreationRequest {
         this.pbaNumber = pbaNumber;
     }
 
-    public String getPbaNumber() {
-        return pbaNumber;
-    }
 }
