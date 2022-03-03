@@ -7,8 +7,12 @@ import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
+@AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
 public class PrdEnumId implements Serializable {
@@ -22,18 +26,5 @@ public class PrdEnumId implements Serializable {
     @NotNull
     @Size(max = 50)
     private String enumType;
-
-    public PrdEnumId(int enumCode, String enumType) {
-        this.enumCode = enumCode;
-        this.enumType = enumType;
-    }
-
-    public int getEnumCode() {
-        return enumCode;
-    }
-
-    public String getEnumType() {
-        return enumType;
-    }
 
 }

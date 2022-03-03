@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ErrorResponse {
 
     private String errorMessage;
@@ -15,9 +17,5 @@ public class ErrorResponse {
 
     private String timeStamp;
 
-    public ErrorResponse(String errorMessage, String errorDescription, String timeStamp) {
-        this.errorMessage = errorMessage;
-        this.errorDescription = errorDescription;
-        this.timeStamp = timeStamp;
-    }
+
 }

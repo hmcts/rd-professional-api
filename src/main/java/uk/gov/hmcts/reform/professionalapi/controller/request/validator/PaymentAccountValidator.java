@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -49,7 +47,7 @@ public class PaymentAccountValidator {
     }
 
     public static String checkPbaNumberIsValid(Set<String> paymentAccounts, boolean throwException) {
-        String invalidPbas = paymentAccounts.stream()
+        var invalidPbas = paymentAccounts.stream()
                 .filter(PaymentAccountValidator::isPbaInvalid)
                 .collect(Collectors.joining(","));
 
@@ -63,8 +61,8 @@ public class PaymentAccountValidator {
 
     public static boolean isPbaInvalid(String pbaAccount) {
         if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
-            Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
-            Matcher matcher = pattern.matcher(pbaAccount);
+            var pattern = Pattern.compile("(?i)pba\\w{7}$");
+            var matcher = pattern.matcher(pbaAccount);
             if (matcher.matches()) {
                 return false;
             }
@@ -73,10 +71,10 @@ public class PaymentAccountValidator {
     }
 
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, Organisation org) {
-        Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
+        var upperCasePbas = getUpperCasePbas(paymentAccounts);
 
-        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
-        List<String> uniquePBas = new ArrayList<>();
+        var paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
+        var uniquePBas = new ArrayList<String>();
 
         paymentAccountsInDatabase.forEach(pbaInDb -> upperCasePbas.forEach(pba -> {
             if (pbaInDb.getPbaNumber().equals(pba) && !pbaInDb.getOrganisation().getOrganisationIdentifier()
@@ -92,12 +90,12 @@ public class PaymentAccountValidator {
     }
 
     public void checkPbasBelongToOrganisation(Set<String> paymentAccounts, Organisation org) {
-        Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
-        List<String> orgPbas = new ArrayList<>();
+        var upperCasePbas = getUpperCasePbas(paymentAccounts);
+        var orgPbas = new ArrayList<String>();
 
         org.getPaymentAccounts().forEach(pba -> orgPbas.add(pba.getPbaNumber()));
 
-        List<String> nonOrgPbas =
+        var nonOrgPbas =
                 upperCasePbas.stream().filter(pba -> !orgPbas.contains(pba)).collect(Collectors.toList());
 
         if (!nonOrgPbas.isEmpty()) {
@@ -107,8 +105,8 @@ public class PaymentAccountValidator {
     }
 
     public Set<String> getDuplicatePbas(Set<String> paymentAccounts) {
-        Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
-        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
+        var upperCasePbas = getUpperCasePbas(paymentAccounts);
+        var paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
         return paymentAccountsInDatabase.stream().map(PaymentAccount::getPbaNumber).collect(Collectors.toSet());
     }
 
