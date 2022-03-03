@@ -1,38 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.doesListContainActiveStatus;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.getOrgStatusEnumsExcludingActiveStatus;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.validateAndReturnStatusList;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.Optional;
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.tuple.Pair;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,52 +13,80 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-
 import org.springframework.util.ObjectUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
-import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.UUID;
+
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_ERROR_BODY_START;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.doesListContainActiveStatus;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.getOrgStatusEnumsExcludingActiveStatus;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.validateAndReturnStatusList;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @Service
 @Slf4j
@@ -139,7 +137,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl())
         );
 
-        Organisation organisation = saveOrganisation(newOrganisation);
+        var organisation = saveOrganisation(newOrganisation);
 
         addDefaultMfaStatusToOrganisation(organisation);
 
@@ -165,10 +163,10 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void addDefaultMfaStatusToOrganisation(Organisation organisation) {
 
-        OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
+        var organisationMfaStatus = new OrganisationMfaStatus();
         organisationMfaStatus.setOrganisation(organisation);
 
-        OrganisationMfaStatus persistedOrganisationMfaStatus
+        var persistedOrganisationMfaStatus
                 = organisationMfaStatusRepository.save(organisationMfaStatus);
         organisation.setOrganisationMfaStatus(persistedOrganisationMfaStatus);
 
@@ -182,12 +180,12 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
 
             paymentAccounts.forEach(pbaAccount -> {
-                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
+                var paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
                 paymentAccount.setOrganisation(organisation);
                 if (isEditPba) {
                     updateStatusAndMessage(paymentAccount, ACCEPTED, PBA_STATUS_MESSAGE_ACCEPTED);
                 }
-                PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
+                var persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
@@ -215,14 +213,14 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (userCreationRequest.getEmail() == null) {
             throw new InvalidRequest("Email cannot be null");
         }
-        ProfessionalUser newProfessionalUser = new ProfessionalUser(
+        var newProfessionalUser = new ProfessionalUser(
                 RefDataUtil.removeEmptySpaces(userCreationRequest.getFirstName()),
                 RefDataUtil.removeEmptySpaces(userCreationRequest.getLastName()),
                 RefDataUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
 
 
-        ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
+        var persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         List<UserAttribute> attributes
                 = userAttributeService.addUserAttributesToSuperUser(persistedSuperUser,
@@ -245,7 +243,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 newContactInformation = setNewContactInformationFromRequest(newContactInformation, contactInfo,
                         organisation);
 
-                ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
+                var contactInformation = contactInformationRepository.save(newContactInformation);
 
                 addDxAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
 
@@ -256,6 +254,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     public ContactInformation setNewContactInformationFromRequest(ContactInformation contactInformation,
                                                                   ContactInformationCreationRequest contactInfo,
                                                                   Organisation organisation) {
+
+        if (!StringUtils.isBlank(contactInfo.getUprn())) {
+            contactInformation.setUprn(RefDataUtil.removeEmptySpaces(contactInfo.getUprn()));
+        }
         contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
         contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
         contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
@@ -266,6 +268,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         contactInformation.setOrganisation(organisation);
         return contactInformation;
     }
+
 
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
                                                   ContactInformation contactInformation) {
@@ -285,9 +288,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
+        var activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
 
-        List<Organisation> activeOrganisations = getOrganisationByStatus(ACTIVE);
+        var activeOrganisations = getOrganisationByStatus(ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
@@ -311,17 +314,17 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse retrieveAllOrganisations() {
-        List<Organisation> retrievedOrganisations = organisationRepository.findAll();
+        var retrievedOrganisations = organisationRepository.findAll();
 
         if (retrievedOrganisations.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        List<Organisation> pendingOrganisations = new ArrayList<>();
-        List<Organisation> activeOrganisations = new ArrayList<>();
-        List<Organisation> resultingOrganisations = new ArrayList<>();
+        var pendingOrganisations = new ArrayList<Organisation>();
+        var activeOrganisations = new ArrayList<Organisation>();
+        var resultingOrganisations = new ArrayList<Organisation>();
 
-        Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
+        var activeOrganisationDetails = new ConcurrentHashMap<String, Organisation>();
 
         retrievedOrganisations.forEach(organisation -> {
             if (organisation.isOrganisationStatusActive()) {
@@ -358,7 +361,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationResponse updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
         //Into update Organisation service
         organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
@@ -369,7 +372,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest
                 .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
-        Organisation savedOrganisation = organisationRepository.save(organisation);
+        var savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
         if (isNotEmpty(savedOrganisation.getPaymentAccounts())
@@ -395,7 +398,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationEntityResponse retrieveOrganisation(
             String organisationIdentifier, boolean isPendingPbaRequired) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
             throw new EmptyResultDataAccessException(ONE);
 
@@ -403,6 +406,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             log.debug("{}:: Retrieving organisation", loggingComponentName);
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
+        }
+        if (!organisation.getContactInformation().isEmpty()
+                && organisation.getContactInformation().size() > 1) {
+            sortContactInfoByCreatedDateAsc(organisation);
         }
 
         return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
@@ -418,7 +425,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisations = retrieveActiveOrganisationDetails();
         }
 
-        List<OrganisationStatus> enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
+        var enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
 
         organisations.addAll(getOrganisationByStatuses(enumStatuses));
 
@@ -432,7 +439,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String prdAdminUserId) {
-        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
+        var deleteOrganisationResponse = new DeleteOrganisationResponse();
         switch (organisation.getStatus()) {
             case PENDING:
                 return deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId);
@@ -464,9 +471,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         // if user count more than one in the current organisation then throw exception
         if (ProfessionalApiConstants.USER_COUNT == professionalUserRepository
                 .findByUserCountByOrganisationId(organisation.getId())) {
-            ProfessionalUser user = organisation.getUsers()
+            var user = organisation.getUsers()
                     .get(ProfessionalApiConstants.ZERO_INDEX).toProfessionalUser();
-            NewUserResponse newUserResponse = RefDataUtil
+            var newUserResponse = RefDataUtil
                     .findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
 
             if (ObjectUtils.isEmpty(newUserResponse.getIdamStatus())) {
@@ -476,7 +483,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
             } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
                 // If user is not active in the up will send the request to delete
-                Set<String> userIds = new HashSet<>();
+                var userIds = new HashSet<String>();
                 userIds.add(user.getUserIdentifier());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
@@ -506,7 +513,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new InvalidRequest("Invalid PBA status provided");
         }
 
-        List<Organisation> organisations = organisationRepository.findByPbaStatus(PbaStatus.valueOf(pbaStatus));
+        var organisations = organisationRepository.findByPbaStatus(PbaStatus.valueOf(pbaStatus));
 
         LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
                 .stream()
@@ -535,7 +542,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (organisation.isEmpty()) {
-            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            log.error(LOG_ERROR_BODY_START, loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
 
@@ -553,19 +560,39 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
+    @Override
+    @Transactional
+    public void addContactInformationsToOrganisation(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests,
+            String organisationIdentifier) {
+
+        Optional<Organisation> organisationOptional = Optional.ofNullable(
+                getOrganisationByOrgIdentifier(organisationIdentifier));
+
+        if (organisationOptional.isEmpty()) {
+            log.error(LOG_ERROR_BODY_START, loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
+        }
+
+        var organisation = organisationOptional.get();
+        addContactInformationToOrganisation(contactInformationCreationRequests, organisation);
+    }
+
+
+
     private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaRequest pbaRequest) {
         Set<String> invalidPaymentAccounts = null;
         paymentAccountValidator.isPbaRequestEmptyOrNull(pbaRequest);
         pbaRequest.getPaymentAccounts().removeIf(item -> item == null || "".equals(item.trim()));
 
-        String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaRequest.getPaymentAccounts(),
+        var invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaRequest.getPaymentAccounts(),
                 Boolean.FALSE);
         if (StringUtils.isNotEmpty(invalidPbas)) {
             invalidPaymentAccounts = new HashSet<>(Arrays.asList(invalidPbas.split(",")));
             pbaRequest.getPaymentAccounts().removeAll(invalidPaymentAccounts);
         }
 
-        Set<String> duplicatePaymentAccounts = paymentAccountValidator.getDuplicatePbas(
+        var duplicatePaymentAccounts = paymentAccountValidator.getDuplicatePbas(
                 pbaRequest.getPaymentAccounts());
         pbaRequest.getPaymentAccounts().removeAll(duplicatePaymentAccounts);
 
@@ -592,8 +619,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private AddPbaResponse getAddPbaResponse(Set<String> invalidPaymentAccounts,
                                              Set<String> duplicatePaymentAccounts, String msg) {
-        AddPbaResponse addPbaResponse;
-        addPbaResponse = new AddPbaResponse();
+        var addPbaResponse = new AddPbaResponse();
         addPbaResponse.setMessage(msg);
         addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
         return addPbaResponse;
@@ -601,9 +627,24 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void validateOrganisationIsActive(Organisation existingOrganisation) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
+            log.error(LOG_ERROR_BODY_START, loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }
+    }
+
+    private void sortContactInfoByCreatedDateAsc(Organisation organisation) {
+        var sortedContactInfoByCreatedDate = organisation.getContactInformation()
+                .stream()
+                .sorted(Comparator.comparing(ContactInformation::getCreated))
+                .collect(Collectors.toList());
+
+        organisation.setContactInformations(sortedContactInfoByCreatedDate);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet) {
+        contactInformationRepository.deleteByIdIn(idsSet);
     }
 
 }

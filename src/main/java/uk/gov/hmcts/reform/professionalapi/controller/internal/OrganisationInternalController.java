@@ -192,7 +192,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<Object> retrievePaymentAccountBySuperUserEmail() {
 
-        String userEmail = getUserEmailFromHeader();
+        var userEmail = getUserEmailFromHeader();
         //Received request to retrieve an organisations payment accounts by email for internal
         return retrievePaymentAccountByUserEmail(userEmail);
     }
@@ -249,7 +249,7 @@ public class OrganisationInternalController extends SuperController {
         paymentAccountValidator.validatePaymentAccounts(
                 pbaEditRequest.getPaymentAccounts(), organisation.get(), false);
 
-        PbaResponse response = paymentAccountService
+        var response = paymentAccountService
                 .editPaymentAccountsByOrganisation(organisation.get(), pbaEditRequest);
 
         return ResponseEntity
@@ -357,7 +357,7 @@ public class OrganisationInternalController extends SuperController {
 
         //Received request to add a internal new user to an organisation
 
-        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
+        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
     }
 
     @ApiOperation(
@@ -416,7 +416,7 @@ public class OrganisationInternalController extends SuperController {
             throw new EmptyResultDataAccessException(1);
         }
 
-        DeleteOrganisationResponse deleteOrganisationResponse =
+        var deleteOrganisationResponse =
                 organisationService.deleteOrganisation(organisation.get(), userId);
 
         return ResponseEntity
@@ -472,7 +472,7 @@ public class OrganisationInternalController extends SuperController {
 
         organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(organisationIdentifier);
 
-        Organisation organisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        var organisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
 
         if (isNotTrue(organisation.isOrganisationStatusActive())) {
             throw new InvalidRequest(ORG_NOT_ACTIVE);
@@ -577,7 +577,7 @@ public class OrganisationInternalController extends SuperController {
 
         organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
 
-        UpdatePbaStatusResponse updatePbaStatusResponse =
+        var updatePbaStatusResponse =
                 updateAnOrganisationsPbas(updatePbaRequest.getPbaRequestList(), organisationIdentifier);
 
         return ResponseEntity

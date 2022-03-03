@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -13,27 +8,42 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application.yml")
@@ -105,6 +115,8 @@ public class ProfessionalReferenceDataClient {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
                 APP_EXT_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
         HttpStatus status = responseEntity.getStatusCode();
+        objectMapper.registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
             return Arrays.asList((OrganisationMinimalInfoResponse[]) objectMapper.convertValue(
                     responseEntity.getBody(), expectedClass));
@@ -692,4 +704,35 @@ public class ProfessionalReferenceDataClient {
 
         return getResponse(responseEntity);
     }
+
+    public Map<String, Object> addContactInformationsToOrganisation(
+            List<ContactInformationCreationRequest> contactInformationCreationRequests,
+             String supportedRole, String userId) {
+
+        StringBuilder addContactsInfoURL = new StringBuilder(baseUrl);
+        addContactsInfoURL.append("/").append("addresses");
+
+        return postRequest(addContactsInfoURL.toString(), contactInformationCreationRequests, supportedRole, userId);
+    }
+
+    public Map<String, Object> deleteContactInformationAddressOfOrganisation(
+            List<DeleteMultipleAddressRequest> deleteRequest, String supportedRole, String userId) {
+        ResponseEntity<Map> responseEntity = null;
+        var urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/addresses";
+
+        try {
+            HttpEntity<List<DeleteMultipleAddressRequest>> requestEntity = new HttpEntity<>(deleteRequest,
+                    getMultipleAuthHeaders(supportedRole, userId));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            var statusAndBody = new HashMap<String, Object>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
 }

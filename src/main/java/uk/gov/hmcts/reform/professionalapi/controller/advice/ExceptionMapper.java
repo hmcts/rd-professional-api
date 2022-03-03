@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import javax.validation.ConstraintViolationException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 
@@ -165,8 +167,13 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, UNKNOWN_EXCEPTION.getErrorMessage());
     }
 
+    @ExceptionHandler(InvalidContactInformations.class)
+    public ResponseEntity<Object> handleContactInformationException(InvalidContactInformations ex) {
+        return  errorDetailsContactInfoResponseEntity(BAD_REQUEST,ex.getContactInfoValidations());
+    }
+
     private String getTimeStamp() {
-        return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());
+        return (LocalDateTime.now()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.SSS"));
     }
 
     private Throwable getRootException(Throwable exception) {
@@ -190,6 +197,13 @@ public class ExceptionMapper {
                 getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
+    }
+
+    private ResponseEntity<Object> errorDetailsContactInfoResponseEntity(
+            HttpStatus httpStatus,
+            List<ContactInformationValidationResponse> contactInfoValidations) {
+
+        return new ResponseEntity<>(contactInfoValidations, httpStatus);
     }
 
     private boolean mfaEnumException(Exception ex) {

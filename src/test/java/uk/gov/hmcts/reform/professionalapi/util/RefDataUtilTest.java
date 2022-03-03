@@ -20,6 +20,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_ORGANISATION_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_PBA_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_ADDRESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_IDS_DOES_NOT_MATCH;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
 
@@ -36,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,6 +62,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -73,6 +78,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -115,8 +121,8 @@ class RefDataUtilTest {
         userAccountMaps.add(userAccountMap);
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isPositive();
+        assertThat(paymentAccounts).isNotNull()
+                                   .isNotEmpty();
     }
 
     @Test
@@ -128,8 +134,8 @@ class RefDataUtilTest {
         userAccountMaps.add(userAccountMap);
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isPositive();
+        assertThat(paymentAccounts).isNotNull()
+                                    .isNotEmpty();
     }
 
     @Test
@@ -137,8 +143,8 @@ class RefDataUtilTest {
         List<UserAccountMap> userAccountMaps = new ArrayList<>();
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isZero();
+        assertThat(paymentAccounts).isNotNull()
+                                   .isEmpty();
     }
 
     @Test
@@ -152,7 +158,7 @@ class RefDataUtilTest {
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountFromUserMap(userMapPaymentAccount,
                 paymentAccountsEntity);
 
-        assertThat(paymentAccounts.size()).isPositive();
+        assertThat(paymentAccounts).isNotEmpty();
     }
 
     @Test
@@ -162,7 +168,7 @@ class RefDataUtilTest {
 
         if (!paymentAccountsEntity.isEmpty()) {
             List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccount(paymentAccountsEntity);
-            assertThat(paymentAccounts.size()).isPositive();
+            assertThat(paymentAccounts).isNotEmpty();
         }
     }
 
@@ -260,7 +266,7 @@ class RefDataUtilTest {
                 "Active");
         assertThat(professionalUsersEntityResponse1).isNotNull();
 
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(2);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles()).hasSize(2);
         assertThat(professionalUsersEntityResponse1.getUserProfiles().get(0)).isEqualTo(professionalUsersResponse);
         assertThat(professionalUsersEntityResponse1.getUserProfiles().get(1)).isEqualTo(professionalUsersResponse1);
     }
@@ -298,7 +304,7 @@ class RefDataUtilTest {
                 "Active");
         assertThat(professionalUsersEntityResponseWithoutRoles11).isNotNull();
 
-        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().size()).isEqualTo(2);
+        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles()).hasSize(2);
         assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(0))
                 .isEqualTo(professionalUsersResponse);
         assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(1))
@@ -386,8 +392,8 @@ class RefDataUtilTest {
         HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock,
                 realResponseEntity);
 
-        assertThat(httpHeaders.containsKey("fakeHeader")).isTrue();
-        assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
+        assertThat(httpHeaders).containsKey("fakeHeader")
+                               .containsKey("paginationInfo");
 
         verify(pageMock, times(1)).getTotalElements();
         verify(pageMock, times(1)).getTotalPages();
@@ -408,7 +414,7 @@ class RefDataUtilTest {
         HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock,
                 null);
 
-        assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
+        assertThat(httpHeaders).containsKey("paginationInfo");
 
         verify(pageMock, times(1)).getTotalElements();
         verify(pageMock, times(1)).getTotalPages();
@@ -594,7 +600,7 @@ class RefDataUtilTest {
     }
 
     @Test
-    void test_GetSingleUserIdFromUserProfile_WithFeignException() throws Exception {
+    void test_GetSingleUserIdFromUserProfile_WithFeignException() {
         FeignException feignExceptionMock = mock(FeignException.class);
         when(feignExceptionMock.status()).thenReturn(500);
 
@@ -638,7 +644,7 @@ class RefDataUtilTest {
     }
 
     @Test
-    void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() throws Exception {
+    void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -719,7 +725,7 @@ class RefDataUtilTest {
 
 
     @Test
-    void test_GetSingleUserIdFromUserProfileForException() throws Exception {
+    void test_GetSingleUserIdFromUserProfileForException() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -971,5 +977,47 @@ class RefDataUtilTest {
         assertThat(catchThrowable(() -> RefDataUtil.checkOrganisationAndPbaExists(organisation)))
                 .isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(ERROR_MSG_NO_PBA_FOUND);
+    }
+
+    @Test
+    void testCheckOrganisationAndMoreThanTwoAddressExists_Organisation_null() {
+        assertThat(catchThrowable(() -> RefDataUtil
+                .checkOrganisationAndMoreThanRequiredAddressExists(null, Set.of("1"))))
+                .isExactlyInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(ERROR_MSG_ORG_NOT_EXIST);
+    }
+
+    @Test
+    void testCheckOrganisationAndMoreThanTwoAddressExists_contact_null() {
+        assertThat(catchThrowable(() -> RefDataUtil
+                .checkOrganisationAndMoreThanRequiredAddressExists(organisation, Set.of("1"))))
+                .isExactlyInstanceOf(InvalidRequest.class)
+                .hasMessage(ERROR_MSG_ORG_ADDRESS);
+    }
+
+    @Test
+    void testCheckOrganisationAndMoreThanTwoAddressExists_equal_size() {
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setAddressLine1("addressLine1");
+        contactInformation.setId(UUID.randomUUID());
+        organisation.setContactInformations(Arrays.asList(contactInformation));
+
+        assertThat(catchThrowable(() -> RefDataUtil
+                .checkOrganisationAndMoreThanRequiredAddressExists(organisation, Set.of("1"))))
+                .isExactlyInstanceOf(InvalidRequest.class)
+                .hasMessage(ERROR_MSG_ORG_ADDRESS);
+    }
+
+    @Test
+    void testMatchAddressIdsWithOrgContactInformationIds_equal_size() {
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setAddressLine1("addressLine1");
+        contactInformation.setId(UUID.randomUUID());
+        organisation.setContactInformations(Arrays.asList(contactInformation));
+
+        assertThat(catchThrowable(() -> RefDataUtil
+                .matchAddressIdsWithOrgContactInformationIds(organisation, Set.of("1"))))
+                .isExactlyInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + "1");
     }
 }

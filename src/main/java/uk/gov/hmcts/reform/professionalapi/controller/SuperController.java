@@ -11,6 +11,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
@@ -23,6 +25,8 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRole
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
 
 import feign.FeignException;
 import feign.Response;
@@ -65,7 +69,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreati
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
@@ -80,8 +83,9 @@ import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.UUID;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 
 @RestController
 @Slf4j
@@ -163,8 +167,7 @@ public abstract class SuperController {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
         }
 
-        OrganisationResponse organisationResponse =
-                organisationService.createOrganisationFrom(organisationCreationRequest);
+        var organisationResponse = organisationService.createOrganisationFrom(organisationCreationRequest);
 
         //Received response to create a new organisation
         return ResponseEntity
@@ -173,8 +176,8 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
-        String orgId = removeEmptySpaces(organisationIdentifier);
-        String orgStatus = removeEmptySpaces(status);
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        var orgStatus = removeEmptySpaces(status);
 
         Object organisationResponse = null;
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
@@ -205,7 +208,7 @@ public abstract class SuperController {
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {
 
         validateEmail(email);
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
+        var organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
 
         checkOrganisationAndPbaExists(organisation);
 
@@ -223,7 +226,7 @@ public abstract class SuperController {
 
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
-        String orgId = removeEmptySpaces(organisationIdentifier);
+        var orgId = removeEmptySpaces(organisationIdentifier);
 
         if (isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
@@ -231,12 +234,12 @@ public abstract class SuperController {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, valueOf(organisationCreationRequest
                 .getStatus()), orgId);
 
-        SuperUser superUser = existingOrganisation.getUsers().get(0);
-        ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
+        var superUser = existingOrganisation.getUsers().get(0);
+        var professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
         if ((existingOrganisation.getStatus().isPending() || existingOrganisation.getStatus().isReview())
                 && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
@@ -264,8 +267,8 @@ public abstract class SuperController {
     private ResponseEntity<Object> createUserProfileFor(ProfessionalUser professionalUser, List<String> roles,
                                                         boolean isAdminUser, boolean isResendInvite) {
         //Creating user...
-        List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
-        UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
+        var userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
+        var userCreationRequest = new UserProfileCreationRequest(
                 professionalUser.getEmailAddress(),
                 professionalUser.getFirstName(),
                 professionalUser.getLastName(),
@@ -289,13 +292,13 @@ public abstract class SuperController {
 
         isInputOrganisationStatusValid(status, allowedOrganisationStatus);
 
-        List<Organisation> organisations = organisationService.getOrganisationByStatus(ACTIVE);
+        var organisations = organisationService.getOrganisationByStatus(ACTIVE);
 
         if (isEmpty(organisations)) {
             throw new ResourceNotFoundException("No Organisations found");
         }
 
-        List<OrganisationMinimalInfoResponse> organisationMinimalInfoResponses =
+        var organisationMinimalInfoResponses =
                 organisations.stream().map(organisation -> new OrganisationMinimalInfoResponse(organisation, address))
                         .collect(Collectors.toList());
 
@@ -303,10 +306,10 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<Object> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
-                                                              String organisationIdentifier, String userId) {
+                                                              String organisationIdentifier) {
 
-        List<String> roles = newUserCreationRequest.getRoles();
-        ProfessionalUser professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest,
+        var roles = newUserCreationRequest.getRoles();
+        var professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest,
                 removeEmptySpaces(organisationIdentifier), roles);
         if (newUserCreationRequest.isResendInvite() && resendInviteEnabled) {
             return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles, organisationIdentifier);
@@ -320,7 +323,7 @@ public abstract class SuperController {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
+        var responseEntity = createUserProfileFor(professionalUser, roles, false,
                 false);
         if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
             UserProfileCreationResponse userProfileCreationResponse
@@ -345,7 +348,7 @@ public abstract class SuperController {
                                                        String organisationIdentifier) {
 
         Object responseBody = null;
-        ProfessionalUser existingUser = professionalUserService
+        var existingUser = professionalUserService
                 .findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
         if (existingUser == null) {
             throw new ResourceNotFoundException("User does not exist");
@@ -354,7 +357,7 @@ public abstract class SuperController {
             throw new AccessDeniedException("User does not belong to same organisation");
         }
 
-        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
+        var responseEntity = createUserProfileFor(professionalUser, roles, false,
                 true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
@@ -410,7 +413,7 @@ public abstract class SuperController {
 
     protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
                                                             String orgId, String userId) {
-        Set<String> paymentAccounts = deletePbaRequest.getPaymentAccounts();
+        var paymentAccounts = deletePbaRequest.getPaymentAccounts();
         if (ObjectUtils.isEmpty(deletePbaRequest.getPaymentAccounts())) {
             throw new InvalidRequest("No PBA number passed in the request");
         }
@@ -422,7 +425,7 @@ public abstract class SuperController {
         //check if user status is 'ACTIVE'
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
 
         //if the organisation is present, check if it is 'ACTIVE'
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation, BAD_REQUEST);
@@ -460,7 +463,7 @@ public abstract class SuperController {
 
     public Organisation checkOrganisationIsActive(String orgId) {
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         return existingOrganisation;
     }
@@ -504,5 +507,34 @@ public abstract class SuperController {
         }
 
         return userEmail;
+    }
+
+    protected void deleteMultipleAddressOfGivenOrganisation(List<DeleteMultipleAddressRequest> deleteRequest,
+                                                            String orgId) {
+        var addressIds = deleteRequest.stream()
+                .map(DeleteMultipleAddressRequest::getAddressId)
+                .collect(Collectors.toSet());
+
+        if (ObjectUtils.isEmpty(addressIds)) {
+            throw new InvalidRequest(ERROR_MSG_ADDRESS_LIST_IS_EMPTY);
+        }
+        if (addressIds.contains(null) || addressIds.contains(EMPTY)
+                || addressIds.stream().anyMatch(StringUtils::isBlank)) {
+            throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);
+        }
+
+        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+
+        //match address id with organisation contact information id's
+        matchAddressIdsWithOrgContactInformationIds(existingOrganisation, addressIds);
+
+        //check if organisation is present in the database and that it has more than required address associated
+        checkOrganisationAndMoreThanRequiredAddressExists(existingOrganisation, addressIds);
+
+        //delete the passed address id numbers from the request
+        var idsSet = addressIds.stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toSet());
+        organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }
 }

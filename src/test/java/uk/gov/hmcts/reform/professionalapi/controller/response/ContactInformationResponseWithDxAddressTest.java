@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class ContactInformationResponseWithDxAddressTest {
@@ -21,6 +22,10 @@ class ContactInformationResponseWithDxAddressTest {
     final String expectCounty = "City of London";
     final String expectCountry = "England";
     final String expectTownCity = "London";
+    final String uprn = "uprn";
+
+    final LocalDateTime created = LocalDateTime.now();
+
 
     @Test
     void testGetContactInformationResponse() {
@@ -34,7 +39,9 @@ class ContactInformationResponseWithDxAddressTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
+        contactInformation.setCreated(created);
         contactInformation.setDxAddresses(dxAddressList);
+        contactInformation.setUprn(uprn);
 
         ContactInformationResponseWithDxAddress sut = new ContactInformationResponseWithDxAddress(contactInformation);
 
@@ -46,11 +53,16 @@ class ContactInformationResponseWithDxAddressTest {
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
         assertThat(sut.getDxAddress()).isNotEmpty();
+        assertThat(sut.getUprn()).isEqualTo(uprn);
+
+        assertThat(sut.getCreated()).isEqualTo(created);
+
     }
 
     @Test
     void testGetContactInformationResponseWithDxAddress() {
         ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn(uprn);
         contactInformation.setAddressLine1(expectAddress1);
         contactInformation.setAddressLine2(expectAddress2);
         contactInformation.setAddressLine3(expectAddress3);
@@ -58,9 +70,11 @@ class ContactInformationResponseWithDxAddressTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
+        contactInformation.setCreated(created);
 
         ContactInformationResponseWithDxAddress sut = new ContactInformationResponseWithDxAddress(contactInformation);
 
+        assertThat(sut.getUprn()).isEqualTo(uprn);
         assertThat(sut.getAddressLine1()).isEqualTo(expectAddress1);
         assertThat(sut.getAddressLine2()).isEqualTo(expectAddress2);
         assertThat(sut.getAddressLine3()).isEqualTo(expectAddress3);
@@ -68,6 +82,7 @@ class ContactInformationResponseWithDxAddressTest {
         assertThat(sut.getCounty()).isEqualTo(expectCounty);
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
+        assertThat(sut.getCreated()).isEqualTo(created);
         assertThat(sut.getDxAddress()).isEmpty();
     }
 }

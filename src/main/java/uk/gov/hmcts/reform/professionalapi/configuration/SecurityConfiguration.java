@@ -47,6 +47,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
+    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
     public List<String> getAnonymousPaths() {
         return anonymousPaths;
     }
@@ -64,10 +66,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Inject
     public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
-                                                       final ServiceAuthFilter serviceAuthFilter
-    ) {
+                                 final ServiceAuthFilter serviceAuthFilter,
+                                 RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
 
         this.serviceAuthFilter = serviceAuthFilter;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 
@@ -88,7 +91,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
            .anyRequest()
            .authenticated()
            .and()
-           .oauth2ResourceServer()
+           .oauth2ResourceServer().authenticationEntryPoint(restAuthenticationEntryPoint)
            .jwt()
            .jwtAuthenticationConverter(jwtAuthenticationConverter)
            .and()

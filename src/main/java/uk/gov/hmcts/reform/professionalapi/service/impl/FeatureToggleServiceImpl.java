@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_MFA_LD_FLAG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTI_PBA_LD_FLAG;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTIPLE_ADDRESS;
 
 @Service
 public class FeatureToggleServiceImpl implements FeatureToggleService {
@@ -53,6 +54,11 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
         launchDarklyMap.put("OrganisationInternalController.updateAnOrganisationsRegisteredPbas",
                 RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
+        launchDarklyMap.put("OrganisationExternalController.addContactInformationsToOrganisation",
+                RD_PROFESSIONAL_MULTIPLE_ADDRESS);
+        launchDarklyMap.put("OrganisationExternalController.deleteMultipleAddressesOfOrganisation",
+                RD_PROFESSIONAL_MULTIPLE_ADDRESS);
+
     }
 
     @Override

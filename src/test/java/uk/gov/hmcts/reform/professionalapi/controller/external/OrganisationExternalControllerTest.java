@@ -4,13 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +19,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -35,10 +30,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -46,7 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -55,24 +53,33 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference.EN;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationExternalControllerTest {
@@ -376,5 +383,80 @@ class OrganisationExternalControllerTest {
         verify(organisationServiceMock, times(1))
                 .addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
 
+    }
+
+    @Test
+    void should_add_contact_informations_to_organisation() {
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
+        List<DxAddressCreationRequest> dxAddressRequests = new ArrayList<>();
+
+        DxAddressCreationRequest dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
+        dxAddressRequests.add(dxAddressRequest);
+
+        ContactInformationCreationRequest contactInformationCreationRequest =
+                new ContactInformationCreationRequest("uprn", "addressLine-1",
+                "addressLine-2", "addressLine-3", "townCity", "county",
+                "country", "postCode", dxAddressRequests);
+
+        contactInformationCreationRequests.add(contactInformationCreationRequest);
+        List<ContactInformationResponseWithDxAddress> result = new ArrayList<>();
+
+        final String orgUUId = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
+
+        doNothing().when(organisationServiceMock).addContactInformationsToOrganisation(anyList(), anyString());
+
+
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgUUId)).thenReturn(organisationMock);
+
+        ResponseEntity<?> actual = organisationExternalController
+                .addContactInformationsToOrganisation(contactInformationCreationRequests, orgUUId);
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(anyString());
+
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+    @Test
+    void testDeleteMultipleAddressesOfOrganisation() {
+        ContactInformation contactInformation01 = new ContactInformation();
+        contactInformation01.setAddressLine1("addressLine1");
+        UUID uuid = UUID.randomUUID();
+        contactInformation01.setId(uuid);
+
+        ContactInformation contactInformation02 = new ContactInformation();
+        contactInformation02.setAddressLine1("addressLine2");
+        contactInformation02.setId(UUID.randomUUID());
+
+        var contacts = new ArrayList<>(List.of(contactInformation01, contactInformation02));
+        organisation.setContactInformations(contacts);
+
+        var addressId = new HashSet<UUID>();
+        addressId.add(uuid);
+
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(uuid.toString());
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+
+        String orgId = uuid.toString().substring(0, 7);
+        organisationExternalController
+                .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId);
+
+        verify(organisationServiceMock, times(1))
+                .deleteMultipleAddressOfGivenOrganisation(addressId);
+
+    }
+
+    @Test
+    void test_deleteMultipleAddressesOfOrganisation_EmptyAddressIdPassed() {
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
+        var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        assertThrows(InvalidRequest.class,() ->
+                organisationExternalController
+                        .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId));
     }
 }

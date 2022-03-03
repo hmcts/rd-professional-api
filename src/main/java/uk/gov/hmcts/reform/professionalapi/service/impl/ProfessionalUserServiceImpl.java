@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -84,7 +83,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public NewUserResponse addNewUserToAnOrganisation(ProfessionalUser newUser, List<String> roles,
                                                       List<PrdEnum> prdEnumList) {
 
-        ProfessionalUser persistedNewUser = persistUser(newUser);
+        var persistedNewUser = persistUser(newUser);
 
         userAttributeService.addUserAttributesToUser(persistedNewUser, roles, prdEnumList);
 
@@ -107,13 +106,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                                                                   String showDeleted,
                                                                                   boolean rolesRequired,
                                                                                   String status, Pageable pageable) {
-        Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
+        var pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
         ResponseEntity<Object> responseEntity
                 = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
                 showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
 
-        HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
+        var headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
                 responseEntity);
 
         return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
@@ -122,7 +121,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted,
                                                                       boolean rolesRequired, String status) {
-        List<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+        var professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
@@ -170,7 +169,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     private Page<ProfessionalUser> getPagedListOfUsers(Organisation organisation, Pageable pageable) {
-        Page<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation,
+        var professionalUsers = professionalUserRepository.findByOrganisation(organisation,
                 pageable);
 
         if (professionalUsers.getContent().isEmpty()) {
@@ -181,7 +180,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     public RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(List<ProfessionalUser> professionalUsers) {
-        List<String> usersId = new ArrayList<>();
+        var usersId = new ArrayList<String>();
 
         professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
 
@@ -209,15 +208,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
 
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil
+        var user = professionalUserRepository.findByEmailAddress(RefDataUtil
                 .removeAllSpaces(emailAddress));
         int statusCode = 200;
-        NewUserResponse newUserResponse = null;
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        newUserResponse = RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
+        var newUserResponse = RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
 
         if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
             // If we dont find active user in up will send it to user 404 status code in the header
@@ -235,7 +233,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public void checkUserStatusIsActiveByUserId(String userId) {
         NewUserResponse newUserResponse = null;
-        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(userId);
+        var user = professionalUserRepository.findByUserIdentifier(userId);
 
         if (null != user) {
             newUserResponse = RefDataUtil.findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);

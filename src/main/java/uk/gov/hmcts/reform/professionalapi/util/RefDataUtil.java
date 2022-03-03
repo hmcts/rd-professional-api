@@ -14,6 +14,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_PBA_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_ADDRESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_IDS_DOES_NOT_MATCH;
 
 import feign.FeignException;
 import feign.Response;
@@ -24,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiC
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -71,29 +76,19 @@ public class RefDataUtil {
     private static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
-
-        List<PaymentAccount> userMapPaymentAccount;
-
-        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
+        return userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
                 .getPaymentAccount()).collect(toList());
-
-        return userMapPaymentAccount;
     }
 
 
     public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount,
                                                                     List<PaymentAccount> paymentAccountsEntity) {
-
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
-
+        var paymentAccounts = new ArrayList<PaymentAccount>();
         if (!paymentAccountsEntity.isEmpty()) {
-
             paymentAccountsEntity.forEach(paymentAccount -> {
                 for (PaymentAccount usrMapPaymentAccount : userMapPaymentAccount) {
                     if (usrMapPaymentAccount.getId().equals(paymentAccount.getId())) {
-
                         paymentAccounts.add(paymentAccount);
-
                     }
                 }
             });
@@ -102,9 +97,7 @@ public class RefDataUtil {
     }
 
     public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
-
-        List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
-
+        var paymentAccountsFromOrg = new ArrayList<PaymentAccount>();
         paymentAccountsFromOrg.addAll(paymentAccounts);
         return paymentAccounts;
     }
@@ -112,8 +105,7 @@ public class RefDataUtil {
     public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users,
                                                            UserProfileFeignClient userProfileFeignClient,
                                                            Boolean isRequiredRoles) {
-
-        List<SuperUser> userProfileDtls = new ArrayList<>();
+        var userProfileDtls = new ArrayList<SuperUser>();
         ProfessionalUser professionalUser = null;
         for (SuperUser user : users) {
             professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient,
@@ -432,4 +424,31 @@ public class RefDataUtil {
             throw new ResourceNotFoundException(ERROR_MSG_NO_PBA_FOUND);
         }
     }
+
+    public static void checkOrganisationAndMoreThanRequiredAddressExists(
+            Organisation organisation, Set<String> addressIds) {
+        if (isNull(organisation)) {
+            throw new ResourceNotFoundException(ERROR_MSG_ORG_NOT_EXIST);
+        } else if ((CollectionUtils.isEmpty(organisation.getContactInformation()))
+                || (organisation.getContactInformation().size() <= addressIds.size())) {
+            throw new InvalidRequest(ERROR_MSG_ORG_ADDRESS);
+        }
+    }
+
+    public static void matchAddressIdsWithOrgContactInformationIds(Organisation organisation, Set<String> addressIds) {
+        var invalidAddIdsSet = addressIds.stream()
+                .filter(addressId -> organisation.getContactInformation().stream()
+                        .noneMatch(contactInformation -> contactInformation.getId().toString().equals(addressId)))
+                .collect(Collectors.toSet());
+
+        if (!invalidAddIdsSet.isEmpty()) {
+            String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
+            throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
+        }
+
+
+
+    }
+
+
 }
