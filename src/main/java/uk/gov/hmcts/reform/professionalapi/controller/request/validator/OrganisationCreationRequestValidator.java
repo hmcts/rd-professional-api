@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -83,7 +83,7 @@ public class OrganisationCreationRequestValidator {
 
     private List<ContactInformationValidationResponse> validateConstraintValidation(
             List<ContactInformationCreationRequest> contactInformationCreationRequests) {
-        List<ContactInformationValidationResponse> contactInformationValidationResponses = new ArrayList<>();
+        var contactInformationValidationResponses = new ArrayList<ContactInformationValidationResponse>();
 
         contactInformationCreationRequests.forEach(contactInfo ->
             validateContactInformation(contactInfo, contactInformationValidationResponses));
@@ -93,7 +93,7 @@ public class OrganisationCreationRequestValidator {
     public void validateContactInformations(
             List<ContactInformationCreationRequest> contactInformationCreationRequests) {
 
-        List<ContactInformationValidationResponse> contactInfoValidations =
+        var contactInfoValidations =
                 validate(contactInformationCreationRequests);
 
         List<ContactInformationValidationResponse> result = null;
@@ -148,7 +148,6 @@ public class OrganisationCreationRequestValidator {
     }
 
     private void requestSuperUserValidateAccount(UserCreationRequest superUser) {
-
         if (superUser == null || isEmptyValue(superUser.getFirstName())
                 || isEmptyValue(superUser.getEmail()) || isEmptyValue(superUser.getLastName())) {
 
@@ -158,7 +157,6 @@ public class OrganisationCreationRequestValidator {
     }
 
     private void requestPaymentAccount(Set<String> paymentAccounts) {
-
         if (paymentAccounts != null) {
             paymentAccounts
                     .forEach(paymentAccount -> {
@@ -170,9 +168,7 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void requestValues(String... values) {
-
         for (String value : values) {
-
             if (isEmptyValue(value)) {
                 throw new InvalidRequest("Empty input value" + value);
             }
@@ -237,7 +233,7 @@ public class OrganisationCreationRequestValidator {
             }
         } catch (InvalidRequest invalidRequest) {
 
-            ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
+            var contactInfoBuilder = new ContactInformationValidationResponse();
             contactInfoBuilder.setUprn(contactInformation.getUprn());
             contactInfoBuilder.setValidAddress(false);
             contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
@@ -247,15 +243,8 @@ public class OrganisationCreationRequestValidator {
 
     }
 
-
-
     public boolean isEmptyValue(String value) {
-
-        boolean isEmpty = false;
-        if (value != null && value.trim().isEmpty()) {
-            isEmpty = true;
-        }
-        return isEmpty;
+        return  (value != null && value.trim().isEmpty()) ? true : false;
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
@@ -270,8 +259,8 @@ public class OrganisationCreationRequestValidator {
     }
 
     public static void isInputOrganisationStatusValid(String organisationStatus, String allowedStatus) {
-        List<String> validStatusList = asList(allowedStatus.split(","));
-        String orgStatus = removeAllSpaces(organisationStatus);
+        var validStatusList = asList(allowedStatus.split(","));
+        var orgStatus = removeAllSpaces(organisationStatus);
         if (isBlank(orgStatus) || !validStatusList.contains(orgStatus.toUpperCase())) {
             log.error(loggingComponentName + ERROR_MESSAGE_INVALID_STATUS_PASSED);
             throw new ResourceNotFoundException(ERROR_MESSAGE_INVALID_STATUS_PASSED);

@@ -112,17 +112,14 @@ public class ProfessionalExternalUserController extends SuperController {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
-        ResponseEntity<Object> profUsersEntityResponse;
-
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
                 .getRoles(), PUI_USER_MANAGER)) {
             status = isBlank(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
-        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
                 page, size);
-        return profUsersEntityResponse;
     }
 
     @ApiOperation(
@@ -223,7 +220,7 @@ public class ProfessionalExternalUserController extends SuperController {
     public ResponseEntity<NewUserResponse> findUserStatusByEmail(
             @RequestParam(value = "email", required = false) String email) {
 
-        String userEmail = getUserEmail(email);
+        var userEmail = getUserEmail(email);
         validateEmail(userEmail);
         return professionalUserService.findUserStatusByEmailAddress(userEmail.toLowerCase());
     }

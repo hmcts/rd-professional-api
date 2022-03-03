@@ -24,7 +24,7 @@ public class ProfessionalUserReqValidator {
             throw new InvalidRequest("No input values given for the request");
         }
 
-        if (!StringUtils.isEmpty(status)) {
+        if (StringUtils.isNotEmpty(status)) {
             validateUserStatus(status);
         }
     }

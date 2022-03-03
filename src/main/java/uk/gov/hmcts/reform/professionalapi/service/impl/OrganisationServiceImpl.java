@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -64,7 +63,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -139,7 +137,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl())
         );
 
-        Organisation organisation = saveOrganisation(newOrganisation);
+        var organisation = saveOrganisation(newOrganisation);
 
         addDefaultMfaStatusToOrganisation(organisation);
 
@@ -165,10 +163,10 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void addDefaultMfaStatusToOrganisation(Organisation organisation) {
 
-        OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
+        var organisationMfaStatus = new OrganisationMfaStatus();
         organisationMfaStatus.setOrganisation(organisation);
 
-        OrganisationMfaStatus persistedOrganisationMfaStatus
+        var persistedOrganisationMfaStatus
                 = organisationMfaStatusRepository.save(organisationMfaStatus);
         organisation.setOrganisationMfaStatus(persistedOrganisationMfaStatus);
 
@@ -182,12 +180,12 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
 
             paymentAccounts.forEach(pbaAccount -> {
-                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
+                var paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
                 paymentAccount.setOrganisation(organisation);
                 if (isEditPba) {
                     updateStatusAndMessage(paymentAccount, ACCEPTED, PBA_STATUS_MESSAGE_ACCEPTED);
                 }
-                PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
+                var persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
@@ -215,14 +213,14 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (userCreationRequest.getEmail() == null) {
             throw new InvalidRequest("Email cannot be null");
         }
-        ProfessionalUser newProfessionalUser = new ProfessionalUser(
+        var newProfessionalUser = new ProfessionalUser(
                 RefDataUtil.removeEmptySpaces(userCreationRequest.getFirstName()),
                 RefDataUtil.removeEmptySpaces(userCreationRequest.getLastName()),
                 RefDataUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
 
 
-        ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
+        var persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         List<UserAttribute> attributes
                 = userAttributeService.addUserAttributesToSuperUser(persistedSuperUser,
@@ -245,7 +243,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 newContactInformation = setNewContactInformationFromRequest(newContactInformation, contactInfo,
                         organisation);
 
-                ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
+                var contactInformation = contactInformationRepository.save(newContactInformation);
 
                 addDxAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
 
@@ -290,9 +288,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
+        var activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
 
-        List<Organisation> activeOrganisations = getOrganisationByStatus(ACTIVE);
+        var activeOrganisations = getOrganisationByStatus(ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
@@ -316,17 +314,17 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse retrieveAllOrganisations() {
-        List<Organisation> retrievedOrganisations = organisationRepository.findAll();
+        var retrievedOrganisations = organisationRepository.findAll();
 
         if (retrievedOrganisations.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        List<Organisation> pendingOrganisations = new ArrayList<>();
-        List<Organisation> activeOrganisations = new ArrayList<>();
-        List<Organisation> resultingOrganisations = new ArrayList<>();
+        var pendingOrganisations = new ArrayList<Organisation>();
+        var activeOrganisations = new ArrayList<Organisation>();
+        var resultingOrganisations = new ArrayList<Organisation>();
 
-        Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
+        var activeOrganisationDetails = new ConcurrentHashMap<String, Organisation>();
 
         retrievedOrganisations.forEach(organisation -> {
             if (organisation.isOrganisationStatusActive()) {
@@ -363,7 +361,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationResponse updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
         //Into update Organisation service
         organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
@@ -374,7 +372,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest
                 .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
-        Organisation savedOrganisation = organisationRepository.save(organisation);
+        var savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
         if (isNotEmpty(savedOrganisation.getPaymentAccounts())
@@ -400,7 +398,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationEntityResponse retrieveOrganisation(
             String organisationIdentifier, boolean isPendingPbaRequired) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
             throw new EmptyResultDataAccessException(ONE);
 
@@ -427,7 +425,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisations = retrieveActiveOrganisationDetails();
         }
 
-        List<OrganisationStatus> enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
+        var enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
 
         organisations.addAll(getOrganisationByStatuses(enumStatuses));
 
@@ -441,7 +439,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String prdAdminUserId) {
-        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
+        var deleteOrganisationResponse = new DeleteOrganisationResponse();
         switch (organisation.getStatus()) {
             case PENDING:
                 return deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId);
@@ -473,9 +471,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         // if user count more than one in the current organisation then throw exception
         if (ProfessionalApiConstants.USER_COUNT == professionalUserRepository
                 .findByUserCountByOrganisationId(organisation.getId())) {
-            ProfessionalUser user = organisation.getUsers()
+            var user = organisation.getUsers()
                     .get(ProfessionalApiConstants.ZERO_INDEX).toProfessionalUser();
-            NewUserResponse newUserResponse = RefDataUtil
+            var newUserResponse = RefDataUtil
                     .findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
 
             if (ObjectUtils.isEmpty(newUserResponse.getIdamStatus())) {
@@ -485,7 +483,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
             } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
                 // If user is not active in the up will send the request to delete
-                Set<String> userIds = new HashSet<>();
+                var userIds = new HashSet<String>();
                 userIds.add(user.getUserIdentifier());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
@@ -515,7 +513,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new InvalidRequest("Invalid PBA status provided");
         }
 
-        List<Organisation> organisations = organisationRepository.findByPbaStatus(PbaStatus.valueOf(pbaStatus));
+        var organisations = organisationRepository.findByPbaStatus(PbaStatus.valueOf(pbaStatus));
 
         LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
                 .stream()
@@ -571,17 +569,13 @@ public class OrganisationServiceImpl implements OrganisationService {
         Optional<Organisation> organisationOptional = Optional.ofNullable(
                 getOrganisationByOrgIdentifier(organisationIdentifier));
 
-
         if (organisationOptional.isEmpty()) {
             log.error(LOG_ERROR_BODY_START, loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
 
-        Organisation organisation = organisationOptional.get();
-
+        var organisation = organisationOptional.get();
         addContactInformationToOrganisation(contactInformationCreationRequests, organisation);
-
-
     }
 
 
@@ -591,14 +585,14 @@ public class OrganisationServiceImpl implements OrganisationService {
         paymentAccountValidator.isPbaRequestEmptyOrNull(pbaRequest);
         pbaRequest.getPaymentAccounts().removeIf(item -> item == null || "".equals(item.trim()));
 
-        String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaRequest.getPaymentAccounts(),
+        var invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaRequest.getPaymentAccounts(),
                 Boolean.FALSE);
         if (StringUtils.isNotEmpty(invalidPbas)) {
             invalidPaymentAccounts = new HashSet<>(Arrays.asList(invalidPbas.split(",")));
             pbaRequest.getPaymentAccounts().removeAll(invalidPaymentAccounts);
         }
 
-        Set<String> duplicatePaymentAccounts = paymentAccountValidator.getDuplicatePbas(
+        var duplicatePaymentAccounts = paymentAccountValidator.getDuplicatePbas(
                 pbaRequest.getPaymentAccounts());
         pbaRequest.getPaymentAccounts().removeAll(duplicatePaymentAccounts);
 
@@ -625,8 +619,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private AddPbaResponse getAddPbaResponse(Set<String> invalidPaymentAccounts,
                                              Set<String> duplicatePaymentAccounts, String msg) {
-        AddPbaResponse addPbaResponse;
-        addPbaResponse = new AddPbaResponse();
+        var addPbaResponse = new AddPbaResponse();
         addPbaResponse.setMessage(msg);
         addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
         return addPbaResponse;
@@ -640,7 +633,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void sortContactInfoByCreatedDateAsc(Organisation organisation) {
-        List<ContactInformation> sortedContactInfoByCreatedDate = organisation.getContactInformation()
+        var sortedContactInfoByCreatedDate = organisation.getContactInformation()
                 .stream()
                 .sorted(Comparator.comparing(ContactInformation::getCreated))
                 .collect(Collectors.toList());
