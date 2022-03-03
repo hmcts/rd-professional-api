@@ -531,7 +531,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                                         paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
                                 .map(FetchPbaByStatusResponse::new).collect(Collectors.toList()),
                         v.get(0).getName(),
-                        v.get(0).getUsers())));
+                        v.get(0).getUsers().stream().findFirst().orElse(null))));
 
         return ResponseEntity
                 .status(HttpStatus.OK)

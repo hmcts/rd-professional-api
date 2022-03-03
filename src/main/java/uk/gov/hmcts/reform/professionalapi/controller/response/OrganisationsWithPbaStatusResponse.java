@@ -29,6 +29,6 @@ public class OrganisationsWithPbaStatusResponse {
     private String organisationName;
 
     @JsonProperty
-    private List<SuperUser> superUser;
+    private SuperUser superUser;
 
 }

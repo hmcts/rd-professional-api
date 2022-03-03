@@ -179,7 +179,7 @@ class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegrationTe
         orgPbaResponse.forEach(org -> assertNotNull((org.getPbaNumbers())));
         orgPbaResponse.forEach(org -> assertTrue(org.getPbaNumbers().stream()
                 .allMatch(pba -> pba.getStatus().equalsIgnoreCase(expectedPbaStatus.toString()))));
-        orgPbaResponse.forEach(org -> assertThat(org.getSuperUser()).hasSizeGreaterThan(0));
+        orgPbaResponse.forEach(org -> assertThat(org.getSuperUser()).isNotNull());
         if (expectedPbaStatus.equals(PbaStatus.ACCEPTED)) {
             orgPbaResponse.forEach(org -> org.getPbaNumbers().forEach(pba -> assertNotNull(pba.getDateAccepted())));
         } else if (expectedPbaStatus.equals(PbaStatus.PENDING)) {

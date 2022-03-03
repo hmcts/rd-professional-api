@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,10 +23,14 @@ class OrganisationsWithPbaStatusResponseTest {
         pba1.setDateCreated(LocalDateTime.now().toString());
         pba1.setDateAccepted(LocalDateTime.now().toString());
         List<FetchPbaByStatusResponse> pbas = Collections.singletonList(pba1);
+        SuperUser superUser = new SuperUser();
+        superUser.setFirstName("fname");
+        superUser.setLastName("lname");
+        superUser.setEmailAddress("example.email@test.com");
 
         OrganisationsWithPbaStatusResponse organisations =
                 new OrganisationsWithPbaStatusResponse("ABCDEFG7", OrganisationStatus.ACTIVE, pbas,
-                        "ORGNAME", Collections.emptyList());
+                        "ORGNAME", superUser);
 
         assertEquals("ABCDEFG7", organisations.getOrganisationIdentifier());
         assertEquals(1, organisations.getPbaNumbers().size());
