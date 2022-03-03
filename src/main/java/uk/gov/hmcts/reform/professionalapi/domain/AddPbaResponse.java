@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class AddPbaResponse {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,8 +18,4 @@ public class AddPbaResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private FailedPbaReason reason;
 
-    public AddPbaResponse(String message, FailedPbaReason reason) {
-        this.message = message;
-        this.reason = reason;
-    }
 }
