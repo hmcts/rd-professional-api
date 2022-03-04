@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 import java.util.List;
 
@@ -29,6 +28,6 @@ public class OrganisationsWithPbaStatusResponse {
     private String organisationName;
 
     @JsonProperty
-    private SuperUser superUser;
+    private SuperUserResponse superUser;
 
 }

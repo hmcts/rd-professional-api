@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
@@ -531,7 +532,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                                         paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
                                 .map(FetchPbaByStatusResponse::new).collect(Collectors.toList()),
                         v.get(0).getName(),
-                        v.get(0).getUsers().stream().findFirst().orElse(null))));
+                        v.get(0).getUsers().stream().findFirst().map(SuperUserResponse::new).orElse(null))));
 
         return ResponseEntity
                 .status(HttpStatus.OK)

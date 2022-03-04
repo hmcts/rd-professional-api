@@ -30,7 +30,7 @@ class OrganisationsWithPbaStatusResponseTest {
 
         OrganisationsWithPbaStatusResponse organisations =
                 new OrganisationsWithPbaStatusResponse("ABCDEFG7", OrganisationStatus.ACTIVE, pbas,
-                        "ORGNAME", superUser);
+                        "ORGNAME", new SuperUserResponse(superUser));
 
         assertEquals("ABCDEFG7", organisations.getOrganisationIdentifier());
         assertEquals(1, organisations.getPbaNumbers().size());
