@@ -34,11 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
