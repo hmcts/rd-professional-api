@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,6 +46,7 @@ public class SuperUser implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "ORGANISATION_ID", nullable = false, insertable = false, updatable = false)
+    @JsonBackReference
     private Organisation organisation;
 
     @Column(name = "DELETED", insertable = false, updatable = false)
