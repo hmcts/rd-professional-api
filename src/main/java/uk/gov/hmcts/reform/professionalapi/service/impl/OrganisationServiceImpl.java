@@ -28,10 +28,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
@@ -528,7 +530,9 @@ public class OrganisationServiceImpl implements OrganisationService {
                                 .stream()
                                 .filter(paymentAccount ->
                                         paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
-                                .collect(Collectors.toList()))));
+                                .map(FetchPbaByStatusResponse::new).collect(Collectors.toList()),
+                        v.get(0).getName(),
+                        v.get(0).getUsers().stream().findFirst().map(SuperUserResponse::new).orElse(null))));
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -576,6 +580,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         var organisation = organisationOptional.get();
         addContactInformationToOrganisation(contactInformationCreationRequests, organisation);
+
+
     }
 
 
