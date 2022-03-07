@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrganisationsWithPbaStatusResponse {
 
     @JsonProperty
@@ -24,14 +24,10 @@ public class OrganisationsWithPbaStatusResponse {
     @JsonProperty
     private List<FetchPbaByStatusResponse> pbaNumbers;
 
-    public OrganisationsWithPbaStatusResponse(String organisationIdentifier, OrganisationStatus organisationStatus,
-                                              List<PaymentAccount> paymentAccounts) {
+    @JsonProperty
+    private String organisationName;
 
-        this.organisationIdentifier = organisationIdentifier;
-        this.status = organisationStatus;
-        this.pbaNumbers = paymentAccounts
-                .stream()
-                .map(FetchPbaByStatusResponse::new)
-                .collect(Collectors.toList());
-    }
+    @JsonProperty
+    private SuperUserResponse superUser;
+
 }
