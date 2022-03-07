@@ -518,7 +518,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                         .anyMatch(r -> r.getStatusMessage() == null || !r.getStatusMessage()
                                 .equals(PBA_STATUS_MESSAGE_ACCEPTED))))
                 .allMatch(org -> org.getStatus().isActive());
-        orgsResponse.forEach(o -> assertNotNull(o.getSuperUser()));
+        assertThat(orgsResponse.stream().filter(o -> o.getSuperUser() != null)).hasSizeGreaterThan(0);
 
         var pbaByStatusResponses = new ArrayList<FetchPbaByStatusResponse>();
         orgsResponse.forEach(org -> pbaByStatusResponses.addAll(org.getPbaNumbers()));
