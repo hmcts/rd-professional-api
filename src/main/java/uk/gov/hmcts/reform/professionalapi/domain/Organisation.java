@@ -24,6 +24,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.CascadeType;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -57,6 +59,7 @@ public class Organisation implements Serializable {
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = SuperUser.class)
     @JoinColumn(name = "organisation_id", insertable = false, updatable = false)
+    @JsonManagedReference
     private List<SuperUser> users = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
