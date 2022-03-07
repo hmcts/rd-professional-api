@@ -527,6 +527,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(pbaByStatusResponses.size()).isPositive();
         assertThat(pbaByStatusResponses.stream()).allMatch(pba -> pba.getStatus().equals("ACCEPTED"));
         assertThat(pbaByStatusResponses).allMatch(pba -> nonNull(pba.getDateAccepted()));
+
         log.info("findOrganisationByPbaStatusShouldBeSuccess :: END");
     }
 
