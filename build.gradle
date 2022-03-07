@@ -412,7 +412,7 @@ dependencies {
 
     testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.9'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.15'
-    testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.15'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '3.0.10'
     testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
