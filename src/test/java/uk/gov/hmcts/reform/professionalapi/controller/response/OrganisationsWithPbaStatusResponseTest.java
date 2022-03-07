@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,15 +17,20 @@ class OrganisationsWithPbaStatusResponseTest {
 
     @Test
     void testOrganisationsWithPbaStatusResponse() {
-        PaymentAccount pba1 = new PaymentAccount();
-        pba1.setPbaStatus(ACCEPTED);
+        FetchPbaByStatusResponse pba1 = new FetchPbaByStatusResponse();
+        pba1.setStatus(ACCEPTED.name());
         pba1.setPbaNumber("PBA123456");
-        pba1.setCreated(LocalDateTime.now());
-        pba1.setLastUpdated(LocalDateTime.now());
-        List<PaymentAccount> pbas = Collections.singletonList(pba1);
+        pba1.setDateCreated(LocalDateTime.now().toString());
+        pba1.setDateAccepted(LocalDateTime.now().toString());
+        List<FetchPbaByStatusResponse> pbas = Collections.singletonList(pba1);
+        SuperUser superUser = new SuperUser();
+        superUser.setFirstName("fname");
+        superUser.setLastName("lname");
+        superUser.setEmailAddress("example.email@test.com");
 
         OrganisationsWithPbaStatusResponse organisations =
-                new OrganisationsWithPbaStatusResponse("ABCDEFG7", OrganisationStatus.ACTIVE, pbas);
+                new OrganisationsWithPbaStatusResponse("ABCDEFG7", OrganisationStatus.ACTIVE, pbas,
+                        "ORGNAME", new SuperUserResponse(superUser));
 
         assertEquals("ABCDEFG7", organisations.getOrganisationIdentifier());
         assertEquals(1, organisations.getPbaNumbers().size());
