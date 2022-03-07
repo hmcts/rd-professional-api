@@ -264,7 +264,11 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("org1");
         organisation.setPaymentAccounts(Collections.singletonList(paymentAccount));
-
+        SuperUser superUser = new SuperUser();
+        superUser.setFirstName("fName");
+        superUser.setLastName("lName");
+        superUser.setEmailAddress("example.email@test.com");
+        organisation.setUsers(Collections.singletonList(superUser));
         return organisation;
     }
 }
