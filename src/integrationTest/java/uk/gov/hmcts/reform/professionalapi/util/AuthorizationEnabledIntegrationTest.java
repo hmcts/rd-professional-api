@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static com.gargoylesoftware.htmlunit.util.MimeType.APPLICATION_JSON;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -155,6 +154,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
+    public static final String APPLICATION_JSON = "application/json";
 
     @MockBean
     protected FeatureToggleServiceImpl featureToggleService;
