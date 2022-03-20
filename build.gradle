@@ -525,3 +525,13 @@ rootProject.tasks.named("processIntegrationTestResources") {
 rootProject.tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
+
+dependencyManagement {
+    dependencies {
+        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.1') {
+            entry 'jackson-databind'
+            entry 'jackson-core'
+            entry 'jackson-annotations'
+        }
+    }
+}
