@@ -477,6 +477,12 @@ dependencyManagement {
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
         }
+
+        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.2') {
+            entry 'jackson-databind'
+            entry 'jackson-core'
+            entry 'jackson-annotations'
+        }
     }
 }
 
