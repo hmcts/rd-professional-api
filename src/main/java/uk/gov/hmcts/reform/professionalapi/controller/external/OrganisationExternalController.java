@@ -132,7 +132,7 @@ public class OrganisationExternalController extends SuperController {
             @ApiParam(hidden = true) @OrgId String extOrgIdentifier,
             @ApiParam(name = "pbaStatus") @RequestParam(value = "pbaStatus", required = false) String pbaStatus) {
 
-        boolean isPendingPbaRequired = false;
+        boolean isPendingPbaRequired = true;
 
         if (!isBlank(pbaStatus)) {
             isPendingPbaRequired = pbaStatus.equalsIgnoreCase(PENDING.name());

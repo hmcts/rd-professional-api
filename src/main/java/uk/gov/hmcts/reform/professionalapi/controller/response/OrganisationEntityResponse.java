@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -33,7 +31,6 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     private SuperUserResponse superUser;
     @JsonProperty
     private List<String> paymentAccount;
-    @JsonInclude(NON_EMPTY)
     @JsonProperty
     private List<String> pendingPaymentAccount;
 

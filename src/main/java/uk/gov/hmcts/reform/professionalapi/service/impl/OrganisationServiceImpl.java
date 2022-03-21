@@ -356,7 +356,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         resultingOrganisations.addAll(pendingOrganisations);
         resultingOrganisations.addAll(updatedActiveOrganisations);
 
-        return new OrganisationsDetailResponse(resultingOrganisations, true, false, false);
+        return new OrganisationsDetailResponse(resultingOrganisations, true, true, false);
     }
 
     @Override
