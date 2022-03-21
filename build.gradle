@@ -324,7 +324,6 @@ dependencies {
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.11.3'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation 'com.github.hmcts:idam-java-client:2.0.1'
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
@@ -476,6 +475,12 @@ dependencyManagement {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
+        }
+
+        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.2') {
+            entry 'jackson-databind'
+            entry 'jackson-core'
+            entry 'jackson-annotations'
         }
     }
 }
