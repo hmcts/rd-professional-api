@@ -435,7 +435,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(ONE);
         }
 
-        return new OrganisationsDetailResponse(organisations, true, false, false);
+        return new OrganisationsDetailResponse(organisations, true, true, false);
     }
 
     @Override
