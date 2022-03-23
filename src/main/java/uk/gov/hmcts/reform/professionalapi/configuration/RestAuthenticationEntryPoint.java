@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 
 
@@ -21,7 +22,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authenticationException) throws IOException {
 
         var mapper = new ObjectMapper();
-        var errorResponse = new ErrorResponse(
+        var errorResponse = new ErrorResponse(BAD_REQUEST.value(),BAD_REQUEST.getReasonPhrase(),
             authenticationException.getMessage(),
             "Authentication Exception",
             LocalDateTime.now().toString()

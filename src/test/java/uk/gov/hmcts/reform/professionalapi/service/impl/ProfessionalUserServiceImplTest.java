@@ -228,7 +228,7 @@ class ProfessionalUserServiceImplTest {
         List<ProfessionalUser> users = new ArrayList<>();
         users.add(professionalUser);
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
-        ErrorResponse errorResponse = new ErrorResponse("some error message",
+        ErrorResponse errorResponse = new ErrorResponse(400,"error status","some error message",
                 "some error description", "21:10");
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(mapper.writeValueAsString(errorResponse),

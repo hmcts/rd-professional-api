@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.validation.ConstraintViolationException;
-
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants;
+
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -41,7 +44,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorCons
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.DUPLICATE_USER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.INVALID_REQUEST;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.MALFORMED_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.METHOD_ARG_NOT_VALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
@@ -99,6 +101,21 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, CONFLICT, DUPLICATE_USER.getErrorMessage());
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
+        String field = "";
+        if (ex.getCause() != null) {
+            JsonMappingException jme = (JsonMappingException) ex.getCause();
+            field = jme.getPath().get(0).getFieldName();
+        }
+        var errorDetails = new ErrorResponse(BAD_REQUEST.value(), BAD_REQUEST.getReasonPhrase(),
+                field + " in invalid format",
+                ErrorConstants.MALFORMED_JSON.getErrorMessage(), getTimeStamp());
+
+        return new ResponseEntity<>(errorDetails, BAD_REQUEST);
+    }
+
+
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
@@ -139,12 +156,6 @@ public class ExceptionMapper {
     public ResponseEntity<Object> handleHttpStatusException(HttpStatusCodeException ex) {
         HttpStatus httpStatus = ex.getStatusCode();
         return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
-    }
-
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, MALFORMED_JSON.getErrorMessage());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -193,8 +204,8 @@ public class ExceptionMapper {
             errorDescription = INVALID_MFA_VALUE;
         }
 
-        ErrorResponse errorDetails = new ErrorResponse(errorMsg, errorDescription,
-                getTimeStamp());
+        ErrorResponse errorDetails = new ErrorResponse(BAD_REQUEST.value(),BAD_REQUEST.getReasonPhrase(),errorMsg,
+                errorDescription, getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
     }

@@ -306,7 +306,7 @@ class SuperControllerTest {
         lenient().when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
-        ErrorResponse errorDetails = new ErrorResponse("errorMessage", "errorDescription",
+        ErrorResponse errorDetails = new ErrorResponse(400,"error status","errorMessage", "errorDescription",
                 "23:13");
         String userId = UUID.randomUUID().toString();
 

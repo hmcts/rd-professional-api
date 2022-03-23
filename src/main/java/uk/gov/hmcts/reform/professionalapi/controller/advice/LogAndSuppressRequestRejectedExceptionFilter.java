@@ -22,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 
 @Component
@@ -51,7 +52,8 @@ public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterB
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.setStatus(400);
-            response.getWriter().print(this.gson.toJson(new ErrorResponse(INVALID_REQUEST.getErrorMessage(),
+            response.getWriter().print(this.gson.toJson(new ErrorResponse(BAD_REQUEST.value(),
+                    BAD_REQUEST.getReasonPhrase(),INVALID_REQUEST.getErrorMessage(),
                     "The request was rejected because the URL is potentially malicious",
                     new Timestamp(System.currentTimeMillis()).toString())));
         }
