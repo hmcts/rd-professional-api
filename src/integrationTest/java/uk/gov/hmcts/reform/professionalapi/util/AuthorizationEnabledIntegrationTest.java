@@ -540,8 +540,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             returnHttpStatus = 200;
         } else if (status.value() == 400) {
             body = "{"
-                    + "  \"errorMessage\": \"400\","
-                    + "  \"errorDescription\": \"BAD REQUEST\","
+                    + "  \"errorCode\": \"400\","
+                    + "  \"status\": \"BAD REQUEST\","
+                    + "  \"errorMessage\": \"status in invalid format\","
+                    + "  \"errorDescription\": \"1 : Malformed Input Request\","
                     + "  \"timeStamp\": \"23:10\""
                     + "}";
             returnHttpStatus = 400;

@@ -12,7 +12,7 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MFA_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INCORRECT_MFA_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
@@ -40,7 +40,7 @@ class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledIntegrationT
                 .updateOrgMfaStatus(null, getOrganisationId(), hmctsAdmin);
 
         assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString()).contains(INVALID_MFA_VALUE);
+        assertThat(updateResponse.get("response_body").toString()).contains(INCORRECT_MFA_VALUE);
     }
 
     @Test

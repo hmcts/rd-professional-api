@@ -456,7 +456,7 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
-        assertThat(errorResponse.getErrorMessage()).isEqualTo(MALFORMED_JSON.getErrorMessage());
+        assertThat(errorResponse.getErrorDescription()).isEqualTo(MALFORMED_JSON.getErrorMessage());
     }
 
     @Test
@@ -478,7 +478,7 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
         ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
         assertThat(pbaResponse).containsEntry("http_status", "400");
-        assertThat(errorResponse.getErrorMessage()).isEqualTo(MALFORMED_JSON.getErrorMessage());
+        assertThat(errorResponse.getErrorDescription()).isEqualTo(MALFORMED_JSON.getErrorMessage());
     }
 
     @Test

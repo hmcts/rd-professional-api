@@ -332,6 +332,6 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
                 .findUsersByOrganisation(createAndActivateOrganisation(), "false", "invalidRole");
         assertThat(response.get("http_status")).isEqualTo("403");
         assertThat((String) response.get("response_body"))
-                .contains("{\"errorMessage\":\"9 : Access Denied\",\"errorDescription\":\"Access is denied\"");
+                .contains("{\"errorCode\":403,\"status\":\"Forbidden\",\"errorMessage\":\"9 : Access Denied\",\"errorDescription\":\"Access is denied\"");
     }
 }
