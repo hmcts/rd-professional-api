@@ -91,7 +91,8 @@ class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegrationTes
                         hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body"))
-                .isEqualTo("{\"errorCode\":400,\"status\":\"BAD REQUEST\",\"errorMessage\":\"status in invalid format\",\"errorDescription\":\"1 : Malformed Input Request\",\"timeStamp\":\"23:10\"}");
+                .isEqualTo("{\"errorCode\":400,\"status\":\"BAD REQUEST\",\"errorMessage\":\"status in invalid format\""
+                        + ",\"errorDescription\":\"1 : Malformed Input Request\",\"timeStamp\":\"23:10\"}");
 
     }
 
