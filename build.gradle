@@ -23,7 +23,6 @@ plugins {
     id 'au.com.dius.pact' version '4.1.7'// do not change, otherwise serenity report fails
 }
 
-
 apply plugin: 'java'
 apply plugin: 'net.serenity-bdd.aggregator'
 apply plugin: 'project-report'
