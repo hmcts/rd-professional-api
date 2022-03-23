@@ -319,7 +319,7 @@ dependencies {
 
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
     implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
-    implementation 'com.github.hmcts:properties-volume-spring-boot-starter:0.1.0'
+    implementation 'com.github.hmcts:properties-volume-spring-boot-starter:0.1.1'
     implementation 'com.github.hmcts:service-auth-provider-java-client:4.0.3'
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
@@ -375,12 +375,12 @@ dependencies {
     testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.2.0'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.3.1'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.3.3'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: '4.4.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: '4.5.1'
 
     testImplementation group: 'com.h2database', name: 'h2'
 
