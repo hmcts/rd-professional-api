@@ -36,7 +36,7 @@ def versions = [
         reformLogging   : '5.1.9',
         serenity        : '2.0.76',
         sonarPitest     : '0.5',
-        springBoot      : '2.4.12',
+        springBoot      : '2.6.4',
         springfoxSwagger: '2.9.2',
         pact_version    : '4.1.7',
         launchDarklySdk : "5.2.2",
