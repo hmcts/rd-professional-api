@@ -204,7 +204,7 @@ public class ExceptionMapper {
             errorDescription = INVALID_MFA_VALUE;
         }
 
-        ErrorResponse errorDetails = new ErrorResponse(BAD_REQUEST.value(),BAD_REQUEST.getReasonPhrase(),errorMsg,
+        ErrorResponse errorDetails = new ErrorResponse(httpStatus.value(),httpStatus.getReasonPhrase(),errorMsg,
                 errorDescription, getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
