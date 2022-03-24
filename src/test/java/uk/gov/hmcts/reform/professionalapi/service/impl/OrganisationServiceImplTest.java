@@ -208,7 +208,7 @@ class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", "statusMessage",
                 "sra-id", "false", "number01", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests,null,null);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
@@ -606,7 +606,7 @@ class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "company-number", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests,null,null);
 
         assertThrows(InvalidRequest.class, () ->
                 sut.createOrganisationFrom(organisationCreationRequest));
@@ -623,7 +623,7 @@ class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "company-number", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests,null,null);
 
         assertThrows(InvalidRequest.class, () ->
                 sut.createOrganisationFrom(organisationCreationRequest));

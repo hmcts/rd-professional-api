@@ -36,6 +36,12 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @JsonInclude(NON_EMPTY)
     @JsonProperty
     private List<String> pendingPaymentAccount;
+    @JsonProperty
+    private String dateReceived;
+    @JsonProperty
+    private String dateApproved;
+
+
 
     public OrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
@@ -91,5 +97,11 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
                     .map(ContactInformationResponseWithDxAddress::new)
                     .collect(toList());
         }
+
+        this.dateReceived = organisation.getCreated().toString();
+
+        this.dateApproved = organisation.getDateApproved().toString();
+
+
     }
 }

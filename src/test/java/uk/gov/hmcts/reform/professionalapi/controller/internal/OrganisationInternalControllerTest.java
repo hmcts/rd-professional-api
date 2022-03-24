@@ -147,7 +147,7 @@ class OrganisationInternalControllerTest {
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
-                userCreationRequest, null, null);
+                userCreationRequest, null, null,null,null);
 
         organisation.setOrganisationIdentifier("AK57L4T");
 

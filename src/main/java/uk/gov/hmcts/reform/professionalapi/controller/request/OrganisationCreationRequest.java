@@ -38,6 +38,10 @@ public class OrganisationCreationRequest {
     @NotNull
     private List<ContactInformationCreationRequest> contactInformation;
 
+    private final String dateReceived;
+
+    private final String dateApproved;
+
     @JsonCreator
     public OrganisationCreationRequest(
             @JsonProperty("name") String name,
@@ -49,7 +53,9 @@ public class OrganisationCreationRequest {
             @JsonProperty("companyUrl") String companyUrl,
             @JsonProperty("superUser") UserCreationRequest superUser,
             @JsonProperty("paymentAccount") Set<String> paymentAccount,
-            @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
+            @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest,
+            @JsonProperty("dateReceived") String dateReceived,
+            @JsonProperty("dateApproved") String dateApproved) {
 
         this.name = name;
         this.status = status;
@@ -61,5 +67,8 @@ public class OrganisationCreationRequest {
         this.superUser = superUser;
         this.paymentAccount = paymentAccount;
         this.contactInformation = contactInformationRequest;
+        this.dateReceived = dateReceived;
+        this.dateApproved = dateApproved;
+
     }
 }

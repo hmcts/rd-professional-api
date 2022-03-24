@@ -59,6 +59,7 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -380,6 +381,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (isNotEmpty(savedOrganisation.getPaymentAccounts())
                 && organisationCreationRequest.getStatus().equals("ACTIVE")) {
             updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
+            organisation.setDateApproved(LocalDateTime.now());
         }
 
         return new OrganisationResponse(organisation);
