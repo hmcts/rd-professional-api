@@ -38,10 +38,6 @@ public class OrganisationCreationRequest {
     @NotNull
     private List<ContactInformationCreationRequest> contactInformation;
 
-    private final String dateReceived;
-
-    private final String dateApproved;
-
     @JsonCreator
     public OrganisationCreationRequest(
             @JsonProperty("name") String name,
@@ -67,8 +63,6 @@ public class OrganisationCreationRequest {
         this.superUser = superUser;
         this.paymentAccount = paymentAccount;
         this.contactInformation = contactInformationRequest;
-        this.dateReceived = dateReceived;
-        this.dateApproved = dateApproved;
 
     }
 }
