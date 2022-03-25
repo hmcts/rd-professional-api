@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.ObjectUtils;
@@ -32,7 +33,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @JsonProperty
     private List<String> paymentAccount;
     @JsonProperty
-    private List<String> pendingPaymentAccount;
+    private List<String> pendingPaymentAccount = new ArrayList<String>();
 
     public OrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
