@@ -9,8 +9,10 @@ import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -37,9 +39,11 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @JsonProperty
     private List<String> pendingPaymentAccount;
     @JsonProperty
-    private String dateReceived;
+    @DateTimeFormat
+    private LocalDateTime dateReceived;
     @JsonProperty
-    private String dateApproved;
+    @DateTimeFormat
+    private LocalDateTime dateApproved;
 
 
 
@@ -98,10 +102,8 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
                     .collect(toList());
         }
 
-        this.dateReceived = organisation.getCreated().toString();
-
-        this.dateApproved = organisation.getDateApproved().toString();
-
+        this.dateReceived = organisation.getCreated();
+        this.dateApproved = organisation.getDateApproved();
 
     }
 }

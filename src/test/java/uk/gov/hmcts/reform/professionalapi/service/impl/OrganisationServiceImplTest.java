@@ -208,7 +208,7 @@ class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", "statusMessage",
                 "sra-id", "false", "number01", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests,null,null);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
@@ -346,7 +346,7 @@ class OrganisationServiceImplTest {
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
         OrganisationResponse organisationResponse = sut.updateOrganisation(organisationCreationRequest,
-                organisationIdentifier);
+                organisationIdentifier, false);
 
         assertThat(organisationResponse).isNotNull();
 
@@ -606,7 +606,7 @@ class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "company-number", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests,null,null);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
         assertThrows(InvalidRequest.class, () ->
                 sut.createOrganisationFrom(organisationCreationRequest));
@@ -623,7 +623,7 @@ class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "company-number", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests,null,null);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
         assertThrows(InvalidRequest.class, () ->
                 sut.createOrganisationFrom(organisationCreationRequest));

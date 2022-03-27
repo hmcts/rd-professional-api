@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -55,6 +56,8 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("sraRegulated")).isEqualTo(false);
         assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
         assertThat(orgResponse.get("companyNumber")).isNotNull();
+        assertNotNull(orgResponse.get("dateReceived"));
+        assertNull(orgResponse.get("dateApproved"));
 
         Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
         assertThat(superUser.get("firstName")).isEqualTo("some-fname");
@@ -608,17 +611,19 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
 
-        Map<String, Object> organisation = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+        Map<String, Object> organisationPending = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
 
-        Map<String, Object> superUser = ((Map<String, Object>) organisation.get("superUser"));
+        Map<String, Object> superUser = ((Map<String, Object>) organisationPending.get("superUser"));
 
         assertThat(superUser.get("firstName")).isEqualTo("fname");
         assertThat(superUser.get("lastName")).isEqualTo("lname1");
         assertThat(superUser.get("email")).isEqualTo("someone11@somewhere.com");
 
-        Map<String, Object> organisationSecond = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
+        Map<String, Object> organisationActive = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
+        assertThat(organisationActive.get("dateReceived")).isNotNull();
+        assertThat(organisationActive.get("dateApproved")).isNotNull();
 
-        Map<String, Object> superUserSecond = ((Map<String, Object>) organisationSecond.get("superUser"));
+        Map<String, Object> superUserSecond = ((Map<String, Object>) organisationActive.get("superUser"));
 
         assertThat(superUserSecond.get("firstName")).isEqualTo("some-fname");
         assertThat(superUserSecond.get("lastName")).isEqualTo("some-lname");
