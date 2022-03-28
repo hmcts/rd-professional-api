@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
@@ -43,7 +44,8 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     private LocalDateTime dateReceived;
     @JsonProperty
     @DateTimeFormat
-    private LocalDateTime dateApproved;
+    @JsonInclude(ALWAYS)
+    private LocalDateTime dateApproved = null;
 
 
 
