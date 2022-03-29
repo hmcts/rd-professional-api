@@ -200,7 +200,7 @@ class OrganisationExternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         String id = UUID.randomUUID().toString().substring(0, 7);
-        when(organisationServiceMock.retrieveOrganisation(id, false)).thenReturn(organisationEntityResponse);
+        when(organisationServiceMock.retrieveOrganisation(id, true)).thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id, "");
 
