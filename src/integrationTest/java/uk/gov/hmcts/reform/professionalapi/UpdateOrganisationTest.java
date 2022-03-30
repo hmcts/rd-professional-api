@@ -277,6 +277,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
                 SuperUser professionalUser = persistedOrganisation.getUsers().get(0);
                 assertThat(professionalUser.getUserIdentifier()).isNotNull();
                 assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
+                assertThat(persistedOrganisation.getDateApproved());
             }
         } else {
             if (responseForOrganisationUpdate.get("http_status") instanceof String) {
