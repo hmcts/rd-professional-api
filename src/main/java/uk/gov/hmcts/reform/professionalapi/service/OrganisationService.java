@@ -25,7 +25,7 @@ public interface OrganisationService {
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
-                                            String organisationIdentifier);
+                                            String organisationIdentifier,Boolean isOrgApprovalRequest);
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
