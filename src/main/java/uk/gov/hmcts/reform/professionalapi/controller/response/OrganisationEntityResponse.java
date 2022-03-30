@@ -1,15 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -34,6 +39,15 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     private List<String> paymentAccount;
     @JsonProperty
     private List<String> pendingPaymentAccount = new ArrayList<String>();
+    @JsonProperty
+    @DateTimeFormat
+    private LocalDateTime dateReceived;
+    @JsonProperty
+    @DateTimeFormat
+    @JsonInclude(ALWAYS)
+    private LocalDateTime dateApproved = null;
+
+
 
     public OrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
@@ -89,5 +103,9 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
                     .map(ContactInformationResponseWithDxAddress::new)
                     .collect(toList());
         }
+
+        this.dateReceived = organisation.getCreated();
+        this.dateApproved = organisation.getDateApproved();
+
     }
 }
