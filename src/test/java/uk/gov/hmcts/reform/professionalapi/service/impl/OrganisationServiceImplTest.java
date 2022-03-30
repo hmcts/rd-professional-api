@@ -346,7 +346,7 @@ class OrganisationServiceImplTest {
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
         OrganisationResponse organisationResponse = sut.updateOrganisation(organisationCreationRequest,
-                organisationIdentifier);
+                organisationIdentifier, false);
 
         assertThat(organisationResponse).isNotNull();
 

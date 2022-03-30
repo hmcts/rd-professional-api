@@ -59,6 +59,7 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -361,7 +362,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationResponse updateOrganisation(
-            OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
+            OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier,
+            Boolean isOrgApprovalRequest) {
 
         var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
@@ -374,6 +376,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest
                 .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
+
+        if (isOrgApprovalRequest) {
+            organisation.setDateApproved(LocalDateTime.now());
+        }
         var savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
