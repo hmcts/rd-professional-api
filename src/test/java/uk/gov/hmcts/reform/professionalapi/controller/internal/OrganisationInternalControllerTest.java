@@ -118,13 +118,13 @@ class OrganisationInternalControllerTest {
         organisationsDetailResponse =
                 new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
         organisationEntityResponse =
-                new OrganisationEntityResponse(organisation, false, false, true);
+                new OrganisationEntityResponse(organisation, false, true, true);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
         organisationResponse = new OrganisationResponse(organisation);
         organisationsDetailResponse =
                 new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
         organisationEntityResponse =
-                new OrganisationEntityResponse(organisation, false, false, true);
+                new OrganisationEntityResponse(organisation, false, true, true);
 
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
@@ -210,7 +210,7 @@ class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisation(organisation.getOrganisationIdentifier(), false);
+                .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
     }
 
     @Test
@@ -227,7 +227,7 @@ class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisation(organisation.getOrganisationIdentifier(), false);
+                .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
     }
 
     @Test
