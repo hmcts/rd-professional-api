@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
@@ -42,7 +44,8 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     private LocalDateTime dateReceived;
     @JsonProperty
     @DateTimeFormat
-    private LocalDateTime dateApproved;
+    @JsonInclude(ALWAYS)
+    private LocalDateTime dateApproved = null;
 
 
 
