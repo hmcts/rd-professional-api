@@ -67,6 +67,9 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         List<String> accounts = ((List<String>)  orgResponse.get("paymentAccount"));
         assertThat(accounts.size()).isZero();
 
+        List<String> pendingPaymentAccount = ((List<String>)  orgResponse.get("pendingPaymentAccount"));
+        assertThat(pendingPaymentAccount.size()).isOne();
+
         Map<String, Object> contactInfo = ((List<Map<String, Object>>) orgResponse.get("contactInformation")).get(0);
         assertThat(contactInfo.get("addressLine1")).isEqualTo("addressLine1");
         assertThat(contactInfo.get("addressLine2")).isEqualTo("addressLine2");
@@ -216,6 +219,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(pendingOrganisation1.get("name")).isEqualTo("some-org-name");
         assertThat(pendingOrganisation1.get("contactInformation")).asList().size().isEqualTo(1);
         assertThat(pendingOrganisation1.get("paymentAccount")).asList().size().isEqualTo(0);
+        assertThat(pendingOrganisation1.get("pendingPaymentAccount")).asList().hasSize(0);
 
         assertThat(pendingOrganisation2.get("name")).isEqualTo("some-other-org-nam3");
         assertThat(pendingOrganisation2.get("contactInformation")).asList().size().isEqualTo(3);

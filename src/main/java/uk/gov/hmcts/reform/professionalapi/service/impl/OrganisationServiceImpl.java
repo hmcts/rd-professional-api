@@ -357,7 +357,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         resultingOrganisations.addAll(pendingOrganisations);
         resultingOrganisations.addAll(updatedActiveOrganisations);
 
-        return new OrganisationsDetailResponse(resultingOrganisations, true, false, false);
+        return new OrganisationsDetailResponse(resultingOrganisations, true, true, false);
     }
 
     @Override
@@ -441,7 +441,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(ONE);
         }
 
-        return new OrganisationsDetailResponse(organisations, true, false, false);
+        return new OrganisationsDetailResponse(organisations, true, true, false);
     }
 
     @Override
