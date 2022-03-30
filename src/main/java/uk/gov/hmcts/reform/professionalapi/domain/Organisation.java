@@ -105,6 +105,9 @@ public class Organisation implements Serializable {
     @Column(name = "ORGANISATION_IDENTIFIER")
     private String organisationIdentifier;
 
+    @Column(name = "date_approved")
+    private LocalDateTime dateApproved;
+
 
     public Organisation(
             String name,
