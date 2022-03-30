@@ -219,7 +219,7 @@ public abstract class SuperController {
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
-
+        Boolean  isOrgApprovalRequest = false;
         if (isBlank(organisationCreationRequest.getStatus())) {
             throw new InvalidRequest("Mandatory field status is missing");
         }
@@ -244,7 +244,7 @@ public abstract class SuperController {
                 && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             //Organisation is getting activated
-
+            isOrgApprovalRequest = true;
             ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, null, true,
                     false);
             if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
@@ -260,7 +260,7 @@ public abstract class SuperController {
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
-        organisationService.updateOrganisation(organisationCreationRequest, orgId);
+        organisationService.updateOrganisation(organisationCreationRequest, orgId,isOrgApprovalRequest);
         return ResponseEntity.status(200).build();
     }
 
