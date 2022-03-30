@@ -290,6 +290,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
+        assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
         log.info("findOrgByPfmShouldBeSuccess :: END");
         responseValidate(response);
     }
@@ -299,6 +300,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
+        assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
         log.info("findOrgByPomShouldBeSuccess :: END");
     }
 

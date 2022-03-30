@@ -190,7 +190,7 @@ public abstract class SuperController {
             //Received request to retrieve organisation with ID
 
             organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-            organisationResponse = organisationService.retrieveOrganisation(orgId, false);
+            organisationResponse = organisationService.retrieveOrganisation(orgId, true);
 
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
             //Received request to retrieve organisation with status
