@@ -44,7 +44,7 @@ import java.util.Optional;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 
 @RequestMapping(
@@ -132,10 +132,11 @@ public class OrganisationExternalController extends SuperController {
             @ApiParam(hidden = true) @OrgId String extOrgIdentifier,
             @ApiParam(name = "pbaStatus") @RequestParam(value = "pbaStatus", required = false) String pbaStatus) {
 
-        boolean isPendingPbaRequired = false;
+        boolean isPendingPbaRequired = true;
 
-        if (!isBlank(pbaStatus)) {
-            isPendingPbaRequired = pbaStatus.equalsIgnoreCase(PENDING.name());
+        if (!isBlank(pbaStatus)
+            && pbaStatus.equalsIgnoreCase(ACCEPTED.name())) {
+            isPendingPbaRequired = false;
         }
 
         return retrieveOrganisationOrById(extOrgIdentifier, isPendingPbaRequired);
