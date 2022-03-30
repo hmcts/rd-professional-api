@@ -271,6 +271,8 @@ public class AuthorizationFunctionalTest {
                 Assertions.assertThat(v.toString().contains("some-org-name"));
                 Assertions.assertThat(v.toString().equals("ACTIVE"));
                 Assertions.assertThat(v.toString()).isNotEmpty();
+                Assertions.assertThat(v.toString()).contains("dateCreated");
+                Assertions.assertThat(v.toString()).contains("dateApproved");
             }
 
         });
