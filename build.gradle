@@ -307,6 +307,18 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
     implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.18'
 
+    implementation group: 'org.springframework', name: 'spring-aop', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-aspects', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-context-support', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-expression', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-jcl', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-orm', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-web', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.18'
+
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
     implementation(group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
