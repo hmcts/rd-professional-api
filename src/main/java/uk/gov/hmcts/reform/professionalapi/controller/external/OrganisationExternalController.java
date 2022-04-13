@@ -96,8 +96,14 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves Organisation details of the requesting User",
-            notes = "**IDAM Roles to access API** :\n pui-organisation-manager,\n pui-finance-manager,"
-                    + "\n pui-case-manager,\n pui-caa,\n pui-user-manager",
+            notes = """
+                    **IDAM Roles to access API** :
+                    pui-organisation-manager,
+                    pui-finance-manager,
+                    pui-case-manager,
+                    pui-caa,
+                    pui-user-manager
+                    """,
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -144,8 +150,13 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
-            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
-                    + "\n pui-organisation-manager,\n pui-case-manager",
+            notes = """
+                    **IDAM Roles to access API** :
+                    - pui-finance-manager
+                    - pui-user-manager
+                    - pui-organisation-manager
+                    - pui-case-manager
+                    """,
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),
@@ -251,8 +262,16 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves all Active Organisations of requested status for user"
                     + " with minimal e.g. organisationIdentifier, name and contact information if address flag is true",
-            notes = "**IDAM Roles to access API** : \n pui-organisation-manager,\n pui-finance-manager,"
-                    + "\n pui-case-manager,pui-caa,\n pui-user-manager,citizen,caseworker",
+            notes = """
+                    *IDAM Roles to access API** :
+                    - pui-organisation-manager
+                    - pui-finance-manager
+                    - pui-case-manager
+                    - pui-caa
+                    - pui-user-manager
+                    - citizen
+                    - caseworker
+                    """,
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -312,11 +331,13 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Bad Request Error: One of the below reasons: \n"
-                            + "- Organisation is not ACTIVE.\n"
-                            + "- No payment accounts passed to be deleted in the request body.\n"
-                            + "- Passed payment account numbers are in an invalid format.\n"
-                            + "- The payment accounts are not associated with users organisation"
+                    message = """
+                            Bad Request Error: One of the below reasons:
+                            - Organisation is not ACTIVE
+                            - No payment accounts passed to be deleted in the request body
+                            - Passed payment account numbers are in an invalid format
+                            - The payment accounts are not associated with users organisation
+                            """
             ),
             @ApiResponse(
                     code = 401,
@@ -507,10 +528,12 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Bad Request Error: One of the below reasons: \n"
-                            + "- Request is malformed.\n"
-                            + "- Organisation id is missing.\n"
-                            + "- Organisation should have at least one address."
+                    message = """
+                            Bad Request Error: One of the below reasons:
+                            - Request is malformed.
+                            - Organisation id is missing.
+                            - Organisation should have at least one address.
+                            """
             ),
             @ApiResponse(
                     code = 401,
@@ -522,12 +545,14 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "NOT FOUND Error: One of the below reasons: \n"
-                            + "- Organisation does not exist.\n"
-                            + "- Request is empty.\n"
-                            + "- id1, id2 does not exist\n"
-                            + "OR\n"
-                            + "id1, id2 does not belong to given org."
+                    message = """
+                            NOT FOUND Error: One of the below reasons:
+                            - Organisation does not exist.
+                            - Request is empty.
+                            - id1, id2 does not exis
+                            OR
+                            - id1, id2 does not belong to given org.
+                            """
             ),
             @ApiResponse(
                     code = 500,
