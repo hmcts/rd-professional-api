@@ -99,8 +99,7 @@ public class OrganisationCreationRequestValidator {
         List<ContactInformationValidationResponse> result = null;
         if (contactInfoValidations != null && !contactInfoValidations.isEmpty()) {
             result = contactInfoValidations.stream()
-                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress())
-                    .collect(Collectors.toList());
+                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress()).toList();
         }
         if (result != null && !result.isEmpty()) {
             throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);
@@ -244,7 +243,7 @@ public class OrganisationCreationRequestValidator {
     }
 
     public boolean isEmptyValue(String value) {
-        return  (value != null && value.trim().isEmpty()) ? true : false;
+        return value != null && value.trim().isEmpty();
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
