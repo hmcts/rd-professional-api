@@ -31,7 +31,7 @@ public class ContactInformationResponseWithDxAddress extends ContactInformationR
         this.dxAddress = contactInfo.getDxAddresses()
                 .stream()
                 .map(DxAddressResponse::new)
-                .collect(toList());
+                .toList();
     }
 
 }
