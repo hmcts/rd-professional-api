@@ -48,9 +48,14 @@ public class ProfessionalExternalUserController extends SuperController {
     @ApiOperation(
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
                     + " returnRoles is False",
-            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
-                    + "\n pui-organisation-manager,"
-                    + "\n pui-case-manager,\n pui-caa",
+            notes = """
+                    **IDAM Roles to access API** :
+                    - pui-finance-manager
+                    - pui-user-manager
+                    - pui-organisation-manager
+                    - pui-case-manager
+                    - pui-caa
+                    """,
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -179,9 +184,14 @@ public class ProfessionalExternalUserController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves the Status of a User belonging to an Active Organisation with the given Email Address",
-            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
-                    + "\n pui-organisation-manager,"
-                    + "\n pui-case-manager,\n caseworker-publiclaw-courtadmin",
+            notes = """
+                    **IDAM Roles to access API** :
+                    - pui-finance-manager
+                    - pui-user-manager
+                    - pui-organisation-manager
+                    - pui-case-manager
+                    - caseworker-publiclaw-courtadmin
+                    """,
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),
