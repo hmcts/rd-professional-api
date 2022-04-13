@@ -32,9 +32,11 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
 
-    @Query("select o from Organisation o join fetch payment_account p \n"
-            + "on p.organisationId = o.id \n"
-            + "where p.pbaStatus = :pbaStatus \n"
-            + "order by p.created asc")
+    @Query("""
+            select o from Organisation o join fetch payment_account p
+            on p.organisationId = o.id
+            where p.pbaStatus = :pbaStatus
+            order by p.created asc
+            """)
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
 }
