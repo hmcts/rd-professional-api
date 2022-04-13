@@ -19,7 +19,7 @@ public class MultipleUserProfilesResponse {
     public MultipleUserProfilesResponse(List<UserProfile> userProfiles, Boolean isRequiredRoles) {
 
         this.userProfiles = userProfiles.stream().map(userProfile ->
-                new GetUserProfileResponse(userProfile, isRequiredRoles)).collect(Collectors.toList());
+                new GetUserProfileResponse(userProfile, isRequiredRoles)).toList();
 
     }
 }
