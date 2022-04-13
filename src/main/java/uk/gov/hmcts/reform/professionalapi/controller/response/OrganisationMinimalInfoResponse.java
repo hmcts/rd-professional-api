@@ -35,7 +35,7 @@ public class OrganisationMinimalInfoResponse {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
                     .map(ContactInformationResponse::new)
-                    .collect(toList());
+                    .toList();
         }
     }
 }
