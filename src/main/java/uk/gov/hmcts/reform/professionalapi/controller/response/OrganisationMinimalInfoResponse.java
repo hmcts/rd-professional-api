@@ -8,8 +8,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @NoArgsConstructor
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)

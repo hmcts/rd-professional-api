@@ -495,6 +495,7 @@ public class OrganisationExternalController extends SuperController {
                 .body(null);
 
     }
+
     @SuppressWarnings("java:S6126") //Supressing as Checkstyle breaks when using TextBlocks
     @ApiOperation(
             value = "Deletes the Contact Information Address of an Organisation.",

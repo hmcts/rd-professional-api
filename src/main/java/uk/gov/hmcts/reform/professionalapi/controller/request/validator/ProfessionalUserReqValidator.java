@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
