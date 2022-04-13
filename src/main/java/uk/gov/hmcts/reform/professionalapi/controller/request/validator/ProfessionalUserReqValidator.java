@@ -57,8 +57,7 @@ public class ProfessionalUserReqValidator {
 
         List<RoleName> emptyRoles = new ArrayList<>();
         if (!CollectionUtils.isEmpty(roleNames)) {
-            emptyRoles = roleNames.stream().filter(roleName -> StringUtils.isBlank(roleName.getName()))
-                    .collect(Collectors.toList());
+            emptyRoles = roleNames.stream().filter(roleName -> StringUtils.isBlank(roleName.getName())).toList();
 
         }
         return !emptyRoles.isEmpty();
