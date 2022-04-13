@@ -18,6 +18,6 @@ public class OrganisationsDetailResponse {
 
         this.organisations = organisations.stream().map(organisation ->
                 new OrganisationEntityResponse(organisation, isRequiredContactInfo,
-                        isRequiredPendingPbas, isRequiredAllPbas)).collect(Collectors.toList());
+                        isRequiredPendingPbas, isRequiredAllPbas)).toList();
     }
 }
