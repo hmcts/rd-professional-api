@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.util.serenity5;
 
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.hmcts.reform.professionalapi.util.serenity5.extension.SerenityReportExtension;
+import uk.gov.hmcts.reform.lib.serenity5.SerenityTestWithoutReporting;
+import uk.gov.hmcts.reform.lib.serenity5.extension.SerenityReportExtension;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
