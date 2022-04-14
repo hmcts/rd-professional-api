@@ -91,4 +91,34 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MSG_REQUEST_IS_EMPTY = "Request is empty";
     public static final String ERROR_MSG_ADDRESS_LIST_IS_EMPTY = "Address list is empty";
 
+    public static final String GET_ORG_BY_ID_NOTES_1 = "**IDAM Roles to access API**";
+    public static final String GET_ORG_BY_ID_NOTES_2 = ":\n pui-organisation-manager,\n pui-finance-manager,";
+    public static final String GET_ORG_BY_ID_NOTES_3 = "\n pui-case-manager,\n pui-caa,\n pui-user-manager";
+
+    public static final String DEL_ORG_PBA_NOTES_1 = "Bad Request Error: One of the below reasons: \n";
+    public static final String DEL_ORG_PBA_NOTES_2 = "- Organisation is not ACTIVE.\n";
+    public static final String DEL_ORG_PBA_NOTES_3 = "- No payment accounts passed to be deleted in the request body.";
+    public static final String DEL_ORG_PBA_NOTES_4 = "\n- Passed payment account numbers are in an invalid format.\n";
+    public static final String DEL_ORG_PBA_NOTES_5 = "-The payment accounts are not associated with users organisation";
+
+    public static final String GET_PBA_EMAIL_NOTES_1 = "**IDAM Roles to access API** : \n pui-finance-manager,\npui-";
+    public static final String GET_PBA_EMAIL_NOTES_2 = "user-manager,\n pui-organisation-manager,\n pui-case-manager";
+
+    public static final String GET_ORG_BY_STATUS_NOTES_1 = "**IDAM Roles to access API** : \n pui-organisation-manager";
+    public static final String GET_ORG_BY_STATUS_NOTES_2 = ",\npui-finance-manager,\n pui-case-manager,pui-caa,\n";
+    public static final String GET_ORG_BY_STATUS_NOTES_3 = "pui-user-manager,citizen,caseworker";
+
+    public static final String DELETE_ORG_ADD_400_MESSAGE_1 = "Bad Request Error: One of the below reasons: \n";
+    public static final String DELETE_ORG_ADD_400_MESSAGE_2 = "- Request is malformed.\n";
+    public static final String DELETE_ORG_ADD_400_MESSAGE_3 = "- Organisation id is missing.\n";
+    public static final String DELETE_ORG_ADD_400_MESSAGE_4 = "- Organisation should have at least one address.";
+
+    public static final String DELETE_ORG_ADD_404_MESSAGE_1 = "NOT FOUND Error: One of the below reasons: \n";
+    public static final String DELETE_ORG_ADD_404_MESSAGE_2 = "- Organisation does not exist.\n";
+    public static final String DELETE_ORG_ADD_404_MESSAGE_3 = "- Request is empty.\n";
+    public static final String DELETE_ORG_ADD_404_MESSAGE_4 = "- id1, id2 does not exist\n";
+    public static final String DELETE_ORG_ADD_404_MESSAGE_5 = "OR\n";
+    public static final String DELETE_ORG_ADD_404_MESSAGE_6 = "id1, id2 does not belong to given org.";
+
+
 }

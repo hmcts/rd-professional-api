@@ -43,6 +43,29 @@ import java.util.Optional;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_400_MESSAGE_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_400_MESSAGE_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_400_MESSAGE_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_400_MESSAGE_4;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_404_MESSAGE_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_404_MESSAGE_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_404_MESSAGE_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_404_MESSAGE_4;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_404_MESSAGE_5;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETE_ORG_ADD_404_MESSAGE_6;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_4;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_5;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_ID_NOTES_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_ID_NOTES_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_ID_NOTES_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_STATUS_NOTES_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_STATUS_NOTES_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_STATUS_NOTES_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_PBA_EMAIL_NOTES_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_PBA_EMAIL_NOTES_2;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
@@ -94,11 +117,9 @@ public class OrganisationExternalController extends SuperController {
         return createOrganisationFrom(organisationCreationRequest);
     }
 
-    @SuppressWarnings("java:S6126") //Supressing as Checkstyle breaks when using TextBlocks
     @ApiOperation(
             value = "Retrieves Organisation details of the requesting User",
-            notes = "**IDAM Roles to access API** :\n pui-organisation-manager,\n pui-finance-manager,"
-                    + "\n pui-case-manager,\n pui-caa,\n pui-user-manager",
+            notes = GET_ORG_BY_ID_NOTES_1 + GET_ORG_BY_ID_NOTES_2 + GET_ORG_BY_ID_NOTES_3,
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -143,11 +164,9 @@ public class OrganisationExternalController extends SuperController {
         return retrieveOrganisationOrById(extOrgIdentifier, isPendingPbaRequired);
     }
 
-    @SuppressWarnings("java:S6126") //Supressing as Checkstyle breaks when using TextBlocks
     @ApiOperation(
             value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
-            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
-                    + "\n pui-organisation-manager,\n pui-case-manager",
+            notes = GET_PBA_EMAIL_NOTES_1 + GET_PBA_EMAIL_NOTES_2,
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),
@@ -250,12 +269,10 @@ public class OrganisationExternalController extends SuperController {
 
     }
 
-    @SuppressWarnings("java:S6126") //Supressing as Checkstyle breaks when using TextBlocks
     @ApiOperation(
             value = "Retrieves all Active Organisations of requested status for user"
                     + " with minimal e.g. organisationIdentifier, name and contact information if address flag is true",
-            notes = "**IDAM Roles to access API** : \n pui-organisation-manager,\n pui-finance-manager,"
-                    + "\n pui-case-manager,pui-caa,\n pui-user-manager,citizen,caseworker",
+            notes = GET_ORG_BY_STATUS_NOTES_1 + GET_ORG_BY_STATUS_NOTES_2 + GET_ORG_BY_STATUS_NOTES_3,
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -300,7 +317,6 @@ public class OrganisationExternalController extends SuperController {
         return retrieveAllOrganisationsByStatus(status, address);
     }
 
-    @SuppressWarnings("java:S6126") //Supressing as Checkstyle breaks when using TextBlocks
     @ApiOperation(
             value = "Deletes the provided list of payment accounts from the organisation.",
             notes = "**IDAM Roles to access API** : \n - pui-finance-manager",
@@ -316,11 +332,8 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Bad Request Error: One of the below reasons: \n"
-                            + "- Organisation is not ACTIVE.\n"
-                            + "- No payment accounts passed to be deleted in the request body.\n"
-                            + "- Passed payment account numbers are in an invalid format.\n"
-                            + "- The payment accounts are not associated with users organisation"
+                    message = DEL_ORG_PBA_NOTES_1 + DEL_ORG_PBA_NOTES_2 + DEL_ORG_PBA_NOTES_3
+                    + DEL_ORG_PBA_NOTES_4 + DEL_ORG_PBA_NOTES_5
             ),
             @ApiResponse(
                     code = 401,
@@ -496,7 +509,6 @@ public class OrganisationExternalController extends SuperController {
 
     }
 
-    @SuppressWarnings("java:S6126") //Supressing as Checkstyle breaks when using TextBlocks
     @ApiOperation(
             value = "Deletes the Contact Information Address of an Organisation.",
             notes = "**IDAM Roles to access API** : \n - pui-organisation-manager",
@@ -512,10 +524,8 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Bad Request Error: One of the below reasons: \n"
-                            + "- Request is malformed.\n"
-                            + "- Organisation id is missing.\n"
-                            + "- Organisation should have at least one address."
+                    message = DELETE_ORG_ADD_400_MESSAGE_1 + DELETE_ORG_ADD_400_MESSAGE_2
+                            + DELETE_ORG_ADD_400_MESSAGE_3 + DELETE_ORG_ADD_400_MESSAGE_4
             ),
             @ApiResponse(
                     code = 401,
@@ -527,12 +537,8 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "NOT FOUND Error: One of the below reasons: \n"
-                            + "- Organisation does not exist.\n"
-                            + "- Request is empty.\n"
-                            + "- id1, id2 does not exist\n"
-                            + "OR\n"
-                            + "id1, id2 does not belong to given org."
+                    message = DELETE_ORG_ADD_404_MESSAGE_1 + DELETE_ORG_ADD_404_MESSAGE_2 + DELETE_ORG_ADD_404_MESSAGE_3
+                    + DELETE_ORG_ADD_404_MESSAGE_4 + DELETE_ORG_ADD_404_MESSAGE_5 + DELETE_ORG_ADD_404_MESSAGE_6
             ),
             @ApiResponse(
                     code = 500,
