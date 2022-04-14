@@ -14,6 +14,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_4;
+
 @Repository
 public interface OrganisationRepository extends JpaRepository<Organisation, UUID> {
 
@@ -32,10 +37,6 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
 
-    @SuppressWarnings("java:S6126") //Supressing as Checkstyle breaks when using TextBlocks
-    @Query("select o from Organisation o join fetch payment_account p \n"
-            + "on p.organisationId = o.id \n"
-            + "where p.pbaStatus = :pbaStatus \n"
-            + "order by p.created asc")
+    @Query(FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2 + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4)
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
 }

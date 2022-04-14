@@ -120,5 +120,18 @@ public class ProfessionalApiConstants {
     public static final String DELETE_ORG_ADD_404_MESSAGE_5 = "OR\n";
     public static final String DELETE_ORG_ADD_404_MESSAGE_6 = "id1, id2 does not belong to given org.";
 
+    public static final String FIND_BY_PBA_STATUS_1 = "select o from Organisation o join fetch payment_account p \n";
+    public static final String FIND_BY_PBA_STATUS_2 = "on p.organisationId = o.id \n";
+    public static final String FIND_BY_PBA_STATUS_3 = "where p.pbaStatus = :pbaStatus \n";
+    public static final String FIND_BY_PBA_STATUS_4 = "order by p.created asc";
+
+    public static final String GET_USERS_BY_ORG_1 = "**IDAM Roles to access API** : \n pui-finance-manager,";
+    public static final String GET_USERS_BY_ORG_2 = "pui-user-manager,\n pui-organisation-manager,";
+    public static final String GET_USERS_BY_ORG_3 = "\n pui-case-manager,\n pui-caa";
+
+    public static final String GET_USER_STATUS_EMAIL_1 = "**IDAM Roles to access API** : \n pui-finance-manager";
+    public static final String GET_USER_STATUS_EMAIL_2 = ",\n pui-user-manager,\n pui-organisation-manager,";
+    public static final String GET_USER_STATUS_EMAIL_3 = "\n pui-case-manager,\n caseworker-publiclaw-courtadmin";
+
 
 }
