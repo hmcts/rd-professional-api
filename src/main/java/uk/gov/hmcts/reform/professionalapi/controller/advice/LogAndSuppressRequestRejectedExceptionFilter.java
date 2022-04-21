@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.INVALID_REQUEST;
 
-import com.microsoft.applicationinsights.core.dependencies.google.gson.Gson;
-
 import java.io.IOException;
 import java.sql.Timestamp;
 import javax.servlet.FilterChain;
@@ -13,6 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.launchdarkly.shaded.com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
