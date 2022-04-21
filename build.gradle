@@ -333,7 +333,6 @@ dependencies {
 
     implementation 'com.github.hmcts:service-auth-provider-java-client:4.0.3'
 
-    implementation group: 'org.jetbrains', name: 'annotations', version: '13.0'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.1'
     implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.2.20220324', ext: 'pom'
@@ -364,7 +363,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-alpha-3'
-
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
