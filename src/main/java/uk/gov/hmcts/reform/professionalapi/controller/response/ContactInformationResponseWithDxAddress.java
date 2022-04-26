@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static java.util.stream.Collectors.toList;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -31,7 +29,7 @@ public class ContactInformationResponseWithDxAddress extends ContactInformationR
         this.dxAddress = contactInfo.getDxAddresses()
                 .stream()
                 .map(DxAddressResponse::new)
-                .collect(toList());
+                .toList();
     }
 
 }
