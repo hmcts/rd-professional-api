@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
@@ -18,6 +17,6 @@ public class OrganisationsDetailResponse {
 
         this.organisations = organisations.stream().map(organisation ->
                 new OrganisationEntityResponse(organisation, isRequiredContactInfo,
-                        isRequiredPendingPbas, isRequiredAllPbas)).collect(Collectors.toList());
+                        isRequiredPendingPbas, isRequiredAllPbas)).toList();
     }
 }
