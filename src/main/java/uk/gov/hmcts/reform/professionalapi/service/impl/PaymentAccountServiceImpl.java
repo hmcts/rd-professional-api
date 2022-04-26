@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -136,10 +135,11 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         return new PbaResponse(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase());
     }
 
+
     public List<UserAccountMapId> generateListOfAccountsToDelete(ProfessionalUser user, List<PaymentAccount> accounts) {
         return accounts.stream().filter(account -> null != user && null != account)
                 .map(account -> new UserAccountMapId(user, account))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void removePaymentAccountAndUserAccountMaps(EntityManager em, List<UserAccountMapId> userAccountMaps) {
@@ -232,12 +232,12 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
             //get PBA Numbers from Payment Accounts
             List<String> pbaNumbersFromDb =
-                    pbasFromDb.stream().map(PaymentAccount::getPbaNumber).collect(Collectors.toList());
+                    pbasFromDb.stream().map(PaymentAccount::getPbaNumber).toList();
 
             //Get the PBA Numbers that are not present in DB
             List<String> pbasNotInDb =
                     pbasFromRequest.stream().filter(pba -> !pbaNumbersFromDb.contains(pba))
-                            .collect(Collectors.toList());
+                            .toList();
 
             //Generate invalid responses for PBAs not in DB
             pbasNotInDb.forEach(invalidPba -> invalidPbaResponses.add(
