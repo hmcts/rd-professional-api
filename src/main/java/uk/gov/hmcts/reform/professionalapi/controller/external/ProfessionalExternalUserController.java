@@ -3,6 +3,12 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_3;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
@@ -48,9 +54,7 @@ public class ProfessionalExternalUserController extends SuperController {
     @ApiOperation(
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
                     + " returnRoles is False",
-            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
-                    + "\n pui-organisation-manager,"
-                    + "\n pui-case-manager,\n pui-caa",
+            notes = GET_USERS_BY_ORG_1 + GET_USERS_BY_ORG_2 + GET_USERS_BY_ORG_3,
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -176,12 +180,9 @@ public class ProfessionalExternalUserController extends SuperController {
 
     }
 
-
     @ApiOperation(
             value = "Retrieves the Status of a User belonging to an Active Organisation with the given Email Address",
-            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
-                    + "\n pui-organisation-manager,"
-                    + "\n pui-case-manager,\n caseworker-publiclaw-courtadmin",
+            notes = GET_USER_STATUS_EMAIL_1 + GET_USER_STATUS_EMAIL_2 + GET_USER_STATUS_EMAIL_3,
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),
