@@ -7,7 +7,7 @@ import net.thucydides.core.annotations.WithTags;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.professionalapi.util.serenity5.SerenityTest;
+import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 @SerenityTest
 @SpringBootTest
