@@ -73,6 +73,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.UUID;
 
+import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -306,7 +307,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                     = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted()
-                    .collect(Collectors.toList()));
+                    .toList());
             updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
                     "false", activeOrganisationDtls);
@@ -348,7 +349,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                     = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
-                    .collect(Collectors.toList()));
+                    .toList());
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
                     "false", activeOrganisationDetails);
@@ -377,7 +378,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
 
-        if (isOrgApprovalRequest) {
+        if (TRUE.equals(isOrgApprovalRequest)) {
             organisation.setDateApproved(LocalDateTime.now());
         }
         var savedOrganisation = organisationRepository.save(organisation);
@@ -536,7 +537,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                                 .stream()
                                 .filter(paymentAccount ->
                                         paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
-                                .map(FetchPbaByStatusResponse::new).collect(Collectors.toList()),
+                                .map(FetchPbaByStatusResponse::new).toList(),
                         v.get(0).getName(),
                         v.get(0).getUsers().stream().findFirst().map(SuperUserResponse::new).orElse(null))));
 
@@ -648,7 +649,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         var sortedContactInfoByCreatedDate = organisation.getContactInformation()
                 .stream()
                 .sorted(Comparator.comparing(ContactInformation::getCreated))
-                .collect(Collectors.toList());
+                .toList();
 
         organisation.setContactInformations(sortedContactInfoByCreatedDate);
     }
