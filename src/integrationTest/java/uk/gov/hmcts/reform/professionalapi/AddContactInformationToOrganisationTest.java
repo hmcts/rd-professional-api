@@ -319,7 +319,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                         .postCode("some-post-code")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
                                 .dxNumber("DX 1234567890")
-                                .dxExchange("this is an invalid dxExchange").build()))
+                                .dxExchange("this is an invalid dxExchange this is an invalid dxExchange").build()))
                         .build(),
                 aContactInformationCreationRequest()
                         .uprn("uprn4")
@@ -332,7 +332,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                         .postCode("some-post-code")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
                                 .dxNumber("")
-                                .dxExchange("this is an invalid dxExchange").build()))
+                                .dxExchange("this is an invalid dxExchange this is an invalid dxExchange").build()))
                         .build(),
                 aContactInformationCreationRequest()
                         .uprn("uprn5")
