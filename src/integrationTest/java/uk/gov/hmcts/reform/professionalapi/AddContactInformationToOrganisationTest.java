@@ -368,7 +368,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
 
         assertThat(errorResponse.get(1).getErrorDescription()).contains("DX Number or DX Exchange cannot be empty");
         assertThat(errorResponse.get(2).getErrorDescription()).contains(
-                "DX Number (max=13) or DX Exchange (max=20) has invalid length");
+                "DX Number (max=13) or DX Exchange (max=40) has invalid length");
         assertThat(errorResponse.get(3).getErrorDescription()).contains("DX Number or DX Exchange cannot be empty");
         assertThat(errorResponse.get(4).getErrorDescription()).contains("DX Number or DX Exchange cannot be empty");
 
@@ -441,7 +441,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
                         addContactsToOrgresponse
                                 .get("response_body").toString());
         assertThat(errorResponse.get(0).getErrorDescription())
-                .contains("DX Number (max=13) or DX Exchange (max=20) has invalid length");
+                .contains("DX Number (max=13) or DX Exchange (max=40) has invalid length");
 
 
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("400");
