@@ -323,6 +323,11 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-web', version: '5.3.18'
     implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.18'
 
+    implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
+    implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
+    implementation "io.github.openfeign:feign-httpclient:11.0"
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
+
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
     implementation(group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
@@ -365,6 +370,8 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-alpha-3'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
+    implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
+    implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -395,7 +402,7 @@ dependencies {
         exclude group: "net.bytebuddy", module: "byte-buddy"
         exclude group: "net.bytebuddy", module: "byte-buddy-agent"
     }
-    testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.9'){
+    testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.13'){
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
     }
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.7'
