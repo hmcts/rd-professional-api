@@ -408,7 +408,8 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
-        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient.getInternalOpenIdToken(), email)
+        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
+            .getcwdAdminOpenIdToken("prd-admin"), email)
             .body("")
             .get("/refdata/internal/v1/organisations/pbas")
             .andReturn();
@@ -453,7 +454,8 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmailFromHeader(String email, String role) {
-        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient.getInternalOpenIdToken(), email)
+        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
+            .getcwdAdminOpenIdToken("prd-admin"), email)
                 .body("")
                 .get("/refdata/internal/v1/organisations/pbas")
                 .andReturn();
@@ -900,11 +902,11 @@ public class ProfessionalApiClient {
     }
 
     private RequestSpecification getMultipleAuthHeadersInternal() {
-        return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken());
+        return getMultipleAuthHeaders(idamOpenIdClient.getcwdAdminOpenIdToken("prd-admin"));
     }
 
     public RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
-        return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
+        return getMultipleAuthHeaders(idamOpenIdClient.getCwdSystemUserOpenIdToken(role));
     }
 
     public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName,
