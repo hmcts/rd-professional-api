@@ -214,24 +214,24 @@ class OrganisationCreationRequestValidatorTest {
         ContactInformationCreationRequest contactInfoCreateRequest
                 = new ContactInformationCreationRequest("A","A", "A", "A",
                 "A", "A", "A", "A", dxList);
-        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
-        contactList.add(contactInfoCreateRequest);
+        List<ContactInformationCreationRequest> contactListInvalidDxNumber = new ArrayList<>();
+        contactListInvalidDxNumber.add(contactInfoCreateRequest);
 
         assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.requestContactInformation(contactList));
+                organisationCreationRequestValidator.requestContactInformation(contactListInvalidDxNumber));
 
         DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest("DX 1234567890",
-                "DxExchangeDxExchange123");
+                "DxExchange1234567890DxExchange1234567890DxExchange");
         List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
         dxList1.add(dxRequest1);
         ContactInformationCreationRequest contactInfoCreateRequest1
                 = new ContactInformationCreationRequest("A","A", "A", "A",
                 "A", "A", "A", "A", dxList1);
-        List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
-        contactList1.add(contactInfoCreateRequest1);
+        List<ContactInformationCreationRequest> contactListInvalidDxExchange = new ArrayList<>();
+        contactListInvalidDxExchange.add(contactInfoCreateRequest1);
 
         assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.requestContactInformation(contactList1));
+                organisationCreationRequestValidator.requestContactInformation(contactListInvalidDxExchange));
     }
 
     @Test
