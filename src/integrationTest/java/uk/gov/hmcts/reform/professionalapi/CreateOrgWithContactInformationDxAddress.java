@@ -99,7 +99,22 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
     }
 
     @Test
-    void create_an_organisation_with_Dx_Exchange_more_than_20_throws_400() {
+    void create_an_organisation_with_Dx_Exchange_more_than_40_throws_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX123456789")
+                                .dxExchange("dxExchange12345678901dxExchange12345678901").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    void create_an_organisation_with_Dx_Exchange_more_than_20_gives_201() {
 
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
@@ -110,7 +125,7 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
     }
 
     @Test
