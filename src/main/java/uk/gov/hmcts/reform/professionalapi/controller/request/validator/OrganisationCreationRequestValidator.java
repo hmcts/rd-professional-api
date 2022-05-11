@@ -248,8 +248,8 @@ public class OrganisationCreationRequestValidator {
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
         if (StringUtils.isBlank(dxAddress.getDxNumber()) || StringUtils.isBlank(dxAddress.getDxExchange())) {
             throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
-        } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 21) {
-            throw new InvalidRequest("DX Number (max=13) or DX Exchange (max=20) has invalid length");
+        } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 41) {
+            throw new InvalidRequest("DX Number (max=13) or DX Exchange (max=40) has invalid length");
         } else if (!dxAddress.getDxNumber().matches("^[a-zA-Z0-9 ]*$")) {
             throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain "
                     .concat("numbers, letters and spaces"));
