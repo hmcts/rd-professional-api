@@ -147,8 +147,8 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
 
-        when(professionalUserRepositoryMock.findByOrganisation(organisation))
-                .thenReturn(Arrays.asList(professionalUser));
+        when(professionalUserRepositoryMock.findByOrganisationAndUserIdentifier(organisation, anyString()))
+                .thenReturn(professionalUser);
 
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();

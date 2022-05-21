@@ -61,6 +61,7 @@ class ProfessionalExternalUserControllerTest {
     private UserProfileFeignClient userProfileFeignClient;
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
+    private final String userIdentifier = "1234567";
 
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
@@ -109,7 +110,7 @@ class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities,
                 TestConstants.PUI_USER_MANAGER)).thenReturn(true);
@@ -122,8 +123,8 @@ class ProfessionalExternalUserControllerTest {
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation
-                        .getOrganisationIdentifier(), "true", "", true, null, null,
-                null);
+                        .getOrganisationIdentifier(), "true", "", true, null,
+                null, userIdentifier, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
@@ -131,7 +132,7 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true, "");
     }
 
     @Test
@@ -155,7 +156,7 @@ class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER))
                 .thenReturn(true);
@@ -168,14 +169,14 @@ class ProfessionalExternalUserControllerTest {
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
-                        true, null, null, null);
+                        true, null, null, userIdentifier,null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true,
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true,
                         "");
     }
 
@@ -206,7 +207,7 @@ class ProfessionalExternalUserControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         lenient().when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
-                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
+                anyString(), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(professionalUsersEntityResponse);
 
@@ -218,7 +219,7 @@ class ProfessionalExternalUserControllerTest {
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
-                        false, null, null, null);
+                        false, null, null, userIdentifier, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -229,10 +230,11 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", false, "Active");
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true",
+                        false, "Active");
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class),
-                        any(String.class));
+                .findProfessionalUsersByOrganisation(any(Organisation.class), anyString(), any(String.class),
+                        any(Boolean.class), any(String.class));
         verify(responseEntity, times(1)).getStatusCode();
         verify(responseEntity, times(1)).getBody();
     }

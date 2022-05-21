@@ -13,7 +13,6 @@ import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -30,6 +29,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
+
+    private final String userIdentifier = "1234567";
 
     @Test
     void persists_and_returns_valid_minimal_organisation() {
@@ -68,11 +69,12 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
         PrdEnum prdEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "BULKSCAN");
         UserAttribute jurisAttribute1 = new UserAttribute(persistedSuperUser, prdEnum1);
         UserAttribute jurisAttribute2 = new UserAttribute(persistedSuperUser, prdEnum1);
-        List<ProfessionalUser> professionalUser = professionalUserRepository.findByOrganisation(persistedOrganisation);
-        assertThat(professionalUser.get(0).getUserAttributes().get(4).getPrdEnum().getEnumName())
+        ProfessionalUser professionalUser = professionalUserRepository.findByOrganisationAndUserIdentifier(
+                persistedOrganisation, userIdentifier);
+        assertThat(professionalUser.getUserAttributes().get(4).getPrdEnum().getEnumName())
                 .isEqualTo("organisation-admin");
-        assertThat(professionalUser.get(0).getUserAttributes().contains(jurisAttribute1));
-        assertThat(professionalUser.get(0).getUserAttributes().contains(jurisAttribute2));
+        assertThat(professionalUser.getUserAttributes().contains(jurisAttribute1));
+        assertThat(professionalUser.getUserAttributes().contains(jurisAttribute2));
 
 
     }

@@ -155,6 +155,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
     public static final String APPLICATION_JSON = "application/json";
+    private final String userIdentifier = "1234567";
 
     @MockBean
     protected FeatureToggleServiceImpl featureToggleService;
@@ -362,8 +363,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public String retrieveSuperUserIdFromOrganisationId(String orgId) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-        return users.get(0).getId().toString();
+        ProfessionalUser user = professionalUserRepository.findByOrganisationAndUserIdentifier(organisation,
+                userIdentifier);
+        return user.getId().toString();
     }
 
     public void userProfileCreateUserWireMock(HttpStatus status) {

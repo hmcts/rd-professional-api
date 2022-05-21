@@ -111,6 +111,7 @@ public class ProfessionalExternalUserController extends SuperController {
                     required = false, defaultValue = "true") Boolean returnRoles,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
+            @RequestParam(value = "userIdentifier") String userIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
 
@@ -122,7 +123,7 @@ public class ProfessionalExternalUserController extends SuperController {
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
+        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
                 page, size);
     }
 
