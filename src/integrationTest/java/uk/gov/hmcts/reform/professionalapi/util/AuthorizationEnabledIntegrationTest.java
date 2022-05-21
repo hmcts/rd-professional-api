@@ -362,8 +362,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public String retrieveSuperUserIdFromOrganisationId(String orgId) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-        return users.get(0).getId().toString();
+        ProfessionalUser user = professionalUserRepository.findByOrganisationAndUserIdentifier(
+                organisation,USER_IDENTIFIER);
+        return user.getId().toString();
     }
 
     public void userProfileCreateUserWireMock(HttpStatus status) {

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -98,7 +99,8 @@ public class OrganisationCreationRequestValidator {
         List<ContactInformationValidationResponse> result = null;
         if (contactInfoValidations != null && !contactInfoValidations.isEmpty()) {
             result = contactInfoValidations.stream()
-                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress()).toList();
+                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress())
+                    .collect(Collectors.toList());
         }
         if (result != null && !result.isEmpty()) {
             throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);

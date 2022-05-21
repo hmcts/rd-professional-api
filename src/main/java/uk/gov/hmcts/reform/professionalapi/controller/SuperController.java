@@ -299,8 +299,8 @@ public abstract class SuperController {
         }
 
         var organisationMinimalInfoResponses =
-                organisations.stream()
-                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address)).toList();
+                organisations.stream().map(organisation -> new OrganisationMinimalInfoResponse(organisation, address))
+                        .collect(Collectors.toList());
 
         return ResponseEntity.status(200).body(organisationMinimalInfoResponses);
     }
@@ -386,9 +386,9 @@ public abstract class SuperController {
 
     }
 
-    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted,
-                                                               Boolean returnRoles, String status, Integer page,
-                                                               Integer size) {
+    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String userIdentifier,
+                                                               String showDeleted, Boolean returnRoles, String status,
+                                                               Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -406,7 +406,7 @@ public abstract class SuperController {
                             status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
-                    showDeleted, returnRoles, status);
+                    userIdentifier, showDeleted, returnRoles, status);
         }
         return responseEntity;
     }

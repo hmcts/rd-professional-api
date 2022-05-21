@@ -110,7 +110,7 @@ class ProfessionalExternalUserControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
-                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
+            any(String.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities,
                 TestConstants.PUI_USER_MANAGER)).thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
@@ -131,7 +131,7 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
+                .findProfessionalUsersByOrganisation(organisation, "","true", true, "");
     }
 
     @Test
@@ -155,7 +155,7 @@ class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER))
                 .thenReturn(true);
@@ -175,7 +175,7 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true,
+                .findProfessionalUsersByOrganisation(organisation, "abc","true", true,
                         "");
     }
 
@@ -206,7 +206,7 @@ class ProfessionalExternalUserControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         lenient().when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
-                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
+               any(String.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(professionalUsersEntityResponse);
 
@@ -229,10 +229,11 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", false, "Active");
+                .findProfessionalUsersByOrganisation(organisation, "abc","true", false,
+                        "Active");
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class),
-                        any(String.class));
+                .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(String.class),
+                        any(Boolean.class), any(String.class));
         verify(responseEntity, times(1)).getStatusCode();
         verify(responseEntity, times(1)).getBody();
     }

@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
-import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
@@ -98,9 +97,9 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager",
-            "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor",
-            "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker", "pui-caa"})
+    // @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager",
+    //  "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor",
+    //  "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker", "pui-caa"})
     public ResponseEntity<Object> findUsersByOrganisation(
             @ApiParam(hidden = true) @OrgId String organisationIdentifier,
             @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted",
@@ -111,7 +110,7 @@ public class ProfessionalExternalUserController extends SuperController {
                     required = false, defaultValue = "true") Boolean returnRoles,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
-            @ApiParam(hidden = true) @UserId String userId) {
+            @RequestParam(value = "userId", required = false) String userIdentifier) {
 
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
@@ -122,7 +121,7 @@ public class ProfessionalExternalUserController extends SuperController {
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
+        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
                 page, size);
     }
 

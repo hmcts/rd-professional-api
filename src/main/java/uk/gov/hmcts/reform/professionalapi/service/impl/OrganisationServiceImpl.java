@@ -307,7 +307,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                     = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted()
-                    .toList());
+                    .collect(Collectors.toList()));
             updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
                     "false", activeOrganisationDtls);
@@ -349,7 +349,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                     = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
-                    .toList());
+                    .collect(Collectors.toList()));
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
                     "false", activeOrganisationDetails);
@@ -537,7 +537,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                                 .stream()
                                 .filter(paymentAccount ->
                                         paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
-                                .map(FetchPbaByStatusResponse::new).toList(),
+                                .map(FetchPbaByStatusResponse::new).collect(Collectors.toList()),
                         v.get(0).getName(),
                         v.get(0).getUsers().stream().findFirst().map(SuperUserResponse::new).orElse(null))));
 
@@ -649,7 +649,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         var sortedContactInfoByCreatedDate = organisation.getContactInformation()
                 .stream()
                 .sorted(Comparator.comparing(ContactInformation::getCreated))
-                .toList();
+                .collect(Collectors.toList());
 
         organisation.setContactInformations(sortedContactInfoByCreatedDate);
     }

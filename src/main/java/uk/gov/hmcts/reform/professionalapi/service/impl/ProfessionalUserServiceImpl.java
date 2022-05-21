@@ -119,16 +119,17 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted,
-                                                                      boolean rolesRequired, String status) {
-        var professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String userIdentifier,
+                                                           String showDeleted, boolean rolesRequired, String status) {
+        var professionalUser = professionalUserRepository.findByOrganisationAndUserIdentifier(
+                organisation,userIdentifier);
 
-        if (professionalUsers.isEmpty()) {
-            throw new ResourceNotFoundException("No Users were found for the given organisation");
+        if (professionalUser == null) {
+            throw new ResourceNotFoundException("No Users were found for the given userIdentifier");
         }
 
-        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired,
-                status, organisation.getOrganisationIdentifier());
+        return retrieveUserProfiles(new RetrieveUserProfilesRequest(List.of(professionalUser.getUserIdentifier())),
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
     }
 
     @SuppressWarnings("unchecked")

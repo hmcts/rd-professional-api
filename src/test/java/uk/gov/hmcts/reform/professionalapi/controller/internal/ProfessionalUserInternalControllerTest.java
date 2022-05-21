@@ -108,8 +108,8 @@ class ProfessionalUserInternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         when(professionalUserServiceMock
-                .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class),
-                        any(String.class))).thenReturn(responseEntityMock);
+                .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(String.class),
+                        any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
                 .thenReturn(new UserInfo("", "", "", "", "", userRoles));
@@ -120,7 +120,7 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actual = professionalUserInternalController
                 .findUsersByOrganisation(organisation
-                        .getOrganisationIdentifier(), "true", true, null, null);
+                        .getOrganisationIdentifier(), "","true", true, null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -128,7 +128,7 @@ class ProfessionalUserInternalControllerTest {
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(any(Organisation.class),
-                        any(String.class), any(Boolean.class), any(String.class));
+                        any(String.class), any(String.class), any(Boolean.class), any(String.class));
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
     }
@@ -148,7 +148,7 @@ class ProfessionalUserInternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
-                any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
+                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
                 .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
@@ -158,15 +158,16 @@ class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", true,
-                        null, null);
+                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "abc","true",
+                        true, null, null);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
+                .findProfessionalUsersByOrganisation(organisation, "abc","true", true,
+                        "");
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
     }
@@ -185,7 +186,7 @@ class ProfessionalUserInternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
-                any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
+               any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
                 .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
@@ -195,15 +196,16 @@ class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", true,
-                        null, null);
+                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "abc","true",
+                        true, null, null);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
+                .findProfessionalUsersByOrganisation(organisation, "abc", "true", true,
+                        "");
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
     }
