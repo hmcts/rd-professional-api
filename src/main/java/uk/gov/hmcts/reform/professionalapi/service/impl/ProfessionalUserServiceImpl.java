@@ -121,14 +121,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String userIdentifier,
                                                             String showDeleted, boolean rolesRequired, String status) {
-        var professionalUser = professionalUserRepository.findByOrganisationAndUserIdentifier(
-                organisation, userIdentifier);
+        var professionalUsers = userIdentifier != null
+                ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userIdentifier)
+                : professionalUserRepository.findByOrganisation(organisation);
 
-        if (professionalUser == null) {
-            throw new ResourceNotFoundException("No User is found with the given userIdentifier");
+        if (professionalUsers.isEmpty()) {
+            throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
-
-        return retrieveUserProfiles(new RetrieveUserProfilesRequest(List.of(professionalUser.getUserIdentifier())),
+        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
                 showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
     }
 

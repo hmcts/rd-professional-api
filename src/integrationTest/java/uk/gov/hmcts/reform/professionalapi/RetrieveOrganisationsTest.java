@@ -552,9 +552,8 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
                 inviteUserCreationRequest("some@email2.com", user2Roles), hmctsAdmin, userIdentifier);
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-        ProfessionalUser persistedUser = professionalUserRepository.findByOrganisationAndUserIdentifier(
-                persistedOrganisation, userIdentifier);
-        assertThat(persistedUser).isNotNull();
+        List<ProfessionalUser> persistedUsers = professionalUserRepository.findByOrganisation(persistedOrganisation);
+        assertThat(persistedUsers.size()).isEqualTo(3);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);

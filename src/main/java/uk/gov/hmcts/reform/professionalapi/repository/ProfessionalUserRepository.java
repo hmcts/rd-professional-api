@@ -22,7 +22,9 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     Page<ProfessionalUser> findByOrganisation(Organisation organisation, Pageable pageable);
 
-    ProfessionalUser findByOrganisationAndUserIdentifier(Organisation organisation, String userIdentifier);
+    List<ProfessionalUser> findByOrganisation(Organisation organisation);
+
+    List<ProfessionalUser> findByOrganisationAndUserIdentifier(Organisation organisation, String userIdentifier);
 
     ProfessionalUser findByUserIdentifier(String userIdentifier);
 
