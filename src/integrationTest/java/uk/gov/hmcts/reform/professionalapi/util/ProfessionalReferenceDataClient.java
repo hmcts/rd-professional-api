@@ -145,6 +145,12 @@ public class ProfessionalReferenceDataClient {
                 role, showDeleted);
     }
 
+    public Map<String, Object> findUsersByOrganisationAndUserIdentifier(String organisationIdentifier, String role,
+                                                                        String userIdentifier) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier
+                        + "/users?userIdentifier={userIdentifier}", role, userIdentifier);
+    }
+
     // Override the method to support return roles param
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role,
                                                        String returnRoles) {

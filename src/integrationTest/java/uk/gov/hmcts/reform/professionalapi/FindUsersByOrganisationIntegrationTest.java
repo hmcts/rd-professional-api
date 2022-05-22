@@ -192,6 +192,33 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
     }
 
     @Test
+    void retrieve_all_users_for_an_organisation_with_userIdentifier() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        NewUserCreationRequest userCreationRequest = inviteUserCreationRequest(randomAlphabetic(5)
+                + "@email.com", userRoles);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, userCreationRequest,
+                hmctsAdmin, userIdentifier);
+        NewUserCreationRequest userCreationRequest1 = inviteUserCreationRequest(randomAlphabetic(6)
+                + "@email.com", userRoles);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> profUser = professionalReferenceDataClient.addUserToOrganisationWithUserId(
+                organisationIdentifier, userCreationRequest1, hmctsAdmin, userIdentifier);
+
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationAndUserIdentifier(
+                organisationIdentifier, hmctsAdmin, profUser.get("userIdentifier").toString());
+
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
+
+    }
+
+    @Test
     void ac1_find_all_active_users_without_roles_for_an_organisation_should_return_200() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles(
