@@ -123,9 +123,8 @@ public class ProfessionalExternalUserController extends SuperController {
             status = isBlank(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
-
-        profExtUsrReqValidator.validateUuid(userIdentifier);
         if (userIdentifier != null) {
+            profExtUsrReqValidator.validateUuid(userIdentifier);
             ProfessionalUser fetchingUser = professionalUserService.findProfessionalUserByUserIdentifier(
                     userIdentifier);
             profExtUsrReqValidator.validateOrganisationMatch(organisationIdentifier, fetchingUser);
