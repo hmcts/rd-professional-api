@@ -61,7 +61,7 @@ class ProfessionalExternalUserControllerTest {
     private UserProfileFeignClient userProfileFeignClient;
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
-    private final String userIdentifier = "1234567";
+    private final String userIdentifier = UUID.randomUUID().toString();
 
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
@@ -115,6 +115,8 @@ class ProfessionalExternalUserControllerTest {
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities,
                 TestConstants.PUI_USER_MANAGER)).thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(professionalUserServiceMock.findProfessionalUserById(any(UUID.class)))
+                .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
@@ -161,6 +163,8 @@ class ProfessionalExternalUserControllerTest {
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER))
                 .thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(professionalUserServiceMock.findProfessionalUserById(any(UUID.class)))
+                .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
@@ -210,6 +214,8 @@ class ProfessionalExternalUserControllerTest {
                 anyString(), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(professionalUsersEntityResponse);
+        when(professionalUserServiceMock.findProfessionalUserById(any(UUID.class)))
+                .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
@@ -238,6 +244,35 @@ class ProfessionalExternalUserControllerTest {
         verify(responseEntity, times(1)).getStatusCode();
         verify(responseEntity, times(1)).getBody();
     }
+
+    @Test
+    void testFindUsersByOrganisationWithUserHaveDifferentOrganisation() throws Exception {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
+                "emailAddress", organisation);
+
+        List<SuperUser> users = new ArrayList<>();
+        users.add(professionalUser.toSuperUser());
+        organisation.setUsers(users);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        List<String> authorities = new ArrayList<>();
+        authorities.add(TestConstants.PUI_CASE_MANAGER);
+
+        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(userInfoMock.getRoles()).thenReturn(authorities);
+
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
+                any(String.class));
+
+        assertThrows(InvalidRequest.class, () ->  professionalExternalUserController
+                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
+                        false, null, null, "123456", null));
+    }
+
+
 
     @Test
     void test_FindUserStatusByEmail() throws JsonProcessingException {
