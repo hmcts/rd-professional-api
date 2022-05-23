@@ -48,7 +48,7 @@ public class ProfessionalUserReqValidator {
         }
     }
 
-    public static boolean validateUuid(String inputString) {
+    public boolean validateUuid(String inputString) {
         if (inputString != null && !inputString.isEmpty() && !Pattern.matches(UUID_PATTERN, inputString)) {
             throw new InvalidRequest(
                     String.format(

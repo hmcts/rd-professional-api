@@ -261,14 +261,14 @@ class ProfessionalExternalUserControllerTest {
 
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
-
+        when(profExtUsrReqValidator.validateUuid(anyString())).thenThrow(new InvalidRequest(""));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
-
+        String orgId = organisation.getOrganisationIdentifier();
         assertThrows(InvalidRequest.class, () ->  professionalExternalUserController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
+                .findUsersByOrganisation(orgId, "true", "",
                         false, null, null, "123456", null));
     }
 
