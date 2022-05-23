@@ -493,6 +493,30 @@ class ProfessionalUserServiceImplTest {
     }
 
     @Test
+    void test_shouldReturnProfessionalUserByUserIdentifier() {
+        String id = UUID.randomUUID().toString();
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+
+        when(professionalUserRepository.findByUserIdentifier(id)).thenReturn(professionalUserMock);
+
+        ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserByUserIdentifier(id);
+        assertThat(professionalUserResponse).isNotNull();
+
+        verify(professionalUserRepository, times(1)).findByUserIdentifier(id);
+    }
+
+    @Test
+    void test_shouldReturnProfessionalUserByUserIdentifierShouldReturnNullIfUserNotFound() {
+        String id = UUID.randomUUID().toString();
+        when(professionalUserRepository.findByUserIdentifier(id)).thenReturn(null);
+
+        ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserByUserIdentifier(id);
+        assertThat(professionalUserResponse).isNull();
+
+        verify(professionalUserRepository, times(1)).findByUserIdentifier(id);
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void test_shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
         Pageable pageableMock = mock(Pageable.class);

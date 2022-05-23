@@ -102,6 +102,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
+    public ProfessionalUser findProfessionalUserByUserIdentifier(String id) {
+        return professionalUserRepository.findByUserIdentifier(id);
+    }
+
+    @Override
     public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation,
                                                                                   String showDeleted,
                                                                                   boolean rolesRequired,

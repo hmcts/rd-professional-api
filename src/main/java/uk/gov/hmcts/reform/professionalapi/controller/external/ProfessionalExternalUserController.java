@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_MISMATCH;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_1;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_3;
@@ -20,13 +19,11 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @RequestMapping(
@@ -129,12 +126,9 @@ public class ProfessionalExternalUserController extends SuperController {
 
         profExtUsrReqValidator.validateUuid(userIdentifier);
         if (userIdentifier != null) {
-            Organisation fetchingUserOrg = professionalUserService.findProfessionalUserById(
-                    UUID.fromString(userIdentifier)).getOrganisation();
-            if (fetchingUserOrg == null
-                    || !organisationIdentifier.trim().equals(fetchingUserOrg.getOrganisationIdentifier())) {
-                throw new AccessDeniedException(ORGANISATION_MISMATCH);
-            }
+            ProfessionalUser fetchingUser = professionalUserService.findProfessionalUserByUserIdentifier(
+                    userIdentifier);
+            profExtUsrReqValidator.validateOrganisationMatch(organisationIdentifier, fetchingUser);
         }
 
         return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,

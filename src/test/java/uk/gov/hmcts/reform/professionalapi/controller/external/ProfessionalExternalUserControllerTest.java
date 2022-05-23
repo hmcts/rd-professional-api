@@ -115,7 +115,7 @@ class ProfessionalExternalUserControllerTest {
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities,
                 TestConstants.PUI_USER_MANAGER)).thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(professionalUserServiceMock.findProfessionalUserById(any(UUID.class)))
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(String.class)))
                 .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
@@ -163,7 +163,7 @@ class ProfessionalExternalUserControllerTest {
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER))
                 .thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(professionalUserServiceMock.findProfessionalUserById(any(UUID.class)))
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(String.class)))
                 .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
@@ -214,7 +214,7 @@ class ProfessionalExternalUserControllerTest {
                 anyString(), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(professionalUsersEntityResponse);
-        when(professionalUserServiceMock.findProfessionalUserById(any(UUID.class)))
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(anyString()))
                 .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
