@@ -11,7 +11,7 @@ import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.professionalapi.exception.UnauthorizedException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.UnauthorizedException;
 
 import static java.util.Objects.requireNonNull;
 

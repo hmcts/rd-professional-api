@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
-import uk.gov.hmcts.reform.professionalapi.exception.UnauthorizedException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.UnauthorizedException;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;

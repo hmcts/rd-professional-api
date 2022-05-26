@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.professionalapi.exception.UnauthorizedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

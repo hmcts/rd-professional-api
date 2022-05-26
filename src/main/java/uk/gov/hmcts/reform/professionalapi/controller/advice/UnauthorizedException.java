@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.exception;
+package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
