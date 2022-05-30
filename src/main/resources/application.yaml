@@ -30,7 +30,7 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
+            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.axyzat.platform.hmcts.net/o}
         registration:
           oidc:
             client-id: microservicekey-rd-professional-api
