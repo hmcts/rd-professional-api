@@ -16,7 +16,7 @@ public class ProfessionalUsersEntityResponse {
     private String organisationIdentifier;
     private List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
     
-    @JsonGetter("users")
+    @JsonGetter("userProfiles")
     public List<ProfessionalUsersResponse> getUserProfiles() {
         return userProfiles;
     }
