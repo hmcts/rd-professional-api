@@ -16,12 +16,12 @@ public class ProfessionalUsersEntityResponse {
     private String organisationIdentifier;
     private List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
     
-    @JsonGetter("userProfiles")
+    @JsonGetter("users")
     public List<ProfessionalUsersResponse> getUserProfiles() {
         return userProfiles;
     }
     
-    @JsonSetter("userProfiles")
+    @JsonSetter("users")
     public void setUserProfiles(List<ProfessionalUsersResponse> userProfiles) {
         this.userProfiles = userProfiles;
     }
