@@ -409,7 +409,8 @@ dependencies {
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.7'
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.7'
 
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.3.1'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.4.0'
+
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
