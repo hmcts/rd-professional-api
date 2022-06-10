@@ -106,7 +106,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(PROFESSIONAL_USER_ID);
         userProfiles.add(userProfileResponse);
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);

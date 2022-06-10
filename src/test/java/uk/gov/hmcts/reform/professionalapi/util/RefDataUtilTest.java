@@ -254,7 +254,7 @@ class RefDataUtilTest {
                 professionalUsersResponse2);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -331,7 +331,7 @@ class RefDataUtilTest {
                 professionalUsersResponse2);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -347,7 +347,7 @@ class RefDataUtilTest {
     void test_filterUsersByStatusWhereNoUsersFoundThrowsResourceNotFoundException() {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -504,7 +504,7 @@ class RefDataUtilTest {
         List<ProfessionalUsersResponse> userProfiles = asList(professionalUsersResponse, professionalUsersResponse1,
                 professionalUsersResponse2);
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
 
@@ -538,7 +538,7 @@ class RefDataUtilTest {
         List<ProfessionalUsersResponse> userProfiles = asList(professionalUsersResponse, professionalUsersResponse1,
                 professionalUsersResponse2);
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -879,7 +879,7 @@ class RefDataUtilTest {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
         professionalUsersResponses.add(professionalUsersResponse);
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(professionalUsersResponses);
+        professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
         ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity,
                 "ABCD123");

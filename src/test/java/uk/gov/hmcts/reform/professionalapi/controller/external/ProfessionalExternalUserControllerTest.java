@@ -201,7 +201,7 @@ class ProfessionalExternalUserControllerTest {
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         userProfiles.add(new ProfessionalUsersResponse(professionalUser));
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);

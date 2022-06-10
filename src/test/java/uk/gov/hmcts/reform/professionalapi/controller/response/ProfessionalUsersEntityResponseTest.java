@@ -31,7 +31,7 @@ class ProfessionalUsersEntityResponseTest {
         professionalUsers.add(professionalResponse);
 
         sut = new ProfessionalUsersEntityResponse();
-        sut.setUsers(professionalUsers);
+        sut.setUserProfiles(professionalUsers);
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
         List<ProfessionalUsersResponse> usersExpected = new ArrayList<>();

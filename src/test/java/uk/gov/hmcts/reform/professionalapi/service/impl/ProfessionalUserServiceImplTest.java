@@ -133,7 +133,7 @@ class ProfessionalUserServiceImplTest {
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(professionalUser.getUserIdentifier());
         userProfiles.add(userProfileResponse);
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
@@ -175,7 +175,7 @@ class ProfessionalUserServiceImplTest {
         userProfiles.add(professionalUsersResponse2);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -440,7 +440,7 @@ class ProfessionalUserServiceImplTest {
         userProfiles.add(professionalUsersResponse);
         userProfiles.add(professionalUsersResponse1);
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -518,7 +518,7 @@ class ProfessionalUserServiceImplTest {
         userProfiles.add(professionalUsersResponse2);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUsers(userProfiles);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
