@@ -38,7 +38,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @JsonProperty
     private List<String> paymentAccount;
     @JsonProperty
-    private List<String> pendingPaymentAccount = new ArrayList<String>();
+    private List<String> pendingPaymentAccount = new ArrayList<>();
     @JsonProperty
     @DateTimeFormat
     private LocalDateTime dateReceived;
@@ -80,13 +80,13 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
             this.paymentAccount = organisation.getPaymentAccounts()
                     .stream()
                     .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
-                    .collect(toList());
+                    .toList();
         } else {
             this.paymentAccount = organisation.getPaymentAccounts()
                     .stream()
                     .filter(pba -> pba.getPbaStatus().equals(ACCEPTED))
                     .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
-                    .collect(toList());
+                    .toList();
         }
 
         if (Boolean.TRUE.equals(isRequiredPendingPbas)) {
@@ -94,7 +94,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
                     .stream()
                     .filter(pba -> pba.getPbaStatus().equals(PENDING))
                     .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
-                    .collect(toList());
+                    .toList();
         }
 
         if (Boolean.TRUE.equals(isRequiredContactInfo)) {
