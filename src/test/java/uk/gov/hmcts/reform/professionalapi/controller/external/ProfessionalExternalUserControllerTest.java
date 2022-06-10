@@ -201,7 +201,7 @@ class ProfessionalExternalUserControllerTest {
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         userProfiles.add(new ProfessionalUsersResponse(professionalUser));
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+        professionalUsersEntityResponse.setUsers(userProfiles);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
@@ -223,7 +223,7 @@ class ProfessionalExternalUserControllerTest {
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         List<ProfessionalUsersResponse> usersResponse = ((ProfessionalUsersEntityResponse) actual.getBody())
-                .getUserProfiles();
+                .getUsers();
         assertThat(usersResponse.get(0).getRoles()).isNull();
 
         verify(organisationServiceMock, times(1))

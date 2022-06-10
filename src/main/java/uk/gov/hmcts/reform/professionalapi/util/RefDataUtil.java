@@ -171,9 +171,9 @@ public class RefDataUtil {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse
                 = (ProfessionalUsersEntityResponse) responseEntity.getBody();
         if (null != professionalUsersEntityResponse
-                && !CollectionUtils.isEmpty(professionalUsersEntityResponse.getUserProfiles())) {
+                && !CollectionUtils.isEmpty(professionalUsersEntityResponse.getUsers())) {
 
-            List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUserProfiles();
+            List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUsers();
             userProfiles.forEach(userProfile -> {
 
                 if (null != activeOrganisationDtls.get(userProfile.getUserIdentifier())) {
@@ -261,13 +261,13 @@ public class RefDataUtil {
     public static ProfessionalUsersEntityResponse filterUsersByStatusWithRoles(
             ProfessionalUsersEntityResponse professionalUsersEntityResponse, String status) {
         List<ProfessionalUsersResponse> filteredUsers = professionalUsersEntityResponse
-                .getUserProfiles().stream()
+                .getUsers().stream()
                 .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
                 .collect(Collectors.toList());
 
         checkListIsEmpty(filteredUsers, status);
 
-        professionalUsersEntityResponse.setUserProfiles(filteredUsers);
+        professionalUsersEntityResponse.setUsers(filteredUsers);
         return professionalUsersEntityResponse;
     }
 

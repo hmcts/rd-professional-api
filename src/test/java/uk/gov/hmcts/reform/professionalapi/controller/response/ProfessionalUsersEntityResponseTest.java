@@ -31,15 +31,15 @@ class ProfessionalUsersEntityResponseTest {
         professionalUsers.add(professionalResponse);
 
         sut = new ProfessionalUsersEntityResponse();
-        sut.setUserProfiles(professionalUsers);
+        sut.setUsers(professionalUsers);
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
         List<ProfessionalUsersResponse> usersExpected = new ArrayList<>();
         usersExpected.add(professionalUsersResponse);
 
-        assertThat(sut.getUserProfiles().get(0).getUserIdentifier()).isEqualTo(professionalUser.getUserIdentifier());
-        assertThat(sut.getUserProfiles().get(0).getFirstName()).isEqualTo(professionalUser.getFirstName());
-        assertThat(sut.getUserProfiles().get(0).getLastName()).isEqualTo(professionalUser.getLastName());
-        assertThat(sut.getUserProfiles().get(0).getEmail()).isEqualTo(professionalUser.getEmailAddress());
+        assertThat(sut.getUsers().get(0).getUserIdentifier()).isEqualTo(professionalUser.getUserIdentifier());
+        assertThat(sut.getUsers().get(0).getFirstName()).isEqualTo(professionalUser.getFirstName());
+        assertThat(sut.getUsers().get(0).getLastName()).isEqualTo(professionalUser.getLastName());
+        assertThat(sut.getUsers().get(0).getEmail()).isEqualTo(professionalUser.getEmailAddress());
     }
 }

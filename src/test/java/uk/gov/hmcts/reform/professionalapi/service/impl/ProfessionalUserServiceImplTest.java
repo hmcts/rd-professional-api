@@ -133,7 +133,7 @@ class ProfessionalUserServiceImplTest {
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(professionalUser.getUserIdentifier());
         userProfiles.add(userProfileResponse);
-        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+        professionalUsersEntityResponse.setUsers(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
@@ -175,7 +175,7 @@ class ProfessionalUserServiceImplTest {
         userProfiles.add(professionalUsersResponse2);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+        professionalUsersEntityResponse.setUsers(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -207,8 +207,8 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         assertThat(professionalUsersEntityResponse1.getOrganisationIdentifier())
                 .isEqualTo(organisation.getOrganisationIdentifier());
-        assertThat(professionalUsersEntityResponse1.getUserProfiles()).hasSize(2);
-        professionalUsersEntityResponse1.getUserProfiles().forEach(userProfile -> {
+        assertThat(professionalUsersEntityResponse1.getUsers()).hasSize(2);
+        professionalUsersEntityResponse1.getUsers().forEach(userProfile -> {
             assertThat(userProfile.getIdamStatus()).isEqualToIgnoringCase("active");
         });
 
@@ -440,7 +440,7 @@ class ProfessionalUserServiceImplTest {
         userProfiles.add(professionalUsersResponse);
         userProfiles.add(professionalUsersResponse1);
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+        professionalUsersEntityResponse.setUsers(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -518,7 +518,7 @@ class ProfessionalUserServiceImplTest {
         userProfiles.add(professionalUsersResponse2);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+        professionalUsersEntityResponse.setUsers(userProfiles);
 
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
@@ -539,7 +539,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity).isNotNull();
 
         List<ProfessionalUsersResponse> usersResponse
-                = ((ProfessionalUsersEntityResponse)responseEntity.getBody()).getUserProfiles();
+                = ((ProfessionalUsersEntityResponse)responseEntity.getBody()).getUsers();
         assertThat(usersResponse.get(0).getRoles()).isNull();
         assertThat(usersResponse.get(1).getRoles()).isNull();
 
