@@ -267,7 +267,7 @@ public class RefDataUtil {
 
         checkListIsEmpty(filteredUsers, status);
 
-        professionalUsersEntityResponse.setUsers(filteredUsers);
+        professionalUsersEntityResponse.setUserProfiles(filteredUsers);
         return professionalUsersEntityResponse;
     }
 
