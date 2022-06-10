@@ -407,7 +407,7 @@ dependencies {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
     }
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.7'
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.7'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.10'
 
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.4.0'
 
