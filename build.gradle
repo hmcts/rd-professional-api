@@ -442,7 +442,7 @@ dependencies {
     testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
 
     testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.9'
-    testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '3.0.11'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '3.0.8'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '3.0.10'
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
