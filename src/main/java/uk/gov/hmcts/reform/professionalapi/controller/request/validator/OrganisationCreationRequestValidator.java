@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -99,8 +98,7 @@ public class OrganisationCreationRequestValidator {
         List<ContactInformationValidationResponse> result = null;
         if (contactInfoValidations != null && !contactInfoValidations.isEmpty()) {
             result = contactInfoValidations.stream()
-                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress())
-                    .collect(Collectors.toList());
+                    .filter(contactInfoValidation -> !contactInfoValidation.isValidAddress()).toList();
         }
         if (result != null && !result.isEmpty()) {
             throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);
@@ -244,14 +242,14 @@ public class OrganisationCreationRequestValidator {
     }
 
     public boolean isEmptyValue(String value) {
-        return  (value != null && value.trim().isEmpty()) ? true : false;
+        return value != null && value.trim().isEmpty();
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
         if (StringUtils.isBlank(dxAddress.getDxNumber()) || StringUtils.isBlank(dxAddress.getDxExchange())) {
             throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
-        } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 21) {
-            throw new InvalidRequest("DX Number (max=13) or DX Exchange (max=20) has invalid length");
+        } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 41) {
+            throw new InvalidRequest("DX Number (max=13) or DX Exchange (max=40) has invalid length");
         } else if (!dxAddress.getDxNumber().matches("^[a-zA-Z0-9 ]*$")) {
             throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain "
                     .concat("numbers, letters and spaces"));

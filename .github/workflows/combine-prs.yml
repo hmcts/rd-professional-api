@@ -1,0 +1,23 @@
+name: "Combine Renovate Pull Requests"
+
+on:
+  schedule:
+    - cron: '00 10 * * 1' # Runs at 10 AM every Monday
+
+  workflow_dispatch:
+
+jobs:
+  combine-prs:
+    name: "Combine Renovate Pull Requests"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: hmcts/am-github-actions/combine-prs@master
+        name: "Combine Renovate Pull Requests"
+        with:
+          branchPrefix: "renovate"
+          mustBeGreen: "true"
+          combineBranchName: "combine-prs-branch"
+          ignoreLabel: "nocombine"
+          combinePullRequestTitle: "Renovate Combined Pull Request"
+          closeCombinedPrs: "true"
+          githubToken: "${{ secrets.GITHUB_TOKEN }}"

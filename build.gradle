@@ -30,19 +30,18 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 def versions = [
-        lombok          : '1.18.20',
-        gradlePitest    : '1.5.1',
-        pitest          : '1.7.0',
+        lombok          : '1.18.22',
+        pitest          : '1.7.3',
         reformLogging   : '6.0.1',
         serenity        : '2.0.76',
-        sonarPitest     : '0.5',
         springBoot      : '2.6.6',
         springfoxSwagger: '2.9.2',
         pact_version    : '4.1.7',
-        launchDarklySdk : "5.2.2",
+        launchDarklySdk : "5.8.1",
         junit           : '5.8.1',
         junitPlatform   : '1.8.1',
-        log4j           : '2.17.1'
+        log4j           : '2.17.1',
+        springVersion   : '5.3.20'
 ]
 
 
@@ -52,8 +51,11 @@ def jarName = 'rd-professional-api.jar'
 group = 'uk.gov.hmcts.reform.refdata'
 version = '0.1.0'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 jacocoTestCoverageVerification {
     violationRules {
@@ -75,6 +77,10 @@ compileJava {
 compileTestJava {
 
     options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
+}
+
+tasks.withType(JavaExec).configureEach {
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
 tasks.withType(Test) {
@@ -236,15 +242,15 @@ pact {
 }
 
 jacoco {
-    toolVersion = "0.8.5"
+    toolVersion = "0.8.7"
 }
 
 jacocoTestReport {
     executionData(test, integration)
     reports {
-        xml.enabled = true
-        csv.enabled = false
-        xml.destination = file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+        xml.required = true
+        csv.required = false
+        xml.outputLocation = file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
 
@@ -302,26 +308,28 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.1'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.2'
-    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.18'
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
-    implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.18'
 
-    implementation group: 'org.springframework', name: 'spring-aop', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-aspects', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-context-support', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-expression', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-jcl', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-orm', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-web', version: '5.3.18'
-    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.18'
+    implementation group: 'org.springframework', name: 'spring-core', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-beans', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-aop', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-aspects', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-context', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-context-support', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-expression', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-jcl', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-orm', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-tx', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-web', version: versions.springVersion
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: versions.springVersion
 
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
+    implementation "io.github.openfeign:feign-httpclient:11.0"
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
+
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
     implementation(group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
         exclude group: "org.apache.sling"
@@ -330,9 +338,6 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
-    implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
-    implementation 'com.github.hmcts:properties-volume-spring-boot-starter:0.1.1'
     implementation 'com.github.hmcts:service-auth-provider-java-client:4.0.3'
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
@@ -345,7 +350,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
-    implementation "io.github.openfeign:feign-httpclient:11.0"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     //Fix for CVE-2021-29425
     implementation 'commons-io:commons-io:2.8.0'
@@ -360,13 +364,15 @@ dependencies {
     implementation group: "org.yaml", name: "snakeyaml", version: "1.27"
 
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-alpha-3'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
+    implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
+    implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -389,9 +395,21 @@ dependencies {
     testImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
     testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
 
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.3.1'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.3.3'
+    testImplementation ("org.mockito:mockito-core:4.3.1") {
+        exclude group: "net.bytebuddy", module: "byte-buddy"
+        exclude group: "net.bytebuddy", module: "byte-buddy-agent"
+    }
+    testImplementation ("org.mockito:mockito-inline:4.3.1") {
+        exclude group: "net.bytebuddy", module: "byte-buddy"
+        exclude group: "net.bytebuddy", module: "byte-buddy-agent"
+    }
+    testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.13'){
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+    }
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.7'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.7'
+
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.3.1'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
@@ -408,19 +426,16 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
     testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
+    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '0.15'
 
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5', {
         exclude group: 'junit', module: 'junit'
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 
-    testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: '3.1.15'
-    testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: '3.2.1'
-    testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testImplementation 'io.github.openfeign:feign-jackson:11.7'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
@@ -429,7 +444,6 @@ dependencies {
     testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.9'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.15'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '3.0.10'
-    testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
@@ -486,7 +500,7 @@ dependencyManagement {
     dependencies {
         // CVE-2021-25122
         // CVE-2021-42340
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.58') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.63') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'

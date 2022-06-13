@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EXCEPTION_MSG_NO_VALID_ORG_STATUS_PASSED;
@@ -76,7 +75,7 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     }
 
     public static boolean areInvalidValidOrgStatuses(List<String> statusList) {
-        var validOrgStatuses = Stream.of(OrganisationStatus.values()).map(Enum::name).collect(toList());
+        var validOrgStatuses = Stream.of(OrganisationStatus.values()).map(Enum::name).toList();
         return statusList.stream().anyMatch(s -> (s.isBlank() || !validOrgStatuses.contains(s.toUpperCase())));
     }
 
@@ -86,6 +85,6 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
 
     public static List<OrganisationStatus> getOrgStatusEnumsExcludingActiveStatus(List<String> statuses) {
         statuses.removeIf(ACTIVE.name()::equalsIgnoreCase);
-        return statuses.stream().map(OrganisationStatus::valueOf).collect(toList());
+        return statuses.stream().map(OrganisationStatus::valueOf).toList();
     }
 }
