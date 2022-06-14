@@ -334,7 +334,7 @@ dependencies {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
         exclude group: "org.apache.sling"
     }
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '3.0.0'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.0'
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
