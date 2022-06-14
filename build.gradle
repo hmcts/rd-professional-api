@@ -395,7 +395,7 @@ dependencies {
     testImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
     testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
 
-    testImplementation ("org.mockito:mockito-core:4.3.1") {
+    testImplementation ("org.mockito:mockito-core:4.6.1") {
         exclude group: "net.bytebuddy", module: "byte-buddy"
         exclude group: "net.bytebuddy", module: "byte-buddy-agent"
     }
