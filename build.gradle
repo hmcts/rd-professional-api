@@ -329,7 +329,7 @@ dependencies {
     implementation "io.github.openfeign:feign-httpclient:11.0"
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
 
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.1'
     implementation(group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
         exclude group: "org.apache.sling"
