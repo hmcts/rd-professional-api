@@ -458,7 +458,7 @@ class OrganisationServiceImplTest {
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
         userProfiles.add(userProfileResponse);
-        professionalUsersEntityResponse.getUserProfiles().addAll(userProfiles);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
