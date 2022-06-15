@@ -432,7 +432,7 @@ dependencies {
 
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
     testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
-    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '0.15'
+    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '0.16'
 
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5', {
         exclude group: 'junit', module: 'junit'
