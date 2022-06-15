@@ -207,8 +207,8 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         assertThat(professionalUsersEntityResponse1.getOrganisationIdentifier())
                 .isEqualTo(organisation.getOrganisationIdentifier());
-        assertThat(professionalUsersEntityResponse1.getUserProfiles()).hasSize(2);
-        professionalUsersEntityResponse1.getUserProfiles().forEach(userProfile -> {
+        assertThat(professionalUsersEntityResponse1.getUsers()).hasSize(2);
+        professionalUsersEntityResponse1.getUsers().forEach(userProfile -> {
             assertThat(userProfile.getIdamStatus()).isEqualToIgnoringCase("active");
         });
 
@@ -539,7 +539,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity).isNotNull();
 
         List<ProfessionalUsersResponse> usersResponse
-                = ((ProfessionalUsersEntityResponse)responseEntity.getBody()).getUserProfiles();
+                = ((ProfessionalUsersEntityResponse)responseEntity.getBody()).getUsers();
         assertThat(usersResponse.get(0).getRoles()).isNull();
         assertThat(usersResponse.get(1).getRoles()).isNull();
 
