@@ -266,9 +266,9 @@ class RefDataUtilTest {
                 "Active");
         assertThat(professionalUsersEntityResponse1).isNotNull();
 
-        assertThat(professionalUsersEntityResponse1.getUserProfiles()).hasSize(2);
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(0)).isEqualTo(professionalUsersResponse);
-        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(1)).isEqualTo(professionalUsersResponse1);
+        assertThat(professionalUsersEntityResponse1.getUsers()).hasSize(2);
+        assertThat(professionalUsersEntityResponse1.getUsers().get(0)).isEqualTo(professionalUsersResponse);
+        assertThat(professionalUsersEntityResponse1.getUsers().get(1)).isEqualTo(professionalUsersResponse1);
     }
 
     @Test
