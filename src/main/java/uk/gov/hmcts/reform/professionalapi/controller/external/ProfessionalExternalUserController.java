@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -56,7 +56,7 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
                     + " returnRoles is False",
             notes = GET_USERS_BY_ORG_1 + GET_USERS_BY_ORG_2 + GET_USERS_BY_ORG_3,
-            response = ProfessionalUsersResponse.class,
+            response = ProfessionalUsersEntityResponse.class,
             responseContainer = "list",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),

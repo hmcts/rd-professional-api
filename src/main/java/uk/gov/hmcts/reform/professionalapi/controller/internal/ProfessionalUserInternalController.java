@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -48,7 +48,7 @@ public class ProfessionalUserInternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
             notes = "**IDAM Roles to access API** :\n prd-admin,\n prd-aac-system",
-            response = ProfessionalUsersResponse.class,
+            response = ProfessionalUsersEntityResponse.class,
             responseContainer = "list",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
