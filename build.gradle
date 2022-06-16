@@ -334,7 +334,7 @@ dependencies {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
         exclude group: "org.apache.sling"
     }
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '3.0.0'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '4.0.0'
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
@@ -342,7 +342,7 @@ dependencies {
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.1'
-    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.2.20220324', ext: 'pom'
+    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.3', ext: 'pom'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation 'com.github.hmcts:idam-java-client:2.0.1'
@@ -355,24 +355,26 @@ dependencies {
     implementation 'commons-io:commons-io:2.8.0'
 
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '7.10.0'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.4.0'
 
-    implementation group: 'com.google.guava', name: 'guava', version: '30.0-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
-    implementation group: "org.yaml", name: "snakeyaml", version: "1.27"
+    implementation group: "org.yaml", name: "snakeyaml", version: "1.30"
 
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-alpha-3'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
     implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
+
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -407,9 +409,10 @@ dependencies {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
     }
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.7'
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.7'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.10'
 
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.3.1'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.4.0'
+
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
@@ -429,7 +432,7 @@ dependencies {
 
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
     testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
-    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '0.15'
+    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '0.16'
 
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5', {
         exclude group: 'junit', module: 'junit'
@@ -439,7 +442,7 @@ dependencies {
     testImplementation 'io.github.openfeign:feign-jackson:11.7'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.1'
 
     testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.9'
     testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.15'
@@ -453,7 +456,7 @@ dependencies {
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.3.2'
     contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.2.14'
 
-    functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
+    functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2'
     functionalTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
     functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
     functionalTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
@@ -476,7 +479,7 @@ dependencies {
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
     contractTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
-    contractTestImplementation('org.scala-lang:scala-library:2.12.5')
+    contractTestImplementation('org.scala-lang:scala-library:2.13.8')
 
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
