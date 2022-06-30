@@ -362,6 +362,9 @@ dependencies {
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
     implementation group: "org.yaml", name: "snakeyaml", version: "1.30"
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.1.0-M16'
+    // https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-websocket
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.0-M16'
 
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
@@ -504,9 +507,9 @@ dependencyManagement {
         // CVE-2021-25122
         // CVE-2021-42340
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.63') {
-            entry 'tomcat-embed-core'
+
             entry 'tomcat-embed-el'
-            entry 'tomcat-embed-websocket'
+
         }
 
         dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.2') {
