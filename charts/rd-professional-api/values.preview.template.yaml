@@ -3,15 +3,16 @@ java:
   ingressHost: ${SERVICE_FQDN}
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-    POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-    POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-    POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    POSTGRES_NAME: "{{ .Values.postgresql.auth.database}}"
+    POSTGRES_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     LAUNCH_DARKLY_ENV: "preview"
   postgresql:
     enabled: true
-    postgresqlUsername: dbrefdata
-    postgresqlPassword: dbrefdata
-    postgresqlDatabase: dbrefdata
+    auth:
+      username: dbrefdata
+      password: dbrefdata
+      database: dbrefdata
   keyVaults:
     rd:
       secrets:
