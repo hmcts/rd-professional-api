@@ -111,6 +111,15 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
     @State({"Pbas organisational data exists for identifier " + ORGANISATION_EMAIL})
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
 
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .header("aHeader", "aHeader")
+                .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+
         String name = "name";
         String sraId = "sraId";
         String companyNumber = "companyNumber";
@@ -123,15 +132,6 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
-
-        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
-                .claim("aClaim", "aClaim")
-                .claim("aud", Lists.newArrayList("ccd_gateway"))
-                .header("aHeader", "aHeader")
-                .build();
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
 
         when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
                 .thenReturn(Response.builder()
