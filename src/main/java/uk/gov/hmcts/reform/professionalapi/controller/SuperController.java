@@ -90,7 +90,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddr
 
 @RestController
 @Slf4j
-@RequestScope
 public abstract class SuperController {
 
     @Autowired
