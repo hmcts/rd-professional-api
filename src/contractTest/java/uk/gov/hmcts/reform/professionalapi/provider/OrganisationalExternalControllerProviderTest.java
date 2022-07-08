@@ -3,11 +3,17 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import feign.Request;
 import feign.Response;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
@@ -49,6 +55,7 @@ import static org.mockito.Mockito.when;
 public class OrganisationalExternalControllerProviderTest extends MockMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
+    private static final String USER_JWT = "Bearer 8gf364fg367f67";
 
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
@@ -64,7 +71,6 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     IdamRepository idamRepositoryMock;
-
 
     @Autowired
     MfaStatusService mfaStatusService;
@@ -92,6 +98,11 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
     @Autowired
     ContactInformationRepository contactInformationRepositoryMock;
 
+    @Mock
+    Authentication authentication;
+    @Mock
+    SecurityContext securityContext;
+
     @Override
     void setController() {
         testTarget.setControllers(organisationExternalController);
@@ -112,6 +123,15 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
+
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .header("aHeader", "aHeader")
+                .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
 
         when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
                 .thenReturn(Response.builder()

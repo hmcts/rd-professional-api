@@ -51,7 +51,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -112,10 +111,9 @@ class OrganisationExternalControllerTest {
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private Response response;
-    private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private IdamRepository idamRepositoryMock;
-    Authentication authentication = Mockito.mock(Authentication.class);
-    SecurityContext securityContext = mock(SecurityContext.class);
+    private Authentication authentication;
+    private SecurityContext securityContext;
     private UserInfo userInfoMock;
     RefDataUtil refDataUtilMock;
     private PaymentAccountValidator paymentAccountValidator;
@@ -143,7 +141,6 @@ class OrganisationExternalControllerTest {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-        jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
         idamRepositoryMock = mock(IdamRepository.class);
         authentication = Mockito.mock(Authentication.class);
         securityContext = mock(SecurityContext.class);
