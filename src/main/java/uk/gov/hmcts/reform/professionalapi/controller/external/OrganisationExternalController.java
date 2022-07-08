@@ -374,7 +374,7 @@ public class OrganisationExternalController extends SuperController {
 
         checkOrganisationAndPbaExists(organisation);
 
-        var userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
+        var userInfo = idamRepository.getUserInfo(getUserToken());
 
         organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(userInfo.getRoles(),
                 organisation, extOrgIdentifier);

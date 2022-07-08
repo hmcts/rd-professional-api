@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.annotation.RequestScope;
@@ -20,7 +22,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 
 
@@ -33,7 +35,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
     ProfessionalUserRepository professionalUserRepository;
 
     @Autowired
-    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
+    IdamRepository idamRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -58,7 +60,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
         ProfessionalUser professionalUser;
         Organisation organisation;
 
-        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
+        UserInfo userInfo = idamRepository.getUserInfo(getUserToken());
 
         if (null != userInfo && StringUtils.isNotEmpty(userInfo.getUid())) {
             userId = userInfo.getUid();
@@ -80,5 +82,10 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
             throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
         }
         return orgId;
+    }
+
+    public String getUserToken() {
+        var jwt = (Jwt)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return jwt.getTokenValue();
     }
 }

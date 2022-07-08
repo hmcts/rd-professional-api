@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -38,6 +39,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,6 +61,10 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+
+    @Autowired
+    IdamRepository idamRepositoryMock;
+
 
     @Autowired
     MfaStatusService mfaStatusService;
@@ -112,7 +118,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
                         .request(mock(Request.class))
                         .body(body, Charset.defaultCharset()).status(200).build());
 
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
+        when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).build());
 
         when(professionalUserRepositoryMock.findByEmailAddress(ORGANISATION_EMAIL)).thenReturn(professionalUser);

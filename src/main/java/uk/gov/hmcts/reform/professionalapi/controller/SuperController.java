@@ -40,9 +40,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -73,7 +74,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -145,7 +146,7 @@ public abstract class SuperController {
     private String loggingComponentName;
 
     @Autowired
-    protected JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
+    protected IdamRepository idamRepository;
 
     private static final String SRA_REGULATED_FALSE = "false";
     private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
@@ -537,5 +538,10 @@ public abstract class SuperController {
                 .map(UUID::fromString)
                 .collect(Collectors.toSet());
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
+    }
+
+    public String getUserToken() {
+        var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return jwt.getTokenValue();
     }
 }
