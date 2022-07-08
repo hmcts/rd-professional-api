@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
  *
  */
 @Component
-@RequestScope
 public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     public static final String TOKEN_NAME = "tokenName";
