@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
@@ -50,7 +49,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 )
 @RestController
 @Slf4j
-@RequestScope
 public class ProfessionalExternalUserController extends SuperController {
 
     @ApiOperation(
