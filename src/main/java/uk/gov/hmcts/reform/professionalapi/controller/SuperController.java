@@ -42,6 +42,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -89,6 +90,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddr
 
 @RestController
 @Slf4j
+@RequestScope
 public abstract class SuperController {
 
     @Autowired

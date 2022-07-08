@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
  *
  */
 @Component
+@RequestScope
 public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     public static final String TOKEN_NAME = "tokenName";
