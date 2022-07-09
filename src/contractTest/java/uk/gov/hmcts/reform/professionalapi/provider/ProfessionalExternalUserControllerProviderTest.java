@@ -141,7 +141,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
-        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("some-access-token")
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("someUid")
                 .roles(Arrays.asList("pui-case-manager")).build());
 
         String name = "name";

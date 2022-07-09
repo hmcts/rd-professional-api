@@ -98,7 +98,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @State({"Organisation exists that can invite new users"})
     public void toInviteNewUsers() throws IOException {
-
+        mockSecurityContext();
         ProfessionalUser professionalUser = setUpProfessionalUser();
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
@@ -126,18 +126,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @State({"Organisation with Id exists"})
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
-        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
-                .claim("aClaim", "aClaim")
-                .claim("tokenName", "access_token")
-                .claim("aud", Collections.singletonList("pui-case-manager"))
-                .header("aHeader", "aHeader")
-                .build();
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
-        when(idamRepositoryMock.getUserInfo(anyString()))
-                .thenReturn(UserInfo.builder().uid("some-access-token")
-                        .roles(Arrays.asList("pui-case-manager")).build());
+        mockSecurityContext();
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
@@ -155,6 +144,21 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
                 .thenReturn(organisation);
 
+    }
+
+    private void mockSecurityContext() {
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("tokenName", "access_token")
+                .claim("aud", Collections.singletonList("pui-case-manager"))
+                .header("aHeader", "aHeader")
+                .build();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+        when(idamRepositoryMock.getUserInfo(anyString()))
+                .thenReturn(UserInfo.builder().uid("someUid")
+                        .roles(Arrays.asList("pui-case-manager")).build());
     }
 
     @State({"Organisations exists with status of Active"})

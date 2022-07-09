@@ -117,6 +117,8 @@ public abstract class SuperController {
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
     @Autowired
     protected MfaStatusService mfaStatusService;
+    @Autowired
+    protected IdamRepository idamRepository;
 
     @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;
@@ -144,9 +146,6 @@ public abstract class SuperController {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
-
-    @Autowired
-    protected IdamRepository idamRepository;
 
     private static final String SRA_REGULATED_FALSE = "false";
     private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
