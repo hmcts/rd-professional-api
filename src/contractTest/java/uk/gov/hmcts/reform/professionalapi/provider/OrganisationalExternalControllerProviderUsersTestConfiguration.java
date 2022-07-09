@@ -42,9 +42,6 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
     ServiceAuthFilter serviceAuthFilter;
 
     @MockBean
-    IdamRepository idamRepository;
-
-    @MockBean
     OrganisationRepository organisationRepository;
 
     @MockBean

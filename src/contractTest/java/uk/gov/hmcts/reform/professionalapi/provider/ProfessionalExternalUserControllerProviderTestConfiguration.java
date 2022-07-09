@@ -34,9 +34,6 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     protected ClientRegistrationRepository clientRegistrationRepository;
 
     @MockBean
-    IdamRepository idamRepository;
-
-    @MockBean
     FeatureToggleService featureToggleService;
 
     @MockBean

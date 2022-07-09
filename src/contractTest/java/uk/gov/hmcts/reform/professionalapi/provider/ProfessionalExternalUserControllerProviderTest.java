@@ -5,11 +5,9 @@ import au.com.dius.pact.provider.junitsupport.State;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import feign.Request;
 import feign.Response;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,6 +16,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ContextConfiguration;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -36,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,6 +75,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+
+    @Autowired
+    IdamRepository idamRepositoryMock;
 
     @Mock
     Authentication authentication;
@@ -131,12 +135,14 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     private ProfessionalUser setupInteractionsForProfessionalUser() throws JsonProcessingException {
         Jwt jwt =   Jwt.withTokenValue(USER_JWT)
                 .claim("aClaim", "aClaim")
-                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .claim("aud", Collections.singletonList("pui-case-manager"))
                 .header("aHeader", "aHeader")
                 .build();
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("some-access-token")
+                .roles(Arrays.asList("pui-case-manager")).build());
 
         String name = "name";
         String sraId = "sraId";
