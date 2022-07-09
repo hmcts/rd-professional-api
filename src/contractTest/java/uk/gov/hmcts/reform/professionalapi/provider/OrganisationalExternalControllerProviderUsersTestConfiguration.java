@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExter
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
