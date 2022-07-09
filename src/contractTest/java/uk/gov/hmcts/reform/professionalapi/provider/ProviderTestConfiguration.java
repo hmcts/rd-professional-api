@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
@@ -58,7 +59,8 @@ public class ProviderTestConfiguration {
 
     @MockBean
     public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
-
+    @MockBean
+    public IdamRepository idamRepository;
 
     @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;
