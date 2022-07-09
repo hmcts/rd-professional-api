@@ -5,11 +5,18 @@ import au.com.dius.pact.provider.junitsupport.State;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import feign.Request;
 import feign.Response;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
@@ -68,12 +75,18 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
 
+    @Mock
+    Authentication authentication;
+    @Mock
+    SecurityContext securityContext;
+
     @Autowired
     MfaStatusService mfaStatusService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
 
+    private static final String USER_JWT = "Bearer some-access-token";
 
     @State({"Professional User exists for identifier " + PROFESSIONAL_USER_ID})
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
@@ -116,6 +129,15 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     }
 
     private ProfessionalUser setupInteractionsForProfessionalUser() throws JsonProcessingException {
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .header("aHeader", "aHeader")
+                .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+
         String name = "name";
         String sraId = "sraId";
         String companyNumber = "companyNumber";

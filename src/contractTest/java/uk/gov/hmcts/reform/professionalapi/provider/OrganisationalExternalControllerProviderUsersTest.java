@@ -4,11 +4,18 @@ import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import feign.Request;
 import feign.Response;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
@@ -47,7 +54,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 public class OrganisationalExternalControllerProviderUsersTest extends WebMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
-
+    private static final String USER_JWT = "Bearer some-access-token";
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
 
@@ -65,7 +72,10 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
-
+    @Mock
+    Authentication authentication;
+    @Mock
+    SecurityContext securityContext;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
 
@@ -108,6 +118,14 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @State({"Organisation with Id exists"})
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .header("aHeader", "aHeader")
+                .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
