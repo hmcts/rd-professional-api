@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -62,6 +63,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 @RestController
 @Slf4j
 @NoArgsConstructor
+@RequestScope
 public class OrganisationInternalController extends SuperController {
 
     @Value("${loggingComponentName}")

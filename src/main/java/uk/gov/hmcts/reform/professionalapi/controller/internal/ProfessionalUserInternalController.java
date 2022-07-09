@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 @Validated
 @RestController
 @Slf4j
+@RequestScope
 public class ProfessionalUserInternalController extends SuperController {
 
     @ApiOperation(

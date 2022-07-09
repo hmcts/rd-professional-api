@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
 
@@ -17,6 +18,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
         path = "/refdata/external/v1/organisations/mfa"
 )
 @RestController
+@RequestScope
 public class OrganisationMfaStatusController extends SuperController {
 
     @ApiOperation(

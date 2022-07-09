@@ -13,6 +13,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 
 @Component
 @Slf4j
+@RequestScope
 public class OrganisationIdArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Autowired
