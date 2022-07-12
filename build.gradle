@@ -561,3 +561,6 @@ rootProject.tasks.named("processIntegrationTestResources") {
 rootProject.tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
+
+
+//dummy test
