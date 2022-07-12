@@ -519,7 +519,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<Object> retrieveOrgByPbaStatus(@PathVariable("status") @NotBlank String pbaStatus) {
 
-        log.info("{}:: Received request to retrieve organisations by pba status::", loggingComponentName);
+        log.info("{}:: Received a request to retrieve organisations by pba status::", loggingComponentName);
         return organisationService.getOrganisationsByPbaStatus(pbaStatus.toUpperCase());
     }
 
