@@ -437,7 +437,7 @@ public class OrganisationExternalController extends SuperController {
             @ApiParam(hidden = true) @OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        log.info("Received request to add payment accounts to organisation Id");
+        log.info("Received a request to add payment accounts to organisation Id");
 
         return organisationService.addPaymentAccountsToOrganisation(pbaRequest, organisationIdentifier, userId);
 
