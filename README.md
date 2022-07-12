@@ -25,6 +25,8 @@ If running locally for development or testing you will need to set the following
 * export POSTGRES_USERNAME=dbrefdata
 * export POSTGRES_PASSWORD=<The database password. Please check with the dev team for more information.>
 * export S2S_SECRET=<The actual s2s secret. Please check with the dev team for more information.>
+ 
+ 
 
 ### Running the application
 
