@@ -277,6 +277,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         return invalidPbaResponses;
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public void updatePBAsInDb(List<PaymentAccount> pbasToSave, List<PaymentAccount> pbasToDelete) {
         if (isNotEmpty(pbasToSave)) {
             paymentAccountRepository.saveAll(pbasToSave);
