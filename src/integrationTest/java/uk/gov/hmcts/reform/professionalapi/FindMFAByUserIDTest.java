@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @Slf4j
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
 
