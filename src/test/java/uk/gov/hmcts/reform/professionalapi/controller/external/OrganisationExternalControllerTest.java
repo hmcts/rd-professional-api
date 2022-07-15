@@ -82,7 +82,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @ExtendWith(MockitoExtension.class)
-
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationExternalControllerTest {
 
     @InjectMocks
