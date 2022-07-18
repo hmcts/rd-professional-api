@@ -98,7 +98,7 @@ public class ProfessionalUserInternalController extends SuperController {
             @RequestParam(value = "size", required = false) Integer size
     ) {
         var status = EMPTY;
-        if (isSystemRoleUser(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles())) {
+        if (isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles())) {
             status = ACTIVE;
         }
         return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status, page,
