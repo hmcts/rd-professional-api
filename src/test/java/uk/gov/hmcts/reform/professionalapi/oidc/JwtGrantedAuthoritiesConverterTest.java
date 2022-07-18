@@ -31,6 +31,7 @@ class JwtGrantedAuthoritiesConverterTest {
     IdamRepository idamRepositoryMock;
     UserInfo userInfoMock;
     Jwt jwtMock;
+    private static final String USER_JWT = "Bearer 123456789asdfghjk";
 
     @BeforeEach
     void setUp() {
@@ -133,13 +134,13 @@ class JwtGrantedAuthoritiesConverterTest {
         when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
 
         converter.convert(jwtMock);
-        UserInfo userInfo = converter.getUserInfo();
+        UserInfo userInfo = idamRepositoryMock.getUserInfo(USER_JWT);
 
         assertThat(userInfo).isNotNull();
         verify(jwtMock, times(1)).containsClaim(anyString());
         verify(jwtMock, times(1)).getClaim(anyString());
         verify(jwtMock, times(1)).getTokenValue();
         verify(userInfoMock, times(1)).getRoles();
-        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
+        verify(idamRepositoryMock, times(2)).getUserInfo(anyString());
     }
 }
