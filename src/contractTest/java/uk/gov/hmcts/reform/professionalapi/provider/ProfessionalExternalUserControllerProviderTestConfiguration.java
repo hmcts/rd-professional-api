@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UserProfileUpdateRequestValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -32,9 +31,6 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
 
     @MockBean
     protected ClientRegistrationRepository clientRegistrationRepository;
-
-    @MockBean
-    IdamRepository idamRepository;
 
     @MockBean
     FeatureToggleService featureToggleService;
