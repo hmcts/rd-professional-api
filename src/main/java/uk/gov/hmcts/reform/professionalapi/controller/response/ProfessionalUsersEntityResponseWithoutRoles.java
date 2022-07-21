@@ -3,11 +3,10 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class ProfessionalUsersEntityResponseWithoutRoles {

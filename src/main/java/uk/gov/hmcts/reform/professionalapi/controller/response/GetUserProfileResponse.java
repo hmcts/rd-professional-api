@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static java.util.Objects.requireNonNull;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
+
+import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 @Setter
 @Getter

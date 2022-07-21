@@ -1,11 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.BAD_REQUEST_STR;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +7,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.BAD_REQUEST_STR;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationStatusValidatorImplTest {
