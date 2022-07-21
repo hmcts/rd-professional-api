@@ -12,10 +12,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
@@ -25,12 +25,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.UUID;
-import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
 @SuppressWarnings("unchecked")
+
 class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest {
 
     String pumBearerToken;
@@ -477,11 +478,13 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @DisplayName("MFA Scenarios")
     @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationMfaStatusController.retrieveMfaStatusByUserId", withFeature = true)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void findMFAScenario() {
         setUpOrgTestData();
         findMFAByUserIDShouldBeSuccess();
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public void findMFAByUserIDShouldBeSuccess() {
         log.info("findMFAByUserIDShouldBeSuccess :: STARTED");
         Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
@@ -506,6 +509,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
@@ -547,6 +551,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
@@ -599,6 +604,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void testAddContactsInformationsToOrganisationScenariosShouldBeForbiddenWhenLDOff() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
@@ -620,6 +626,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @DisplayName("Add Contact informations to organisations  Test Scenarios")
     @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void testAddContactsInformationsToOrganisationScenariosShouldBeSuccessWhenLDON() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
@@ -678,6 +685,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 

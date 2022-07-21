@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 import java.util.List;
-
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 public class OrganisationsDetailResponse {
 
