@@ -113,7 +113,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
-        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
+        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(idamRepository.getUserInfo(getUserToken())
                 .getRoles(), PUI_USER_MANAGER)) {
             status = isBlank(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);

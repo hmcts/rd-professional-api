@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
@@ -35,6 +36,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -60,6 +62,8 @@ class ProfessionalUserInternalControllerTest {
     private ProfessionalUserInternalController professionalUserInternalController;
     @Mock
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+    @Mock
+    IdamRepository idamRepositoryMock;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -110,7 +114,7 @@ class ProfessionalUserInternalControllerTest {
                 .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class),
                         any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
+        when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", userRoles));
 
         lenient().doNothing().when(organisationIdentifierValidatorMock)
@@ -129,7 +133,7 @@ class ProfessionalUserInternalControllerTest {
                 .findProfessionalUsersByOrganisation(any(Organisation.class),
                         any(String.class), any(Boolean.class), any(String.class));
         verify(responseEntityMock, times(1)).getStatusCode();
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
 
@@ -149,7 +153,7 @@ class ProfessionalUserInternalControllerTest {
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
                 any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
+        when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
 
         lenient().doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
@@ -167,7 +171,7 @@ class ProfessionalUserInternalControllerTest {
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(organisation, "true", true, "");
         verify(responseEntityMock, times(1)).getStatusCode();
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
     @Test
@@ -186,7 +190,7 @@ class ProfessionalUserInternalControllerTest {
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
                 any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
+        when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
 
         lenient().doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
@@ -204,7 +208,7 @@ class ProfessionalUserInternalControllerTest {
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(organisation, "true", true, "");
         verify(responseEntityMock, times(1)).getStatusCode();
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
     @Test

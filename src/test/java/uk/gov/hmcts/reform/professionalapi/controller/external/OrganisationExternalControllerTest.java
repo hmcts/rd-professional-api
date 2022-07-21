@@ -2,16 +2,22 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import feign.Request;
 import feign.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -45,7 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -106,7 +112,9 @@ class OrganisationExternalControllerTest {
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private Response response;
-    private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+    private IdamRepository idamRepositoryMock;
+    private Authentication authentication;
+    private SecurityContext securityContext;
     private UserInfo userInfoMock;
     RefDataUtil refDataUtilMock;
     private PaymentAccountValidator paymentAccountValidator;
@@ -120,6 +128,8 @@ class OrganisationExternalControllerTest {
     private final PrdEnum anEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "JURISD_ID");
     private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, "pui-case-manager", "PRD_ROLE");
 
+    private static final String USER_JWT = "Bearer 8gf364fg367f67";
+
     private List<PrdEnum> prdEnumList;
 
     @BeforeEach
@@ -132,7 +142,9 @@ class OrganisationExternalControllerTest {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-        jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
+        idamRepositoryMock = mock(IdamRepository.class);
+        authentication = Mockito.mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
         userInfoMock = mock(UserInfo.class);
         paymentAccountValidator = mock(PaymentAccountValidator.class);
 
@@ -220,8 +232,18 @@ class OrganisationExternalControllerTest {
         authorities.add(TestConstants.PUI_USER_MANAGER);
         String email = "test@email.com";
         when(httpRequest.getHeader(anyString())).thenReturn(email);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
+
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .header("aHeader", "aHeader")
+                .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(
                 UUID.randomUUID().toString().substring(0, 7));
@@ -230,7 +252,7 @@ class OrganisationExternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
         verify(httpRequest, times(2)).getHeader(anyString());
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
         verify(userInfoMock, times(1)).getRoles();
     }
 
@@ -242,7 +264,7 @@ class OrganisationExternalControllerTest {
         authorities.add(TestConstants.PUI_USER_MANAGER);
         String email = "test@email.com";
         when(httpRequest.getHeader(anyString())).thenReturn(email);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(
@@ -252,7 +274,7 @@ class OrganisationExternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
         verify(httpRequest, times(2)).getHeader(anyString());
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
         verify(userInfoMock, times(1)).getRoles();
 
     }

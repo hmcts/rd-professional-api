@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
@@ -59,7 +59,7 @@ class ProfessionalExternalUserControllerTest {
     private ResponseEntity<Object> responseEntity;
     private ProfessionalUser professionalUser;
     private UserProfileFeignClient userProfileFeignClient;
-    private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+    private IdamRepository idamRepositoryMock;
     private UserInfo userInfoMock;
 
     @InjectMocks
@@ -80,7 +80,7 @@ class ProfessionalExternalUserControllerTest {
         organisationCreationRequestValidator = mock(OrganisationCreationRequestValidator.class);
         responseEntity = mock(ResponseEntity.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-        jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
+        idamRepositoryMock = mock(IdamRepository.class);
         userInfoMock = mock(UserInfo.class);
 
         organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
@@ -102,7 +102,7 @@ class ProfessionalExternalUserControllerTest {
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_USER_MANAGER);
 
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -148,7 +148,7 @@ class ProfessionalExternalUserControllerTest {
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_CASE_MANAGER);
 
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -193,7 +193,7 @@ class ProfessionalExternalUserControllerTest {
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_CASE_MANAGER);
 
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
