@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.configuration;
 
-import java.util.ArrayList;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -10,6 +9,8 @@ import org.springframework.security.access.vote.AuthenticatedVoter;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
+
+import java.util.ArrayList;
 
 
 @Configuration

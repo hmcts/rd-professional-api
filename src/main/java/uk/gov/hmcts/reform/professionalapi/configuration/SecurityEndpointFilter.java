@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.UnauthorizedException;
 
+import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Configuration
 @Slf4j

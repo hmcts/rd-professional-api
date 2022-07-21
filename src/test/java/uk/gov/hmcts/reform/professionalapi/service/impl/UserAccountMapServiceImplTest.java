@@ -1,19 +1,19 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
-
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class UserAccountMapServiceImplTest {
 
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
