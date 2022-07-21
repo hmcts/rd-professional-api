@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExter
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationMfaStatusController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 
 @TestConfiguration
 public class OrganisationalExternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
