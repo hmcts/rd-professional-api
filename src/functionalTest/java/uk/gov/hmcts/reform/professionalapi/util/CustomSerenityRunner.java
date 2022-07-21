@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.launchdarkly.sdk.server.LDClient;
-
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;

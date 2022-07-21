@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
-
 import lombok.Getter;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+
+import java.util.List;
 
 @Getter
 public class ContactInformationResponseWithDxAddress extends ContactInformationResponse {

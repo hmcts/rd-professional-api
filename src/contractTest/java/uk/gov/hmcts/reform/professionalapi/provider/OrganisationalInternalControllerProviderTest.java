@@ -177,6 +177,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     @State("An Organisation with PBA accounts exists")
     public void setUpOrganisationForPBAsUpdate() {
 
@@ -197,6 +198,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(getOrgWithMfaStatus());
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     @State("Update an Organisation's PBA accounts")
     public void setUpOrganisationForUpdatingPBAs() {
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
