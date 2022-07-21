@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.idam;
 
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 import com.google.gson.Gson;
-
 import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.rest.SerenityRest;
+import uk.gov.hmcts.reform.lib.idam.IdamOpenId;
+import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.rest.SerenityRest;
-import uk.gov.hmcts.reform.lib.idam.IdamOpenId;
-import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @Slf4j

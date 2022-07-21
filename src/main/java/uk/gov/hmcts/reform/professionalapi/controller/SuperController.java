@@ -1,33 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
-
 import feign.FeignException;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -82,12 +55,39 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.UUID;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RestController
 @Slf4j
