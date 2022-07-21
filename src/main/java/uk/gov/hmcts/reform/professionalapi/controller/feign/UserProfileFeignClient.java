@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.feign;
 import feign.Headers;
 import feign.RequestLine;
 import feign.Response;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
