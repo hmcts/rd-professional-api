@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -53,6 +53,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 @Slf4j
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class ProfessionalApiClient {
 
     @Value("${loggingComponentName}")

@@ -1,5 +1,25 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,27 +36,8 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-
 @Slf4j
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @SuppressWarnings("unchecked")
