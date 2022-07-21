@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import net.minidev.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import net.minidev.json.JSONObject;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class KeyGenUtil {
 
     private static RSAKey rsaJwk;

@@ -7,7 +7,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import javax.servlet.http.HttpServletRequest;

@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,14 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
-import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SerenityTest
 @Slf4j

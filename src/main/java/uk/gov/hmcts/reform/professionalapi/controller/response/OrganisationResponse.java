@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Getter;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
