@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import static javax.persistence.GenerationType.AUTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.util.UUID;
-
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
@@ -12,10 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import static javax.persistence.GenerationType.AUTO;
 
 @Entity(name = "user_attribute")
 @NoArgsConstructor

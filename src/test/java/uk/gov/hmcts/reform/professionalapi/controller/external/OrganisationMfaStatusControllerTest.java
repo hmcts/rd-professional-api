@@ -1,12 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +10,15 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationMfaStatusControllerTest {
 
     @InjectMocks
