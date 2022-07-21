@@ -3,13 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +16,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.WelcomeController;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluatio
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.SERVICE_AUTHORIZATION;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class FeatureConditionEvaluationTest {
 
     FeatureToggleServiceImpl featureToggleService = mock(FeatureToggleServiceImpl.class);
