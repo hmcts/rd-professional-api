@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import com.launchdarkly.sdk.server.LDClient;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

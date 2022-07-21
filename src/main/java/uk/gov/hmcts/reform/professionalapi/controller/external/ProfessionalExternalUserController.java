@@ -1,27 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static org.apache.logging.log4j.util.Strings.isBlank;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_1;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_2;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_3;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_1;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_2;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_3;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -34,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
@@ -42,6 +25,20 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
+import java.util.Optional;
+
+import static org.apache.logging.log4j.util.Strings.isBlank;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
