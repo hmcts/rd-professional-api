@@ -53,7 +53,12 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8)
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
                 .containsAll(paymentAccountsToAdd);
     }
 
@@ -90,8 +95,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8)
-                .containsAll(paymentAccountsToAdd);
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     @Test
@@ -129,7 +139,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8);
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     @Test
@@ -165,7 +181,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8);
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     @Test
@@ -261,7 +283,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8);
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     private String createActiveUserAndOrganisation(boolean isActive) {
@@ -429,7 +457,12 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(10)
+                .hasSize(7)
+                .doesNotContain("PBAKQNROCA","PBAKQNR1CA","PBAC013ABE");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(3)
                 .contains("PBAKQNROCA","PBAKQNR1CA","PBAC013ABE");
 
     }
@@ -547,8 +580,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8)
-                .contains("PBA0000001","PBA0000001","PBA0000001");
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     @Test
