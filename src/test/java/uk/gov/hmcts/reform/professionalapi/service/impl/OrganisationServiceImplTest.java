@@ -373,7 +373,7 @@ class OrganisationServiceImplTest {
         String status = OrganisationStatus.ACTIVE.name();
 
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.findByOrganisationStatus(status));
+                sut.findByOrganisationStatus(status, null));
     }
 
 
@@ -403,7 +403,7 @@ class OrganisationServiceImplTest {
 
 
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.retrieveAllOrganisations());
+                sut.retrieveAllOrganisations(null));
     }
 
     @Test
@@ -468,7 +468,7 @@ class OrganisationServiceImplTest {
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name());
+                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE.name(), null);
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
@@ -506,7 +506,7 @@ class OrganisationServiceImplTest {
         String status = OrganisationStatus.PENDING.name();
 
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.findByOrganisationStatus(status));
+                sut.findByOrganisationStatus(status, null));
     }
 
     @Test
@@ -517,7 +517,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByStatusIn(asList(OrganisationStatus.PENDING))).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.PENDING.name());
+                = sut.findByOrganisationStatus(OrganisationStatus.PENDING.name(), null);
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1))
@@ -527,7 +527,7 @@ class OrganisationServiceImplTest {
     @Test
     void test_RetrieveOrganisationThrows400WhenStatusInvalid() {
         assertThrows(InvalidRequest.class,() ->
-                sut.findByOrganisationStatus("this is not a status"));
+                sut.findByOrganisationStatus("this is not a status", null));
     }
 
     @Test
@@ -538,7 +538,7 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.findAll()).thenReturn(organisations);
 
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(null);
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findAll();
@@ -554,7 +554,7 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.findAll()).thenReturn(organisations);
 
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(null);
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findAll();
@@ -572,7 +572,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findAll()).thenReturn(organisations);
         when(organisationMock.getStatus()).thenReturn(REVIEW);
 
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(null);
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findAll();
@@ -595,7 +595,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findAll()).thenReturn(new ArrayList<>());
 
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.retrieveAllOrganisations());
+                sut.retrieveAllOrganisations(null));
     }
 
 

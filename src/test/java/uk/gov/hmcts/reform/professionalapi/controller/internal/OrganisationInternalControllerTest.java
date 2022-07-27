@@ -11,6 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -65,10 +68,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -185,14 +190,14 @@ class OrganisationInternalControllerTest {
     void test_RetrieveOrganisations() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveAllOrganisations()).thenReturn(organisationsDetailResponse);
+        when(organisationServiceMock.retrieveAllOrganisations(null)).thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveAllOrganisations();
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
     }
 
     @Test
@@ -203,7 +208,7 @@ class OrganisationInternalControllerTest {
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null);
+                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, 1, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -220,7 +225,7 @@ class OrganisationInternalControllerTest {
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
-                .getOrganisationIdentifier(), "PENDING");
+                .getOrganisationIdentifier(), "PENDING", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -233,16 +238,67 @@ class OrganisationInternalControllerTest {
     void test_RetrieveOrganisationByStatusWithIdNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.findByOrganisationStatus(any(String.class)))
+        when(organisationServiceMock.findByOrganisationStatus(any(), any()))
                 .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING");
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .findByOrganisationStatus(OrganisationStatus.PENDING.name());
+                .findByOrganisationStatus(OrganisationStatus.PENDING.name(), null);
+    }
+
+    @Test
+    void test_RetrieveOrganisationWithPageNull() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        Pageable pageable = PageRequest.of(1, 1, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+
+        when(organisationServiceMock.retrieveAllOrganisations(pageable))
+            .thenReturn(organisationsDetailResponse);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, 1);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+            .retrieveAllOrganisations(pageable);
+    }
+
+    @Test
+    void test_RetrieveOrganisationWithSizeNull() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        Pageable pageable = PageRequest.of(1, 20, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+
+        when(organisationServiceMock.retrieveAllOrganisations(pageable))
+            .thenReturn(organisationsDetailResponse);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, 1, null);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+            .retrieveAllOrganisations(pageable);
+    }
+
+    @Test
+    void test_RetrieveOrganisationByStatusWithPagination() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        Pageable pageable = PageRequest.of(1, 20, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+
+        when(organisationServiceMock.findByOrganisationStatus(any(), any()))
+            .thenReturn(organisationsDetailResponse);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING", 1, 20);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+            .findByOrganisationStatus(OrganisationStatus.PENDING.name(), pageable);
     }
 
     @Test
