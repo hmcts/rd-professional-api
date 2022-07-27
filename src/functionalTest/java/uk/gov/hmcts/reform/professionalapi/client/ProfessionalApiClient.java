@@ -407,6 +407,22 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsWithPagination(String role, String page, String size) {
+        Response response = getMultipleAuthHeadersInternal()
+            .body("")
+            .get("/refdata/internal/v1/organisations?" + "page=" + page + "&size=" + size)
+            .andReturn();
+
+
+        response.then()
+            .assertThat()
+            .statusCode(OK.value());
+
+        log.info("{}:: Retrieve all orgs with pagination (Internal) response: {}",
+            loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
         Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
