@@ -69,10 +69,13 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEFAULT_PAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEFAULT_PAGE_SIZE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
@@ -176,15 +179,27 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
+    protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status,
+                                                                   Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
 
         Object organisationResponse = null;
+
+        Pageable pageable = null;
+
+        if (page != null || size != null) {
+            if (page == null) {
+                page = DEFAULT_PAGE;
+            } else if (size == null) {
+                size = DEFAULT_PAGE_SIZE;
+            }
+            pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        }
+
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-
-            organisationResponse = organisationService.retrieveAllOrganisations();
+            organisationResponse = organisationService.retrieveAllOrganisations(pageable);
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
                 || (isNotEmpty(orgStatus) && isNotEmpty(orgId))) {
@@ -196,7 +211,7 @@ public abstract class SuperController {
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
             //Received request to retrieve organisation with status
 
-            organisationResponse = organisationService.findByOrganisationStatus(orgStatus.toUpperCase());
+            organisationResponse = organisationService.findByOrganisationStatus(orgStatus.toUpperCase(), pageable);
         }
 
         log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
@@ -400,6 +415,7 @@ public abstract class SuperController {
         showDeleted = getShowDeletedValue(showDeleted);
         returnRoles = getReturnRolesValue(returnRoles);
 
+        //copy from here
         if (page != null) {
             Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService

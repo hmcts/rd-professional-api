@@ -8,6 +8,8 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -289,12 +291,18 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    public List<Organisation> retrieveActiveOrganisationDetails() {
+    public List<Organisation> retrieveActiveOrganisationDetails(Pageable pageable) {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         var activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
 
-        var activeOrganisations = getOrganisationByStatus(ACTIVE);
+        List<Organisation> activeOrganisations = null;
+
+        if (pageable != null) {
+            activeOrganisations = getOrganisationByStatus(ACTIVE);
+        } else {
+            activeOrganisations = getOrganisationByStatus(ACTIVE, pageable);
+        }
 
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
@@ -317,8 +325,15 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationsDetailResponse retrieveAllOrganisations() {
-        var retrievedOrganisations = organisationRepository.findAll();
+    public OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable) {
+        List<Organisation> retrievedOrganisations = null;
+
+        if (pageable != null) {
+            Page<Organisation> page = organisationRepository.findAll(pageable);
+            retrievedOrganisations = page.getContent();
+        } else {
+            retrievedOrganisations = organisationRepository.findAll();
+        }
 
         if (retrievedOrganisations.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
@@ -425,18 +440,18 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationsDetailResponse findByOrganisationStatus(String status) {
+    public OrganisationsDetailResponse findByOrganisationStatus(String status, Pageable pageable) {
         List<Organisation> organisations = new ArrayList<>();
 
         List<String> statuses = new ArrayList<>(validateAndReturnStatusList(status));
 
         if (doesListContainActiveStatus(statuses)) {
-            organisations = retrieveActiveOrganisationDetails();
+            organisations = retrieveActiveOrganisationDetails(pageable);
         }
 
         var enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
 
-        organisations.addAll(getOrganisationByStatuses(enumStatuses));
+        organisations.addAll(getOrganisationByStatuses(enumStatuses, pageable));
 
         if (CollectionUtils.isEmpty(organisations)) {
             throw new EmptyResultDataAccessException(ONE);
@@ -508,11 +523,21 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
-    public List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses) {
+    public List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable) {
+        if (pageable != null) {
+            return  organisationRepository.findByStatusIn(enumStatuses, pageable).getContent();
+        }
         return organisationRepository.findByStatusIn(enumStatuses);
     }
 
     public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
+        return organisationRepository.findByStatus(status);
+    }
+
+    public List<Organisation> getOrganisationByStatus(OrganisationStatus status, Pageable pageable) {
+        if (pageable != null) {
+            return organisationRepository.findByStatus(status, pageable).getContent();
+        }
         return organisationRepository.findByStatus(status);
     }
 
