@@ -299,9 +299,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> activeOrganisations = null;
 
         if (pageable != null) {
-            activeOrganisations = getOrganisationByStatus(ACTIVE);
-        } else {
             activeOrganisations = getOrganisationByStatus(ACTIVE, pageable);
+        } else {
+            activeOrganisations = getOrganisationByStatus(ACTIVE);
         }
 
         activeOrganisations.forEach(organisation -> {

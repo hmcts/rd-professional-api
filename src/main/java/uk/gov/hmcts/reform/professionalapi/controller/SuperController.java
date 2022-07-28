@@ -186,16 +186,7 @@ public abstract class SuperController {
 
         Object organisationResponse = null;
 
-        Pageable pageable = null;
-
-        if (page != null || size != null) {
-            if (page == null) {
-                page = DEFAULT_PAGE;
-            } else if (size == null) {
-                size = DEFAULT_PAGE_SIZE;
-            }
-            pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
-        }
+        var pageable = createPageable(page, size);
 
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
@@ -219,6 +210,22 @@ public abstract class SuperController {
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
+    }
+
+    private Pageable createPageable(Integer page, Integer size) {
+        Pageable pageable = null;
+        if (page != null || size != null) {
+            if (page != null && page == 0) {
+                throw new ResourceNotFoundException("Default page number should start with page 1");
+            }
+            if (page == null) {
+                page = DEFAULT_PAGE;
+            } else if (size == null) {
+                size = DEFAULT_PAGE_SIZE;
+            }
+            pageable = createPageableObject(page - 1, size, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        }
+        return pageable;
     }
 
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {
