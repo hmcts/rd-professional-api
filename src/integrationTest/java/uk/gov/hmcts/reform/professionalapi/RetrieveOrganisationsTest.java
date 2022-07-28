@@ -177,6 +177,19 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    void retrieve_organisations_with_invalid_pagination_size() {
+        String orgIdentifierResponse = createOrganisationRequest("PENDING");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+
+        Map<String, Object> orgResponse =
+            professionalReferenceDataClient.retrieveAllOrganisationsWithPagination("1", "0", hmctsAdmin);
+
+        assertThat(orgResponse).containsEntry("http_status", "400");
+        assertThat(orgResponse.get("response_body").toString())
+            .contains("Page size must not be less than one!");
+    }
+
+    @Test
     void return_organisation_payload_with_200_status_code_for_pui_case_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiCaseManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
