@@ -165,6 +165,12 @@ class SuperControllerTest {
         verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
     }
 
+    @Test
+    void test_retrieveAllOrganisationWithPagination0_shouldThrowException() {
+        assertThrows(ResourceNotFoundException.class, () ->
+            superController.retrieveAllOrganisationOrById(null, null, 0, null));
+    }
+
 
     @Test
     void test_retrievePaymentAccountByEmail() {

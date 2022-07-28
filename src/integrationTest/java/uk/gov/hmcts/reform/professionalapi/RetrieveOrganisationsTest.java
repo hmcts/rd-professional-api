@@ -91,6 +91,92 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void persists_and_returns_organisation_with_pagination() {
+
+        String orgIdentifierResponse1 = createOrganisationRequest("PENDING");
+        String orgIdentifier2 = createAndActivateOrganisationWithGivenRequest(
+            someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier3 = createOrganisationWithGivenRequest(
+            someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier4 = createOrganisationWithGivenRequest(
+            someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier5 = createOrganisationWithGivenRequest(
+            someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        assertThat(orgIdentifierResponse1).isNotEmpty();
+        assertThat(orgIdentifier2).isNotEmpty();
+        assertThat(orgIdentifier3).isNotEmpty();
+        assertThat(orgIdentifier4).isNotEmpty();
+        assertThat(orgIdentifier5).isNotEmpty();
+
+        Map<String, Object> orgResponse1 =
+            professionalReferenceDataClient.retrieveAllOrganisationsWithPagination("1", "2", hmctsAdmin);
+
+        Map<String, Object> orgResponse2 =
+            professionalReferenceDataClient.retrieveAllOrganisationsWithPagination("1", "3", hmctsAdmin);
+
+        Map<String, Object> orgResponse3 =
+            professionalReferenceDataClient.retrieveAllOrganisationsWithPagination("1", "5", hmctsAdmin);
+
+        int orgResponse1Size = ((List<Organisation>) orgResponse1.get("organisations")).size();
+        int orgResponse2Size = ((List<Organisation>) orgResponse2.get("organisations")).size();
+        int orgResponse3Size = ((List<Organisation>) orgResponse3.get("organisations")).size();
+
+        assertThat(orgResponse1).containsEntry("http_status","200 OK");
+        assertThat(orgResponse2).containsEntry("http_status","200 OK");
+        assertThat(orgResponse3).containsEntry("http_status","200 OK");
+        assertThat(orgResponse1Size).isEqualTo(2);
+        assertThat(orgResponse2Size).isEqualTo(3);
+        assertThat(orgResponse3Size).isEqualTo(5);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void persists_and_returns_organisation_with_default_pagination() {
+        String orgIdentifierResponse1 = createOrganisationRequest("PENDING");
+        String orgIdentifier2 = createAndActivateOrganisationWithGivenRequest(
+            someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier3 = createOrganisationWithGivenRequest(
+            someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier4 = createOrganisationWithGivenRequest(
+            someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier5 = createOrganisationWithGivenRequest(
+            someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        assertThat(orgIdentifierResponse1).isNotEmpty();
+        assertThat(orgIdentifier2).isNotEmpty();
+        assertThat(orgIdentifier3).isNotEmpty();
+        assertThat(orgIdentifier4).isNotEmpty();
+        assertThat(orgIdentifier5).isNotEmpty();
+
+        Map<String, Object> orgResponseWithDefaultPageSize =
+            professionalReferenceDataClient.retrieveAllOrganisationsWithPagination("1", null, hmctsAdmin);
+
+        Map<String, Object> orgResponseWithDefaultPage =
+            professionalReferenceDataClient.retrieveAllOrganisationsWithPagination(null, "2", hmctsAdmin);
+
+        int orgResponse1Size = ((List<Organisation>) orgResponseWithDefaultPageSize.get("organisations")).size();
+        int orgResponse2Size = ((List<Organisation>) orgResponseWithDefaultPage.get("organisations")).size();
+
+        assertThat(orgResponseWithDefaultPageSize).containsEntry("http_status","200 OK");
+        assertThat(orgResponseWithDefaultPage).containsEntry("http_status","200 OK");
+        assertThat(orgResponse1Size).isEqualTo(5);
+        assertThat(orgResponse2Size).isEqualTo(2);
+    }
+
+    @Test
+    void retrieve_organisations_with_invalid_pagination() {
+        String orgIdentifierResponse = createOrganisationRequest("PENDING");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+
+        Map<String, Object> orgResponse =
+            professionalReferenceDataClient.retrieveAllOrganisationsWithPagination("0", null, hmctsAdmin);
+
+        assertThat(orgResponse).containsEntry("http_status", "404");
+        assertThat(orgResponse.get("response_body").toString())
+            .contains("Default page number should start with page 1");
+    }
+
+    @Test
     void return_organisation_payload_with_200_status_code_for_pui_case_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiCaseManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
