@@ -167,7 +167,7 @@ class SuperControllerTest {
 
     @Test
     void test_retrieveAllOrganisationWithPagination0_shouldThrowException() {
-        assertThrows(ResourceNotFoundException.class, () ->
+        assertThrows(InvalidRequest.class, () ->
             superController.retrieveAllOrganisationOrById(null, null, 0, null));
     }
 

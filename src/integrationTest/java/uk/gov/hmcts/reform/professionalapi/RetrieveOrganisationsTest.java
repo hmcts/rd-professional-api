@@ -171,7 +171,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> orgResponse =
             professionalReferenceDataClient.retrieveAllOrganisationsWithPagination("0", null, hmctsAdmin);
 
-        assertThat(orgResponse).containsEntry("http_status", "404");
+        assertThat(orgResponse).containsEntry("http_status", "400");
         assertThat(orgResponse.get("response_body").toString())
             .contains("Default page number should start with page 1");
     }

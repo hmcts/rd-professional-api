@@ -216,7 +216,7 @@ public abstract class SuperController {
         Pageable pageable = null;
         if (page != null || size != null) {
             if (page != null && page == 0) {
-                throw new ResourceNotFoundException("Default page number should start with page 1");
+                throw new InvalidRequest("Default page number should start with page 1");
             }
             if (page == null) {
                 page = DEFAULT_PAGE;
@@ -422,7 +422,6 @@ public abstract class SuperController {
         showDeleted = getShowDeletedValue(showDeleted);
         returnRoles = getReturnRolesValue(returnRoles);
 
-        //copy from here
         if (page != null) {
             Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService
