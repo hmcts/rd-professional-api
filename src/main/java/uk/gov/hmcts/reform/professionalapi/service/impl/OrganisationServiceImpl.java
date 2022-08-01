@@ -371,7 +371,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         resultingOrganisations.addAll(pendingOrganisations);
         resultingOrganisations.addAll(updatedActiveOrganisations);
 
-        if(pageable != null) {
+        if (pageable != null) {
             resultingOrganisations.sort(Comparator.comparing(Organisation::getName));
         }
 
