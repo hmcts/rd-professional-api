@@ -64,6 +64,39 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
     @Test
     @SuppressWarnings("unchecked")
+    void test_all_PaymentAccounts_Success_ShouldReturn_201_and_retrieve_pbas_external() {
+        Set<String> paymentAccountsToAdd = new HashSet<>();
+        paymentAccountsToAdd.add("PBA0000002");
+
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
+
+        assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
+
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeaderForExternalUsers(
+                        "someone@somewhere.com", puiUserManager, userId);
+
+        Map<String, Object> organisationEntityResponse =
+                (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
+        List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
+        assertThat(paymentAccount)
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsAll(paymentAccountsToAdd);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void test_add_PaymentAccounts_PartialSuccess_Dupl_ShouldReturn_201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000001");
