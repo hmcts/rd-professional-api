@@ -215,7 +215,7 @@ public abstract class SuperController {
     private Pageable createPageable(Integer page, Integer size) {
         Pageable pageable = null;
         if (page != null || size != null) {
-            if (page != null && page == 0) {
+            if (page != null && page < 1) {
                 throw new InvalidRequest("Default page number should start with page 1");
             }
             if (page == null) {
@@ -223,7 +223,8 @@ public abstract class SuperController {
             } else if (size == null) {
                 size = DEFAULT_PAGE_SIZE;
             }
-            pageable = createPageableObject(page - 1, size, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+            var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+            pageable = createPageableObject(page - 1, size, Sort.by(order));
         }
         return pageable;
     }
