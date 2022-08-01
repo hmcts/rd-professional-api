@@ -8,7 +8,6 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -329,8 +328,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> retrievedOrganisations = null;
 
         if (pageable != null) {
-            Page<Organisation> page = organisationRepository.findAll(pageable);
-            retrievedOrganisations = page.getContent();
+            retrievedOrganisations = organisationRepository.findAll(pageable).getContent();
         } else {
             retrievedOrganisations = organisationRepository.findAll();
         }

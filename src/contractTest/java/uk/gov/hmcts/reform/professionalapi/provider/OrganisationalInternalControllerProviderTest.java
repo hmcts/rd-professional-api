@@ -8,6 +8,8 @@ import feign.Request;
 import feign.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
@@ -109,6 +111,36 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         Organisation organisation = getOrganisation();
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
+    }
+
+    //retrieveOrganisationsWithPagination
+    @State("An organisation exists with pagination")
+    public void setUpOrganisationWithPagination() {
+
+        Organisation organisation = getOrganisation();
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findAll(any(Pageable.class))).thenReturn(orgPage);
+        when(orgPage.getContent()).thenReturn(List.of(organisation));
+    }
+
+
+    //retrieveOrganisationsWithStatusAndPagination
+    @State("An active organisation exists for given status and with pagination")
+    public void setUpOrganisationWithStatusAndPagination() {
+
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+            COMPANY_NUMBER, false, COMPANY_URL);
+        addSuperUser(organisation);
+        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE, any(Pageable.class)))
+            .thenReturn(mock(Page.class));
+        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE, any(Pageable.class)).getContent())
+            .thenReturn(List.of(organisation));
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class)))
+            .thenReturn(mock(Page.class));
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class))
+            .getContent())
+            .thenReturn(Collections.emptyList());
     }
 
     @State("Active organisations exists for a logged in user")
