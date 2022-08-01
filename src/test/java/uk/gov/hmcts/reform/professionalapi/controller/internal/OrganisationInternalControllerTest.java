@@ -252,7 +252,8 @@ class OrganisationInternalControllerTest {
     @Test
     void test_RetrieveOrganisationWithPageNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        Pageable pageable = PageRequest.of(0, 1, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+        Pageable pageable = PageRequest.of(0, 1, Sort.by(order));
 
         when(organisationServiceMock.retrieveAllOrganisations(pageable))
             .thenReturn(organisationsDetailResponse);
@@ -269,7 +270,8 @@ class OrganisationInternalControllerTest {
     @Test
     void test_RetrieveOrganisationWithSizeNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(order));
 
         when(organisationServiceMock.retrieveAllOrganisations(pageable))
             .thenReturn(organisationsDetailResponse);
@@ -286,7 +288,8 @@ class OrganisationInternalControllerTest {
     @Test
     void test_RetrieveOrganisationByStatusWithPagination() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(order));
 
         when(organisationServiceMock.findByOrganisationStatus(any(), any()))
             .thenReturn(organisationsDetailResponse);
