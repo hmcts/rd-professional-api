@@ -378,7 +378,7 @@ public class OrganisationExternalController extends SuperController {
                 organisation, extOrgIdentifier);
         return ResponseEntity
                 .status(200)
-                .body(new OrganisationPbaResponse(organisation, false, false, true));
+                .body(new OrganisationPbaResponse(organisation, false, true, false));
     }
 
 
