@@ -238,7 +238,7 @@ public abstract class SuperController {
 
         return ResponseEntity
                 .status(200)
-                .body(new OrganisationPbaResponse(organisation, false, false, true));
+                .body(new OrganisationPbaResponse(organisation, false, true, false));
     }
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
