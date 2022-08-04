@@ -120,7 +120,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         Organisation organisation = getOrganisation();
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findAll(any(Pageable.class))).thenReturn(orgPage);
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE, OrganisationStatus.PENDING),
+            any(Pageable.class))).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(List.of(organisation));
     }
 
