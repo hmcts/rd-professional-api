@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +22,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_4;
 
 @Repository
-public interface OrganisationRepository extends PagingAndSortingRepository<Organisation, UUID> {
+public interface OrganisationRepository extends JpaRepository<Organisation, UUID> {
 
     Organisation findByName(String name);
 
@@ -33,15 +34,18 @@ public interface OrganisationRepository extends PagingAndSortingRepository<Organ
 
     List<Organisation> findByStatus(OrganisationStatus status);
 
+    @EntityGraph(value = "Organisation.alljoins")
     Page<Organisation> findByStatus(OrganisationStatus status, Pageable pageable);
 
     List<Organisation> findByStatusIn(List<OrganisationStatus> statuses);
 
+    @EntityGraph(value = "Organisation.alljoins")
     Page<Organisation> findByStatusIn(List<OrganisationStatus> statuses, Pageable pageable);
 
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
 
+    @EntityGraph(value = "Organisation.alljoins")
     Page<Organisation> findAll(Pageable pageable);
 
     @Query(FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2 + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4)

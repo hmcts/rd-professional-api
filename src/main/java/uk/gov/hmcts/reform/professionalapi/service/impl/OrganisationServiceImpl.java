@@ -90,6 +90,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.i
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.getOrgStatusEnumsExcludingActiveStatus;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.validateAndReturnStatusList;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
@@ -328,7 +329,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> retrievedOrganisations = null;
 
         if (pageable != null) {
-            retrievedOrganisations = organisationRepository.findAll(pageable).getContent();
+            retrievedOrganisations = organisationRepository.findByStatusIn(List.of(ACTIVE, PENDING), pageable)
+                    .getContent();
         } else {
             retrievedOrganisations = organisationRepository.findAll();
         }
@@ -351,7 +353,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(),
                             organisation);
                 }
-            } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
+            } else if (organisation.getStatus() == PENDING) {
                 pendingOrganisations.add(organisation);
             }
         });
