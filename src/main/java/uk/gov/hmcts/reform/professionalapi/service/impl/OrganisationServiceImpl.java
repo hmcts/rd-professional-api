@@ -372,7 +372,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         resultingOrganisations.addAll(updatedActiveOrganisations);
 
         if (pageable != null) {
-            resultingOrganisations.sort(Comparator.comparing(Organisation::getName));
+            resultingOrganisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
         }
 
         return new OrganisationsDetailResponse(resultingOrganisations, true, true, false);
