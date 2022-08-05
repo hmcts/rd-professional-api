@@ -461,6 +461,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(ONE);
         }
 
+        if (pageable != null) {
+            organisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
+        }
+
         return new OrganisationsDetailResponse(organisations, true, true, false);
     }
 
