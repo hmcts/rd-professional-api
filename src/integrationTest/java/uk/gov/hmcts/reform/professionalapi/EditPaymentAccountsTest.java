@@ -93,6 +93,7 @@ class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
 
         Map organisationEntityResponse = (Map) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List paymentAccount = (List) organisationEntityResponse.get("paymentAccount");
+        
         assertThat(paymentAccount).hasSize(7);
         assertThat(paymentAccount).containsExactlyInAnyOrderElementsOf(newPaymentAccounts);
     }
