@@ -233,7 +233,7 @@ class ProfessionalExternalUserControllerTest {
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class),
                         any(String.class));
-        verify(responseEntity, times(1)).getStatusCode();
+        verify(responseEntity, times(3)).getStatusCode();
         verify(responseEntity, times(1)).getBody();
     }
 
