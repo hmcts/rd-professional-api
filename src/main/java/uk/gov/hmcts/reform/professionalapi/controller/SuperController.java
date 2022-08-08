@@ -404,15 +404,20 @@ public abstract class SuperController {
         returnRoles = getReturnRolesValue(returnRoles);
 
         if (page != null) {
+            log.info(" sample log 21 page getOrganisationByOrgIdentifier returned :: STARTED" + "  "
+                    + organisationIdentifier + " " + existingOrganisation.getOrganisationIdentifier() + "   ");
             Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService
                     .findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles,
                             status, pageable);
         } else {
+            log.info(" sample log 21 getOrganisationByOrgIdentifier returned :: STARTED" + "  " + organisationIdentifier
+                    + " " + existingOrganisation.getOrganisationIdentifier() + "   ");
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
                     showDeleted, returnRoles, status);
         }
-        log.info(" sample log 2 getOrganisationByOrgIdentifier returned :: STARTED" + "  " + organisationIdentifier);
+        log.info(" sample log 2 getOrganisationByOrgIdentifier returned :: STARTED" + "  " + organisationIdentifier
+                + " " + responseEntity.getStatusCode().name() + " " + responseEntity.getStatusCode().getReasonPhrase());
         return responseEntity;
     }
 
