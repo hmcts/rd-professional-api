@@ -132,7 +132,7 @@ class ProfessionalUserInternalControllerTest {
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(any(Organisation.class),
                         any(String.class), any(Boolean.class), any(String.class));
-        verify(responseEntityMock, times(1)).getStatusCode();
+        verify(responseEntityMock, times(3)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
@@ -170,7 +170,7 @@ class ProfessionalUserInternalControllerTest {
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(organisation, "true", true, "");
-        verify(responseEntityMock, times(1)).getStatusCode();
+        verify(responseEntityMock, times(3)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
@@ -207,7 +207,7 @@ class ProfessionalUserInternalControllerTest {
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(organisation, "true", true, "");
-        verify(responseEntityMock, times(1)).getStatusCode();
+        verify(responseEntityMock, times(3)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
