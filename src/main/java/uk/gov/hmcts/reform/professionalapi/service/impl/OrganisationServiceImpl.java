@@ -401,6 +401,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public Organisation getOrganisationByOrgIdentifier(String organisationIdentifier) {
         RefDataUtil.removeAllSpaces(organisationIdentifier);
+        log.info(" sample log 1 getOrganisationByOrgIdentifier :: STARTED" + "  " + organisationIdentifier);
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
 

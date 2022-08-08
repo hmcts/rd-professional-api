@@ -110,7 +110,7 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(hidden = true) @UserId String userId) {
 
-
+        log.info(" sample log findUsersByOrganisation :: STARTED" + "  " + organisationIdentifier);
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(idamRepository.getUserInfo(getUserToken())
@@ -119,6 +119,7 @@ public class ProfessionalExternalUserController extends SuperController {
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
+        log.info(" sample log 1 findUsersByOrganisation :: STARTED" + "  " + organisationIdentifier);
         return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
                 page, size);
     }

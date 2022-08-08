@@ -393,6 +393,9 @@ public abstract class SuperController {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+
+        log.info(" sample log 1 getOrganisationByOrgIdentifier returned :: STARTED" + "  " + organisationIdentifier);
+
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation, NOT_FOUND);
         ResponseEntity<Object> responseEntity;
@@ -409,6 +412,7 @@ public abstract class SuperController {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
                     showDeleted, returnRoles, status);
         }
+        log.info(" sample log 2 getOrganisationByOrgIdentifier returned :: STARTED" + "  " + organisationIdentifier);
         return responseEntity;
     }
 
