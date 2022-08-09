@@ -7,6 +7,7 @@ java:
     POSTGRES_USERNAME: "{{ .Values.postgresql.auth.username}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     LAUNCH_DARKLY_ENV: "preview"
+    S2S_URL: https://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   postgresql:
     enabled: true
     auth:
