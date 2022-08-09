@@ -144,3 +144,5 @@ launchdarkly:
     key: ${LD_SDK_KEY:}
     environment: ${LAUNCH_DARKLY_ENV:local}
     user: rd
+
+logging.level.uk.gov.hmcts: ${APPLICATION_LOGGING_LEVEL:DEBUG}
