@@ -95,6 +95,7 @@ public class ProfessionalUserInternalController extends SuperController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size
     ) {
+        log.info("reached first step of findUsersByOrganisation....");
         var status = EMPTY;
         if (isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles())) {
             status = ACTIVE;
