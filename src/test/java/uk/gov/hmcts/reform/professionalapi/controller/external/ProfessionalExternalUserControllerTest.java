@@ -234,7 +234,7 @@ class ProfessionalExternalUserControllerTest {
                 .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class),
                         any(String.class));
         verify(responseEntity, times(4)).getStatusCode();
-        verify(responseEntity, times(1)).getBody();
+        verify(responseEntity, times(2)).getBody();
     }
 
     @Test
