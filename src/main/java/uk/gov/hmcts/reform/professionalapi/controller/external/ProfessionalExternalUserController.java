@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -125,7 +124,7 @@ public class ProfessionalExternalUserController extends SuperController {
                 searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
                 page, size);
         log.info(" sample log 11111 findUsersByOrganisation :: STARTED" + "  " + objectResponseEntity.getStatusCode()
-        + objectResponseEntity.getBody().toString());
+            + objectResponseEntity.getBody().toString());
         return objectResponseEntity;
     }
 
