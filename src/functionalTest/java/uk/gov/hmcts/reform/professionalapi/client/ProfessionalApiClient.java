@@ -582,9 +582,11 @@ public class ProfessionalApiClient {
     public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId, String role,
                                                                        HttpStatus status) {
 
+        log.info("Reached searchOrganisationUsersByStatusInternal");
         Response response = getMultipleAuthHeadersInternal()
             .get("/refdata/internal/v1/organisations/" + organisationId + "/users")
             .andReturn();
+        log.info("response in searchOrganisationUsersByStatusInternal"+response.toString());
         response.then()
             .assertThat()
             .statusCode(status.value());
