@@ -586,7 +586,7 @@ public class ProfessionalApiClient {
         Response response = getMultipleAuthHeadersInternal()
             .get("/refdata/internal/v1/organisations/" + organisationId + "/users")
             .andReturn();
-        log.info("response in searchOrganisationUsersByStatusInternal"+response.toString());
+        log.info("response in searchOrganisationUsersByStatusInternal" + response.toString());
         response.then()
             .assertThat()
             .statusCode(status.value());
