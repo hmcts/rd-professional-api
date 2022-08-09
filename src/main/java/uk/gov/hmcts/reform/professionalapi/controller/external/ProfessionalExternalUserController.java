@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
@@ -124,7 +125,7 @@ public class ProfessionalExternalUserController extends SuperController {
                 searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
                 page, size);
         log.info(" sample log 11111 findUsersByOrganisation :: STARTED" + "  " + objectResponseEntity.getStatusCode()
-            + objectResponseEntity.getBody().toString());
+            + Objects.requireNonNull(objectResponseEntity.getBody()));
         return objectResponseEntity;
     }
 
