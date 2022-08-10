@@ -904,7 +904,7 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeadersInternal() {
         String userToken = idamOpenIdClient.getcwdAdminOpenIdToken("prd-admin");
-        log.info(" userToken in getMultipleAuthHeadersInternal ", loggingComponentName, userToken);
+        log.info(" userToken in getMultipleAuthHeadersInternal " + loggingComponentName + userToken);
         return getMultipleAuthHeaders(userToken);
     }
 
