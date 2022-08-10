@@ -99,7 +99,10 @@ public class ProfessionalUserInternalController extends SuperController {
         if (isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles())) {
             status = ACTIVE;
         }
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
+        var objectResponseEntity =
+                searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
+        log.info("logging the response" + objectResponseEntity.getStatusCode().name());
+        return objectResponseEntity;
     }
 
     @ApiOperation(
