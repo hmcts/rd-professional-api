@@ -101,7 +101,7 @@ public class ProfessionalUserInternalController extends SuperController {
         }
         var objectResponseEntity =
                 searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
-        objectResponseEntity.getHeaders().forEach((k,a) -> { System.out.println(k + " " + a);});
+        objectResponseEntity.getHeaders().forEach((k,a) ->  log.info("key: " + k + " " + "value: " + a));
         log.info("logging the response" + objectResponseEntity.getStatusCode().name());
         return objectResponseEntity;
     }

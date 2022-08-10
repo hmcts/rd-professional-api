@@ -88,16 +88,6 @@ class ProfessionalUserInternalControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testFindUsersByOrganisation_for_prd_admin() {
-        testFindUsersByOrganisation(prdAdminRoles);
-    }
-
-    @Test
-    void testFindUsersByOrganisation_for_system_user() {
-        testFindUsersByOrganisation(systemUserRoles);
-    }
-
     void testFindUsersByOrganisation(List<String> userRoles) {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser =
@@ -132,81 +122,6 @@ class ProfessionalUserInternalControllerTest {
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(any(Organisation.class),
                         any(String.class), any(Boolean.class), any(String.class));
-        verify(responseEntityMock, times(2)).getStatusCode();
-        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
-    }
-
-
-    @Test
-    void testFindUsersByOrganisationwithoutRoles() {
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
-                "emailAddress", organisation);
-
-        List<SuperUser> users = new ArrayList<>();
-        users.add(professionalUser.toSuperUser());
-        organisation.setUsers(users);
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
-                .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
-                any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
-        when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(idamRepositoryMock.getUserInfo(anyString()))
-                .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
-
-        lenient().doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
-                any(OrganisationStatus.class), any(String.class));
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
-
-        ResponseEntity<?> actualRolesFalse = professionalUserInternalController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", true,
-                        null, null);
-        assertThat(actualRolesFalse).isNotNull();
-        assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
-
-        verify(organisationServiceMock, times(1))
-                .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
-        verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
-        verify(responseEntityMock, times(2)).getStatusCode();
-        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
-    }
-
-    @Test
-    void testFindUsersByOrganisationwithoutRolesDefaultNull() {
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
-                "emailAddress", organisation);
-
-        List<SuperUser> users = new ArrayList<>();
-        users.add(professionalUser.toSuperUser());
-        organisation.setUsers(users);
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
-                .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
-                any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
-        when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(idamRepositoryMock.getUserInfo(anyString()))
-                .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
-
-        lenient().doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
-                any(OrganisationStatus.class), any(String.class));
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
-
-        ResponseEntity<?> actualRolesFalse = professionalUserInternalController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", true,
-                        null, null);
-        assertThat(actualRolesFalse).isNotNull();
-        assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
-
-        verify(organisationServiceMock, times(1))
-                .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
-        verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
         verify(responseEntityMock, times(2)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
