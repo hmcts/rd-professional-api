@@ -43,12 +43,14 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
         UserInfo userInfo = idamRepository.getUserInfo(getUserToken());
         if (null != userInfo && StringUtils.isNotEmpty(userInfo.getUid())) {
             userId = userInfo.getUid().trim();
+            log.info("Generating user Info" + userId);
         }
         return userId;
     }
 
     public String getUserToken() {
         var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("jwt generation" + jwt.getTokenValue());
         return jwt.getTokenValue();
     }
 }

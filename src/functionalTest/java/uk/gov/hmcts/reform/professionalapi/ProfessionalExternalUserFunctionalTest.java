@@ -7,30 +7,21 @@ import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
-import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +30,6 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -80,7 +70,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
         inviteUserScenarios();
-        retrieveOrganisationPbaScenarios();
         findUsersByOrganisationScenarios();
         findOrganisationScenarios();
         findActiveOrganisationScenarios();
@@ -474,158 +463,9 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         return bearerToken;
     }
 
-    @Test
-    @DisplayName("MFA Scenarios")
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    @ToggleEnable(mapKey = "OrganisationMfaStatusController.retrieveMfaStatusByUserId", withFeature = true)
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-    void findMFAScenario() {
-        setUpOrgTestData();
-        findMFAByUserIDShouldBeSuccess();
-    }
-
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-    public void findMFAByUserIDShouldBeSuccess() {
-        log.info("findMFAByUserIDShouldBeSuccess :: STARTED");
-        Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
-        assertThat(mfaStatusResponse).containsEntry("mfa", "EMAIL");
-        log.info("findMFAByUserIDShouldBeSuccess :: END");
-    }
-
-    public void retrieveOrganisationPbaScenarios() {
-        findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest();
-    }
-
-    public void findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest() {
-        log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: STARTED");
-
-
-        professionalApiClient.retrievePaymentAccountsWithoutEmailForExternal(
-                professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
-
-        log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
-    }
-
-    @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-    void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
-        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
-
-        setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiFinanceManager));
-
-        PbaRequest deletePbaRequest = new PbaRequest();
-        deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
-
-        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
-
-        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
-    }
-
-    @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    void deletePbaOfExistingOrganisationShouldBeSuccess() {
-        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
-
-        setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiFinanceManager));
-
-        PbaRequest deletePbaRequest = new PbaRequest();
-        deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
-
-        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), NO_CONTENT);
-
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
-
-        var paymentAccounts = (List<String>) response.get("paymentAccount");
-        assertThat(paymentAccounts).isEmpty();
-        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: END");
-    }
-
-    @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-    void addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
-        log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
-
-        setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiFinanceManager));
-
-        PbaRequest pbaRequest = new PbaRequest();
-        pbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
-
-        professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
-
-        log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
-    }
-
-    @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    void addPbaOfExistingOrganisationShouldBeSuccess() {
-        log.info("addPaymentAccountsToOrganisation :: STARTED");
-
-        setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiFinanceManager));
-
-        Set<String> paymentAccountsToAdd =  new HashSet<>();
-        paymentAccountsToAdd.add("PBA".concat(RandomStringUtils.randomAlphanumeric(7)));
-
-        PbaRequest pbaRequest = new PbaRequest();
-        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
-
-        professionalApiClient.addPaymentAccountsOfOrganisation(pbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), CREATED);
-
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdWithPbaStatusExternal(OK,
-                "PENDING", professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
-
-        paymentAccountsToAdd.addAll(organisationCreationRequest.getPaymentAccount());
-        paymentAccountsToAdd = paymentAccountsToAdd.stream().map(String::toUpperCase).collect(Collectors.toSet());
-
-        var pendingPaymentAccounts = (List<String>) response.get("pendingPaymentAccount");
-        var acceptedPaymentAccounts = (List<String>) response.get("paymentAccount");
-        List<String> allStatusPaymentAccounts = new ArrayList<>();
-        allStatusPaymentAccounts.addAll(pendingPaymentAccounts);
-        allStatusPaymentAccounts.addAll(acceptedPaymentAccounts);
-
-        assertThat(paymentAccountsToAdd).hasSameElementsAs(allStatusPaymentAccounts);
-        log.info("addPbaOfExistingOrganisationShouldBeSuccess :: END");
-    }
-
-    @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-    void testAddContactsInformationsToOrganisationScenariosShouldBeForbiddenWhenLDOff() {
-        setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
-
-        log.info("addContactInformationsToOrganisationShouldBeSuccess :: STARTED");
-
-        List<ContactInformationCreationRequest> createContactInformationCreationRequests =
-                createContactInformationCreationRequests();
-        Map<String, Object> result = professionalApiClient
-                .addContactInformationsToOrganisation(createContactInformationCreationRequests,
-                        pomBearerToken,FORBIDDEN);
-
-        assertThat(result.get("statusCode")).isNotNull();
-        assertThat(result.get("statusCode")).isEqualTo(403);
-        log.info("addContactInformationsToOrganisationShouldBeSuccess :: END");
-    }
 
     @Test
     @DisplayName("Add Contact informations to organisations  Test Scenarios")
-    @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void testAddContactsInformationsToOrganisationScenariosShouldBeSuccessWhenLDON() {
         setUpOrgTestData();
@@ -658,7 +498,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                 createContactInformationCreationRequests();
         Map<String, Object> result = professionalApiClient
                 .addContactInformationsToOrganisation(createContactInformationCreationRequests,
-                        pomBearerToken,httpStatus);
+                        pomBearerToken, httpStatus);
 
         assertThat(result.get("statusCode")).isNotNull();
         assertThat(result.get("statusCode")).isEqualTo(201);
@@ -681,8 +521,9 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(searchUserStatus(extActiveOrgId, activeUserId)).isEqualTo(SUSPENDED.name());
         log.info("suspendUserByPuiOrgManagerShouldBeSuccess :: END");
     }
+}
 
-    @Test
+  /*  @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -752,3 +593,4 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: END");
     }
 }
+*/
