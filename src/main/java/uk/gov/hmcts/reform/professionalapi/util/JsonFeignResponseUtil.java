@@ -51,7 +51,7 @@ public class JsonFeignResponseUtil {
                 responseEntityHeaders.put(e.getKey(), new ArrayList<>(e.getValue()));
             }
         });
-
+        responseEntityHeaders.remove("transfer-encoding");
         return responseEntityHeaders;
     }
 }
