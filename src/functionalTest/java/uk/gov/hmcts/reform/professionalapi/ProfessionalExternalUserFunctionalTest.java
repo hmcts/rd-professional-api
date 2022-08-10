@@ -129,14 +129,11 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         if (roles.contains(puiFinanceManager)) {
             pfmBearerToken = inviteUser(puiFinanceManager);
         }
-        if (roles.contains(caseworker)) {
-            caseworkerBearerToken = inviteUser(caseworker);
-        }
     }
 
 
     public void inviteUserScenarios() {
-        inviteUserByPuiUserManagerShouldBeSuccess();
+       // inviteUserByPuiUserManagerShouldBeSuccess();
         // below test receives 504 from SIDAM intermittently, needs investigation:
         // inviteUserBySuperUserShouldBeSuccess();
     }
