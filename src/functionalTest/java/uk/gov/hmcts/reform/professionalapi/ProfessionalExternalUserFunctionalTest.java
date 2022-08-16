@@ -628,7 +628,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void testAddContactsInformationsToOrganisationScenariosShouldBeSuccessWhenLDON() {
-        log.info("Reached testAddContactsInformations");
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
         invitePuiOrgManagerUserScenarios();

@@ -134,7 +134,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                                         String organisationIdentifier) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
-        log.info("Calling userProfileFeignClient" + userProfileFeignClient.toString());
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,
                 Boolean.toString(rolesRequired))) {
 
@@ -144,7 +143,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 clazz = rolesRequired ? ProfessionalUsersEntityResponse.class
                         : ProfessionalUsersEntityResponseWithoutRoles.class;
             }
-            log.info("getting from  userProfileFeignClient" + clazz);
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
