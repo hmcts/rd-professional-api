@@ -47,7 +47,8 @@ public class JsonFeignResponseUtil {
         responseHeaders.entrySet().stream().forEach(e -> {
             if (!(e.getKey().equalsIgnoreCase("request-context") || e.getKey()
                     .equalsIgnoreCase("x-powered-by") || e.getKey()
-                    .equalsIgnoreCase("content-length"))) {
+                    .equalsIgnoreCase("content-length") || e.getKey()
+                    .equalsIgnoreCase("transfer-encoding"))) {
                 responseEntityHeaders.put(e.getKey(), new ArrayList<>(e.getValue()));
             }
         });
