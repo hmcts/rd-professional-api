@@ -195,6 +195,8 @@ class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
+                .getOrganisations().size());
 
         verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
     }
@@ -211,6 +213,7 @@ class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(1);
 
         verify(organisationServiceMock, times(1))
                 .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
@@ -228,6 +231,7 @@ class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(1);
 
         verify(organisationServiceMock, times(1))
                 .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
@@ -244,6 +248,8 @@ class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
+                .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
                 .findByOrganisationStatus(OrganisationStatus.PENDING.name(), null);
@@ -262,6 +268,8 @@ class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
+                .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
             .retrieveAllOrganisations(pageable);
@@ -280,6 +288,8 @@ class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
+                .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
             .retrieveAllOrganisations(pageable);
@@ -298,6 +308,8 @@ class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
+                .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
             .findByOrganisationStatus(OrganisationStatus.PENDING.name(), pageable);

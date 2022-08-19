@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
@@ -183,6 +184,7 @@ public abstract class SuperController {
                                                                    Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
+        int totalRecords = 1;
 
         Object organisationResponse = null;
 
@@ -191,6 +193,7 @@ public abstract class SuperController {
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
             organisationResponse = organisationService.retrieveAllOrganisations(pageable);
+            totalRecords = ((OrganisationsDetailResponse) organisationResponse).getOrganisations().size();
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
                 || (isNotEmpty(orgStatus) && isNotEmpty(orgId))) {
@@ -203,12 +206,14 @@ public abstract class SuperController {
             //Received request to retrieve organisation with status
 
             organisationResponse = organisationService.findByOrganisationStatus(orgStatus.toUpperCase(), pageable);
+            totalRecords = ((OrganisationsDetailResponse) organisationResponse).getOrganisations().size();
         }
 
         log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
 
         return ResponseEntity
                 .status(200)
+                .header("total_records",String.valueOf(totalRecords))
                 .body(organisationResponse);
     }
 
