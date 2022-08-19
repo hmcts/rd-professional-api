@@ -134,6 +134,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                                         String organisationIdentifier) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
+
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,
                 Boolean.toString(rolesRequired))) {
 

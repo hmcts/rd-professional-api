@@ -23,5 +23,3 @@ class OrganisationsDetailResponseTest {
         assertThat(organisationsDetailResponseResponse).isNotNull();
     }
 }
-
-
