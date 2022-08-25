@@ -373,7 +373,6 @@ dependencies {
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-alpha-3'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
-    implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
