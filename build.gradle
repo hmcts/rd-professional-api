@@ -326,7 +326,7 @@ dependencies {
 
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-    implementation "io.github.openfeign:feign-httpclient:11.0"
+    implementation "io.github.openfeign:feign-httpclient:11.9.1"
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
 
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
@@ -438,7 +438,7 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 
-    testImplementation 'io.github.openfeign:feign-jackson:11.7'
+    testImplementation 'io.github.openfeign:feign-jackson:11.9.1'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.1'
