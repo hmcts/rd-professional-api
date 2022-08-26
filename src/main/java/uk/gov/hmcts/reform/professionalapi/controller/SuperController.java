@@ -258,7 +258,7 @@ public abstract class SuperController {
                 professionalUserService.persistUser(professionalUser);
             } else {
                 log.error("{}:: " + String.format(USER_PROFILE_ERROR_MESSAGE, responseEntity.getStatusCode().value(),
-                                responseEntity.toString() ),
+                                responseEntity.toString()),
                         loggingComponentName);
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
