@@ -148,7 +148,8 @@ public abstract class SuperController {
     private String loggingComponentName;
 
     private static final String SRA_REGULATED_FALSE = "false";
-    private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
+    private static final String USER_PROFILE_ERROR_MESSAGE =
+            "{}:: user profile failed with status code : %s, error message: %s";
 
 
     protected ResponseEntity<OrganisationResponse> createOrganisationFrom(
@@ -256,7 +257,8 @@ public abstract class SuperController {
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {
-                log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()),
+                log.error("{}:: " + String.format(USER_PROFILE_ERROR_MESSAGE, responseEntity.getStatusCode().value(),
+                                responseEntity.toString() ),
                         loggingComponentName);
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
@@ -335,8 +337,8 @@ public abstract class SuperController {
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles,
                     prdEnumService.findAllPrdEnums());
         } else {
-            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE,
-                    responseEntity.getStatusCode().value()));
+            log.error(loggingComponentName + String.format(USER_PROFILE_ERROR_MESSAGE,
+                    responseEntity.getStatusCode().value(), responseEntity.toString()));
             responseBody = responseEntity.getBody();
         }
 
@@ -364,8 +366,8 @@ public abstract class SuperController {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
-            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE,
-                    responseEntity.getStatusCode().value()));
+            log.error(loggingComponentName + String.format(USER_PROFILE_ERROR_MESSAGE,
+                    responseEntity.getStatusCode().value(), responseEntity.toString()));
             responseBody = responseEntity.getBody();
         }
 
