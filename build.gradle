@@ -357,6 +357,8 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '7.10.0'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.4.1'
 
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.31'
+
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
@@ -512,9 +514,6 @@ dependencyManagement {
             entry 'jackson-annotations'
         }
 
-        dependencySet(group: 'org.yaml', version: '1.31') {
-            entry 'snakeyaml'
-        }
 
     }
 }
