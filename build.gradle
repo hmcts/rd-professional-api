@@ -18,7 +18,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
-    id 'org.springframework.boot' version '2.7.3'
+    id 'org.springframework.boot' version '2.4.12'
     id "org.flywaydb.flyway" version "8.3.0"
     id 'au.com.dius.pact' version '4.1.7'// do not change, otherwise serenity report fails
 }
