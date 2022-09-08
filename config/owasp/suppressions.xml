@@ -19,4 +19,9 @@
      ]]></notes>
         <cve>CVE-2022-34305</cve>
     </suppress>
+    <suppress>
+        <notes>Suppressed due to unavailability of updated version of launchdarkly-java-server-sdk</notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2022-25857</cve>
+    </suppress>
 </suppressions>
