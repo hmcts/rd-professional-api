@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.flywaydb.core.internal.util.Pair;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -176,8 +176,9 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
-    public void addPbaAccountToOrganisation(Set<String> paymentAccounts,
-                                            Organisation organisation, boolean pbasValidated, boolean isEditPba) {
+    public List<PaymentAccount> addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation,
+                                                            boolean pbasValidated, boolean isEditPba) {
+
         if (paymentAccounts != null) {
             if (!pbasValidated) {
                 PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts, true);
@@ -193,6 +194,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
+
+        return organisation.getPaymentAccounts();
     }
 
     public void updateStatusAndMessage(PaymentAccount paymentAccount, PbaStatus pbaStatus, String statusMessage) {
@@ -563,9 +566,13 @@ public class OrganisationServiceImpl implements OrganisationService {
         Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaRequest);
 
         if (!isEmpty(pbaRequest.getPaymentAccounts())) {
-            addPbaAccountToOrganisation(
+            List<PaymentAccount> paymentAccountsForUserAccountMap = addPbaAccountToOrganisation(
                     pbaRequest.getPaymentAccounts(), organisation.get(), false, false);
+
+            userAccountMapService.persistedUserAccountMap(
+                    organisation.get().getUsers().get(0).toProfessionalUser(), paymentAccountsForUserAccountMap);
         }
+
         return getResponse(unsuccessfulPbas.getLeft(),
                 unsuccessfulPbas.getRight(), pbaRequest.getPaymentAccounts());
 
