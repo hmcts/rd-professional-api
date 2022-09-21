@@ -1008,17 +1008,14 @@ class OrganisationServiceImplTest {
         pbas.add("PBA0000001");
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(pbas);
-        AddPbaResponse addPbaResponse = new AddPbaResponse();
-        ResponseEntity<Object> responseEntity = ResponseEntity
-                .status(200)
-                .body(addPbaResponse);
+
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setUsers(asList(superUser));
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
-
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
     }
@@ -1088,16 +1085,14 @@ class OrganisationServiceImplTest {
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(pbas);
         AddPbaResponse addPbaResponse = new AddPbaResponse();
-        ResponseEntity<Object> responseEntity = ResponseEntity
-                .status(200)
-                .body(addPbaResponse);
+
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setUsers(asList(superUser));
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
-
-        responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+        ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         AddPbaResponse response = (AddPbaResponse) responseEntity.getBody();
 
         assertThat(response).isNotNull();
@@ -1107,7 +1102,6 @@ class OrganisationServiceImplTest {
     }
 
     @Test
-
     void should_add_contact_informations_to_organisation() {
 
         Organisation organisationMock = mock(Organisation.class);
