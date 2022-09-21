@@ -51,6 +51,54 @@ class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    void test_editPaymentAccountsShouldReturn_200_after_addPaymentAccounts() {
+        Set<String> newPaymentAccounts = new HashSet<>();
+        newPaymentAccounts.add("PBA0000001");
+        newPaymentAccounts.add("PBA0000003");
+        newPaymentAccounts.add("PBA0000004");
+        newPaymentAccounts.add("PBA0000005");
+        newPaymentAccounts.add("PBA0000006");
+        newPaymentAccounts.add("PBA0000007");
+        newPaymentAccounts.add("PBA0000008");
+
+        PbaRequest pbaEditRequest = new PbaRequest();
+        pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
+
+        Set<String> paymentAccountsToAdd = new HashSet<>();
+        paymentAccountsToAdd.add("PBA0000009");
+        paymentAccountsToAdd.add("PBA0000010");
+        paymentAccountsToAdd.add("PBA0000011");
+
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userId = createActiveUserAndOrganisation(true);
+        String orgId = retrieveOrganisationIdFromSuperUserId(userId);
+
+        Map<String, Object> addPbaResponse = professionalReferenceDataClient
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
+
+        assertThat(addPbaResponse).containsEntry("http_status", "201 CREATED");
+
+        Map<String, Object> pbaResponse =
+                professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin, null);
+
+        assertThat(pbaResponse.get("http_status")).isEqualTo("200 OK");
+        assertThat(pbaResponse.get("statusMessage")).isEqualTo(HttpStatus.OK.getReasonPhrase());
+
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeader("someone@somewhere.com", hmctsAdmin);
+
+        Map organisationEntityResponse = (Map) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
+        List paymentAccount = (List) organisationEntityResponse.get("paymentAccount");
+        
+        assertThat(paymentAccount).hasSize(7);
+        assertThat(paymentAccount).containsExactlyInAnyOrderElementsOf(newPaymentAccounts);
+    }
+
+    @Test
     void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
         PbaRequest pbaEditRequest = new PbaRequest();
         Set<String> newPaymentAccounts = new HashSet<>();
@@ -160,6 +208,31 @@ class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
         updateOrganisation(orgId, hmctsAdmin, ACTIVE);
 
         return orgId;
+    }
+
+    private String createActiveUserAndOrganisation(boolean isActive) {
+        Set<String> existingPaymentAccounts = new HashSet<>();
+        existingPaymentAccounts.add("PBA0000001");
+        existingPaymentAccounts.add("PBA0000003");
+        existingPaymentAccounts.add("PBA0000004");
+        existingPaymentAccounts.add("PBA0000005");
+        existingPaymentAccounts.add("PBA0000006");
+        existingPaymentAccounts.add("PBA0000007");
+        existingPaymentAccounts.add("PBA0000008");
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .paymentAccount(existingPaymentAccounts).build();
+        String organisationIdentifier = createOrganisationWithGivenRequest(organisationCreationRequest);
+        String userId = updateOrgAndInviteUser(organisationIdentifier, puiFinanceManager);
+
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
+        String orgId = (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
+        if (isActive) {
+            updateOrganisation(orgId, hmctsAdmin, ACTIVE);
+        }
+        return userId;
     }
 
     @Test
