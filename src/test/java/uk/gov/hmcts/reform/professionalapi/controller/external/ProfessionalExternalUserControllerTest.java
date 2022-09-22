@@ -2,14 +2,20 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -58,10 +64,14 @@ class ProfessionalExternalUserControllerTest {
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
     private ResponseEntity<Object> responseEntity;
     private ProfessionalUser professionalUser;
+    private Authentication authentication;
     private UserProfileFeignClient userProfileFeignClient;
     private IdamRepository idamRepositoryMock;
+    private SecurityContext securityContext;
     private UserInfo userInfoMock;
     private final String userIdentifier = UUID.randomUUID().toString();
+    private static final String USER_JWT = "Bearer 8gf364fg367f67";
+
 
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
@@ -79,7 +89,9 @@ class ProfessionalExternalUserControllerTest {
         organisationIdentifierValidatorImpl = mock(OrganisationIdentifierValidatorImpl.class);
         profExtUsrReqValidator = mock(ProfessionalUserReqValidator.class);
         organisationCreationRequestValidator = mock(OrganisationCreationRequestValidator.class);
+        authentication = Mockito.mock(Authentication.class);
         responseEntity = mock(ResponseEntity.class);
+        securityContext = mock(SecurityContext.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         idamRepositoryMock = mock(IdamRepository.class);
         userInfoMock = mock(UserInfo.class);
@@ -259,7 +271,15 @@ class ProfessionalExternalUserControllerTest {
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_CASE_MANAGER);
 
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .header("aHeader", "aHeader")
+                .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(profExtUsrReqValidator.validateUuid(anyString())).thenThrow(new InvalidRequest(""));
         organisation.setStatus(OrganisationStatus.ACTIVE);
