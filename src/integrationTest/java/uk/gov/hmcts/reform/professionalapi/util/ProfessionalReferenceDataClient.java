@@ -150,6 +150,12 @@ public class ProfessionalReferenceDataClient {
                 + "/users?showDeleted={showDeleted}&returnRoles={returnRoles}", role, showDeleted, returnRoles);
     }
 
+    public Map<String, Object> findUsersByOrganisationAndUserIdentifier(String organisationIdentifier, String role,
+                                                                        String userIdentifier) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier
+                + "/users?userIdentifier={userIdentifier}", role, userIdentifier);
+    }
+
     public Map<String, Object> findUsersByOrganisationWithoutAuthHeaders(
             String organisationIdentifier, String showDeleted, String returnRoles) {
         return getRequestWithoutAuthHeaders(APP_INT_BASE_PATH + "/" + organisationIdentifier

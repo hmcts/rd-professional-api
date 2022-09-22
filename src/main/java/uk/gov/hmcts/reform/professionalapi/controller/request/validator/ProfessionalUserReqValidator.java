@@ -1,17 +1,27 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
+
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_MISMATCH;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.UUID_PATTERN;
 
 @Component
 @Slf4j
@@ -38,6 +48,27 @@ public class ProfessionalUserReqValidator {
     public void validateStatusIsActive(String status) {
         if (!IdamStatus.ACTIVE.toString().equalsIgnoreCase(status)) {
             throw new InvalidRequest("Required status param value equal to 'Active'");
+        }
+    }
+
+    public boolean validateUuid(String inputString) {
+        if (inputString != null && !inputString.isEmpty() && !Pattern.matches(UUID_PATTERN, inputString)) {
+            throw new InvalidRequest(
+                    String.format(
+                            "The input parameter: \"%s\", does not comply with the required pattern",
+                            inputString
+                    ));
+        }
+        return true;
+    }
+
+    public void validateOrganisationMatch(String organisationIdentifier, ProfessionalUser user) {
+        if (user == null) {
+            throw new InvalidRequest("Invalid UserIdentifier passed in the request");
+        }
+        if (user.getOrganisation() == null
+                || !organisationIdentifier.trim().equals(user.getOrganisation().getOrganisationIdentifier())) {
+            throw new AccessDeniedException(ORGANISATION_MISMATCH);
         }
     }
 

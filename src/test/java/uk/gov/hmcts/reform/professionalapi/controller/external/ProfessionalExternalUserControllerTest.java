@@ -61,6 +61,7 @@ class ProfessionalExternalUserControllerTest {
     private UserProfileFeignClient userProfileFeignClient;
     private IdamRepository idamRepositoryMock;
     private UserInfo userInfoMock;
+    private final String userIdentifier = UUID.randomUUID().toString();
 
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
@@ -109,11 +110,13 @@ class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities,
                 TestConstants.PUI_USER_MANAGER)).thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(String.class)))
+                .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
@@ -122,8 +125,8 @@ class ProfessionalExternalUserControllerTest {
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation
-                        .getOrganisationIdentifier(), "true", "", true, null, null,
-                null);
+                        .getOrganisationIdentifier(), "true", "", true, null,
+                null, userIdentifier, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
@@ -131,7 +134,7 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true, "");
     }
 
     @Test
@@ -155,11 +158,13 @@ class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER))
                 .thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(String.class)))
+                .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
@@ -168,14 +173,14 @@ class ProfessionalExternalUserControllerTest {
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
-                        true, null, null, null);
+                        true, null, null, userIdentifier,null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true,
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true,
                         "");
     }
 
@@ -206,9 +211,11 @@ class ProfessionalExternalUserControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         lenient().when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
-                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
+                anyString(), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(professionalUsersEntityResponse);
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(anyString()))
+                .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
                 any(String.class));
@@ -218,7 +225,7 @@ class ProfessionalExternalUserControllerTest {
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
-                        false, null, null, null);
+                        false, null, null, userIdentifier, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -229,13 +236,43 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", false, "Active");
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true",
+                        false, "Active");
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class),
-                        any(String.class));
+                .findProfessionalUsersByOrganisation(any(Organisation.class), anyString(), any(String.class),
+                        any(Boolean.class), any(String.class));
         verify(responseEntity, times(1)).getStatusCode();
         verify(responseEntity, times(1)).getBody();
     }
+
+    @Test
+    void testFindUsersByOrganisationWithUserHaveDifferentOrganisation() throws Exception {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
+                "emailAddress", organisation);
+
+        List<SuperUser> users = new ArrayList<>();
+        users.add(professionalUser.toSuperUser());
+        organisation.setUsers(users);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        List<String> authorities = new ArrayList<>();
+        authorities.add(TestConstants.PUI_CASE_MANAGER);
+
+        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(userInfoMock.getRoles()).thenReturn(authorities);
+        when(profExtUsrReqValidator.validateUuid(anyString())).thenThrow(new InvalidRequest(""));
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
+                any(String.class));
+        String orgId = organisation.getOrganisationIdentifier();
+        assertThrows(InvalidRequest.class, () ->  professionalExternalUserController
+                .findUsersByOrganisation(orgId, "true", "",
+                        false, null, null, "123456", null));
+    }
+
+
 
     @Test
     void test_FindUserStatusByEmail() throws JsonProcessingException {

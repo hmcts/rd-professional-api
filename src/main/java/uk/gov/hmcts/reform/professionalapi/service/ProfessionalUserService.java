@@ -19,8 +19,10 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserById(UUID userIdentifier);
 
-    ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted,
-                                                               boolean rolesRequired, String status);
+    ProfessionalUser findProfessionalUserByUserIdentifier(String userIdentifier);
+
+    ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String userIdentifier,
+                                                             String showDeleted, boolean rolesRequired, String status);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation existingOrganisation,
                                                                            String showDeleted, boolean rolesRequired,

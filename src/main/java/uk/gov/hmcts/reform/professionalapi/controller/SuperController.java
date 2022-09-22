@@ -387,9 +387,9 @@ public abstract class SuperController {
 
     }
 
-    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted,
-                                                               Boolean returnRoles, String status, Integer page,
-                                                               Integer size) {
+    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String userIdentifier,
+                                                               String showDeleted, Boolean returnRoles, String status,
+                                                               Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -400,14 +400,14 @@ public abstract class SuperController {
         showDeleted = getShowDeletedValue(showDeleted);
         returnRoles = getReturnRolesValue(returnRoles);
 
-        if (page != null) {
+        if (page != null && userIdentifier == null) {
             Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService
                     .findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles,
                             status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
-                    showDeleted, returnRoles, status);
+                    userIdentifier, showDeleted, returnRoles, status);
         }
         return responseEntity;
     }
