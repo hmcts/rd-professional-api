@@ -14,10 +14,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_MISMATCH;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.UUID_PATTERN;
 
 @Component
 @Slf4j
@@ -48,7 +46,7 @@ public class ProfessionalUserReqValidator {
     }
 
     public boolean validateUuid(String inputString) {
-        if (inputString != null && !inputString.isEmpty() && !Pattern.matches(UUID_PATTERN, inputString)) {
+        if (inputString != null && !inputString.isEmpty()) {
             throw new InvalidRequest(
                     String.format(
                             "The input parameter: \"%s\", does not comply with the required pattern",
