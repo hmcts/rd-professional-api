@@ -49,7 +49,7 @@ public class ProfessionalUserReqValidator {
         if (inputString != null && !inputString.isEmpty()) {
             throw new InvalidRequest(
                     String.format(
-                            "The input parameter: \"%s\", does not comply with the required pattern",
+                            "The input parameter: \"%s\", should neither be null nor empty",
                             inputString
                     ));
         }
