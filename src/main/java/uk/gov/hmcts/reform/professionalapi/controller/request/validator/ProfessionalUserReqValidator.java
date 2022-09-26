@@ -46,10 +46,10 @@ public class ProfessionalUserReqValidator {
     }
 
     public boolean validateUuid(String inputString) {
-        if (inputString != null && !inputString.isEmpty()) {
+        if (StringUtils.isEmpty(inputString)) {
             throw new InvalidRequest(
                     String.format(
-                            "The input parameter: \"%s\", should neither be null nor empty",
+                            "The input parameter: \"%s\", should not be empty",
                             inputString
                     ));
         }

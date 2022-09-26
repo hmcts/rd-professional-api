@@ -72,25 +72,14 @@ class ProfessionalUserReqValidatorTest {
     }
 
     @Test
-    void test_validateUuidThrows400ForInvalidUuid() {
-        String id = "123456";
-        assertThrows(InvalidRequest.class, () -> profUserReqValidator.validateUuid(id));
-    }
-
-    @Test
     void test_validateUuidDoesNotThrow400ForValidUuid() {
         String id = UUID.randomUUID().toString();
         assertTrue(profUserReqValidator.validateUuid(id));
     }
 
     @Test
-    void test_validateUuidDoesNotThrow400ForNullId() {
-        assertTrue(profUserReqValidator.validateUuid(null));
-    }
-
-    @Test
-    void test_validateUuidDoesNotThrow400ForEmptyId() {
-        assertTrue(profUserReqValidator.validateUuid(""));
+    void test_validateUuidDoesThrow400ForEmptyId() {
+        assertThrows(InvalidRequest.class,() -> profUserReqValidator.validateUuid(""));
     }
 
     @Test
