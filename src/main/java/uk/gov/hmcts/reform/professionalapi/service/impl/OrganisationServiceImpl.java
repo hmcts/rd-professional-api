@@ -8,6 +8,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -86,8 +87,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.doesListContainActiveStatus;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.getOrgStatusEnumsExcludingActiveStatus;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.validateAndReturnStatusList;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
@@ -291,19 +290,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    public List<Organisation> retrieveActiveOrganisationDetails(Pageable pageable) {
+    public List<Organisation> retrieveActiveOrganisationDetails(List<Organisation> activeOrganisations) {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         var activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
-
-        List<Organisation> activeOrganisations = null;
-
-        if (pageable != null) {
-            activeOrganisations = getOrganisationByStatus(ACTIVE, pageable);
-        } else {
-            activeOrganisations = getOrganisationByStatus(ACTIVE);
-        }
-
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
                     .getUserIdentifier()) {
@@ -327,12 +317,17 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable) {
         List<Organisation> retrievedOrganisations = null;
+        long totalRecords = 0;
 
         if (pageable != null) {
-            retrievedOrganisations = organisationRepository.findByStatusIn(List.of(ACTIVE, PENDING), pageable)
-                    .getContent();
+            Page<Organisation> pageableOrganisations = organisationRepository.findByStatusIn(List.of(ACTIVE, PENDING),
+                    pageable);
+            totalRecords = pageableOrganisations.getTotalElements();
+            retrievedOrganisations = pageableOrganisations.getContent();
         } else {
             retrievedOrganisations = organisationRepository.findAll();
+            totalRecords = retrievedOrganisations.size();
+
         }
 
         if (retrievedOrganisations.isEmpty()) {
@@ -377,7 +372,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             resultingOrganisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
         }
 
-        return new OrganisationsDetailResponse(resultingOrganisations, true, true, false);
+        OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(
+                resultingOrganisations, true, true, false);
+        organisationsDetailResponse.setTotalRecords(totalRecords);
+        return organisationsDetailResponse;
     }
 
     @Override
@@ -445,27 +443,39 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(String status, Pageable pageable) {
-        List<Organisation> organisations = new ArrayList<>();
-
-        List<String> statuses = new ArrayList<>(validateAndReturnStatusList(status));
-
-        if (doesListContainActiveStatus(statuses)) {
-            organisations = retrieveActiveOrganisationDetails(pageable);
-        }
-
-        var enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
-
-        organisations.addAll(getOrganisationByStatuses(enumStatuses, pageable));
-
-        if (CollectionUtils.isEmpty(organisations)) {
-            throw new EmptyResultDataAccessException(ONE);
-        }
+        List<OrganisationStatus> statuses = new ArrayList<>(validateAndReturnStatusList(status));
+        List<Organisation> organisations;
+        List<Organisation> activeOrganisations = new ArrayList<>();
+        List<Organisation> resultOrganisations = new ArrayList<>();
+        long totalRecords = 0;
 
         if (pageable != null) {
-            organisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
+            Page<Organisation> orgs = organisationRepository.findByStatusIn(statuses,pageable);
+            organisations = orgs.getContent();
+            totalRecords = orgs.getTotalElements();
+        } else {
+            organisations = organisationRepository.findByStatusIn(statuses);
         }
 
-        return new OrganisationsDetailResponse(organisations, true, true, false);
+        organisations.forEach(organisation -> {
+            if (organisation.isOrganisationStatusActive()) {
+                activeOrganisations.add(organisation);
+            } else {
+                resultOrganisations.add(organisation);
+            }
+        });
+        resultOrganisations.addAll(retrieveActiveOrganisationDetails(activeOrganisations));
+        if (CollectionUtils.isEmpty(resultOrganisations)) {
+            throw new EmptyResultDataAccessException(ONE);
+        }
+        if (pageable != null) {
+            resultOrganisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
+        }
+        OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(resultOrganisations,
+                true, true, false);
+        organisationsDetailResponse.setTotalRecords(totalRecords);
+
+        return organisationsDetailResponse;
     }
 
     @Override

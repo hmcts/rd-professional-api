@@ -161,8 +161,6 @@ class SuperControllerTest {
 
         assertThat(actual.getBody()).isEqualTo(organisationsDetailResponse);
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
-        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
-                .getOrganisations().size());
 
         verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
     }

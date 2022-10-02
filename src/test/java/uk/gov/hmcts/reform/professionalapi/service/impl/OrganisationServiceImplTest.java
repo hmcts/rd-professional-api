@@ -456,7 +456,7 @@ class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
-        when(organisationRepository.findByStatus(ACTIVE)).thenReturn(organisations);
+        when(organisationRepository.findByStatusIn(List.of(ACTIVE))).thenReturn(organisations);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -478,7 +478,7 @@ class OrganisationServiceImplTest {
                 = sut.findByOrganisationStatus(ACTIVE.name(), null);
 
         assertThat(organisationDetailResponse).isNotNull();
-        verify(organisationRepository, times(1)).findByStatus(ACTIVE);
+        verify(organisationRepository, times(1)).findByStatusIn(List.of(ACTIVE));
     }
 
     @Test
@@ -602,8 +602,8 @@ class OrganisationServiceImplTest {
         Pageable pageable = PageRequest.of(1,2, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByStatus(ACTIVE, pageable)).thenReturn(orgPage);
-        when(organisationRepository.findByStatus(ACTIVE, pageable).getContent())
+        when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable)).thenReturn(orgPage);
+        when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable).getContent())
             .thenReturn(organisations);
         when(organisationRepository.findByStatusIn(Collections.emptyList(), pageable)).thenReturn(orgPage);
         when(organisationRepository.findByStatusIn(Collections.emptyList(), pageable).getContent())
@@ -618,8 +618,8 @@ class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(2))
-            .findByStatus(ACTIVE, pageable);
-        verify(organisationRepository, times(2))
+            .findByStatusIn(List.of(ACTIVE), pageable);
+        verify(organisationRepository, times(1))
             .findByStatusIn(Collections.emptyList(), pageable);
     }
 
