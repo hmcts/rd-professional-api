@@ -564,11 +564,14 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE, OrganisationStatus.PENDING),
             pageable)).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE,OrganisationStatus.PENDING),
+                pageable).getTotalElements()).thenReturn(1L);
 
         OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(pageable);
 
         assertThat(organisationDetailResponse).isNotNull();
-        verify(organisationRepository, times(1)).findByStatusIn(
+        assertThat(organisationDetailResponse.getTotalRecords()).isGreaterThanOrEqualTo(1);
+        verify(organisationRepository, times(2)).findByStatusIn(
             List.of(OrganisationStatus.ACTIVE, OrganisationStatus.PENDING),
             pageable);
     }
@@ -608,19 +611,20 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByStatusIn(Collections.emptyList(), pageable)).thenReturn(orgPage);
         when(organisationRepository.findByStatusIn(Collections.emptyList(), pageable).getContent())
             .thenReturn(organisations);
-
+        when(organisationRepository.findByStatusIn(List.of(ACTIVE),pageable).getTotalElements()).thenReturn(1L);
 
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
             .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationDetailResponse
             = sut.findByOrganisationStatus(ACTIVE.name(), pageable);
-
         assertThat(organisationDetailResponse).isNotNull();
-        verify(organisationRepository, times(2))
+        verify(organisationRepository, times(3))
             .findByStatusIn(List.of(ACTIVE), pageable);
         verify(organisationRepository, times(1))
             .findByStatusIn(Collections.emptyList(), pageable);
+        assertThat(organisationDetailResponse.getTotalRecords()).isGreaterThanOrEqualTo(1);
+
     }
 
     @Test
