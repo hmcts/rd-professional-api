@@ -137,11 +137,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
             .thenReturn(mock(Page.class));
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class))
                 .getContent()).thenReturn(List.of(organisation));
-        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class)))
-            .thenReturn(mock(Page.class));
-        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class))
-            .getContent())
-            .thenReturn(Collections.emptyList());
+
     }
 
     @State("Active organisations exists for a logged in user")
