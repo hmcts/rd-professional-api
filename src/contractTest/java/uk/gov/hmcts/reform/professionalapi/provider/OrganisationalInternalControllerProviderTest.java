@@ -133,9 +133,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
             COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE, any(Pageable.class)))
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class)))
             .thenReturn(mock(Page.class));
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE, any(Pageable.class)).getContent())
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class)).getContent())
             .thenReturn(List.of(organisation));
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class)))
             .thenReturn(mock(Page.class));
