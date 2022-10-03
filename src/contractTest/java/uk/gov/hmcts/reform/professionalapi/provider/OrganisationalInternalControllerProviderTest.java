@@ -137,7 +137,6 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
             .thenReturn(mock(Page.class));
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class))
                 .getContent()).thenReturn(List.of(organisation));
-
     }
 
     @State("Active organisations exists for a logged in user")
@@ -147,7 +146,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(List.of(organisation));
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE)))
+                .thenReturn(List.of(organisation));
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
