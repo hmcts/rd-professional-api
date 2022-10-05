@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -52,8 +53,9 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     }
 
     @SuppressWarnings("unchecked")
-    public static List<String> validateAndReturnStatusList(String statuses) {
+    public static List<OrganisationStatus> validateAndReturnStatusList(String statuses) {
         List<String> statusList = null;
+        List<OrganisationStatus> orgStatusList = new ArrayList<>();;
         if (isBlank(statuses)) {
             throwInvalidOrgStatus("null or empty");
         } else {
@@ -67,7 +69,8 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
             }
         }
         statusList.replaceAll(String::toUpperCase);
-        return statusList;
+        statusList.forEach(k -> orgStatusList.add(OrganisationStatus.valueOf(k)));
+        return orgStatusList;
     }
 
     public static List<String> throwInvalidOrgStatus(String statuses) {
