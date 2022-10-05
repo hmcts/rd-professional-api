@@ -31,6 +31,9 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MESSAGE_INVALID_STATUS_PASSED =
             "Invalid status param provided, only Active status is allowed";
     public static final String FIRST_NAME = "firstName";
+    public static final String ORG_NAME = "name";
+    public static final Integer DEFAULT_PAGE_SIZE = 20;
+    public static final Integer DEFAULT_PAGE = 1;
     public static final String EMPTY = "";
     public static final String ERROR_MESSAGE_UP_FAILED = "Error while invoking UP";
     public static final String ERROR_MESSAGE_USER_MUST_BE_ACTIVE = "User status must be Active to perform this "
