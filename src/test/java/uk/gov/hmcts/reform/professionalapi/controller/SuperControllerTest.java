@@ -155,14 +155,20 @@ class SuperControllerTest {
     void test_retrieveAllOrganisationOrById() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveAllOrganisations()).thenReturn(organisationsDetailResponse);
+        when(organisationServiceMock.retrieveAllOrganisations(null)).thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = superController.retrieveAllOrganisationOrById(null, null);
+        ResponseEntity<?> actual = superController.retrieveAllOrganisationOrById(null, null, null, null);
 
         assertThat(actual.getBody()).isEqualTo(organisationsDetailResponse);
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveAllOrganisations();
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
+    }
+
+    @Test
+    void test_retrieveAllOrganisationWithPagination0_shouldThrowException() {
+        assertThrows(InvalidRequest.class, () ->
+            superController.retrieveAllOrganisationOrById(null, null, 0, null));
     }
 
 
