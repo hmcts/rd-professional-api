@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -20,7 +21,7 @@ public interface OrganisationService {
 
     OrganisationResponse createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest);
 
-    OrganisationsDetailResponse retrieveAllOrganisations();
+    OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable);
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
@@ -29,11 +30,11 @@ public interface OrganisationService {
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
-    OrganisationsDetailResponse findByOrganisationStatus(String status);
+    OrganisationsDetailResponse findByOrganisationStatus(String status, Pageable pageable);
 
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
 
-    List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses);
+    List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable);
 
     List<Organisation> getOrganisationByStatus(OrganisationStatus status);
 
