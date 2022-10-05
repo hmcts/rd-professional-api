@@ -15,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.BAD_REQUEST_STR;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationStatusValidatorImplTest {
@@ -55,21 +57,21 @@ class OrganisationStatusValidatorImplTest {
 
     @Test
     void test_validateAndReturnStatusList_allvalid() {
-        List<String> validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
+        List<OrganisationStatus> validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
                 "ACTIVE,REVIEW");
-        assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
+        assertThat(validStatuses).hasSize(2).contains(ACTIVE,REVIEW);
 
         validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
                 "  , ACTIVE,REVIEW,");
-        assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
+        assertThat(validStatuses).hasSize(2).contains(ACTIVE,REVIEW);
 
         validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
                 " ACTIVE , REVIEW ");
-        assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
+        assertThat(validStatuses).hasSize(2).contains(ACTIVE,REVIEW);
 
         validStatuses = organisationStatusValidatorImpl.validateAndReturnStatusList(
                 " AcTiVe , rEvIeW ");
-        assertThat(validStatuses).hasSize(2).contains("ACTIVE","REVIEW");
+        assertThat(validStatuses).hasSize(2).contains(ACTIVE,REVIEW);
     }
 
     @Test
