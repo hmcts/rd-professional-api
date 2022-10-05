@@ -146,9 +146,11 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<Object> retrieveOrganisations(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @ApiParam(name = "id") @RequestParam(value = "id", required = false) String id,
-            @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status) {
+            @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status,
+            @ApiParam(name = "page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size") @RequestParam(value = "size", required = false) Integer size) {
 
-        return retrieveAllOrganisationOrById(id, status);
+        return retrieveAllOrganisationOrById(id, status, page, size);
     }
 
 
