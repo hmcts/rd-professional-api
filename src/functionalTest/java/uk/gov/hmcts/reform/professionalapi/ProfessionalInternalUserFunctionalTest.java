@@ -633,4 +633,16 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: END");
     }
+
+    @Test
+    void findOrganisationsWithPaginationShouldReturnSuccess() {
+        log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
+        professionalApiClient.createOrganisation();
+        Map<String, Object> organisations = professionalApiClient
+            .retrieveAllOrganisationsWithPagination(hmctsAdmin, "1", "2");
+
+        assertThat(organisations).isNotNull().hasSize(1);
+
+        log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
+    }
 }

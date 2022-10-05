@@ -91,6 +91,10 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?id={id}", role, id);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsWithPagination(String page, String size, String role) {
+        return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}", role, page, size);
+    }
+
     public Map<String, Object> retrieveExternalOrganisation(String id, String role) {
         return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
     }
