@@ -8,6 +8,8 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -85,10 +87,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.doesListContainActiveStatus;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.getOrgStatusEnumsExcludingActiveStatus;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.validateAndReturnStatusList;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
@@ -292,13 +293,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    public List<Organisation> retrieveActiveOrganisationDetails() {
+    public List<Organisation> retrieveActiveOrganisationDetails(List<Organisation> activeOrganisations) {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         var activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
-
-        var activeOrganisations = getOrganisationByStatus(ACTIVE);
-
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
                     .getUserIdentifier()) {
@@ -320,8 +318,20 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationsDetailResponse retrieveAllOrganisations() {
-        var retrievedOrganisations = organisationRepository.findAll();
+    public OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable) {
+        List<Organisation> retrievedOrganisations = null;
+        long totalRecords = 0;
+
+        if (pageable != null) {
+            Page<Organisation> pageableOrganisations = organisationRepository.findByStatusIn(List.of(ACTIVE, PENDING),
+                    pageable);
+            totalRecords = pageableOrganisations.getTotalElements();
+            retrievedOrganisations = pageableOrganisations.getContent();
+        } else {
+            retrievedOrganisations = organisationRepository.findAll();
+            totalRecords = retrievedOrganisations.size();
+
+        }
 
         if (retrievedOrganisations.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
@@ -341,7 +351,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(),
                             organisation);
                 }
-            } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
+            } else if (organisation.getStatus() == PENDING) {
                 pendingOrganisations.add(organisation);
             }
         });
@@ -361,7 +371,14 @@ public class OrganisationServiceImpl implements OrganisationService {
         resultingOrganisations.addAll(pendingOrganisations);
         resultingOrganisations.addAll(updatedActiveOrganisations);
 
-        return new OrganisationsDetailResponse(resultingOrganisations, true, true, false);
+        if (pageable != null) {
+            resultingOrganisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
+        }
+
+        OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(
+                resultingOrganisations, true, true, false);
+        organisationsDetailResponse.setTotalRecords(totalRecords);
+        return organisationsDetailResponse;
     }
 
     @Override
@@ -428,24 +445,40 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationsDetailResponse findByOrganisationStatus(String status) {
-        List<Organisation> organisations = new ArrayList<>();
+    public OrganisationsDetailResponse findByOrganisationStatus(String status, Pageable pageable) {
+        List<OrganisationStatus> statuses = new ArrayList<>(validateAndReturnStatusList(status));
+        List<Organisation> organisations;
+        List<Organisation> activeOrganisations = new ArrayList<>();
+        List<Organisation> resultOrganisations = new ArrayList<>();
+        long totalRecords = 0;
 
-        List<String> statuses = new ArrayList<>(validateAndReturnStatusList(status));
-
-        if (doesListContainActiveStatus(statuses)) {
-            organisations = retrieveActiveOrganisationDetails();
+        if (pageable != null) {
+            Page<Organisation> orgs = organisationRepository.findByStatusIn(statuses,pageable);
+            organisations = orgs.getContent();
+            totalRecords = orgs.getTotalElements();
+        } else {
+            organisations = organisationRepository.findByStatusIn(statuses);
         }
 
-        var enumStatuses = getOrgStatusEnumsExcludingActiveStatus(statuses);
-
-        organisations.addAll(getOrganisationByStatuses(enumStatuses));
-
-        if (CollectionUtils.isEmpty(organisations)) {
+        organisations.forEach(organisation -> {
+            if (organisation.isOrganisationStatusActive()) {
+                activeOrganisations.add(organisation);
+            } else {
+                resultOrganisations.add(organisation);
+            }
+        });
+        resultOrganisations.addAll(retrieveActiveOrganisationDetails(activeOrganisations));
+        if (CollectionUtils.isEmpty(resultOrganisations)) {
             throw new EmptyResultDataAccessException(ONE);
         }
+        if (pageable != null) {
+            resultOrganisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
+        }
+        OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(resultOrganisations,
+                true, true, false);
+        organisationsDetailResponse.setTotalRecords(totalRecords);
 
-        return new OrganisationsDetailResponse(organisations, true, true, false);
+        return organisationsDetailResponse;
     }
 
     @Override
@@ -511,11 +544,21 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
-    public List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses) {
+    public List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable) {
+        if (pageable != null) {
+            return  organisationRepository.findByStatusIn(enumStatuses, pageable).getContent();
+        }
         return organisationRepository.findByStatusIn(enumStatuses);
     }
 
     public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
+        return organisationRepository.findByStatus(status);
+    }
+
+    public List<Organisation> getOrganisationByStatus(OrganisationStatus status, Pageable pageable) {
+        if (pageable != null) {
+            return organisationRepository.findByStatus(status, pageable).getContent();
+        }
         return organisationRepository.findByStatus(status);
     }
 

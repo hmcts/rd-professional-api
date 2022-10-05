@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,7 +33,13 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     List<Organisation> findByStatus(OrganisationStatus status);
 
+    @EntityGraph(value = "Organisation.alljoins")
+    Page<Organisation> findByStatus(OrganisationStatus status, Pageable pageable);
+
     List<Organisation> findByStatusIn(List<OrganisationStatus> statuses);
+
+    @EntityGraph(value = "Organisation.alljoins")
+    Page<Organisation> findByStatusIn(List<OrganisationStatus> statuses, Pageable pageable);
 
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
