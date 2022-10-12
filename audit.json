@@ -204,5 +204,6 @@
   "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/mfa_PUT" : "ignore",
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/mfa_PUT" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/userId?origin=EXUI_PUT" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/userId?origin=EXUI_PUT" : "ignore"
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/userId?origin=EXUI_PUT" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations?id=id&page=10&size=10&status=status_GET" : "ignore"
 }
