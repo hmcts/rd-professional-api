@@ -202,13 +202,11 @@ public class ExceptionMapper {
     private ResponseEntity<Object> errorDetailsContactInfoResponseEntity(
             HttpStatus httpStatus,
             List<ContactInformationValidationResponse> contactInfoValidations) {
-
-        return new ResponseEntity<>(contactInfoValidations, httpStatus);
+            return new ResponseEntity<>(contactInfoValidations, httpStatus);
     }
 
     private boolean mfaEnumException(Exception ex) {
-        if (ex.getCause() instanceof InvalidFormatException) {
-            InvalidFormatException ifx = (InvalidFormatException) ex.getCause();
+        if (ex.getCause() instanceof InvalidFormatException ifx) {
             return ifx.getTargetType().isEnum() && (ifx.getTargetType().equals(MFAStatus.class));
         }
         return false;
