@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -69,7 +70,10 @@ public class OrganisationCreationRequestValidator {
     public List<ContactInformationValidationResponse> validate(
             List<ContactInformationCreationRequest> contactInformationCreationRequests) {
 
-        if (contactInformationCreationRequests.isEmpty()) {
+        Optional<List<ContactInformationCreationRequest>> infoList =
+                Optional.ofNullable(contactInformationCreationRequests);
+
+        if (infoList.isEmpty() || infoList.get().isEmpty()) {
             throw new InvalidRequest("Request is empty");
         }
 
@@ -83,7 +87,7 @@ public class OrganisationCreationRequestValidator {
         var contactInformationValidationResponses = new ArrayList<ContactInformationValidationResponse>();
 
         contactInformationCreationRequests.forEach(contactInfo ->
-            validateContactInformation(contactInfo, contactInformationValidationResponses));
+                validateContactInformation(contactInfo, contactInformationValidationResponses));
         return contactInformationValidationResponses;
     }
 
@@ -266,7 +270,6 @@ public class OrganisationCreationRequestValidator {
     public static void setLoggingComponentName(String loggingComponentName) {
         OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
     }
-
 
 
 }
