@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern;
 public class DxAddressCreationRequest {
 
     @NotNull
-    @Pattern(regexp = "^(?:DX|NI) [0-9]{10}+$")
+    @Pattern(regexp = "^(?:DX|NI) \\d{10}+$")
     private final String dxNumber;
     @NotNull
     private final String dxExchange;
