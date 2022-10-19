@@ -56,6 +56,7 @@ public class OrganisationCreationRequestValidator {
                 || StringUtils.isBlank(request.getEmail())) {
             throw new InvalidRequest("Mandatory fields are blank or null");
         }
+
         validateEmail(request.getEmail());
     }
 

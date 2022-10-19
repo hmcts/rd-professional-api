@@ -87,6 +87,7 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     }
 
     public static List<OrganisationStatus> getOrgStatusEnumsExcludingActiveStatus(List<String> statuses) {
+
         statuses.removeIf(ACTIVE.name()::equalsIgnoreCase);
         return statuses.stream().map(OrganisationStatus::valueOf).toList();
     }
