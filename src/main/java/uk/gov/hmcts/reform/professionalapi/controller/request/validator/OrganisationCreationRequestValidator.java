@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -56,6 +55,7 @@ public class OrganisationCreationRequestValidator {
                 || StringUtils.isBlank(request.getEmail())) {
             throw new InvalidRequest("Mandatory fields are blank or null");
         }
+
         validateEmail(request.getEmail());
     }
 
@@ -69,9 +69,7 @@ public class OrganisationCreationRequestValidator {
     public List<ContactInformationValidationResponse> validate(
             List<ContactInformationCreationRequest> contactInformationCreationRequests) {
 
-        Optional<List<ContactInformationCreationRequest>> infoList =
-                Optional.ofNullable(contactInformationCreationRequests);
-        if (infoList.isPresent() && infoList.get().isEmpty()) {
+        if (contactInformationCreationRequests.isEmpty()) {
             throw new InvalidRequest("Request is empty");
         }
 
@@ -203,9 +201,8 @@ public class OrganisationCreationRequestValidator {
             List<ContactInformationValidationResponse> contactInformationValidationResponses) {
 
         try {
-            Optional<ContactInformationCreationRequest> contactInfoOptional =
-                    Optional.ofNullable(contactInformation);
-            if (!contactInfoOptional.isPresent()) {
+
+            if (null == contactInformation) {
                 throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
             } else if (isEmptyValue(contactInformation.getAddressLine1())
                     || isEmptyValue(contactInformation.getAddressLine2())
@@ -219,9 +216,9 @@ public class OrganisationCreationRequestValidator {
                 throw new InvalidRequest("AddressLine1 cannot be empty");
             } else {
                 List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
-                if (dxAddressList != null && dxAddressList.isEmpty()) {
+                if (dxAddressList != null  && dxAddressList.isEmpty()) {
                     throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
-                } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
+                } else if (dxAddressList != null ){
                     dxAddressList.forEach(this::isDxAddressValid);
                 }
                 ContactInformationValidationResponse contactInfoBuilder = new ContactInformationValidationResponse();
@@ -232,7 +229,7 @@ public class OrganisationCreationRequestValidator {
         } catch (InvalidRequest invalidRequest) {
 
             var contactInfoBuilder = new ContactInformationValidationResponse();
-            contactInfoBuilder.setUprn(contactInformation.getUprn());
+            contactInfoBuilder.setUprn(contactInformation != null ? contactInformation.getUprn() : null);
             contactInfoBuilder.setValidAddress(false);
             contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
             contactInformationValidationResponses.add(contactInfoBuilder);

@@ -21,7 +21,6 @@ public class DxAddressCreationRequest {
     @JsonCreator
     public DxAddressCreationRequest(@JsonProperty("dxNumber") String dxNumber,
                                     @JsonProperty("dxExchange") String dxExchange) {
-
         this.dxNumber = dxNumber;
         this.dxExchange = dxExchange;
     }
