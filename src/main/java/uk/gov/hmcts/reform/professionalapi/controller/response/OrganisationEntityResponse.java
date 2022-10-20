@@ -10,10 +10,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
@@ -99,7 +99,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
             this.contactInformation = organisation.getContactInformation()
                     .stream()
                     .map(ContactInformationResponseWithDxAddress::new)
-                    .collect(toList());
+                    .collect(Collectors.toList());
         }
 
         this.dateReceived = organisation.getCreated();
