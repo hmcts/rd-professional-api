@@ -207,8 +207,7 @@ public class ExceptionMapper {
     }
 
     private boolean mfaEnumException(Exception ex) {
-        if (ex.getCause() instanceof InvalidFormatException) {
-            InvalidFormatException ifx = (InvalidFormatException) ex.getCause();
+        if (ex.getCause() instanceof InvalidFormatException ifx) {
             return ifx.getTargetType().isEnum() && (ifx.getTargetType().equals(MFAStatus.class));
         }
         return false;
