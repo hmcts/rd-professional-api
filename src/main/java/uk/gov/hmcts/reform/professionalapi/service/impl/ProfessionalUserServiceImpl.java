@@ -99,6 +99,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
+    public ProfessionalUser findProfessionalUserByUserIdentifier(String id) {
+        return professionalUserRepository.findByUserIdentifier(id);
+    }
+
+    @Override
     public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation,
                                                                                   String showDeleted,
                                                                                   boolean rolesRequired,
@@ -116,16 +121,17 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted,
-                                                                      boolean rolesRequired, String status) {
-        var professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String userIdentifier,
+                                                            String showDeleted, boolean rolesRequired, String status) {
+        var professionalUsers = userIdentifier != null
+                ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userIdentifier)
+                : professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
-
-        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired,
-                status, organisation.getOrganisationIdentifier());
+        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
     }
 
     @SuppressWarnings("unchecked")
