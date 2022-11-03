@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.Optional;
@@ -108,6 +109,7 @@ public class ProfessionalExternalUserController extends SuperController {
                     required = false, defaultValue = "true") Boolean returnRoles,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
+            @RequestParam(value = "userIdentifier", required = false) String userIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
 
@@ -118,8 +120,14 @@ public class ProfessionalExternalUserController extends SuperController {
             status = isBlank(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
+        if (userIdentifier != null) {
+            profExtUsrReqValidator.validateUuid(userIdentifier);
+            ProfessionalUser fetchingUser = professionalUserService.findProfessionalUserByUserIdentifier(
+                    userIdentifier);
+            profExtUsrReqValidator.validateOrganisationMatch(organisationIdentifier, fetchingUser);
+        }
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
+        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
                 page, size);
     }
 
