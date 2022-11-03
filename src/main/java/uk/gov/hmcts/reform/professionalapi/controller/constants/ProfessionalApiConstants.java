@@ -135,6 +135,6 @@ public class ProfessionalApiConstants {
     public static final String GET_USER_STATUS_EMAIL_1 = "**IDAM Roles to access API** : \n pui-finance-manager";
     public static final String GET_USER_STATUS_EMAIL_2 = ",\n pui-user-manager,\n pui-organisation-manager,";
     public static final String GET_USER_STATUS_EMAIL_3 = "\n pui-case-manager,\n caseworker-publiclaw-courtadmin";
-
+    public static final String ORGANISATION_MISMATCH = "Organisation doesn't match for the given userIdentifier";
 
 }
