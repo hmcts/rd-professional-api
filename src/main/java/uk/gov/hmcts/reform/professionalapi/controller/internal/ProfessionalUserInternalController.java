@@ -89,6 +89,7 @@ public class ProfessionalUserInternalController extends SuperController {
     public ResponseEntity<Object> findUsersByOrganisation(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @RequestParam(value = "userIdentifier", required = false) String userIdentifier,
             @RequestParam(value = "showDeleted", required = false) String showDeleted,
             @ApiParam(name = "returnRoles")
             @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
@@ -99,7 +100,8 @@ public class ProfessionalUserInternalController extends SuperController {
         if (isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles())) {
             status = ACTIVE;
         }
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
+        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status, page,
+                size);
     }
 
     @ApiOperation(
