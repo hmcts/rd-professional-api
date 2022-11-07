@@ -205,5 +205,9 @@
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/mfa_PUT" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/userId?origin=EXUI_PUT" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/userId?origin=EXUI_PUT" : "ignore",
-  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations?id=id&page=10&size=10&status=status_GET" : "ignore"
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations?id=id&page=10&size=10&status=status_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&status=status&userIdentifier=userIdentifier_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&userIdentifier=userIdentifier_GET" : "ignore",
+  "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&status=status&userIdentifier=userIdentifier_GET" : "ignore",
+  "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&userIdentifier=userIdentifier_GET" : "ignore"
 }
