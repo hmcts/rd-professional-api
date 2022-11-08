@@ -71,7 +71,7 @@ public class OrganisationCreationRequestValidator {
 
         Optional<List<ContactInformationCreationRequest>> infoList =
                 Optional.ofNullable(contactInformationCreationRequests);
-        if (infoList.isPresent() && infoList.get().isEmpty()) {
+        if (infoList.isEmpty() || infoList.get().isEmpty()) {
             throw new InvalidRequest("Request is empty");
         }
 
