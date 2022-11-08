@@ -232,7 +232,7 @@ public class OrganisationCreationRequestValidator {
         } catch (InvalidRequest invalidRequest) {
 
             var contactInfoBuilder = new ContactInformationValidationResponse();
-            contactInfoBuilder.setUprn(contactInformation.getUprn());
+            contactInfoBuilder.setUprn(contactInformation != null ? contactInformation.getUprn() : null);
             contactInfoBuilder.setValidAddress(false);
             contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
             contactInformationValidationResponses.add(contactInfoBuilder);
