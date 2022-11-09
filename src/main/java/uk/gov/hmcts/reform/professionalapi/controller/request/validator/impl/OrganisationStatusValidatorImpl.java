@@ -55,7 +55,7 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     @SuppressWarnings("unchecked")
     public static List<OrganisationStatus> validateAndReturnStatusList(String statuses) {
         List<String> statusList = null;
-        List<OrganisationStatus> orgStatusList = new ArrayList<>();
+        List<OrganisationStatus> orgStatusList = new ArrayList<>();;
         if (isBlank(statuses)) {
             throwInvalidOrgStatus("null or empty");
         } else {
@@ -87,7 +87,6 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     }
 
     public static List<OrganisationStatus> getOrgStatusEnumsExcludingActiveStatus(List<String> statuses) {
-
         statuses.removeIf(ACTIVE.name()::equalsIgnoreCase);
         return statuses.stream().map(OrganisationStatus::valueOf).toList();
     }
