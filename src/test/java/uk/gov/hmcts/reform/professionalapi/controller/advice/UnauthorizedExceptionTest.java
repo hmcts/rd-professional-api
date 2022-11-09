@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class UnauthorizedExceptionTest {
+public class UnauthorizedExceptionTest {
     @Test
     void test_handle_feign_exception() {
         UnauthorizedException unAuthorizedException =
