@@ -41,7 +41,8 @@ def versions = [
         junit           : '5.8.1',
         junitPlatform   : '1.8.1',
         log4j           : '2.17.1',
-        springVersion   : '5.3.20'
+        springVersion   : '5.3.20',
+        testContainer_postgresql: '1.17.2'
 ]
 
 
@@ -387,6 +388,10 @@ dependencies {
     functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     smokeTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     smokeTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testContainer_postgresql
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testContainer_postgresql
+    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.testContainer_postgresql
 
     testImplementation("org.hamcrest:hamcrest-junit:2.0.0.0") {
         exclude group: "org.hamcrest", module: "hamcrest-core"
