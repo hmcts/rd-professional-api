@@ -201,6 +201,7 @@ class ProfessionalExternalUserControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
                 "emailAddress", organisation);
+        professionalUser.setUserIdentifier(UUID.randomUUID());
 
         List<SuperUser> users = new ArrayList<>();
         users.add(professionalUser.toSuperUser());

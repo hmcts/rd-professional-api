@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -87,7 +88,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
         assertThat(updatedUsers.size()).isEqualTo(2);
 
         ProfessionalUser persistedProfessionalUser = professionalUserRepository
-                .findByUserIdentifier(userIdentifierResponse);
+                .findByUserIdentifier(UUID.fromString(userIdentifierResponse));
         assertThat(persistedProfessionalUser).isNotNull();
     }
 
@@ -123,7 +124,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
         assertThat(updatedUsers.size()).isEqualTo(2);
 
         ProfessionalUser persistedProfessionalUser = professionalUserRepository
-                .findByUserIdentifier(userIdentifierResponse);
+                .findByUserIdentifier(UUID.fromString(userIdentifierResponse));
         assertThat(persistedProfessionalUser).isNotNull();
     }
 

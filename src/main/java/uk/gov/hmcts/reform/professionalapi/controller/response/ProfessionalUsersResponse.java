@@ -22,7 +22,11 @@ public class ProfessionalUsersResponse extends ProfessionalUsersResponseWithoutR
     private String idamMessage;
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
-        this.userIdentifier = user.getUserIdentifier();
+        if (user.getUserIdentifier() != null) {
+            this.userIdentifier = user.getUserIdentifier().toString();
+        }
+
+        this.userIdentifier = userIdentifier;
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();

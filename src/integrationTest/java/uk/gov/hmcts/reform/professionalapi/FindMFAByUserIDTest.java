@@ -52,11 +52,11 @@ class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
         ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", pendingOrganisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         professionalUserRepository.save(superUser);
 
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(superUser
-                .getUserIdentifier());
+                .getUserIdentifier().toString());
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString()).contains(ORG_NOT_ACTIVE);
@@ -91,7 +91,7 @@ class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
                 .findByOrganisationIdentifier(organisationIdentifier);
         SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
 
-        return professionalReferenceDataClient.findMFAByUserID(persistedSuperUser.getUserIdentifier());
+        return professionalReferenceDataClient.findMFAByUserID(persistedSuperUser.getUserIdentifier().toString());
     }
     
 }

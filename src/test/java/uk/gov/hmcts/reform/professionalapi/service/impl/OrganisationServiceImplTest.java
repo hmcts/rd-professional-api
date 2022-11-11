@@ -415,13 +415,13 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAnOrganisationsByOrgIdentifier() throws Exception {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.fromString(UUID.randomUUID().toString()));
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.fromString(UUID.randomUUID().toString()));
 
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
@@ -445,13 +445,13 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAnOrganisationsByWhenStatusActive() throws Exception {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.fromString(UUID.randomUUID().toString()));
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.fromString(UUID.randomUUID().toString()));
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
@@ -462,7 +462,7 @@ class OrganisationServiceImplTest {
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
                 "email@org.com", organisation);
-
+        profile.setUserIdentifier(UUID.randomUUID());
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
         userProfiles.add(userProfileResponse);
@@ -579,13 +579,13 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_RetrieveAnOrganisationsByStatusAndPagination() throws JsonProcessingException {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.fromString(UUID.randomUUID().toString()));
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.fromString(UUID.randomUUID().toString()));
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
@@ -593,6 +593,7 @@ class OrganisationServiceImplTest {
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
             "email@org.com", organisation);
+        profile.setUserIdentifier(UUID.randomUUID());
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
@@ -990,7 +991,7 @@ class OrganisationServiceImplTest {
 
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
                 "email@org.com", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.fromString(UUID.randomUUID().toString()));
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 

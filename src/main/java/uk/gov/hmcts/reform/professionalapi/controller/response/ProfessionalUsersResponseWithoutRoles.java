@@ -23,7 +23,10 @@ public class ProfessionalUsersResponseWithoutRoles {
     public String idamStatus;
 
     public ProfessionalUsersResponseWithoutRoles(ProfessionalUser user) {
-        this.userIdentifier = user.getUserIdentifier();
+        if (user.getUserIdentifier() != null) {
+            this.userIdentifier = user.getUserIdentifier().toString();
+        }
+
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();

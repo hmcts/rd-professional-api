@@ -280,8 +280,8 @@ public abstract class SuperController {
                 UserProfileCreationResponse userProfileCreationResponse
                         = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
                 //Idam registration success
-                professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-                superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                professionalUser.setUserIdentifier(UUID.fromString(userProfileCreationResponse.getIdamId()));
+                superUser.setUserIdentifier(UUID.fromString(userProfileCreationResponse.getIdamId()));
                 professionalUserService.persistUser(professionalUser);
             } else {
                 log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()),
@@ -358,7 +358,7 @@ public abstract class SuperController {
             UserProfileCreationResponse userProfileCreationResponse
                     = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
             //Idam registration success
-            professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+            professionalUser.setUserIdentifier(UUID.fromString(userProfileCreationResponse.getIdamId()));
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles,
                     prdEnumService.findAllPrdEnums());
         } else {

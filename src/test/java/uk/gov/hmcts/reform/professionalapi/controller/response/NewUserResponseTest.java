@@ -27,7 +27,7 @@ class NewUserResponseTest {
                 "companyN", false, "www.org.com");
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
-        professionalUser.setUserIdentifier(userIdentifier);
+        professionalUser.setUserIdentifier(UUID.fromString(userIdentifier));
         newUserResponse = new NewUserResponse(professionalUser);
         userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("ACM1QR");

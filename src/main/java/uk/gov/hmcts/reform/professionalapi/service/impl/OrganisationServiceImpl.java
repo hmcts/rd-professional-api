@@ -300,7 +300,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
                     .getUserIdentifier()) {
-                activeOrganisationDtls.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(), organisation);
+                activeOrganisationDtls.put(organisation.getUsers()
+                        .get(ZERO_INDEX).getUserIdentifier().toString(), organisation);
             }
         });
 
@@ -348,7 +349,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 activeOrganisations.add(organisation);
                 if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
                         .getUserIdentifier()) {
-                    activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(),
+                    activeOrganisationDetails.put(organisation.getUsers()
+                                    .get(ZERO_INDEX).getUserIdentifier().toString(),
                             organisation);
                 }
             } else if (organisation.getStatus() == PENDING) {
@@ -529,7 +531,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
                 // If user is not active in the up will send the request to delete
                 var userIds = new HashSet<String>();
-                userIds.add(user.getUserIdentifier());
+                userIds.add(user.getUserIdentifier().toString());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
                         .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);

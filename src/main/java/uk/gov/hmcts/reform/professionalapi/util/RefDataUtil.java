@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
@@ -118,7 +119,11 @@ public class RefDataUtil {
     public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user,
                                                                   UserProfileFeignClient userProfileFeignClient,
                                                                   Boolean isRequiredRoles) {
-        try (Response response = userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
+        String userIdentifier = null;
+        if(user.getUserIdentifier() != null){
+            userIdentifier = user.getUserIdentifier().toString();
+        }
+        try (Response response = userProfileFeignClient.getUserProfileById(userIdentifier)) {
 
             Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
@@ -203,7 +208,7 @@ public class RefDataUtil {
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
             if (TRUE.equals(isRequiredRoles)) {
-                user.setUserIdentifier(userProfileResponse.getIdamId());
+                user.setUserIdentifier(UUID.fromString(userProfileResponse.getIdamId()));
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());
                 user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());

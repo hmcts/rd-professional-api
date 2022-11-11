@@ -44,7 +44,7 @@ class SuperUserTest {
         SuperUser superUser = new SuperUser("some-fname", "some-lname", "some-email-address", organisation);
 
         UUID id = UUID.randomUUID();
-        superUser.setUserIdentifier(id.toString());
+        superUser.setUserIdentifier(id);
         superUser.setId(id);
         superUser.setCreated(LocalDateTime.now());
         superUser.setLastUpdated(LocalDateTime.now());
@@ -61,6 +61,6 @@ class SuperUserTest {
         assertThat(professionalUser.getDeleted()).isNotNull();
         assertThat(professionalUser.getId()).isNotNull();
         assertThat(professionalUser.getLastUpdated()).isNotNull();
-        assertThat(professionalUser.getUserIdentifier()).isEqualTo(id.toString());
+        assertThat(professionalUser.getUserIdentifier()).isEqualTo(id);
     }
 }

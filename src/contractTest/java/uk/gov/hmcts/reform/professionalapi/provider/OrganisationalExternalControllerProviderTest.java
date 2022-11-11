@@ -176,7 +176,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         su.setEmailAddress("superUser@email.com");
         su.setFirstName("some-fname");
         su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        su.setUserIdentifier(UUID.fromString("someUserIdentifier"));
 
         PaymentAccount pa = new PaymentAccount();
         pa.setPbaNumber("pbaNumber");

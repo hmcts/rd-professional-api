@@ -100,7 +100,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ProfessionalUser findProfessionalUserByUserIdentifier(String id) {
-        return professionalUserRepository.findByUserIdentifier(id);
+        return professionalUserRepository.findByUserIdentifier(UUID.fromString(id));
     }
 
     @Override
@@ -124,7 +124,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String userIdentifier,
                                                             String showDeleted, boolean rolesRequired, String status) {
         var professionalUsers = userIdentifier != null
-                ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userIdentifier)
+                ? professionalUserRepository.findByOrganisationAndUserIdentifier(
+                        organisation, UUID.fromString(userIdentifier))
                 : professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
@@ -185,7 +186,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(List<ProfessionalUser> professionalUsers) {
         var usersId = new ArrayList<String>();
 
-        professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
+        professionalUsers.forEach(
+                user -> {
+                    if (user.getUserIdentifier() != null) {
+                        usersId.add(user.getUserIdentifier().toString());
+                    }
+
+                }
+        );
 
         return new RetrieveUserProfilesRequest(usersId);
     }
@@ -236,7 +244,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public void checkUserStatusIsActiveByUserId(String userId) {
         NewUserResponse newUserResponse = null;
-        var user = professionalUserRepository.findByUserIdentifier(userId);
+        var user = professionalUserRepository.findByUserIdentifier(UUID.fromString(userId));
 
         if (null != user) {
             newUserResponse = RefDataUtil.findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);

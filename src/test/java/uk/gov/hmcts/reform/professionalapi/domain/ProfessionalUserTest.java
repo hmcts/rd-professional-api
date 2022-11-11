@@ -49,7 +49,7 @@ class ProfessionalUserTest {
                 "some-email-address", organisation);
 
         UUID id = UUID.randomUUID();
-        professionalUser.setUserIdentifier(id.toString());
+        professionalUser.setUserIdentifier(id);
         professionalUser.setId(id);
         professionalUser.setCreated(LocalDateTime.now());
         professionalUser.setLastUpdated(LocalDateTime.now());
@@ -63,6 +63,6 @@ class ProfessionalUserTest {
         assertThat(superUser.getDeleted()).isNotNull();
         assertThat(superUser.getId()).isNotNull();
         assertThat(superUser.getLastUpdated()).isNotNull();
-        assertThat(superUser.getUserIdentifier()).isEqualTo(id.toString());
+        assertThat(superUser.getUserIdentifier()).isEqualTo(id);
     }
 }
