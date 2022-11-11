@@ -26,7 +26,6 @@ public class ProfessionalUsersResponse extends ProfessionalUsersResponseWithoutR
             this.userIdentifier = user.getUserIdentifier().toString();
         }
 
-        this.userIdentifier = userIdentifier;
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
