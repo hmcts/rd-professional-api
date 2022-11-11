@@ -458,7 +458,7 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.findByStatusIn(List.of(ACTIVE))).thenReturn(organisations);
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
                 "email@org.com", organisation);
@@ -466,6 +466,7 @@ class OrganisationServiceImplTest {
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
         userProfiles.add(userProfileResponse);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
@@ -589,7 +590,7 @@ class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
             "email@org.com", organisation);
@@ -598,6 +599,7 @@ class OrganisationServiceImplTest {
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
         userProfiles.add(userProfileResponse);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
             false);

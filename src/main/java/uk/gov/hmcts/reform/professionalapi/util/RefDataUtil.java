@@ -120,7 +120,7 @@ public class RefDataUtil {
                                                                   UserProfileFeignClient userProfileFeignClient,
                                                                   Boolean isRequiredRoles) {
         String userIdentifier = null;
-        if(user.getUserIdentifier() != null){
+        if (user.getUserIdentifier() != null) {
             userIdentifier = user.getUserIdentifier().toString();
         }
         try (Response response = userProfileFeignClient.getUserProfileById(userIdentifier)) {
