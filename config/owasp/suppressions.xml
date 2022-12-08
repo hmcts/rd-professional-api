@@ -18,5 +18,6 @@
      file name: tomcat-embed-core-9.0.63.jar
      ]]></notes>
         <cve>CVE-2022-34305</cve>
+        <cve>CVE-2021-37533</cve>
     </suppress>
 </suppressions>
