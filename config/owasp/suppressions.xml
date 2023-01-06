@@ -20,4 +20,8 @@
         <cve>CVE-2022-34305</cve>
         <cve>CVE-2021-37533</cve>
     </suppress>
+      <suppress until="2023-12-30">
+    <notes>cucumber:datatable pom contains com.googlecode.java-diff-utils:diffutils which has the CVE vulnerability, no fix has been released yet for this</notes>
+    <cve>CVE-2021-4277</cve>
+  </suppress>
 </suppressions>
