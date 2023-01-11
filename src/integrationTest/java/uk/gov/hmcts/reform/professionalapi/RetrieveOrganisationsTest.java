@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -369,21 +370,24 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void forbidden_if_pui_case_manager_user_try_access_organisation_id_without_role_access() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient
+                .retrieveExternalOrganisation(UUID.randomUUID().toString(),
                 puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
     void forbidden_if_pui_user_manager_try_access_organisation_id_without_role_access() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient
+                .retrieveExternalOrganisation(UUID.randomUUID().toString(),
                 puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
     void forbidden_if_user_does_not_exist_in_org_pui_finance_manager_try_access_organisation_id() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient
+                .retrieveExternalOrganisation(UUID.randomUUID().toString(),
                 puiFinanceManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }

@@ -18,7 +18,7 @@ public class NewUserResponse {
 
     public NewUserResponse(ProfessionalUser user) {
 
-        this.userIdentifier = user.getUserIdentifier();
+        this.userIdentifier = user.getUserIdentifier().toString();
     }
 
     public NewUserResponse(UserProfileCreationResponse userProfileCreationResponse) {

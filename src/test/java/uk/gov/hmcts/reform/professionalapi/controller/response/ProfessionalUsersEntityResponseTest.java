@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,6 +26,8 @@ class ProfessionalUsersEntityResponseTest {
 
         ProfessionalUser professionalUser = new ProfessionalUser(dummyFirstName, dummyLastName, dummyEmail,
                 new Organisation());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
+
         ProfessionalUsersResponse professionalResponse = new ProfessionalUsersResponse(professionalUser);
         List<ProfessionalUsersResponse> professionalUsers = new ArrayList<>();
         professionalUsers.add(professionalResponse);
@@ -36,7 +39,8 @@ class ProfessionalUsersEntityResponseTest {
         List<ProfessionalUsersResponse> usersExpected = new ArrayList<>();
         usersExpected.add(professionalUsersResponse);
 
-        assertThat(sut.getUsers().get(0).getUserIdentifier()).isEqualTo(professionalUser.getUserIdentifier());
+        assertThat(UUID.fromString(sut.getUsers().get(0).getUserIdentifier()))
+                .isEqualTo(professionalUser.getUserIdentifier());
         assertThat(sut.getUsers().get(0).getFirstName()).isEqualTo(professionalUser.getFirstName());
         assertThat(sut.getUsers().get(0).getLastName()).isEqualTo(professionalUser.getLastName());
         assertThat(sut.getUsers().get(0).getEmail()).isEqualTo(professionalUser.getEmailAddress());

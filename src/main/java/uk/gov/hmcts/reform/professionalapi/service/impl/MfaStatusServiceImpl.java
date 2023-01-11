@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY_USER_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_USER_FOUND;
@@ -37,7 +38,7 @@ public class MfaStatusServiceImpl implements MfaStatusService {
             throw new InvalidRequest(EMPTY_USER_ID);
         }
 
-        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(id);
+        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(UUID.fromString(id));
         if (Objects.isNull(user)) {
             throw new ResourceNotFoundException(NO_USER_FOUND);
         }

@@ -113,7 +113,8 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .body(body, Charset.defaultCharset()).status(200).build());
 
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(UUID.fromString("someUid")))
+                .thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
 
@@ -138,7 +139,8 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .request(mock(Request.class))
                         .body(body, Charset.defaultCharset()).status(200).build());
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(
+        when(professionalUserRepositoryMock.findByUserIdentifier(UUID.fromString("someUid")))
+                .thenReturn(
                 setUpProfessionalUser());
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
@@ -165,7 +167,8 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     public void toRetrieveActiveOrganisations() throws IOException {
 
         ProfessionalUser professionalUser = setUpProfessionalUser();
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(UUID.fromString("someUid")))
+                .thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
         when(organisationRepository.findByStatus(ACTIVE)).thenReturn(asList(organisation));
@@ -194,7 +197,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         su.setEmailAddress("superUser@email.com");
         su.setFirstName("some-fname");
         su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        su.setUserIdentifier(UUID.fromString("someUserIdentifier"));
 
         PaymentAccount pa = new PaymentAccount();
         pa.setPbaNumber("pbaNumber");

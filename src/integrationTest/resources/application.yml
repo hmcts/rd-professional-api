@@ -1,7 +1,8 @@
 spring:
   flyway.locations: classpath:db/migration
-
+  flyway.enabled: true
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     properties:
       hibernate:
@@ -9,10 +10,10 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:dbrefdata
-    username: ${POSTGRES_USERNAME:dbrefdata}
-    password: ${POSTGRES_PASSWORD:dbrefdata}
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: ${DB_URL:jdbc:tc:postgresql:11.1:///dbrefdata}
+    username: ${DB_USERNAME:dbrefdata}
+    password: ${DB_PASSWORD:dbrefdata}
   security:
     oauth2:
       client:

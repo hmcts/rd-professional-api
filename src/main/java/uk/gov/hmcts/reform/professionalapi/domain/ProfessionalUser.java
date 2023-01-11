@@ -68,7 +68,7 @@ public class ProfessionalUser implements Serializable {
     private LocalDateTime created;
 
     @Column(name = "USER_IDENTIFIER")
-    private String userIdentifier;
+    private UUID userIdentifier;
 
     @Transient
     private List<String> roles;

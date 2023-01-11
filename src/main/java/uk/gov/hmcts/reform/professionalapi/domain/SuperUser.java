@@ -61,7 +61,7 @@ public class SuperUser implements Serializable {
     private LocalDateTime created;
 
     @Column(name = "USER_IDENTIFIER", insertable = false, updatable = false)
-    private String userIdentifier;
+    private UUID userIdentifier;
 
 
     public SuperUser(

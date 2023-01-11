@@ -23,9 +23,9 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     List<ProfessionalUser> findByOrganisation(Organisation organisation);
 
-    List<ProfessionalUser> findByOrganisationAndUserIdentifier(Organisation organisation, String userIdentifier);
+    List<ProfessionalUser> findByOrganisationAndUserIdentifier(Organisation organisation, UUID userIdentifier);
 
-    ProfessionalUser findByUserIdentifier(String userIdentifier);
+    ProfessionalUser findByUserIdentifier(UUID userIdentifier);
 
     @Query(value = "SELECT count(*) FROM professional_user pu WHERE pu.organisation_id = :organisationId",
             nativeQuery = true)

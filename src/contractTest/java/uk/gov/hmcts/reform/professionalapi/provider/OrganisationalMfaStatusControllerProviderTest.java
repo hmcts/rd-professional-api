@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getProfessionalUser;
@@ -42,6 +44,7 @@ public class OrganisationalMfaStatusControllerProviderTest extends MockMvcProvid
         MfaStatusResponse mfaStatusResponse = new MfaStatusResponse();
         mfaStatusResponse.setMfa("EMAIL");
 
-        when(professionalUserRepository.findByUserIdentifier(anyString())).thenReturn(professionalUser);
+        when(professionalUserRepository.findByUserIdentifier(any(UUID.class)))
+                .thenReturn(professionalUser);
     }
 }

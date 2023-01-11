@@ -33,7 +33,7 @@ public class PactUtils {
     public static void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
                 "some-email-address", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -86,7 +86,7 @@ public class PactUtils {
         organisation.setUsers(Collections.singletonList(su));
 
         ProfessionalUser pu = new ProfessionalUser();
-        pu.setUserIdentifier(PROFESSIONAL_USER_ID);
+        pu.setUserIdentifier(UUID.fromString(PROFESSIONAL_USER_ID));
         pu.setEmailAddress(ORGANISATION_EMAIL);
         pu.setOrganisation(organisation);
         return pu;
@@ -111,7 +111,7 @@ public class PactUtils {
         su.setEmailAddress("superUser@email.com");
         su.setFirstName("some-fname");
         su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        su.setUserIdentifier(UUID.fromString("someUserIdentifier"));
         return su;
     }
 }

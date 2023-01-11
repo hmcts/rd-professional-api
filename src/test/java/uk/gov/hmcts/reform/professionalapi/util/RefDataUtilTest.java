@@ -205,7 +205,7 @@ class RefDataUtilTest {
         assertThat(responseUser.getFirstName()).isEqualTo(profile.getFirstName());
         assertThat(responseUser.getLastName()).isEqualTo(profile.getLastName());
         assertThat(responseUser.getIdamStatus()).isEqualTo(profile.getIdamStatus());
-        assertThat(responseUser.getUserIdentifier()).isEqualTo(profile.getIdamId());
+        assertThat(responseUser.getUserIdentifier()).isEqualTo(UUID.fromString(profile.getIdamId()));
         assertThat(responseUser.getRoles()).contains(professionalUser.getRoles().get(0));
         assertThat(getUserProfileResponse.getIdamStatusCode()).isEqualTo(getUserProfileResponse.getIdamStatusCode());
         assertThat(getUserProfileResponse.getIdamMessage()).isEqualTo(getUserProfileResponse.getIdamMessage());

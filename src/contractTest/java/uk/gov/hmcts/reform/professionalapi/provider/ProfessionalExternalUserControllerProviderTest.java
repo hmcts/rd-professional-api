@@ -171,8 +171,10 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
                 .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
 
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
-        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(UUID.fromString("someUid")))
+                .thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(UUID.fromString(PROFESSIONAL_USER_ID)))
+                .thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
 
         when(professionalUserRepositoryMock.findByOrganisation(organisation))
@@ -218,7 +220,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         organisation.setUsers(Arrays.asList(su));
 
         ProfessionalUser pu = new ProfessionalUser();
-        pu.setUserIdentifier(PROFESSIONAL_USER_ID);
+        pu.setUserIdentifier(UUID.fromString(PROFESSIONAL_USER_ID));
         pu.setEmailAddress(ORGANISATION_EMAIL);
         pu.setOrganisation(organisation);
         return pu;
@@ -230,7 +232,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         su.setEmailAddress("superUser@email.com");
         su.setFirstName("some-fname");
         su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        su.setUserIdentifier(UUID.fromString("someUserIdentifier"));
         return su;
     }
 }
