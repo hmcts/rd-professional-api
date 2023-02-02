@@ -819,6 +819,17 @@ class OrganisationServiceImplTest {
     }
 
     @Test
+    void testDeleteReviewOrganisation() {
+        Organisation organisation = getDeleteOrganisation(OrganisationStatus.REVIEW);
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.STATUS_CODE_204);
+        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
+        verify(organisationRepository, times(1)).deleteById(any());
+    }
+
+    @Test
     void testDeleteActiveOrganisationWithOrgAdminPending() throws Exception {
 
 

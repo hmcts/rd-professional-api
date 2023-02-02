@@ -487,6 +487,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         var deleteOrganisationResponse = new DeleteOrganisationResponse();
         switch (organisation.getStatus()) {
             case PENDING:
+            case REVIEW:
                 return deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId);
             case ACTIVE:
                 deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
