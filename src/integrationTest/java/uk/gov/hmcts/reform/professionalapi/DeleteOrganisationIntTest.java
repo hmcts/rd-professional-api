@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
@@ -29,6 +30,31 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifier,
             hmctsAdmin);
+
+        assertThat(orgResponse.get("http_status").toString()).contains("404");
+    }
+
+    @Test
+    void returns_204_when_delete_minimal_review_organisation_successfully() {
+
+        Map<String, Object> deleteResponse = null;
+
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        orgIdentifier = (String) response.get(ORG_IDENTIFIER);
+
+        updateOrganisation(orgIdentifier, hmctsAdmin, OrganisationStatus.REVIEW.name());
+
+
+        deleteResponse = professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
+
+        assertThat(deleteResponse.get("http_status")).isEqualTo(204);
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifier,
+                hmctsAdmin);
 
         assertThat(orgResponse.get("http_status").toString()).contains("404");
     }
