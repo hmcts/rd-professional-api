@@ -645,4 +645,30 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
+
+    @Test
+    @DisplayName("PRD Internal Delete Organisation with status REVIEW Test Scenarios")
+    void testInternalOrganisationDeleteScenario() {
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        String statusMessage = "Company in review";
+
+        professionalApiClient
+                .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+
+        Map<String, Object> orgResponse = professionalApiClient
+                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+
+        assertEquals(REVIEW.toString(), orgResponse.get("status"));
+        assertEquals(statusMessage, orgResponse.get("statusMessage"));
+
+        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, NO_CONTENT);
+
+        orgResponse =  professionalApiClient
+                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
+
+        assertThat(orgResponse.get("status")).toString().contains(NOT_FOUND.toString());
+
+    }
 }
