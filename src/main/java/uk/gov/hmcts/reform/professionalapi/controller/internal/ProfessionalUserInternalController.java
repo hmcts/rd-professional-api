@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,41 +47,40 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleU
 @Slf4j
 public class ProfessionalUserInternalController extends SuperController {
 
-    @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
-            notes = "**IDAM Roles to access API** :\n prd-admin,\n prd-aac-system",
-            response = ProfessionalUsersEntityResponse.class,
-            responseContainer = "list",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
+            description = "**IDAM Roles to access API** :<br> prd-admin,<br> prd-aac-system",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiParam(
+    @Parameter(
             name = "showDeleted",
-            type = "string",
-            value = "Flag (True/False) to decide whether Deleted Users are included in the response"
+            description = "Flag (True/False) to decide whether Deleted Users are included in the response"
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = "List of Professional Users and their details"
+                    responseCode = "200",
+                    description = "List of Professional Users and their details",
+                    content = @Content(array = @ArraySchema(schema =
+                    @Schema(implementation = ProfessionalUsersEntityResponse.class)))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "An invalid Organisation Identifier was provided"
+                    responseCode = "400",
+                    description = "An invalid Organisation Identifier was provided"
             ),
             @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
+                    responseCode = "403",
+                    description = "Forbidden Error: Access denied"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "No Organisation or Users found with the given ID"
+                    responseCode = "404",
+                    description = "No Organisation or Users found with the given ID"
             ),
             @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
+                    responseCode = "500",
+                    description = "Internal Server Error"
             )
     })
     @GetMapping(
@@ -91,7 +93,7 @@ public class ProfessionalUserInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @RequestParam(value = "userIdentifier", required = false) String userIdentifier,
             @RequestParam(value = "showDeleted", required = false) String showDeleted,
-            @ApiParam(name = "returnRoles")
+            @Parameter(name = "returnRoles")
             @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size
@@ -104,39 +106,39 @@ public class ProfessionalUserInternalController extends SuperController {
                 size);
     }
 
-    @ApiOperation(
-            value = "Modify the Roles or Status of a User",
-            notes = "**IDAM Roles to access API** :\n prd-admin",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Modify the Roles or Status of a User",
+            description = "**IDAM Roles to access API** :<br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
-                    message = "The User's Roles/Status have been modified",
-                    response = ModifyUserRolesResponse.class
+                    responseCode = "201",
+                    description = "The User's Roles/Status have been modified",
+                    content = @Content(schema = @Schema(implementation = ModifyUserRolesResponse.class))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Invalid request provided"
+                    responseCode = "400",
+                    description = "Invalid request provided"
             ),
             @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
+                    responseCode = "403",
+                    description = "Forbidden Error: Access denied"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "No Organisation or User found with the given ID"
+                    responseCode = "404",
+                    description = "No Organisation or User found with the given ID"
             ),
             @ApiResponse(
-                    code = 412,
-                    message = "One or more of the Roles provided is already assigned to the User"
+                    responseCode = "412",
+                    description = "One or more of the Roles provided is already assigned to the User"
             ),
             @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
+                    responseCode = "500",
+                    description = "Internal Server Error"
             )
     })
     @PutMapping(
