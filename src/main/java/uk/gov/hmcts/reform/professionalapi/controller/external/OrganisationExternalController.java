@@ -114,6 +114,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for external user
@@ -261,6 +262,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured("pui-user-manager")
     public ResponseEntity<Object> addUserToOrganisationUsingExternalController(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "newUserCreationRequest")
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @Parameter(hidden = true) @OrgId String organisationIdentifier,
             @Parameter(hidden = true) @UserId String userId) {
@@ -363,6 +365,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"pui-finance-manager"})
     public void deletePaymentAccountsOfOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
             @Valid @NotNull @RequestBody PbaRequest deletePbaRequest,
             @Parameter(hidden = true) @OrgId String organisationIdentifier,
             @Parameter(hidden = true) @UserId String userId) {
@@ -439,6 +442,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured("pui-finance-manager")
     public ResponseEntity<Object> addPaymentAccountsToOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "pbaRequest")
             @Valid @NotNull @RequestBody PbaRequest pbaRequest,
             @Parameter(hidden = true) @OrgId String organisationIdentifier,
             @Parameter(hidden = true) @UserId String userId) {
@@ -492,6 +496,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<Void> addContactInformationsToOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
             @Valid @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
             @Parameter(hidden = true) @OrgId String organisationIdentifier) {
 
@@ -559,6 +564,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"pui-organisation-manager"})
     public void deleteMultipleAddressesOfOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deleteRequest")
             @Valid @NotNull @RequestBody List<DeleteMultipleAddressRequest> deleteRequest,
             @Parameter(hidden = true) @OrgId String organisationIdentifier) {
 

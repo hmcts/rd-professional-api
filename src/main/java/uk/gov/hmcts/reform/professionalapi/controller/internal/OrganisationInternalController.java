@@ -101,6 +101,7 @@ public class OrganisationInternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for internal users
@@ -115,10 +116,7 @@ public class OrganisationInternalController extends SuperController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @Parameter(
-            allowEmptyValue = true,
-            required = true
-    )
+
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -236,10 +234,12 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<Object> editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaRequest pbaEditRequest,
-                                                     @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
-                                                             message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-                                                     @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+    public ResponseEntity<Object> editPaymentAccountsByOrgId(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "pbaEditRequest")
+            @Valid @NotNull @RequestBody PbaRequest pbaEditRequest,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+                    message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("{}:: Received request to edit payment accounts by organisation Id...", loggingComponentName);
 
@@ -297,6 +297,7 @@ public class OrganisationInternalController extends SuperController {
     @ResponseBody
     @Secured("prd-admin")
     public ResponseEntity<Object> updatesOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
@@ -353,6 +354,7 @@ public class OrganisationInternalController extends SuperController {
     @ResponseBody
     @Secured("prd-admin")
     public ResponseEntity<Object> addUserToOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "newUserCreationRequest")
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
@@ -468,10 +470,12 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<Object> updateOrgMfaStatus(@Valid @NotNull @RequestBody MfaUpdateRequest mfaUpdateRequest,
-                                                     @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
-                                                             message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-                                                     @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+    public ResponseEntity<Object> updateOrgMfaStatus(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "mfaUpdateRequest")
+            @Valid @NotNull @RequestBody MfaUpdateRequest mfaUpdateRequest,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+                    message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("{}:: Received request to update organisation mfa preference::", loggingComponentName);
 
@@ -573,6 +577,7 @@ public class OrganisationInternalController extends SuperController {
     @ResponseBody
     @Secured("prd-admin")
     public ResponseEntity<Object> updateAnOrganisationsRegisteredPbas(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "updatePbaRequest")
             @Valid @NotNull @RequestBody UpdatePbaRequest updatePbaRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 

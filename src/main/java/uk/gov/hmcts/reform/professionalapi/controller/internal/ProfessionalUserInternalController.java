@@ -26,9 +26,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
-import java.util.Optional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
@@ -148,6 +148,7 @@ public class ProfessionalUserInternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @Secured("prd-admin")
     public ResponseEntity<Object> modifyRolesForExistingUserOfOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "userProfileUpdatedData")
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message
                     = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") String orgId,

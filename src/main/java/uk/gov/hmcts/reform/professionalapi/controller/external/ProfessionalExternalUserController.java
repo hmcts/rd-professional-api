@@ -177,6 +177,7 @@ public class ProfessionalExternalUserController extends SuperController {
     @ResponseBody
     @Secured("pui-user-manager")
     public ResponseEntity<Object> modifyRolesForExistingUserOfExternalOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "userProfileUpdatedData")
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @Parameter(hidden = true) @OrgId String orgId,
             @PathVariable("userId") String userId,
