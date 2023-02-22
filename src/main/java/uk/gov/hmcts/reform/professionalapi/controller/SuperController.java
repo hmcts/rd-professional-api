@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -101,6 +102,8 @@ public abstract class SuperController {
     protected OrganisationService organisationService;
     @Autowired
     protected ProfessionalUserService professionalUserService;
+    @Autowired
+    protected ProfessionalUserRepository professionalUserRepository;
     @Autowired
     protected PaymentAccountService paymentAccountService;
     @Autowired
@@ -374,9 +377,10 @@ public abstract class SuperController {
 
     private ResponseEntity<Object> reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest,
                                                        ProfessionalUser professionalUser, List<String> roles,
-                                                       String organisationIdentifier) {
+                                                           String organisationIdentifier) {
 
         Object responseBody = null;
+        //gets current user by email in prd
         var existingUser = professionalUserService
                 .findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
         if (existingUser == null) {
@@ -386,10 +390,21 @@ public abstract class SuperController {
             throw new AccessDeniedException("User does not belong to same organisation");
         }
 
+        //this creates user in user profile
         var responseEntity = createUserProfileFor(professionalUser, roles, false,
                 true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
+
+            //is using this fine to compare id or do i need to directly using idam repo
+            NewUserResponse userProfileResponse = new NewUserResponse((UserProfileCreationResponse)
+                    responseEntity.getBody());
+
+            //then check if existing user and idam user id are same
+            if (!userProfileResponse.getUserIdentifier().equals(existingUser.getUserIdentifier())) {
+                //we need to then update user info
+                existingUser.setUserIdentifier(userProfileResponse.getUserIdentifier());
+                professionalUserRepository.save(existingUser);
+            }
         } else {
             log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE,
                     responseEntity.getStatusCode().value()));
