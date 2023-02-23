@@ -395,7 +395,6 @@ public abstract class SuperController {
                 true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
 
-            //is using this fine to compare id or do i need to directly using idam repo
             NewUserResponse userProfileResponse = new NewUserResponse((UserProfileCreationResponse)
                     responseEntity.getBody());
 
@@ -404,6 +403,7 @@ public abstract class SuperController {
                 //we need to then update user info
                 existingUser.setUserIdentifier(userProfileResponse.getUserIdentifier());
                 professionalUserRepository.save(existingUser);
+                responseBody = responseEntity.getBody();
             }
         } else {
             log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE,

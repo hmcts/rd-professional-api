@@ -47,6 +47,7 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
@@ -151,6 +152,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             "User status must be Active to perform this operation";
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
+    protected static final String IDAM_ID = "idamId";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
     public static final String APPLICATION_JSON = "application/json";
 
@@ -230,6 +232,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "  \"lastName\": \"dummy\","
                                 + "  \"email\": \"dummy@email.com\","
                                 + "  \"idamStatus\": \"" + IdamStatus.PENDING + "\""
+                                + "}")));
+    }
+
+    public void userProfilePostPendingUserWireMock(boolean resend) {
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+                .withRequestBody(equalToJson("{ \"resendInvite\": " + resend + "}", true,
+                        true))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(201)
+                        .withBody("{"
+                                + "  \"idamId\":\"" + UUID.randomUUID() + "\","
+                                + "  \"idamRegistrationResponse\":\"" + 201 + "\""
                                 + "}")));
     }
 

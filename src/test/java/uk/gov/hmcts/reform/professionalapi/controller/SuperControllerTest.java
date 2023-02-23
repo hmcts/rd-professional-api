@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -80,6 +81,7 @@ class SuperControllerTest {
     private PrdEnumServiceImpl prdEnumServiceMock;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
+    private ProfessionalUserRepository professionalUserRepository;
     private PrdEnumRepository prdEnumRepository;
     private Organisation organisation;
     private ProfessionalUser professionalUser;
@@ -109,6 +111,7 @@ class SuperControllerTest {
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         userProfileUpdateRequestValidator = mock(UserProfileUpdateRequestValidator.class);
+        professionalUserRepository = mock(ProfessionalUserRepository.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -483,4 +486,45 @@ class SuperControllerTest {
         assertThrows(InvalidRequest.class,() ->
                 superController.updateOrganisationById(organisationCreationRequest, "orgId"));
     }
+
+    @Test
+    void test_ReInviteUserToOrganisationWithDifferentIdToPrdId() throws JsonProcessingException {
+
+        ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        newUserCreationRequest.setResendInvite(true);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        lenient().when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        String userId = UUID.randomUUID().toString();
+        professionalUser.setUserIdentifier(userId);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamRegistrationResponse(201);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                        .status(200).build());
+
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest,
+                professionalUser.getOrganisation().getOrganisationIdentifier());
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(professionalUser.getUserIdentifier()).isEqualTo(userProfileCreationResponse.getIdamId());
+
+        verify(organisationServiceMock, times(1))
+                .getOrganisationByOrgIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
+        verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
+        verify(professionalUserRepository, times(1)).save(professionalUser);
+    }
+
 }
