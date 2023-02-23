@@ -403,8 +403,8 @@ public abstract class SuperController {
                 //we need to then update user info
                 existingUser.setUserIdentifier(userProfileResponse.getUserIdentifier());
                 professionalUserRepository.save(existingUser);
-                responseBody = responseEntity.getBody();
             }
+            responseBody = userProfileResponse;
         } else {
             log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE,
                     responseEntity.getStatusCode().value()));

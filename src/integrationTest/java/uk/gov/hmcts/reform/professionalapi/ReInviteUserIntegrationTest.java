@@ -15,6 +15,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 
@@ -53,8 +54,7 @@ class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
             Map<String, Object> reInviteUserResponse =
                     professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest,
                             hmctsAdmin);
-            //assertNotNull(reInviteUserResponse.get(USER_IDENTIFIER));
-            assertThat(reInviteUserResponse).isNotNull();
+            assertNotNull(reInviteUserResponse.get(USER_IDENTIFIER));
         }
     }
 
