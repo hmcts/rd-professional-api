@@ -175,16 +175,18 @@ class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void should_return_201_and_update_idamId_when_reinvite_is_true(){
+    void should_return_201_and_update_idamId_when_reinvite_is_true() {
         if (resendInviteEnabled) {
             userProfileCreateUserWireMock(HttpStatus.CREATED);
             userProfilePostPendingUserWireMock(false);
             userProfilePostPendingUserWireMock(true);
-            Map<String, Object> createdResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+            Map<String, Object> createdResponse = professionalReferenceDataClient.addUserToOrganisation(
+                    organisationIdentifier,
                     userCreationRequest, hmctsAdmin);
             userCreationRequest.setResendInvite(true);
             String userIdentifierResponse = (String) createdResponse.get(USER_IDENTIFIER);
-            Map<String, Object> updatedResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+            Map<String, Object> updatedResponse = professionalReferenceDataClient.addUserToOrganisation(
+                    organisationIdentifier,
                     userCreationRequest, hmctsAdmin);
             String updatedUserIdentifierResponse = (String) updatedResponse.get(IDAM_ID);
 
