@@ -152,7 +152,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             "User status must be Active to perform this operation";
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
-    protected static final String IDAM_ID = "idamId";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
     public static final String APPLICATION_JSON = "application/json";
 

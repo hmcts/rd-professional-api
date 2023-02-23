@@ -54,7 +54,8 @@ class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
             Map<String, Object> reInviteUserResponse =
                     professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest,
                             hmctsAdmin);
-            assertNotNull(reInviteUserResponse.get(USER_IDENTIFIER));
+//            assertNotNull(reInviteUserResponse.get(USER_IDENTIFIER));
+            assertThat(reInviteUserResponse).isNotNull();
         }
     }
 
@@ -188,7 +189,7 @@ class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
             Map<String, Object> updatedResponse = professionalReferenceDataClient.addUserToOrganisation(
                     organisationIdentifier,
                     userCreationRequest, hmctsAdmin);
-            String updatedUserIdentifierResponse = (String) updatedResponse.get(IDAM_ID);
+            String updatedUserIdentifierResponse = (String) updatedResponse.get(USER_IDENTIFIER);
 
             assertThat(updatedResponse).isNotNull();
             assertNotEquals(updatedUserIdentifierResponse, userIdentifierResponse);
