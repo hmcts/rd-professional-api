@@ -68,19 +68,23 @@ public class ProfessionalUserInternalController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "An invalid Organisation Identifier was provided"
+                    description = "An invalid Organisation Identifier was provided",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied"
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "No Organisation or Users found with the given ID"
+                    description = "No Organisation or Users found with the given ID",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @GetMapping(
@@ -122,23 +126,28 @@ public class ProfessionalUserInternalController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid request provided"
+                    description = "Invalid request provided",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied"
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "No Organisation or User found with the given ID"
+                    description = "No Organisation or User found with the given ID",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "412",
-                    description = "One or more of the Roles provided is already assigned to the User"
+                    description = "One or more of the Roles provided is already assigned to the User",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @PutMapping(
@@ -153,13 +162,13 @@ public class ProfessionalUserInternalController extends SuperController {
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message
                     = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") String orgId,
             @PathVariable("userId") String userId,
-            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") String origin
     ) {
 
         organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(orgId);
 
         //Received request to update user roles of an organisation
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of(origin));
 
     }
 }

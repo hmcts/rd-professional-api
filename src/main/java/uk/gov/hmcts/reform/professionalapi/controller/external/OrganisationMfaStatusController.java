@@ -33,15 +33,18 @@ public class OrganisationMfaStatusController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "An invalid request has been provided"
+                    description = "An invalid request has been provided",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "The requested user does not exist"
+                    description = "The requested user does not exist",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
 

@@ -96,15 +96,18 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "An invalid request has been provided"
+                    description = "An invalid request has been provided",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied"
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @PostMapping(
@@ -137,19 +140,23 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "An invalid ID was provided"
+                    description = "An invalid ID was provided",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied"
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "No Organisation found with the given ID"
+                    description = "No Organisation found with the given ID",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
@@ -185,19 +192,23 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "An invalid Email Address was provided"
+                    description = "An invalid Email Address was provided",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied"
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "No Payment Accounts found with the given Email Address"
+                    description = "No Payment Accounts found with the given Email Address",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @GetMapping(
@@ -229,28 +240,34 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "An invalid request was provided"
+                    description = "An invalid request was provided",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied"
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "No Organisation found with the given ID to add new User to"
+                    description = "No Organisation found with the given ID to add new User to",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "409",
                     description = "A User already exists with the given Email Address or is already active in SIDAM "
-                            + "during resend invite"
+                            + "during resend invite",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "429",
-                    description = "Too many requests for resend invite"
+                    description = "Too many requests for resend invite",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @PostMapping(
@@ -293,20 +310,24 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied for either invalid permissions or user is pending"
+                    description = "Forbidden Error: Access denied for either invalid permissions or user is pending",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "No Organisation found"
+                    description = "No Organisation found",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "401",
                     description = "Unauthorized Error : "
-                            + "The requested resource is restricted and requires authentication"
+                            + "The requested resource is restricted and requires authentication",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @GetMapping(
@@ -334,31 +355,37 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
-                    description = "Successfully deleted the list of provided payment accounts from the organisation."
+                    description = "Successfully deleted the list of provided payment accounts from the organisation.",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = DEL_ORG_PBA_NOTES_1 + DEL_ORG_PBA_NOTES_2 + DEL_ORG_PBA_NOTES_3
-                            + DEL_ORG_PBA_NOTES_4 + DEL_ORG_PBA_NOTES_5
+                            + DEL_ORG_PBA_NOTES_4 + DEL_ORG_PBA_NOTES_5,
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "401",
                     description = "Unauthorized Error : "
-                            + "The requested resource is restricted and requires authentication"
+                            + "The requested resource is restricted and requires authentication",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
                     description = "Forbidden Error: "
-                            + "Access denied for either invalid permissions or user is pending"
+                            + "Access denied for either invalid permissions or user is pending",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Resource Not Found Error: The Organisation does not exist"
-                            + " to delete Payment Accounts from"
+                            + " to delete Payment Accounts from",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @DeleteMapping(path = "/pba")
@@ -418,19 +445,23 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "PBA number invalid or Duplicate PBA or Organisation is not active"
+                    description = "PBA number invalid or Duplicate PBA or Organisation is not active",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "S2S unauthorised"
+                    description = "S2S unauthorised",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied"
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @PostMapping(
@@ -465,25 +496,30 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
-                    description = ""
+                    description = "",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "An invalid request has been provided"
+                    description = "An invalid request has been provided",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "401",
                     description = "Unauthorized Error : "
-                            + "The requested resource is restricted and requires authentication"
+                            + "The requested resource is restricted and requires authentication",
+                    content = @Content
             ),
 
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied"
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
 
@@ -532,32 +568,38 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
-                    description = "Successfully deleted the list of Contact Information Address of an Organisation."
+                    description = "Successfully deleted the list of Contact Information Address of an Organisation.",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = DELETE_ORG_ADD_400_MESSAGE_1 + DELETE_ORG_ADD_400_MESSAGE_2
-                            + DELETE_ORG_ADD_400_MESSAGE_3 + DELETE_ORG_ADD_400_MESSAGE_4
+                            + DELETE_ORG_ADD_400_MESSAGE_3 + DELETE_ORG_ADD_400_MESSAGE_4,
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "401",
                     description = "Unauthorized Error : "
-                            + "The requested resource is restricted and requires authentication"
+                            + "The requested resource is restricted and requires authentication",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Forbidden Error: Access denied for either invalid permissions or user is pending"
+                    description = "Forbidden Error: Access denied for either invalid permissions or user is pending",
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = DELETE_ORG_ADD_404_MESSAGE_1 + DELETE_ORG_ADD_404_MESSAGE_2
                             + DELETE_ORG_ADD_404_MESSAGE_3
                             + DELETE_ORG_ADD_404_MESSAGE_4 + DELETE_ORG_ADD_404_MESSAGE_5
-                            + DELETE_ORG_ADD_404_MESSAGE_6
+                            + DELETE_ORG_ADD_404_MESSAGE_6,
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal Server Error"
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @DeleteMapping(path = "/addresses")

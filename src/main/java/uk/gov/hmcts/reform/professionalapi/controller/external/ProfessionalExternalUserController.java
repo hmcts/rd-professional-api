@@ -181,11 +181,11 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @Parameter(hidden = true) @OrgId String orgId,
             @PathVariable("userId") String userId,
-            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") String origin
     ) {
 
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of(origin));
 
     }
 
