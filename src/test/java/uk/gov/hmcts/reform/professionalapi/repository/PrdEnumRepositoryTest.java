@@ -19,7 +19,7 @@ class PrdEnumRepositoryTest extends BaseRepository {
     void test_findAll() {
         List<PrdEnum> prdEnums = prdEnumRepository.findAll();
 
-        assertThat(prdEnums).hasSize(45);
+        assertThat(prdEnums).hasSize(47);
         assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isZero();
     }
 
