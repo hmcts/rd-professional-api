@@ -39,7 +39,6 @@
         <cve>CVE-2022-22976</cve>
         <cve>CVE-2021-22044</cve>
     </suppress>
-
     <suppress>
         <notes>update the spring frame work 5.3.20 to 5.3.22... Remove and check once spring boot upgraded to 2.7.7 and springframe work 6.0  </notes>
         <cve>CVE-2022-22965</cve>
@@ -50,5 +49,8 @@
         <cve>CVE-2022-22971</cve>
         <cve>CVE-2022-31692</cve>
         <cve>CVE-2022-31690</cve>
+    </suppress>
+        <suppress>
+     <cve>CVE-2022-45688</cve>
     </suppress>
 </suppressions>
