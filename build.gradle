@@ -513,7 +513,7 @@ dependencyManagement {
             entry 'tomcat-embed-websocket'
         }
 
-        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.14.0-rc1') {
+        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.14.2') {
             entry 'jackson-core'
             entry 'jackson-annotations'
         }
