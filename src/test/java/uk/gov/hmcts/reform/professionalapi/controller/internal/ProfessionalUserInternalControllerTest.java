@@ -232,7 +232,7 @@ class ProfessionalUserInternalControllerTest {
         String userId = UUID.randomUUID().toString();
         ResponseEntity<Object> actualData = professionalUserInternalController
                 .modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId,
-                        Optional.of("EXUI"));
+                        "EXUI");
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
