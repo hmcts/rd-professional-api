@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -27,14 +30,20 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
 
@@ -54,6 +63,9 @@ public class ProfessionalReferenceDataClient {
     private String baseIntUrl;
     private String issuer;
     private long expiration;
+
+    public Map<String, String> bearerTokenMap = new HashMap<>();
+
 
     public ProfessionalReferenceDataClient(int port, String issuer, Long tokenExpirationInterval) {
         this.prdApiPort = port;
@@ -379,6 +391,24 @@ public class ProfessionalReferenceDataClient {
         return organisationResponse;
     }
 
+    public String getAndReturnBearerToken(String userId, String role) {
+        String bearerToken;
+        if (bearerTokenMap.get(role) == null && userId != null) {
+            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+                    : userId, role));
+            bearerTokenMap.put(role, bearerToken);
+        } else if (bearerTokenMap.get(role + userId) == null) {
+            bearerToken = "Bearer ".concat(getBearerToken(userId, role));
+            bearerTokenMap.put(role + userId, bearerToken);
+            return bearerToken;
+        }
+        if (userId == null) {
+            return bearerTokenMap.get(role + userId);
+        }
+        return bearerTokenMap.get(role);
+    }
+
+
     private HttpHeaders getMultipleAuthHeaders(String role, String userId) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -386,8 +416,8 @@ public class ProfessionalReferenceDataClient {
 
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
-        String bearerToken = "Bearer ".concat(getBearerToken(isNull(userId) ? UUID.randomUUID().toString()
-                : userId, role));
+        String bearerToken = getAndReturnBearerToken(userId, role);
+        mockJwtToken(role, userId, bearerToken);
         headers.add("Authorization", bearerToken);
 
         return headers;
@@ -522,6 +552,44 @@ public class ProfessionalReferenceDataClient {
 
         return getResponse(responseEntity);
     }
+
+    private Jwt createJwt(String token, JWT parsedJwt) {
+        Jwt jwt = null;
+        try {
+            Map<String, Object> headers = new LinkedHashMap<>(parsedJwt.getHeader().toJSONObject());
+            Map<String, Object> claims = new HashMap<>();
+            for (String key : parsedJwt.getJWTClaimsSet().getClaims().keySet()) {
+                Object value = parsedJwt.getJWTClaimsSet().getClaims().get(key);
+                if (key.equals("exp") || key.equals("iat")) {
+                    value = ((Date) value).toInstant();
+                }
+                claims.put(key, value);
+            }
+            jwt = Jwt.withTokenValue(token)
+                    .headers(h -> h.putAll(headers))
+                    .claims(c -> c.putAll(claims))
+                    .build();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        return jwt;
+    }
+
+    public Jwt decode(String token) {
+        JWT jwt = null;
+        try {
+            jwt = JWTParser.parse(token);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return createJwt(token, jwt);
+    }
+
+    public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
+        String[] bearerTokenArray = bearerToken.split(" ");
+        when(JwtDecoderMockBuilder.getJwtDecoder().decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
+    }
+
 
     public Map<String, Object> deletePaymentsAccountsByOrgId(PbaRequest pbaDeleteRequest, String supportedRole,
                                                              String userId) {
@@ -666,7 +734,7 @@ public class ProfessionalReferenceDataClient {
         Map<String, Object> errorResponseMap = new HashMap<>();
         String body = (String) responseEntity.getBody();
         if (org.apache.commons.lang.StringUtils.isNotEmpty(body)) {
-            errorResponseMap.put("response_body",  objectMapper.readValue(
+            errorResponseMap.put("response_body", objectMapper.readValue(
                     body, ErrorResponse.class));
         } else {
             errorResponseMap.put("response_body", null);
@@ -691,7 +759,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> addPaymentsAccountsByOrgId(PbaRequest pbaRequest, String supportedRole,
-                                                             String userId) {
+                                                          String userId) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/pba";
 
@@ -712,7 +780,7 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> addContactInformationsToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequests,
-             String supportedRole, String userId) {
+            String supportedRole, String userId) {
 
         StringBuilder addContactsInfoURL = new StringBuilder(baseUrl);
         addContactsInfoURL.append("/").append("addresses");
