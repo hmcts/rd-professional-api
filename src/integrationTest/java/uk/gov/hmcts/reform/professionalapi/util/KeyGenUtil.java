@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
-import net.minidev.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -32,8 +31,8 @@ public class KeyGenUtil {
 
     public static String getDynamicJwksResponse() throws JOSEException, JsonProcessingException {
         RSAKey rsaKey = KeyGenUtil.getRsaJwk();
-        Map<String, List<JSONObject>> body = new LinkedHashMap<>();
-        List<JSONObject> keyList = new ArrayList<>();
+        Map<String, List<Map<String, Object>>> body = new LinkedHashMap<>();
+        List<Map<String, Object>> keyList = new ArrayList<>();
         keyList.add(rsaKey.toJSONObject());
         body.put("keys", keyList);
         ObjectMapper objectMapper = new ObjectMapper();
