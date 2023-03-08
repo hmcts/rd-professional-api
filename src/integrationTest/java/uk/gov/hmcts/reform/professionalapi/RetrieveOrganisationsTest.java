@@ -186,7 +186,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(orgResponse).containsEntry("http_status", "400");
         assertThat(orgResponse.get("response_body").toString())
-            .contains("Page size must not be less than one!");
+            .contains("Page size must not be less than one");
     }
 
     @Test
