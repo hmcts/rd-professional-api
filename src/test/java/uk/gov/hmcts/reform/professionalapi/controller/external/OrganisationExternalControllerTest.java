@@ -326,7 +326,7 @@ class OrganisationExternalControllerTest {
                 organisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional(
                         ACTIVE.name(), true);
         List<OrganisationMinimalInfoResponse> minimalInfoResponseList = responseEntity.getBody();
-        assertThat(minimalInfoResponseList).usingFieldByFieldElementComparator()
+        assertThat(minimalInfoResponseList).usingRecursiveFieldByFieldElementComparator()
                 .contains(organisationMinimalInfoResponse);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());
