@@ -50,7 +50,7 @@
         <cve>CVE-2022-31692</cve>
         <cve>CVE-2022-31690</cve>
     </suppress>
-        <suppress>
+    <suppress>
      <cve>CVE-2022-45688</cve>
     </suppress>
     <suppress>

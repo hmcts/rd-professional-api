@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
@@ -158,6 +159,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @MockBean
     protected FeatureToggleServiceImpl featureToggleService;
 
+    @MockBean
+    public static JwtDecoder jwtDecoder;
+
     @BeforeEach
     public void setUpClient() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
@@ -256,6 +260,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
         organisationRepository.deleteAll();
+        JwtDecoderMockBuilder.resetJwtDecoder();
     }
 
     protected String settingUpOrganisation(String role) {
@@ -264,7 +269,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return updateOrgAndInviteUser(organisationIdentifier, role);
     }
 
-    protected Pair<String,String> settingUpMinimalFieldOrganisation(String role) {
+    protected Pair<String, String> settingUpMinimalFieldOrganisation(String role) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
         String userEmail = organisationCreationRequest.getSuperUser().getEmail();
@@ -279,14 +284,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         List<String> userRoles = new ArrayList<>();
         userRoles.add(role);
 
-        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+        String userId = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
-                        hmctsAdmin, userIdentifier);
+                        hmctsAdmin, userId);
         return (String) newUserResponse.get(USER_IDENTIFIER);
     }
 
