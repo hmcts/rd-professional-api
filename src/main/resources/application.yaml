@@ -25,6 +25,7 @@ spring:
     name: Professional Reference Data API
   main:
     allow-bean-definition-overriding: true
+    allow-circular-references: true
   security:
     oauth2:
       client:
@@ -88,7 +89,9 @@ security:
     - "/loggers/**"
     - "/swagger-ui.html"
     - "/swagger-resources/**"
-    - "/v2/api-docs"
+    - "/v3/api-docs"
+    - "/v3/**"
+    - "/swagger-ui/**"
     - "/webjars/springfox-swagger-ui/**"
     - "/csrf"
     - "/error"
