@@ -209,5 +209,6 @@
   "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&status=status&userIdentifier=userIdentifier_GET" : "ignore",
   "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&userIdentifier=userIdentifier_GET" : "ignore",
   "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&status=status&userIdentifier=userIdentifier_GET" : "ignore",
-  "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&userIdentifier=userIdentifier_GET" : "ignore"
+  "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&userIdentifier=userIdentifier_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore"
 }
