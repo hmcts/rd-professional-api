@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -176,6 +175,54 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @Operation(
+            summary = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
+            description = GET_PBA_EMAIL_NOTES_1 + GET_PBA_EMAIL_NOTES_2,
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization"),
+                    @SecurityRequirement(name = "UserEmail")
+            }
+    )
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "The Organisation's associated Payment Accounts",
+            content = @Content(schema = @Schema(implementation = OrganisationPbaResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid Email Address was provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Payment Accounts found with the given Email Address",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
+    @GetMapping(
+            path = "/pbas",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
+    public ResponseEntity<OrganisationPbaResponse>
+        retrievePaymentAccountByEmail(@Parameter(hidden = true) @OrgId String orgId) {
+        //Received request to retrieve an organisations payment accounts by email for external
+        var userEmail = getUserEmailFromHeader();
+        return retrievePaymentAccountByUserEmail(userEmail, orgId);
+    }
+
+    @Operation(
             summary = "Add a new User to an Organisation",
             description = "**IDAM Roles to access API** :<br> pui-user-manager",
             security = {
@@ -241,54 +288,6 @@ public class OrganisationExternalController extends SuperController {
 
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
 
-    }
-
-    @Operation(
-            summary = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
-            description = GET_PBA_EMAIL_NOTES_1 + GET_PBA_EMAIL_NOTES_2,
-            security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization"),
-                    @SecurityRequirement(name = "UserEmail")
-            }
-    )
-
-    @ApiResponse(
-            responseCode = "200",
-            description = "The Organisation's associated Payment Accounts",
-            content = @Content(schema = @Schema(implementation = OrganisationPbaResponse.class))
-    )
-    @ApiResponse(
-            responseCode = "400",
-            description = "An invalid Email Address was provided",
-            content = @Content
-    )
-    @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden Error: Access denied",
-            content = @Content
-    )
-    @ApiResponse(
-            responseCode = "404",
-            description = "No Payment Accounts found with the given Email Address",
-            content = @Content
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Internal Server Error",
-            content = @Content
-    )
-
-    @GetMapping(
-            path = "/pbas",
-            produces = APPLICATION_JSON_VALUE
-    )
-    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
-    public ResponseEntity<OrganisationPbaResponse>
-        retrievePaymentAccountByEmail(@Parameter(hidden = true) @OrgId String orgId) {
-        //Received request to retrieve an organisations payment accounts by email for external
-        var userEmail = getUserEmailFromHeader();
-        return retrievePaymentAccountByUserEmail(userEmail, orgId);
     }
 
     @Operation(
@@ -436,33 +435,33 @@ public class OrganisationExternalController extends SuperController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "All PBAs got added successfully or Partial success",
-                    content = @Content(schema = @Schema(implementation = AddPbaResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "PBA number invalid or Duplicate PBA or Organisation is not active",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "S2S unauthorised",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden Error: Access denied",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal Server Error",
-                    content = @Content
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "201",
+            description = "All PBAs got added successfully or Partial success",
+            content = @Content(schema = @Schema(implementation = AddPbaResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "PBA number invalid or Duplicate PBA or Organisation is not active",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "S2S unauthorised",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @PostMapping(
             path = "/pba",
             consumes = APPLICATION_JSON_VALUE,
