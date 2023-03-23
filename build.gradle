@@ -382,6 +382,8 @@ dependencies {
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.5'
 
+    implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.7'
+    implementation group: 'org.json', name: 'json', version: '20230227'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -519,6 +521,16 @@ dependencyManagement {
         }
         // CVE-2021-22060, CVE-2022-22965, CVE-2022-22950, CVE-2022-22971, CVE-2022-22968, CVE-2022-22970, CVE-2022-31690, CVE-2022-31692
         dependency(group: 'org.springframework', name: 'spring-corespring-core', version: '5.3.22') //remove this line after spring boot upgrade to 2.7.7 and spring frame work to 6.0
+
+        //CVE-2023-24998
+        dependencySet(group: 'commons-fileupload', version: '1.5') {
+            entry 'commons-fileupload'
+        }
+        //CVE-2021-22044
+        dependencySet(group: 'org.springframework.cloud', version: '3.1.5') {
+            entry 'spring-cloud-starter-openfeign'
+            entry 'spring-cloud-openfeign-core'
+        }
 
     }
 }
