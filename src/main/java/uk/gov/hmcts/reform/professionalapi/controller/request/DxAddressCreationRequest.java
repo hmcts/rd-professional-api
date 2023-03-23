@@ -15,7 +15,7 @@ public class DxAddressCreationRequest {
 
     @NotNull
     @Schema(name = "dxNumber", example = "string")
-    @Pattern(regexp = "^(?:DX|NI) [0-9]{10}+$")
+    @Pattern(regexp = "^(?:DX|NI) \\d{10}+$")
     private final String dxNumber;
     @NotNull
     private final String dxExchange;
