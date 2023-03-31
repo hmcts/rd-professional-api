@@ -20,4 +20,10 @@ file name: launchdarkly-java-server-sdk-5.10.7.jar (shaded: org.yaml:snakeyaml:1
     <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
     <cve>CVE-2022-1471</cve>
   </suppress>
+
+  <suppress>
+    <cve>CVE-2023-20861</cve>
+    <cve>CVE-2023-20859</cve>
+    <cve>CVE-2023-28708</cve>
+  </suppress>
 </suppressions>
