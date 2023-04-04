@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,28 +24,28 @@ public class OrganisationMfaStatusController extends SuperController {
             summary = "Retrieves the mfa status of the organisation a user belongs to",
             description = "**IDAM Roles to access API** : <br> No role restriction"
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "The mfa status of the organisation the user belongs to",
-                    content = @Content(schema = @Schema(implementation = MfaStatusResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "An invalid request has been provided",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "The requested user does not exist",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal Server Error",
-                    content = @Content
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "The mfa status of the organisation the user belongs to",
+            content = @Content(schema = @Schema(implementation = MfaStatusResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid request has been provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "The requested user does not exist",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<MfaStatusResponse> retrieveMfaStatusByUserId(

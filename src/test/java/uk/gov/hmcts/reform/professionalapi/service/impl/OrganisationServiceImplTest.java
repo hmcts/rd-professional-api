@@ -570,7 +570,7 @@ class OrganisationServiceImplTest {
         OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(pageable);
 
         assertThat(organisationDetailResponse).isNotNull();
-        assertThat(organisationDetailResponse.getTotalRecords()).isGreaterThanOrEqualTo(1);
+        assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
         verify(organisationRepository, times(2)).findByStatusIn(
             List.of(OrganisationStatus.ACTIVE, OrganisationStatus.PENDING),
             pageable);
@@ -623,7 +623,7 @@ class OrganisationServiceImplTest {
             .findByStatusIn(List.of(ACTIVE), pageable);
         verify(organisationRepository, times(1))
             .findByStatusIn(Collections.emptyList(), pageable);
-        assertThat(organisationDetailResponse.getTotalRecords()).isGreaterThanOrEqualTo(1);
+        assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
 
     }
 

@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -59,34 +58,34 @@ public class ProfessionalUserInternalController extends SuperController {
             name = "showDeleted",
             description = "Flag (True/False) to decide whether Deleted Users are included in the response"
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "List of Professional Users and their details",
-                    content = @Content(array = @ArraySchema(schema =
-                    @Schema(implementation = ProfessionalUsersEntityResponse.class)))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "An invalid Organisation Identifier was provided",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden Error: Access denied",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "No Organisation or Users found with the given ID",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal Server Error",
-                    content = @Content
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "List of Professional Users and their details",
+            content = @Content(array = @ArraySchema(schema =
+            @Schema(implementation = ProfessionalUsersEntityResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid Organisation Identifier was provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation or Users found with the given ID",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @GetMapping(
             value = "/{orgId}/users",
             produces = APPLICATION_JSON_VALUE
@@ -118,38 +117,38 @@ public class ProfessionalUserInternalController extends SuperController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "The User's Roles/Status have been modified",
-                    content = @Content(schema = @Schema(implementation = ModifyUserRolesResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid request provided",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden Error: Access denied",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "No Organisation or User found with the given ID",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "412",
-                    description = "One or more of the Roles provided is already assigned to the User",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal Server Error",
-                    content = @Content
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "201",
+            description = "The User's Roles/Status have been modified",
+            content = @Content(schema = @Schema(implementation = ModifyUserRolesResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation or User found with the given ID",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "412",
+            description = "One or more of the Roles provided is already assigned to the User",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @PutMapping(
             path = "/{orgId}/users/{userId}",
             produces = APPLICATION_JSON_VALUE
