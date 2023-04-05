@@ -51,20 +51,32 @@ withPipeline(type, product, component) {
     enableDbMigration('rd')
     disableLegacyDeployment()
     enableAksStagingDeployment()
-
-    // Sync demo and perftest with master branch
-    syncBranchesWithMaster(branchesToSync)
-
+    
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
 
     before('functionalTest:preview') {
         env.execution_environment = "preview"
+        env.TEST_URL = "http://rd-professional-api-preview.preview.hmcts.platform.net"
     }
 
     before('functionalTest:aat') {
         env.execution_environment = "aat"
+        env.TEST_URL = "http://rd-professional-api-aat.aat.hmcts.platform.net"
     }
+
+    before('smoketest:preview') {
+        env.execution_environment = "preview"
+        env.TEST_URL = "http://rd-professional-api-preview.preview.platform.hmcts.net"
+    }
+
+    before('smoketest:aat') {
+        env.execution_environment = "aat"
+        env.TEST_URL = "http://rd-professional-api-aat.aat.platform.hmcts.net"
+    }
+
+    // Sync demo and perftest with master branch
+    syncBranchesWithMaster(branchesToSync)
 
     afterSuccess('sonarscan') {
 
