@@ -32,4 +32,5 @@ class PrdEnumRepositoryTest extends BaseRepository {
         assertThat(prdEnums.get(43).getEnumName()).isEqualTo("caseworker-civil");
         assertThat(prdEnums.get(44).getEnumName()).isEqualTo("caseworker-civil-solicitor");
     }
+    
 }
