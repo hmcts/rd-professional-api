@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,32 +80,35 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisa
 public class OrganisationExternalController extends SuperController {
 
 
-    @ApiOperation(
-            value = "Creates an Organisation",
-            notes = "**IDAM Roles to access API**: \n No role restriction",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+    @Operation(
+            summary = "Creates an Organisation",
+            description = "**IDAM Roles to access API**: <br> No role restriction",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 201,
-                    message = "The Organisation Identifier of the created Organisation",
-                    response = OrganisationResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid request has been provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "201",
+            description = "The Organisation Identifier of the created Organisation",
+            content = @Content(schema = @Schema(implementation = OrganisationResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid request has been provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @PostMapping(
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
@@ -111,144 +116,159 @@ public class OrganisationExternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for external user
         return createOrganisationFrom(organisationCreationRequest);
     }
 
-    @ApiOperation(
-            value = "Retrieves Organisation details of the requesting User",
-            notes = GET_ORG_BY_ID_NOTES_1 + GET_ORG_BY_ID_NOTES_2 + GET_ORG_BY_ID_NOTES_3,
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Retrieves Organisation details of the requesting User",
+            description = GET_ORG_BY_ID_NOTES_1 + GET_ORG_BY_ID_NOTES_2 + GET_ORG_BY_ID_NOTES_3,
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "Details of an Organisation",
-                    response = OrganisationsDetailResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid ID was provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Organisation found with the given ID"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Details of an Organisation",
+            content = @Content(schema = @Schema(implementation = OrganisationsDetailResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid ID was provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation found with the given ID",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-            @ApiParam(hidden = true) @OrgId String extOrgIdentifier,
-            @ApiParam(name = "pbaStatus") @RequestParam(value = "pbaStatus", required = false) String pbaStatus) {
+            @Parameter(hidden = true) @OrgId String extOrgIdentifier,
+            @Parameter(name = "pbaStatus") @RequestParam(value = "pbaStatus", required = false) String pbaStatus) {
 
         boolean isPendingPbaRequired = true;
 
         if (!isBlank(pbaStatus)
-            && pbaStatus.equalsIgnoreCase(ACCEPTED.name())) {
+                && pbaStatus.equalsIgnoreCase(ACCEPTED.name())) {
             isPendingPbaRequired = false;
         }
 
         return retrieveOrganisationOrById(extOrgIdentifier, isPendingPbaRequired);
     }
 
-    @ApiOperation(
-            value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
-            notes = GET_PBA_EMAIL_NOTES_1 + GET_PBA_EMAIL_NOTES_2,
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization"),
-                    @Authorization(value = "UserEmail")
+    @Operation(
+            summary = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
+            description = GET_PBA_EMAIL_NOTES_1 + GET_PBA_EMAIL_NOTES_2,
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization"),
+                    @SecurityRequirement(name = "UserEmail")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "The Organisation's associated Payment Accounts",
-                    response = OrganisationPbaResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid Email Address was provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Payment Accounts found with the given Email Address"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "The Organisation's associated Payment Accounts",
+            content = @Content(schema = @Schema(implementation = OrganisationPbaResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid Email Address was provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Payment Accounts found with the given Email Address",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @GetMapping(
             path = "/pbas",
             produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse>
-        retrievePaymentAccountByEmail(@ApiParam(hidden = true) @OrgId String orgId) {
+        retrievePaymentAccountByEmail(@Parameter(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
         var userEmail = getUserEmailFromHeader();
         return retrievePaymentAccountByUserEmail(userEmail, orgId);
     }
 
-    @ApiOperation(
-            value = "Add a new User to an Organisation",
-            notes = "**IDAM Roles to access API** :\n pui-user-manager",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Add a new User to an Organisation",
+            description = "**IDAM Roles to access API** :<br> pui-user-manager",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
 
-    @ApiResponses({
-            @ApiResponse(
-                    code = 201,
-                    message = "The new User has been added to the Organisation",
-                    response = NewUserResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid request was provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Organisation found with the given ID to add new User to"
-            ),
-            @ApiResponse(
-                    code = 409,
-                    message = "A User already exists with the given Email Address or is already active in SIDAM "
-                            + "during resend invite"
-            ),
-            @ApiResponse(
-                    code = 429,
-                    message = "Too many requests for resend invite"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "201",
+            description = "The new User has been added to the Organisation",
+            content = @Content(schema = @Schema(implementation = NewUserResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid request was provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation found with the given ID to add new User to",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "409",
+            description = "A User already exists with the given Email Address or is already active in SIDAM "
+                    + "during resend invite",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "429",
+            description = "Too many requests for resend invite",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @PostMapping(
             path = "/users/",
             consumes = APPLICATION_JSON_VALUE,
@@ -258,9 +278,10 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured("pui-user-manager")
     public ResponseEntity<Object> addUserToOrganisationUsingExternalController(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "newUserCreationRequest")
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
-            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
-            @ApiParam(hidden = true) @UserId String userId) {
+            @Parameter(hidden = true) @OrgId String organisationIdentifier,
+            @Parameter(hidden = true) @UserId String userId) {
 
         //Received request to add a new user to an organisation for external
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
@@ -269,40 +290,45 @@ public class OrganisationExternalController extends SuperController {
 
     }
 
-    @ApiOperation(
-            value = "Retrieves all Active Organisations of requested status for user"
+    @Operation(
+            summary = "Retrieves all Active Organisations of requested status for user"
                     + " with minimal e.g. organisationIdentifier, name and contact information if address flag is true",
-            notes = GET_ORG_BY_STATUS_NOTES_1 + GET_ORG_BY_STATUS_NOTES_2 + GET_ORG_BY_STATUS_NOTES_3,
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+            description = GET_ORG_BY_STATUS_NOTES_1 + GET_ORG_BY_STATUS_NOTES_2 + GET_ORG_BY_STATUS_NOTES_3,
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "Successfully retrieved list of all Organisations of"
-                            + " requested status with minimal information",
-                    response = OrganisationMinimalInfoResponse.class,
-                    responseContainer = "list"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied for either invalid permissions or user is pending"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Organisation found"
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved list of all Organisations of"
+                    + " requested status with minimal information",
+            content = @Content(array = @ArraySchema(schema =
+            @Schema(implementation = OrganisationMinimalInfoResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied for either invalid permissions or user is pending",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation found",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized Error : "
+                    + "The requested resource is restricted and requires authentication",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @GetMapping(
             path = "/status/{status}",
             produces = APPLICATION_JSON_VALUE
@@ -317,49 +343,57 @@ public class OrganisationExternalController extends SuperController {
         return retrieveAllOrganisationsByStatus(status, address);
     }
 
-    @ApiOperation(
-            value = "Deletes the provided list of payment accounts from the organisation.",
-            notes = "**IDAM Roles to access API** : \n - pui-finance-manager",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Deletes the provided list of payment accounts from the organisation.",
+            description = "**IDAM Roles to access API** : <br> - pui-finance-manager",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 204,
-                    message = "Successfully deleted the list of provided payment accounts from the organisation."
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = DEL_ORG_PBA_NOTES_1 + DEL_ORG_PBA_NOTES_2 + DEL_ORG_PBA_NOTES_3
-                    + DEL_ORG_PBA_NOTES_4 + DEL_ORG_PBA_NOTES_5
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied for either invalid permissions or user is pending"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "Resource Not Found Error: The Organisation does not exist"
-                            + " to delete Payment Accounts from"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+    @ApiResponse(
+            responseCode = "204",
+            description = "Successfully deleted the list of provided payment accounts from the organisation.",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = DEL_ORG_PBA_NOTES_1 + DEL_ORG_PBA_NOTES_2 + DEL_ORG_PBA_NOTES_3
+                    + DEL_ORG_PBA_NOTES_4 + DEL_ORG_PBA_NOTES_5,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized Error : "
+                    + "The requested resource is restricted and requires authentication",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: "
+                    + "Access denied for either invalid permissions or user is pending",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Resource Not Found Error: The Organisation does not exist"
+                    + " to delete Payment Accounts from",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @DeleteMapping(path = "/pba")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"pui-finance-manager"})
     public void deletePaymentAccountsOfOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
             @Valid @NotNull @RequestBody PbaRequest deletePbaRequest,
-            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
-            @ApiParam(hidden = true) @UserId String userId) {
+            @Parameter(hidden = true) @OrgId String organisationIdentifier,
+            @Parameter(hidden = true) @UserId String userId) {
 
         deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, organisationIdentifier, userId);
 
@@ -393,37 +427,41 @@ public class OrganisationExternalController extends SuperController {
                 .body(organisationResponse);
     }
 
-    @ApiOperation(
-            value = "Add multiple PBAs associated with their organisation",
-            notes = "**IDAM Roles to access API** :\n pui-finance-manager",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Add multiple PBAs associated with their organisation",
+            description = "**IDAM Roles to access API** :<br> pui-finance-manager",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 201,
-                    message = "All PBAs got added successfully or Partial success",
-                    response = AddPbaResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "PBA number invalid or Duplicate PBA or Organisation is not active"
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "S2S unauthorised"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "201",
+            description = "All PBAs got added successfully or Partial success",
+            content = @Content(schema = @Schema(implementation = AddPbaResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "PBA number invalid or Duplicate PBA or Organisation is not active",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "S2S unauthorised",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @PostMapping(
             path = "/pba",
             consumes = APPLICATION_JSON_VALUE,
@@ -433,9 +471,10 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured("pui-finance-manager")
     public ResponseEntity<Object> addPaymentAccountsToOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "pbaRequest")
             @Valid @NotNull @RequestBody PbaRequest pbaRequest,
-            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
-            @ApiParam(hidden = true) @UserId String userId) {
+            @Parameter(hidden = true) @OrgId String organisationIdentifier,
+            @Parameter(hidden = true) @UserId String userId) {
 
         log.info("Received request to add payment accounts to organisation Id");
 
@@ -443,38 +482,44 @@ public class OrganisationExternalController extends SuperController {
 
     }
 
-    @ApiOperation(
-            value = "Adds contact informations(address details) to organisation",
-            notes = "**IDAM Roles to access API** :\n pui-organisation-manager",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Adds contact informations(address details) to organisation",
+            description = "**IDAM Roles to access API** :<br> pui-organisation-manager",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
 
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 201,
-                    message = ""
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid request has been provided"
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
-            ),
 
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+    @ApiResponse(
+            responseCode = "201",
+            description = "",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid request has been provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized Error : "
+                    + "The requested resource is restricted and requires authentication",
+            content = @Content
+    )
+
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
 
     @PostMapping(
             path = "/addresses",
@@ -485,8 +530,9 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<Void> addContactInformationsToOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
             @Valid @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
-            @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
+            @Parameter(hidden = true) @OrgId String organisationIdentifier) {
 
 
         organisationCreationRequestValidator.validateContactInformations(contactInformationCreationRequests);
@@ -509,48 +555,58 @@ public class OrganisationExternalController extends SuperController {
 
     }
 
-    @ApiOperation(
-            value = "Deletes the Contact Information Address of an Organisation.",
-            notes = "**IDAM Roles to access API** : \n - pui-organisation-manager",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Deletes the Contact Information Address of an Organisation.",
+            description = "**IDAM Roles to access API** : <br> - pui-organisation-manager",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 204,
-                    message = "Successfully deleted the list of Contact Information Address of an Organisation."
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = DELETE_ORG_ADD_400_MESSAGE_1 + DELETE_ORG_ADD_400_MESSAGE_2
-                            + DELETE_ORG_ADD_400_MESSAGE_3 + DELETE_ORG_ADD_400_MESSAGE_4
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied for either invalid permissions or user is pending"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = DELETE_ORG_ADD_404_MESSAGE_1 + DELETE_ORG_ADD_404_MESSAGE_2 + DELETE_ORG_ADD_404_MESSAGE_3
-                    + DELETE_ORG_ADD_404_MESSAGE_4 + DELETE_ORG_ADD_404_MESSAGE_5 + DELETE_ORG_ADD_404_MESSAGE_6
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "204",
+            description = "Successfully deleted the list of Contact Information Address of an Organisation.",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = DELETE_ORG_ADD_400_MESSAGE_1 + DELETE_ORG_ADD_400_MESSAGE_2
+                    + DELETE_ORG_ADD_400_MESSAGE_3 + DELETE_ORG_ADD_400_MESSAGE_4,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized Error : "
+                    + "The requested resource is restricted and requires authentication",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied for either invalid permissions or user is pending",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = DELETE_ORG_ADD_404_MESSAGE_1 + DELETE_ORG_ADD_404_MESSAGE_2
+                    + DELETE_ORG_ADD_404_MESSAGE_3
+                    + DELETE_ORG_ADD_404_MESSAGE_4 + DELETE_ORG_ADD_404_MESSAGE_5
+                    + DELETE_ORG_ADD_404_MESSAGE_6,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @DeleteMapping(path = "/addresses")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"pui-organisation-manager"})
     public void deleteMultipleAddressesOfOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deleteRequest")
             @Valid @NotNull @RequestBody List<DeleteMultipleAddressRequest> deleteRequest,
-            @ApiParam(hidden = true) @OrgId String organisationIdentifier) {
+            @Parameter(hidden = true) @OrgId String organisationIdentifier) {
 
         deleteMultipleAddressOfGivenOrganisation(deleteRequest, organisationIdentifier);
 

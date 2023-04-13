@@ -8,16 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.reform.professionalapi.Application;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.io.File;
 import java.io.FileOutputStream;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -28,8 +26,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Integration")})
-@SpringBootTest(classes = Application.class, webEnvironment = MOCK)
-class SwaggerPublisher {
+class SwaggerPublisher extends AuthorizationEnabledIntegrationTest {
 
     private static final Logger LOG = getLogger(SwaggerPublisher.class);
 
@@ -55,18 +52,18 @@ class SwaggerPublisher {
             return;
         }
 
-        byte[] specs = mockMvc.perform(get("/v2/api-docs"))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsByteArray();
+        byte[] specs = mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
 
         try (FileOutputStream outputStream = new FileOutputStream(SWAGGER_DOC_JSON_FILE)) {
             outputStream.write(specs);
         }
 
         LOG.info("Completed Generating Swagger docs to the following location {}",
-            SWAGGER_DOC_JSON_FILE);
+                SWAGGER_DOC_JSON_FILE);
     }
 
 }

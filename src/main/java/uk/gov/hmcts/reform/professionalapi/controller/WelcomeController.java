@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -16,10 +16,6 @@ import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Api(
-    value = "/",
-    produces = APPLICATION_JSON_VALUE
-)
 
 @Slf4j
 @RestController
@@ -40,17 +36,17 @@ public class WelcomeController {
      *
      * @return Welcome message from the service.
      */
-    @ApiOperation("Welcome message for the Professional Reference Data API")
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Welcome message",
-            response = String.class
-        )
-    })
+    @Operation(summary = "Welcome message for the Professional Reference Data API")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Welcome message",
+            content = @Content(schema = @Schema(implementation = String.class))
+    )
+
     @GetMapping(
-        path = "/",
-        produces = APPLICATION_JSON_VALUE
+            path = "/",
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     public ResponseEntity<String> welcome() {
@@ -58,8 +54,8 @@ public class WelcomeController {
         log.info("{}:: Welcome message '{}' from running instance: {}", loggingComponentName, MESSAGE, INSTANCE_ID);
 
         return ResponseEntity
-            .ok()
-            .cacheControl(CacheControl.noCache())
-            .body("{\"message\": \"" + MESSAGE + "\"}");
+                .ok()
+                .cacheControl(CacheControl.noCache())
+                .body("{\"message\": \"" + MESSAGE + "\"}");
     }
 }

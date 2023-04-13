@@ -57,6 +57,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         }
     }
 
+    @SuppressWarnings("java:S6204")
     private void getOrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
             Boolean isRequiredPendingPbas, Boolean isRequiredAllPbas) {
