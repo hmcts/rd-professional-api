@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.Parameters;
@@ -21,6 +22,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -39,6 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceI
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -171,6 +174,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @BeforeEach
     public void setupIdamStubs() throws Exception {
 
+        LinkedHashMap<String,Object> data = new LinkedHashMap<>();
+        data.put("id","%s");
+        data.put("uid","%s");
+        data.put("forename","Super");
+        data.put("surname","User");
+        data.put("email","dummy@email.com");
+        data.put("roles",List.of("%s"));
+
         s2sService.stubFor(get(urlEqualTo("/details"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -189,17 +200,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", APPLICATION_JSON)
-                        .withBody("{"
-                                + "  \"id\": \"%s\","
-                                + "  \"uid\": \"%s\","
-                                + "  \"forename\": \"Super\","
-                                + "  \"surname\": \"User\","
-                                + "  \"email\": \"dummy@email.com\","
-                                + "  \"accountStatus\": \"active\","
-                                + "  \"roles\": ["
-                                + "  \"%s\""
-                                + "  ]"
-                                + "}")
+                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(data))
                         .withTransformers("external_user-token-response")));
 
         mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
@@ -210,45 +211,57 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     @BeforeEach
-    public void userProfileGetUserWireMock() {
+    public void userProfileGetUserWireMock() throws Exception {
+
+        HashMap<Object,Object> data = new HashMap<>();
+        data.put("userIdentifier", UUID.randomUUID().toString());
+        data.put("firstName","testFn");
+        data.put("lastName","testLn");
+        data.put("email","dummy@email.com");
+        data.put("idamStatus",IdamStatus.ACTIVE);
+
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", APPLICATION_JSON)
                         .withStatus(200)
-                        .withBody("{"
-                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
-                                + "  \"firstName\": \"testFn\","
-                                + "  \"lastName\": \"testLn\","
-                                + "  \"email\": \"dummy@email.com\","
-                                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
-                                + "}")));
+                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(data))));
     }
 
     public void userProfileGetPendingUserWireMock() {
-        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
+
+        HashMap<Object,Object> data = new HashMap<>();
+        data.put("userIdentifier", UUID.randomUUID().toString());
+        data.put("firstName","testFn");
+        data.put("lastName","dummy");
+        data.put("email","dummy@email.com");
+        data.put("idamStatus",IdamStatus.PENDING);
+        try {
+            userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", APPLICATION_JSON)
-                        .withStatus(200)
-                        .withBody("{"
-                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
-                                + "  \"firstName\": \"testuser\","
-                                + "  \"lastName\": \"dummy\","
-                                + "  \"email\": \"dummy@email.com\","
-                                + "  \"idamStatus\": \"" + IdamStatus.PENDING + "\""
-                                + "}")));
+                    .withHeader("Content-Type", APPLICATION_JSON)
+                    .withStatus(200)
+                    .withBody(WireMockUtil.getObjectMapper().writeValueAsString(data))));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     public void userProfilePostPendingUserWireMock(boolean resend) {
-        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+
+        HashMap<Object,Object> data = new HashMap<>();
+        data.put("idamId", UUID.randomUUID().toString());
+        data.put("idamRegistrationResponse",201);
+        try {
+            userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
                 .withRequestBody(equalToJson("{ \"resendInvite\": " + resend + "}", true,
-                        true))
+                    true))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withStatus(201)
-                        .withBody("{"
-                                + "  \"idamId\":\"" + UUID.randomUUID() + "\","
-                                + "  \"idamRegistrationResponse\":\"" + 201 + "\""
-                                + "}")));
+                    .withHeader("Content-Type", "application/json")
+                    .withStatus(201)
+                    .withBody(WireMockUtil.getObjectMapper().writeValueAsString(data))));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     @AfterEach
@@ -387,7 +400,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return professionalUserRepository.findByUserIdentifier(userId).getOrganisation().getOrganisationIdentifier();
     }
 
-    public void userProfileCreateUserWireMock(HttpStatus status) {
+    public void userProfileCreateUserWireMock(HttpStatus status)  {
         String body = null;
         int returnHttpStaus = status.value();
         if (status.is2xxSuccessful()) {
@@ -548,41 +561,49 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         );
     }
 
-    public void updateUserProfileRolesMock(HttpStatus status) {
+    public void updateUserProfileRolesMock(HttpStatus status)  {
         String body = null;
         int returnHttpStatus = 200;
-        if (status.is2xxSuccessful()) {
-            body = "{"
+        ErrorResponse errorResponse;
+        try {
+            if (status.is2xxSuccessful()) {
+                body = "{"
                     + "  \"statusUpdateResponse\": {"
                     + "  \"idamStatusCode\": \"200\","
                     + "  \"idamMessage\": \"Success\""
                     + "  } "
                     + "}";
-            returnHttpStatus = 200;
-        } else if (status.value() == 400) {
-            body = "{"
-                    + "  \"errorMessage\": \"400\","
-                    + "  \"errorDescription\": \"BAD REQUEST\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-            returnHttpStatus = 400;
-        } else if (status.value() == 404) {
-            body = "{"
-                    + "  \"errorMessage\": \"404\","
-                    + "  \"errorDescription\": \"No User found with the given ID\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-            returnHttpStatus = 404;
-        } else if (status.value() == 412) {
-            body = "{"
-                    + "  \"errorMessage\": \"412\","
-                    + "  \"errorDescription\": \"One or more of the Roles provided is already assigned to the User\","
-                    + "  \"timeStamp\": \"11:11\""
-                    + "}";
-            returnHttpStatus = 412;
-        } else if (status.is5xxServerError()) {
+                returnHttpStatus = 200;
+            } else if (status.value() == 400) {
+                errorResponse = ErrorResponse
+                    .builder()
+                    .errorMessage("400")
+                    .errorDescription("BAD REQUEST")
+                    .timeStamp("23:10")
+                    .build();
+                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                returnHttpStatus = 400;
+            } else if (status.value() == 404) {
+                errorResponse = ErrorResponse
+                    .builder()
+                    .errorMessage("404")
+                    .errorDescription("No User found with the given ID")
+                    .timeStamp("23:10")
+                    .build();
+                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                returnHttpStatus = 404;
+            } else if (status.value() == 412) {
+                errorResponse = ErrorResponse
+                    .builder()
+                    .errorMessage("412")
+                    .errorDescription("One or more of the Roles provided is already assigned to the User")
+                    .timeStamp("23:10")
+                    .build();
+                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                returnHttpStatus = 412;
+            } else if (status.is5xxServerError()) {
 
-            body = "{"
+                body = "{"
                     + "  \"roleAdditionResponse\": {"
                     + "  \"idamStatusCode\": \"500\","
                     + "  \"idamMessage\": \"Internal Server Error\""
@@ -594,6 +615,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "  } "
                     + "  ]"
                     + "}";
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
 
         userProfileService.stubFor(
@@ -610,41 +634,48 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public void reinviteUserMock(HttpStatus status) {
         String body = null;
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-                    + "  \"idamRegistrationResponse\":\"201\""
-                    + "}";
-        } else if (status == HttpStatus.BAD_REQUEST) {
-            body = "{"
-                    + "  \"errorMessage\": \"3 : There is a problem with your request. Please check and try again\","
-                    + "  \"errorDescription\": \"User is not in PENDING state\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-        } else if (status == HttpStatus.NOT_FOUND) {
-            body = "{"
-                    + "  \"errorMessage\": \"4 : Resource not found\","
-                    + "  \"errorDescription\": \"could not find user profile\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-        } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
-            body = "{"
-                    + "  \"errorMessage\": \"10 : The request was last made less than 1 hour ago. Please try after"
-                    + " some time\","
-                    + "  \"errorDescription\": \"" + String.format("The request was last made less than %s minutes ago."
-                    + " Please try after some time", resendInterval) + "\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-        } else if (status == HttpStatus.CONFLICT) {
-            body = "{"
-                    + "  \"errorMessage\": \"7 : Resend invite failed as user is already active. Wait for one hour "
-                    + "for the system to refresh.\","
-                    + "  \"errorDescription\": \"" + String.format("Resend invite failed as user is already active. "
-                    + "Wait for %s minutes for the system to refresh.", syncInterval) + "\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
+        ErrorResponse errorResponse;
+        try {
+            if (status.is2xxSuccessful()) {
+                HashMap<String, String> data = new HashMap<>();
+                data.put("idamId", UUID.randomUUID().toString());
+                data.put("idamRegistrationResponse", "201");
+                body = WireMockUtil.getObjectMapper().writeValueAsString(data);
+            } else if (status == HttpStatus.BAD_REQUEST) {
+                errorResponse = ErrorResponse.builder()
+                    .errorMessage("3 : There is a problem with your request. Please check and try again")
+                    .errorDescription("User is not in PENDING state")
+                    .timeStamp("23:10")
+                    .build();
+                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+            } else if (status == HttpStatus.NOT_FOUND) {
+                errorResponse = ErrorResponse.builder()
+                    .errorMessage("4 : Resource not found")
+                    .errorDescription("could not find user profile")
+                    .timeStamp("23:10")
+                    .build();
+                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+            } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
+                errorResponse = ErrorResponse.builder()
+                    .errorMessage("10 : The request was last made less than 1 hour ago. Please try after some time")
+                    .errorDescription(String.format("The request was last made less than %s minutes ago."
+                        + " Please try after some time", resendInterval))
+                    .timeStamp("23:10")
+                    .build();
+                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+            } else if (status == HttpStatus.CONFLICT) {
+                errorResponse = ErrorResponse.builder()
+                    .errorMessage("7 : Resend invite failed as user is already active. Wait for one hour "
+                        + "for the system to refresh.")
+                    .errorDescription(String.format("Resend invite failed as user is already active. "
+                        + "Wait for %s minutes for the system to refresh.", syncInterval))
+                    .timeStamp("23:10")
+                    .build();
+                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
-
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", APPLICATION_JSON)
@@ -665,12 +696,18 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "}";
             returnHttpStatus = 200;
         } else if (status.is4xxClientError()) {
-            body = "{"
-                    + "  \"errorMessage\": \"400\","
-                    + "  \"errorDescription\": \"BAD REQUEST\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-            returnHttpStatus = 400;
+            try {
+                ErrorResponse errorResponse = ErrorResponse
+                    .builder()
+                    .errorMessage("400")
+                    .errorDescription("BAD REQUEST")
+                    .timeStamp("23:10")
+                    .build();
+                returnHttpStatus = 400;
+                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
 
         userProfileService.stubFor(
@@ -688,30 +725,25 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void deleteUserProfileMock(HttpStatus status) {
         String body = null;
         int returnHttpStatus = status.value();
-        if (status.is2xxSuccessful()) {
-            body = "{"
-
-                    + "  \"statusCode\": \"204\","
-                    + "  \"message\": \"User Profile Deleted Successfully\""
-
-                    + "}";
-            returnHttpStatus = 204;
-        } else if (status == HttpStatus.BAD_REQUEST) {
-            body = "{"
-
-                    + "  \"statusCode\": \"400\","
-                    + "  \"message\": \"User Profile Delete Request has some problem\""
-
-                    + "}";
-        } else if (status == HttpStatus.NOT_FOUND) {
-            body = "{"
-
-                    + "  \"statusCode\": \"404\","
-                    + "  \"message\": \"User Profile Not Found To Delete\""
-
-                    + "}";
+        HashMap<String,String> data = new HashMap<>();
+        try {
+            if (status.is2xxSuccessful()) {
+                data.put("statusCode", "204");
+                data.put("message", "User Profile Deleted Successfully");
+                body = WireMockUtil.getObjectMapper().writeValueAsString(data);
+                returnHttpStatus = 204;
+            } else if (status == HttpStatus.BAD_REQUEST) {
+                data.put("statusCode", "400");
+                data.put("message", "User Profile Delete Request has some problem");
+                body = WireMockUtil.getObjectMapper().writeValueAsString(data);
+            } else if (status == HttpStatus.NOT_FOUND) {
+                data.put("statusCode", "404");
+                data.put("message", "User Profile Not Found To Delete");
+                body = WireMockUtil.getObjectMapper().writeValueAsString(data);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
-
         userProfileService.stubFor(
                 delete(urlEqualTo("/v1/userprofile"))
                         .willReturn(aResponse()
