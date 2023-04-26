@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.WireMockUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -454,19 +456,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
     @Test
     @SuppressWarnings("unchecked")
-    void test_add_PaymentAccounts_Success_Has_Null_Value_also_PBA_ShouldReturn_201() {
+    void test_add_PaymentAccounts_Success_Has_Null_Value_also_PBA_ShouldReturn_201() throws JsonProcessingException {
 
-        String request = "{\n"
-                + "    \"paymentAccounts\": [\n"
-                + "        \"PBAKQNROCA\",\n"
-                + "        \"PBA00000000\",\n"
-                + "        \"PBAKQNR1CA\",\n"
-                + "        \"PBAC013ABE\",\n"
-                + "        null\n"
-                + "    ]\n"
-                + "}";
+        LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
+        data.put("paymentAccounts", ImmutableList
+            .of("PBAKQNROCA","PBA00000000","PBAKQNR1CA","PBAC013ABE","null"));
 
-        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(WireMockUtil.getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
@@ -502,19 +498,12 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
     @Test
     @SuppressWarnings("unchecked")
-    void test_add_PaymentAccounts_Failure_Has_Misspelled_payload_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Misspelled_payload_ShouldThrow_400() throws JsonProcessingException {
 
-        String request = "{\n"
-                + "    \"paymentBccounts\": [\n"
-                + "        \"PBAKQNROCA\",\n"
-                + "        \"PBA00000000\",\n"
-                + "        \"PBAKQNR1CA\",\n"
-                + "        \"PBAC013ABE\",\n"
-                + "        null\n"
-                + "    ]\n"
-                + "}";
-
-        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
+        LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
+        data.put("paymentBccounts", ImmutableList
+            .of("PBAKQNROCA","PBA00000000","PBAKQNR1CA","PBAC013ABE","null"));
+        PbaRequest pbaRequest = convertJsonReqStringToObj(WireMockUtil.getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
@@ -528,15 +517,11 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
     @Test
     @SuppressWarnings("unchecked")
-    void test_add_PaymentAccounts_Failure_Has_Misspelled02_payload_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Misspelled02_payload_ShouldThrow_400() throws JsonProcessingException {
 
-        String request = "{\n"
-                + "    \"PaymentAccounts\": [\n"
-                + "        \"PBAKQNROCA\",\n"
-                + "    ]\n"
-                + "}";
-
-        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
+        LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
+        data.put("PaymentAccounts", ImmutableList.of("PBAKQNROCA"));
+        PbaRequest pbaRequest = convertJsonReqStringToObj(WireMockUtil.getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
@@ -660,7 +645,9 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 + "        \" \"\n"
                 + "    ]\n"
                 + "}";
-
+        LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
+        data.put("PaymentAccounts", ImmutableList
+            .of("PBAKQNROCB8","null","PBAKQNROCB8","null","PBA3DE3PKJ8","null"));
         PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);
