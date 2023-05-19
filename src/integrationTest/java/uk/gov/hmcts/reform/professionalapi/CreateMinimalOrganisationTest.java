@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -78,14 +81,19 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
     }
 
-    @Test
-    void returns_400_when_mandatory_data_not_present() {
+    @ParameterizedTest
+    @CsvSource({
+        "null,someone@somewhere.com",
+        "somename,@@someone@somewhere.com",
+        "some,-someone@somewhere.com"
+    })
+    void returns_400_when_mandatory_data_not_present(String name,String emailId) {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name(null)
+                .name(name)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email("someone@somewhere.com")
+                        .email(emailId)
                         .build())
                 .build();
 
@@ -98,73 +106,15 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
         assertThat(organisationRepository.findAll()).isEmpty();
     }
 
-    @Test
-    void returns_400_when_email_not_valid() {
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("somename")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("@@someone@somewhere.com")
-                        .build())
-                .build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body").toString().contains("Bad Request"));
-
-        assertThat(organisationRepository.findAll()).isEmpty();
-    }
-
-    @Test
-    void returns_400_when_email_minus_not_valid() {
+    @ParameterizedTest
+    @ValueSource(strings = { "some_one_gh@somewhere.com","someone.o'name@test.com"})
+    void returns_200_when_email_has_underscore(String email) {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email("-someone@somewhere.com")
-                        .build())
-                .build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body").toString().contains("Bad Request"));
-
-        assertThat(organisationRepository.findAll()).isEmpty();
-    }
-
-    @Test
-    void returns_200_when_email_has_underscore() {
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("some_one_gh@somewhere.com")
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1").build())).build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
-
-    }
-
-    @Test
-    void returns_200_when_email_has_apostrophe() {
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone.o'name@test.com")
+                        .email(email)
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();

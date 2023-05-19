@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -179,28 +181,20 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     }
 
-    @Test
-    void returns_404_when_organisation_identifier_not_found() {
+    @ParameterizedTest
+    @CsvSource({
+        "AB83N5K,404",
+        "invalid-org-id,400"
+    })
+    void returns_404_when_organisation_identifier_not_found(String orgId,String statusCode) {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("AB83N5K",
+                professionalReferenceDataClient.addUserToOrganisation(orgId,
                         inviteUserCreationRequest("some@email.com", userRoles), hmctsAdmin);
 
-        assertThat(newUserResponse.get("http_status")).isEqualTo("404");
-    }
-
-    @Test
-    void returns_400_when_organisation_identifier_invalid() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("invalid-org-id",
-                        inviteUserCreationRequest("some@email.com", userRoles), hmctsAdmin);
-
-        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+        assertThat(newUserResponse.get("http_status")).isEqualTo(statusCode);
     }
 
 

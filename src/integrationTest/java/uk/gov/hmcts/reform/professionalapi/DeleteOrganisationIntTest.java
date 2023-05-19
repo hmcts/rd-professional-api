@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -73,20 +75,17 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
         assertThat(deleteResponse.get("http_status")).isEqualTo("403");
     }
 
-    @Test
-    void return_404_when_un_known_org_identifier_in_the_request_to_delete_pending_organisation() {
+    @ParameterizedTest
+    @CsvSource({
+        "O12DEF3,404",
+        "O12DEF,400"
+    })
+    void return_404_when_un_known_org_identifier_in_the_request_to_delete_pending_organisation(String orgIdentifier,
+                                                                                                String statusCode) {
 
         Map<String, Object> deleteResponse =
-            professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, "O12DEF3");
-        assertThat(deleteResponse.get("http_status")).isEqualTo("404");
-    }
-
-    @Test
-    void return_400_when_invalid_org_identifier_in_the_request_to_delete_pending_organisation() {
-
-        Map<String, Object> deleteResponse =
-            professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, "O12DEF");
-        assertThat(deleteResponse.get("http_status")).isEqualTo("400");
+            professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
+        assertThat(deleteResponse.get("http_status")).isEqualTo(statusCode);
     }
 
     @Test
