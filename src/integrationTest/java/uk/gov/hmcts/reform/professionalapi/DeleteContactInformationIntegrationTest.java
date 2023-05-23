@@ -476,36 +476,6 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
                 .contains(ERROR_MSG_REQUEST_IS_EMPTY);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @Test
     @SuppressWarnings("unchecked")
     void test_delete_contactInformation_one_empty_single_object() {

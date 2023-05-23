@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -53,13 +55,14 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
         assertThat(response.get("http_status")).isEqualTo("400");
     }
 
-    @Test
-    void returns_bad_request_when_dx_num_invalid() {
+    @ParameterizedTest
+    @ValueSource(strings = { "this is an invalid dx number","DX1234567891011"})
+    void returns_bad_request_when_dx_num_invalid(String dxNumber) {
 
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("this is an invalid dx number")
+                                .dxNumber(dxNumber)
                                 .dxExchange("dxExchange").build()))
                         .build()))
                 .build();
@@ -81,21 +84,6 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         assertThat(response.get("http_status")).isEqualTo("201 CREATED");
-    }
-
-    @Test
-    void create_an_organisation_with_Dx_Number_more_than_13_throws_400() {
-
-        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX1234567891011")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
-                .build();
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
