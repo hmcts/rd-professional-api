@@ -10,9 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+@PactBroker(
+    scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+    port = "${PACT_BROKER_PORT:80}",
+    consumerVersionSelectors = {
     @VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
 public abstract class BaseProviderTest {
