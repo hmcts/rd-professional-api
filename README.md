@@ -10,7 +10,7 @@ Provides professional reference data to client applications. Implemented as a Ja
 
 To run the project you will need to have the following installed:
 
-* Java 11
+* Java 17
 * Docker (optional)
 
 For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle
@@ -171,3 +171,6 @@ Once Verify on url `http://localhost:9292/`
 The pact contract(s) should be published
 
 Remember to return the localhost back to the remote broker
+
+Please refer to the confluence on how to run and publish PACT tests.
+https://tools.hmcts.net/confluence/display/RTRD/PACT+testing
