@@ -78,7 +78,7 @@ If the API is running, you should see this response:
 ```
 {"status":"UP"}
 ```
-If the API is running, you can see this response in swagger :
+If the Application is running, you can see this response in swagger :
 
 ```
 http://localhost:8090/swagger-ui.html
