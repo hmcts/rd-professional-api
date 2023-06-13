@@ -6,6 +6,10 @@ Professional Reference Data API
 
 Provides professional reference data to client applications. Implemented as a Java/SpringBoot application.
 
+Please refer to the confluence for more information. 
+https://tools.hmcts.net/confluence/display/RTRD/Professional+Reference+Data
+
+
 ### Prerequisites
 
 To run the project you will need to have the following installed:
@@ -30,6 +34,10 @@ If running locally for development or testing you will need to set the following
 
 ### Running the application
 
+Please Make sure you are connected to the VPN before running application
+(https://portal.platform.hmcts.net/vdesk/webtop.eui?webtop=/Common/webtop_full&webtop_type=webtop_full) 
+
+
 To run the API quickly use the docker helper script as follows:
 
 ```
@@ -45,7 +53,7 @@ docker-compose up
 application will listen on 8090 when started using the above methods.
 
 
-Alternatively, you can start the application from the current source files using Gradle as follows:
+After, you can start the application from the current source files using Gradle as follows:
 
 ```
 ./gradlew clean bootRun
@@ -69,6 +77,11 @@ If the API is running, you should see this response:
 
 ```
 {"status":"UP"}
+```
+If the API is running, you can see this response in swagger :
+
+```
+http://localhost:8090/swagger-ui.html
 ```
 
 ### DB Initialisation˙
