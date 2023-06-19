@@ -123,6 +123,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
+        findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess();
     }
 
     public void retrieveOrganisationPbaScenarios() {
@@ -268,6 +269,17 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
         assertThat(response.get("organisations").toString()).contains("status=PENDING");
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
+    }
+
+    public void findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess() {
+        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient
+                .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
+        assertThat(response.get("organisations")).isNotNull();
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.get("organisations").toString()).contains("status=PENDING");
+        assertThat(response.get("organisations").toString()).contains("status=REVIEW");
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
