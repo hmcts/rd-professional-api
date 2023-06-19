@@ -262,25 +262,34 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     public void findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess() {
-        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        log.info("findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus("ACTIVE,PENDING", hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
         assertThat(response.get("organisations").toString()).contains("status=PENDING");
-        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
+        log.info("findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
     public void findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess() {
-        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient
+        log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        String statusMessage = "Company in review";
+
+        professionalApiClient
+                .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+        Map<String, Object> orgresponse = professionalApiClient
                 .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
-        assertThat(response.get("organisations")).isNotNull();
-        assertThat(response.size()).isGreaterThanOrEqualTo(1);
-        assertThat(response.get("organisations").toString()).contains("status=PENDING");
-        assertThat(response.get("organisations").toString()).contains("status=REVIEW");
-        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
+
+
+        assertThat(orgresponse.get("organisations")).isNotNull();
+        assertThat(orgresponse.size()).isGreaterThanOrEqualTo(1);
+        assertThat(orgresponse.get("organisations").toString()).contains("status=PENDING");
+        assertThat(orgresponse.get("organisations").toString()).contains("status=REVIEW");
+        log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
