@@ -424,6 +424,34 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    public void persists_and_returns_all_organisations_details_by_pending_and_review_status() {
+
+        String organisationIdentifier = createOrganisationRequest("PENDING");
+        String organisationIdentifier1 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("REVIEW").sraId(randomAlphabetic(10)).build());
+
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        assertThat(organisationIdentifier1).isNotEmpty();
+
+
+        Organisation blockedOrg = organisationRepository.findByOrganisationIdentifier(organisationIdentifier1);
+        blockedOrg.setStatus(REVIEW);
+        organisationRepository.save(blockedOrg);
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusTest("PENDING,REVIEW", hmctsAdmin);
+
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+        assertThat(orgResponse.get("organisations").toString()).contains("status=PENDING");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=REVIEW");
+
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
     public void persists_and_returns_all_organisations_details_by_pending_and_blocked_status() {
 
         String organisationIdentifier = createOrganisationRequest("PENDING");
