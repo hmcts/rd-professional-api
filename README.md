@@ -6,11 +6,15 @@ Professional Reference Data API
 
 Provides professional reference data to client applications. Implemented as a Java/SpringBoot application.
 
+Please refer to the confluence for more information. 
+https://tools.hmcts.net/confluence/display/RTRD/Professional+Reference+Data
+
+
 ### Prerequisites
 
 To run the project you will need to have the following installed:
 
-* Java 11
+* Java 17
 * Docker (optional)
 
 For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle
@@ -24,9 +28,15 @@ If running locally for development or testing you will need to set the following
 
 * export POSTGRES_USERNAME=dbrefdata
 * export POSTGRES_PASSWORD=<The database password. Please check with the dev team for more information.>
-* export S2S_SECRET=<The actual s2s secret. Please check with the dev team for more information.>
+* export client-secret=<The actual client-secret. Please check with the dev team for more information.>
+* export totp_secret=<The actual totp_secret. Please check with the dev team for more information.>
+* export key=<The actual key. Please check with the dev team for more information.>
 
 ### Running the application
+
+Please Make sure you are connected to the VPN before running application
+(https://portal.platform.hmcts.net/vdesk/webtop.eui?webtop=/Common/webtop_full&webtop_type=webtop_full) 
+
 
 To run the API quickly use the docker helper script as follows:
 
@@ -43,7 +53,7 @@ docker-compose up
 application will listen on 8090 when started using the above methods.
 
 
-Alternatively, you can start the application from the current source files using Gradle as follows:
+After, you can start the application from the current source files using Gradle as follows:
 
 ```
 ./gradlew clean bootRun
@@ -67,6 +77,11 @@ If the API is running, you should see this response:
 
 ```
 {"status":"UP"}
+```
+If the Application is running, you can see this response in swagger :
+
+```
+http://localhost:8090/swagger-ui.html
 ```
 
 ### DB Initialisation˙
@@ -171,3 +186,6 @@ Once Verify on url `http://localhost:9292/`
 The pact contract(s) should be published
 
 Remember to return the localhost back to the remote broker
+
+Please refer to the confluence on how to run and publish PACT tests.
+https://tools.hmcts.net/confluence/display/RTRD/PACT+testing
