@@ -473,6 +473,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
         if (pageable != null) {
             resultOrganisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
+            resultOrganisations.sort(Comparator.comparing(Organisation::getStatus));
         }
         OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(resultOrganisations,
                 true, true, false);

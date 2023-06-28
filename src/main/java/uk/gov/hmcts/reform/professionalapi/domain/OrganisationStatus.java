@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 public enum OrganisationStatus {
-   PENDING,
-   ACTIVE,
-   BLOCKED,
-   REVIEW,
-   DELETED;
+    ACTIVE,
+    BLOCKED,
+    DELETED,
+    PENDING,
+    REVIEW;
 
     public boolean isPending() {
         return this == PENDING;

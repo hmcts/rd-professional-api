@@ -628,6 +628,51 @@ class OrganisationServiceImplTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void test_RetrieveOrganisationsByPendingAndReviewStatusAndPagination() throws JsonProcessingException {
+        Organisation pendingOrganisation1 = new Organisation("some-pending-org-name1", OrganisationStatus.PENDING,
+                "PENDING", null, null, null);
+        Organisation reviewOrganisation1 = new Organisation("some-review-org-name1", REVIEW,
+                "REVIEW", null, null, null);
+        Organisation pendingOrganisation2 = new Organisation("some-pending-org-name2", OrganisationStatus.PENDING,
+                "PENDING", null, null, null);
+        Organisation reviewOrganisation2 = new Organisation("some-review-org-name2", REVIEW,
+                "REVIEW", null, null, null);
+        Organisation reviewOrganisation3 = new Organisation("some-review-org-name3", OrganisationStatus.PENDING,
+                "REVIEW", null, null, null);
+        Organisation pendingOrganisation3 = new Organisation("some-pending-org-name3", REVIEW,
+                "PENDING", null, null, null);
+
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(pendingOrganisation1);
+        organisations.add(reviewOrganisation1);
+        organisations.add(pendingOrganisation2);
+        organisations.add(reviewOrganisation2);
+        organisations.add(pendingOrganisation3);
+        organisations.add(reviewOrganisation3);
+
+        Pageable pageable = PageRequest.of(1,2, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.PENDING, REVIEW), pageable))
+                .thenReturn(orgPage);
+        when(orgPage.getContent()).thenReturn(organisations);
+        when(orgPage.getTotalElements()).thenReturn(1L);
+
+
+        String status = "PENDING,REVIEW";
+        OrganisationsDetailResponse organisationDetailResponse
+                = sut.findByOrganisationStatus(status, pageable);
+
+        assertThat(organisationDetailResponse).isNotNull();
+        verify(organisationRepository, times(1))
+                .findByStatusIn(List.of(OrganisationStatus.PENDING,REVIEW), pageable);
+        assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
+    }
+
+    @Test
     void test_retrieveAllOrganisations_withEmptyUsers() {
         Organisation organisationMock = mock(Organisation.class);
 
