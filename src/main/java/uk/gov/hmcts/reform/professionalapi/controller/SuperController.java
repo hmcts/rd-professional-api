@@ -252,7 +252,8 @@ public abstract class SuperController {
                 size = DEFAULT_PAGE_SIZE;
             }
             var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
-            pageable = createPageableObject(page - 1, size, Sort.by(order));
+            var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+            pageable = createPageableObject(page - 1, size, Sort.by(name).by(order));
         }
         return pageable;
     }
