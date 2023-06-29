@@ -78,6 +78,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
@@ -191,6 +192,7 @@ public abstract class SuperController {
 
         Object organisationResponse = null;
         var pageable = createPageable(page, size);
+        var pageableByStatus = createPageableByStatus(page,size);
 
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
@@ -207,7 +209,8 @@ public abstract class SuperController {
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
             //Received request to retrieve organisation with status
 
-            organisationResponse = organisationService.findByOrganisationStatus(orgStatus.toUpperCase(), pageable);
+            organisationResponse = organisationService
+                        .findByOrganisationStatus(orgStatus.toUpperCase(), pageableByStatus);
             totalRecords = ((OrganisationsDetailResponse) organisationResponse).getTotalRecords();
         }
 
@@ -232,6 +235,23 @@ public abstract class SuperController {
                 size = DEFAULT_PAGE_SIZE;
             }
             var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+            pageable = createPageableObject(page - 1, size, Sort.by(order));
+        }
+        return pageable;
+    }
+
+    private Pageable createPageableByStatus(Integer page, Integer size) {
+        Pageable pageable = null;
+        if (page != null || size != null) {
+            if (page != null && page < 1) {
+                throw new InvalidRequest("Default page number should start with page 1");
+            }
+            if (page == null) {
+                page = DEFAULT_PAGE;
+            } else if (size == null) {
+                size = DEFAULT_PAGE_SIZE;
+            }
+            var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
             pageable = createPageableObject(page - 1, size, Sort.by(order));
         }
         return pageable;

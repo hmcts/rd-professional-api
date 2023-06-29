@@ -73,6 +73,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -293,7 +294,7 @@ class OrganisationInternalControllerTest {
     @Test
     void test_RetrieveOrganisationByStatusWithPagination() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+        Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
         Pageable pageable = PageRequest.of(0, 20, Sort.by(order));
 
         when(organisationServiceMock.findByOrganisationStatus(any(), any()))

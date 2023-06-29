@@ -32,6 +32,8 @@ public class ProfessionalApiConstants {
             "Invalid status param provided, only Active status is allowed";
     public static final String FIRST_NAME = "firstName";
     public static final String ORG_NAME = "name";
+
+    public static final String ORG_STATUS = "status";
     public static final Integer DEFAULT_PAGE_SIZE = 20;
     public static final Integer DEFAULT_PAGE = 1;
     public static final String EMPTY = "";
