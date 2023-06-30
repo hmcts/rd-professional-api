@@ -295,7 +295,8 @@ class OrganisationInternalControllerTest {
     void test_RetrieveOrganisationByStatusWithPagination() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
-        Pageable pageable = PageRequest.of(0, 20, Sort.by(order));
+        Sort.Order name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(order).and(Sort.by(name)));
 
         when(organisationServiceMock.findByOrganisationStatus(any(), any()))
             .thenReturn(organisationsDetailResponse);
