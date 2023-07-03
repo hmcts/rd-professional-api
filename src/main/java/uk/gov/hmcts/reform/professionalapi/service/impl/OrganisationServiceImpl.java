@@ -139,7 +139,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()),
                 Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated()
                         .toLowerCase())),
-                RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl())
+                RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()),
+                RefDataUtil.removeAllSpaces(organisationCreationRequest.getOrgTypeKey())
         );
 
         var organisation = saveOrganisation(newOrganisation);

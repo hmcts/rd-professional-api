@@ -114,7 +114,7 @@ class SuperControllerTest {
         professionalUserRepository = mock(ProfessionalUserRepository.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation),
@@ -135,8 +135,8 @@ class SuperControllerTest {
         UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
-                "sra-id", "false", "number02", "company-url", userCreationRequest,
-                null, null);
+                "sra-id", "false", "number02", null,"company-url",
+                userCreationRequest, null, null);
 
         MockitoAnnotations.openMocks(this);
     }

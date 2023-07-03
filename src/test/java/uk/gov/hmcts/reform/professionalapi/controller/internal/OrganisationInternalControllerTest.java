@@ -116,7 +116,7 @@ class OrganisationInternalControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
         organisationResponse = new OrganisationResponse(organisation);
         organisationsDetailResponse =
                 new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
@@ -149,7 +149,7 @@ class OrganisationInternalControllerTest {
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
-                "sra-id", "false", "number02", "company-url",
+                "sra-id", "false", "number02", null,"company-url",
                 userCreationRequest, null, null);
 
         organisation.setOrganisationIdentifier("AK57L4T");

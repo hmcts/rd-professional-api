@@ -15,7 +15,7 @@ class OrganisationsDetailResponseTest {
     @Test
     void test_OrganisationsDetailResponse() {
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
 
         OrganisationsDetailResponse organisationsDetailResponseResponse
                 = new OrganisationsDetailResponse(singletonList(organisation), false, false, true);

@@ -23,7 +23,7 @@ class OrganisationPbaResponseTest {
     @BeforeEach
     void setUp() {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
 

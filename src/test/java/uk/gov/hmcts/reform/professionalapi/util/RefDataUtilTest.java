@@ -96,7 +96,7 @@ class RefDataUtilTest {
     void setUp() {
         paymentAccount = new PaymentAccount("PBA1234567");
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
         professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
@@ -585,7 +585,7 @@ class RefDataUtilTest {
 
         ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
                 "lastName", "some@email.com", new Organisation("name",
-                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
+                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, null,
                 "companyUrl")), userProfileFeignClient, Boolean.TRUE);
         assertThat(result).isNotNull();
         assertThat(result.getFirstName()).isEqualTo("firstName");
@@ -606,7 +606,7 @@ class RefDataUtilTest {
 
         ProfessionalUser user = new ProfessionalUser("firstName",
                 "lastName", "some@email.com", new Organisation("name",
-                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
+                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, null,
                 "companyUrl"));
 
         assertThrows(ExternalApiException.class, () ->
@@ -632,7 +632,7 @@ class RefDataUtilTest {
 
         ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
                 "lastName", "some@email.com", new Organisation("name",
-                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
+                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, null,
                 "companyUrl")), userProfileFeignClient, Boolean.TRUE);
         assertThat(result).isNotNull();
         assertThat(result.getFirstName()).isEqualTo("firstName");
@@ -657,7 +657,7 @@ class RefDataUtilTest {
 
         assertThat(catchThrowable(() -> RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
                 "lastName", "some@email.com", new Organisation("name",
-                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
+                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,null,
                 "companyUrl")), userProfileFeignClient, Boolean.TRUE)))
                 .isExactlyInstanceOf(ExternalApiException.class)
                 .hasMessage(ERROR_MESSAGE_UP_FAILED);
@@ -742,7 +742,7 @@ class RefDataUtilTest {
 
         ProfessionalUser user = new ProfessionalUser("firstName",
                 "lastName", "emailAddress", new Organisation("name",
-                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
+                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, null,
                 "companyUrl"));
 
         assertThrows(ExternalApiException.class, () ->

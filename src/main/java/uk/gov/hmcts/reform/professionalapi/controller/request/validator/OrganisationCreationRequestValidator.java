@@ -138,7 +138,8 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void validateOrganisationRequest(OrganisationCreationRequest request) {
-        requestValues(request.getName(), request.getSraId(), request.getCompanyNumber(), request.getCompanyUrl());
+        requestValues(request.getName(), request.getSraId(), request.getCompanyNumber(), request.getCompanyUrl(),
+                request.getOrgTypeKey());
         requestSuperUserValidateAccount(request.getSuperUser());
 
         requestPaymentAccount(request.getPaymentAccount());

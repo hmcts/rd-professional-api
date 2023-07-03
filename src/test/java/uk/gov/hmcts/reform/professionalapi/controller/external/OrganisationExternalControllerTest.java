@@ -149,14 +149,14 @@ class OrganisationExternalControllerTest {
         paymentAccountValidator = mock(PaymentAccountValidator.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
 
         PaymentAccount paymentAccount = new PaymentAccount();
         paymentAccount.setPbaNumber("PBA1234567");
         organisation.addPaymentAccount(paymentAccount);
 
         organisation1 = new Organisation("Org-Name2", OrganisationStatus.ACTIVE, "sra-id2",
-                "companyN2", false, "www2.org.com");
+                "companyN2", false, null,"www2.org.com");
         organisationResponse = new OrganisationResponse(organisation);
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
@@ -180,7 +180,7 @@ class OrganisationExternalControllerTest {
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
-                "sra-id", "false", "number02", "company-url",
+                "sra-id", "false", "number02", "company-url",null,
                 userCreationRequest, null, null);
         userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
                 "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles,

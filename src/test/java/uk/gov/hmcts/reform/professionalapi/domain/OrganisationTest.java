@@ -23,7 +23,7 @@ class OrganisationTest {
         List<ContactInformation> contactInformations = new ArrayList<>();
 
         Organisation organisation = new Organisation("some-name", OrganisationStatus.ACTIVE,
-                "sra-id", "company-number", Boolean.FALSE, "company-url");
+                "sra-id", "company-number", Boolean.FALSE, null,"company-url");
         organisation.setLastUpdated(LocalDateTime.now());
         organisation.setCreated(LocalDateTime.now());
         organisation.setContactInformations(contactInformations);

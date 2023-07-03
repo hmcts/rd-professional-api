@@ -14,7 +14,7 @@ class OrganisationEntityResponseTest {
     @Test
     void test_OrganisationEntityResponse() {
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
 
         OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(organisation,
                 false, false, true);

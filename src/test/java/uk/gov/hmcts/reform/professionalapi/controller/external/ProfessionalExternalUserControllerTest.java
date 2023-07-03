@@ -81,7 +81,7 @@ class ProfessionalExternalUserControllerTest {
     @SuppressWarnings("unchecked")
     void setUp() throws Exception {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false,null, "www.org.com");
         professionalUser = new ProfessionalUser("fName", "lName", "user@test.com",
                 organisation);
         organisationServiceMock = mock(OrganisationService.class);

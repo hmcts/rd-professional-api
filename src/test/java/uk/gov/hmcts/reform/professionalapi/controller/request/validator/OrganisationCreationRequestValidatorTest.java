@@ -58,9 +58,10 @@ class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
         userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
                 .email("test@email.com").build();
-        organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
-                "true", null, "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null);
+        organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING",
+                "SraId", "true", null, "12345678",
+                "www.company.com", null,
+                userCreationRequest, new HashSet<>(), null);
     }
 
     @Test
@@ -138,7 +139,7 @@ class OrganisationCreationRequestValidatorTest {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("");
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
-                "true", null,"", "", null, paymentAccounts,
+                "true", null,"", "", null,null, paymentAccounts,
                 null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validateOrganisationRequest(orgReq));
@@ -301,9 +302,9 @@ class OrganisationCreationRequestValidatorTest {
 
     @Test
     void test_should_validate_company_no_length_and_throw_if_length_more_than_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null,"",
-                "true", "123456789", "", null, new HashSet<>(),
-                null);
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null,
+                "", "true", "123456789", "", null,null,
+                new HashSet<>(), null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validateCompanyNumber(orgReq));
     }
@@ -334,9 +335,9 @@ class OrganisationCreationRequestValidatorTest {
 
     @Test
     void test_should_validate_company_no_length_and_not_throw_if_length_is_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null, "",
-                "true", "12345678", "", null, new HashSet<>(),
-                null);
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null,
+                "", "true", "12345678", "", null,null,
+                new HashSet<>(), null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 
