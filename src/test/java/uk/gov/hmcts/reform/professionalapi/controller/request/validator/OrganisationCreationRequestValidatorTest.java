@@ -60,7 +60,7 @@ class OrganisationCreationRequestValidatorTest {
                 .email("test@email.com").build();
         organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING",
                 "SraId", "true", null, "12345678",
-                "www.company.com", null,
+                "www.company.com", null,null,
                 userCreationRequest, new HashSet<>(), null);
     }
 
@@ -139,8 +139,8 @@ class OrganisationCreationRequestValidatorTest {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("");
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
-                "true", null,"", "", null,null, paymentAccounts,
-                null);
+                "true", null,"", "", null,null,
+                null, paymentAccounts, null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validateOrganisationRequest(orgReq));
     }
@@ -303,7 +303,8 @@ class OrganisationCreationRequestValidatorTest {
     @Test
     void test_should_validate_company_no_length_and_throw_if_length_more_than_8() {
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null,
-                "", "true", "123456789", "", null,null,
+                "", "true", "123456789", "", null,
+                null,null,
                 new HashSet<>(), null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validateCompanyNumber(orgReq));
@@ -336,8 +337,8 @@ class OrganisationCreationRequestValidatorTest {
     @Test
     void test_should_validate_company_no_length_and_not_throw_if_length_is_8() {
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", null,
-                "", "true", "12345678", "", null,null,
-                new HashSet<>(), null);
+                "", "true", "12345678", "", null,
+                null,null, new HashSet<>(), null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 

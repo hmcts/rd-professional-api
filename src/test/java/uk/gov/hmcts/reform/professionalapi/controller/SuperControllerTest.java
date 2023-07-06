@@ -135,8 +135,8 @@ class SuperControllerTest {
         UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
-                "sra-id", "false", "number02", null,"company-url",
-                userCreationRequest, null, null);
+                "sra-id", "false", "number02", "company-url",null,
+               null, userCreationRequest, null, null);
 
         MockitoAnnotations.openMocks(this);
     }

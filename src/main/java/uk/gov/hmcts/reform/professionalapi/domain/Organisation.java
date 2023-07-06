@@ -83,6 +83,9 @@ public class Organisation implements Serializable {
     @Column(name = "ORG_TYPE_KEY")
     private String orgTypekey;
 
+    @OneToMany(targetEntity = OrgAttribute.class, mappedBy = "organisation")
+    private List<OrgAttribute> orgAttributes = new ArrayList<>();
+
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
@@ -183,11 +186,6 @@ public class Organisation implements Serializable {
         return companyUrl;
     }
 
-    public String getorgTypekey() {
-        return orgTypekey;
-    }
-
-
     public String getOrganisationIdentifier() {
         return organisationIdentifier;
     }
@@ -198,5 +196,9 @@ public class Organisation implements Serializable {
 
     public boolean isOrganisationStatusActive() {
         return OrganisationStatus.ACTIVE == getStatus();
+    }
+
+    public void addAttribute(OrgAttribute orgAttribute) {
+        orgAttributes.add(orgAttribute);
     }
 }

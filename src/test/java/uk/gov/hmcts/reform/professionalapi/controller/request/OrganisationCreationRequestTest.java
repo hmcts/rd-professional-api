@@ -23,12 +23,13 @@ class OrganisationCreationRequestTest {
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest(null, null, null, null, "false",
                         null, null, null, null,null,
+                        null,
                         null);
 
         Set<ConstraintViolation<OrganisationCreationRequest>> violations = validator
                 .validate(organisationCreationRequest);
 
-        assertThat(violations).hasSize(3);
+        assertThat(violations).hasSize(4);
     }
 
     @Test
@@ -37,7 +38,7 @@ class OrganisationCreationRequestTest {
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest("test", "PENDING", null, "sra-id",
                         "false", "number02", "company-url", null,
-                        null, null, null);
+                        null, null,null, null);
 
         organisationCreationRequest.setStatus("ACTIVE");
         organisationCreationRequest.setStatusMessage("In review");

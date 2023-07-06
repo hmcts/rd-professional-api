@@ -131,7 +131,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationWithStatusAndPagination() {
 
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
-            COMPANY_NUMBER, false, COMPANY_URL);
+            COMPANY_NUMBER, false, null, COMPANY_URL);
         addSuperUser(organisation);
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class)))
             .thenReturn(mock(Page.class));
@@ -143,7 +143,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setActiveOrganisationsForLoggedInUser() throws IOException {
 
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
+                COMPANY_NUMBER, false, null, COMPANY_URL);
         addSuperUser(organisation);
 
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE)))
@@ -170,7 +170,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpUserForInviteToOrganisation() throws IOException {
 
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
+                COMPANY_NUMBER, false, null, COMPANY_URL);
         organisation.setOrganisationIdentifier("UTVC86X");
 
         ProfessionalUser pu = new ProfessionalUser("firstName", "lastName",
@@ -194,11 +194,11 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationForUpdate() {
 
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
+                COMPANY_NUMBER, false, null, COMPANY_URL);
         addSuperUser(organisation);
 
         Organisation updatedOrganisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
+                COMPANY_NUMBER, false, null, COMPANY_URL);
         addSuperUser(organisation);
 
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
@@ -211,7 +211,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationForPBAsUpdate() {
 
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
+                COMPANY_NUMBER, false, null, COMPANY_URL);
         addSuperUser(organisation);
 
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
@@ -231,7 +231,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @State("Update an Organisation's PBA accounts")
     public void setUpOrganisationForUpdatingPBAs() {
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null, "www.org.com");
 
         PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
         paymentAccount.setOrganisation(organisation);
@@ -255,7 +255,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     private Organisation getOrganisation() {
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
+                COMPANY_NUMBER, false, null, COMPANY_URL);
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
         ContactInformation contactInformation = new ContactInformation();
@@ -291,7 +291,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         paymentAccount.setCreated(LocalDateTime.now());
         paymentAccount.setLastUpdated(LocalDateTime.now());
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null, "www.org.com");
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("org1");
         organisation.setPaymentAccounts(Collections.singletonList(paymentAccount));
