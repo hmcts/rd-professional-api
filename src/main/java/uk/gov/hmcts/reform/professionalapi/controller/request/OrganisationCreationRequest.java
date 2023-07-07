@@ -32,7 +32,6 @@ public class OrganisationCreationRequest {
 
     private final String orgTypeKey;
 
-    @NotNull
     private List<OrgAttributeRequest> orgAttributeRequests;
 
     @NotNull
