@@ -60,7 +60,7 @@ class OrganisationCreationRequestValidatorTest {
                 .email("test@email.com").build();
         organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING",
                 "SraId", "true", null, "12345678",
-                "www.company.com", null,null,
+                "www.company.com", "Doctor",null,
                 userCreationRequest, new HashSet<>(), null);
     }
 

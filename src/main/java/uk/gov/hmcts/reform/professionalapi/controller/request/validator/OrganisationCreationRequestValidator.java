@@ -55,9 +55,9 @@ public class OrganisationCreationRequestValidator {
     }
 
     public static void validateOrgTypeKey(String orgTypeKey) {
-        if(orgTypeKey == null) {
+        if (orgTypeKey == null) {
             throw new InvalidRequest("orgTypekey must not be null");
-        } else if(!orgTypeKey.matches(ORG_TYPE_KEY_REGEX)) {
+        } else if (!orgTypeKey.matches(ORG_TYPE_KEY_REGEX)) {
             throw new InvalidRequest(ORG_TYPE_KEY_INVALID);
         }
     }
@@ -181,11 +181,11 @@ public class OrganisationCreationRequestValidator {
 
     private void requestOrgAttributes(List<OrgAttributeRequest> orgAttributes) {
         if (orgAttributes != null) {
-            orgAttributes.forEach(orgAttribute -> { if(isEmptyValue(orgAttribute.getKey()) ||
-                    isEmptyValue(orgAttribute.getValue()))
-            {
-                throw new InvalidRequest("Empty Org Attribute Value");
-            }
+            orgAttributes.forEach(orgAttribute -> {
+                if (isEmptyValue(orgAttribute.getKey())
+                    || isEmptyValue(orgAttribute.getValue())) {
+                    throw new InvalidRequest("Empty Org Attribute Value");
+                }
             });
         }
     }
