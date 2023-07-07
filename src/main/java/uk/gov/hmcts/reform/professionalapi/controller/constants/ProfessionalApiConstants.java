@@ -142,4 +142,9 @@ public class ProfessionalApiConstants {
     public static final String GET_USER_STATUS_EMAIL_3 = "\n pui-case-manager,\n caseworker-publiclaw-courtadmin";
     public static final String ORGANISATION_MISMATCH = "Organisation doesn't match for the given userIdentifier";
 
+    public static final String ORG_TYPE_KEY_REGEX ="^[(a-zA-Z0-9 )\\p{L}\\p{N}'’-]{1,256}$";
+
+    public static final String ORG_TYPE_KEY_INVALID = "Org Type Key is invalid - can only contain Alphabetic,"
+            + " empty space, ', - characters and must be less than 256 characters";
+
 }

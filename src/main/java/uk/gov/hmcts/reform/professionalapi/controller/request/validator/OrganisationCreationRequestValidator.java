@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -30,6 +31,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_KEY_INVALID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_KEY_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 @Component
@@ -51,6 +54,14 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
+    public static void validateOrgTypeKey(String orgTypeKey) {
+        if(orgTypeKey == null) {
+            throw new InvalidRequest("orgTypekey must not be null");
+        } else if(!orgTypeKey.matches(ORG_TYPE_KEY_REGEX)) {
+            throw new InvalidRequest(ORG_TYPE_KEY_INVALID);
+        }
+    }
+
     public static void validateNewUserCreationRequestForMandatoryFields(NewUserCreationRequest request) {
         if (StringUtils.isBlank(request.getFirstName()) || StringUtils.isBlank(request.getLastName())
                 || StringUtils.isBlank(request.getEmail())) {
@@ -63,7 +74,7 @@ public class OrganisationCreationRequestValidator {
         validators.forEach(v -> v.validate(organisationCreationRequest));
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
-
+        validateOrgTypeKey(organisationCreationRequest.getOrgTypeKey());
     }
 
     public List<ContactInformationValidationResponse> validate(
@@ -144,6 +155,8 @@ public class OrganisationCreationRequestValidator {
 
         requestPaymentAccount(request.getPaymentAccount());
         requestContactInformation(request.getContactInformation());
+        requestOrgAttributes(request.getOrgAttributes());
+
     }
 
     private void requestSuperUserValidateAccount(UserCreationRequest superUser) {
@@ -163,6 +176,17 @@ public class OrganisationCreationRequestValidator {
                             throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
                         }
                     });
+        }
+    }
+
+    private void requestOrgAttributes(List<OrgAttributeRequest> orgAttributes) {
+        if (orgAttributes != null) {
+            orgAttributes.forEach(orgAttribute -> { if(isEmptyValue(orgAttribute.getKey()) ||
+                    isEmptyValue(orgAttribute.getValue()))
+            {
+                throw new InvalidRequest("Empty Org Attribute Value");
+            }
+            });
         }
     }
 

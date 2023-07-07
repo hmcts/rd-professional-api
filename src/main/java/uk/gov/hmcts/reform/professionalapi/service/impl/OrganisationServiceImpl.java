@@ -160,7 +160,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
-        addAttributeToOrganisation(organisationCreationRequest.getOrgAttributeRequests(), organisation);
+        addAttributeToOrganisation(organisationCreationRequest.getOrgAttributes(), organisation);
 
         return new OrganisationResponse(organisation);
     }
