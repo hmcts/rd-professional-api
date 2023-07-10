@@ -713,6 +713,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         userProfileCreateUserWireMock(CREATED);
         OrganisationCreationRequest organisationRequest = anOrganisationCreationRequest()
                 .name("org-name")
+                .orgTypeKey("doctor")
                 .superUser(aUserCreationRequest()
                         .firstName("fname")
                         .lastName("lname1")
