@@ -398,7 +398,8 @@ public class RefDataUtil {
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
                     = new ProfessionalUsersEntityResponseWithoutRoles();
 
-            ProfessionalUsersEntityResponseWithoutRoles responseEntityBody = (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
+            ProfessionalUsersEntityResponseWithoutRoles responseEntityBody =
+                    (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
             List<ProfessionalUsersResponseWithoutRoles> userProfiles = responseEntityBody == null
                     ? new ArrayList<>()
                     : responseEntityBody.getUserProfiles();
