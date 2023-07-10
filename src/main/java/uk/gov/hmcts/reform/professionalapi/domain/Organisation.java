@@ -146,9 +146,10 @@ public class Organisation implements Serializable {
         contactInformations.add(contactInformation);
     }
 
-    public void addOrgAttribute(OrgAttributes orgAttributesValue){
+    public void addOrgAttribute(OrgAttributes orgAttributesValue) {
         orgAttributes.add(orgAttributesValue);
     }
+
     public UUID getId() {
         return id;
     }
@@ -164,6 +165,7 @@ public class Organisation implements Serializable {
     public String getOrgTypeKey() {
         return orgTypeKey;
     }
+
     public List<PaymentAccount> getPaymentAccounts() {
         return paymentAccounts;
     }
@@ -172,7 +174,7 @@ public class Organisation implements Serializable {
         return contactInformations;
     }
 
-    public List<OrgAttributes> getOrgAttributes(){
+    public List<OrgAttributes> getOrgAttributes() {
         return orgAttributes;
     }
 

@@ -16,7 +16,7 @@ class OrgAttributeResponseTest {
 
     final String value = "TestValue";
 
-    final UUID id= UUID.randomUUID();
+    final UUID id = UUID.randomUUID();
 
     @Test
     void testGetOrgAttributeResponseResponse() {

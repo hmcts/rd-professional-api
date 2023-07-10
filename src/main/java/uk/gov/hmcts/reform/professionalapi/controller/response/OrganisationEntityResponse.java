@@ -82,7 +82,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
 
-        if(Boolean.TRUE.equals(isRequiredContactInfo)){
+        if (Boolean.TRUE.equals(isRequiredContactInfo)) {
             this.orgAttributes = organisation.getOrgAttributes()
                     .stream()
                     .map(OrgAttributeResponse::new)

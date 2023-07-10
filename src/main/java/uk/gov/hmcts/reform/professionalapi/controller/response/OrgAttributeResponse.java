@@ -15,8 +15,8 @@ public class OrgAttributeResponse {
     private String value;
 
 
-    public OrgAttributeResponse(OrgAttributes orgAttributes){
-        this.key=orgAttributes.getKey();
-        this.value= orgAttributes.getValue();
+    public OrgAttributeResponse(OrgAttributes orgAttributes) {
+        this.key = orgAttributes.getKey();
+        this.value = orgAttributes.getValue();
     }
 }
