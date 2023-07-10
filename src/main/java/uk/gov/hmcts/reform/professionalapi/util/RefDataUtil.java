@@ -396,9 +396,14 @@ public class RefDataUtil {
                     responseEntity.getStatusCode());
         } else {
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
-                    = responseEntity.getBody() != null
-                    ? (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody()
-                    : new ProfessionalUsersEntityResponseWithoutRoles();
+                    = new ProfessionalUsersEntityResponseWithoutRoles();
+
+            ProfessionalUsersEntityResponseWithoutRoles responseEntityBody = (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
+            List<ProfessionalUsersResponseWithoutRoles> userProfiles = responseEntityBody == null
+                    ? new ArrayList<>()
+                    : responseEntityBody.getUserProfiles();
+            professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
+
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
