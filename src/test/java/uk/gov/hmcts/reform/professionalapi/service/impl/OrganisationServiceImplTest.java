@@ -327,7 +327,7 @@ class OrganisationServiceImplTest {
     @Test
     void test_addAttributeToOrganisation() {
         Organisation organisationMock = mock(Organisation.class);
-
+        OrgAttribute orgAttribute = mock(OrgAttribute.class);
         List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
         OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
         String key = "RelatedToServices";
@@ -336,9 +336,12 @@ class OrganisationServiceImplTest {
         orgAttributeRequest.setValue(value);
         orgAttributes.add(orgAttributeRequest);
         sut.addAttributeToOrganisation(orgAttributes,organisationMock);
+        assertEquals("RelatedToServices", orgAttributes.get(0).getKey());
+        assertEquals("ACCA", orgAttributes.get(0).getValue());
+        verify(organisationMock, times(1)).setOrgAttributes(anyList());
 
-        verify(orgAttributeRepositoryMock, times(1)).saveAll(anyList());
     }
+
 
     @Test
     void test_addDefaultMfaStatusToOrganisation() {

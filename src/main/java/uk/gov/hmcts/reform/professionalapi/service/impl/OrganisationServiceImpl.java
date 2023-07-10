@@ -282,9 +282,9 @@ public class OrganisationServiceImpl implements OrganisationService {
                 attribute.setOrganisation(organisation);
                 attributes.add(attribute);
             });
-            orgAttributeRepository.saveAll(attributes);
-        }
+            organisation.setOrgAttributes(orgAttributeRepository.saveAll(attributes));
 
+        }
     }
 
     public ContactInformation setNewContactInformationFromRequest(ContactInformation contactInformation,
