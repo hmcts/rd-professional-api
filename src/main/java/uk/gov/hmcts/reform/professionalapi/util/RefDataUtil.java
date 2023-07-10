@@ -396,7 +396,9 @@ public class RefDataUtil {
                     responseEntity.getStatusCode());
         } else {
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
-                    = new ProfessionalUsersEntityResponseWithoutRoles();
+                    = responseEntity.getBody() != null
+                    ? (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody()
+                    : new ProfessionalUsersEntityResponseWithoutRoles();
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
