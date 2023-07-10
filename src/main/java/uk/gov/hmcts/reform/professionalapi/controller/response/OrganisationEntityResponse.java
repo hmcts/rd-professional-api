@@ -45,6 +45,12 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @JsonInclude(ALWAYS)
     private LocalDateTime dateApproved = null;
 
+    @JsonProperty
+    private String orgTypeKey;
+
+    @JsonProperty
+    private List<OrgAttributeResponse> orgAttributes;
+
 
 
     public OrganisationEntityResponse(
@@ -69,12 +75,19 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         this.statusMessage = organisation.getStatusMessage();
         this.sraId = organisation.getSraId();
         this.sraRegulated = organisation.getSraRegulated();
+        this.orgTypeKey = organisation.getOrgTypeKey();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
         if (!organisation.getUsers().isEmpty()) {
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
 
+        if(Boolean.TRUE.equals(isRequiredContactInfo)){
+            this.orgAttributes = organisation.getOrgAttributes()
+                    .stream()
+                    .map(OrgAttributeResponse::new)
+                    .toList();
+        }
         if (Boolean.TRUE.equals(isRequiredAllPbas)) {
             this.paymentAccount = organisation.getPaymentAccounts()
                     .stream()

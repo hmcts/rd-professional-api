@@ -70,6 +70,13 @@ public class Organisation implements Serializable {
     @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = OrgAttributes.class,  mappedBy = "organisation")
+    private List<OrgAttributes> orgAttributes = new ArrayList<>();
+
+    @Column(name = "org_type_key")
+    private String orgTypeKey;
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation", optional = false, fetch = FetchType.LAZY)
     private OrganisationMfaStatus organisationMfaStatus;
 
@@ -123,6 +130,7 @@ public class Organisation implements Serializable {
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
+        this.orgTypeKey = orgTypeKey;
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
@@ -138,6 +146,9 @@ public class Organisation implements Serializable {
         contactInformations.add(contactInformation);
     }
 
+    public void addOrgAttribute(OrgAttributes orgAttributesValue){
+        orgAttributes.add(orgAttributesValue);
+    }
     public UUID getId() {
         return id;
     }
@@ -150,12 +161,19 @@ public class Organisation implements Serializable {
         return users;
     }
 
+    public String getOrgTypeKey() {
+        return orgTypeKey;
+    }
     public List<PaymentAccount> getPaymentAccounts() {
         return paymentAccounts;
     }
 
     public List<ContactInformation> getContactInformation() {
         return contactInformations;
+    }
+
+    public List<OrgAttributes> getOrgAttributes(){
+        return orgAttributes;
     }
 
     public OrganisationStatus getStatus() {
