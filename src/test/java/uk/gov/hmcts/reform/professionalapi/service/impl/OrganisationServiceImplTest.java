@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -44,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -59,6 +61,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -112,6 +115,8 @@ class OrganisationServiceImplTest {
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
+    private final OrgAttributeRepository orgAttributeRepositoryMock = mock(OrgAttributeRepository.class);
+
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock
             = mock(ContactInformationRepository.class);
@@ -157,6 +162,9 @@ class OrganisationServiceImplTest {
     private final List<String> userRoles = new ArrayList<>();
     private final List<PrdEnum> prdEnums = new ArrayList<>();
     private List<UserAttribute> userAttributes;
+
+    private List<OrgAttributeRequest> orgAttributes;
+
     private List<String> jurisdictionIds;
     Set<String> paymentAccountList;
     private DeleteOrganisationResponse deleteOrganisationResponse;
@@ -314,6 +322,22 @@ class OrganisationServiceImplTest {
         sut.addSuperUserToOrganisation(superUserCreationRequest, organisationMock);
 
         verify(organisationMock, times(1)).addProfessionalUser(any(SuperUser.class));
+    }
+
+    @Test
+    void test_addAttributeToOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+        String key = "RelatedToServices";
+        String value = "ACCA";
+        orgAttributeRequest.setKey(key);
+        orgAttributeRequest.setValue(value);
+        orgAttributes.add(orgAttributeRequest);
+        sut.addAttributeToOrganisation(orgAttributes,organisationMock);
+
+        verify(orgAttributeRepositoryMock, times(1)).saveAll(anyList());
     }
 
     @Test
