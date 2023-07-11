@@ -326,7 +326,6 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_addAttributeToOrganisation() {
-        Organisation organisationMock = mock(Organisation.class);
         OrgAttribute orgAttribute = mock(OrgAttribute.class);
         List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
         OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
@@ -335,6 +334,7 @@ class OrganisationServiceImplTest {
         orgAttributeRequest.setKey(key);
         orgAttributeRequest.setValue(value);
         orgAttributes.add(orgAttributeRequest);
+        Organisation organisationMock = mock(Organisation.class);
         sut.addAttributeToOrganisation(orgAttributes,organisationMock);
         assertEquals("RelatedToServices", orgAttributes.get(0).getKey());
         assertEquals("ACCA", orgAttributes.get(0).getValue());
