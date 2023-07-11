@@ -130,7 +130,6 @@ public class Organisation implements Serializable {
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
-        this.orgTypeKey = orgTypeKey;
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
