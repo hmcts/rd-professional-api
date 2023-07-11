@@ -70,7 +70,7 @@ class PaymentAccountServiceImplTest {
     private PaymentAccountServiceImpl sut;
 
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
-            null, null, null);
+            null, null, null,null);
     private final PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
     private final SuperUser superUser = new SuperUser("some-fname", "some-lname",
             "some-email-address", organisation);

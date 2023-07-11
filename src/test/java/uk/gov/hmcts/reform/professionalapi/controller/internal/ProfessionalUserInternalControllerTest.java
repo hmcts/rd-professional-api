@@ -69,7 +69,7 @@ class ProfessionalUserInternalControllerTest {
     @SuppressWarnings("unchecked")
     void setUp() {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
                 "lastName", IdamStatus.ACTIVE.name(), null, null);
 

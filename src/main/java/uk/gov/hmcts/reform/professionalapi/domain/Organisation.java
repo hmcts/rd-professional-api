@@ -80,6 +80,12 @@ public class Organisation implements Serializable {
     @Column(name = "STATUS_MESSAGE")
     private String statusMessage;
 
+    @Column(name = "ORG_TYPE_KEY")
+    private String orgTypekey;
+
+    @OneToMany(targetEntity = OrgAttribute.class, mappedBy = "organisation")
+    private List<OrgAttribute> orgAttributes = new ArrayList<>();
+
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
@@ -115,6 +121,7 @@ public class Organisation implements Serializable {
             String sraId,
             String companyNumber,
             Boolean sraRegulated,
+            String orgTypeKey,
             String companyUrl) {
 
         this.name = name;
@@ -123,6 +130,7 @@ public class Organisation implements Serializable {
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
+        this.orgTypekey = orgTypeKey;
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
@@ -188,5 +196,9 @@ public class Organisation implements Serializable {
 
     public boolean isOrganisationStatusActive() {
         return OrganisationStatus.ACTIVE == getStatus();
+    }
+
+    public void addAttribute(OrgAttribute orgAttribute) {
+        orgAttributes.add(orgAttribute);
     }
 }

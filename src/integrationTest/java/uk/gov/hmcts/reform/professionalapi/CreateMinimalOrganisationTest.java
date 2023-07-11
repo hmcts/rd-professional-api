@@ -111,6 +111,7 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
     void returns_200_when_email_has_underscore(String email) {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
+                .orgTypeKey("doctor")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -206,6 +207,7 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
                 .sraId("sra-id-number")
                 .sraRegulated("false")
                 .companyUrl("company-url")
+                .orgTypeKey("doctor")
                 .companyNumber("same1010")
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname ")
@@ -236,6 +238,7 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
                 .companyNumber("123456")
+                .orgTypeKey("doctor")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")

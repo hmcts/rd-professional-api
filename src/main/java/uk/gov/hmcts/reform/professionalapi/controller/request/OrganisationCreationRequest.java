@@ -30,6 +30,10 @@ public class OrganisationCreationRequest {
 
     private final String companyUrl;
 
+    private final String orgTypeKey;
+
+    private List<OrgAttributeRequest> orgAttributes;
+
     @NotNull
     private final UserCreationRequest superUser;
 
@@ -47,6 +51,8 @@ public class OrganisationCreationRequest {
             @JsonProperty("sraRegulated") String sraRegulated,
             @JsonProperty("companyNumber") String companyNumber,
             @JsonProperty("companyUrl") String companyUrl,
+            @JsonProperty("orgTypeKey") String orgTypeKey,
+            @JsonProperty("orgAttributes") List<OrgAttributeRequest> orgAttributes,
             @JsonProperty("superUser") UserCreationRequest superUser,
             @JsonProperty("paymentAccount") Set<String> paymentAccount,
             @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
@@ -57,6 +63,8 @@ public class OrganisationCreationRequest {
         this.sraId = sraId;
         this.sraRegulated = sraRegulated;
         this.companyNumber = companyNumber;
+        this.orgTypeKey = orgTypeKey;
+        this.orgAttributes = orgAttributes;
         this.companyUrl = companyUrl;
         this.superUser = superUser;
         this.paymentAccount = paymentAccount;

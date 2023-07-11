@@ -30,7 +30,7 @@ class UserAttributeServiceImplTest {
 
     private final PrdEnumId prdEnumIdMock = new PrdEnumId(1, "PRD_ROLE");
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
-            null, null, null);
+            null, null, null,null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname", "test@test.com", organisation);
     private final List<String> userRoles = new ArrayList<>();

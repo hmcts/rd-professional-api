@@ -36,7 +36,7 @@ class OrganisationIdentifierValidatorImplTest {
     @BeforeEach
     void setUp() {
         organisation = new Organisation("Company", OrganisationStatus.PENDING, "SraId",
-                "12345678", false, "www.company.com");
+                "12345678", false, null,"www.company.com");
         organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
         paymentAccount = new PaymentAccount("PBA1234567");
     }
@@ -44,7 +44,7 @@ class OrganisationIdentifierValidatorImplTest {
     @Test
     void test_Validate() {
         Organisation dummyOrganisation = new Organisation("dummyName", OrganisationStatus.ACTIVE, "sraId",
-                "12345678", Boolean.FALSE, "dummySite.com");
+                "12345678", Boolean.FALSE, null,"dummySite.com");
 
         organisationIdentifierValidatorImpl.validate(dummyOrganisation, dummyOrganisation.getStatus(),
                 dummyOrganisation.getOrganisationIdentifier());

@@ -85,7 +85,7 @@ class ProfessionalUserReqValidatorTest {
     @Test
     void test_validateOrganisationMatchDoesThrow400ForMismatchOrgId() {
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
                 "emailAddress", organisation);
 
@@ -111,7 +111,7 @@ class ProfessionalUserReqValidatorTest {
     @Test
     void test_validateOrganisationMatchDoesNotThrow403ForMatchedOrgId() {
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false, null,"www.org.com");
         organisation.setOrganisationIdentifier("orgid");
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
                 "emailAddress", organisation);

@@ -83,7 +83,7 @@ class ProfessionalUserServiceImplTest {
     private final FeignException feignExceptionMock = mock(FeignException.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
-            null, null, null);
+            null, null, null,null);
     private final String userIdentifier = "1234567";
     private final UserProfile userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com",
             "fName", "lName", IdamStatus.PENDING);

@@ -27,7 +27,7 @@ public class PactUtils {
 
     public static Organisation getMinimalOrganisation() {
         return new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
-                "companyN", false, "www.org.com");
+                "companyN", false,null,"www.org.com");
     }
 
     public static void addSuperUser(Organisation organisation) {

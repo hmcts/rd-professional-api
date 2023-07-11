@@ -29,7 +29,7 @@ class OrganisationStatusValidatorImplTest {
     void setUp() {
         organisationStatusValidatorImpl = new OrganisationStatusValidatorImpl();
         organisation = new Organisation("dummyName", OrganisationStatus.ACTIVE, "sraId",
-                "12345678", Boolean.FALSE, "dummySite.com");
+                "12345678", Boolean.FALSE, null,"dummySite.com");
         orgId = organisation.getOrganisationIdentifier();
     }
 

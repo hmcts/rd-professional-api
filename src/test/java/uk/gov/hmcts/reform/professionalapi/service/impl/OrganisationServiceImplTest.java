@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -44,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -59,6 +61,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -112,6 +115,8 @@ class OrganisationServiceImplTest {
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
+    private final OrgAttributeRepository orgAttributeRepositoryMock = mock(OrgAttributeRepository.class);
+
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock
             = mock(ContactInformationRepository.class);
@@ -126,7 +131,7 @@ class OrganisationServiceImplTest {
             = mock(OrganisationMfaStatusRepository.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null,
-            "PENDING", null, null, null);
+            "PENDING", null, null, null,null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname", "test@test.com", organisation);
     private final PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
@@ -157,6 +162,9 @@ class OrganisationServiceImplTest {
     private final List<String> userRoles = new ArrayList<>();
     private final List<PrdEnum> prdEnums = new ArrayList<>();
     private List<UserAttribute> userAttributes;
+
+    private List<OrgAttributeRequest> orgAttributes;
+
     private List<String> jurisdictionIds;
     Set<String> paymentAccountList;
     private DeleteOrganisationResponse deleteOrganisationResponse;
@@ -215,8 +223,8 @@ class OrganisationServiceImplTest {
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", "statusMessage",
-                "sra-id", "false", "number01", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+                "sra-id", "false", "number01", "company-url",null,
+                null,superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
@@ -315,6 +323,25 @@ class OrganisationServiceImplTest {
 
         verify(organisationMock, times(1)).addProfessionalUser(any(SuperUser.class));
     }
+
+    @Test
+    void test_addAttributeToOrganisation() {
+        OrgAttribute orgAttribute = mock(OrgAttribute.class);
+        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+        String key = "RelatedToServices";
+        String value = "ACCA";
+        orgAttributeRequest.setKey(key);
+        orgAttributeRequest.setValue(value);
+        orgAttributes.add(orgAttributeRequest);
+        Organisation organisationMock = mock(Organisation.class);
+        sut.addAttributeToOrganisation(orgAttributes,organisationMock);
+        assertEquals("RelatedToServices", orgAttributes.get(0).getKey());
+        assertEquals("ACCA", orgAttributes.get(0).getValue());
+        verify(organisationMock, times(1)).setOrgAttributes(anyList());
+
+    }
+
 
     @Test
     void test_addDefaultMfaStatusToOrganisation() {
@@ -631,17 +658,17 @@ class OrganisationServiceImplTest {
     @SuppressWarnings("unchecked")
     void test_RetrieveOrganisationsByPendingAndReviewStatusAndPagination() throws JsonProcessingException {
         Organisation pendingOrganisation1 = new Organisation("some-pending-org-name1", OrganisationStatus.PENDING,
-                "PENDING", null, null, null);
+                "PENDING", null, null, null,null);
         Organisation reviewOrganisation1 = new Organisation("some-review-org-name1", REVIEW,
-                "REVIEW", null, null, null);
+                "REVIEW", null, null, null,null);
         Organisation pendingOrganisation2 = new Organisation("some-pending-org-name2", OrganisationStatus.PENDING,
-                "PENDING", null, null, null);
+                "PENDING", null, null, null,null);
         Organisation reviewOrganisation2 = new Organisation("some-review-org-name2", REVIEW,
-                "REVIEW", null, null, null);
+                "REVIEW", null, null, null,null);
         Organisation reviewOrganisation3 = new Organisation("some-review-org-name3", OrganisationStatus.PENDING,
-                "REVIEW", null, null, null);
+                "REVIEW", null, null, null,null);
         Organisation pendingOrganisation3 = new Organisation("some-pending-org-name3", REVIEW,
-                "PENDING", null, null, null);
+                "PENDING", null, null, null,null);
 
 
         List<Organisation> organisations = new ArrayList<>();
@@ -733,9 +760,10 @@ class OrganisationServiceImplTest {
         String pbaNumber = "GBA1234567";
         paymentAccountList.add(pbaNumber);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
-                "sra-id", "false", "company-number", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
+                null, "sra-id", "false", "company-number",
+                "company-url",null, null,superUserCreationRequest,
+                paymentAccountList, contactInformationCreationRequests);
 
         assertThrows(InvalidRequest.class, () ->
                 sut.createOrganisationFrom(organisationCreationRequest));
@@ -750,9 +778,10 @@ class OrganisationServiceImplTest {
         superUserCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 null);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
-                "sra-id", "false", "company-number", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
+                null, "sra-id", "false", "company-number",
+                "company-url",null, null,superUserCreationRequest,
+                paymentAccountList, contactInformationCreationRequests);
 
         assertThrows(InvalidRequest.class, () ->
                 sut.createOrganisationFrom(organisationCreationRequest));
