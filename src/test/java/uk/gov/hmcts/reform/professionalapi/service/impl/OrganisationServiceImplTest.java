@@ -98,8 +98,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.BLOCKED;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
@@ -322,7 +324,7 @@ class OrganisationServiceImplTest {
 
         sut.addDefaultMfaStatusToOrganisation(organisationMock);
 
-        verify(organisationMock, times(1)).setOrganisationMfaStatus(any(OrganisationMfaStatus.class));
+        verify(organisationMock, times(1)).setOrganisationMfaStatus(any());
     }
 
     @Test
@@ -602,7 +604,10 @@ class OrganisationServiceImplTest {
             false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
-        Pageable pageable = PageRequest.of(1,2, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
+        var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+
+        Pageable pageable = PageRequest.of(1,2, Sort.by(order).and(Sort.by(name)));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable)).thenReturn(orgPage);
@@ -640,7 +645,7 @@ class OrganisationServiceImplTest {
                 "REVIEW", null, null, null);
         Organisation reviewOrganisation3 = new Organisation("some-review-org-name3", OrganisationStatus.PENDING,
                 "REVIEW", null, null, null);
-        Organisation pendingOrganisation3 = new Organisation("some-pending-org-name3", REVIEW,
+        Organisation pendingOrganisation3 = new Organisation("some-pending-org-name3", BLOCKED,
                 "PENDING", null, null, null);
 
 
@@ -652,24 +657,30 @@ class OrganisationServiceImplTest {
         organisations.add(pendingOrganisation3);
         organisations.add(reviewOrganisation3);
 
-        Pageable pageable = PageRequest.of(1,2, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
+        var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+
+        Pageable pageable = PageRequest.of(1,2, Sort.by(order).and(Sort.by(name)));
 
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.PENDING, REVIEW), pageable))
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.PENDING, REVIEW,BLOCKED), pageable))
                 .thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
         when(orgPage.getTotalElements()).thenReturn(1L);
 
 
-        String status = "PENDING,REVIEW";
+        String status = "PENDING,REVIEW,blocked";
         OrganisationsDetailResponse organisationDetailResponse
                 = sut.findByOrganisationStatus(status, pageable);
 
+
+
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1))
-                .findByStatusIn(List.of(OrganisationStatus.PENDING,REVIEW), pageable);
+                .findByStatusIn(List.of(OrganisationStatus.PENDING,REVIEW,BLOCKED), pageable);
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
+
     }
 
     @Test
@@ -1159,6 +1170,22 @@ class OrganisationServiceImplTest {
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
     }
 
+
+    @Test
+    void test_addPaymentAccountsToOrganisationForNullRequest() {
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(null);
+
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setUsers(asList(superUser));
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(InvalidRequest.class, () ->
+                sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
+    }
+
     @Test
     void test_addPaymentAccountsToOrganisation_pba_invalid() {
         var pbas = new HashSet<String>();
@@ -1266,6 +1293,7 @@ class OrganisationServiceImplTest {
     }
 
 
+    @Test
     void test_sortContactInfoByCreatedDateAsc() {
         var contactInformation = new ContactInformation();
         contactInformation.setCountry("TestCountry");

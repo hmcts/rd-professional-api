@@ -23,7 +23,16 @@ class FeatureToggleServiceImplTest {
 
 
         flaFeatureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
-        assertFalse(flaFeatureToggleService.isFlagEnabled("test", "test"));
+        assertFalse(flaFeatureToggleService.isFlagEnabled("test1", "test1"));
+    }
+
+    @Test
+    void testIsFlagEnabledFalse() {
+        when(flaFeatureToggleService.isFlagEnabled("test1", "test1")).thenReturn(false);
+        assertFalse(flaFeatureToggleService.isFlagEnabled("test1", "test1"));
+
+        flaFeatureToggleService = new FeatureToggleServiceImpl(ldClient, "rd1");
+        assertFalse(flaFeatureToggleService.isFlagEnabled("test1", "test1"));
     }
 
     @Test
