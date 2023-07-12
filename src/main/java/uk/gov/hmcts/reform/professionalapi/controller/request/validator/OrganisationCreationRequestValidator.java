@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
@@ -30,6 +32,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_KEY_INVALID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_KEY_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 @Component
@@ -63,7 +67,18 @@ public class OrganisationCreationRequestValidator {
         validators.forEach(v -> v.validate(organisationCreationRequest));
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
+        if(organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+           validateOrgTypeKey(orgCreationRequestV2.getOrgTypeKey());
+        }
+    }
 
+
+    public void validateOrgTypeKey(String orgTypeKey) {
+        if (orgTypeKey == null || isEmptyValue(orgTypeKey)) {
+            throw new InvalidRequest("orgTypekey must not be null/empty");
+        } else if (!orgTypeKey.matches(ORG_TYPE_KEY_REGEX)) {
+            throw new InvalidRequest(ORG_TYPE_KEY_INVALID);
+        }
     }
 
     public List<ContactInformationValidationResponse> validate(
@@ -143,7 +158,23 @@ public class OrganisationCreationRequestValidator {
 
         requestPaymentAccount(request.getPaymentAccount());
         requestContactInformation(request.getContactInformation());
+        if(request instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            requestOrgAttributes(orgCreationRequestV2.getOrgAttributes());
+        }
     }
+
+    private void requestOrgAttributes(List<OrgAttributeRequest> orgAttributes) {
+        if (orgAttributes != null) {
+            orgAttributes.forEach(orgAttribute -> {
+                if (isEmptyValue(orgAttribute.getKey())
+                        || isEmptyValue(orgAttribute.getValue())) {
+                    throw new InvalidRequest("Empty Org Attribute Value");
+                }
+            });
+        }
+    }
+
+
 
     private void requestSuperUserValidateAccount(UserCreationRequest superUser) {
         if (superUser == null || isEmptyValue(superUser.getFirstName())

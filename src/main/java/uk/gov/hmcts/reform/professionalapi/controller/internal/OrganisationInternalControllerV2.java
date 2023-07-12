@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
@@ -102,59 +103,9 @@ public class OrganisationInternalControllerV2 extends SuperController {
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisation(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-            @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
+            @Valid @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for internal users
         return createOrganisationFrom(organisationCreationRequest);
     }
-
-    @Operation(
-            summary = "Retrieves all Organisations filtered by given Status or one Organisation if ID is given",
-            description = "**IDAM Roles to access API** : <br> prd-admin",
-            security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
-            }
-    )
-
-
-    @ApiResponse(
-            responseCode = "200",
-            description = "Details of one or more Organisations",
-            content = @Content(schema = @Schema(implementation = OrganisationsDetailResponse.class))
-    )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request (Status or ID) provided",
-            content = @Content
-    )
-    @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden Error: Access denied",
-            content = @Content
-    )
-    @ApiResponse(
-            responseCode = "404",
-            description = "No Organisation(s) found with the given ID",
-            content = @Content
-    )
-    @ApiResponse(
-            responseCode = "500",
-            description = "Internal Server Error",
-            content = @Content
-    )
-
-
-    @Secured("prd-admin")
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> retrieveOrganisations(
-            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-            @Parameter(name = "id") @RequestParam(value = "id", required = false) String id,
-            @Parameter(name = "status") @RequestParam(value = "status", required = false) String status,
-            @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
-            @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
-
-        return retrieveAllOrganisationOrById(id, status, page, size);
-    }
-
 }
