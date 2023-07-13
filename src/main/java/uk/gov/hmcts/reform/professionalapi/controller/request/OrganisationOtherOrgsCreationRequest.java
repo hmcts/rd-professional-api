@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class OrganisationOtherOrgsCreationRequest extends OrganisationCreationRequest{
+public class OrganisationOtherOrgsCreationRequest extends OrganisationCreationRequest {
 
     private final String orgTypeKey;
 

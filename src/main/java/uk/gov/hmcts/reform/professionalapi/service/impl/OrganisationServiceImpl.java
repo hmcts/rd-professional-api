@@ -148,8 +148,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl())
         );
 
-        if(organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-          newOrganisation.setOrgTypekey(orgCreationRequestV2.getOrgTypeKey());
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            newOrganisation.setOrgTypekey(orgCreationRequestV2.getOrgTypeKey());
         }
 
         var organisation = saveOrganisation(newOrganisation);
@@ -162,7 +162,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
-        if(organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
         }
 

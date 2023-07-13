@@ -67,18 +67,9 @@ public class OrganisationCreationRequestValidator {
         validators.forEach(v -> v.validate(organisationCreationRequest));
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
-        if(organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             validateOrgTypeKey(orgCreationRequestV2.getOrgTypeKey());
             validateOrgAttributesRequest(orgCreationRequestV2.getOrgAttributes());
-        }
-    }
-
-
-    public void validateOrgTypeKey(String orgTypeKey) {
-        if (orgTypeKey == null || orgTypeKey.trim().isEmpty()) {
-            throw new InvalidRequest("orgTypekey must not be null/empty");
-        } else if (!orgTypeKey.matches(ORG_TYPE_KEY_REGEX)) {
-            throw new InvalidRequest(ORG_TYPE_KEY_INVALID);
         }
     }
 
@@ -118,6 +109,14 @@ public class OrganisationCreationRequestValidator {
         }
         if (result != null && !result.isEmpty()) {
             throw new InvalidContactInformations("Invalid Contact informations", contactInfoValidations);
+        }
+    }
+
+    public void validateOrgTypeKey(String orgTypeKey) {
+        if (orgTypeKey == null || orgTypeKey.trim().isEmpty()) {
+            throw new InvalidRequest("orgTypekey must not be null/empty");
+        } else if (!orgTypeKey.matches(ORG_TYPE_KEY_REGEX)) {
+            throw new InvalidRequest(ORG_TYPE_KEY_INVALID);
         }
     }
 
@@ -165,7 +164,7 @@ public class OrganisationCreationRequestValidator {
         if (orgAttributes != null) {
             orgAttributes.forEach(orgAttribute -> {
                 if (orgAttribute.getKey() == null || orgAttribute.getKey().trim().isEmpty()
-                || orgAttribute.getValue() == null || orgAttribute.getValue().trim().isEmpty()) {
+                    || orgAttribute.getValue() == null || orgAttribute.getValue().trim().isEmpty()) {
                     throw new InvalidRequest("Empty Org Attribute Value");
                 }
             });
