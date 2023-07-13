@@ -68,13 +68,14 @@ public class OrganisationCreationRequestValidator {
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         if(organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-           validateOrgTypeKey(orgCreationRequestV2.getOrgTypeKey());
+            validateOrgTypeKey(orgCreationRequestV2.getOrgTypeKey());
+            validateOrgAttributesRequest(orgCreationRequestV2.getOrgAttributes());
         }
     }
 
 
     public void validateOrgTypeKey(String orgTypeKey) {
-        if (orgTypeKey == null || isEmptyValue(orgTypeKey)) {
+        if (orgTypeKey == null || orgTypeKey.trim().isEmpty()) {
             throw new InvalidRequest("orgTypekey must not be null/empty");
         } else if (!orgTypeKey.matches(ORG_TYPE_KEY_REGEX)) {
             throw new InvalidRequest(ORG_TYPE_KEY_INVALID);
@@ -158,16 +159,13 @@ public class OrganisationCreationRequestValidator {
 
         requestPaymentAccount(request.getPaymentAccount());
         requestContactInformation(request.getContactInformation());
-        if(request instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            requestOrgAttributes(orgCreationRequestV2.getOrgAttributes());
-        }
     }
 
-    private void requestOrgAttributes(List<OrgAttributeRequest> orgAttributes) {
+    private void validateOrgAttributesRequest(List<OrgAttributeRequest> orgAttributes) {
         if (orgAttributes != null) {
             orgAttributes.forEach(orgAttribute -> {
-                if (isEmptyValue(orgAttribute.getKey())
-                        || isEmptyValue(orgAttribute.getValue())) {
+                if (orgAttribute.getKey() == null || orgAttribute.getKey().trim().isEmpty()
+                || orgAttribute.getValue() == null || orgAttribute.getValue().trim().isEmpty()) {
                     throw new InvalidRequest("Empty Org Attribute Value");
                 }
             });

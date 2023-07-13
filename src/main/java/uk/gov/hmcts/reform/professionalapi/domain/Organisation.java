@@ -121,7 +121,6 @@ public class Organisation implements Serializable {
             String sraId,
             String companyNumber,
             Boolean sraRegulated,
-            String orgTypeKey,
             String companyUrl) {
 
         this.name = name;
@@ -129,7 +128,6 @@ public class Organisation implements Serializable {
         this.sraId = sraId;
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
-        this.orgTypekey = orgTypeKey;
         this.companyUrl = companyUrl;
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }

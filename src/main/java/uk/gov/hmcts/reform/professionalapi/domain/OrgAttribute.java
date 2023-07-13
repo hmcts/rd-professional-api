@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,7 +22,7 @@ import static javax.persistence.GenerationType.AUTO;
 @Getter
 @Setter
 @Table(name = "org_attributes")
-public class OrgAttribute {
+public class OrgAttribute implements Serializable {
 
     @Id
     @GeneratedValue(strategy = AUTO)
