@@ -23,6 +23,22 @@ import org.springframework.web.method.HandlerMethod;
 public class SwaggerConfiguration {
 
     @Bean
+    public GroupedOpenApi internalOrganisationApiV2(OperationCustomizer customGlobalHeaders) {
+        return GroupedOpenApi.builder()
+                .group("V2: Internal API")
+                .pathsToMatch("/refdata/internal/v2/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi externalOrganisationApiV2(OperationCustomizer customGlobalHeaders) {
+        return GroupedOpenApi.builder()
+                .group("V2: External API")
+                .pathsToMatch("/refdata/external/v2/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi publicApi(OperationCustomizer customGlobalHeaders) {
         return GroupedOpenApi.builder()
                 .group("rd-professional-api")

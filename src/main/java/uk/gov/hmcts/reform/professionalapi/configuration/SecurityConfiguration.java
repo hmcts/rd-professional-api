@@ -97,6 +97,8 @@ public class SecurityConfiguration {
            .antMatchers("/error").permitAll()
            .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations").permitAll()
            .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations").permitAll()
+                .antMatchers(HttpMethod.POST, "/refdata/external/v2/organisations").permitAll()
+                .antMatchers(HttpMethod.POST, "/refdata/internal/v2/organisations").permitAll()
            .anyRequest()
            .authenticated()
            .and()
