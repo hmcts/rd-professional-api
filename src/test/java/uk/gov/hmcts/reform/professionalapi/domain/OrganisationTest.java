@@ -102,6 +102,7 @@ class OrganisationTest {
         Organisation organisation = new Organisation();
         organisation.setOrgTypekey("Doctor");
         organisation.setOrgAttributes(orgAttributes);
+        organisation.addAttribute(orgAttribute);
         assertThat(organisation.getOrgTypekey()).isNotNull();
         assertThat(organisation.getOrgTypekey()).isEqualTo("Doctor");
         assertThat(organisation.getOrgAttributes()).isNotNull();
