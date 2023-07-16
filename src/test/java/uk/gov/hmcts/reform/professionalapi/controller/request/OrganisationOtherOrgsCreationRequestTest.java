@@ -23,6 +23,7 @@ public class OrganisationOtherOrgsCreationRequestTest {
         assertThat(organisationOtherOrgsCreationRequest.getSraId()).isEqualTo("sra-id");
         assertThat(organisationOtherOrgsCreationRequest.getSraRegulated()).isEqualTo("false");
         assertThat(organisationOtherOrgsCreationRequest.getOrgTypeKey()).isEqualTo("Doctor");
+        assertThat(organisationOtherOrgsCreationRequest.getOrgAttributes()).isNull();
 
     }
 
