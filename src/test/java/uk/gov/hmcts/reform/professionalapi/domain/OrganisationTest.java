@@ -95,7 +95,7 @@ class OrganisationTest {
     @Test
     void test_organisation_orgTypeKey_orgAttributes_correctly() {
         OrgAttribute orgAttribute = new OrgAttribute();
-        List<OrgAttribute> orgAttributes =new ArrayList<>();
+        List<OrgAttribute> orgAttributes = new ArrayList<>();
         orgAttribute.setKey("TestKey");
         orgAttribute.setValue("TestValue");
         orgAttributes.add(orgAttribute);
