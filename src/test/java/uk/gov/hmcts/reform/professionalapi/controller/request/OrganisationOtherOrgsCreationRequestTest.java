@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 
 import java.util.ArrayList;
 import java.util.List;
