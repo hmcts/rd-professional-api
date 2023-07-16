@@ -91,4 +91,19 @@ class OrganisationTest {
         assertThat(organisation.getOrganisationMfaStatus()).isNotNull();
         assertThat(organisation.getOrganisationMfaStatus()).isEqualTo(organisationMfaStatus);
     }
+
+    @Test
+    void test_organisation_orgTypeKey_orgAttributes_correctly() {
+        OrgAttribute orgAttribute = new OrgAttribute();
+        List<OrgAttribute> orgAttributes =new ArrayList<>();
+        orgAttribute.setKey("TestKey");
+        orgAttribute.setValue("TestValue");
+        orgAttributes.add(orgAttribute);
+        Organisation organisation = new Organisation();
+        organisation.setOrgTypekey("Doctor");
+        organisation.setOrgAttributes(orgAttributes);
+        assertThat(organisation.getOrgTypekey()).isNotNull();
+        assertThat(organisation.getOrgTypekey()).isEqualTo("Doctor");
+        assertThat(organisation.getOrgAttributes()).isNotNull();
+    }
 }
