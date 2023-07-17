@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 
@@ -121,7 +121,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
-    public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
+    public ResponseEntity<OrganisationEntityResponseV2> retrieveOrganisationUsingOrgIdentifier(
             @Parameter(hidden = true) @OrgId String extOrgIdentifier,
             @Parameter(name = "pbaStatus") @RequestParam(value = "pbaStatus", required = false) String pbaStatus) {
 
@@ -135,11 +135,11 @@ public class OrganisationExternalControllerV2 extends SuperController {
         return retrieveAllOrganisationOrByIdForV2Api(extOrgIdentifier, isPendingPbaRequired);
     }
 
-    protected ResponseEntity<OrganisationEntityResponse> retrieveAllOrganisationOrByIdForV2Api(
+    protected ResponseEntity<OrganisationEntityResponseV2> retrieveAllOrganisationOrByIdForV2Api(
             String id, boolean isPendingPbaRequired) {
         //Received request to retrieve External organisation with ID
 
-        var organisationResponse = organisationService.retrieveOrganisation(id, isPendingPbaRequired);
+        var organisationResponse = organisationService.retrieveOrganisationForV2Api(id, isPendingPbaRequired);
 
         return ResponseEntity
                 .status(200)
