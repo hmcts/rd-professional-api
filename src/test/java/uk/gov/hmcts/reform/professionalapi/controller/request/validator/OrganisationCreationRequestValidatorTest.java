@@ -4,6 +4,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -475,35 +478,14 @@ class OrganisationCreationRequestValidatorTest {
                 .hasMessageStartingWith(ERROR_MESSAGE_INVALID_STATUS_PASSED);
     }
 
-    @Test
-    void test_validateOrganisationRequestWithOrgTypeKeyNull() {
+    @ParameterizedTest
+    @ValueSource(strings = {"","D*&&&&&"})
+    void test_validateOrganisationRequestWithOrgTypeKeyNull(String orgTypeKey) {
 
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
                 "SraId",
                 "true", null, "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null,null, null);
-        assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
-    }
-
-    @Test
-    void test_validateOrganisationRequestWithOrgTypeKeyEmpty() {
-
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
-                "SraId",
-                "true", null, "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null,"", null);
-        assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
-    }
-
-    @Test
-    void test_validateOrganisationRequestWithOrgTypeKeySpecialChars() {
-
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
-                "SraId",
-                "true", null, "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null,"D*&&&&&", null);
+                new HashSet<>(), null, orgTypeKey, null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
