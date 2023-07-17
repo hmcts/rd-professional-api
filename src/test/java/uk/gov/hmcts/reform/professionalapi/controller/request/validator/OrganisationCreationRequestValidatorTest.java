@@ -13,7 +13,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -53,6 +55,9 @@ class OrganisationCreationRequestValidatorTest {
     private OrganisationCreationRequest organisationCreationRequest;
     private Exception myException;
 
+    private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
+
+
     @BeforeEach
     void setup() {
         organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
@@ -69,6 +74,21 @@ class OrganisationCreationRequestValidatorTest {
 
         verify(validator1, times(1)).validate(organisationCreationRequest);
         verify(validator2, times(1)).validate(organisationCreationRequest);
+
+        assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isTrue();
+        assertThat(OrganisationCreationRequestValidator.contains("pend")).isFalse();
+    }
+
+    @Test
+    void test_CallsAllValidatorsOrgTypeKeyNOrgAtt() {
+        organisationOtherOrgsCreationRequest =
+                new OrganisationOtherOrgsCreationRequest("Company", "PENDING", "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,  "Doctor", null);
+        organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest);
+
+        verify(validator1, times(1)).validate(organisationOtherOrgsCreationRequest);
+        verify(validator2, times(1)).validate(organisationOtherOrgsCreationRequest);
 
         assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isTrue();
         assertThat(OrganisationCreationRequestValidator.contains("pend")).isFalse();
@@ -454,4 +474,73 @@ class OrganisationCreationRequestValidatorTest {
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessageStartingWith(ERROR_MESSAGE_INVALID_STATUS_PASSED);
     }
+
+    @Test
+    void test_validateOrganisationRequestWithOrgTypeKeyNull() {
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
+                "true", null,"", "", null, new HashSet<>(),
+                null,null, null);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+    }
+
+    @Test
+    void test_validateOrganisationRequestWithOrgTypeKeyEmpty() {
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
+                "true", null,"", "", null, new HashSet<>(),
+                null,"", null);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+    }
+
+    @Test
+    void test_validateOrganisationRequestWithOrgTypeKeySpecialChars() {
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
+                "true", null,"", "", null, new HashSet<>(),
+                null,"D*&&&&&", null);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+    }
+
+    @Test
+    void test_validateOrganisationRequestWithOrgAttributeKeyEmpty() {
+
+        OrgAttributeRequest orgAttribute = new OrgAttributeRequest();
+
+        orgAttribute.setKey("");
+        orgAttribute.setValue("testValue");
+
+        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
+
+        orgAttributes.add(orgAttribute);
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
+                "true", null,"", "", null, new HashSet<>(),
+                null,null, orgAttributes);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+    }
+
+    @Test
+    void test_validateOrganisationRequestWithOrgAttributeValueEmpty() {
+
+        OrgAttributeRequest orgAttribute = new OrgAttributeRequest();
+
+        orgAttribute.setKey("testKey");
+        orgAttribute.setValue("");
+
+        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
+
+        orgAttributes.add(orgAttribute);
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
+                "true", null,"", "", null, new HashSet<>(),
+                null,null, orgAttributes);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+    }
+
 }

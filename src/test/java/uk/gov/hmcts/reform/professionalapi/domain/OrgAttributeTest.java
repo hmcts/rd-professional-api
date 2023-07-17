@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OrgAttributeTest {
+class OrgAttributeTest {
 
     private OrgAttribute orgAttribute;
     private final Organisation organisation = new Organisation();
