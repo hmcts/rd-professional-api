@@ -4,7 +4,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.professionalapi.domain.OrgAttributes;
+import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 
 @NoArgsConstructor
 @Getter
@@ -16,7 +16,7 @@ public class OrgAttributeResponse {
     private String value;
 
 
-    public OrgAttributeResponse(OrgAttributes orgAttributes) {
+    public OrgAttributeResponse(OrgAttribute orgAttributes) {
         this.key = orgAttributes.getKey();
         this.value = orgAttributes.getValue();
     }

@@ -74,8 +74,8 @@ public class Organisation implements Serializable {
     private OrganisationMfaStatus organisationMfaStatus;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = OrgAttributes.class,  mappedBy = "organisation")
-    private List<OrgAttributes> orgAttributes = new ArrayList<>();
+    @OneToMany(targetEntity = OrgAttribute.class,  mappedBy = "organisation")
+    private List<OrgAttribute> orgAttributes = new ArrayList<>();
 
     @Column(name = "org_type_key")
     private String orgTypeKey;
@@ -149,7 +149,7 @@ public class Organisation implements Serializable {
         return id;
     }
 
-    public void addOrgAttribute(OrgAttributes orgAttributesValue) {
+    public void addOrgAttribute(OrgAttribute orgAttributesValue) {
         orgAttributes.add(orgAttributesValue);
     }
 
@@ -157,7 +157,7 @@ public class Organisation implements Serializable {
         return orgTypeKey;
     }
 
-    public List<OrgAttributes> getOrgAttributes() {
+    public List<OrgAttribute> getOrgAttributes() {
         return orgAttributes;
     }
 
