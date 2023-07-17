@@ -482,7 +482,7 @@ class OrganisationCreationRequestValidatorTest {
                 "true", null,"", "", null, new HashSet<>(),
                 null,null, null);
         assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
 
     @Test
@@ -492,7 +492,7 @@ class OrganisationCreationRequestValidatorTest {
                 "true", null,"", "", null, new HashSet<>(),
                 null,"", null);
         assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
 
     @Test
@@ -502,7 +502,7 @@ class OrganisationCreationRequestValidatorTest {
                 "true", null,"", "", null, new HashSet<>(),
                 null,"D*&&&&&", null);
         assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
 
     @Test
@@ -521,7 +521,7 @@ class OrganisationCreationRequestValidatorTest {
                 "true", null,"", "", null, new HashSet<>(),
                 null,null, orgAttributes);
         assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
 
     @Test
@@ -540,7 +540,7 @@ class OrganisationCreationRequestValidatorTest {
                 "true", null,"", "", null, new HashSet<>(),
                 null,null, orgAttributes);
         assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validateOrganisationRequest(organisationOtherOrgsCreationRequest));
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
 
 }
