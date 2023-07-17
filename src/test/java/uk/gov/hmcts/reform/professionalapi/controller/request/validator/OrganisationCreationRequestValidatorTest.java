@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -491,73 +492,21 @@ class OrganisationCreationRequestValidatorTest {
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
 
-    @Test
-    void test_validateOrganisationRequestWithOrgAttributeKeyEmpty() {
+    @ParameterizedTest
+    @CsvSource({
+            "'',testValue",
+            "testKey,''",
+            ",testValue",
+            "testKey, ",
+            "'',testValue"
+
+    })
+    void test_validateOrganisationRequestWithOrgAttributeKeyEmpty(String key,String value) {
 
         OrgAttributeRequest orgAttribute = new OrgAttributeRequest();
 
-        orgAttribute.setKey("");
-        orgAttribute.setValue("testValue");
-
-        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
-
-        orgAttributes.add(orgAttribute);
-
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
-                "SraId",
-                "true", null, "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null,"Doctor", orgAttributes);
-        assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
-    }
-
-    @Test
-    void test_validateOrganisationRequestWithOrgAttributeKeyNull() {
-
-        OrgAttributeRequest orgAttribute = new OrgAttributeRequest();
-
-        orgAttribute.setKey(null);
-        orgAttribute.setValue("testValue");
-
-        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
-
-        orgAttributes.add(orgAttribute);
-
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
-                "SraId",
-                "true", null, "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null,"Doctor", orgAttributes);
-        assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
-    }
-
-    @Test
-    void test_validateOrganisationRequestWithOrgAttributeValueEmpty() {
-
-        OrgAttributeRequest orgAttribute = new OrgAttributeRequest();
-
-        orgAttribute.setKey("testKey");
-        orgAttribute.setValue("");
-
-        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
-
-        orgAttributes.add(orgAttribute);
-
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
-                "SraId",
-                "true", null, "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null,"Doctor", orgAttributes);
-        assertThrows(InvalidRequest.class, () ->
-                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
-    }
-
-    @Test
-    void test_validateOrganisationRequestWithOrgAttributeValueNull() {
-
-        OrgAttributeRequest orgAttribute = new OrgAttributeRequest();
-
-        orgAttribute.setKey("testKey");
-        orgAttribute.setValue(null);
+        orgAttribute.setKey(key);
+        orgAttribute.setValue(value);
 
         List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
 
