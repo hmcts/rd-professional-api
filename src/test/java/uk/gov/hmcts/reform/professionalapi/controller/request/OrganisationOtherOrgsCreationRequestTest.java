@@ -7,7 +7,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OrganisationOtherOrgsCreationRequestTest {
+class OrganisationOtherOrgsCreationRequestTest {
 
     @Test
     void test_OrganisationCreationRequest() {

@@ -478,9 +478,10 @@ class OrganisationCreationRequestValidatorTest {
     @Test
     void test_validateOrganisationRequestWithOrgTypeKeyNull() {
 
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
-                "true", null,"", "", null, new HashSet<>(),
-                null,null, null);
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,null, null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
@@ -488,9 +489,10 @@ class OrganisationCreationRequestValidatorTest {
     @Test
     void test_validateOrganisationRequestWithOrgTypeKeyEmpty() {
 
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
-                "true", null,"", "", null, new HashSet<>(),
-                null,"", null);
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,"", null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
@@ -498,9 +500,10 @@ class OrganisationCreationRequestValidatorTest {
     @Test
     void test_validateOrganisationRequestWithOrgTypeKeySpecialChars() {
 
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
-                "true", null,"", "", null, new HashSet<>(),
-                null,"D*&&&&&", null);
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,"D*&&&&&", null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
@@ -517,9 +520,10 @@ class OrganisationCreationRequestValidatorTest {
 
         orgAttributes.add(orgAttribute);
 
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
-                "true", null,"", "", null, new HashSet<>(),
-                null,null, orgAttributes);
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,"Doctor", orgAttributes);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
@@ -536,9 +540,10 @@ class OrganisationCreationRequestValidatorTest {
 
         orgAttributes.add(orgAttribute);
 
-        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("", "", "",
-                "true", null,"", "", null, new HashSet<>(),
-                null,null, orgAttributes);
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,"Doctor", orgAttributes);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
