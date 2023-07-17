@@ -395,14 +395,12 @@ public class RefDataUtil {
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(),
                     responseEntity.getStatusCode());
         } else {
+            Object response = responseEntity.getBody();
+            List<ProfessionalUsersResponseWithoutRoles> userProfiles = response == null
+                    ? new ArrayList<>()
+                    : ((ProfessionalUsersEntityResponseWithoutRoles) response).getUserProfiles();
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
                     = new ProfessionalUsersEntityResponseWithoutRoles();
-
-            ProfessionalUsersEntityResponseWithoutRoles responseEntityBody =
-                    (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
-            List<ProfessionalUsersResponseWithoutRoles> userProfiles = responseEntityBody == null
-                    ? new ArrayList<>()
-                    : responseEntityBody.getUserProfiles();
             professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
 
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
