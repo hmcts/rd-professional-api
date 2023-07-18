@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddr
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -53,6 +54,8 @@ import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToke
 public class ProfessionalReferenceDataClient {
 
     private static final String APP_EXT_BASE_PATH = "/refdata/external/v1/organisations";
+
+    private static final String APP_EXT_V2_BASE_PATH = "/refdata/external/v2/organisations";
     private static final String APP_INT_BASE_PATH = "/refdata/internal/v1/organisations";
     private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI"
             + "6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -61,6 +64,9 @@ public class ProfessionalReferenceDataClient {
     private final RestTemplate restTemplate = new RestTemplate();
     private String baseUrl;
     private String baseIntUrl;
+
+    private String baseV2Url;
+
     private String issuer;
     private long expiration;
 
@@ -71,6 +77,7 @@ public class ProfessionalReferenceDataClient {
         this.prdApiPort = port;
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
+        this.baseV2Url = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH;
         this.issuer = issuer;
         this.expiration = tokenExpirationInterval;
     }
@@ -79,6 +86,9 @@ public class ProfessionalReferenceDataClient {
         return postRequest(baseUrl, request, null, null);
     }
 
+    public Map<String, Object> createOrganisationV2(OrganisationOtherOrgsCreationRequest request) {
+        return postRequest(baseV2Url, request, null, null);
+    }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
         return getRequestToGetEmailFromHeader("/refdata/internal/v1/organisations" + "/pbas", role, email);
