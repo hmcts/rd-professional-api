@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 
@@ -33,7 +34,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_ID_NOTES_1;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_ID_NOTES_2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_ORG_BY_ID_NOTES_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_PBA_EMAIL_NOTES_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_PBA_EMAIL_NOTES_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 
 @RequestMapping(
         path = "refdata/external/v2/organisations"
@@ -144,6 +149,71 @@ public class OrganisationExternalControllerV2 extends SuperController {
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
+    }
+
+    @Operation(
+            summary = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
+            description = GET_PBA_EMAIL_NOTES_1 + GET_PBA_EMAIL_NOTES_2,
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization"),
+                    @SecurityRequirement(name = "UserEmail")
+            }
+    )
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "The Organisation's associated Payment Accounts",
+            content = @Content(schema = @Schema(implementation = OrganisationPbaResponseV2.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid Email Address was provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Payment Accounts found with the given Email Address",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
+    @GetMapping(
+            path = "/pbas",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
+    public ResponseEntity<OrganisationPbaResponseV2> retrievePaymentAccountByEmail(@Parameter(hidden = true)
+                                                                                       @OrgId String orgId) {
+        //Received request to retrieve an organisations payment accounts by email for external
+        var userEmail = getUserEmailFromHeader();
+        return retrievePaymentAccountByUserEmail(userEmail, orgId);
+    }
+
+    protected ResponseEntity<OrganisationPbaResponseV2> retrievePaymentAccountByUserEmail(String email,
+                                                                                        String extOrgIdentifier) {
+        validateEmail(email);
+        var organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
+
+        checkOrganisationAndPbaExists(organisation);
+
+        var userInfo = idamRepository.getUserInfo(getUserToken());
+
+        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(userInfo.getRoles(),
+                organisation, extOrgIdentifier);
+        return ResponseEntity
+                .status(200)
+                .body(new OrganisationPbaResponseV2(organisation,
+                        false, true, false,true));
     }
 
 }
