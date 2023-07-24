@@ -16,7 +16,7 @@ import org.springframework.security.core.context.SecurityContext;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
@@ -68,7 +68,8 @@ class OrganisationExternalControllerV2Test {
     private ProfessionalUserService professionalUserServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
     private PrdEnumServiceImpl prdEnumServiceMock;
-    private OrganisationCreationRequest organisationCreationRequest;
+
+    private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PrdEnumRepository prdEnumRepository;
     private UserCreationRequest userCreationRequest;
@@ -148,9 +149,9 @@ class OrganisationExternalControllerV2Test {
                 "some@email.com", userRoles, false);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
-        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
-                userCreationRequest, null, null);
+                userCreationRequest, null, null,"Doctor",null);
         userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
                 "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles,
                 false);
@@ -161,21 +162,22 @@ class OrganisationExternalControllerV2Test {
     }
 
     @Test
-    void test_CreateOrganisation() {
-        when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
+    void test_CreateOrganisationV2() {
+        when(organisationServiceMock.createOrganisationFrom(organisationOtherOrgsCreationRequest))
                 .thenReturn(organisationResponse);
 
         ResponseEntity<?> actual = organisationExternalController
-                .createOrganisationUsingExternalController(organisationCreationRequest);
+                .createOrganisationUsingExternalController(organisationOtherOrgsCreationRequest);
 
         verify(organisationCreationRequestValidatorMock, times(1))
-                .validate(any(OrganisationCreationRequest.class));
+                .validate(any(OrganisationOtherOrgsCreationRequest.class));
         verify(organisationServiceMock, times(1))
-                .createOrganisationFrom(organisationCreationRequest);
+                .createOrganisationFrom(organisationOtherOrgsCreationRequest);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
+
 
     @Test
     void test_RetrieveOrganisationByIdentifier() {

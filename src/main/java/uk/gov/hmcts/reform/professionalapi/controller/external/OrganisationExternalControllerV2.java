@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
@@ -78,7 +78,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-            @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
+            @Valid @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for external user
         return createOrganisationFrom(organisationCreationRequest);

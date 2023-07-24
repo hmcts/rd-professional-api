@@ -77,9 +77,6 @@ public class Organisation implements Serializable {
     @OneToMany(targetEntity = OrgAttribute.class,  mappedBy = "organisation")
     private List<OrgAttribute> orgAttributes = new ArrayList<>();
 
-    @Column(name = "org_type_key")
-    private String orgTypeKey;
-
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
@@ -90,6 +87,9 @@ public class Organisation implements Serializable {
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
+
+    @Column(name = "ORG_TYPE_KEY")
+    private String orgTypekey;
 
     @CreatedDate
     @Column(name = "CREATED")
@@ -154,7 +154,7 @@ public class Organisation implements Serializable {
     }
 
     public String getOrgTypeKey() {
-        return orgTypeKey;
+        return orgTypekey;
     }
 
     public List<OrgAttribute> getOrgAttributes() {
@@ -208,4 +208,9 @@ public class Organisation implements Serializable {
     public boolean isOrganisationStatusActive() {
         return OrganisationStatus.ACTIVE == getStatus();
     }
+
+    public void addAttribute(OrgAttribute orgAttribute) {
+        orgAttributes.add(orgAttribute);
+    }
+
 }

@@ -29,7 +29,7 @@ class OrganisationTest {
         organisation.setContactInformations(contactInformations);
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
         organisation.setStatusMessage("statusMessage");
-        organisation.setOrgTypeKey("testOrgTypeKey");
+        organisation.setOrgTypekey("testOrgTypeKey");
 
         assertThat(organisation.isOrganisationStatusActive()).isTrue();
         assertThat(organisation.getName()).isEqualTo("some-name");
@@ -103,5 +103,21 @@ class OrganisationTest {
 
         assertThat(organisation.getOrganisationMfaStatus()).isNotNull();
         assertThat(organisation.getOrganisationMfaStatus()).isEqualTo(organisationMfaStatus);
+    }
+
+    @Test
+    void test_organisation_orgTypeKey_orgAttributes_correctly() {
+        OrgAttribute orgAttribute = new OrgAttribute();
+        List<OrgAttribute> orgAttributes = new ArrayList<>();
+        orgAttribute.setKey("TestKey");
+        orgAttribute.setValue("TestValue");
+        orgAttributes.add(orgAttribute);
+        Organisation organisation = new Organisation();
+        organisation.setOrgTypekey("Doctor");
+        organisation.setOrgAttributes(orgAttributes);
+        organisation.addAttribute(orgAttribute);
+        assertThat(organisation.getOrgTypeKey()).isNotNull();
+        assertThat(organisation.getOrgTypeKey()).isEqualTo("Doctor");
+        assertThat(organisation.getOrgAttributes()).isNotNull();
     }
 }
