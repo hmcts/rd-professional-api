@@ -20,7 +20,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCr
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 @Slf4j
-public class CreateOrgWithOtherOrg extends AuthorizationEnabledIntegrationTest {
+class CreateOrgWithOtherOrg extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void persists_and_returns_valid_organisation_with_otherOrgs() {
