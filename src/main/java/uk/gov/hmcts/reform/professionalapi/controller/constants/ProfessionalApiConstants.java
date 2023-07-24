@@ -32,6 +32,8 @@ public class ProfessionalApiConstants {
             "Invalid status param provided, only Active status is allowed";
     public static final String FIRST_NAME = "firstName";
     public static final String ORG_NAME = "name";
+
+    public static final String ORG_STATUS = "status";
     public static final Integer DEFAULT_PAGE_SIZE = 20;
     public static final Integer DEFAULT_PAGE = 1;
     public static final String EMPTY = "";
@@ -141,5 +143,10 @@ public class ProfessionalApiConstants {
     public static final String GET_USER_STATUS_EMAIL_2 = ",\n pui-user-manager,\n pui-organisation-manager,";
     public static final String GET_USER_STATUS_EMAIL_3 = "\n pui-case-manager,\n caseworker-publiclaw-courtadmin";
     public static final String ORGANISATION_MISMATCH = "Organisation doesn't match for the given userIdentifier";
+
+    public static final String ORG_TYPE_KEY_REGEX = "^[(a-zA-Z0-9 )\\p{L}\\p{N}'’-]{1,256}$";
+
+    public static final String ORG_TYPE_KEY_INVALID = "Org Type Key is invalid - can only contain Alphabetic,"
+            + " empty space, ', - characters and must be less than 256 characters";
 
 }

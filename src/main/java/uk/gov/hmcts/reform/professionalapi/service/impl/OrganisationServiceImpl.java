@@ -24,7 +24,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -40,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
+import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -49,6 +52,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -123,6 +127,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
     @Autowired
     ProfessionalUserService professionalUserService;
+    @Autowired
+    OrgAttributeRepository orgAttributeRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -142,6 +148,10 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl())
         );
 
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            newOrganisation.setOrgTypekey(orgCreationRequestV2.getOrgTypeKey());
+        }
+
         var organisation = saveOrganisation(newOrganisation);
 
         addDefaultMfaStatusToOrganisation(organisation);
@@ -152,7 +162,25 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
+        }
+
         return new OrganisationResponse(organisation);
+    }
+
+    public void addAttributeToOrganisation(List<OrgAttributeRequest> orgAttributes, Organisation organisation) {
+        if (orgAttributes != null) {
+            List<OrgAttribute> attributes = new ArrayList<>();
+            orgAttributes.forEach(attReq -> {
+                OrgAttribute attribute = new OrgAttribute();
+                attribute.setKey(RefDataUtil.removeEmptySpaces(attReq.getKey()));
+                attribute.setValue(RefDataUtil.removeEmptySpaces(attReq.getValue()));
+                attribute.setOrganisation(organisation);
+                attributes.add(attribute);
+            });
+            organisation.setOrgAttributes(orgAttributeRepository.saveAll(attributes));
+        }
     }
 
     public Organisation saveOrganisation(Organisation organisation) {
