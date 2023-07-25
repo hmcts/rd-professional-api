@@ -43,6 +43,7 @@ public class SwaggerConfiguration {
         return GroupedOpenApi.builder()
                 .group("rd-professional-api")
                 .pathsToMatch("/**")
+                .pathsToExclude("/refdata/external/v2/**","/refdata/internal/v2/**")
                 .build();
     }
 

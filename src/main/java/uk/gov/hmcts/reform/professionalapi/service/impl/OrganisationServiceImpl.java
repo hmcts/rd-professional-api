@@ -34,8 +34,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
@@ -406,6 +408,129 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(
                 resultingOrganisations, true, true, false);
         organisationsDetailResponse.setTotalRecords(totalRecords);
+        return organisationsDetailResponse;
+    }
+
+    @Override
+    public OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(Pageable pageable) {
+        List<Organisation> retrievedOrganisations = null;
+        long totalRecords = 0;
+
+        if (pageable != null) {
+            Page<Organisation> pageableOrganisations = organisationRepository.findByStatusIn(List.of(ACTIVE, PENDING),
+                    pageable);
+            totalRecords = pageableOrganisations.getTotalElements();
+            retrievedOrganisations = pageableOrganisations.getContent();
+        } else {
+            retrievedOrganisations = organisationRepository.findAll();
+            totalRecords = retrievedOrganisations.size();
+
+        }
+
+        if (retrievedOrganisations.isEmpty()) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        var pendingOrganisations = new ArrayList<Organisation>();
+        var activeOrganisations = new ArrayList<Organisation>();
+        var resultingOrganisations = new ArrayList<Organisation>();
+
+        var activeOrganisationDetails = new ConcurrentHashMap<String, Organisation>();
+
+        retrievedOrganisations.forEach(organisation -> {
+            if (organisation.isOrganisationStatusActive()) {
+                activeOrganisations.add(organisation);
+                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
+                        .getUserIdentifier()) {
+                    activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(),
+                            organisation);
+                }
+            } else if (organisation.getStatus() == PENDING) {
+                pendingOrganisations.add(organisation);
+            }
+        });
+
+        List<Organisation> updatedActiveOrganisations = new ArrayList<>();
+
+        if (!CollectionUtils.isEmpty(activeOrganisations)) {
+
+            RetrieveUserProfilesRequest retrieveUserProfilesRequest
+                    = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
+                    .toList());
+            updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
+                    retrieveUserProfilesRequest,
+                    "false", activeOrganisationDetails);
+        }
+
+        resultingOrganisations.addAll(pendingOrganisations);
+        resultingOrganisations.addAll(updatedActiveOrganisations);
+
+        if (pageable != null) {
+            resultingOrganisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
+        }
+
+        OrganisationsDetailResponseV2 organisationsDetailResponse = new OrganisationsDetailResponseV2(
+                resultingOrganisations, true, true, false,true);
+        organisationsDetailResponse.setTotalRecords(totalRecords);
+        return organisationsDetailResponse;
+    }
+
+    @Override
+    public OrganisationEntityResponseV2 retrieveOrganisationForV2Api(
+            String organisationIdentifier, boolean isPendingPbaRequired) {
+        var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        if (organisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+
+        } else if (ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
+            log.debug("{}:: Retrieving organisation", loggingComponentName);
+            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
+                    false));
+        }
+        if (!organisation.getContactInformation().isEmpty()
+                && organisation.getContactInformation().size() > 1) {
+            sortContactInfoByCreatedDateAsc(organisation);
+        }
+
+        return new OrganisationEntityResponseV2(organisation, true, isPendingPbaRequired, false, true);
+    }
+
+    @Override
+    public OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(String status, Pageable pageable) {
+        List<OrganisationStatus> statuses = new ArrayList<>(validateAndReturnStatusList(status));
+        List<Organisation> organisations;
+        List<Organisation> activeOrganisations = new ArrayList<>();
+        List<Organisation> resultOrganisations = new ArrayList<>();
+        long totalRecords = 0;
+
+        if (pageable != null) {
+            Page<Organisation> orgs = organisationRepository.findByStatusIn(statuses,pageable);
+            organisations = orgs.getContent();
+            totalRecords = orgs.getTotalElements();
+        } else {
+            organisations = organisationRepository.findByStatusIn(statuses);
+        }
+
+        organisations.forEach(organisation -> {
+            if (organisation.isOrganisationStatusActive()) {
+                activeOrganisations.add(organisation);
+            } else {
+                resultOrganisations.add(organisation);
+            }
+        });
+        resultOrganisations.addAll(retrieveActiveOrganisationDetails(activeOrganisations));
+        if (CollectionUtils.isEmpty(resultOrganisations)) {
+            throw new EmptyResultDataAccessException(ONE);
+        }
+        if (pageable != null) {
+            resultOrganisations.sort(Comparator.comparing(Organisation::getName, String.CASE_INSENSITIVE_ORDER));
+            resultOrganisations.sort(Comparator.comparing(Organisation::getStatus));
+        }
+        OrganisationsDetailResponseV2 organisationsDetailResponse =
+                new OrganisationsDetailResponseV2(resultOrganisations,
+                true, true, false, true);
+        organisationsDetailResponse.setTotalRecords(totalRecords);
+
         return organisationsDetailResponse;
     }
 

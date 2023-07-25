@@ -73,6 +73,10 @@ public class Organisation implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation", optional = false, fetch = FetchType.LAZY)
     private OrganisationMfaStatus organisationMfaStatus;
 
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = OrgAttribute.class,  mappedBy = "organisation")
+    private List<OrgAttribute> orgAttributes = new ArrayList<>();
+
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
@@ -86,9 +90,6 @@ public class Organisation implements Serializable {
 
     @Column(name = "ORG_TYPE_KEY")
     private String orgTypekey;
-
-    @OneToMany(targetEntity = OrgAttribute.class, mappedBy = "organisation")
-    private List<OrgAttribute> orgAttributes = new ArrayList<>();
 
     @CreatedDate
     @Column(name = "CREATED")
@@ -146,6 +147,18 @@ public class Organisation implements Serializable {
 
     public UUID getId() {
         return id;
+    }
+
+    public void addOrgAttribute(OrgAttribute orgAttributesValue) {
+        orgAttributes.add(orgAttributesValue);
+    }
+
+    public String getOrgTypeKey() {
+        return orgTypekey;
+    }
+
+    public List<OrgAttribute> getOrgAttributes() {
+        return orgAttributes;
     }
 
     public String getName() {

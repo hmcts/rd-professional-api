@@ -26,7 +26,6 @@ file name: launchdarkly-java-server-sdk-5.10.7.jar (shaded: org.yaml:snakeyaml:1
   </suppress>
 
     <suppress>
-
         <notes>Suppressing disputed CVE: https://github.com/FasterXML/jackson-databind/issues/3972</notes>
         <cve>CVE-2023-2976</cve>
         <cve>CVE-2023-34462</cve>

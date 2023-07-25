@@ -56,6 +56,7 @@ public class ProfessionalReferenceDataClient {
     private static final String APP_EXT_BASE_PATH = "/refdata/external/v1/organisations";
 
     private static final String APP_EXT_V2_BASE_PATH = "/refdata/external/v2/organisations";
+    private static final String APP_INT_V2_BASE_PATH = "/refdata/internal/v2/organisations";
     private static final String APP_INT_BASE_PATH = "/refdata/internal/v1/organisations";
     private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI"
             + "6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -113,11 +114,23 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?id={id}", role, id);
     }
 
+    public Map<String, Object> retrieveSingleOrganisationForV2Api(String id, String role) {
+        return getRequest(APP_INT_V2_BASE_PATH + "?id={id}", role, id);
+    }
+
     public Map<String, Object> retrieveAllOrganisationsWithPagination(String page, String size, String role) {
         return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsWithPaginationForV2Api(String page, String size, String role) {
+        return getRequest(APP_INT_V2_BASE_PATH + "?page={page}&size={size}", role, page, size);
+    }
+
     public Map<String, Object> retrieveExternalOrganisation(String id, String role) {
+        return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
+    }
+
+    public Map<String, Object> retrieveExternalOrganisationForV2Api(String id, String role) {
         return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
     }
 
@@ -125,8 +138,17 @@ public class ProfessionalReferenceDataClient {
         return getRequestForExternal(APP_EXT_BASE_PATH + "?pbaStatus=" + pbaStatus, role, id);
     }
 
+    public Map<String, Object> retrieveExternalOrganisationWithPendingPbasForV2Api(String id, String pbaStatus,
+                                                                                   String role) {
+        return getRequestForExternal(APP_EXT_V2_BASE_PATH + "?pbaStatus=" + pbaStatus, role, id);
+    }
+
     public Map<String, Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationsForV2Api(String role) {
+        return getRequest(APP_INT_V2_BASE_PATH + "/", role);
     }
 
     public Object retrieveOrganisationsWithMinimalInfo(String id, String role, String orgStatus,
@@ -149,8 +171,32 @@ public class ProfessionalReferenceDataClient {
         }
     }
 
+    public Object retrieveOrganisationsWithMinimalInfoForV2Api(String id, String role, String orgStatus,
+                                                       Boolean address, Class expectedClass)
+            throws JsonProcessingException {
+        ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
+                APP_EXT_V2_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
+        HttpStatus status = responseEntity.getStatusCode();
+        objectMapper.registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        if (status.is2xxSuccessful()) {
+            return Arrays.asList((OrganisationMinimalInfoResponse[]) objectMapper.convertValue(
+                    responseEntity.getBody(), expectedClass));
+        } else {
+            Map<String, Object> errorResponseMap = new HashMap<>();
+            errorResponseMap.put("response_body", objectMapper.readValue(
+                    responseEntity.getBody().toString(), ErrorResponse.class));
+            errorResponseMap.put("http_status", status);
+            return errorResponseMap;
+        }
+    }
+
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationDetailsByStatusForV2ApiTest(String status, String role) {
+        return getRequest(APP_INT_V2_BASE_PATH + "?status={status}", role, status);
     }
 
     public Map<String, Object> addUserToOrganisationWithUserId(String orgId,

@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinim
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
@@ -222,6 +223,47 @@ public abstract class SuperController {
         }
         return ResponseEntity.status(200).body(organisationResponse);
     }
+
+
+    protected ResponseEntity<Object> retrieveAllOrganisationOrByIdForV2Api(String organisationIdentifier, String status,
+                                                                   Integer page, Integer size) {
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        var orgStatus = removeEmptySpaces(status);
+        long totalRecords = 1;
+
+        Object organisationResponse = null;
+        var pageable = createPageable(page, size);
+        var pageableByStatus = createPageableByStatus(page,size);
+
+        if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
+            //Received request to retrieve all organisations
+            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(pageable);
+            totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
+
+        } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
+                || (isNotEmpty(orgStatus) && isNotEmpty(orgId))) {
+            //Received request to retrieve organisation with ID
+
+            organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+            organisationResponse = organisationService.retrieveOrganisationForV2Api(orgId, true);
+
+        } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
+            //Received request to retrieve organisation with status
+
+            organisationResponse = organisationService
+                    .findByOrganisationStatusForV2Api(orgStatus.toUpperCase(), pageableByStatus);
+            totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
+        }
+
+        log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
+
+        if (pageable != null) {
+            return ResponseEntity.status(200).header("total_records",String.valueOf(totalRecords))
+                    .body(organisationResponse);
+        }
+        return ResponseEntity.status(200).body(organisationResponse);
+    }
+
 
     private Pageable createPageable(Integer page, Integer size) {
         Pageable pageable = null;
