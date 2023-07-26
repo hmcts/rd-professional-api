@@ -929,7 +929,7 @@ class OrganisationServiceImplTest {
                 "REVIEW", null, null, null);
         Organisation reviewOrganisation3 = new Organisation("some-review-org-name3", OrganisationStatus.PENDING,
                 "REVIEW", null, null, null);
-        Organisation pendingOrganisation3 = new Organisation("some-pending-org-name3", REVIEW,
+        Organisation pendingOrganisation3 = new Organisation("some-pending-org-name3", BLOCKED,
                 "PENDING", null, null, null);
 
 
@@ -958,13 +958,27 @@ class OrganisationServiceImplTest {
         OrganisationsDetailResponse organisationDetailResponse
                 = sut.findByOrganisationStatus(status, pageable);
 
-
-
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1))
                 .findByStatusIn(List.of(OrganisationStatus.PENDING,REVIEW,BLOCKED), pageable);
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
     }
+
+    @Test
+    void test_addPaymentAccountsToOrganisationForNullRequest() {
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(null);
+
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setUsers(asList(superUser));
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(InvalidRequest.class, () ->
+                sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
+    }
+
 
     @Test
     @SuppressWarnings("unchecked")
@@ -1539,22 +1553,6 @@ class OrganisationServiceImplTest {
         ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
-    }
-
-
-    @Test
-    void test_addPaymentAccountsToOrganisationForNullRequest() {
-        PbaRequest pbaRequest = new PbaRequest();
-        pbaRequest.setPaymentAccounts(null);
-
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisation.setUsers(asList(superUser));
-        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
-
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
-        assertThrows(InvalidRequest.class, () ->
-                sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
     }
 
     @Test

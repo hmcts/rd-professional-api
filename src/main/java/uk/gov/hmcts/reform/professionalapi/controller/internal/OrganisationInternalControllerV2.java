@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 
@@ -137,4 +138,51 @@ public class OrganisationInternalControllerV2 extends SuperController {
         return retrieveAllOrganisationOrByIdForV2Api(id, status, page, size);
     }
 
+    @Operation(
+            summary = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization"),
+                    @SecurityRequirement(name = "UserEmail")
+            }
+    )
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "The Organisation's associated Payment Accounts",
+            content = @Content(schema = @Schema(implementation = OrganisationPbaResponseV2.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid Email Address was provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Payment Accounts found with the given Email Address",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
+    @GetMapping(
+            path = "/pbas",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<Object> retrievePaymentAccountBySuperUserEmail() {
+
+        var userEmail = getUserEmailFromHeader();
+        //Received request to retrieve an organisations payment accounts by email for internal
+        return retrievePaymentAccountByUserEmailForV2Api(userEmail);
+    }
 }

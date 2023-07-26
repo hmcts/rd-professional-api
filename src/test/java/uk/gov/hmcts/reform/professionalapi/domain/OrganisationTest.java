@@ -52,7 +52,7 @@ class OrganisationTest {
     void test_adds_org_attributes_correctly() {
         OrgAttribute orgAttributes = new OrgAttribute();
         Organisation organisation = new Organisation();
-        organisation.addOrgAttribute(orgAttributes);
+        organisation.addAttribute(orgAttributes);
 
         assertThat(organisation.getOrgAttributes()).containsExactly(orgAttributes);
         assertThat(organisation.getOrgAttributes()).isNotEmpty();
