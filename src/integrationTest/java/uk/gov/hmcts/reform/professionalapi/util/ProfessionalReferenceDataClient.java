@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddr
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -53,10 +54,10 @@ import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToke
 public class ProfessionalReferenceDataClient {
 
     private static final String APP_EXT_BASE_PATH = "/refdata/external/v1/organisations";
-    private static final String APP_INT_BASE_PATH = "/refdata/internal/v1/organisations";
 
-    private static final String APP_EXT_BASE_PATH_V2 = "/refdata/external/v2/organisations";
-    private static final String APP_INT_BASE_PATH_V2 = "/refdata/internal/v2/organisations";
+    private static final String APP_EXT_V2_BASE_PATH = "/refdata/external/v2/organisations";
+    private static final String APP_INT_V2_BASE_PATH = "/refdata/internal/v2/organisations";
+    private static final String APP_INT_BASE_PATH = "/refdata/internal/v1/organisations";
     private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI"
             + "6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private final Integer prdApiPort;
@@ -65,8 +66,8 @@ public class ProfessionalReferenceDataClient {
     private String baseUrl;
     private String baseIntUrl;
 
-    private String baseUrlV2;
-    private String baseIntUrlV2;
+    private String baseV2Url;
+
     private String issuer;
     private long expiration;
 
@@ -77,8 +78,7 @@ public class ProfessionalReferenceDataClient {
         this.prdApiPort = port;
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
-        this.baseUrlV2 = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH_V2;
-        this.baseIntUrlV2 = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH_V2;
+        this.baseV2Url = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH;
         this.issuer = issuer;
         this.expiration = tokenExpirationInterval;
     }
@@ -87,6 +87,9 @@ public class ProfessionalReferenceDataClient {
         return postRequest(baseUrl, request, null, null);
     }
 
+    public Map<String, Object> createOrganisationV2(OrganisationOtherOrgsCreationRequest request) {
+        return postRequest(baseV2Url, request, null, null);
+    }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
         return getRequestToGetEmailFromHeader("/refdata/internal/v1/organisations" + "/pbas", role, email);
@@ -112,7 +115,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveSingleOrganisationForV2Api(String id, String role) {
-        return getRequest(APP_INT_BASE_PATH_V2 + "?id={id}", role, id);
+        return getRequest(APP_INT_V2_BASE_PATH + "?id={id}", role, id);
     }
 
     public Map<String, Object> retrieveAllOrganisationsWithPagination(String page, String size, String role) {
@@ -120,7 +123,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveAllOrganisationsWithPaginationForV2Api(String page, String size, String role) {
-        return getRequest(APP_INT_BASE_PATH_V2 + "?page={page}&size={size}", role, page, size);
+        return getRequest(APP_INT_V2_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
 
     public Map<String, Object> retrieveExternalOrganisation(String id, String role) {
@@ -137,7 +140,7 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveExternalOrganisationWithPendingPbasForV2Api(String id, String pbaStatus,
                                                                                    String role) {
-        return getRequestForExternal(APP_EXT_BASE_PATH_V2 + "?pbaStatus=" + pbaStatus, role, id);
+        return getRequestForExternal(APP_EXT_V2_BASE_PATH + "?pbaStatus=" + pbaStatus, role, id);
     }
 
     public Map<String, Object> retrieveAllOrganisations(String role) {
@@ -145,7 +148,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveAllOrganisationsForV2Api(String role) {
-        return getRequest(APP_INT_BASE_PATH_V2 + "/", role);
+        return getRequest(APP_INT_V2_BASE_PATH + "/", role);
     }
 
     public Object retrieveOrganisationsWithMinimalInfo(String id, String role, String orgStatus,
@@ -172,7 +175,7 @@ public class ProfessionalReferenceDataClient {
                                                        Boolean address, Class expectedClass)
             throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
-                APP_EXT_BASE_PATH_V2 + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
+                APP_EXT_V2_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
         HttpStatus status = responseEntity.getStatusCode();
         objectMapper.registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -193,7 +196,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusForV2ApiTest(String status, String role) {
-        return getRequest(APP_INT_BASE_PATH_V2 + "?status={status}", role, status);
+        return getRequest(APP_INT_V2_BASE_PATH + "?status={status}", role, status);
     }
 
     public Map<String, Object> addUserToOrganisationWithUserId(String orgId,

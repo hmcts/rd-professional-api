@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -46,6 +47,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -61,6 +63,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -114,6 +117,8 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 class OrganisationServiceImplTest {
 
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
+    private final OrgAttributeRepository orgAttributeRepository = mock(OrgAttributeRepository.class);
+
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
@@ -237,6 +242,7 @@ class OrganisationServiceImplTest {
         when(organisationRepositoryImplNullReturnedMock.findByOrganisationIdentifier(any())).thenReturn(null);
         when(organisationMfaStatusRepositoryMock.save(any(OrganisationMfaStatus.class)))
                 .thenReturn(organisationMfaStatus);
+
     }
 
     @Test
@@ -326,8 +332,27 @@ class OrganisationServiceImplTest {
 
         sut.addDefaultMfaStatusToOrganisation(organisationMock);
 
-        verify(organisationMock, times(1))
-                .setOrganisationMfaStatus(any());
+        verify(organisationMock, times(1)).setOrganisationMfaStatus(any());
+    }
+
+
+    @Test
+    void test_addAttributeToOrganisation() {
+        OrgAttribute orgAttribute = mock(OrgAttribute.class);
+        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+        String key = "RelatedToServices";
+        String value = "ACCA";
+        orgAttributeRequest.setKey(key);
+        orgAttributeRequest.setValue(value);
+        orgAttributes.add(orgAttributeRequest);
+        Organisation organisationMock = mock(Organisation.class);
+        when(orgAttributeRepository.saveAll(anyList())).thenReturn(anyList());
+        sut.addAttributeToOrganisation(orgAttributes,organisationMock);
+        assertEquals("RelatedToServices", orgAttributes.get(0).getKey());
+        assertEquals("ACCA", orgAttributes.get(0).getValue());
+        verify(organisationMock, times(1)).setOrgAttributes(anyList());
+
     }
 
     @Test
@@ -812,7 +837,10 @@ class OrganisationServiceImplTest {
             false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
-        Pageable pageable = PageRequest.of(1,2, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
+        var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+
+        Pageable pageable = PageRequest.of(1,2, Sort.by(order).and(Sort.by(name)));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable)).thenReturn(orgPage);
@@ -1634,7 +1662,6 @@ class OrganisationServiceImplTest {
     }
 
 
-    @Test
     void test_sortContactInfoByCreatedDateAsc() {
         var contactInformation = new ContactInformation();
         contactInformation.setCountry("TestCountry");

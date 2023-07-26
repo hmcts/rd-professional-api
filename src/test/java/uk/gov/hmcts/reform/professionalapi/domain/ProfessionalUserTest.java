@@ -23,6 +23,7 @@ class ProfessionalUserTest {
     }
 
 
+
     @Test
     void test_creates_professional_for_empty_user_Attribute() {
 
@@ -60,12 +61,15 @@ class ProfessionalUserTest {
         ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "some-email-address", organisation);
 
+        PrdEnumId prdEnumId = new PrdEnumId(1,"test");
+        PrdEnum anEnum = new PrdEnum(prdEnumId,"testenumName","testenumDescription");
+        UserAttribute userAttribute = new UserAttribute(professionalUser, anEnum);
+        List<UserAttribute> userAttributes =  new ArrayList<>();
+        userAttributes.add(userAttribute);
+
         professionalUser.setLastUpdated(LocalDateTime.now());
         professionalUser.setCreated(LocalDateTime.now());
         professionalUser.setRoles(roles);
-        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE");
-        UserAttribute userAttribute = new UserAttribute(professionalUser, prdEnum);
-        userAttributes.add(userAttribute);
         professionalUser.setUserAttributes(userAttributes);
 
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
@@ -78,7 +82,39 @@ class ProfessionalUserTest {
         assertThat(professionalUser.getRoles().get(0)).isEqualTo("pui-user-manager");
         assertThat(professionalUser.getLastUpdated()).isNotNull();
         assertThat(professionalUser.getCreated()).isNotNull();
-        assertThat(professionalUser.getUserAttributes()).isNotEmpty();
+        assertThat(professionalUser.getUserAttributes()).isNotNull();
+
+        ProfessionalUser user = new ProfessionalUser();
+        assertThat(user).isNotNull();
+    }
+
+    @Test
+    void test_creates_professional_user_for_empty_user_attribute_correctly() {
+        List<String> roles = new ArrayList<>();
+        roles.add("pui-user-manager");
+
+        Organisation organisation = new Organisation();
+        ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
+                "some-email-address", organisation);
+        List<UserAttribute> userAttributes =  null;
+
+
+        professionalUser.setLastUpdated(LocalDateTime.now());
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUser.setRoles(roles);
+        professionalUser.setUserAttributes(userAttributes);
+
+        assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
+        assertThat(professionalUser.getLastName()).isEqualTo("some-lname");
+        assertThat(professionalUser.getEmailAddress()).isEqualTo("some-email-address");
+        assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
+        assertThat(professionalUser.getUserIdentifier()).isNull();
+        assertThat(professionalUser.getId()).isNull(); // hibernate generated
+        assertThat(professionalUser.getRoles()).hasSize(1);
+        assertThat(professionalUser.getRoles().get(0)).isEqualTo("pui-user-manager");
+        assertThat(professionalUser.getLastUpdated()).isNotNull();
+        assertThat(professionalUser.getCreated()).isNotNull();
+        assertThat(professionalUser.getUserAttributes()).isNull();
 
         ProfessionalUser user = new ProfessionalUser();
         assertThat(user).isNotNull();
@@ -90,12 +126,19 @@ class ProfessionalUserTest {
         ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "some-email-address", organisation);
 
+        PrdEnumId prdEnumId = new PrdEnumId(1,"test");
+        PrdEnum anEnum = new PrdEnum(prdEnumId,"testenumName","testenumDescription");
+        UserAttribute userAttribute = new UserAttribute(professionalUser, anEnum);
+        List<UserAttribute> userAttributes =  new ArrayList<>();
+        userAttributes.add(userAttribute);
+
         UUID id = UUID.randomUUID();
         professionalUser.setUserIdentifier(id.toString());
         professionalUser.setId(id);
         professionalUser.setCreated(LocalDateTime.now());
         professionalUser.setLastUpdated(LocalDateTime.now());
         professionalUser.setDeleted(LocalDateTime.now());
+        professionalUser.setUserAttributes(userAttributes);
 
         SuperUser superUser = professionalUser.toSuperUser();
         assertThat(superUser.getFirstName()).isEqualTo("some-fname");
@@ -106,6 +149,6 @@ class ProfessionalUserTest {
         assertThat(superUser.getId()).isNotNull();
         assertThat(superUser.getLastUpdated()).isNotNull();
         assertThat(superUser.getUserIdentifier()).isEqualTo(id.toString());
-        assertThat(professionalUser.getUserAttributes()).isEmpty();
+        assertThat(professionalUser.getUserAttributes()).isNotNull();
     }
 }
