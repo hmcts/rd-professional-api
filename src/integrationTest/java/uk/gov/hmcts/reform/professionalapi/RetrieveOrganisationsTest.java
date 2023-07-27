@@ -354,6 +354,30 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    void return_organisation_payload_with_200_status_code_with_pending_pbas_v2() {
+        String organisationIdentifier = createOtherOrganisationRequest("PENDING");
+        assertThat(organisationIdentifier).isNotNull();
+
+        String userId = updateOrgAndInviteUser(organisationIdentifier, puiCaseManager);
+        assertThat(userId).isNotNull();
+
+        Optional<PaymentAccount> orgPbas = paymentAccountRepository.findByPbaNumber("PBA1234567");
+        assertThat(orgPbas).isPresent();
+        PaymentAccount pendingPba = orgPbas.get();
+        pendingPba.setPbaStatus(PbaStatus.PENDING);
+        paymentAccountRepository.save(pendingPba);
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveExternalOrganisationWithPendingPbasForV2Api(userId, "PENDING",
+                        puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
+        assertThat(response.get("pendingPaymentAccount")).isNotNull();
+        assertThat(response.get("orgTypeKey")).isEqualTo("Doctor");
+        assertThat(response.get("orgAttributes")).isNotNull();
+    }
+
+    @Test
     void return_organisation_payload_with_200_status_code_for_pui_finance_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiFinanceManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
