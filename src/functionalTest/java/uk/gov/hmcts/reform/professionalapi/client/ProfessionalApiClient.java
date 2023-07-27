@@ -938,18 +938,11 @@ public class ProfessionalApiClient {
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
     }
 
+    //with OPENID implementation
     public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role,
                                    String organisationIdentifier) {
 
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier, OK);
-    }
-
-
-    public void updateOrganisation(String organisationIdentifier, String role, HttpStatus expectedStatus) {
-
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
-
-        updateOrganisation(organisationCreationRequest, role, organisationIdentifier, expectedStatus);
     }
 
 
