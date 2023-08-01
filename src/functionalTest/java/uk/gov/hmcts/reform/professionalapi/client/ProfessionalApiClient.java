@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddr
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -171,6 +173,84 @@ public class ProfessionalApiClient {
             .contactInformation(contactInfoList);
     }
 
+    public static OrganisationOtherOrgsCreationRequest createOrganisationRequestForV2() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456777")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456788")
+                .dxExchange("dxExchange").build());
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123452222")
+                .dxExchange("dxExchange").build());
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456333")
+                .dxExchange("dxExchange").build());
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .uprn("uprn1")
+                .dxAddress(dx1)
+                .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+                .addressLine1("addLine1")
+                .addressLine2("addLine2")
+                .addressLine3("addLine3")
+                .uprn("uprn")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx2)
+                .build());
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey");
+        orgAttributeRequest.setValue("testValue");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+        String superUserEmail = generateRandomEmail();
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
+                new OrganisationOtherOrgsCreationRequest(randomAlphabetic(10),
+                        "PENDING",
+                        "test",
+                        randomAlphabetic(10) + "sra-id-number1",
+                        "false",
+                        randomAlphabetic(5) + "com",
+                        randomAlphabetic(10) + "company-url",
+                        aUserCreationRequest()
+                                .firstName("some-fname")
+                                .lastName("some-lname")
+                                .email(superUserEmail.toLowerCase())
+                                .build(),
+                        paymentAccounts,
+                        contactInfoList,
+                        "Doctor",
+                        orgAttributeRequests);
+
+        return  organisationOtherOrgsCreationRequest;
+    }
+
     public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
@@ -245,6 +325,29 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> createOrganisationV2() {
+        return createOrganisationV2(createOrganisationRequestForV2());
+    }
+
+    public Map<String, Object> createOrganisationV2(OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
+        Response response = getS2sTokenHeaders()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v2/organisations")
+                .andReturn();
+
+        if (response.statusCode() != CREATED.value()) {
+            log.info("{}:: Create organisation response: {}", loggingComponentName, response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
+
+
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> addContactInformationsToOrganisation(
 
@@ -284,6 +387,14 @@ public class ProfessionalApiClient {
             .body(organisationCreationRequest)
             .post("/refdata/external/v1/organisations")
             .andReturn();
+    }
+
+    public Response createOrganisationWithoutS2STokenV2(OrganisationOtherOrgsCreationRequest
+                                                              organisationCreationRequest) {
+        return withUnauthenticatedRequest()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v2/organisations")
+                .andReturn();
     }
 
     public NewUserCreationRequest createNewUserRequest() {
@@ -391,6 +502,28 @@ public class ProfessionalApiClient {
 
     }
 
+    public Map<String, Object> retrieveOrganisationDetailsForV2(String id, String role, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get("/refdata/internal/v2/organisations?id=" + id)
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("{}:: Retrieve organisation response: {}", loggingComponentName, response.statusCode());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
+    }
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrieveAllOrganisations(String role) {
         Response response = getMultipleAuthHeadersInternal()
@@ -402,6 +535,21 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(OK.value());
+
+        log.info("{}:: Retrieve all orgs (Internal) response: {}", loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationsV2(String role) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get("/refdata/internal/v2/organisations")
+                .andReturn();
+
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
 
         log.info("{}:: Retrieve all orgs (Internal) response: {}", loggingComponentName, response.statusCode());
         return response.body().as(Map.class);
@@ -423,6 +571,22 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsWithPaginationV2(String role, String page, String size) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get("/refdata/internal/v2/organisations?" + "page=" + page + "&size=" + size)
+                .andReturn();
+
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        log.info("{}:: Retrieve all orgs with pagination (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
         Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
@@ -436,6 +600,22 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrievePaymentAccountsByEmailV2(String email, String role) {
+        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
+                .getcwdAdminOpenIdToken("prd-admin"), email)
+                .body("")
+                .get("/refdata/internal/v2/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (Internal) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
 
         return response.body().as(Map.class);
     }
@@ -455,10 +635,39 @@ public class ProfessionalApiClient {
 
     }
 
+    public void retrievePaymentAccountsWithoutEmailForInternalV2() {
+        Response response = getMultipleAuthHeadersInternal()
+                .get("/refdata/internal/v2/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (Internal) response: {}", loggingComponentName, response.statusCode());
+
+
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value())
+                .body("errorDescription", equalTo("No User Email provided via header"));
+    }
+
     @SuppressWarnings("unchecked")
     public void retrievePaymentAccountsWithoutEmailForExternal(RequestSpecification requestSpecification) {
         Response response = requestSpecification
                 .get("refdata/external/v1/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (External) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value())
+                .body("errorDescription", equalTo("No User Email provided via header"));
+    }
+
+    @SuppressWarnings("unchecked")
+    public void retrievePaymentAccountsWithoutEmailForExternalV2(RequestSpecification requestSpecification) {
+        Response response = requestSpecification
+                .get("refdata/external/v2/organisations/pbas")
                 .andReturn();
 
         log.info("{}:: Retrieve organisation (External) response: {}", loggingComponentName, response.statusCode());
@@ -475,6 +684,22 @@ public class ProfessionalApiClient {
             .getcwdAdminOpenIdToken("prd-admin"), email)
                 .body("")
                 .get("/refdata/internal/v1/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve pba by email (Internal) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrievePaymentAccountsByEmailFromHeaderV2(String email, String role) {
+        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
+                .getcwdAdminOpenIdToken("prd-admin"), email)
+                .body("")
+                .get("/refdata/internal/v2/organisations/pbas")
                 .andReturn();
 
         log.info("{}:: Retrieve pba by email (Internal) response: {}", loggingComponentName, response.statusCode());
@@ -630,6 +855,19 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> retrieveOrganisationByOrgIdExternalV2(HttpStatus status,
+                                                                   RequestSpecification requestSpecification) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v2/organisations")
+                .andReturn();
+        log.info("{}:: find org by orgId (External): {}", loggingComponentName, response.statusCode());
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> retrieveOrganisationByOrgIdWithPbaStatusExternal(HttpStatus status, String pbaStatus,
                                                                    RequestSpecification requestSpecification) {
 
@@ -664,19 +902,40 @@ public class ProfessionalApiClient {
 
     }
 
+    public void updateOrganisationV2(String organisationIdentifier, String role) {
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("ACTIVE");
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
+    }
+
+    public void updateOrganisationV2(OrganisationOtherOrgsCreationRequest organisationCreationRequest, String role,
+                                     String organisationIdentifier) {
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier, OK);
+    }
+
+    public void updateOrganisationV2(OrganisationOtherOrgsCreationRequest organisationCreationRequest, String role,
+                                     String organisationIdentifier, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("{}:: Update organisation response: {}", loggingComponentName, response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+    }
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
 
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
-    }
-
-    public void updateOrganisation(String organisationIdentifier, String role, HttpStatus expectedStatus) {
-
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
-
-        updateOrganisation(organisationCreationRequest, role, organisationIdentifier, expectedStatus);
     }
 
     //with OPENID implementation
@@ -710,6 +969,14 @@ public class ProfessionalApiClient {
                 .build();
 
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
+    }
+
+    public void updateOrganisationToReviewV2(String organisationIdentifier, String statusMessage, String role) {
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("REVIEW");
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
     }
 
     public void updateOrganisationToBlocked(String organisationIdentifier, String statusMessage, String role) {
@@ -761,6 +1028,20 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveOrganisationDetailsByStatusV2(String status, String role) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get("/refdata/internal/v2/organisations?status=" + status)
+                .andReturn();
+        log.debug("{}:: Retrieve organisation response by status: {}", loggingComponentName, response.getStatusCode());
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
 
         return response.body().as(Map.class);
     }
