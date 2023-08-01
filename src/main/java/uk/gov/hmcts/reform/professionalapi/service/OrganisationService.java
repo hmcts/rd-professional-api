@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
@@ -63,5 +64,7 @@ public interface OrganisationService {
             List<ContactInformationCreationRequest> contactInformationCreationRequest, String organisationIdentifier);
 
     void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet);
+
+    void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier);
 
 }
