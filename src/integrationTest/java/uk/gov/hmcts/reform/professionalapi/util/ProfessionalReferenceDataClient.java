@@ -447,6 +447,27 @@ public class ProfessionalReferenceDataClient {
         return organisationResponse;
     }
 
+    public Map<String, Object> updateOrganisationForV2Api(
+            OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
+
+        ResponseEntity<OrganisationResponse> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH + "/" + organisationIdentifier;
+        try {
+            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
+                    getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> organisationResponse = new HashMap<>();
+        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return organisationResponse;
+    }
+
     public String getAndReturnBearerToken(String userId, String role) {
         String bearerToken;
         if (bearerTokenMap.get(role) == null && userId != null) {

@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 public class OrganisationOtherOrgsCreationRequest extends OrganisationCreationRequest {
 
-    private final String orgTypeKey;
+    private  String orgTypeKey;
 
     private List<OrgAttributeRequest> orgAttributes;
 
