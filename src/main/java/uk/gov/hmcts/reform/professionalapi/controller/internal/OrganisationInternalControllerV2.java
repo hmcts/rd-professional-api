@@ -14,13 +14,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -184,5 +188,56 @@ public class OrganisationInternalControllerV2 extends SuperController {
         var userEmail = getUserEmailFromHeader();
         //Received request to retrieve an organisations payment accounts by email for internal
         return retrievePaymentAccountByUserEmailForV2Api(userEmail);
+    }
+
+    @Operation(
+            summary = "Updates an Organisation",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Organisation has been updated",
+            content = @Content(schema = @Schema(implementation = String.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "If Organisation request sent with null/invalid values for mandatory fields",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation found with the given ID",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
+    @PutMapping(
+            value = "/{orgId}",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    @Secured("prd-admin")
+    public ResponseEntity<Object> updatesOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+            @Valid @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @Parameter(hidden = true) @UserId String userId) {
+
+
+        return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }
 }

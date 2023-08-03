@@ -551,6 +551,15 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
 
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            organisation.setOrgTypekey(orgCreationRequestV2.getOrgTypeKey());
+        }
+
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
+
+        }
+
         if (TRUE.equals(isOrgApprovalRequest)) {
             organisation.setDateApproved(LocalDateTime.now());
         }
@@ -563,6 +572,15 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         return new OrganisationResponse(organisation);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        UUID value = organisation.getId();
+        orgAttributeRepository.deleteByOrganistion(value);
     }
 
     public void updatePaymentAccounts(List<PaymentAccount> pbas) {

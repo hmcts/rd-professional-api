@@ -921,7 +921,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(organisationCreationRequest)
-                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .put("/refdata/internal/v2/organisations/" + organisationIdentifier)
                 .andReturn();
 
         log.info("{}:: Update organisation response: {}", loggingComponentName, response.getStatusCode());
