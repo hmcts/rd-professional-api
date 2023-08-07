@@ -566,6 +566,15 @@ bootJar {
     }
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        // Remedy for CVE-2020-8908, ensures launchdarkly uses correct version
+        if (details.requested.group == 'com.google.guava'
+                && details.requested.name == 'guava') {
+            details.useVersion "32.1.1-jre"
+        }
+    }
+}
 
 // this is required to force Java running on the Azure Windows Server OS into using
 // UTF-8 as the default character set instead of windows-1252 which causes issues.
