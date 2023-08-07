@@ -55,4 +55,12 @@ file name: launchdarkly-java-server-sdk-5.10.7.jar (shaded: org.yaml:snakeyaml:1
         <cve>CVE-2020-8908</cve>
     </suppress>
 
+    <suppress>
+        <notes><![CDATA[
+             file name: launchdarkly-java-server-sdk-5.1.1.jar (shaded: com.google.guava:guava:28.2-jre)
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
+        <cve>CVE-2020-8908</cve>
+    </suppress>
+
 </suppressions>
