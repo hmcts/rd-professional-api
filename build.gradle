@@ -367,7 +367,9 @@ dependencies {
     implementation group: 'org.glassfish', name: 'javax.el', version: '3.0.0'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
+    implementation (group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk) {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
 
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
@@ -380,7 +382,9 @@ dependencies {
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-alpha-3'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.2'
+    implementation (group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.2') {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
 
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.5'
