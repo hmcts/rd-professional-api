@@ -24,6 +24,10 @@ file name: launchdarkly-java-server-sdk-5.10.7.jar (shaded: org.yaml:snakeyaml:1
     <notes>Suppressing disputed CVE: https://github.com/FasterXML/jackson-databind/issues/3972</notes>
     <cve>CVE-2023-35116</cve>
   </suppress>
+  <suppress>
+    <notes>Suppressing, com.google.common.io.Files.createTempDir() marked as deprecated in library and no remedy available</notes>
+    <cve>CVE-2020-8908</cve>
+  </suppress>
 
     <suppress>
         <notes>Temporary suppression for CVE fix</notes>
