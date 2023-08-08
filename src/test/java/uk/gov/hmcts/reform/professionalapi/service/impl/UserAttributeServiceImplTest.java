@@ -28,7 +28,9 @@ class UserAttributeServiceImplTest {
     private final UserAttributeServiceImpl sut
             = new UserAttributeServiceImpl(userAttributeRepositoryMock, prdEnumRepositoryMock, prdEnumServiceMock);
 
-    private final PrdEnumId prdEnumIdMock = new PrdEnumId(1, "PRD_ROLE");
+    private final PrdEnumId prdEnumIdMock = new PrdEnumId(1, "SIDAM_ROLE");
+
+
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
             null, null, null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
@@ -44,8 +46,8 @@ class UserAttributeServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        anEnum = new PrdEnum(prdEnumIdMock, "pui-user-manager", "SIDAM_ROLE");
-        anEnum1 = new PrdEnum(prdEnumIdMock, "pui-user-manager", "JURISD_ID");
+        anEnum = new PrdEnum(prdEnumIdMock, "pui-user-manager", "prd-description");
+        anEnum1 = new PrdEnum(prdEnumIdMock, "pui-user-manager", "prd-description-test");
         userAttributes.add(userAttribute);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
         prdEnums.add(anEnum);
@@ -74,6 +76,11 @@ class UserAttributeServiceImplTest {
 
         assertThat(userAttributeResponse).isNotNull().isNotEmpty();
         assertThat(professionalUser.getUserAttributes()).isNotNull();
+        assertThat(userAttributeResponse.get(0).getPrdEnum().getEnumName()).isEqualTo("pui-user-manager");
+        assertThat(userAttributeResponse.get(0).getPrdEnum().getPrdEnumId().getEnumCode()).isEqualTo(1);
+        assertThat(userAttributeResponse.get(0).getPrdEnum().getPrdEnumId().getEnumType()).isEqualTo("SIDAM_ROLE");
+        assertThat(userAttributeResponse.get(0).getPrdEnum().getEnumDescription()).isEqualTo("prd-description");
+
         verify(userAttributeRepositoryMock, times(1)).saveAll(any());
     }
 
@@ -88,6 +95,10 @@ class UserAttributeServiceImplTest {
 
         assertThat(userAttributeResponse).isNotNull().isNotEmpty();
         assertThat(professionalUser.getUserAttributes()).isNotNull();
+        assertThat(userAttributeResponse.get(0).getPrdEnum().getEnumName()).isEqualTo("pui-user-manager");
+        assertThat(userAttributeResponse.get(0).getPrdEnum().getPrdEnumId().getEnumCode()).isEqualTo(1);
+        assertThat(userAttributeResponse.get(0).getPrdEnum().getPrdEnumId().getEnumType()).isEqualTo("SIDAM_ROLE");
+        assertThat(userAttributeResponse.get(0).getPrdEnum().getEnumDescription()).isEqualTo("prd-description-test");
         verify(userAttributeRepositoryMock, times(1)).saveAll(any());
     }
 

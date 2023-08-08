@@ -138,10 +138,8 @@ class PaymentAccountServiceImplTest {
     @Test
     void testEditPaymentAccountsByOrganisationIdentifier() {
 
-        Organisation organisationMock = mock(Organisation.class);
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
-        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);

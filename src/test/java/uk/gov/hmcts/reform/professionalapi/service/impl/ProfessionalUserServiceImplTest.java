@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -81,6 +82,8 @@ class ProfessionalUserServiceImplTest {
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
     private final FeignException feignExceptionMock = mock(FeignException.class);
+
+    private final RefDataUtil refDataUtil = mock(RefDataUtil.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
             null, null, null);
@@ -676,6 +679,7 @@ class ProfessionalUserServiceImplTest {
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        assertThat(newResponse.getBody().getIdamStatus()).isNull();
     }
 
     @Test
