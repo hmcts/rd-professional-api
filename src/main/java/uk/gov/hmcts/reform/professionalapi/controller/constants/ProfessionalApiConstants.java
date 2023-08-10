@@ -89,6 +89,13 @@ public class ProfessionalApiConstants {
 
     public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
     public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
+    public static final String PRD_RETRIEVE_ORGANISATION_EXTERNAL_V2 = "prd-retrieve-organisation-external-v2";
+    public static final String PRD_CREATE_ORGANISATION_EXTERNAL_V2 = "prd-create-organisation-external-v2";
+    public static final String PRD_RETRIEVE_ORGANISATION_PBA_EXTERNAL_V2 = "prd-retrieve-organisation-pba-external-v2";
+    public static final String PRD_UPDATE_ORGANISATION_INTERNAL_V2 = "prd-update-organisation-internal-v2";
+    public static final String PRD_RETRIEVE_ORGANISATION_INTERNAL_V2 = "prd-retrieve-organisation-internal-v2";
+    public static final String PRD_CREATE_ORGANISATION_INTERNAL_V2 = "prd-create-organisation-internal-v2";
+    public static final String PRD_RETRIEVE_ORGANISATION_PBA_INTERNAL_V2 = "prd-retrieve-organisation-pba-internal-v2";
     public static final String RD_PROFESSIONAL_MULTIPLE_ADDRESS = "rd-professional-multiple-address";
     public static final String ERROR_MSG_ORG_ADDRESS = "Organisation should have at least one address";
     public static final String ERROR_MSG_ORG_NOT_EXIST = "Organisation does not exist";

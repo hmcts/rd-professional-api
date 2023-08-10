@@ -11,7 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_CREATE_ORGANISATION_EXTERNAL_V2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_CREATE_ORGANISATION_INTERNAL_V2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_MFA_LD_FLAG;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_RETRIEVE_ORGANISATION_EXTERNAL_V2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_RETRIEVE_ORGANISATION_INTERNAL_V2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_RETRIEVE_ORGANISATION_PBA_EXTERNAL_V2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_RETRIEVE_ORGANISATION_PBA_INTERNAL_V2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_UPDATE_ORGANISATION_INTERNAL_V2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTIPLE_ADDRESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTI_PBA_LD_FLAG;
 
@@ -58,6 +65,21 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_PROFESSIONAL_MULTIPLE_ADDRESS);
         launchDarklyMap.put("OrganisationExternalController.deleteMultipleAddressesOfOrganisation",
                 RD_PROFESSIONAL_MULTIPLE_ADDRESS);
+        launchDarklyMap.put("OrganisationExternalControllerV2.createOrganisationUsingExternalController",
+            PRD_RETRIEVE_ORGANISATION_EXTERNAL_V2);
+        launchDarklyMap.put("OrganisationExternalControllerV2.retrieveOrganisationUsingOrgIdentifier",
+            PRD_CREATE_ORGANISATION_EXTERNAL_V2);
+        launchDarklyMap.put("OrganisationExternalControllerV2.retrievePaymentAccountByUserEmail",
+            PRD_RETRIEVE_ORGANISATION_PBA_EXTERNAL_V2);
+        launchDarklyMap.put("OrganisationInternalControllerV2.retrieveOrganisations",
+            PRD_RETRIEVE_ORGANISATION_INTERNAL_V2);
+        launchDarklyMap.put("OrganisationInternalControllerV2.createOrganisation",
+            PRD_CREATE_ORGANISATION_INTERNAL_V2);
+        launchDarklyMap.put("OrganisationInternalControllerV2.updatesOrganisation",
+            PRD_UPDATE_ORGANISATION_INTERNAL_V2);
+        launchDarklyMap.put("OrganisationInternalControllerV2.retrievePaymentAccountBySuperUserEmail",
+            PRD_RETRIEVE_ORGANISATION_PBA_INTERNAL_V2);
+
 
     }
 
