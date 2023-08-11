@@ -208,6 +208,7 @@ class PaymentAccountServiceImplTest {
         assertThat(sut.generateListOfAccountsToDelete(prefU, paymentAccounts)).isNotNull();
         listUserMap = sut.generateListOfAccountsToDelete(prefU, paymentAccounts);
         assertThat(listUserMap.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
+        assertThat(listUserMap.get(0).getPaymentAccount().getPbaNumber()).isEqualTo("PBA1234567");
     }
 
     @Test
@@ -259,6 +260,8 @@ class PaymentAccountServiceImplTest {
         assertThat(response.getPbaUpdateStatusResponses().get(0).getPbaNumber()).contains("PBA123");
         assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage())
                 .contains(ERROR_MSG_PBA_INVALID_FORMAT);
+        assertThat(pbaRequestList.get(0).getPbaNumber()).isEqualTo("PBA1234567");
+        assertThat(pbaRequestList.get(1).getPbaNumber()).isEqualTo("PBA123");
     }
 
     @Test
@@ -331,6 +334,9 @@ class PaymentAccountServiceImplTest {
         List<PbaUpdateStatusResponse> response = sut.acceptOrRejectPbas(pbasFromDb, pbaRequestList, new ArrayList<>());
 
         assertThat(response).isNotNull();
+        assertThat(pbaRequestList.get(0).getPbaNumber()).isEqualTo("PBA1234567");
+        assertThat(pbaRequestList.get(1).getPbaNumber()).isEqualTo("PBA7654321");
+
         verify(paymentAccount, times(1)).setPbaStatus(ACCEPTED);
         verify(paymentAccount, times(1)).setStatusMessage("ACCEPTED STATUS");
         verify(paymentAccountRepositoryMock, times(1)).deleteAll(any());
