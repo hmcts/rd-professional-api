@@ -87,7 +87,7 @@ public class Organisation implements Serializable {
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
 
-    @Column(name = "ORG_TYPE_KEY")
+    @Column(name = "ORG_TYPE")
     private String orgTypekey;
 
     @CreatedDate
