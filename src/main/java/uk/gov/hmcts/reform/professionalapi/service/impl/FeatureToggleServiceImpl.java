@@ -65,9 +65,9 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_PROFESSIONAL_MULTIPLE_ADDRESS);
         launchDarklyMap.put("OrganisationExternalController.deleteMultipleAddressesOfOrganisation",
                 RD_PROFESSIONAL_MULTIPLE_ADDRESS);
-        launchDarklyMap.put("OrganisationExternalControllerV2.createOrganisationUsingExternalController",
-            PRD_RETRIEVE_ORGANISATION_EXTERNAL_V2);
         launchDarklyMap.put("OrganisationExternalControllerV2.retrieveOrganisationUsingOrgIdentifier",
+            PRD_RETRIEVE_ORGANISATION_EXTERNAL_V2);
+        launchDarklyMap.put("OrganisationExternalControllerV2.createOrganisationUsingExternalController",
             PRD_CREATE_ORGANISATION_EXTERNAL_V2);
         launchDarklyMap.put("OrganisationExternalControllerV2.retrievePaymentAccountByUserEmail",
             PRD_RETRIEVE_ORGANISATION_PBA_EXTERNAL_V2);
