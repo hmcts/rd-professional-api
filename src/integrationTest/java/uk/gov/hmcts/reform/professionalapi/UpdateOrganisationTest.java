@@ -405,7 +405,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
         OrganisationOtherOrgsCreationRequest organisationUpdateRequest = otherOrganisationRequestWithAllFields();
         organisationUpdateRequest.setStatus("ACTIVE");
         organisationUpdateRequest.setOrgAttributes(orgAttributeRequests);
-        organisationUpdateRequest.setOrgTypeKey("updatedOrgTypeKey");
+        organisationUpdateRequest.setOrgType("updatedOrgTypeKey");
 
         String organisationIdentifier = createOrganisationRequestForV2();
         Map<String, Object> responseForOrganisationUpdate =

@@ -324,7 +324,7 @@ class OrganisationServiceImplTest {
         assertThat(organisationOtherOrgsCreationRequest.getStatusMessage()).isEqualTo("In review");
         assertThat(organisationOtherOrgsCreationRequest.getSraId()).isEqualTo("sra-id");
         assertThat(organisationOtherOrgsCreationRequest.getSraRegulated()).isEqualTo("false");
-        assertThat(organisationOtherOrgsCreationRequest.getOrgTypeKey()).isEqualTo("Doctor");
+        assertThat(organisationOtherOrgsCreationRequest.getOrgType()).isEqualTo("Doctor");
         assertThat(organisationOtherOrgsCreationRequest.getOrgAttributes()).isNotNull();
 
         verify(organisationRepository, times(1)).save(any(Organisation.class));
@@ -618,7 +618,7 @@ class OrganisationServiceImplTest {
         verify(organisationMock, times(1)).setName((organisationOtherOrgsCreationRequest
                 .getName()));
         verify(organisationMock, times(1)).setOrgType(organisationOtherOrgsCreationRequest
-                .getOrgTypeKey());
+                .getOrgType());
         verify(organisationMock, times(1)).setOrgAttributes(any());
         verify(organisationMock, times(1))
                 .setStatus((OrganisationStatus.valueOf(organisationOtherOrgsCreationRequest.getStatus())));

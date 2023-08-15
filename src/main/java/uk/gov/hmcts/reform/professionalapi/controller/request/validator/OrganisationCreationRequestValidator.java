@@ -68,7 +68,7 @@ public class OrganisationCreationRequestValidator {
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            validateOrgTypeKey(orgCreationRequestV2.getOrgTypeKey());
+            validateOrgTypeKey(orgCreationRequestV2.getOrgType());
             validateOrgAttributesRequest(orgCreationRequestV2.getOrgAttributes());
         }
     }
