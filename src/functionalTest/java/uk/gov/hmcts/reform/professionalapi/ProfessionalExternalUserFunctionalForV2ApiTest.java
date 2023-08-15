@@ -178,7 +178,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
-    @ToggleEnable(mapKey = "OrganisationExternalControllerV2.retrievePaymentAccountByUserEmail", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationExternalControllerV2.retrievePaymentAccountByEmail", withFeature = true)
     void retrieveOrganisationPbaScenarios() {
         findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequestV2();
     }

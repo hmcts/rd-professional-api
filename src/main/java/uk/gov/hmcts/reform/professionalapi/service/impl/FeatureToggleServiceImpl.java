@@ -69,8 +69,6 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
             PRD_RETRIEVE_ORGANISATION_EXTERNAL_V2);
         launchDarklyMap.put("OrganisationExternalControllerV2.createOrganisationUsingExternalController",
             PRD_CREATE_ORGANISATION_EXTERNAL_V2);
-        launchDarklyMap.put("OrganisationExternalControllerV2.retrievePaymentAccountByUserEmail",
-            PRD_RETRIEVE_ORGANISATION_PBA_EXTERNAL_V2);
         launchDarklyMap.put("OrganisationInternalControllerV2.retrieveOrganisations",
             PRD_RETRIEVE_ORGANISATION_INTERNAL_V2);
         launchDarklyMap.put("OrganisationInternalControllerV2.createOrganisation",
@@ -79,7 +77,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
             PRD_UPDATE_ORGANISATION_INTERNAL_V2);
         launchDarklyMap.put("OrganisationInternalControllerV2.retrievePaymentAccountBySuperUserEmail",
             PRD_RETRIEVE_ORGANISATION_PBA_INTERNAL_V2);
-
+        launchDarklyMap.put("OrganisationExternalControllerV2.retrievePaymentAccountByEmail",
+            PRD_RETRIEVE_ORGANISATION_PBA_EXTERNAL_V2);
 
     }
 
