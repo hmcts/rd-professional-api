@@ -37,7 +37,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
     @Test
-    @DisplayName("PRD Internal Test Scenarios")
+    @DisplayName("PRD Internal Test Scenarios For V2 API")
     void testInternalUserScenario() {
         setUpTestData();
         createOrganisationScenario();

@@ -151,7 +151,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         );
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            newOrganisation.setOrgTypekey(orgCreationRequestV2.getOrgTypeKey());
+            newOrganisation.setOrgType(orgCreationRequestV2.getOrgTypeKey());
         }
 
         var organisation = saveOrganisation(newOrganisation);
@@ -552,7 +552,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            organisation.setOrgTypekey(orgCreationRequestV2.getOrgTypeKey());
+            organisation.setOrgType(orgCreationRequestV2.getOrgTypeKey());
         }
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {

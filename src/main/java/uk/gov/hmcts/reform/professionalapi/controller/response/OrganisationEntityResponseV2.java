@@ -46,7 +46,7 @@ public class OrganisationEntityResponseV2 extends OrganisationMinimalInfoRespons
     private LocalDateTime dateApproved = null;
 
     @JsonProperty
-    private String orgTypeKey;
+    private String orgType;
 
     @JsonProperty
     private List<OrgAttributeResponse> orgAttributes;
@@ -78,7 +78,7 @@ public class OrganisationEntityResponseV2 extends OrganisationMinimalInfoRespons
         this.statusMessage = organisation.getStatusMessage();
         this.sraId = organisation.getSraId();
         this.sraRegulated = organisation.getSraRegulated();
-        this.orgTypeKey = organisation.getOrgTypeKey();
+        this.orgType = organisation.getOrgType();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
         if (!organisation.getUsers().isEmpty()) {

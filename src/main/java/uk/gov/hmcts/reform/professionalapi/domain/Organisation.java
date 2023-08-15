@@ -88,7 +88,7 @@ public class Organisation implements Serializable {
     private LocalDateTime lastUpdated;
 
     @Column(name = "ORG_TYPE")
-    private String orgTypekey;
+    private String orgType;
 
     @CreatedDate
     @Column(name = "CREATED")
@@ -148,8 +148,8 @@ public class Organisation implements Serializable {
         return id;
     }
 
-    public String getOrgTypeKey() {
-        return orgTypekey;
+    public String getOrgType() {
+        return orgType;
     }
 
     public List<OrgAttribute> getOrgAttributes() {

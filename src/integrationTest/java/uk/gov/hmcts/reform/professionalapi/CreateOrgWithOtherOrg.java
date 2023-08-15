@@ -66,7 +66,7 @@ class CreateOrgWithOtherOrg extends AuthorizationEnabledIntegrationTest {
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getOrgTypeKey()).isEqualTo("Doctor");
+        assertThat(persistedOrganisation.getOrgType()).isEqualTo("Doctor");
         assertThat(persistedOrganisation.getOrgAttributes().size()).isEqualTo(1);
     }
 }
