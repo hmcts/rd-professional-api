@@ -51,7 +51,10 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         retrieveOrganisationPbaScenarios();
     }
 
-
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalControllerV2"
+        + ".createOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void setUpTestData() {
         superUserEmail = generateRandomEmail();
         invitedUserEmail = generateRandomEmail();

@@ -61,6 +61,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
 
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
+        + ".createOrganisationUsingExternalController", withFeature = true)
     void setUpOrgTestData() {
         if (isEmpty(extActiveOrgId)) {
             log.info("Setting up organization...");
