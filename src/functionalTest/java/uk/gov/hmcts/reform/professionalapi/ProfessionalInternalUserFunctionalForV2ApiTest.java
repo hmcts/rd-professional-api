@@ -7,12 +7,15 @@ import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +48,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         retrieveOrganisationPbaScenarios();
     }
 
-    public void setUpTestData() {
+
+    void setUpTestData() {
         superUserEmail = generateRandomEmail();
         invitedUserEmail = generateRandomEmail();
         organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
@@ -61,7 +65,11 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
  
     }
 
-    public void createOrganisationScenario() {
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalControllerV2"
+        + ".createOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void createOrganisationScenario() {
         createOrganisationWithoutS2STokenShouldReturnAuthorised();
     }
 
@@ -71,8 +79,11 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         inviteUserWithDuplicateUserShouldReturnConflict(newUserCreationRequest);
     }
 
-
-    public void findOrganisationScenarios() {
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalControllerV2"
+        + ".retrieveOrganisations", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void findOrganisationScenarios() {
         findOrganisationByIdByInternalUserShouldBeSuccess();
         findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         findActiveOrganisationsByInternalUserShouldBeSuccess();
@@ -81,12 +92,15 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess();
     }
 
-    public void retrieveOrganisationPbaScenarios() {
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalControllerV2"
+        + ".retrievePaymentAccountBySuperUserEmail", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void retrieveOrganisationPbaScenarios() {
         findOrganisationPbaWithEmailByInternalUserShouldBeSuccess();
         findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess();
         findOrganisationPbaWithoutEmailByInternalUserShouldBeBadRequest();
     }
-
 
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
@@ -142,7 +156,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         professionalApiClient.createOrganisation();
         Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisationsV2(hmctsAdmin);
         assertThat(finalResponse.get("organisations")).isNotNull();
-        Assertions.assertThat(finalResponse.size()).isPositive();
+        Assertions.assertThat(finalResponse).isNotEmpty();
         log.info("findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
@@ -150,7 +164,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("findActiveOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatusV2(OrganisationStatus.PENDING.name(), hmctsAdmin);
-        assertThat(response.size()).isPositive();
+        assertThat(response).isNotEmpty();
         log.info("findActiveOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
@@ -159,7 +173,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatusV2(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
-        assertThat(response.size()).isPositive();
+        assertThat(response).isNotEmpty();
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
@@ -168,7 +182,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatusV2("ACTIVE,PENDING", hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
-        assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response).isNotEmpty();
         assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
         assertThat(response.get("organisations").toString()).contains("status=PENDING");
         log.info("findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess :: END");
@@ -188,7 +202,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
         assertThat(orgresponse.get("organisations")).isNotNull();
-        assertThat(orgresponse.size()).isGreaterThanOrEqualTo(1);
+        assertThat(orgresponse).isNotEmpty();
         assertThat(orgresponse.get("organisations").toString()).contains("status=PENDING");
         assertThat(orgresponse.get("organisations").toString()).contains("status=REVIEW");
         log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: END");
@@ -223,6 +237,9 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
     @Test
+    @ToggleEnable(mapKey = "OrganisationInternalControllerV2"
+        + ".retrieveOrganisations", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisationV2();
