@@ -6,10 +6,13 @@ import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +50,18 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     @DisplayName("PRD External Test Scenarios")
-    void testExternalUserScenario() {
+   void testExternalUserScenario() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
         retrieveOrganisationPbaScenarios();
         findOrganisationScenarios();
     }
 
-    public void setUpOrgTestData() {
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
+        + ".createOrganisationUsingExternalController", withFeature = true)
+    void setUpOrgTestData() {
         if (isEmpty(extActiveOrgId)) {
             log.info("Setting up organization...");
             superUserEmail = generateRandomEmail();
@@ -95,8 +102,11 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         }
     }
 
-
-    public void findOrganisationScenarios() {
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
+        + ".retrieveOrganisationUsingOrgIdentifier", withFeature = true)
+    void findOrganisationScenarios() {
         findOrgByPfmShouldBeSuccess();
         findOrgByPomShouldBeSuccess();
         findOrgByPumShouldBeSuccess();
@@ -109,7 +119,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternalV2(OK,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
-        assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
+        assertThat(response.get("pendingPaymentAccount")).asList().isEmpty();
         assertThat(response.get("orgTypeKey")).isEqualTo("Doctor");
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPfmShouldBeSuccess :: END");
@@ -121,7 +131,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternalV2(OK,
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
-        assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
+        assertThat(response.get("pendingPaymentAccount")).asList().isEmpty();
         assertThat(response.get("orgTypeKey")).isEqualTo("Doctor");
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPomShouldBeSuccess :: END");
@@ -162,8 +172,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
 
-
-    public void retrieveOrganisationPbaScenarios() {
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = "OrganisationExternalControllerV2.retrievePaymentAccountByUserEmail", withFeature = true)
+    void retrieveOrganisationPbaScenarios() {
         findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequestV2();
     }
 
