@@ -50,6 +50,9 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     @DisplayName("PRD External Test Scenarios")
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
+        + ".retrieveOrganisationUsingOrgIdentifier", withFeature = true)
    void testExternalUserScenario() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
@@ -57,10 +60,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findOrganisationScenarios();
     }
 
-    @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
-        + ".retrieveOrganisationUsingOrgIdentifier", withFeature = true)
+
     void setUpOrgTestData() {
         if (isEmpty(extActiveOrgId)) {
             log.info("Setting up organization...");
