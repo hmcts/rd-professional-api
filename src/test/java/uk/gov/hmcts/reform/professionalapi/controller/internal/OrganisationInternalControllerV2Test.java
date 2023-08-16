@@ -277,7 +277,7 @@ class OrganisationInternalControllerV2Test {
 
         organisationOtherOrgsCreationRequest.setStatusMessage("Company in review");
         organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
-        organisationOtherOrgsCreationRequest.setOrgType("testOrgTypeKey");
+        organisationOtherOrgsCreationRequest.setOrgType("testOrgType");
 
         SuperUser superUser = new SuperUser();
         organisation.setUsers(Collections.singletonList(superUser));

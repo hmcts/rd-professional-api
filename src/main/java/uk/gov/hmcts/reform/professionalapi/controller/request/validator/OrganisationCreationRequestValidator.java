@@ -32,8 +32,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_KEY_INVALID;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_KEY_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_INVALID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 @Component
@@ -68,7 +68,7 @@ public class OrganisationCreationRequestValidator {
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            validateOrgTypeKey(orgCreationRequestV2.getOrgType());
+            validateOrgType(orgCreationRequestV2.getOrgType());
             validateOrgAttributesRequest(orgCreationRequestV2.getOrgAttributes());
         }
     }
@@ -112,11 +112,11 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
-    public void validateOrgTypeKey(String orgTypeKey) {
-        if (orgTypeKey == null || orgTypeKey.trim().isEmpty()) {
-            throw new InvalidRequest("orgTypekey must not be null/empty");
-        } else if (!orgTypeKey.matches(ORG_TYPE_KEY_REGEX)) {
-            throw new InvalidRequest(ORG_TYPE_KEY_INVALID);
+    public void validateOrgType(String orgType) {
+        if (orgType == null || orgType.trim().isEmpty()) {
+            throw new InvalidRequest("orgType must not be null/empty");
+        } else if (!orgType.matches(ORG_TYPE_REGEX)) {
+            throw new InvalidRequest(ORG_TYPE_INVALID);
         }
     }
 
