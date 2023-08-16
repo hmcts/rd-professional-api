@@ -509,7 +509,7 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
-    void test_validateErrorMessageWhenOrgTypeIsNotMatchingTheREGEX() {
+    void test_validateErrorMessageWhenOrgTypeIsNotMatchingTheRegex() {
 
         Throwable thrown = catchThrowable(() -> {
             organisationCreationRequestValidator
@@ -518,10 +518,11 @@ class OrganisationCreationRequestValidatorTest {
 
         assertThat(thrown)
                 .isInstanceOf(InvalidRequest.class)
-                .hasMessageContaining("Org Type is invalid - can only contain Alphabetic, empty space, ', " +
-                        "- characters and must be less than 256 characters");
+                .hasMessageContaining("Org Type is invalid - can only contain Alphabetic, empty space, ', "
+                        + "- characters and must be less than 256 characters");
 
     }
+
     @ParameterizedTest
     @CsvSource({
             "'',testValue",
