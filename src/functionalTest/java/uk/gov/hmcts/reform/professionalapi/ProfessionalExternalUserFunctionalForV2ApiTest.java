@@ -50,7 +50,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     @DisplayName("PRD External Test Scenarios")
-    @ToggleEnable(mapKey = "OrganisationExternalControllerV2.retrieveOrganisationUsingOrgIdentifier", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
+        + ".retrieveOrganisationUsingOrgIdentifier", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void testExternalUserScenario() {
         setUpOrgTestData();
