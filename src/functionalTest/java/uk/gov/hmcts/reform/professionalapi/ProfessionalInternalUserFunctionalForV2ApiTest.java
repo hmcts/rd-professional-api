@@ -228,23 +228,15 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationInternalControllerV2.retrieveOrganisations", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
-        createOrganisationV2();
+        professionalApiClient.createOrganisationV2();
         Map<String, Object> organisations = professionalApiClient
             .retrieveAllOrganisationsWithPaginationV2(hmctsAdmin, "1", "10");
 
         assertThat(organisations).isNotNull().hasSize(1);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
-
-    @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    private static void createOrganisationV2() {
-        professionalApiClient.createOrganisationV2();
-    }
-
-
 }
