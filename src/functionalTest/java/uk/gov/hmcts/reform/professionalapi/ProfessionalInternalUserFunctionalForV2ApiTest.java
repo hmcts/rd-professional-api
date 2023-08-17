@@ -239,6 +239,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(organisations).isNotNull().hasSize(1);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
+
     @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     private static void createOrganisationV2() {
