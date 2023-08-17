@@ -7,12 +7,15 @@ import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +41,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     @DisplayName("PRD Internal Test Scenarios")
+    @ToggleEnable(mapKey = "OrganisationInternalControllerV2.retrieveOrganisations", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void testInternalUserScenario() {
         setUpTestData();
         createOrganisationScenario();
@@ -223,6 +228,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
     @Test
+    @ToggleEnable(mapKey = "OrganisationInternalControllerV2.retrieveOrganisations", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisationV2();
