@@ -29,6 +29,8 @@ file name: launchdarkly-java-server-sdk-5.10.7.jar (shaded: org.yaml:snakeyaml:1
         <notes>Temporary suppression for CVE fix</notes>
         <cve>CVE-2023-2976</cve>
         <cve>CVE-2023-34462</cve>
+        <cve>CVE-2022-45046</cve>
+        <cve>CVE-2023-34442</cve>
     </suppress>
 
 </suppressions>
