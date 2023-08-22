@@ -386,6 +386,16 @@ dependencies {
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.5'
 
+    //Added below dependencies for shedlock
+    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.2.0'
+    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.2.0'
+
+    implementation ('com.github.hmcts:data-ingestion-lib:0.5.2.5') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+        exclude group: 'org.glassfish', module: 'jakarta.el'
+    }
+
+
     implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.7'
     implementation group: 'org.json', name: 'json', version: '20230227'
 
