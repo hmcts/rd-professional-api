@@ -1,0 +1,23 @@
+professional-user-details-start-route: direct:Professional-UserDetails
+professional-user-details-route-task: userDetailsRouteTask
+professional-user-details-routes-to-execute: professional-user-details-load
+route:
+  #Route: professional-user-details-load
+  professional-user-details-load:
+    id: professional-user-details-load
+    file-name: UserDetails.csv
+    table-name: user_details
+    truncate-sql:
+      sql:truncate table user_details restart identity cascade?dataSource=dataSource
+    insert-sql:
+      sql:insert into user_details (id,first_name,last_name)
+      values (:#id,:#first_name,:#last_name)?batch=true&dataSource=dataSource
+
+    blob-path:
+      azure-blob://${azure.storage.account-name}/rd-common-data/UserDetails.csv?credentials=#credsreg&operation=updateBlockBlob
+    processor-class: userDetailsProcessor
+    mapper-class: userDetailsMapper
+    csv-binder-object: UserDetails
+    csv-headers-expected: id,first_name,last_name
+    header-validation-enabled: true
+

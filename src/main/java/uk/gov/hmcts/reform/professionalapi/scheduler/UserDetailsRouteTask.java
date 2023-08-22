@@ -36,8 +36,8 @@ public class UserDetailsRouteTask implements Tasklet {
     @Autowired
     CamelContext camelContext;
 
-//    @Autowired
-//    DataLoadRoute dataLoadRoute;
+    @Autowired
+    DataLoadRoute dataLoadRoute;
 
     @Value("${logging-component-name}")
     String logComponentName;
@@ -45,7 +45,7 @@ public class UserDetailsRouteTask implements Tasklet {
     @PostConstruct
     public void init() {
         camelContext.getGlobalOptions().put(ORCHESTRATED_ROUTE, JUDICIAL_REF_DATA_ORCHESTRATION);
-//        dataLoadRoute.startRoute(startRoute, routesToExecute);
+        dataLoadRoute.startRoute(startRoute, routesToExecute);
     }
 
 
