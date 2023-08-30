@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.professionalapi.BaseProviderTest;
 public abstract class MockMvcProviderTest extends BaseProviderTest {
 
     MockMvcTestTarget testTarget = new MockMvcTestTarget();
-
     @BeforeEach
     void before(PactVerificationContext context) {
         this.setController();
