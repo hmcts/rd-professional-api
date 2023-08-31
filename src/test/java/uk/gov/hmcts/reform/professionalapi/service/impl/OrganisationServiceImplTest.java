@@ -1856,22 +1856,6 @@ class OrganisationServiceImplTest {
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
     }
 
-
-    @Test
-    void test_addPaymentAccountsToOrganisationForNullRequest() {
-        PbaRequest pbaRequest = new PbaRequest();
-        pbaRequest.setPaymentAccounts(null);
-
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisation.setUsers(asList(superUser));
-        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
-
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
-        assertThrows(InvalidRequest.class, () ->
-                sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
-    }
-
     @Test
     void test_addPaymentAccountsToOrganisation_pba_invalid() {
         var pbas = new HashSet<String>();

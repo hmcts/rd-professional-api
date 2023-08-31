@@ -99,12 +99,6 @@ class ProfessionalUserTest {
         List<UserAttribute> userAttributes =  null;
 
 
-        PrdEnumId prdEnumId = new PrdEnumId(1,"test");
-        PrdEnum anEnum = new PrdEnum(prdEnumId,"testenumName","testenumDescription");
-        UserAttribute userAttribute = new UserAttribute(professionalUser, anEnum);
-        List<UserAttribute> userAttributes =  new ArrayList<>();
-        userAttributes.add(userAttribute);
-
         professionalUser.setLastUpdated(LocalDateTime.now());
         professionalUser.setCreated(LocalDateTime.now());
         professionalUser.setRoles(roles);
