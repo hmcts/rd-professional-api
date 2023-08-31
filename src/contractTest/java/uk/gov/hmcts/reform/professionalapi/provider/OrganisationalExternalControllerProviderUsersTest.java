@@ -54,7 +54,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 @WebMvcTest({OrganisationExternalController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {OrganisationalExternalControllerProviderUsersTestConfiguration.class, WebConfig.class})
-public class OrganisationalExternalControllerProviderUsersTest extends WebMvcProviderTest {
+public class OrganisationalExternalControllerProviderUsersTest extends MockMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
     private static final String USER_JWT = "Bearer some-access-token";
@@ -87,7 +87,10 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
 
-
+    @Override
+    void setController() {
+        testTarget.setControllers(organisationExternalController);
+    }
     @State({"a request to register an organisation"})
     public void toRegisterNewOrganisation() throws IOException {
 
@@ -235,5 +238,6 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         contactInformation.setPostCode("HA5 1BJ");
         organisation.setContactInformations(asList(contactInformation));
     }
+
 
 }
