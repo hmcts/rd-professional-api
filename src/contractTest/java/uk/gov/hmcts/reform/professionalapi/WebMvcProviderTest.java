@@ -15,6 +15,6 @@ public class WebMvcProviderTest extends BaseProviderTest {
         if (context != null) {
             context.setTarget(testTarget);
         }
-        testTarget.setControllers(new OrganisationExternalController());
+
     }
 }
