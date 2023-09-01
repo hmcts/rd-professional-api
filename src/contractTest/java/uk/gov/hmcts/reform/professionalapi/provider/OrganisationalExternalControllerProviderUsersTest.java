@@ -16,7 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
@@ -87,6 +86,10 @@ public class OrganisationalExternalControllerProviderUsersTest extends MockMvcPr
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
 
+    @Override
+    void setController() {
+        testTarget.setControllers(organisationExternalController);
+    }
 
     @State({"a request to register an organisation"})
     public void toRegisterNewOrganisation() throws IOException {
@@ -236,9 +239,4 @@ public class OrganisationalExternalControllerProviderUsersTest extends MockMvcPr
         organisation.setContactInformations(asList(contactInformation));
     }
 
-
-    @Override
-    void setController() {
-        testTarget.setControllers(organisationExternalController);
-    }
 }
