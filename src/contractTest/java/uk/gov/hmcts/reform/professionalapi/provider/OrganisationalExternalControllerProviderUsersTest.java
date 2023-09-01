@@ -87,10 +87,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends MockMvcPr
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
 
-    @Override
-    void setController() {
-        testTarget.setControllers(organisationExternalController);
-    }
+
     @State({"a request to register an organisation"})
     public void toRegisterNewOrganisation() throws IOException {
 
@@ -240,4 +237,8 @@ public class OrganisationalExternalControllerProviderUsersTest extends MockMvcPr
     }
 
 
+    @Override
+    void setController() {
+        testTarget.setControllers(organisationExternalController);
+    }
 }
