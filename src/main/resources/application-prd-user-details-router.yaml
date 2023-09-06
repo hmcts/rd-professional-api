@@ -1,20 +1,20 @@
 professional-user-details-start-route: direct:Professional-UserDetails
 professional-user-details-route-task: userDetailsRouteTask
 professional-user-details-routes-to-execute: professional-user-details-load
+start-route: direct:PRD
 route:
   #Route: professional-user-details-load
   professional-user-details-load:
     id: professional-user-details-load
-    file-name: UserDetails.csv
-    table-name: user_details
+    file-name: BulkCustomerIDs.csv
+    table-name: bulk_customer
     truncate-sql:
-      sql:truncate table user_details restart identity cascade?dataSource=dataSource
+      sql:truncate table bulk_customer
     insert-sql:
-      sql:insert into user_details (id,first_name,last_name)
-      values (:#id,:#first_name,:#last_name)?batch=true&dataSource=dataSource
-
+      sql:insert into bulk_customer (organisation_id,bulk_customer_Id,sidam_id,pba)
+      values (:#organisationId,:#bulkCustomerId,:#sidamId,:#sidamId,:#pba)
     blob-path:
-      azure-blob://${azure.storage.account-name}/rd-common-data/UserDetails.csv?credentials=#credsreg&operation=updateBlockBlob
+      azure-blob://${azure.storage.account-name}/prd-ref-data/BulkCustomerIDs.csv?credentials=#credsreg&operation=updateBlockBlob
     processor-class: userDetailsProcessor
     mapper-class: userDetailsMapper
     csv-binder-object: UserDetails

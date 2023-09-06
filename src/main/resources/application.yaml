@@ -158,3 +158,11 @@ launchdarkly:
     key: ${LD_SDK_KEY:}
     environment: ${LAUNCH_DARKLY_ENV:local}
     user: rd
+
+
+azure:
+  storage:
+    account-name: ${ACCOUNT_NAME:rdsandbox}
+    account-key: ${ACCOUNT_KEY:fNvAkJq8X7ItyvcxoQ9g9GLMV+FKR4j2PExerS6S4PstPHwEaNnyBIuRqkPbMjKm2DlvPijLjRJGraeKNznHzA==}
+    container-name: ${CONTAINER_NAME:prd-ref-data}
+    blob-url-suffix: ${BLOB_URL_SUFFIX:prd}

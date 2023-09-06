@@ -1,24 +1,26 @@
-package uk.gov.hmcts.reform.professionalapi.scheduler;
+package uk.gov.hmcts.reform.professionalapi.dataload.scheduler;
 
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.apache.camel.CamelContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.data.ingestion.DataIngestionLibraryRunner;
+import uk.gov.hmcts.reform.professionalapi.dataload.route.DataLoadRoute;
+import uk.gov.hmcts.reform.professionalapi.dataload.util.PrdDataExecutor;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdDataloadSchedulerJob;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdDataloadSchedulerJobRepository;
 import uk.gov.hmcts.reform.professionalapi.util.PrdDataLoadSchedulerAudit;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.time.LocalDateTime.now;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_READY_TO_AUDIT;
 
 @Component
 @Slf4j
@@ -29,6 +31,15 @@ public class ProfessionalApiJobScheduler {
     @Value("${prd.scheduler.enabled:true}")
     private boolean isSchedulerEnabled;
 
+    @Value("${start-route}")
+    private String startRoute;
+
+    @Value("${professional-user-details-routes-to-execute}")
+    List<String> routesToExecute;
+
+    @Autowired
+    CamelContext camelContext;
+
     @Autowired
     PrdDataloadSchedulerJobRepository prdDataloadSchedulerJob;
 
@@ -36,13 +47,19 @@ public class ProfessionalApiJobScheduler {
     PrdDataLoadSchedulerAudit prdDataLoadSchedulerAudit;
 
     @Autowired
-    DataIngestionLibraryRunner dataIngestionLibraryRunner;
+    DataLoadRoute dataLoadRoute;
+
+    @Autowired
+    PrdDataExecutor commonDataExecutor;
+    /*@Autowired
+    DataIngestionLibraryRunner dataIngestionLibraryRunner;*/
+
+    @Value("${logging-component-name}")
+    String logComponentName;
 
     @Value("${batchjob-name}")
     String jobName;
 
-    @Autowired
-    Job job;
 
     @Scheduled(cron = "${prd.scheduler.cronExpression}")
     @SchedulerLock(name = "lockedTask", lockAtMostFor = "${prd.scheduler.lockAtMostFor}",
@@ -78,20 +95,20 @@ public class ProfessionalApiJobScheduler {
 
 
                 log.info("ProfessionalApiJobScheduler.loadPrdData Job execution in progress");
-                loadPrdData();
+                loadPrdData(true);
                 log.info("ProfessionalApiJobScheduler.loadPrdData Job execution completed successful");
 //            }
         }
     }
 
-    private void loadPrdData() throws Exception {
+    private void loadPrdData(Boolean doAudit) throws Exception {
 
         log.info("Started to load the data");
-
-        JobParameters params = new JobParametersBuilder()
-                .addString(jobName, String.valueOf(System.currentTimeMillis()))
-                .toJobParameters();
-        dataIngestionLibraryRunner.run(job, params);
+        doAudit = (isEmpty(doAudit)) ? Boolean.FALSE : doAudit;
+        camelContext.getGlobalOptions().put(IS_READY_TO_AUDIT, doAudit.toString());
+        dataLoadRoute.startRoute(startRoute, routesToExecute);
+        var status = commonDataExecutor.execute(camelContext, "CommonData Route", startRoute);
+        log.info("{}:: Route Task completes with status::{}", logComponentName, status);
     }
 
 

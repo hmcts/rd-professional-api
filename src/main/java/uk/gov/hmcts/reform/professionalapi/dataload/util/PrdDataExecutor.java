@@ -1,4 +1,9 @@
-package uk.gov.hmcts.reform.professionalapi.scheduler;
+package uk.gov.hmcts.reform.professionalapi.dataload.util;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_READY_TO_AUDIT;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
@@ -6,19 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.data.ingestion.camel.service.AuditServiceImpl;
-import uk.gov.hmcts.reform.data.ingestion.camel.util.RouteExecutor;
-
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.data.ingestion.camel.util.MappingConstants.ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.data.ingestion.camel.util.MappingConstants.FAILURE;
+import uk.gov.hmcts.reform.professionalapi.dataload.service.AuditServiceImpl;
 
 @Slf4j
 @Component
 @RefreshScope
-public class CommonDataExecutor extends RouteExecutor {
-
-    private static final String IS_READY_TO_AUDIT = "IS_READY_TO_AUDIT";
+public class PrdDataExecutor extends RouteExecutor {
 
     @Value("${logging-component-name}")
     String logComponentName;
