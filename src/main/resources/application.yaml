@@ -162,7 +162,7 @@ launchdarkly:
 
 azure:
   storage:
-    account-name: ${ACCOUNT_NAME:rdsandbox}
-    account-key: ${ACCOUNT_KEY:fNvAkJq8X7ItyvcxoQ9g9GLMV+FKR4j2PExerS6S4PstPHwEaNnyBIuRqkPbMjKm2DlvPijLjRJGraeKNznHzA==}
-    container-name: ${CONTAINER_NAME:prd-ref-data}
-    blob-url-suffix: ${BLOB_URL_SUFFIX:prd}
+    account-name: ${ACCOUNT_NAME:ACCOUNT_NAME}
+    account-key: ${ACCOUNT_KEY:ACCOUNT_KEY}
+    container-name: ${CONTAINER_NAME:CONTAINER_NAME}
+    blob-url-suffix: ${BLOB_URL_SUFFIX:BLOB_URL_SUFFIX}
