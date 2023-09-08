@@ -31,7 +31,7 @@ public class ProfessionalApiJobScheduler {
     @Value("${prd.scheduler.enabled:true}")
     private boolean isSchedulerEnabled;
 
-    @Value("${start-route}")
+    @Value("${professional-user-details-start-route}")
     private String startRoute;
 
     @Value("${professional-user-details-routes-to-execute}")
@@ -102,13 +102,14 @@ public class ProfessionalApiJobScheduler {
     }
 
     private void loadPrdData(Boolean doAudit) throws Exception {
-
         log.info("Started to load the data");
         doAudit = (isEmpty(doAudit)) ? Boolean.FALSE : doAudit;
         camelContext.getGlobalOptions().put(IS_READY_TO_AUDIT, doAudit.toString());
         dataLoadRoute.startRoute(startRoute, routesToExecute);
         var status = commonDataExecutor.execute(camelContext, "CommonData Route", startRoute);
         log.info("{}:: Route Task completes with status::{}", logComponentName, status);
+        //TODO camel context need to be closed properly
+        camelContext.stop();
     }
 
 

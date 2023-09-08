@@ -75,7 +75,7 @@ public class DataLoadRoute {
     @Autowired
     CommonCsvFieldProcessor commonCsvFieldProcessor;
 
-    @Transactional("txManager")
+    @Transactional
     public void startRoute(String startRoute, List<String> routesToExecute) throws FailedToCreateRouteException {
 
         List<RouteProperties> routePropertiesList = getRouteProperties(routesToExecute);
@@ -111,7 +111,7 @@ public class DataLoadRoute {
                             Optional<String> updateSqlOptional = route.getUpdateSql();
 
                             from(DIRECT_ROUTE + route.getRouteName()).id(DIRECT_ROUTE + route.getRouteName())
-                                .transacted().policy(String.valueOf(Propagation.REQUIRED))
+                                //.transacted("PROPAGATION_REQUIRED")
                                 .process(headerValidationProcessor)
                                 .split(body()).unmarshal().bindy(BindyType.Csv, applicationContext.getBean(route.getBinder()).getClass())
                                 .process(commonCsvFieldProcessor)
@@ -138,8 +138,7 @@ public class DataLoadRoute {
                             //to(DIRECT_ROUTE + route.getRouteName())
                             //with Spring Propagation new for each file
                             from(DIRECT_ROUTE + TRUNCATE_ROUTE_PREFIX + route.getRouteName())
-                                .transacted()
-                                .policy(String.valueOf(Propagation.REQUIRES_NEW))
+                              //  .transacted("PROPAGATION_REQUIRED")
                                 .setHeader(MappingConstants.ROUTE_DETAILS, () -> route)
                                 //checks parent failure status & set header
                                 .process(parentStateCheckProcessor)
