@@ -905,7 +905,7 @@ class OrganisationServiceImplTest {
 
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(organisationIdentifier);
-        verify(organisationMock, times(3)).getStatus();
+        verify(organisationMock, times(4)).getStatus();
         verify(organisationMock, times(1)).setUsers(anyList());
     }
 

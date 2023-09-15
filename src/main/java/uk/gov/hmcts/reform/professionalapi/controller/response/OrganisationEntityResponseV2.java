@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 import java.util.List;
