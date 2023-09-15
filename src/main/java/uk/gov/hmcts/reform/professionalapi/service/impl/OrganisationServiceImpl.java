@@ -135,6 +135,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+    private static final String SHOW_DELETED = "false";
+
     @Override
     @Transactional
     public OrganisationResponse createOrganisationFrom(
@@ -341,7 +343,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     .toList());
             updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
-                    "false", activeOrganisationDtls);
+                    SHOW_DELETED, activeOrganisationDtls);
 
         }
         return updatedOrganisationDetails;
@@ -395,7 +397,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     .toList());
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
-                    "false", activeOrganisationDetails);
+                    SHOW_DELETED, activeOrganisationDetails);
         }
 
         resultingOrganisations.addAll(pendingOrganisations);
@@ -459,7 +461,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     .toList());
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
-                    "false", activeOrganisationDetails);
+                    SHOW_DELETED, activeOrganisationDetails);
         }
 
         resultingOrganisations.addAll(pendingOrganisations);

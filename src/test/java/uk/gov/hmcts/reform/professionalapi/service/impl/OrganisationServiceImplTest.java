@@ -905,7 +905,7 @@ class OrganisationServiceImplTest {
 
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(organisationIdentifier);
-        verify(organisationMock, times(2)).getStatus();
+        verify(organisationMock, times(3)).getStatus();
         verify(organisationMock, times(1)).setUsers(anyList());
     }
 
@@ -1252,22 +1252,6 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(1))
                 .findByStatusIn(List.of(OrganisationStatus.PENDING,REVIEW,BLOCKED), pageable);
     }
-
-    @Test
-    void test_addPaymentAccountsToOrganisationForNullRequest() {
-        PbaRequest pbaRequest = new PbaRequest();
-        pbaRequest.setPaymentAccounts(null);
-
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisation.setUsers(asList(superUser));
-        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
-
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
-        assertThrows(InvalidRequest.class, () ->
-                sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
-    }
-
 
     @Test
     @SuppressWarnings("unchecked")
@@ -1854,6 +1838,23 @@ class OrganisationServiceImplTest {
         ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+    }
+
+
+
+    @Test
+    void test_addPaymentAccountsToOrganisationForNullRequest() {
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(null);
+
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setUsers(asList(superUser));
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(InvalidRequest.class, () ->
+                sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
     }
 
     @Test
