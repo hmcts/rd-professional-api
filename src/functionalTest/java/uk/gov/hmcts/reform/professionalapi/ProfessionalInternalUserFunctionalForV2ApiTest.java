@@ -40,7 +40,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
     @Test
-    @DisplayName("PRD Internal Test Scenarios")
+    @DisplayName("PRD Internal Test Scenarios For V2 API")
     @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void testInternalUserScenario() {

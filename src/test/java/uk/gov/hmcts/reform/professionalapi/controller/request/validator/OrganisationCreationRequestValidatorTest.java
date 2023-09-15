@@ -84,7 +84,7 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
-    void test_CallsAllValidatorsOrgTypeKeyNOrgAtt() {
+    void test_CallsAllValidatorsOrgTypeNOrgAtt() {
         organisationOtherOrgsCreationRequest =
                 new OrganisationOtherOrgsCreationRequest("Company", "PENDING", "SraId",
                 "true", null, "12345678", "www.company.com", userCreationRequest,
@@ -102,6 +102,7 @@ class OrganisationCreationRequestValidatorTest {
     void test_validateOrganisationIdentifierNull() {
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationCreationRequestValidator.validateOrganisationIdentifier(null));
+
     }
 
     @Test
@@ -482,14 +483,44 @@ class OrganisationCreationRequestValidatorTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"","D*&&&&&"})
-    void test_validateOrganisationRequestWithOrgTypeKeyNull(String orgTypeKey) {
+    void test_validateOrganisationRequestWithOrgTypeNull(String orgType) {
 
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
                 "SraId",
                 "true", null, "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null, orgTypeKey, null);
+                new HashSet<>(), null, orgType, null);
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
+    }
+
+
+    @Test
+    void test_validateErrorMessageWhenOrgTypeIsNull() {
+
+        Throwable thrown = catchThrowable(() -> {
+            organisationCreationRequestValidator
+                    .validateOrgType(null);
+        });
+
+        assertThat(thrown)
+                .isInstanceOf(InvalidRequest.class)
+                .hasMessageContaining("orgType must not be null/empty");
+
+    }
+
+    @Test
+    void test_validateErrorMessageWhenOrgTypeIsNotMatchingTheRegex() {
+
+        Throwable thrown = catchThrowable(() -> {
+            organisationCreationRequestValidator
+                    .validateOrgType("&ascd");
+        });
+
+        assertThat(thrown)
+                .isInstanceOf(InvalidRequest.class)
+                .hasMessageContaining("Org Type is invalid - can only contain Alphabetic, empty space, ', "
+                        + "- characters and must be less than 256 characters");
+
     }
 
     @ParameterizedTest

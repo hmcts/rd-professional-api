@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 public class OrganisationOtherOrgsCreationRequest extends OrganisationCreationRequest {
 
-    private  String orgTypeKey;
+    private  String orgType;
 
     private List<OrgAttributeRequest> orgAttributes;
 
@@ -27,12 +27,12 @@ public class OrganisationOtherOrgsCreationRequest extends OrganisationCreationRe
                 @JsonProperty("superUser") UserCreationRequest superUser,
                 @JsonProperty("paymentAccount") Set<String> paymentAccount,
                 @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest,
-                @JsonProperty("orgTypeKey") String orgTypeKey,
+                @JsonProperty("orgType") String orgType,
                 @JsonProperty("orgAttributes") List<OrgAttributeRequest> orgAttributes) {
         super(name, status, statusMessage, sraId, sraRegulated, companyNumber, companyUrl, superUser, paymentAccount,
                 contactInformationRequest);
 
-        this.orgTypeKey = orgTypeKey;
+        this.orgType = orgType;
         this.orgAttributes = orgAttributes;
     }
 }

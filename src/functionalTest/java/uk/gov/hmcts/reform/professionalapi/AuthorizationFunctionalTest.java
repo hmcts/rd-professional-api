@@ -382,7 +382,7 @@ public class AuthorizationFunctionalTest {
         assertThat(response.get("superUser")).isNotNull();
         assertThat(response.get("paymentAccount")).isNotNull();
         assertThat(response.get("contactInformation")).isNotNull();
-        assertThat(response.get("orgTypeKey")).isNotNull();
+        assertThat(response.get("orgType")).isNotNull();
         assertThat(response.get("orgAttributes")).isNotNull();
         verifyContactInfoCreatedDateSorting(response.get("contactInformation"));
 
