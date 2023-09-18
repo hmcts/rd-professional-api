@@ -760,8 +760,8 @@ class RefDataUtilTest {
         assertNull(item.getOrganisation().getId());
         assertEquals("Org-Name", item.getOrganisation().getName());
 
-        assertThat(orgResponse).isNotNull()
-                                .isNotEmpty();
+        assertThat(orgResponse).isNotNull();
+        assertThat(orgResponse).isNotEmpty();
         assertThat(orgResponse.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
         assertThat(orgResponse.get(0).getName()).isEqualTo("Org-Name");
         assertThat(orgResponse.get(0).getSraId()).isEqualTo("sra-id");

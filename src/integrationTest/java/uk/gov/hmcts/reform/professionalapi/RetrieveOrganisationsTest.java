@@ -143,7 +143,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
 
         //RetrieveOrganisationsTest:Received response to retrieve an organisation details
-        assertThat(orgResponse.get("orgTypeKey")).isEqualTo("Doctor");
+        assertThat(orgResponse.get("orgType")).isEqualTo("Doctor");
         assertThat(orgResponse.get("orgAttributes")).isNotNull();
     }
 
@@ -373,7 +373,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
         assertThat(response.get("pendingPaymentAccount")).isNotNull();
-        assertThat(response.get("orgTypeKey")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo("Doctor");
         assertThat(response.get("orgAttributes")).isNotNull();
     }
 

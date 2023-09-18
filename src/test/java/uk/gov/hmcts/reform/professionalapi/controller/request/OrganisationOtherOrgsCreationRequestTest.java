@@ -31,7 +31,7 @@ class OrganisationOtherOrgsCreationRequestTest {
         assertThat(organisationOtherOrgsCreationRequest.getStatusMessage()).isEqualTo("In review");
         assertThat(organisationOtherOrgsCreationRequest.getSraId()).isEqualTo("sra-id");
         assertThat(organisationOtherOrgsCreationRequest.getSraRegulated()).isEqualTo("false");
-        assertThat(organisationOtherOrgsCreationRequest.getOrgTypeKey()).isEqualTo("Doctor");
+        assertThat(organisationOtherOrgsCreationRequest.getOrgType()).isEqualTo("Doctor");
         assertThat(organisationOtherOrgsCreationRequest.getOrgAttributes()).isNotNull();
 
     }

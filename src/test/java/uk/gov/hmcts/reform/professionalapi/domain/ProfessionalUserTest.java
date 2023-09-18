@@ -88,6 +88,7 @@ class ProfessionalUserTest {
         assertThat(user).isNotNull();
     }
 
+
     @Test
     void test_creates_professional_user_for_empty_user_attribute_correctly() {
         List<String> roles = new ArrayList<>();

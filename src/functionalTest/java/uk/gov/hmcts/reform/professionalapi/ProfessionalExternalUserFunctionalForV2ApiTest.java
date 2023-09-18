@@ -49,7 +49,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String lastName = "lastName";
 
     @Test
-    @DisplayName("PRD External Test Scenarios")
+    @DisplayName("PRD External Test Scenarios For V2 API")
     @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
         + ".createOrganisationUsingExternalController", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
@@ -116,7 +116,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgTypeKey")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo("Doctor");
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPfmShouldBeSuccess :: END");
         responseValidate(response);
@@ -128,7 +128,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgTypeKey")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo("Doctor");
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPomShouldBeSuccess :: END");
     }

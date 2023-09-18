@@ -152,7 +152,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         );
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            newOrganisation.setOrgTypekey(orgCreationRequestV2.getOrgTypeKey());
+            newOrganisation.setOrgType(orgCreationRequestV2.getOrgType());
         }
 
         var organisation = saveOrganisation(newOrganisation);
@@ -456,10 +456,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
-                    = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
-                    .toList());
+                = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
+                .toList());
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
-                    retrieveUserProfilesRequest,
+                retrieveUserProfilesRequest,
                 FALSE, activeOrganisationDetails);
         }
 
@@ -553,7 +553,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            organisation.setOrgTypekey(orgCreationRequestV2.getOrgTypeKey());
+            organisation.setOrgType(orgCreationRequestV2.getOrgType());
         }
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {

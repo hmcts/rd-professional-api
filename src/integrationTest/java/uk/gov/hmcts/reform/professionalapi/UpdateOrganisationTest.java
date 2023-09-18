@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -404,7 +405,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
         OrganisationOtherOrgsCreationRequest organisationUpdateRequest = otherOrganisationRequestWithAllFields();
         organisationUpdateRequest.setStatus("ACTIVE");
         organisationUpdateRequest.setOrgAttributes(orgAttributeRequests);
-        organisationUpdateRequest.setOrgTypeKey("updatedOrgTypeKey");
+        organisationUpdateRequest.setOrgType("updatedOrgType");
 
         String organisationIdentifier = createOrganisationRequestForV2();
         Map<String, Object> responseForOrganisationUpdate =
@@ -460,10 +461,13 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
             assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
             assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
             if (OrganisationStatus.ACTIVE.toString() == status) {
+                LocalDateTime localDate = LocalDateTime.now();
+
                 SuperUser professionalUser = persistedOrganisation.getUsers().get(0);
                 assertThat(professionalUser.getUserIdentifier()).isNotNull();
                 assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
-                assertThat(persistedOrganisation.getDateApproved());
+                assertThat(localDate).hasSameClassAs(persistedOrganisation.getDateApproved());
+
             }
         } else {
             if (responseForOrganisationUpdate.get("http_status") instanceof String) {
@@ -511,14 +515,16 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
             assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.TRUE);
             assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
             assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
-            assertThat(persistedOrganisation.getOrgTypeKey()).isEqualTo("Doctor1");
+            assertThat(persistedOrganisation.getOrgType()).isEqualTo("Doctor1");
             assertThat(persistedOrganisation.getOrgAttributes().get(0).getKey()).isEqualTo("testKey1");
             assertThat(persistedOrganisation.getOrgAttributes().get(0).getValue()).isEqualTo("testValue1");
             if (OrganisationStatus.ACTIVE.toString() == status) {
+                LocalDateTime localDate = LocalDateTime.now();
+
                 SuperUser professionalUser = persistedOrganisation.getUsers().get(0);
                 assertThat(professionalUser.getUserIdentifier()).isNotNull();
                 assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
-                assertThat(persistedOrganisation.getDateApproved());
+                assertThat(localDate).hasSameClassAs(persistedOrganisation.getDateApproved());
             }
 
         } else {
