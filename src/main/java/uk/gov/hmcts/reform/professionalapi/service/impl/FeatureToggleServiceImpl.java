@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_MFA_LD_FLAG;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTIPLE_ADDRESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTI_PBA_LD_FLAG;
 
@@ -58,6 +59,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_PROFESSIONAL_MULTIPLE_ADDRESS);
         launchDarklyMap.put("OrganisationExternalController.deleteMultipleAddressesOfOrganisation",
                 RD_PROFESSIONAL_MULTIPLE_ADDRESS);
+        launchDarklyMap.put("BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomerId",
+                RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG);
 
     }
 

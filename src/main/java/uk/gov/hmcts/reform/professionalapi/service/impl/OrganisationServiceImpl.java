@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -47,6 +48,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
@@ -109,6 +111,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     ContactInformationRepository contactInformationRepository;
     @Autowired
     PrdEnumRepository prdEnumRepository;
+    @Autowired
+    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
     @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
@@ -441,8 +445,29 @@ public class OrganisationServiceImpl implements OrganisationService {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
-        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
+        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired,
+                                    false);
     }
+
+    @Override
+    public BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
+                                                                                              String idamId) {
+
+        var bulkCustomerDetails = bulkCustomerDetailsRepository.findByBulkCustomerId(bulkCustId);
+        var pbaNumberStatus = paymentAccountRepository.findByPbaNumber(bulkCustomerDetails
+                                                                              .getPbaNumber());
+        if (!bulkCustomerDetails.getOrganisation().getStatus().isActive()) {
+            throw new ResourceNotFoundException("No Organisations found");
+        } else {
+            if (!pbaNumberStatus.get().getPbaStatus().equals(ACCEPTED)) {
+                bulkCustomerDetails.setPbaNumber("");
+            }
+
+        }
+
+        return new BulkCustomerOrganisationsDetailResponse(bulkCustomerDetails);
+    }
+
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(String status, Pageable pageable) {

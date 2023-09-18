@@ -184,6 +184,21 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
+
+    protected ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomerId(String bulkCustomerId,
+                                                                                  String idamId) {
+
+        var bulkCustId = removeAllSpaces(bulkCustomerId);
+        var sidamId = removeAllSpaces(idamId);
+        Object bulkCustomerDetailResponse = null;
+
+        if (StringUtils.isNotEmpty(bulkCustId) && StringUtils.isNotEmpty(sidamId)) {
+            bulkCustomerDetailResponse = organisationService
+                                            .retrieveOrganisationDetailsForBulkCustomer(bulkCustId,sidamId);
+        }
+        return ResponseEntity.status(200).body(bulkCustomerDetailResponse);
+    }
+
     protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status,
                                                                    Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);

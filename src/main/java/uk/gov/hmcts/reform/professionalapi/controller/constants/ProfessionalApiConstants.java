@@ -88,6 +88,9 @@ public class ProfessionalApiConstants {
     public static final String LOG_TWO_ARG_PLACEHOLDER = "{}:: {}";
 
     public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
+
+    public static final String RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG = "rd-professional-bulk-customer-details";
+
     public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
     public static final String RD_PROFESSIONAL_MULTIPLE_ADDRESS = "rd-professional-multiple-address";
     public static final String ERROR_MSG_ORG_ADDRESS = "Organisation should have at least one address";

@@ -73,6 +73,9 @@ public class Organisation implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation", optional = false, fetch = FetchType.LAZY)
     private OrganisationMfaStatus organisationMfaStatus;
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation", optional = false, fetch = FetchType.LAZY)
+    private BulkCustomerDetails bulkCustomerDetails;
+
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
