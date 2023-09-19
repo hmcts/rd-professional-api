@@ -7,6 +7,8 @@ route:
     id: professional-user-details-load
     file-name: BulkCustomerIDs.csv
     table-name: bulk_customer_details
+    truncate-sql:
+      sql:truncate table bulk_customer_details
     insert-sql:
       sql:insert into bulk_customer_details (id,organisation_id,bulk_customer_id,sidam_id,pba_number)
       values (:#id, :#organisation_id,:#bulk_customer_id,:#sidam_id,:#pba_number)

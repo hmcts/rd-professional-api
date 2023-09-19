@@ -100,4 +100,5 @@ public class MappingConstants {
     public static final String DB_SCHEDULER_START_TIME = "scheduler_start_time";
     public static final String DB_STATUS = "status";
     public static final String IS_READY_TO_AUDIT = "IS_READY_TO_AUDIT";
+    public static final String DATE_TIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
 }

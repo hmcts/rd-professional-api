@@ -40,6 +40,7 @@ public class PrdDataExecutor extends RouteExecutor {
             var errorMessage = camelContext.getGlobalOptions().get(ERROR_MESSAGE);
             auditService.auditException(camelContext, errorMessage);
             log.error("{}:: {} failed:: {}", logComponentName, schedulerName, errorMessage);
+            log.error("",ex);
             return FAILURE;
         } finally {
             var isReadyToAudit = camelContext.getGlobalOption(IS_READY_TO_AUDIT);
@@ -47,5 +48,10 @@ public class PrdDataExecutor extends RouteExecutor {
                 auditService.auditSchedulerStatus(camelContext);
             }
         }
+    }
+
+    @Override
+    public String stop(CamelContext camelContext, String schedulerName, String route) throws Exception {
+        return super.stop(camelContext, schedulerName, route);
     }
 }

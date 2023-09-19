@@ -16,11 +16,13 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdDataloadSchedulerJobRep
 import uk.gov.hmcts.reform.professionalapi.util.PrdDataLoadSchedulerAudit;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_READY_TO_AUDIT;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_START_TIME;
 
 @Component
 @Slf4j
@@ -104,6 +106,7 @@ public class ProfessionalApiJobScheduler {
     private void loadPrdData(Boolean doAudit) throws Exception {
         log.info("Started to load the data");
         doAudit = (isEmpty(doAudit)) ? Boolean.FALSE : doAudit;
+        camelContext.getGlobalOptions().put(SCHEDULER_START_TIME, String.valueOf(new Date().getTime()));
         camelContext.getGlobalOptions().put(IS_READY_TO_AUDIT, doAudit.toString());
         dataLoadRoute.startRoute(startRoute, routesToExecute);
         var status = commonDataExecutor.execute(camelContext, "CommonData Route", startRoute);

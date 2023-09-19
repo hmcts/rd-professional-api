@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.dataload.config;
 import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.StorageCredentials;
 import com.microsoft.azure.storage.StorageCredentialsAccountAndKey;
+import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -28,4 +29,5 @@ public class BlobStorageCredentials {
         return new CloudStorageAccount(storageCredentials,
             true);
     }
+
 }

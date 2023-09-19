@@ -30,6 +30,7 @@ public class SwaggerConfiguration {
                 .build();
     }
 
+
     @Bean
     public OperationCustomizer customGlobalHeaders() {
         return (Operation customOperation, HandlerMethod handlerMethod) -> {

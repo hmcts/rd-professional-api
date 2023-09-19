@@ -33,6 +33,12 @@ public class DataLoadUtil {
         globalOptions.put(MappingConstants.SCHEDULER_NAME, schedulerName);
     }
 
+    public void removeGlobalConstant(CamelContext camelContext) throws Exception {
+        Map<String, String> globalOptions = camelContext.getGlobalOptions();
+        globalOptions.clear();
+        camelContext.stop();
+    }
+
     public static boolean isFileExecuted(CamelContext camelContext, String file) {
         return nonNull(camelContext.getRegistry().lookupByName(file)) ? true : false;
     }

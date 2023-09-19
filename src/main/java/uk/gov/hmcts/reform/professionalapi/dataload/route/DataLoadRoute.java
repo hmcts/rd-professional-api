@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.dataload.processor.CommonCsvFieldProcessor;
 import uk.gov.hmcts.reform.professionalapi.dataload.processor.ExceptionProcessor;
@@ -122,6 +121,8 @@ public class DataLoadRoute {
                                 .streaming()
                                 .bean(applicationContext.getBean(route.getMapper()), MAPPING_METHOD)
                                 .process(exchange -> setHeader(exchange, "sqlToExecute", sqls))
+                                .log(sqls.get(0))
+                                .log(String.valueOf(sqls.size()))
                                 .toD("${header.sqlToExecute}")
                                 .end()
                                 .process(fileResponseProcessor)
@@ -161,6 +162,15 @@ public class DataLoadRoute {
                 startRoute, ex);
         }
     }
+
+    @Transactional
+    public void stopRoute(String startRoute, List<String> routesToExecute) throws Exception {
+        List<RouteProperties> routePropertiesList = getRouteProperties(routesToExecute);
+        camelContext.getRouteController().stopRoute("truncateprofessional-user-details-load");
+        camelContext.getRouteController().stopRoute("professional-user-details-load");
+        camelContext.getRouteController().stopRoute("Professional-UserDetails");
+    }
+
 
     private void setHeader(Exchange exchange, String headerName, List<String> sqls) {
         Integer index = (Integer) exchange.getProperty(Exchange.LOOP_INDEX);

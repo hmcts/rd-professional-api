@@ -78,7 +78,7 @@ public class AuditServiceImpl implements IAuditService {
      */
     public void auditSchedulerStatus(final CamelContext camelContext) {
 
-       /* List<FileStatus> fileStatuses = archivalFileNames.stream().filter(file ->
+        List<FileStatus> fileStatuses = archivalFileNames.stream().filter(file ->
             isFileExecuted(camelContext, file)).map(s -> getFileDetails(camelContext, s)).collect(toList());
 
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -99,7 +99,7 @@ public class AuditServiceImpl implements IAuditService {
         }
 
         TransactionStatus status = platformTransactionManager.getTransaction(def);
-        platformTransactionManager.commit(status);*/
+        platformTransactionManager.commit(status);
     }
 
     /**
@@ -107,7 +107,7 @@ public class AuditServiceImpl implements IAuditService {
      *
      * @param camelContext CamelContext
      */
-    public void auditException(final CamelContext camelContext, String exceptionMessage) {/*
+    public void auditException(final CamelContext camelContext, String exceptionMessage) {
         Map<String, String> globalOptions = camelContext.getGlobalOptions();
         Timestamp schedulerStartTime = new Timestamp(parseLong((globalOptions.get(SCHEDULER_START_TIME))));
         String schedulerName = globalOptions.get(SCHEDULER_NAME);
@@ -120,7 +120,7 @@ public class AuditServiceImpl implements IAuditService {
         jdbcTemplate.update(invalidExceptionSql, params);
         TransactionStatus status = platformTransactionManager.getTransaction(def);
         platformTransactionManager.commit(status);
-    */}
+    }
 
     /**
      * check auditing is done/not on the current day.

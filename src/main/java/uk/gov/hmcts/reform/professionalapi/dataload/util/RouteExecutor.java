@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.dataload.util;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.DIRECT_ROUTE;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SUCCESS;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,20 @@ public abstract class RouteExecutor implements IRouteExecutor {
         globalOptions.remove(MappingConstants.IS_EXCEPTION_HANDLED);
         globalOptions.remove(MappingConstants.SCHEDULER_STATUS);
         dataLoadUtil.setGlobalConstant(camelContext, schedulerName);
+        producerTemplate.start();
         producerTemplate.sendBody(route, "starting " + schedulerName);
+        return SUCCESS;
+    }
+
+    @Override
+    public String stop(CamelContext camelContext, String schedulerName, String route) throws Exception {
+        Map<String, String> globalOptions = camelContext.getGlobalOptions();
+        globalOptions.remove(MappingConstants.IS_EXCEPTION_HANDLED);
+        globalOptions.remove(MappingConstants.SCHEDULER_STATUS);
+        globalOptions.remove(MappingConstants.SCHEDULER_START_TIME);
+        camelContext.removeRoute(route);
+        dataLoadUtil.removeGlobalConstant(camelContext);
+        producerTemplate.stop();
         return SUCCESS;
     }
 }
