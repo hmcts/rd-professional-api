@@ -59,7 +59,7 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_PROFESSIONAL_MULTIPLE_ADDRESS);
         launchDarklyMap.put("OrganisationExternalController.deleteMultipleAddressesOfOrganisation",
                 RD_PROFESSIONAL_MULTIPLE_ADDRESS);
-        launchDarklyMap.put("BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomerId",
+        launchDarklyMap.put("BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomer",
                 RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG);
 
     }
