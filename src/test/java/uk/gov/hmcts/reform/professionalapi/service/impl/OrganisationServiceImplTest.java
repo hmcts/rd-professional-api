@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWith
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -57,6 +59,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
@@ -117,6 +120,8 @@ class OrganisationServiceImplTest {
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock
             = mock(ContactInformationRepository.class);
+    private final BulkCustomerDetailsRepository bulkCustomerDetailsRepositoryMock =
+            mock(BulkCustomerDetailsRepository.class);
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final OrganisationRepository organisationRepositoryImplNullReturnedMock
@@ -129,10 +134,14 @@ class OrganisationServiceImplTest {
 
     private final Organisation organisation = new Organisation("some-org-name", null,
             "PENDING", null, null, null);
+    private final Organisation organisationOfBulkCustomer = new Organisation("org-name", ACTIVE,
+            "SRAID1234", null, null, null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname", "test@test.com", organisation);
     private final PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
+    private final PaymentAccount paymentAccountForBulkCustomer = new PaymentAccount();
     private final ContactInformation contactInformation = new ContactInformation();
+    private final BulkCustomerDetails bulkCustomerDetails = new BulkCustomerDetails();
     private final DxAddress dxAddress = new DxAddress("dx-number", "dx-exchange",
             contactInformation);
     private final UserAccountMap userAccountMap = new UserAccountMap();
@@ -185,6 +194,7 @@ class OrganisationServiceImplTest {
         sut.setUserAttributeService(userAttributeServiceMock);
         sut.setPaymentAccountValidator(paymentAccountValidator);
         sut.setOrganisationMfaStatusRepository(organisationMfaStatusRepositoryMock);
+        sut.setBulkCustomerDetailsRepository(bulkCustomerDetailsRepositoryMock);
 
         paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
@@ -235,6 +245,7 @@ class OrganisationServiceImplTest {
         when(organisationRepositoryImplNullReturnedMock.findByOrganisationIdentifier(any())).thenReturn(null);
         when(organisationMfaStatusRepositoryMock.save(any(OrganisationMfaStatus.class)))
                 .thenReturn(organisationMfaStatus);
+        when(bulkCustomerDetailsRepositoryMock.save(any(BulkCustomerDetails.class))).thenReturn(bulkCustomerDetails);
     }
 
     @Test
@@ -630,6 +641,55 @@ class OrganisationServiceImplTest {
             .findByStatusIn(Collections.emptyList(), pageable);
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
 
+    }
+
+    @Test
+    public void testRetrieveOrganisationDetailsForBulkCustomer() throws Exception {
+
+        organisationOfBulkCustomer.setId(UUID.randomUUID());
+        bulkCustomerDetails.setOrganisation(organisationOfBulkCustomer);
+        paymentAccount.setPbaStatus(ACCEPTED);
+        bulkCustomerDetails.setPbaNumber("PBA1234567");
+        when(paymentAccountRepositoryMock.findByPbaNumber(bulkCustomerDetails.getPbaNumber()))
+                .thenReturn(Optional.of(paymentAccount));
+        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString())).thenReturn(bulkCustomerDetails);
+
+        BulkCustomerOrganisationsDetailResponse result = sut.retrieveOrganisationDetailsForBulkCustomer(
+                "bulkCustId", "idamId");
+        assertThat(new BulkCustomerOrganisationsDetailResponse(bulkCustomerDetails)).hasSameClassAs(result);
+    }
+
+    @Test
+    public void testRetrieveOrganisationDetailsForBulkCustomer_when_org_status_is_not_active() throws Exception {
+
+        organisation.setStatus(OrganisationStatus.PENDING);
+        bulkCustomerDetails.setOrganisation(organisation);
+        bulkCustomerDetails.setBulkCustomerId("bulkCustId");
+        bulkCustomerDetails.setSidamId("idamId");
+        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString())).thenReturn(bulkCustomerDetails);
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                sut.retrieveOrganisationDetailsForBulkCustomer("bulkCustId", "idamId"));
+    }
+
+    @Test
+    public void testRetrieveOrganisationDetailsForBulkCustomer1() throws Exception {
+
+        organisation.setStatus(ACTIVE);
+        bulkCustomerDetails.setOrganisation(organisation);
+        bulkCustomerDetails.setBulkCustomerId("bulkCustId");
+        bulkCustomerDetails.setSidamId("idamId");
+        paymentAccount.setPbaStatus(PENDING);
+        bulkCustomerDetails.setPbaNumber("PBA1234567");
+
+        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString())).thenReturn(bulkCustomerDetails);
+        when(paymentAccountRepositoryMock.findByPbaNumber(bulkCustomerDetails.getPbaNumber()))
+                .thenReturn(Optional.of(paymentAccount));
+
+        BulkCustomerOrganisationsDetailResponse result = sut.retrieveOrganisationDetailsForBulkCustomer(
+                "bulkCustId", "idamId");
+        assertThat(new BulkCustomerOrganisationsDetailResponse(bulkCustomerDetails)).hasSameClassAs(result);
+        assertThat(bulkCustomerDetails.getPbaNumber()).isEqualTo("");
     }
 
     @Test

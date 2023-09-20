@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -75,6 +76,8 @@ class SuperControllerTest {
     private final SuperController superController = mock(SuperController.class, CALLS_REAL_METHODS);
 
     private OrganisationsDetailResponse organisationsDetailResponse;
+
+    private BulkCustomerOrganisationsDetailResponse bulkCustomerOrganisationsDetailResponse;
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
@@ -166,6 +169,39 @@ class SuperControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
+    }
+
+    @Test
+    void test_retrieveOrganisationDetailsForBulkCustomerId() {
+        final HttpStatus expectedHttpsStatus = HttpStatus.OK;
+        when(organisationServiceMock.retrieveOrganisationDetailsForBulkCustomer(
+                "c5e5c75d-cced-4e57-97c8-e359ce33a857", "6601e79e-3169-461d-a751-59a33a5sdfk"))
+                .thenReturn(bulkCustomerOrganisationsDetailResponse);
+
+        ResponseEntity<?> actual = superController
+                .retrieveOrganisationDetailsForBulkCustomerId("c5e5c75d-cced-4e57-97c8-e359ce33a857",
+                        "6601e79e-3169-461d-a751-59a33a5sdfk");
+        assertThat(actual.getBody()).isEqualTo(bulkCustomerOrganisationsDetailResponse);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpsStatus);
+
+        verify(organisationServiceMock, times(1))
+                .retrieveOrganisationDetailsForBulkCustomer("c5e5c75d-cced-4e57-97c8-e359ce33a857",
+                        "6601e79e-3169-461d-a751-59a33a5sdfk");
+    }
+
+    @Test
+    void test_retrieveOrganisationDetailsForBulkCustomerId_for_input_values() {
+        final HttpStatus expectedHttpsStatus = HttpStatus.OK;
+
+        ResponseEntity<?> actual = superController
+                .retrieveOrganisationDetailsForBulkCustomerId(null,
+                        null);
+        assertThat(actual.getBody()).isEqualTo(bulkCustomerOrganisationsDetailResponse);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpsStatus);
+
+        verify(organisationServiceMock, times(0))
+                .retrieveOrganisationDetailsForBulkCustomer(null,
+                        null);
     }
 
     @Test

@@ -91,4 +91,14 @@ class OrganisationTest {
         assertThat(organisation.getOrganisationMfaStatus()).isNotNull();
         assertThat(organisation.getOrganisationMfaStatus()).isEqualTo(organisationMfaStatus);
     }
+
+    @Test
+    void test_adds_organisation_bulk_customer_details_correctly() {
+        BulkCustomerDetails bulkCustomerDetails = new BulkCustomerDetails();
+        Organisation organisation = new Organisation();
+        organisation.setBulkCustomerDetails(bulkCustomerDetails);
+
+        assertThat(organisation.getBulkCustomerDetails()).isNotNull();
+        assertThat(organisation.getBulkCustomerDetails()).isEqualTo(bulkCustomerDetails);
+    }
 }
