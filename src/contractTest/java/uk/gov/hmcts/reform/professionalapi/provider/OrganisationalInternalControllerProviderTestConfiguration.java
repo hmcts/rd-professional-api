@@ -6,12 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.*;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -32,6 +27,9 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
 
     @MockBean
     OrganisationRepository organisationRepository;
+
+    @MockBean
+    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
     @MockBean
     PaymentAccountRepository paymentAccountRepository;
