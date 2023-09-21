@@ -13,7 +13,7 @@ CREATE TABLE dataload_exception_records(
  table_name varchar(64),
  scheduler_name varchar(64) NOT NULL,
  scheduler_start_time timestamp NOT NULL,
- "key" varchar(256),
+ key varchar(256),
  field_in_error varchar(256),
  error_description varchar(512),
  updated_timestamp timestamp NOT NULL,
