@@ -453,7 +453,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     public BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                               String idamId) {
 
-        var bulkCustomerDetails = bulkCustomerDetailsRepository.findByBulkCustomerId(bulkCustId);
+        var bulkCustomerDetails = bulkCustomerDetailsRepository.findByBulkCustomerId(bulkCustId,idamId);
+
+        if(bulkCustomerDetails == null){
+            throw new InvalidRequest("Invalid Input");
+        }
+
         var pbaNumberStatus = paymentAccountRepository.findByPbaNumber(bulkCustomerDetails
                                                                               .getPbaNumber());
         if (!bulkCustomerDetails.getOrganisation().getStatus().isActive()) {

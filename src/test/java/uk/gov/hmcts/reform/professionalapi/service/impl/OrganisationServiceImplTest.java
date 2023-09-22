@@ -652,7 +652,7 @@ class OrganisationServiceImplTest {
         bulkCustomerDetails.setPbaNumber("PBA1234567");
         when(paymentAccountRepositoryMock.findByPbaNumber(bulkCustomerDetails.getPbaNumber()))
                 .thenReturn(Optional.of(paymentAccount));
-        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString())).thenReturn(bulkCustomerDetails);
+        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString(),anyString())).thenReturn(bulkCustomerDetails);
 
         BulkCustomerOrganisationsDetailResponse result = sut.retrieveOrganisationDetailsForBulkCustomer(
                 "bulkCustId", "idamId");
@@ -666,7 +666,7 @@ class OrganisationServiceImplTest {
         bulkCustomerDetails.setOrganisation(organisation);
         bulkCustomerDetails.setBulkCustomerId("bulkCustId");
         bulkCustomerDetails.setSidamId("idamId");
-        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString())).thenReturn(bulkCustomerDetails);
+        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString(),anyString())).thenReturn(bulkCustomerDetails);
 
         assertThrows(ResourceNotFoundException.class, () ->
                 sut.retrieveOrganisationDetailsForBulkCustomer("bulkCustId", "idamId"));
@@ -682,7 +682,7 @@ class OrganisationServiceImplTest {
         paymentAccount.setPbaStatus(PENDING);
         bulkCustomerDetails.setPbaNumber("PBA1234567");
 
-        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString())).thenReturn(bulkCustomerDetails);
+        when(bulkCustomerDetailsRepositoryMock.findByBulkCustomerId(anyString(),anyString())).thenReturn(bulkCustomerDetails);
         when(paymentAccountRepositoryMock.findByPbaNumber(bulkCustomerDetails.getPbaNumber()))
                 .thenReturn(Optional.of(paymentAccount));
 
