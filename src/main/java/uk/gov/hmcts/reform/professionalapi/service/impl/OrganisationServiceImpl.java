@@ -455,7 +455,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         var bulkCustomerDetails = bulkCustomerDetailsRepository.findByBulkCustomerId(bulkCustId,idamId);
 
-        if(bulkCustomerDetails == null){
+        if (bulkCustomerDetails == null) {
             throw new InvalidRequest("Invalid Input");
         }
 
