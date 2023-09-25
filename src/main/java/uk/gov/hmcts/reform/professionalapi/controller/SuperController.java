@@ -185,19 +185,7 @@ public abstract class SuperController {
     }
 
 
-    protected ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomerId(String bulkCustomerId,
-                                                                                  String idamId) {
 
-        var bulkCustId = removeAllSpaces(bulkCustomerId);
-        var sidamId = removeAllSpaces(idamId);
-        Object bulkCustomerDetailResponse = null;
-
-        if (StringUtils.isNotEmpty(bulkCustId) && StringUtils.isNotEmpty(sidamId)) {
-            bulkCustomerDetailResponse = organisationService
-                                            .retrieveOrganisationDetailsForBulkCustomer(bulkCustId,sidamId);
-        }
-        return ResponseEntity.status(200).body(bulkCustomerDetailResponse);
-    }
 
     protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status,
                                                                    Integer page, Integer size) {
@@ -490,6 +478,19 @@ public abstract class SuperController {
                     userIdentifier, showDeleted, returnRoles, status);
         }
         return responseEntity;
+    }
+
+    protected ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomerId(String bulkCustomerId,
+                                                                                  String idamId) {
+        var bulkCustId = removeAllSpaces(bulkCustomerId);
+        var sidamId = removeAllSpaces(idamId);
+        Object bulkCustomerDetailResponse = null;
+
+        if (StringUtils.isNotEmpty(bulkCustId) && StringUtils.isNotEmpty(sidamId)) {
+            bulkCustomerDetailResponse = organisationService
+                    .retrieveOrganisationDetailsForBulkCustomer(bulkCustId,sidamId);
+        }
+        return ResponseEntity.status(200).body(bulkCustomerDetailResponse);
     }
 
     protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,

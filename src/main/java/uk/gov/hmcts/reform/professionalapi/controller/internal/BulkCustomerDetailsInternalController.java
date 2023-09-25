@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -30,6 +32,9 @@ public class BulkCustomerDetailsInternalController extends SuperController {
 
     @Value("${loggingComponentName}")
     protected String loggingComponentName;
+
+    @Autowired
+    protected OrganisationCreationRequestValidator organisationCreationRequestValidator;
 
     @Operation(
             summary = "Retrieves organisation details for bulk customer",
@@ -72,6 +77,9 @@ public class BulkCustomerDetailsInternalController extends SuperController {
     public ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomer(
             @Parameter(name = "bulkCustomerId") @RequestParam(value = "bulkCustomerId") String bulkCustomerId,
             @Parameter(name = "idamId") @RequestParam(value = "idamId") String idamId) {
+
+        organisationCreationRequestValidator.validateInputForSpecialCharacter(bulkCustomerId);
+        organisationCreationRequestValidator.validateInputForSpecialCharacter(idamId);
 
         return retrieveOrganisationDetailsForBulkCustomerId(bulkCustomerId, idamId);
 

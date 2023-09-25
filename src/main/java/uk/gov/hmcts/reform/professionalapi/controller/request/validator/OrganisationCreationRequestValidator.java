@@ -19,17 +19,22 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.REG_EXP_COMMA_DILIMETER;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 @Component
@@ -120,6 +125,21 @@ public class OrganisationCreationRequestValidator {
             throw new EmptyResultDataAccessException(1);
         }
     }
+
+    public void validateInputForSpecialCharacter(String inputRequest) {
+        Arrays.stream(inputRequest.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
+            if (isRegexSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
+                throw new InvalidRequest("Invalid Request");
+            }
+        });
+
+    }
+
+    public static boolean isRegexSatisfied(String stringToEvaluate, String regex) {
+        Matcher matcher = Pattern.compile(regex).matcher(stringToEvaluate);
+        return matcher.find();
+    }
+
 
     public void isOrganisationActive(Organisation organisation) {
 

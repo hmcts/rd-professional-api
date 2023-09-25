@@ -456,7 +456,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         var bulkCustomerDetails = bulkCustomerDetailsRepository.findByBulkCustomerId(bulkCustId,idamId);
 
         if (bulkCustomerDetails == null) {
-            throw new InvalidRequest("Invalid Input");
+            throw new ResourceNotFoundException("Record not found");
         }
 
         var pbaNumberStatus = paymentAccountRepository.findByPbaNumber(bulkCustomerDetails
