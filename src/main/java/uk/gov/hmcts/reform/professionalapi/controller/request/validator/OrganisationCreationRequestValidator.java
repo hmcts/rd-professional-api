@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,7 +33,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.REG_EXP_COMMA_DILIMETER;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 @Component
@@ -128,18 +126,15 @@ public class OrganisationCreationRequestValidator {
 
 
     public void validateForEmptyOrNullInput(String bulkCustomerId, String idamId) {
-        if (bulkCustomerId == null || idamId == null || isEmptyValue(bulkCustomerId) || isEmptyValue(idamId)) {
+        if (isEmptyValue(bulkCustomerId) || isEmptyValue(idamId)) {
             throw new InvalidRequest("Invalid Request");
         }
     }
 
     public void validateInputForSpecialCharacter(String inputRequest) {
-        Arrays.stream(inputRequest.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
-            if (isRegexSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
-                throw new InvalidRequest("Invalid Request");
-            }
-        });
-
+        if (isRegexSatisfied(inputRequest, ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
+            throw new InvalidRequest("Invalid Request");
+        }
     }
 
     public static boolean isRegexSatisfied(String stringToEvaluate, String regex) {

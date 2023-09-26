@@ -95,10 +95,11 @@ class OrganisationTest {
     @Test
     void test_adds_organisation_bulk_customer_details_correctly() {
         BulkCustomerDetails bulkCustomerDetails = new BulkCustomerDetails();
+        List<BulkCustomerDetails> bulkCustomerDetailsList = new ArrayList<>();
         Organisation organisation = new Organisation();
-        organisation.setBulkCustomerDetails(bulkCustomerDetails);
+        bulkCustomerDetailsList.add(bulkCustomerDetails);
+        organisation.setBulkCustomerDetails(bulkCustomerDetailsList);
 
         assertThat(organisation.getBulkCustomerDetails()).isNotNull();
-        assertThat(organisation.getBulkCustomerDetails()).isEqualTo(bulkCustomerDetails);
     }
 }

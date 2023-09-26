@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
@@ -453,24 +454,35 @@ public class OrganisationServiceImpl implements OrganisationService {
     public BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                               String idamId) {
 
-        var bulkCustomerDetails = bulkCustomerDetailsRepository.findByBulkCustomerId(bulkCustId,idamId);
+        var bulkCustomerDetails = bulkCustomerDetailsRepository
+                                                                    .findByBulkCustomerId(bulkCustId,idamId);
 
+        validatebulkCustomerDetails(bulkCustomerDetails);
+
+        var pbaNumberStatus = paymentAccountRepository
+                                                     .findByPbaNumberAndOrganisationId(
+                                                             bulkCustomerDetails.getPbaNumber(),
+                                                             bulkCustomerDetails.getOrganisation().getId());
+
+        if (pbaNumberStatus.isEmpty() || !pbaNumberStatus.get().getPbaStatus().equals(ACCEPTED)) {
+            bulkCustomerDetails.setPbaNumber("");
+        }
+
+
+
+        return new BulkCustomerOrganisationsDetailResponse(bulkCustomerDetails);
+    }
+
+    private static void validatebulkCustomerDetails(BulkCustomerDetails bulkCustomerDetails) {
         if (bulkCustomerDetails == null) {
             throw new ResourceNotFoundException("Record not found");
         }
 
-        var pbaNumberStatus = paymentAccountRepository.findByPbaNumber(bulkCustomerDetails
-                                                                              .getPbaNumber());
-        if (!bulkCustomerDetails.getOrganisation().getStatus().isActive()) {
-            throw new ResourceNotFoundException("No Organisations found");
-        } else {
-            if (!pbaNumberStatus.get().getPbaStatus().equals(ACCEPTED)) {
-                bulkCustomerDetails.setPbaNumber("");
+        if (null != bulkCustomerDetails.getOrganisation().getStatus()) {
+            if (!bulkCustomerDetails.getOrganisation().getStatus().isActive()) {
+                throw new ResourceNotFoundException("Record not found");
             }
-
         }
-
-        return new BulkCustomerOrganisationsDetailResponse(bulkCustomerDetails);
     }
 
 

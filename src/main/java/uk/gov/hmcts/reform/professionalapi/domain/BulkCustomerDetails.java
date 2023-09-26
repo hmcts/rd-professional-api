@@ -14,8 +14,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
 import static javax.persistence.GenerationType.AUTO;
@@ -43,8 +42,7 @@ public class BulkCustomerDetails implements Serializable {
     @Size(max = 255)
     private String pbaNumber;
 
-    @OneToOne
-    @JoinColumn(name = "ORGANISATION_ID")
-    @MapsId
+    @ManyToOne
+    @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 }
