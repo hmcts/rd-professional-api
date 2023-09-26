@@ -34,7 +34,7 @@ apply plugin: 'idea'
 def versions = [
         lombok          : '1.18.22',
         pitest          : '1.7.4',
-        reformLogging   : '5.1.9',
+        reformLogging   : '6.0.1',
         serenity        : '2.0.76',
         springBoot      : '2.7.14',
         camel           : '3.8.0',
@@ -537,7 +537,7 @@ dependencyManagement {
         // CVE-2021-25122
         // CVE-2021-42340
         // CVE-2023-28709
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.75') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.80') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'

@@ -29,9 +29,15 @@ file name: launchdarkly-java-server-sdk-5.10.7.jar (shaded: org.yaml:snakeyaml:1
         <notes>Temporary suppression for CVE fix</notes>
         <cve>CVE-2023-2976</cve>
         <cve>CVE-2023-34462</cve>
-        <cve>CVE-2022-45046</cve>
-        <cve>CVE-2023-34442</cve>
-        <cve>CVE-2023-20859</cve>
-        <cve>CVE-2022-45047</cve>
+        <cve>CVE-2023-41080</cve>
     </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+             file name: launchdarkly-java-server-sdk-5.1.1.jar (shaded: com.google.guava:guava:28.2-jre)
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
+        <cve>CVE-2020-8908</cve>
+    </suppress>
+
 </suppressions>
