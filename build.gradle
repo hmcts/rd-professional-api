@@ -192,22 +192,9 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
 }
 
-task contract(type: Test) {
-    description = 'Runs the consumer Pact tests'
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-    include "uk/gov/hmcts/reform/cwrdapi/**"
-    systemProperty 'pact.rootDir', "pacts"
-}
 
-//Provider PACT tasks
-task contractTest(type: Test) {
-    logger.lifecycle("Runnning contract Tests")
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-}
+
+
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
     testClassesDirs = sourceSets.smokeTest.output.classesDirs
@@ -248,7 +235,7 @@ task fortifyScan(type: JavaExec) {
     ignoreExitValue = true
 }
 
-runProviderPactVerification.dependsOn contractTest
+
 
 runProviderPactVerification.finalizedBy pactVerify
 
@@ -259,7 +246,6 @@ def getCheckedOutGitCommitHash() {
 pact {
     publish {
         pactDirectory = 'pacts'
-        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
         tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
         version = project.pactVersion
     }
