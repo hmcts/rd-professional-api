@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.util;
 
+import org.apache.camel.Exchange;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
+import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,12 +17,10 @@ import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.reg
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
 
-import org.apache.camel.Exchange;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
-import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
-
 public class PrdLoadUtils {
+
+    private PrdLoadUtils() {
+    }
 
     public static <T> List<T> filterDomainObjects(List<T> domainObjects, Predicate<T> predicate) {
         return domainObjects.stream()

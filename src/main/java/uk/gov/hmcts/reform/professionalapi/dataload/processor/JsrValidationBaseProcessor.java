@@ -1,15 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
-import java.util.List;
-
-import static java.lang.Boolean.FALSE;
-import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.getFileDetails;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.registerFileStatusBean;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.PARTIAL_SUCCESS;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -20,6 +10,16 @@ import uk.gov.hmcts.reform.professionalapi.dataload.exception.RouteFailedExcepti
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.FileStatus;
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
 import uk.gov.hmcts.reform.professionalapi.dataload.validator.JsrValidatorInitializer;
+
+import java.util.List;
+
+import static java.lang.Boolean.FALSE;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.getFileDetails;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.registerFileStatusBean;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.PARTIAL_SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
 
 /**
  * This JsrValidationBaseProcessor captures JSR violations related to blob files.

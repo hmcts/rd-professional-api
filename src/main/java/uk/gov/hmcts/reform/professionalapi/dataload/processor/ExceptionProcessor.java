@@ -1,17 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
-import java.util.Map;
-
-import static org.apache.camel.Exchange.EXCEPTION_CAUGHT;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.getFileDetails;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.registerFileStatusBean;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FILE_NAME;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.TABLE_NAME;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -23,6 +11,18 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.FileStatus;
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
 import uk.gov.hmcts.reform.professionalapi.dataload.service.IAuditService;
+
+import java.util.Map;
+
+import static org.apache.camel.Exchange.EXCEPTION_CAUGHT;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.getFileDetails;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.registerFileStatusBean;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FILE_NAME;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.TABLE_NAME;
 
 @Component
 @Slf4j

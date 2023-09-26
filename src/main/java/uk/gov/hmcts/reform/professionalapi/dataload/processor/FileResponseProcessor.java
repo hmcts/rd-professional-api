@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.getFileDetails;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.registerFileStatusBean;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_STATUS;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +7,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.FileStatus;
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
+
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.getFileDetails;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.registerFileStatusBean;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_STATUS;
 
 @Component
 public class FileResponseProcessor implements Processor {

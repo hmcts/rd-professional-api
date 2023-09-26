@@ -1,34 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.validator;
 
-import javax.annotation.PostConstruct;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.lang.Boolean.TRUE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_NAME;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_START_TIME;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,7 +19,29 @@ import uk.gov.hmcts.reform.professionalapi.dataload.domain.CommonCsvField;
 import uk.gov.hmcts.reform.professionalapi.dataload.exception.RouteFailedException;
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
 
-@Component
+import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import static java.lang.Boolean.TRUE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_NAME;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_START_TIME;
+
+@Component("JsrValidatorInitializerDataload")
 @Slf4j
 public class JsrValidatorInitializer<T> {
 

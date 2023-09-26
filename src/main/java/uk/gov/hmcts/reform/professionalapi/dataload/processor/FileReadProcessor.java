@@ -1,24 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
-import java.util.Date;
-import java.util.function.BiPredicate;
-
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.apache.commons.lang.time.DateUtils.isSameDay;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.BlobStatus.NEW;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.BlobStatus.NOT_EXISTS;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.BlobStatus.STALE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.BLOBPATH;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FILE_NOT_EXISTS;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_FILE_STALE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_NOT_BLANK;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_START_ROUTE_JRD;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.MILLIS_IN_A_DAY;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.NOT_STALE_FILE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_START_TIME;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.STALE_FILE_ERROR;
-
 import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
@@ -39,6 +20,25 @@ import uk.gov.hmcts.reform.professionalapi.dataload.exception.RouteFailedExcepti
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
 import uk.gov.hmcts.reform.professionalapi.dataload.service.AuditServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.dataload.util.BlobStatus;
+
+import java.util.Date;
+import java.util.function.BiPredicate;
+
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.time.DateUtils.isSameDay;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.BlobStatus.NEW;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.BlobStatus.NOT_EXISTS;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.BlobStatus.STALE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.BLOBPATH;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FILE_NOT_EXISTS;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_FILE_STALE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_NOT_BLANK;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_START_ROUTE_JRD;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.MILLIS_IN_A_DAY;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.NOT_STALE_FILE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_START_TIME;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.STALE_FILE_ERROR;
 
 /**
  * This FileReadProcessor checks if file has following status

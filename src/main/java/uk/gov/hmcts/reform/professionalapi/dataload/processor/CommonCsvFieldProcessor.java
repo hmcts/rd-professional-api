@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.dataload.domain.CommonCsvField;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class CommonCsvFieldProcessor implements Processor {

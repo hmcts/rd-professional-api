@@ -1,5 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
+import com.opencsv.CSVReader;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.dataload.exception.RouteFailedException;
+import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
+import uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -13,19 +26,6 @@ import static org.apache.commons.lang.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.isStringArraysEqual;
-
-import com.opencsv.CSVReader;
-import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.BOMInputStream;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.professionalapi.dataload.exception.RouteFailedException;
-import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
-import uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants;
 
 /**
  * Validate headers in CSV file (limited Only more no headers currently).

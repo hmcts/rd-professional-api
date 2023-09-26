@@ -1,5 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.CamelContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.FileStatus;
+import uk.gov.hmcts.reform.professionalapi.dataload.service.dto.Audit;
+
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -22,19 +34,6 @@ import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SCHEDULER_START_TIME;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.TABLE_NAME;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.camel.CamelContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.FileStatus;
-import uk.gov.hmcts.reform.professionalapi.dataload.service.dto.Audit;
 
 /**
  * This AuditServiceImpl auditing scheduler/file details and logging exceptions.

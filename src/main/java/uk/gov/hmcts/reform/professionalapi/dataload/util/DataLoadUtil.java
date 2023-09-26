@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.util;
 
+import org.apache.camel.CamelContext;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.FileStatus;
+
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
@@ -8,13 +15,6 @@ import java.util.function.BiPredicate;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-
-import org.apache.camel.CamelContext;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.FileStatus;
 
 @Component
 public class DataLoadUtil {

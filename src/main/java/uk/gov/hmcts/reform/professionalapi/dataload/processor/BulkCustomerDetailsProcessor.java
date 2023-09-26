@@ -1,5 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.Exchange;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.professionalapi.dataload.binder.BulkCustomerDetails;
+import uk.gov.hmcts.reform.professionalapi.dataload.validator.JsrValidatorInitializer;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -9,19 +20,6 @@ import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.PrdLoadUtils.setFileStatus;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.reform.professionalapi.dataload.binder.BulkCustomerDetails;
-import uk.gov.hmcts.reform.professionalapi.dataload.validator.JsrValidatorInitializer;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
-
 @Component
 @Slf4j
 public class BulkCustomerDetailsProcessor extends JsrValidationBaseProcessor<BulkCustomerDetails> {
@@ -30,7 +28,8 @@ public class BulkCustomerDetailsProcessor extends JsrValidationBaseProcessor<Bul
     OrganisationRepository organisationRepository;
 
     @Autowired
-    JsrValidatorInitializer<BulkCustomerDetails> BulkCustomerJsrValidatorInitializer;
+    @Qualifier("JsrValidatorInitializerDataload")
+    JsrValidatorInitializer<BulkCustomerDetails> bulkCustomerDetailsJsrValidatorInitializer;
 
     public static final String ORGANISATION_ID = "organisationId";
     public static final String ERROR_MSG = "organisationId Not present in Organisation";
@@ -62,7 +61,8 @@ public class BulkCustomerDetailsProcessor extends JsrValidationBaseProcessor<Bul
         }
 
         exchange.getMessage().setBody(finalBulkCustomerDetails);
-        List<BulkCustomerDetails> invalidBulkCustomers = getInvalidCategories(bulkCustomerDetails, finalBulkCustomerDetails);
+        List<BulkCustomerDetails> invalidBulkCustomers =
+            getInvalidCategories(bulkCustomerDetails, finalBulkCustomerDetails);
         List<Pair<String, Long>> invalidBulkCustomerIds = new ArrayList<>();
         if (!CollectionUtils.isEmpty(invalidBulkCustomers)) {
             invalidBulkCustomers.forEach(bulkCustomer -> invalidBulkCustomerIds.add(Pair.of(
@@ -70,7 +70,7 @@ public class BulkCustomerDetailsProcessor extends JsrValidationBaseProcessor<Bul
                 bulkCustomer.getRowId()
             )));
 
-            BulkCustomerJsrValidatorInitializer.auditJsrExceptions(
+            bulkCustomerDetailsJsrValidatorInitializer.auditJsrExceptions(
                 invalidBulkCustomerIds,
                 ORGANISATION_ID,
                 ERROR_MSG,
@@ -79,7 +79,8 @@ public class BulkCustomerDetailsProcessor extends JsrValidationBaseProcessor<Bul
         }
     }
 
-    private List<BulkCustomerDetails> getInvalidCategories(List<BulkCustomerDetails> bulkCustomerDetails, List<BulkCustomerDetails> finalBulkCustomerDetails) {
+    private List<BulkCustomerDetails> getInvalidCategories(List<BulkCustomerDetails> bulkCustomerDetails,
+                                                           List<BulkCustomerDetails> finalBulkCustomerDetails) {
 
         List<BulkCustomerDetails> invalidBulkCustomerDetails = new ArrayList<>(bulkCustomerDetails);
 
@@ -90,7 +91,7 @@ public class BulkCustomerDetailsProcessor extends JsrValidationBaseProcessor<Bul
 
     private List<BulkCustomerDetails> getValidCategories(List<BulkCustomerDetails> bulkCustomerDetails) {
         return bulkCustomerDetails.stream()
-            .filter(bulkCustomerDetail->organisationRepository
+            .filter(bulkCustomerDetail -> organisationRepository
                 .findById(UUID.fromString(bulkCustomerDetail.getOrganisationId())).isPresent()).toList();
 
     }

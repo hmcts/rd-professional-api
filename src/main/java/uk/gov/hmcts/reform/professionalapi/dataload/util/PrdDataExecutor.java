@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.util;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_READY_TO_AUDIT;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.dataload.service.AuditServiceImpl;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_READY_TO_AUDIT;
 
 @Slf4j
 @Component

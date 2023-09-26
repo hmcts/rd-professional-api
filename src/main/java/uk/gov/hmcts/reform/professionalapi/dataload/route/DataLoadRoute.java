@@ -1,22 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.route;
 
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.WordUtils.uncapitalize;
-import static org.apache.logging.log4j.util.Strings.isBlank;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.DIRECT_ROUTE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_FILE_STALE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_PARENT_FAILED;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.MAPPING_METHOD;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SQL_DELIMITER;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.TRUNCATE_ROUTE_PREFIX;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
@@ -25,7 +8,6 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.apache.camel.model.language.SimpleExpression;
-import org.apache.camel.spring.spi.SpringTransactionPolicy;
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -40,6 +22,23 @@ import uk.gov.hmcts.reform.professionalapi.dataload.processor.HeaderValidationPr
 import uk.gov.hmcts.reform.professionalapi.dataload.processor.ParentStateCheckProcessor;
 import uk.gov.hmcts.reform.professionalapi.dataload.route.beans.RouteProperties;
 import uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import javax.sql.DataSource;
+
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang.WordUtils.uncapitalize;
+import static org.apache.logging.log4j.util.Strings.isBlank;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.DIRECT_ROUTE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_FILE_STALE;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_PARENT_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.MAPPING_METHOD;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SQL_DELIMITER;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.TRUNCATE_ROUTE_PREFIX;
+
 
 @Component
 public class DataLoadRoute {
@@ -112,7 +111,8 @@ public class DataLoadRoute {
                             from(DIRECT_ROUTE + route.getRouteName()).id(DIRECT_ROUTE + route.getRouteName())
                                 //.transacted("PROPAGATION_REQUIRED")
                                 .process(headerValidationProcessor)
-                                .split(body()).unmarshal().bindy(BindyType.Csv, applicationContext.getBean(route.getBinder()).getClass())
+                                .split(body()).unmarshal().bindy(BindyType.Csv,
+                                    applicationContext.getBean(route.getBinder()).getClass())
                                 .process(commonCsvFieldProcessor)
                                 .process((Processor) applicationContext.getBean(route.getProcessor()))
                                 .loop(loopCount)
@@ -139,21 +139,20 @@ public class DataLoadRoute {
                             //to(DIRECT_ROUTE + route.getRouteName())
                             //with Spring Propagation new for each file
                             from(DIRECT_ROUTE + TRUNCATE_ROUTE_PREFIX + route.getRouteName())
-                              //  .transacted("PROPAGATION_REQUIRED")
-                                .setHeader(MappingConstants.ROUTE_DETAILS, () -> route)
-                                //checks parent failure status & set header
-                                .process(parentStateCheckProcessor)
-                                .choice()
-                                .when(header(IS_PARENT_FAILED).isEqualTo(false))
-                                .setProperty(MappingConstants.BLOBPATH, exp)
-                                .process(fileReadProcessor)
-                                .choice()
-                                .when(header(IS_FILE_STALE).isEqualTo(false))
-                                .to(route.getTruncateSql())
-                                .to(DIRECT_ROUTE + route.getRouteName())
-                                .endChoice()
-                                .endChoice()
-                                .end();
+                            .setHeader(MappingConstants.ROUTE_DETAILS, () -> route)
+                            //checks parent failure status & set header
+                            .process(parentStateCheckProcessor)
+                            .choice()
+                            .when(header(IS_PARENT_FAILED).isEqualTo(false))
+                            .setProperty(MappingConstants.BLOBPATH, exp)
+                            .process(fileReadProcessor)
+                            .choice()
+                            .when(header(IS_FILE_STALE).isEqualTo(false))
+                            .to(route.getTruncateSql())
+                            .to(DIRECT_ROUTE + route.getRouteName())
+                            .endChoice()
+                            .endChoice()
+                                    .end();
                         }
                     }
                 });

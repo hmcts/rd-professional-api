@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.scheduler;
 
-
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,9 +16,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdDataloadSchedulerJob;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdDataloadSchedulerJobRepository;
 import uk.gov.hmcts.reform.professionalapi.util.PrdDataLoadSchedulerAudit;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -53,8 +56,9 @@ public class ProfessionalApiJobScheduler {
 
     @Autowired
     PrdDataExecutor commonDataExecutor;
-    /*@Autowired
-    DataIngestionLibraryRunner dataIngestionLibraryRunner;*/
+
+    @Autowired
+    protected ProducerTemplate producerTemplate;
 
     @Value("${logging-component-name}")
     String logComponentName;
@@ -62,45 +66,64 @@ public class ProfessionalApiJobScheduler {
     @Value("${batchjob-name}")
     String jobName;
 
+    int i=0;
 
     @Scheduled(cron = "${prd.scheduler.cronExpression}")
     @SchedulerLock(name = "lockedTask", lockAtMostFor = "${prd.scheduler.lockAtMostFor}",
-            lockAtLeastFor = "${prd.scheduler.lockAtLeastFor}")
+        lockAtLeastFor = "${prd.scheduler.lockAtLeastFor}")
     public void loadProfessioanlDataJob()throws Exception  {
 
         log.info("PRD load started....."+isSchedulerEnabled);
+        Boolean doAudit=Boolean.TRUE;
         if (isSchedulerEnabled) {
             LocalDateTime jobStartTime = now();
 
-//            PrdDataloadSchedulerJob latestEntry = prdDataloadSchedulerJob.findFirstByOrderByIdDesc();
+            PrdDataloadSchedulerJob latestEntry = prdDataloadSchedulerJob.findFirstByOrderByIdDesc();
 
-//            System.out.println("Value of Latestnetyr: "+latestEntry);
+            System.out.println("Value of Latestnetyr: "+latestEntry);
 
-//            if(Optional.ofNullable(latestEntry).isPresent()) {
+            if(Optional.ofNullable(latestEntry).isPresent()) {
 
-//                LocalDate startDate = Optional.ofNullable(latestEntry.getJobStartTime()).isPresent() ? latestEntry
-//                        .getJobStartTime().toLocalDate() : null;
-//                LocalDate endDate = Optional.ofNullable(latestEntry.getJobEndTime()).isPresent() ? latestEntry
-//                        .getJobEndTime().toLocalDate() : null;
-//                LocalDate currentDate = jobStartTime.toLocalDate();
-//
-//                if (currentDate.equals(startDate) || currentDate.equals(endDate)) {
-//                    log.info("PRD load failed since job has already ran for the day");
-//                }
+                LocalDate startDate = Optional.ofNullable(latestEntry.getJobStartTime()).isPresent() ? latestEntry
+                    .getJobStartTime().toLocalDate() : null;
+                LocalDate endDate = Optional.ofNullable(latestEntry.getJobEndTime()).isPresent() ? latestEntry
+                    .getJobEndTime().toLocalDate() : null;
+                LocalDate currentDate = jobStartTime.toLocalDate();
 
-                PrdDataloadSchedulerJob audit = new PrdDataloadSchedulerJob();
-                audit.setJobStartTime(jobStartTime);
-                audit.setPublishingStatus("INPROGRESS");
-
-
-                prdDataLoadSchedulerAudit.auditSchedulerJobStatus(audit);
+                if (currentDate.equals(startDate) || currentDate.equals(endDate)) {
+                    log.info("PRD load failed since job has already ran for the day");
+                }
+                return;
+            }
+            PrdDataloadSchedulerJob audit = new PrdDataloadSchedulerJob();
+            audit.setJobStartTime(jobStartTime);
+            audit.setPublishingStatus("INPROGRESS");
 
 
-                log.info("ProfessionalApiJobScheduler.loadPrdData Job execution in progress");
-                loadPrdData(true);
-                log.info("ProfessionalApiJobScheduler.loadPrdData Job execution completed successful");
-//            }
+            prdDataLoadSchedulerAudit.auditSchedulerJobStatus(audit);
+
+            log.info("ProfessionalApiJobScheduler.loadPrdData Job execution in progress");
+            if (i==0)
+            {
+                loadPrdData(Boolean.TRUE);
+            }
+            else
+            {
+                loadPrdDataa(Boolean.TRUE);
+            }
+            log.info("ProfessionalApiJobScheduler.loadPrdData Job execution completed successful");
+
         }
+    }
+
+    private void loadPrdDataa(Boolean aTrue) throws Exception {
+
+        aTrue = (isEmpty(aTrue)) ? Boolean.FALSE : aTrue;
+        camelContext.start();
+        camelContext.getGlobalOptions().put(SCHEDULER_START_TIME, String.valueOf(new Date().getTime()));
+        camelContext.getGlobalOptions().put(IS_READY_TO_AUDIT, aTrue.toString());
+        var status = commonDataExecutor.execute(camelContext, "PRD Route", startRoute);
+
     }
 
     private void loadPrdData(Boolean doAudit) throws Exception {
@@ -108,12 +131,28 @@ public class ProfessionalApiJobScheduler {
         doAudit = (isEmpty(doAudit)) ? Boolean.FALSE : doAudit;
         camelContext.getGlobalOptions().put(SCHEDULER_START_TIME, String.valueOf(new Date().getTime()));
         camelContext.getGlobalOptions().put(IS_READY_TO_AUDIT, doAudit.toString());
+        /*commonDataExecutor=applicationContext.getBean(PrdDataExecutor.class);*/
+        String status="";
+        camelContext.start();
         dataLoadRoute.startRoute(startRoute, routesToExecute);
-        var status = commonDataExecutor.execute(camelContext, "CommonData Route", startRoute);
+        List<Route> routes = camelContext.getRoutes();
+        routes.stream().forEach(route -> {
+            route.getId();
+            route.getEndpoint().getEndpointUri();
+
+        });
+        status = commonDataExecutor.execute(camelContext, "PRD Route", startRoute);
+
+
         log.info("{}:: Route Task completes with status::{}", logComponentName, status);
         //TODO camel context need to be closed properly
-        camelContext.stop();
+        /*dataLoadRoute.stopRoute(startRoute, routesToExecute);*/
+
+        /*var stopStatus=commonDataExecutor.stop(camelContext, "PRD Route", startRoute);*/
+
+        i=1;
     }
 
 
 }
+

@@ -378,7 +378,9 @@ dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
 
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
-
+    testImplementation group: 'org.apache.camel', name: 'camel-test', version: versions.camel
+    testImplementation group: 'org.apache.camel', name: 'camel-test-spring-junit5', version: versions.camel
+    testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-alpha-3'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'

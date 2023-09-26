@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.util;
 
-import java.util.Map;
-
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.DIRECT_ROUTE;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SUCCESS;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SUCCESS;
 
 @Slf4j
 @Component

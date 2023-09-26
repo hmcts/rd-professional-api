@@ -243,7 +243,6 @@ class RefDataUtilTest {
         ProfessionalUsersResponse professionalUsersResponse2
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2",
                 "some2@email.com", organisation));
-
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());

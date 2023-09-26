@@ -9,7 +9,6 @@ import lombok.Setter;
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.springframework.stereotype.Component;
-
 import uk.gov.hmcts.reform.professionalapi.dataload.domain.CommonCsvField;
 
 import java.io.Serializable;
