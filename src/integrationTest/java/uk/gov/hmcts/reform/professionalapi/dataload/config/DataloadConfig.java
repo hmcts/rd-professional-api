@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.config;
 
 import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.StorageCredentials;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.Exchange;
@@ -21,12 +22,17 @@ import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants
 @Configuration
 public class DataloadConfig {
 
-    @MockBean
-    @Qualifier("credscloudStorageAccount")
-    CloudStorageAccount cloudStorageAccount;
 
     @MockBean
     BlobStorageCredentials blobStorageCredentials;
+
+    @MockBean
+    @Qualifier("credsreg")
+    StorageCredentials storageCredentials;
+
+    @MockBean
+    @Qualifier("credscloudStorageAccount")
+    CloudStorageAccount cloudStorageAccount;
 
     @Bean
     FileReadProcessor fileReadProcessor() {
