@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -75,6 +76,8 @@ class SuperControllerTest {
     private final SuperController superController = mock(SuperController.class, CALLS_REAL_METHODS);
 
     private OrganisationsDetailResponse organisationsDetailResponse;
+
+    private OrganisationsDetailResponseV2 organisationsDetailResponseV2;
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
@@ -119,6 +122,8 @@ class SuperControllerTest {
                 "soMeone@somewhere.com", organisation);
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation),
                 false, false, true);
+        organisationsDetailResponseV2 = new OrganisationsDetailResponseV2(singletonList(organisation),
+                false, false, true,true);
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
                 "lastName", IdamStatus.ACTIVE.name(), null, null);
 
@@ -174,6 +179,29 @@ class SuperControllerTest {
             superController.retrieveAllOrganisationOrById(null, null, 0, null));
     }
 
+
+    @Test
+    void test_retrieveAllOrganisationOrByIdForV2Api() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null))
+                .thenReturn(organisationsDetailResponseV2);
+
+        ResponseEntity<?> actual = superController
+                .retrieveAllOrganisationOrByIdForV2Api(null, null, null, null);
+
+        assertThat(actual.getBody()).isEqualTo(organisationsDetailResponseV2);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisationsForV2Api(null);
+    }
+
+    @Test
+    void test_retrieveAllOrganisationForV2ApiWithPagination0_shouldThrowException() {
+        assertThrows(InvalidRequest.class, () ->
+                superController
+                        .retrieveAllOrganisationOrByIdForV2Api(null, null, 0, null));
+    }
 
     @Test
     void test_retrievePaymentAccountByEmail() {

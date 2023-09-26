@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
@@ -93,6 +94,11 @@ class OrganisationExternalControllerTest {
 
     @InjectMocks
     private OrganisationExternalController organisationExternalController;
+
+    private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
+
+    @InjectMocks
+    private OrganisationExternalControllerV2 organisationExternalControllerV2;
 
     private OrganisationResponse organisationResponse;
     private OrganisationEntityResponse organisationEntityResponse;
@@ -182,6 +188,9 @@ class OrganisationExternalControllerTest {
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
+                "sra-id", "false", "number02", "company-url",
+                userCreationRequest, null, null,"Doctor",null);
         userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
                 "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles,
                 false);
@@ -203,6 +212,24 @@ class OrganisationExternalControllerTest {
                 .validate(any(OrganisationCreationRequest.class));
         verify(organisationServiceMock, times(1))
                 .createOrganisationFrom(organisationCreationRequest);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+
+    @Test
+    void test_CreateOrganisationV2() {
+        when(organisationServiceMock.createOrganisationFrom(organisationOtherOrgsCreationRequest))
+                .thenReturn(organisationResponse);
+
+        ResponseEntity<?> actual = organisationExternalControllerV2
+                .createOrganisationUsingExternalController(organisationOtherOrgsCreationRequest);
+
+        verify(organisationCreationRequestValidatorMock, times(1))
+                .validate(any(OrganisationOtherOrgsCreationRequest.class));
+        verify(organisationServiceMock, times(1))
+                .createOrganisationFrom(organisationOtherOrgsCreationRequest);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);

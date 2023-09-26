@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationMfaSt
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -29,6 +30,9 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
 
     @MockBean
     protected OrganisationService organisationService;
+
+    @MockBean
+    OrgAttributeRepository orgAttributeRepository;
 
     @Bean
     @Primary

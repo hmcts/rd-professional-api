@@ -71,7 +71,7 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
         PrdEnum prdEnum1 = new PrdEnum(prdEnumId1, "PROBATE", "PROBATE");
         PrdEnum prdEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "BULKSCAN");
         UserAttribute jurisAttribute1 = new UserAttribute(persistedSuperUser, prdEnum1);
-        UserAttribute jurisAttribute2 = new UserAttribute(persistedSuperUser, prdEnum1);
+        UserAttribute jurisAttribute2 = new UserAttribute(persistedSuperUser, prdEnum2);
         List<ProfessionalUser> professionalUser = professionalUserRepository.findByOrganisation(persistedOrganisation);
         assertThat(professionalUser.get(0).getUserAttributes().get(4).getPrdEnum().getEnumName())
                 .isEqualTo("organisation-admin");

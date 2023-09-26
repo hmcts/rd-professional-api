@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -81,6 +82,8 @@ class ProfessionalUserServiceImplTest {
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
     private final FeignException feignExceptionMock = mock(FeignException.class);
+
+    private final RefDataUtil refDataUtil = mock(RefDataUtil.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
             null, null, null);
@@ -563,6 +566,51 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void test_shouldReturnUsersInResponseEntityWithPageable_300() throws JsonProcessingException {
+        Pageable pageableMock = mock(Pageable.class);
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+        Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        ProfessionalUser professionalUser1 = new ProfessionalUser("fName", "lName",
+                "some1@email.com", organisation);
+        professionalUserList.add(professionalUser);
+        professionalUserList.add(professionalUser1);
+
+        when(professionalUserRepository.findByOrganisation(organisation, pageableMock))
+                .thenReturn(professionalUserPage);
+        when(professionalUserPage.getContent()).thenReturn(professionalUserList);
+
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(professionalUser1);
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        userProfiles.add(professionalUsersResponse);
+        userProfiles.add(professionalUsersResponse1);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(APPLICATION_JSON);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+        Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                .status(300).build();
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
+
+        assertThrows(ExternalApiException.class, () ->
+                professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false",
+                        false, "Active", pageableMock));
+
+        verify(professionalUserRepository, times(1))
+                .findByOrganisation(organisation, pageableMock);
+        verify(professionalUserPage, times(2)).getContent();
+        verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void shouldThrowResourceNotFoundExceptionWhenNoUsersReturnedWithPageable() {
         Pageable pageableMock = mock(Pageable.class);
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
@@ -676,6 +724,7 @@ class ProfessionalUserServiceImplTest {
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        assertThat(newResponse.getBody().getIdamStatus()).isNull();
     }
 
     @Test

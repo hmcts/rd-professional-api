@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
@@ -94,6 +95,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Autowired
     protected UserAccountMapRepository userAccountMapRepository;
+
+    @Autowired
+    protected OrgAttributeRepository orgAttributeRepository;
 
     @Autowired
     protected UserAttributeRepository userAttributeRepository;
@@ -272,6 +276,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userAccountMapRepository.deleteAll();
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
+        orgAttributeRepository.deleteAll();
         organisationRepository.deleteAll();
         JwtDecoderMockBuilder.resetJwtDecoder();
     }
