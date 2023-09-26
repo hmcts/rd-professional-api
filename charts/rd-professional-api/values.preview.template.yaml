@@ -7,6 +7,7 @@ java:
     POSTGRES_USERNAME: "{{ .Values.postgresql.auth.username}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     LAUNCH_DARKLY_ENV: "preview"
+    CONTAINER_NAME: kud-ref-data
   postgresql:
     enabled: true
     auth:
@@ -22,3 +23,9 @@ java:
           alias: azure.application-insights.instrumentation-key
         - name: professional-api-s2s-secret
           alias: PROFESSIONAL_API_S2S_SECRET
+        - name: ACCOUNT-NAME
+          alias: ACCOUNT_NAME
+        - name: ACCOUNT-KEY
+          alias: ACCOUNT_KEY
+        - name: CONTAINER-NAME
+          alias: CONTAINER_NAME
