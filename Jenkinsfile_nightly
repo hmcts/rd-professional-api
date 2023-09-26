@@ -22,6 +22,9 @@ def secrets = [
     secret('microservicekey-rd-professional-api', 'PROFESSIONAL_API_S2S_SECRET')
   ],
   'rd-${env}': [
+          secret('ACCOUNT-KEY-PREVIEW', 'ACCOUNT_KEY_PREVIEW'),
+          secret('ACCOUNT-NAME', 'ACCOUNT_NAME'),
+          secret('ACCOUNT-KEY', 'ACCOUNT_KEY'),
           secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
           secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
           secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
