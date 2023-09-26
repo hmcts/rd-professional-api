@@ -25,6 +25,9 @@ public class DataloadConfig {
     @Qualifier("credscloudStorageAccount")
     CloudStorageAccount cloudStorageAccount;
 
+    @MockBean
+    BlobStorageCredentials blobStorageCredentials;
+
     @Bean
     FileReadProcessor fileReadProcessor() {
         return new FileReadProcessor() {

@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.LaunchDarklyConfiguration;
 import uk.gov.hmcts.reform.professionalapi.configuration.SecurityConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.dataload.config.BlobStorageCredentials;
 import uk.gov.hmcts.reform.professionalapi.dataload.processor.ExceptionProcessor;
 import uk.gov.hmcts.reform.professionalapi.dataload.scheduler.ProfessionalApiJobScheduler;
 import uk.gov.hmcts.reform.professionalapi.dataload.service.AuditServiceImpl;
@@ -54,9 +53,6 @@ public abstract class AuthorizationDataloadEnabledIntegrationTest extends Spring
 
     @MockBean
     protected SecurityConfiguration securityConfiguration;
-
-    @MockBean
-    BlobStorageCredentials blobStorageCredentials;
 
 
     @MockBean
