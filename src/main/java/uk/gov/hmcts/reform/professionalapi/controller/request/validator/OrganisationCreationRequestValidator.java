@@ -126,6 +126,13 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
+
+    public void validateForEmptyOrNullInput(String bulkCustomerId, String idamId) {
+        if (bulkCustomerId == null || idamId == null || isEmptyValue(bulkCustomerId) || isEmptyValue(idamId)) {
+            throw new InvalidRequest("Invalid Request");
+        }
+    }
+
     public void validateInputForSpecialCharacter(String inputRequest) {
         Arrays.stream(inputRequest.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
             if (isRegexSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {

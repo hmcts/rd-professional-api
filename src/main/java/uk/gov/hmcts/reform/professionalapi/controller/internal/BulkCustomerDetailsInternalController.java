@@ -78,6 +78,7 @@ public class BulkCustomerDetailsInternalController extends SuperController {
             @Parameter(name = "bulkCustomerId") @RequestParam(value = "bulkCustomerId") String bulkCustomerId,
             @Parameter(name = "idamId") @RequestParam(value = "idamId") String idamId) {
 
+        organisationCreationRequestValidator.validateForEmptyOrNullInput(bulkCustomerId, idamId);
         organisationCreationRequestValidator.validateInputForSpecialCharacter(bulkCustomerId);
         organisationCreationRequestValidator.validateInputForSpecialCharacter(idamId);
 
