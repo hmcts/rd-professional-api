@@ -668,6 +668,58 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
 
+    //Will add below code as soon as RDCC-7024 will be pushed in Dev branch
+    /*@Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when Org is ACTIVE")
+    void findOrganisationsForBulkCustomerShouldReturnSuccess() {
+        log.info("findOrganisationsForBulkCustomerShouldReturnSuccess :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfk";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf4";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, sidamId, OK);
+
+        assertThat(organisations).isNotNull().hasSize(3);
+        assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a855");
+        assertThat(organisations.get("organisationName")).toString().contains("ORGTESTUSER-PBA-ACCEPTED");
+        assertThat(organisations.get("paymentAccount")).toString().contains("pba-3234569");
+
+
+        log.info("findOrganisationsForBulkCustomerShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when PBA statis is not ACCEPTED")
+    void findOrganisationsForBulkCustomerForPbaStatusIsNotAccepted() {
+        log.info("findOrganisationsForBulkCustomerForPBAStatusIsNotAccepted :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfj";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf6";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, sidamId, OK);
+
+        assertThat(organisations).isNotNull().hasSize(3);
+        assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a857");
+        assertThat(organisations.get("organisationName")).toString().contains("ORGTESTUSER-PBA-ACCEPTED");
+        assertThat(organisations.get("paymentAccount")).toString().contains("");
+
+
+        log.info("findOrganisationsForBulkCustomerForPBAStatusIsNotAccepted :: END");
+    }
+
+    @Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when Org is PENDING")
+    void findOrganisationsForBulkCustomerForPendingOrg() {
+        log.info("findOrganisationsForBulkCustomerForPendingOrg :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfl";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf5";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, sidamId, NOT_FOUND);
+
+        assertThat(organisations.get("status")).toString().contains("No Organisations found");
+
+
+        log.info("findOrganisationsForBulkCustomerForPendingOrg :: END");
+    }*/
+
     @Test
     @DisplayName("PRD Internal Delete Organisation with status REVIEW Test Scenarios")
     void testInternalOrganisationDeleteScenario() {
