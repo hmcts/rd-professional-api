@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.azure.storage.CloudStorageAccount;
 import feign.FeignException;
 import feign.Request;
 import feign.Response;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
+import uk.gov.hmcts.reform.professionalapi.dataload.config.BlobStorageCredentials;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -81,6 +84,12 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGet
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 class RefDataUtilTest {
+
+    @MockBean
+    private BlobStorageCredentials blobStorageCredentials;
+
+    @MockBean
+    CloudStorageAccount cloudStorageAccount;
 
     private PaymentAccount paymentAccount;
     private Organisation organisation;
