@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -90,6 +91,7 @@ class SuperControllerTest {
     private ProfessionalUser professionalUser;
     private UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
     private NewUserCreationRequest newUserCreationRequest;
+    private BulkCustomerRequest bulkCustomerRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private UserProfileUpdatedData userProfileUpdatedData;
 
@@ -140,6 +142,7 @@ class SuperControllerTest {
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url", userCreationRequest,
                 null, null);
+        bulkCustomerRequest = new BulkCustomerRequest("testBulkCustomerId", "testIdamId");
 
         MockitoAnnotations.openMocks(this);
     }
@@ -175,34 +178,19 @@ class SuperControllerTest {
     void test_retrieveOrganisationDetailsForBulkCustomerId() {
         final HttpStatus expectedHttpsStatus = HttpStatus.OK;
         when(organisationServiceMock.retrieveOrganisationDetailsForBulkCustomer(
-                "c5e5c75d-cced-4e57-97c8-e359ce33a857", "6601e79e-3169-461d-a751-59a33a5sdfk"))
+                "testBulkCustomerId", "testIdamId"))
                 .thenReturn(bulkCustomerOrganisationsDetailResponse);
 
         ResponseEntity<?> actual = superController
-                .retrieveOrganisationDetailsForBulkCustomerId("c5e5c75d-cced-4e57-97c8-e359ce33a857",
-                        "6601e79e-3169-461d-a751-59a33a5sdfk");
+                .retrieveOrganisationDetailsForBulkCustomerId(bulkCustomerRequest);
         assertThat(actual.getBody()).isEqualTo(bulkCustomerOrganisationsDetailResponse);
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpsStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisationDetailsForBulkCustomer("c5e5c75d-cced-4e57-97c8-e359ce33a857",
-                        "6601e79e-3169-461d-a751-59a33a5sdfk");
+                .retrieveOrganisationDetailsForBulkCustomer("testBulkCustomerId",
+                        "testIdamId");
     }
 
-    @Test
-    void test_retrieveOrganisationDetailsForBulkCustomerId_for_input_values() {
-        final HttpStatus expectedHttpsStatus = HttpStatus.OK;
-
-        ResponseEntity<?> actual = superController
-                .retrieveOrganisationDetailsForBulkCustomerId(null,
-                        null);
-        assertThat(actual.getBody()).isEqualTo(bulkCustomerOrganisationsDetailResponse);
-        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpsStatus);
-
-        verify(organisationServiceMock, times(0))
-                .retrieveOrganisationDetailsForBulkCustomer(null,
-                        null);
-    }
 
     @Test
     void test_retrieveAllOrganisationWithPagination0_shouldThrowException() {

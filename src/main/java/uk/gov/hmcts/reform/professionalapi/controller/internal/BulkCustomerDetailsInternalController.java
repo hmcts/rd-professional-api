@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,12 +13,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -71,18 +74,19 @@ public class BulkCustomerDetailsInternalController extends SuperController {
             content = @Content
     )
 
-
     @Secured("prd-admin")
-    @PostMapping(produces = APPLICATION_JSON_VALUE)
+    @PostMapping(
+            produces = APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomer(
-            @Parameter(name = "bulkCustomerId") @RequestParam(value = "bulkCustomerId") String bulkCustomerId,
-            @Parameter(name = "idamId") @RequestParam(value = "idamId") String idamId) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description =
+                                                                    "retrieveOrganisationDetailsForBulkCustomer")
+            @Valid @NotNull @RequestBody BulkCustomerRequest bulkCustomerRequest) {
 
-        organisationCreationRequestValidator.validateForEmptyOrNullInput(bulkCustomerId, idamId);
-        organisationCreationRequestValidator.validateInputForSpecialCharacter(bulkCustomerId);
-        organisationCreationRequestValidator.validateInputForSpecialCharacter(idamId);
+        log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomer", loggingComponentName);
 
-        return retrieveOrganisationDetailsForBulkCustomerId(bulkCustomerId, idamId);
+
+        return retrieveOrganisationDetailsForBulkCustomerId(bulkCustomerRequest);
 
     }
 }

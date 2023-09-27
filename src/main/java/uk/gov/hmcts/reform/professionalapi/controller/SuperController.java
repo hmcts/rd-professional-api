@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -480,10 +481,16 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    protected ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomerId(String bulkCustomerId,
-                                                                                  String idamId) {
-        var bulkCustId = removeAllSpaces(bulkCustomerId);
-        var sidamId = removeAllSpaces(idamId);
+    protected ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomerId(BulkCustomerRequest
+                                                                                          bulkCustomerRequest) {
+        var bulkCustId = removeAllSpaces(bulkCustomerRequest.getBulkCustomerId());
+        var sidamId = removeAllSpaces(bulkCustomerRequest.getIdamId());
+
+
+        organisationCreationRequestValidator.validateForEmptyOrNullInput(bulkCustId, sidamId);
+        organisationCreationRequestValidator.validateInputForSpecialCharacter(bulkCustId);
+        organisationCreationRequestValidator.validateInputForSpecialCharacter(sidamId);
+
         Object bulkCustomerDetailResponse = null;
 
         if (StringUtils.isNotEmpty(bulkCustId) && StringUtils.isNotEmpty(sidamId)) {
@@ -492,6 +499,7 @@ public abstract class SuperController {
         }
         return ResponseEntity.status(200).body(bulkCustomerDetailResponse);
     }
+
 
     protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
                                                             String orgId, String userId) {
