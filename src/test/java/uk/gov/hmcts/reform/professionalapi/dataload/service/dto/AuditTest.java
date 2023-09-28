@@ -24,6 +24,18 @@ public class AuditTest {
             .isEqualTo(getDate(2021, 11, 16, 10, 0, 0));
     }
 
+    @Test
+    void test_AuditWitConstructor() {
+
+        Audit audit = new Audit("filename"
+            ,getDate(2021, 11, 16, 10, 0, 0),"status");
+        assertThat(audit.getFileName()).isNotEmpty();
+        assertThat(audit.getStatus()).isNotEmpty();
+        assertThat(audit.getSchedulerStartTime())
+            .isEqualTo(getDate(2021, 11, 16, 10, 0, 0));
+    }
+
+
     private static Date getDate(int year, int month, int day, int hour, int minute, int second) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, year);
