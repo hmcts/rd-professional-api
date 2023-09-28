@@ -94,6 +94,10 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public static final String COMPANY_NUMBER = "companyN";
     public static final String COMPANY_URL = "www.org.com";
 
+    public static final String PBA_NUMBER = "PBA1234567";
+
+
+
     @Override
     void setController() {
         testTarget.setControllers(organisationInternalController);
@@ -234,10 +238,10 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     @State("Update an Organisation's PBA accounts")
     public void setUpOrganisationForUpdatingPBAs() {
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
-                "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
 
-        PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
+        PaymentAccount paymentAccount = new PaymentAccount(PBA_NUMBER);
         paymentAccount.setOrganisation(organisation);
 
         doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
@@ -294,8 +298,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         paymentAccount.setPbaStatus(PbaStatus.ACCEPTED);
         paymentAccount.setCreated(LocalDateTime.now());
         paymentAccount.setLastUpdated(LocalDateTime.now());
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
-                "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("org1");
         organisation.setPaymentAccounts(Collections.singletonList(paymentAccount));

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
@@ -129,6 +130,17 @@ public class OrganisationCreationRequestValidator {
         if (isEmptyValue(bulkCustomerId) || isEmptyValue(idamId)) {
             throw new InvalidRequest("Invalid Request");
         }
+    }
+
+
+    public static void validateBulkCustomerRequest(BulkCustomerRequest bulkCustomerRequest) {
+        if (StringUtils.isBlank(bulkCustomerRequest.getBulkCustomerId())
+                || StringUtils.isBlank(bulkCustomerRequest.getIdamId())
+                || null == bulkCustomerRequest.getBulkCustomerId()
+                || null == bulkCustomerRequest.getIdamId()) {
+            throw new InvalidRequest("Mandatory fields are blank or null");
+        }
+
     }
 
     public void validateInputForSpecialCharacter(String inputRequest) {

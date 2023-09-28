@@ -454,6 +454,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                               String idamId) {
 
+        log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomer", loggingComponentName);
         var bulkCustomerDetails = bulkCustomerDetailsRepository
                                                                     .findByBulkCustomerId(bulkCustId,idamId);
 

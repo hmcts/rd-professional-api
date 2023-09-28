@@ -3,11 +3,12 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Builder(builderMethodName = "abulkCustomerRequest")
 public class BulkCustomerRequest {
 

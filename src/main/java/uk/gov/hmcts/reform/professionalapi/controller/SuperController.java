@@ -82,6 +82,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateBulkCustomerRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
@@ -487,9 +488,13 @@ public abstract class SuperController {
         var sidamId = removeAllSpaces(bulkCustomerRequest.getIdamId());
 
 
+
         organisationCreationRequestValidator.validateForEmptyOrNullInput(bulkCustId, sidamId);
+        validateBulkCustomerRequest(bulkCustomerRequest);
         organisationCreationRequestValidator.validateInputForSpecialCharacter(bulkCustId);
         organisationCreationRequestValidator.validateInputForSpecialCharacter(sidamId);
+
+        log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomerId Valdiation success", loggingComponentName);
 
         Object bulkCustomerDetailResponse = null;
 
