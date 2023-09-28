@@ -27,8 +27,8 @@ public class AuditTest {
     @Test
     void test_AuditWitConstructor() {
 
-        Audit audit = new Audit("filename"
-            ,getDate(2021, 11, 16, 10, 0, 0),"status");
+        Audit audit = new Audit("filename",
+            getDate(2021, 11, 16, 10, 0, 0),"status");
         assertThat(audit.getFileName()).isNotEmpty();
         assertThat(audit.getStatus()).isNotEmpty();
         assertThat(audit.getSchedulerStartTime())
