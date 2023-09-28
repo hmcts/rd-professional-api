@@ -60,8 +60,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @ExtendWith(SpringExtension.class)
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
         host = "${PACT_BROKER_URL:localhost}",
-        port = "${PACT_BROKER_PORT:9292}", consumerVersionSelectors = {
-        @VersionSelector(tag = "Dev")})
+        port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+        @VersionSelector(tag = "master")})
 @ContextConfiguration(classes = {BulkCustomerDetailsInternalController.class})
 @Provider("referenceData_bulkCustomerDetails")
 @TestPropertySource(locations = "/application-contract.yaml")
@@ -174,7 +174,6 @@ public class BulkCustomerDetailsProviderTest {
     @BeforeEach
     void before(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
                 bulkCustomerDetailsInternalController);
         if (nonNull(context)) {
