@@ -1,13 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
-import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_READY_TO_AUDIT;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -19,8 +11,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.dataload.service.AuditServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.dataload.util.PrdDataExecutor;
 
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
+import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_READY_TO_AUDIT;
+
 @ExtendWith(MockitoExtension.class)
-class CommonDataExecutorTest {
+class PrdExecutorTest {
     PrdDataExecutor prdDataExecutor = new PrdDataExecutor();
 
     PrdDataExecutor prdDataExecutorSpy = spy(prdDataExecutor);
