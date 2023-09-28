@@ -263,6 +263,7 @@ public class OrganisationCreationRequestValidator {
 
     }
 
+
     public boolean isEmptyValue(String value) {
         return value != null && value.trim().isEmpty();
     }
