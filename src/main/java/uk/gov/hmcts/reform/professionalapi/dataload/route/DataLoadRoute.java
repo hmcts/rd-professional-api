@@ -162,14 +162,6 @@ public class DataLoadRoute {
         }
     }
 
-    @Transactional
-    public void stopRoute(String startRoute, List<String> routesToExecute) throws Exception {
-        List<RouteProperties> routePropertiesList = getRouteProperties(routesToExecute);
-        camelContext.getRouteController().stopRoute("truncateprofessional-user-details-load");
-        camelContext.getRouteController().stopRoute("professional-user-details-load");
-        camelContext.getRouteController().stopRoute("Professional-UserDetails");
-    }
-
 
     private void setHeader(Exchange exchange, String headerName, List<String> sqls) {
         Integer index = (Integer) exchange.getProperty(Exchange.LOOP_INDEX);
