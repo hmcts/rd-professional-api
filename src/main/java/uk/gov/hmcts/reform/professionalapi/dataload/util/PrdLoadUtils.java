@@ -22,11 +22,6 @@ public class PrdLoadUtils {
     private PrdLoadUtils() {
     }
 
-    public static <T> List<T> filterDomainObjects(List<T> domainObjects, Predicate<T> predicate) {
-        return domainObjects.stream()
-            .filter(predicate).collect(Collectors.toList());
-    }
-
     public static void setFileStatus(Exchange exchange, ApplicationContext applicationContext, String auditStatus) {
         var routeProperties = (RouteProperties) exchange.getIn().getHeader(ROUTE_DETAILS);
         var fileStatus = getFileDetails(exchange.getContext(), routeProperties.getFileName());
@@ -34,14 +29,5 @@ public class PrdLoadUtils {
         registerFileStatusBean(applicationContext, routeProperties.getFileName(), fileStatus,
             exchange.getContext()
         );
-    }
-
-    public static Timestamp getDateTimeStamp(String dateTime) {
-        if (!StringUtils.isBlank(dateTime)) {
-            LocalDateTime ldt = LocalDateTime.parse(dateTime,
-                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
-            return Timestamp.valueOf(ldt);
-        }
-        return null;
     }
 }

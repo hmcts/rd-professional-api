@@ -290,7 +290,8 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/util/RefDataUtil.java,"+
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/config/**"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/config/**,"+
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/scheduler/**"
     }
 }
 
