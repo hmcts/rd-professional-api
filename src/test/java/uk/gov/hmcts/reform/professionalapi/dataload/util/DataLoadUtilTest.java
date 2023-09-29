@@ -29,6 +29,14 @@ public class DataLoadUtilTest extends CamelTestSupport {
     }
 
     @Test
+    public void removeGlobalConstant() throws Exception {
+        CamelContext camelContext = createCamelContext();
+        camelContext.stop();
+        dataLoadUtil.removeGlobalConstant(camelContext);
+        assertNull(camelContext.getGlobalOption(MappingConstants.SCHEDULER_NAME));
+    }
+
+    @Test
     public void test_getDateTimeStamp() {
         Timestamp ts = DataLoadUtil.getDateTimeStamp(JrdTestSupport.createCurrentLocalDate());
         assertNotNull(ts);

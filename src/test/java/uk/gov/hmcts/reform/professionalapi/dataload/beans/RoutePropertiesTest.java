@@ -16,6 +16,9 @@ public class RoutePropertiesTest {
 
         assertEquals("Binder", routeProperties.getBinder());
         assertEquals("Blobpath", routeProperties.getBlobPath());
+        assertEquals("startRoute", routeProperties.getStartRoute());
+        assertEquals("tableName", routeProperties.getTableName());
+        assertEquals("deferredSql", routeProperties.getDeferredSql());
         assertEquals("childNames", routeProperties.getChildNames());
         assertEquals("mapper", routeProperties.getMapper());
         assertEquals("processor", routeProperties.getProcessor());

@@ -19,13 +19,15 @@ public class JrdTestSupport {
         RouteProperties routeProperties = new RouteProperties();
         routeProperties.setBinder("Binder");
         routeProperties.setBlobPath("Blobpath");
+        routeProperties.setStartRoute("startRoute");
+        routeProperties.setTableName("tableName");
+        routeProperties.setDeferredSql("deferredSql");
         routeProperties.setChildNames("childNames");
         routeProperties.setMapper("mapper");
         routeProperties.setProcessor("processor");
         routeProperties.setRouteName("routeName");
         routeProperties.setSql("sql");
         routeProperties.setFileName("test");
-        routeProperties.setTableName("test");
         routeProperties.setTruncateSql("truncateSql");
         return routeProperties;
     }
