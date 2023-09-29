@@ -295,7 +295,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/scheduler/**,"+
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/domain/PrdDataloadSchedulerJob.java,"+
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/util/PrdDataLoadSchedulerAudit.java,"+
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/validator/JsrValidatorInitializerTest.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/validator/JsrValidatorInitializer.java"
 
     }
 }
