@@ -14,7 +14,7 @@ public class MappingConstants {
 
     public static final String SCHEDULER_START_TIME = "start-time";
 
-    public static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
+    public static final long MILLIS_IN_A_DAY = 86400000;
 
     public static final String START_ROUTE = "start-route";
 
