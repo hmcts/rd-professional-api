@@ -4,6 +4,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,7 +17,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -53,6 +59,9 @@ class OrganisationCreationRequestValidatorTest {
     private OrganisationCreationRequest organisationCreationRequest;
     private Exception myException;
 
+    private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
+
+
     @BeforeEach
     void setup() {
         organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
@@ -69,6 +78,21 @@ class OrganisationCreationRequestValidatorTest {
 
         verify(validator1, times(1)).validate(organisationCreationRequest);
         verify(validator2, times(1)).validate(organisationCreationRequest);
+
+        assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isTrue();
+        assertThat(OrganisationCreationRequestValidator.contains("pend")).isFalse();
+    }
+
+    @Test
+    void test_CallsAllValidatorsOrgTypeKeyNOrgAtt() {
+        organisationOtherOrgsCreationRequest =
+                new OrganisationOtherOrgsCreationRequest("Company", "PENDING", "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,  "Doctor", null);
+        organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest);
+
+        verify(validator1, times(1)).validate(organisationOtherOrgsCreationRequest);
+        verify(validator2, times(1)).validate(organisationOtherOrgsCreationRequest);
 
         assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isTrue();
         assertThat(OrganisationCreationRequestValidator.contains("pend")).isFalse();
@@ -454,4 +478,46 @@ class OrganisationCreationRequestValidatorTest {
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessageStartingWith(ERROR_MESSAGE_INVALID_STATUS_PASSED);
     }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"","D*&&&&&"})
+    void test_validateOrganisationRequestWithOrgTypeKeyNull(String orgTypeKey) {
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null, orgTypeKey, null);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'',testValue",
+            "testKey,''",
+            ",testValue",
+            "testKey, ",
+            "'',testValue"
+
+    })
+    void test_validateOrganisationRequestWithOrgAttributeKeyEmpty(String key,String value) {
+
+        OrgAttributeRequest orgAttribute = new OrgAttributeRequest();
+
+        orgAttribute.setKey(key);
+        orgAttribute.setValue(value);
+
+        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
+
+        orgAttributes.add(orgAttribute);
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,"Doctor", orgAttributes);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
+    }
+
 }
