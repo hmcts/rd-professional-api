@@ -70,6 +70,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -121,6 +122,9 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 class OrganisationServiceImplTest {
 
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
+
+    private final SingletonOrgTypeRepository singletonOrgTypeRepository = mock(SingletonOrgTypeRepository.class);
+
     private final OrgAttributeRepository orgAttributeRepository = mock(OrgAttributeRepository.class);
 
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
@@ -635,6 +639,7 @@ class OrganisationServiceImplTest {
         verify(organisationMock, times(1)).setDateApproved(any());
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(any(String.class));
+        verify(singletonOrgTypeRepository, times(1)).findByOrgType(anyString());
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
 

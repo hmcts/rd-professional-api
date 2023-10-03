@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SingletonOrgType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
@@ -60,6 +61,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -131,6 +133,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     ProfessionalUserService professionalUserService;
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
+
+    @Autowired
+    SingletonOrgTypeRepository singletonOrgTypeRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -554,7 +559,21 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            organisation.setOrgType(orgCreationRequestV2.getOrgType());
+            String orgTypeInRequest = orgCreationRequestV2.getOrgType();
+            Optional<SingletonOrgType> isOrgTypePresentInSingleTonOrgTable = singletonOrgTypeRepository
+                    .findByOrgType(orgTypeInRequest);
+            Organisation orgDetailForRequestedOrgType = organisationRepository.findByOrgType(orgTypeInRequest);
+
+            if (isOrgTypePresentInSingleTonOrgTable.isPresent()) {
+                if (null != orgDetailForRequestedOrgType && orgDetailForRequestedOrgType.getStatus().isActive()) {
+                    throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
+                } else if (null == orgDetailForRequestedOrgType
+                        || !orgDetailForRequestedOrgType.getStatus().isActive()) {
+                    organisation.setOrgType(orgTypeInRequest);
+                }
+            } else if (!isOrgTypePresentInSingleTonOrgTable.isPresent()) {
+                organisation.setOrgType(orgTypeInRequest);
+            }
         }
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
