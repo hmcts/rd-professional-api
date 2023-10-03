@@ -371,6 +371,7 @@ public abstract class SuperController {
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
+        // deleting the orgAttribute array to add new changes
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             organisationService.deleteOrgAttribute(orgCreationRequestV2.getOrgAttributes(), organisationIdentifier);
         }
