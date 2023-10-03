@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
@@ -85,6 +86,7 @@ class OrganisationInternalControllerTest {
     private PaymentAccountService paymentAccountServiceMock;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
+    private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
     private ProfessionalUserService professionalUserServiceMock;
@@ -113,6 +115,9 @@ class OrganisationInternalControllerTest {
 
     @InjectMocks
     private OrganisationInternalController organisationInternalController;
+
+    @InjectMocks
+    private OrganisationInternalControllerV2 organisationInternalControllerV2;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -152,6 +157,9 @@ class OrganisationInternalControllerTest {
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
+                "sra-id", "false", "number02", "company-url",
+                userCreationRequest, null, null,"Doctor",null);
 
         organisation.setOrganisationIdentifier("AK57L4T");
 
@@ -181,6 +189,25 @@ class OrganisationInternalControllerTest {
                 .validate(any(OrganisationCreationRequest.class));
         verify(organisationServiceMock, times(1))
                 .createOrganisationFrom(any(OrganisationCreationRequest.class));
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
+    void test_CreateOrganisationV2() {
+        final HttpStatus expectedHttpStatus = HttpStatus.CREATED;
+
+        when(organisationServiceMock.createOrganisationFrom(organisationOtherOrgsCreationRequest))
+                .thenReturn(organisationResponse);
+
+        ResponseEntity<?> actual = organisationInternalControllerV2
+                .createOrganisation(organisationOtherOrgsCreationRequest);
+
+        verify(organisationCreationRequestValidatorMock, times(1))
+                .validate(any(OrganisationOtherOrgsCreationRequest.class));
+        verify(organisationServiceMock, times(1))
+                .createOrganisationFrom(any(OrganisationOtherOrgsCreationRequest.class));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
