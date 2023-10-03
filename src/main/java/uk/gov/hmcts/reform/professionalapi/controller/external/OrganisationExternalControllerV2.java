@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -100,7 +101,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
     @ApiResponse(
             responseCode = "200",
             description = "Details of an Organisation",
-            content = @Content(schema = @Schema(implementation = OrganisationEntityResponseV2.class))
+            content = @Content(schema = @Schema(implementation = OrganisationsDetailResponseV2.class))
     )
     @ApiResponse(
             responseCode = "400",
