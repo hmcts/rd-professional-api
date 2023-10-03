@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import feign.Request;
 import feign.Response;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalControllerV2;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -28,92 +30,71 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
-import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalExternalPbasV2")
-@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import(OrganisationalExternalControllerV2ProviderTestConfiguration.class)
 public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProviderTest {
 
+    public static final String A_CLAIM = "aClaim";
+    public static final String A_HEADER = "aHeader";
+    public static final String ORG_NAME = "Org-Name";
+    public static final String SRA_ID = "sra-id";
+    public static final String COMPANY_NUMBER = "companyN";
+    public static final String COMPANY_URL = "www.org.com";
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
     private static final String USER_JWT = "Bearer 8gf364fg367f67";
-
     private static final String SOME_USER_IDENTIFIER = "someUserIdentifier";
-
-    @Autowired
-    ProfessionalUserRepository professionalUserRepositoryMock;
-
     @Autowired
     OrganisationExternalControllerV2 organisationExternalControllerV2;
 
+
+    @MockBean
+    OrganisationRepository organisationRepository;
+
+    @MockBean
+    Authentication authentication;
+    @MockBean
+    SecurityContext securityContext;
+    @Autowired
+    OrganisationServiceImpl organisationServiceImpl;
     @Autowired
     UserProfileFeignClient userProfileFeignClientMock;
-
     @Autowired
-    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
-
+    ProfessionalUserRepository professionalUserRepositoryMock;
     @Autowired
     IdamRepository idamRepositoryMock;
-    
-    @Autowired
-    PaymentAccountRepository paymentAccountRepositoryMock;
-
-    @Autowired
-    OrganisationService organisationServiceMock;
-
-    @Autowired
-    ProfessionalUserService professionalUserServiceMock;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-    @Mock
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisationMock;
-
-    @Autowired
-    OrganisationRepository organisationRepository;
-  
-    @Mock
-    Authentication authentication;
-    @Mock
-    SecurityContext securityContext;
-
-    @Autowired
-    OrgAttributeRepository orgAttributeRepository;
 
     @Override
     void setController() {
         testTarget.setControllers(organisationExternalControllerV2);
     }
 
-    public static final String A_CLAIM = "aClaim";
-    public static final String A_HEADER = "aHeader";
-
-    @State({"Pbas organisational v2 data exists for identifier " + ORGANISATION_EMAIL})
+    @State("Pbas External organisational v2 data exists for identifier")
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
 
-        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
-                .claim(A_CLAIM, A_CLAIM)
-                .claim("aud", Lists.newArrayList("ccd_gateway"))
-                .header(A_HEADER, A_HEADER)
-                .build();
+        Jwt jwt = Jwt.withTokenValue(USER_JWT)
+            .claim(A_CLAIM, A_CLAIM)
+            .claim("aud", Lists.newArrayList("ccd_gateway"))
+            .header(A_HEADER, A_HEADER)
+            .build();
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
@@ -126,23 +107,22 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
-                "firstName", "lastName", IdamStatus.ACTIVE);
+            "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClientMock.getUserProfileById(SOME_USER_IDENTIFIER))
-                .thenReturn(Response.builder()
-                        .request(mock(Request.class))
-                        .body(body, Charset.defaultCharset()).status(200).build());
+            .thenReturn(Response.builder()
+                .request(mock(Request.class))
+                .body(body, Charset.defaultCharset()).status(200).build());
 
         when(idamRepositoryMock.getUserInfo(anyString()))
-                .thenReturn(UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).build());
+            .thenReturn(UserInfo.builder().roles(List.of("pui-finance-manager")).build());
 
         when(professionalUserRepositoryMock.findByEmailAddress(ORGANISATION_EMAIL)).thenReturn(professionalUser);
 
     }
-
 
 
     private ProfessionalUser getProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
@@ -169,10 +149,10 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
         oa.setKey("123");
         oa.setValue("ACCA");
 
-        organisation.setPaymentAccounts(Arrays.asList(pa));
-        organisation.setUsers(Arrays.asList(su));
+        organisation.setPaymentAccounts(List.of(pa));
+        organisation.setUsers(List.of(su));
 
-        organisation.setOrgAttributes(Arrays.asList(oa));
+        organisation.setOrgAttributes(List.of(oa));
         organisation.setOrgType("some");
 
         ProfessionalUser pu = new ProfessionalUser();
@@ -183,88 +163,39 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
     }
 
 
-    @State({"a request to register an organisationV2"})
-    public void toRegisterNewOrganisation()  {
+    @State({"a request to register an External organisationV2"})
+    public void toRegisterNewOrganisation() {
 
-        when(organisationRepository.save(any(Organisation.class))).thenAnswer(i -> i.getArguments()[0]);
+        Organisation org = getCreateOrganisationResponse();
+        OrganisationResponse organisationResponse = new OrganisationResponse(org);
 
-    }
+        organisationResponse.getOrganisationIdentifier();
+        org.setOrganisationIdentifier("AAA6");
+        OrganisationResponse response = new OrganisationResponse(org);
 
 
+        when(organisationServiceImpl.createOrganisationFrom(any())).thenReturn(response);
 
-    @State({"OrganisationV2 with Id exists"})
-    public void toRetreiveOrganisationalData() throws IOException {
-        mockSecurityContext();
-
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
-            "firstName", "lastName", IdamStatus.ACTIVE);
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
-        String body = objectMapper.writeValueAsString(userProfileResponse);
-
-        when(userProfileFeignClientMock.getUserProfileById(SOME_USER_IDENTIFIER))
-            .thenReturn(Response.builder()
-                .request(mock(Request.class))
-                .body(body, Charset.defaultCharset()).status(200).build());
-
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(
-            setUpProfessionalUser());
-
-        when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
-            .thenReturn(organisationMock);
 
     }
 
-    private void mockSecurityContext() {
-        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
-            .claim(A_CLAIM, A_CLAIM)
-            .claim("tokenName", "access_token")
-            .claim("aud", Collections.singletonList("pui-case-manager"))
-            .header(A_HEADER, A_HEADER)
-            .build();
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
-        when(idamRepositoryMock.getUserInfo(anyString()))
-            .thenReturn(UserInfo.builder().uid("someUid")
-                .roles(Arrays.asList("pui-case-manager")).build());
-    }
 
-    private ProfessionalUser setUpProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
-        setUpOrganisation(name, sraId, companyNumber, companyUrl);
+    @State({"OrganisationV2 External with Id exists"})
+    public void toRetreiveOrganisationalData() {
 
-        SuperUser su = new SuperUser();
-        su.setEmailAddress("superUser@email.com");
-        su.setFirstName("some-fname");
-        su.setLastName("some-lname");
-        su.setUserIdentifier(SOME_USER_IDENTIFIER);
+        setUpOrganisation("name", "SRdid", "123", "url");
 
-        PaymentAccount pa = new PaymentAccount();
-        pa.setPbaNumber("pbaNumber");
+        OrganisationEntityResponseV2 organisationEntityResponseV2 = new
+            OrganisationEntityResponseV2(organisationMock, true,
+            true,
+            true,
+            true);
 
-        organisationMock.setPaymentAccounts(asList(pa));
-        organisationMock.setUsers(asList(su));
-        organisationMock.setOrgType("some");
-
-        OrgAttribute oa = new OrgAttribute();
-        oa.setKey("123");
-        oa.setValue("ACCA");
-        organisationMock.setOrgAttributes(asList(oa));
-
-        ProfessionalUser pu = new ProfessionalUser();
-        pu.setEmailAddress(ORGANISATION_EMAIL);
-        pu.setOrganisation(organisationMock);
-        return pu;
+        when(organisationServiceImpl.retrieveOrganisationForV2Api(any(), anyBoolean()))
+            .thenReturn(organisationEntityResponseV2);
 
     }
 
-    private ProfessionalUser setUpProfessionalUser() {
-        String name = "name";
-        String sraId = "sraId";
-        String companyNumber = "companyNumber";
-        String companyUrl = "companyUrl";
-
-        return setUpProfessionalUser(name, sraId, companyNumber, companyUrl);
-    }
 
     private void setUpOrganisation(String name, String sraId, String companyNumber, String companyUrl) {
         organisationMock = new Organisation();
@@ -281,6 +212,34 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
         contactInformation.setAddressLine2("addressLine2");
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
-        organisationMock.setContactInformations(asList(contactInformation));
+        organisationMock.setContactInformations(List.of(contactInformation));
+
+        organisationMock.setOrgType("123");
+        OrgAttribute orgAttribute = new OrgAttribute();
+        orgAttribute.setKey("123");
+        orgAttribute.setValue("ACCA");
+        organisationMock.setOrgAttributes(List.of(orgAttribute));
+    }
+
+    private Organisation getCreateOrganisationResponse() {
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
+            COMPANY_NUMBER, false, COMPANY_URL);
+        organisation.setSraRegulated(true);
+        organisation.setOrgType("123");
+        OrgAttribute orgAttribute = new OrgAttribute();
+        orgAttribute.setKey("123");
+        orgAttribute.setValue("ACCA");
+        organisation.setOrgAttributes(List.of(orgAttribute));
+        organisation.setOrganisationIdentifier("AAA6");
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn("uprn");
+        contactInformation.setAddressLine1("addressLine1");
+        contactInformation.setAddressLine2("addressLine2");
+        contactInformation.setCountry("country");
+        contactInformation.setPostCode("HA5 1BJ");
+        contactInformation.setCreated(LocalDateTime.now());
+        contactInformation.setId(UUID.randomUUID());
+        organisation.setContactInformations(List.of(contactInformation));
+        return organisation;
     }
 }

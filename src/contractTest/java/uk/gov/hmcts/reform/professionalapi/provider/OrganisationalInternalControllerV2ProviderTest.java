@@ -2,38 +2,45 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalControllerV2;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalInternalV2")
-@Import(OrganisationalInternalControllerProviderTestConfiguration.class)
+@Import(OrganisationalInternalControllerV2ProviderTestConfiguration.class)
 public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProviderTest {
+
+
+    private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
+
+    private static final String FIRST_NAME = "some name";
+
+    private static final String LAST_NAME = "last name";
 
     @Autowired
     OrganisationRepository organisationRepository;
@@ -41,95 +48,84 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     @Autowired
     OrganisationInternalControllerV2 organisationInternalControllerV2;
 
-
-    @Autowired
+    @MockBean
     PaymentAccountService paymentAccountService;
 
-    @Autowired
-    MappingJackson2HttpMessageConverter httpMessageConverter;
+
+    @MockBean
+    OrganisationServiceImpl organisationService;
+
 
     public static final String ORG_NAME = "Org-Name";
     public static final String SRA_ID = "sra-id";
     public static final String COMPANY_NUMBER = "companyN";
     public static final String COMPANY_URL = "www.org.com";
 
+    @MockBean
+    OrganisationResponse  organisationResponse;
+
+    @MockBean
+    OrganisationOtherOrgsCreationRequest  organisationOtherOrgsCreationRequest;
+
     @Override
     void setController() {
         testTarget.setControllers(organisationInternalControllerV2);
-        testTarget.setMessageConverters(httpMessageConverter);
     }
+
+
+    @State("a request to register an internal organisationV2")
+    public void toRegisterNewOrganisation() {
+        Organisation org = getCreateOrganisationResponse();
+        OrganisationResponse response = new OrganisationResponse(org);
+        when(organisationService.createOrganisationFrom(any())).thenReturn(response);
+
+    }
+
 
     //retrieveOrganisations
     @State("Organisation V2 exists for given Id")
     public void setUpOrganisationForGivenId() {
-
         Organisation organisation = getOrganisation();
+        mockOrgDetails(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
-
     }
 
-    //retrieveOrganisationsWithPagination
-    @State("An organisation V2 exists with pagination")
-    public void setUpOrganisationWithPagination() {
-
-        Organisation organisation = getOrganisation();
-        Page<Organisation> orgPage = mock(Page.class);
-
-        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE, OrganisationStatus.PENDING),
-            any(Pageable.class))).thenReturn(orgPage);
-        when(orgPage.getContent()).thenReturn(List.of(organisation));
+    //retrieveOrganisations by PBA
+    @State("Organisations V2 with payment accounts exist for given Pba Email")
+    public void setUpOrganisationWithStatusForGivenPbaEmail() {
+        Organisation organisation = getOrganisationWithPbaEmail();
+        mockPbaDetails(organisation);
+        when(organisationRepository.findByPbaStatus(any())).thenReturn(List.of(organisation));
     }
 
-
-    //retrieveOrganisationsWithStatusAndPagination
-    @State("An active organisation V2 exists for given status and with pagination")
-    public void setUpOrganisationWithStatusAndPagination() {
-
-        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
-            COMPANY_NUMBER, false, COMPANY_URL);
-        addSuperUser(organisation);
-        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class)))
-            .thenReturn(mock(Page.class));
-        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class))
-                .getContent()).thenReturn(List.of(organisation));
-    }
-
-
-    @State("An Organisation V2 exists for update")
+    @State("An internal OrganisationV2 exists for update")
     public void setUpOrganisationForUpdate() {
 
-        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
+        Organisation organisation = new Organisation(ORG_NAME,
+            OrganisationStatus.PENDING, SRA_ID, COMPANY_NUMBER,
+            false, COMPANY_URL);
         addSuperUser(organisation);
-
-        Organisation updatedOrganisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
-        addSuperUser(organisation);
-
+        Organisation updatedOrganisation = new Organisation(ORG_NAME,OrganisationStatus.ACTIVE, SRA_ID, COMPANY_NUMBER,
+            false, COMPANY_URL);
+        when(organisationService.getOrganisationByOrgIdentifier(any())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.save(any())).thenReturn(updatedOrganisation);
 
     }
 
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-    @State("An Organisation V2 with PBA accounts exists")
-    public void setUpOrganisationForPBAsUpdate() {
 
-        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
-        addSuperUser(organisation);
-
-        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
-
-        when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
-            any(PbaRequest.class)))
-            .thenReturn(new PbaResponse("200", "Success"));
+    private void mockOrgDetails(Organisation organisation) {
+        List<Organisation> organisationList = new ArrayList<>();
+        organisationList.add(organisation);
+        when(organisationService.retrieveAllOrganisationsForV2Api(null))
+            .thenReturn(new OrganisationsDetailResponseV2(
+                organisationList, true, true,
+                false,true));
     }
 
-
     private void addSuperUser(Organisation organisation) {
-        SuperUser superUser = new SuperUser("some-fname", "some-lname",
-                "some-email-address", organisation);
+        SuperUser superUser = new SuperUser(FIRST_NAME, LAST_NAME,
+                ORGANISATION_EMAIL, organisation);
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
@@ -147,6 +143,13 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
         orgAttribute.setValue("ACCA");
         organisation.setOrgAttributes(List.of(orgAttribute));
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+        ContactInformation contactInformation = getContactInformation();
+        organisation.setContactInformations(List.of(contactInformation));
+        return organisation;
+    }
+
+    @NotNull
+    private static ContactInformation getContactInformation() {
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setUprn("uprn");
         contactInformation.setAddressLine1("addressLine1");
@@ -155,39 +158,61 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
         contactInformation.setPostCode("HA5 1BJ");
         contactInformation.setCreated(LocalDateTime.now());
         contactInformation.setId(UUID.randomUUID());
+        return contactInformation;
+    }
+
+
+    private Organisation getCreateOrganisationResponse() {
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
+            COMPANY_NUMBER, false, COMPANY_URL);
+        organisation.setSraRegulated(true);
+        organisation.setOrgType("123");
+        OrgAttribute orgAttribute = new OrgAttribute();
+        orgAttribute.setKey("123");
+        orgAttribute.setValue("ACCA");
+        organisation.setOrgAttributes(List.of(orgAttribute));
+        organisation.setOrganisationIdentifier("AAA6");
+        ContactInformation contactInformation = getContactInformation();
         organisation.setContactInformations(List.of(contactInformation));
         return organisation;
     }
 
 
-    @State("Organisations V2 with payment accounts exist for given Pba Email")
-    public void setUpOrganisationWithStatusForGivenPbaEmail() {
-        Organisation organisation = getOrganisationWithPbaEmail();
-        when(organisationRepository.findByPbaStatus(any())).thenReturn(List.of(organisation));
+    private void mockPbaDetails(Organisation organisation) {
+        when(paymentAccountService.findPaymentAccountsByEmail(ORGANISATION_EMAIL))
+            .thenReturn(organisation);
     }
 
     private Organisation getOrganisationWithPbaEmail() {
-        PaymentAccount paymentAccount = new PaymentAccount();
-        paymentAccount.setPbaNumber("PBA12345");
-        paymentAccount.setStatusMessage("Approved");
-        paymentAccount.setPbaStatus(PbaStatus.ACCEPTED);
-        paymentAccount.setCreated(LocalDateTime.now());
-        paymentAccount.setLastUpdated(LocalDateTime.now());
-        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
-                COMPANY_NUMBER, false, COMPANY_URL);
-        organisation.setSraRegulated(true);
-        organisation.setOrganisationIdentifier("org1");
-        organisation.setPaymentAccounts(Collections.singletonList(paymentAccount));
-        SuperUser superUser = new SuperUser();
-        superUser.setFirstName("fName");
-        superUser.setLastName("lName");
-        superUser.setEmailAddress("example.email@test.com");
-        organisation.setUsers(Collections.singletonList(superUser));
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE,
+            SRA_ID,COMPANY_NUMBER, true, COMPANY_URL);
+        SuperUser su = getSuperUser();
+        organisation.setUsers(Arrays.asList(su));
+
+        PaymentAccount pa = new PaymentAccount();
+        pa.setPbaNumber("pbaNumber");
+        pa.setPbaStatus(PbaStatus.ACCEPTED);
+        organisation.setPaymentAccounts(Arrays.asList(pa));
+
+        ContactInformation contactInformation = getContactInformation();
+        organisation.setContactInformations(List.of(contactInformation));
+
+        organisation.setOrgType("123");
         OrgAttribute orgAttribute = new OrgAttribute();
         orgAttribute.setKey("123");
         orgAttribute.setValue("ACCA");
-        organisation.setOrgAttributes(Collections.singletonList(orgAttribute));
-        organisation.setOrgType("some");
+        organisation.setOrgAttributes(List.of(orgAttribute));
+
         return organisation;
+    }
+
+    @NotNull
+    private static SuperUser getSuperUser() {
+        SuperUser su = new SuperUser();
+        su.setEmailAddress(ORGANISATION_EMAIL);
+        su.setFirstName("some-fname");
+        su.setLastName("some-lname");
+        su.setUserIdentifier("someUserIdentifier");
+        return su;
     }
 }
