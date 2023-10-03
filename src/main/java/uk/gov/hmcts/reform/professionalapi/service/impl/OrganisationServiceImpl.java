@@ -85,6 +85,7 @@ import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_ERROR_BODY_START;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
@@ -134,8 +135,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
-
-    private static final String SHOW_DELETED = "false";
 
     @Override
     @Transactional
@@ -343,7 +342,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     .toList());
             updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
-                    SHOW_DELETED, activeOrganisationDtls);
+                    FALSE, activeOrganisationDtls);
 
         }
         return updatedOrganisationDetails;
@@ -397,7 +396,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     .toList());
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
-                    SHOW_DELETED, activeOrganisationDetails);
+                FALSE, activeOrganisationDetails);
         }
 
         resultingOrganisations.addAll(pendingOrganisations);
@@ -457,11 +456,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
-                    = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
-                    .toList());
+                = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
+                .toList());
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
-                    retrieveUserProfilesRequest,
-                    SHOW_DELETED, activeOrganisationDetails);
+                retrieveUserProfilesRequest,
+                FALSE, activeOrganisationDetails);
         }
 
         resultingOrganisations.addAll(pendingOrganisations);

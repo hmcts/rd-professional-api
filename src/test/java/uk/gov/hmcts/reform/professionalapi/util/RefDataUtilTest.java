@@ -760,7 +760,8 @@ class RefDataUtilTest {
         assertNull(item.getOrganisation().getId());
         assertEquals("Org-Name", item.getOrganisation().getName());
 
-        assertThat(orgResponse).isNotNull().isNotEmpty();
+        assertThat(orgResponse).isNotNull()
+                                .isNotEmpty();
         assertThat(orgResponse.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
         assertThat(orgResponse.get(0).getName()).isEqualTo("Org-Name");
         assertThat(orgResponse.get(0).getSraId()).isEqualTo("sra-id");
@@ -892,7 +893,8 @@ class RefDataUtilTest {
 
         List<Organisation> orgResponse = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                 mock(RetrieveUserProfilesRequest.class), "true", activeOrganisationDetails);
-        assertThat(orgResponse).isNotNull().isEmpty();
+        assertThat(orgResponse).isNotNull()
+                                .isEmpty();
         assertThat(response.body()).isNotNull();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
@@ -922,7 +924,8 @@ class RefDataUtilTest {
 
         List<Organisation> orgResponse = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                 mock(RetrieveUserProfilesRequest.class), "true", activeOrganisationDetails);
-        assertThat(orgResponse).isNotNull().isEmpty();
+        assertThat(orgResponse).isNotNull()
+                                .isEmpty();
         assertEquals(HttpStatus.MULTIPLE_CHOICES.value(),realResponse.status());
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
