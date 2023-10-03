@@ -167,13 +167,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
     public void toRegisterNewOrganisation() {
 
         Organisation org = getCreateOrganisationResponse();
-        OrganisationResponse organisationResponse = new OrganisationResponse(org);
-
-        organisationResponse.getOrganisationIdentifier();
-        org.setOrganisationIdentifier("AAA6");
         OrganisationResponse response = new OrganisationResponse(org);
-
-
         when(organisationServiceImpl.createOrganisationFrom(any())).thenReturn(response);
 
 
