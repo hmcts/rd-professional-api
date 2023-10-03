@@ -48,7 +48,6 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
         return new OrganisationExternalController();
     }
 
-
     @Bean
     @Primary
     public OrganisationMfaStatusController organisationMfaStatusController() {
