@@ -1,4 +1,5 @@
 {
+  "10049_Non-Storable Content_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore",
   "10021_X-Content-Type-Options Header Missing_http://rd-professional-api-aat.service.core-compute-aat.internal/_GET": "ignore",
   "10021_X-Content-Type-Options Header Missing_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?showDeleted=showDeleted_GET": "ignore",

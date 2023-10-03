@@ -162,6 +162,7 @@ into the pre-script window.  Also add a header as follows:
 ServiceAuthorization: Bearer {{token}}
 ```
 
+
 ### Contract testing with pact
 
 To publish against remote broker:
