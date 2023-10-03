@@ -556,16 +556,17 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisation.setOrgType(orgCreationRequestV2.getOrgType());
         }
 
-        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
-
-        }
-
         if (TRUE.equals(isOrgApprovalRequest)) {
             organisation.setDateApproved(LocalDateTime.now());
         }
         var savedOrganisation = organisationRepository.save(organisation);
+
         //Update Organisation service done
+
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
+        }
+
 
         if (isNotEmpty(savedOrganisation.getPaymentAccounts())
                 && organisationCreationRequest.getStatus().equals("ACTIVE")) {
