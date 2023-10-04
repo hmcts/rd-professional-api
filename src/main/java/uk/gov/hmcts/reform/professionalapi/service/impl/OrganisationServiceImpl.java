@@ -562,24 +562,28 @@ public class OrganisationServiceImpl implements OrganisationService {
             String orgTypeInRequest = orgCreationRequestV2.getOrgType();
             Optional<SingletonOrgType> isOrgTypePresentInSingleTonOrgTable = singletonOrgTypeRepository
                     .findByOrgType(orgTypeInRequest);
-            Organisation orgDetailForRequestedOrgType = organisationRepository.findByOrgType(orgTypeInRequest);
 
+            var organisationList = organisationRepository.findByOrgType(orgTypeInRequest);
+            boolean orgStatus = organisationList.stream()
+                    .anyMatch(org -> org.getStatus().isActive());
+
+            // When org type is not present in organisation table
+            if (isEmpty(organisationList)) {
+                organisation.setOrgType(orgTypeInRequest);
+            }
+
+            //When org Type is present in Singleton table
             if (isOrgTypePresentInSingleTonOrgTable.isPresent()) {
-                if (null != orgDetailForRequestedOrgType && orgDetailForRequestedOrgType.getStatus().isActive()) {
-                    throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
-                } else if (null == orgDetailForRequestedOrgType
-                        || !orgDetailForRequestedOrgType.getStatus().isActive()) {
+                if (!orgStatus) {
                     organisation.setOrgType(orgTypeInRequest);
+                } else {
+                    throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
                 }
-            } else if (!isOrgTypePresentInSingleTonOrgTable.isPresent()) {
+            } else {
                 organisation.setOrgType(orgTypeInRequest);
             }
         }
 
-        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
-
-        }
 
         if (TRUE.equals(isOrgApprovalRequest)) {
             organisation.setDateApproved(LocalDateTime.now());
@@ -587,6 +591,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         var savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
+
+        }
         if (isNotEmpty(savedOrganisation.getPaymentAccounts())
                 && organisationCreationRequest.getStatus().equals("ACTIVE")) {
             updatePaymentAccounts(savedOrganisation.getPaymentAccounts());

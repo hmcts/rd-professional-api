@@ -621,7 +621,7 @@ class OrganisationServiceImplTest {
 
         verify(organisationMock, times(1)).setName((organisationOtherOrgsCreationRequest
                 .getName()));
-        verify(organisationMock, times(1)).setOrgType(organisationOtherOrgsCreationRequest
+        verify(organisationMock, times(2)).setOrgType(organisationOtherOrgsCreationRequest
                 .getOrgType());
         verify(organisationMock, times(1)).setOrgAttributes(any());
         verify(organisationMock, times(1))
