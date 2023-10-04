@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Professi
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
@@ -96,6 +97,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDelete
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeLeadingAndTailingSpaces;
 
 @RestController
 @Slf4j
@@ -482,10 +484,10 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    protected ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomerId(BulkCustomerRequest
-                                                                                          bulkCustomerRequest) {
-        var bulkCustId = removeAllSpaces(bulkCustomerRequest.getBulkCustomerId());
-        var sidamId = removeAllSpaces(bulkCustomerRequest.getIdamId());
+    protected ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomerId(
+                                                                            BulkCustomerRequest bulkCustomerRequest) {
+        var bulkCustId = removeLeadingAndTailingSpaces(bulkCustomerRequest.getBulkCustomerId());
+        var sidamId = removeLeadingAndTailingSpaces(bulkCustomerRequest.getIdamId());
 
 
 
@@ -496,7 +498,7 @@ public abstract class SuperController {
 
         log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomerId Valdiation success", loggingComponentName);
 
-        Object bulkCustomerDetailResponse = null;
+        BulkCustomerOrganisationsDetailResponse bulkCustomerDetailResponse = null;
 
         if (StringUtils.isNotEmpty(bulkCustId) && StringUtils.isNotEmpty(sidamId)) {
             bulkCustomerDetailResponse = organisationService

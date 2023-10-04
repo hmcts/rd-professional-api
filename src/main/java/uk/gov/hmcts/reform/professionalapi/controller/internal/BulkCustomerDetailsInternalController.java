@@ -55,7 +55,7 @@ public class BulkCustomerDetailsInternalController extends SuperController {
     )
     @ApiResponse(
             responseCode = "400",
-            description = "Invalid request (Status or ID) provided",
+            description = "Invalid request (BulkCustomerId or IdamId) provided",
             content = @Content
     )
     @ApiResponse(
@@ -65,7 +65,7 @@ public class BulkCustomerDetailsInternalController extends SuperController {
     )
     @ApiResponse(
             responseCode = "404",
-            description = "No Organisation(s) found with the given ID",
+            description = "No Organisation(s) found with the given Bulk Customer ID",
             content = @Content
     )
     @ApiResponse(
@@ -78,7 +78,7 @@ public class BulkCustomerDetailsInternalController extends SuperController {
     @PostMapping(
             produces = APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Object> retrieveOrganisationDetailsForBulkCustomer(
+    public ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomer(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description =
                                                                     "retrieveOrganisationDetailsForBulkCustomer")
             @Valid @NotNull @RequestBody BulkCustomerRequest bulkCustomerRequest) {

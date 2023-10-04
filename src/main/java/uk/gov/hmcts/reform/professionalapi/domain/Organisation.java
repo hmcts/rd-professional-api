@@ -74,7 +74,7 @@ public class Organisation implements Serializable {
     private OrganisationMfaStatus organisationMfaStatus;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
+    @OneToMany(targetEntity = BulkCustomerDetails.class, mappedBy = "organisation")
     private List<BulkCustomerDetails> bulkCustomerDetails;
 
     @Column(name = "STATUS")

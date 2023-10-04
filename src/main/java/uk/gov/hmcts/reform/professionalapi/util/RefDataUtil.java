@@ -229,6 +229,14 @@ public class RefDataUtil {
         return modValue;
     }
 
+    public static String removeLeadingAndTailingSpaces(String value) {
+        String modValue = value;
+        if (isNotBlank(modValue)) {
+            modValue = modValue.strip();
+        }
+        return modValue;
+    }
+
     public static void validateOrgIdentifier(String extOrgId, String orgId) {
 
         if (!extOrgId.trim().equals(orgId.trim())) {
