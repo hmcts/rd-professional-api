@@ -574,16 +574,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                     throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
                 }
             } else {
-                if (!orgStatus) {
-                    organisation.setOrgType(orgTypeInRequest);
-                } else {
-                    throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
-                }
+                organisation.setOrgType(orgTypeInRequest);
             }
-
-
-
-
         }
 
         //Into update Organisation service
