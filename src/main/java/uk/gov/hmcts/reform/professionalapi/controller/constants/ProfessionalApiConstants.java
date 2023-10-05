@@ -90,6 +90,21 @@ public class ProfessionalApiConstants {
     public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
     public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
     public static final String RD_PROFESSIONAL_MULTIPLE_ADDRESS = "rd-professional-multiple-address";
+
+    public static final String PRD_RETRIEVE_INTERNAL_V2 = "prd-retrieve-organisation-internal-v2";
+
+    public static final String PRD_CREATE_INTERNAL_V2 = "prd-create-organisation-internal-v2";
+
+    public static final String PRD_UPDATE_INTERNAL_V2 = "prd-update-organisation-internal-v2";
+
+    public static final String PRD_RETRIEVE_PBA_INTERNAL_V2 = "prd-retrieve-organisation-pba-internal-v2";
+
+    public static final String PRD_RETRIEVE_PBA_EXTERNAL_V2 = "prd-retrieve-organisation-pba-external-v2";
+
+    public static final String PRD_RETRIEVE_EXTERNAL_V2 = "prd-retrieve-organisation-external-v2";
+
+    public static final String PRD_CREATE_EXTERNAL_V2 = "prd-create-organisation-external-v2";
+
     public static final String ERROR_MSG_ORG_ADDRESS = "Organisation should have at least one address";
     public static final String ERROR_MSG_ORG_NOT_EXIST = "Organisation does not exist";
     public static final String ERROR_MSG_ORG_IDS_DOES_NOT_MATCH = "ids not found or not belonging to org";
@@ -143,5 +158,10 @@ public class ProfessionalApiConstants {
     public static final String GET_USER_STATUS_EMAIL_2 = ",\n pui-user-manager,\n pui-organisation-manager,";
     public static final String GET_USER_STATUS_EMAIL_3 = "\n pui-case-manager,\n caseworker-publiclaw-courtadmin";
     public static final String ORGANISATION_MISMATCH = "Organisation doesn't match for the given userIdentifier";
+
+    public static final String ORG_TYPE_REGEX = "^[(a-zA-Z0-9 )\\p{L}\\p{N}'’-]{1,256}$";
+
+    public static final String ORG_TYPE_INVALID = "Org Type is invalid - can only contain Alphabetic,"
+            + " empty space, ', - characters and must be less than 256 characters";
 
 }
