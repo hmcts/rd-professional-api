@@ -115,6 +115,7 @@ module "db-professional-ref-data-v15" {
   name               = join("-", [var.product-V15, var.component-V15])
 }
 
+
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {
   name          = join("-", [var.component, "POSTGRES-USER-V15"])
   value         = module.db-professional-ref-data-v15.username
