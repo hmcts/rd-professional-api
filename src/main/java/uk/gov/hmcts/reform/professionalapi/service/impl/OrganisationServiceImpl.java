@@ -69,6 +69,7 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -548,16 +549,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
-        //Into update Organisation service
-        organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
-        organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
-        organisation.setStatusMessage(organisationCreationRequest.getStatusMessage());
-        organisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
-        organisation.setCompanyNumber(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()));
-        organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest
-                .getSraRegulated().toLowerCase())));
-        organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
-
+        //Setting the org Type before settinf the status of the organisation
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             String orgTypeInRequest = orgCreationRequestV2.getOrgType();
             Optional<SingletonOrgType> isOrgTypePresentInSingleTonOrgTable = singletonOrgTypeRepository
@@ -580,9 +572,28 @@ public class OrganisationServiceImpl implements OrganisationService {
                     throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
                 }
             } else {
-                organisation.setOrgType(orgTypeInRequest);
+                if (!orgStatus) {
+                    organisation.setOrgType(orgTypeInRequest);
+                } else {
+                    throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
+                }
             }
+
+
+
+
         }
+
+        //Into update Organisation service
+        organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
+        organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
+        organisation.setStatusMessage(organisationCreationRequest.getStatusMessage());
+        organisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
+        organisation.setCompanyNumber(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()));
+        organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest
+                .getSraRegulated().toLowerCase())));
+        organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
+
 
 
         if (TRUE.equals(isOrgApprovalRequest)) {
