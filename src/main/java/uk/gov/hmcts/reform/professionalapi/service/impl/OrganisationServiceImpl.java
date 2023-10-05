@@ -69,7 +69,6 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -166,7 +165,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addDefaultMfaStatusToOrganisation(organisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false, false);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false,
+                false);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -478,7 +478,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         OrganisationsDetailResponseV2 organisationsDetailResponse = new OrganisationsDetailResponseV2(
-                resultingOrganisations, true, true, false,true);
+                resultingOrganisations, true, true, false,
+                true);
         organisationsDetailResponse.setTotalRecords(totalRecords);
         return organisationsDetailResponse;
     }
@@ -500,7 +501,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
-        return new OrganisationEntityResponseV2(organisation, true, isPendingPbaRequired, false, true);
+        return new OrganisationEntityResponseV2(organisation, true, isPendingPbaRequired,
+                false, true);
     }
 
     @Override
@@ -652,7 +654,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
-        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
+        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired,
+                false);
     }
 
     @Override
