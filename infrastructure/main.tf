@@ -107,7 +107,7 @@ module "db-professional-ref-data-v15" {
   env                  = var.env
   pgsql_databases = [
     {
-      name = "rd-professional-api-db"
+      name = "dbrefdata"
     }
   ]
   pgsql_version        = "15"
@@ -135,7 +135,7 @@ resource "azurerm_key_vault_secret" "POSTGRES-PASS-V15" {
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-V15" {
   name          = join("-", [var.component, "POSTGRES-DATABASE-V15"])
-  value         = "rd-professional-api-db"
+  value         = "dbrefdata"
   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 }
 
