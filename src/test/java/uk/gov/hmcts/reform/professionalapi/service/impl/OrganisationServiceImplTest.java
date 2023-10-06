@@ -57,6 +57,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SingletonOrgType;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
@@ -90,6 +91,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -294,7 +296,8 @@ class OrganisationServiceImplTest {
         verify(dxAddressRepositoryMock, times(1)).saveAll(any());
         verify(userAccountMapServiceMock, times(1))
                 .persistedUserAccountMap(any(ProfessionalUser.class), anyList());
-        verify(organisationMfaStatusRepositoryMock, times(1)).save(any(OrganisationMfaStatus.class));
+        verify(organisationMfaStatusRepositoryMock, times(1))
+                                                    .save(any(OrganisationMfaStatus.class));
     }
 
 
@@ -338,15 +341,17 @@ class OrganisationServiceImplTest {
         verify(dxAddressRepositoryMock, times(1)).saveAll(any());
         verify(userAccountMapServiceMock, times(1))
                 .persistedUserAccountMap(any(ProfessionalUser.class), anyList());
-        verify(organisationMfaStatusRepositoryMock, times(1)).save(any(OrganisationMfaStatus.class));
+        verify(organisationMfaStatusRepositoryMock, times(1))
+                .save(any(OrganisationMfaStatus.class));
     }
 
     @Test
     void testCreateOrganisationFrom()  {
         OrganisationResponse result = sut.createOrganisationFrom(organisationOtherOrgsCreationRequest);
 
-        assertThat(result).hasSameClassAs(new OrganisationResponse(new Organisation("name", OrganisationStatus.ACTIVE,
-                "sraId", "companyNumber", Boolean.TRUE, "companyUrl")));
+        assertThat(result).hasSameClassAs(new OrganisationResponse(new Organisation("name",
+                OrganisationStatus.ACTIVE,
+                "sraId", "companyNumber", TRUE, "companyUrl")));
 
     }
 
@@ -467,7 +472,8 @@ class OrganisationServiceImplTest {
 
         sut.addDefaultMfaStatusToOrganisation(organisationMock);
 
-        verify(organisationMfaStatusRepositoryMock,times(1)).save(any(OrganisationMfaStatus.class));
+        verify(organisationMfaStatusRepositoryMock,times(1))
+                .save(any(OrganisationMfaStatus.class));
         verify(organisationMock, times(1)).setOrganisationMfaStatus(any());
     }
 
@@ -559,7 +565,8 @@ class OrganisationServiceImplTest {
         verify(organisationMock, times(1)).setName((organisationCreationRequest.getName()));
         verify(organisationMock, times(1))
                 .setStatus((OrganisationStatus.valueOf(organisationCreationRequest.getStatus())));
-        verify(organisationMock, times(1)).setStatusMessage((organisationCreationRequest.getStatusMessage()));
+        verify(organisationMock, times(1))
+                .setStatusMessage((organisationCreationRequest.getStatusMessage()));
         verify(organisationMock, times(1)).setSraId((organisationCreationRequest.getSraId()));
         verify(organisationMock, times(1))
                 .setCompanyNumber(organisationCreationRequest.getCompanyNumber());
@@ -621,7 +628,7 @@ class OrganisationServiceImplTest {
 
         verify(organisationMock, times(1)).setName((organisationOtherOrgsCreationRequest
                 .getName()));
-        verify(organisationMock, times(2)).setOrgType(organisationOtherOrgsCreationRequest
+        verify(organisationMock, times(1)).setOrgType(organisationOtherOrgsCreationRequest
                 .getOrgType());
         verify(organisationMock, times(1)).setOrgAttributes(any());
         verify(organisationMock, times(1))
@@ -643,6 +650,69 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
 
+    @Test
+    void test_updatesAnOrganisationVerify_when_org_type_not_present_in_org_table() {
+        Organisation organisationMock = mock(Organisation.class);
+        organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
+        organisationOtherOrgsCreationRequest.setOrgType("Doctor1");
+        List<Organisation> organisationList = new ArrayList<>();
+
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationRepository.findByOrgType("Doctor1")).thenReturn(organisationList);
+        when(singletonOrgTypeRepository.findByOrgType(any(String.class)))
+                    .thenReturn(Optional.of(new SingletonOrgType()));
+
+        OrganisationResponse organisationResponse = sut.updateOrganisation(organisationOtherOrgsCreationRequest,
+                organisationIdentifier, true);
+
+        assertThat(organisationResponse).isNotNull();
+        verify(organisationMock, times(1)).setOrgType(organisationOtherOrgsCreationRequest
+                .getOrgType());
+    }
+
+    @Test
+    void test_updatesAnOrganisation_when_org_type_pending_in_org_and_present_in_singleton_table() {
+        Organisation organisationMock = mock(Organisation.class);
+        organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
+
+        Organisation organisation = new Organisation("some-org-name", OrganisationStatus.PENDING,
+                "sra1234", null, null, null);
+        List<Organisation> organisationList = new ArrayList<>();
+        organisationList.add(organisation);
+
+        when(organisationRepository.save(any(Organisation.class))).thenReturn(organisationMock);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationRepository.findByOrgType("Doctor")).thenReturn(organisationList);
+        when(singletonOrgTypeRepository.findByOrgType("Doctor")).thenReturn(Optional.of(new SingletonOrgType()));
+
+        OrganisationResponse organisationResponse = sut.updateOrganisation(organisationOtherOrgsCreationRequest,
+                organisationIdentifier, true);
+
+        assertThat(organisationResponse).isNotNull();
+        verify(organisationMock, times(1)).setOrgType(organisationOtherOrgsCreationRequest
+                .getOrgType());
+    }
+
+    @Test
+    void test_updatesAnOrganisation_when_org_type_active_in_org_and_present_in_singleton_table() {
+        Organisation organisationMock = mock(Organisation.class);
+        organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
+
+        Organisation organisation = new Organisation("some-org-name", OrganisationStatus.ACTIVE,
+                "sra1234", null, null, null);
+        List<Organisation> organisationList = new ArrayList<>();
+        organisationList.add(organisation);
+
+        when(organisationRepository.save(any(Organisation.class))).thenReturn(organisationMock);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationRepository.findByOrgType("Doctor")).thenReturn(organisationList);
+        when(singletonOrgTypeRepository.findByOrgType("Doctor")).thenReturn(Optional.of(new SingletonOrgType()));
+
+        assertThrows(InvalidRequest.class, () ->
+                sut.updateOrganisation(organisationOtherOrgsCreationRequest,
+                        organisationIdentifier, true));
+
+    }
 
     @Test
     void test_retrieve_an_organisations_by_status() {
@@ -2087,7 +2157,7 @@ class OrganisationServiceImplTest {
     void testRetrieveOrganisationForV2Api() {
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(new Organisation("name",
                 OrganisationStatus.ACTIVE, "sraId", "companyNumber",
-                Boolean.TRUE, "companyUrl"));
+                TRUE, "companyUrl"));
 
         OrganisationEntityResponseV2 result = sut
                 .retrieveOrganisationForV2Api("organisationIdentifier",
@@ -2096,7 +2166,7 @@ class OrganisationServiceImplTest {
 
         assertThat(result).hasSameClassAs(new OrganisationEntityResponseV2(new Organisation("name",
                 OrganisationStatus.ACTIVE, "sraId", "companyNumber",
-                Boolean.TRUE, "companyUrl"), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE));
+                TRUE, "companyUrl"), TRUE, TRUE, TRUE, TRUE));
     }
 
 
@@ -2106,7 +2176,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(anyString()))
                 .thenReturn(new Organisation("name",
                         OrganisationStatus.ACTIVE, "sraId",
-                        "companyNumber", Boolean.TRUE, "companyUrl"));
+                        "companyNumber", TRUE, "companyUrl"));
 
         OrganisationEntityResponse result = sut.retrieveOrganisation("organisationIdentifier",
                                                                     true);
@@ -2119,7 +2189,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByStatus(any()))
                 .thenReturn(Arrays.<Organisation>asList(new Organisation("name",
                         OrganisationStatus.ACTIVE, "sraId",
-                        "companyNumber", Boolean.TRUE, "companyUrl")));
+                        "companyNumber", TRUE, "companyUrl")));
 
         List<Organisation> result = sut.getOrganisationByStatus(OrganisationStatus.ACTIVE);
         assertThat(result).isNotNull();
@@ -2130,7 +2200,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByStatus(any()))
                 .thenReturn(Arrays.<Organisation>asList(new Organisation("name",
                         OrganisationStatus.ACTIVE, "sraId",
-                        "companyNumber", Boolean.TRUE, "companyUrl")));
+                        "companyNumber", TRUE, "companyUrl")));
         when(organisationRepository.findByStatus(any(), any())).thenReturn(null);
 
         List<Organisation> result = sut.getOrganisationByStatus(OrganisationStatus.ACTIVE, null);

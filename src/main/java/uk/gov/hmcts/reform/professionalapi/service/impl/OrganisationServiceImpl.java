@@ -561,11 +561,6 @@ public class OrganisationServiceImpl implements OrganisationService {
             boolean orgStatus = organisationList.stream()
                     .anyMatch(org -> org.getStatus().isActive());
 
-            // When org type is not present in organisation table
-            if (isEmpty(organisationList)) {
-                organisation.setOrgType(orgTypeInRequest);
-            }
-
             //When org Type is present in Singleton table
             if (isOrgTypePresentInSingleTonOrgTable.isPresent()) {
                 if (!orgStatus) {
