@@ -13,7 +13,7 @@ route:
       sql:insert into bulk_customer_details (id,organisation_id,bulk_customer_id,sidam_id,pba_number)
       values (:#id, :#organisation_id,:#bulk_customer_id,:#sidam_id,:#pba_number)
     blob-path:
-      azure-blob://${azure.storage.account-name}/prd-ref-data/BulkCustomerIDs.csv?credentials=#credsreg&operation=updateBlockBlob
+      azure-blob://${azure.storage.account-name}/rd-prd-data/BulkCustomerIDs.csv?credentials=#credsreg&operation=updateBlockBlob
     processor-class: BulkCustomerDetailsProcessor
     mapper-class: BulkCustomerDetailsMapper
     csv-binder-object: BulkCustomerDetails

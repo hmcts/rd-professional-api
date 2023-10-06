@@ -13,8 +13,8 @@ def secrets = [
         ],
         'rd-${env}' : [
                 secret('ACCOUNT-KEY-PREVIEW', 'ACCOUNT_KEY_PREVIEW'),
-                secret('ACCOUNT-NAME', 'ACCOUNT_NAME'),
-                secret('ACCOUNT-KEY', 'ACCOUNT_KEY'),
+                secret('rd-prd-storage-account-name', 'ACCOUNT_NAME'),
+                secret('rd-prd-storage-account-primary-key', 'ACCOUNT_KEY'),
                 secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
                 secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
                 secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),

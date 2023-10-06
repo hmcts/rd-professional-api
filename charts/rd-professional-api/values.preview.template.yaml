@@ -23,9 +23,19 @@ java:
           alias: azure.application-insights.instrumentation-key
         - name: professional-api-s2s-secret
           alias: PROFESSIONAL_API_S2S_SECRET
-        - name: ACCOUNT-NAME
+        - name: rd-prd-storage-account-name
           alias: ACCOUNT_NAME
-        - name: ACCOUNT-KEY
+        - name: rd-prd-storage-account-primary-key
           alias: ACCOUNT_KEY
         - name: CONTAINER-NAME
           alias: CONTAINER_NAME
+  secrets:
+    BLOB_ACCOUNT_NAME:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: storageAccountName
+    BLOB_ACCESS_KEY:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: accessKey
+    BLOB_SERVICE_ENDPOINT:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: primaryBlobServiceEndPoint
