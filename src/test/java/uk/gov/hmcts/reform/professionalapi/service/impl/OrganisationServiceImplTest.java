@@ -658,7 +658,7 @@ class OrganisationServiceImplTest {
         List<Organisation> organisationList = new ArrayList<>();
 
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-        when(organisationRepository.findByOrgType("Doctor1")).thenReturn(organisationList);
+        when(organisationRepository.findByOrgTypeAndStatus("Doctor1", ACTIVE)).thenReturn(organisationList);
         when(singletonOrgTypeRepository.findByOrgType(any(String.class)))
                     .thenReturn(Optional.of(new SingletonOrgType()));
 
@@ -682,7 +682,8 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.save(any(Organisation.class))).thenReturn(organisationMock);
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-        when(organisationRepository.findByOrgType("Doctor")).thenReturn(organisationList);
+        when(organisationRepository.findByOrgTypeAndStatus("Doctor", OrganisationStatus.PENDING))
+                                                                        .thenReturn(organisationList);
         when(singletonOrgTypeRepository.findByOrgType("Doctor")).thenReturn(Optional.of(new SingletonOrgType()));
 
         OrganisationResponse organisationResponse = sut.updateOrganisation(organisationOtherOrgsCreationRequest,
@@ -705,7 +706,7 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.save(any(Organisation.class))).thenReturn(organisationMock);
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-        when(organisationRepository.findByOrgType("Doctor")).thenReturn(organisationList);
+        when(organisationRepository.findByOrgTypeAndStatus("Doctor", ACTIVE)).thenReturn(organisationList);
         when(singletonOrgTypeRepository.findByOrgType("Doctor")).thenReturn(Optional.of(new SingletonOrgType()));
 
         assertThrows(InvalidRequest.class, () ->

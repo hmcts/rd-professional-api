@@ -332,7 +332,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> createOrganisationV2(OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
         Response response = getS2sTokenHeaders()
                 .body(organisationCreationRequest)
-                .post("/refdata/external/v2/organisations")
+                .post("/refdata/internal/v2/organisations")
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
@@ -902,10 +902,32 @@ public class ProfessionalApiClient {
 
     }
 
+    public void updateOrganisationV2ForNotActiveOrgType(String organisationIdentifier, String role) {
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("ACTIVE");
+        organisationCreationRequest.setOrgType("HMCTS-GOV");
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
+
+
+    }
+
+    public void updateOrganisationAsNoActiveV2(String organisationIdentifier, String role) {
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("BLOCKED");
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
+
+
+    }
+
     public void updateOrganisationV2(String organisationIdentifier, String role) {
 
         OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
         organisationCreationRequest.setStatus("ACTIVE");
+        organisationCreationRequest.setOrgType("HMRC-GOV");
 
         updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
     }
@@ -929,6 +951,30 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
+    }
+
+    public Map<String, Object> updateOrganisationV2Api(OrganisationOtherOrgsCreationRequest organisationCreationRequest,
+
+                                              String organisationIdentifier,String role, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v2/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("{}:: Update organisation response: {}", loggingComponentName, response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        if (HttpStatus.OK == expectedStatus) {
+            return response.as(Map.class);
+        } else if (BAD_REQUEST == expectedStatus) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
     }
 
     public void updateOrganisation(String organisationIdentifier, String role) {

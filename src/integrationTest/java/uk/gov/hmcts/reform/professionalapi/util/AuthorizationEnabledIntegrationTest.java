@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
@@ -95,6 +96,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Autowired
     protected UserAccountMapRepository userAccountMapRepository;
+
+    @Autowired
+    protected SingletonOrgTypeRepository singletonOrgTypeRepository;
 
     @Autowired
     protected OrgAttributeRepository orgAttributeRepository;
@@ -277,6 +281,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
         orgAttributeRepository.deleteAll();
+        singletonOrgTypeRepository.deleteAll();
         organisationRepository.deleteAll();
         JwtDecoderMockBuilder.resetJwtDecoder();
     }

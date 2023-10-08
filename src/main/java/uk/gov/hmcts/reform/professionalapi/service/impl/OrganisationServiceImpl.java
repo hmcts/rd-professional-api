@@ -557,13 +557,15 @@ public class OrganisationServiceImpl implements OrganisationService {
             Optional<SingletonOrgType> isOrgTypePresentInSingleTonOrgTable = singletonOrgTypeRepository
                     .findByOrgType(orgTypeInRequest);
 
-            var organisationList = organisationRepository.findByOrgType(orgTypeInRequest);
-            boolean orgStatus = organisationList.stream()
-                    .anyMatch(org -> org.getStatus().isActive());
-
             //When org Type is present in Singleton table
             if (isOrgTypePresentInSingleTonOrgTable.isPresent()) {
-                if (!orgStatus) {
+                var organisationList = organisationRepository.findByOrgTypeAndStatus(orgTypeInRequest,
+                        ACTIVE);
+
+                if (organisationList.isEmpty()) {
+                    organisation.setOrgType(orgTypeInRequest);
+                } else if (organisationList.size() == 1 && organisationList.get(0)
+                        .getOrganisationIdentifier().equals(organisationIdentifier)) {
                     organisation.setOrgType(orgTypeInRequest);
                 } else {
                     throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
