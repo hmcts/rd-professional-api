@@ -964,6 +964,21 @@ public class ProfessionalApiClient {
                 .statusCode(expectedStatus.value());
     }
 
+    public void updateOrganisationForExternalV2(OrganisationOtherOrgsCreationRequest organisationCreationRequest,
+                                     String organisationIdentifier, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v2/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("{}:: Update organisation response: {}", loggingComponentName, response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+    }
+
     public Map<String, Object> updateOrganisationV2Api(OrganisationOtherOrgsCreationRequest organisationCreationRequest,
 
                                               String organisationIdentifier,String role, HttpStatus expectedStatus) {

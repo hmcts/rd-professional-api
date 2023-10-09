@@ -66,6 +66,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             superUserEmail = generateRandomEmail();
             organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
             organisationOtherOrgsCreationRequest.getSuperUser().setEmail(superUserEmail);
+            organisationOtherOrgsCreationRequest.setOrgType("external-org-type");
 
 
             organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
