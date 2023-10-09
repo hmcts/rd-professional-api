@@ -913,6 +913,17 @@ public class ProfessionalApiClient {
 
     }
 
+    public void updateOrganisationV2ForReviewStatus(String organisationIdentifier, String role) {
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("REVIEW");
+        organisationCreationRequest.setOrgType("REVIEW-ORG-TYPE");
+        organisationCreationRequest.setStatusMessage("Compy in Review Status");
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
+
+    }
+
     public void updateOrganisationAsNoActiveV2(String organisationIdentifier, String role) {
 
         OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();

@@ -242,10 +242,9 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         Map<String, Object> response = professionalApiClient.createOrganisationV2();
         String orgIdentifier = (String) response.get("organisationIdentifier");
-        String statusMessage = "Company in review";
 
         professionalApiClient
-                .updateOrganisationToReviewV2(orgIdentifier, statusMessage, hmctsAdmin);
+                .updateOrganisationV2ForReviewStatus(orgIdentifier,hmctsAdmin);
         Map<String, Object> orgresponse = professionalApiClient
                 .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
 
