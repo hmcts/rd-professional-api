@@ -3,5 +3,5 @@ output "resourceGroup" {
 }
 
 output "username" {
-  value = join("@", ["dbrefdata", join("-", [var.product-V15, var.component-V15])])
+  value = azurerm_resource_group.rg.username
 }
