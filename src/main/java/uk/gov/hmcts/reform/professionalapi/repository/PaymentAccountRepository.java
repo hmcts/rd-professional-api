@@ -16,6 +16,8 @@ public interface PaymentAccountRepository extends JpaRepository<PaymentAccount, 
 
     Optional<PaymentAccount> findByPbaNumber(String pbaNumber);
 
+    Optional<PaymentAccount> findByPbaNumberAndOrganisationId(String pbaNumber, UUID organisationId);
+
     List<PaymentAccount> findByPbaNumberIn(Set<String> pbaNumbers);
 
     @Modifying

@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
@@ -47,6 +49,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
@@ -109,6 +112,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     ContactInformationRepository contactInformationRepository;
     @Autowired
     PrdEnumRepository prdEnumRepository;
+    @Autowired
+    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
     @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
@@ -441,8 +446,46 @@ public class OrganisationServiceImpl implements OrganisationService {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
-        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
+        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired,
+                                    false);
     }
+
+    @Override
+    public BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
+                                                                                              String idamId) {
+
+        log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomer", loggingComponentName);
+        var bulkCustomerDetails = bulkCustomerDetailsRepository
+                                                                    .findByBulkCustomerId(bulkCustId,idamId);
+
+        validatebulkCustomerDetails(bulkCustomerDetails);
+
+        var pbaNumberStatus = paymentAccountRepository
+                                                     .findByPbaNumberAndOrganisationId(
+                                                             bulkCustomerDetails.getPbaNumber(),
+                                                             bulkCustomerDetails.getOrganisation().getId());
+
+        if (pbaNumberStatus.isEmpty() || !pbaNumberStatus.get().getPbaStatus().equals(ACCEPTED)) {
+            bulkCustomerDetails.setPbaNumber("");
+        }
+
+
+
+        return new BulkCustomerOrganisationsDetailResponse(bulkCustomerDetails);
+    }
+
+    private static void validatebulkCustomerDetails(BulkCustomerDetails bulkCustomerDetails) {
+        if (bulkCustomerDetails == null) {
+            throw new ResourceNotFoundException("Record not found");
+        }
+
+        if (null != bulkCustomerDetails.getOrganisation().getStatus()) {
+            if (!bulkCustomerDetails.getOrganisation().getStatus().isActive()) {
+                throw new ResourceNotFoundException("Record not found");
+            }
+        }
+    }
+
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(String status, Pageable pageable) {

@@ -192,6 +192,10 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
 }
 
+
+
+
+
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
     testClassesDirs = sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
@@ -230,6 +234,8 @@ task fortifyScan(type: JavaExec) {
     // This is a temporary fix to prevent the nightly build from failing if the Fortify scan detects issues
     ignoreExitValue = true
 }
+
+
 
 runProviderPactVerification.finalizedBy pactVerify
 

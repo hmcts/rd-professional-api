@@ -8,4 +8,3 @@ create table bulk_customer_details(
     constraint organisation_fk7 foreign key (organisation_id)
     references organisation (id)
 );
-

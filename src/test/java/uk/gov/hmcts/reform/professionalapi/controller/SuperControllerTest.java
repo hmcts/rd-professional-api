@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -75,6 +77,8 @@ class SuperControllerTest {
     private final SuperController superController = mock(SuperController.class, CALLS_REAL_METHODS);
 
     private OrganisationsDetailResponse organisationsDetailResponse;
+
+    private BulkCustomerOrganisationsDetailResponse bulkCustomerOrganisationsDetailResponse;
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
@@ -87,6 +91,7 @@ class SuperControllerTest {
     private ProfessionalUser professionalUser;
     private UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
     private NewUserCreationRequest newUserCreationRequest;
+    private BulkCustomerRequest bulkCustomerRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private UserProfileUpdatedData userProfileUpdatedData;
 
@@ -137,6 +142,7 @@ class SuperControllerTest {
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url", userCreationRequest,
                 null, null);
+        bulkCustomerRequest = new BulkCustomerRequest("testBulkCustomerId", "testIdamId");
 
         MockitoAnnotations.openMocks(this);
     }
@@ -167,6 +173,24 @@ class SuperControllerTest {
 
         verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
     }
+
+    @Test
+    void test_retrieveOrganisationDetailsForBulkCustomerId() {
+        final HttpStatus expectedHttpsStatus = HttpStatus.OK;
+        when(organisationServiceMock.retrieveOrganisationDetailsForBulkCustomer(
+                "testBulkCustomerId", "testIdamId"))
+                .thenReturn(bulkCustomerOrganisationsDetailResponse);
+
+        ResponseEntity<?> actual = superController
+                .retrieveOrganisationDetailsForBulkCustomerId(bulkCustomerRequest);
+        assertThat(actual.getBody()).isEqualTo(bulkCustomerOrganisationsDetailResponse);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpsStatus);
+
+        verify(organisationServiceMock, times(1))
+                .retrieveOrganisationDetailsForBulkCustomer("testBulkCustomerId",
+                        "testIdamId");
+    }
+
 
     @Test
     void test_retrieveAllOrganisationWithPagination0_shouldThrowException() {
