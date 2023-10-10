@@ -3,5 +3,5 @@ output "resourceGroup" {
 }
 
 output "username" {
-  value = azurerm_resource_group.rg.username
+  value = azurerm_postgresql_flexible_server.pgsql_server.administrator_login
 }
