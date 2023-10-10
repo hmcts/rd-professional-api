@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.Optional;
+import javax.validation.constraints.Size;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -112,7 +114,10 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
             @RequestParam(value = "userIdentifier", required = false) String userIdentifier,
-            @Parameter(hidden = true) @UserId String userId) {
+            @Parameter(hidden = true) @UserId String userId,
+            @RequestParam(value = "searchString", required = false)
+                @Size(min = 3,message = "SearchString must have at least 3 character")
+                String searchString) {
 
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
@@ -130,7 +135,7 @@ public class ProfessionalExternalUserController extends SuperController {
         }
 
         return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
-                page, size);
+                page, size,searchString);
     }
 
     @Operation(

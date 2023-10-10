@@ -515,7 +515,7 @@ public abstract class SuperController {
 
     protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String userIdentifier,
                                                                String showDeleted, Boolean returnRoles, String status,
-                                                               Integer page, Integer size) {
+                                                               Integer page, Integer size,String searchString) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -530,10 +530,10 @@ public abstract class SuperController {
             Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService
                     .findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles,
-                            status, pageable);
+                            status, pageable,searchString);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
-                    userIdentifier, showDeleted, returnRoles, status);
+                    userIdentifier, showDeleted, returnRoles, status,searchString);
         }
         return responseEntity;
     }

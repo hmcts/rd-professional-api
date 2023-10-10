@@ -43,6 +43,7 @@ import javax.transaction.Transactional;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersBySearchString;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
 
@@ -107,12 +108,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation,
                                                                                   String showDeleted,
                                                                                   boolean rolesRequired,
-                                                                                  String status, Pageable pageable) {
+                                                                                  String status, Pageable pageable,
+                                                                                  String searchString) {
         var pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
         ResponseEntity<Object> responseEntity
                 = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),searchString);
 
         var headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
                 responseEntity);
@@ -122,7 +124,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String userIdentifier,
-                                                            String showDeleted, boolean rolesRequired, String status) {
+                                                            String showDeleted, boolean rolesRequired, String status,
+                                                                      String searchString) {
         var professionalUsers = userIdentifier != null
                 ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userIdentifier)
                 : professionalUserRepository.findByOrganisation(organisation);
@@ -131,13 +134,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
         return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),searchString);
     }
 
     @SuppressWarnings("unchecked")
     private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest,
                                                         String showDeleted, boolean rolesRequired, String status,
-                                                        String organisationIdentifier) {
+                                                        String organisationIdentifier,String searchString) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
@@ -166,6 +169,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             Object response = filterUsersByStatus(responseEntity, status);
             responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(),
                     responseEntity.getStatusCode());
+        }
+        if (!StringUtils.isBlank(searchString)) {
+            //Filtering users by status
+
+            Object response = filterUsersBySearchString(responseEntity, searchString.toLowerCase());
+            responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(),
+                responseEntity.getStatusCode());
         }
 
         return responseEntity;

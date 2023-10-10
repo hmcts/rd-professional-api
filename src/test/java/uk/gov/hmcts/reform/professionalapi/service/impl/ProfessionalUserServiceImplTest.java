@@ -145,7 +145,7 @@ class ProfessionalUserServiceImplTest {
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation,
-                userIdentifier,"false", true, "");
+                userIdentifier,"false", true, "",null);
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -201,7 +201,7 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation,
-                userIdentifier, "false", true, "Active");
+                userIdentifier, "false", true, "Active",null);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse1
                 = ((ProfessionalUsersEntityResponse)responseEntity.getBody());
@@ -271,7 +271,7 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation,
-                null, "false", true, "Active");
+                null, "false", true, "Active",null);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse1
                 = ((ProfessionalUsersEntityResponse)responseEntity.getBody());
@@ -308,7 +308,7 @@ class ProfessionalUserServiceImplTest {
                 .request(mock(Request.class)).body(mapper.writeValueAsString(errorResponse),
                         Charset.defaultCharset()).status(400).build());
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation,
-                null, "false", true, "");
+                null, "false", true, "",null);
         verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isExactlyInstanceOf(ErrorResponse.class);
@@ -416,7 +416,7 @@ class ProfessionalUserServiceImplTest {
 
         assertThrows(ExternalApiException.class, () ->
                 professionalUserService.findProfessionalUsersByOrganisation(organisation,
-                        userIdentifier, "false", true, ""));
+                        userIdentifier, "false", true, "",null));
 
         verify(professionalUserRepository, times(1)).findByOrganisationAndUserIdentifier(
                 organisation, userIdentifier);
@@ -437,7 +437,7 @@ class ProfessionalUserServiceImplTest {
 
         assertThrows(ExternalApiException.class, () ->
                 professionalUserService.findProfessionalUsersByOrganisation(organisation, userIdentifier,
-                "false", true, ""));
+                "false", true, "",null));
 
         verify(professionalUserRepository, times(1)).findByOrganisationAndUserIdentifier(
                 organisation, userIdentifier);
@@ -523,10 +523,10 @@ class ProfessionalUserServiceImplTest {
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
-                "some@email.com", organisation);
-        ProfessionalUser professionalUser1 = new ProfessionalUser("fName", "lName",
-                "some1@email.com", organisation);
+        ProfessionalUser professionalUser = new ProfessionalUser("TestFName", "TestLName",
+                "testName@email.com", organisation);
+        ProfessionalUser professionalUser1 = new ProfessionalUser("TestFName", "TestFName",
+                "testName1@email.com", organisation);
         professionalUserList.add(professionalUser);
         professionalUserList.add(professionalUser1);
 
@@ -553,7 +553,7 @@ class ProfessionalUserServiceImplTest {
 
         ResponseEntity responseEntity = professionalUserService
                 .findProfessionalUsersByOrganisationWithPageable(organisation, "false", false,
-                        "Active", pageableMock);
+                        "Active", pageableMock,"test");
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
@@ -601,7 +601,7 @@ class ProfessionalUserServiceImplTest {
 
         assertThrows(ExternalApiException.class, () ->
                 professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false",
-                        false, "Active", pageableMock));
+                        false, "Active", pageableMock,null));
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
@@ -620,7 +620,7 @@ class ProfessionalUserServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () ->
                 professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false",
-                false, "Active", pageableMock));
+                false, "Active", pageableMock,null));
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
@@ -637,7 +637,7 @@ class ProfessionalUserServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () ->
                 professionalUserService.findProfessionalUsersByOrganisation(organisation, userIdentifier,
-                        "false", false, "Active"));
+                        "false", false, "Active",null));
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisationAndUserIdentifier(organisation, userIdentifier);
@@ -682,7 +682,7 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation,
-                userIdentifier, "false", true, "Active");
+                userIdentifier, "false", true, "Active",null);
 
         assertThat(responseEntity).isNotNull();
 

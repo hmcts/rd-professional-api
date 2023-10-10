@@ -2,15 +2,21 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
@@ -55,9 +61,12 @@ class ProfessionalUserInternalControllerTest {
     private UserProfileUpdateRequestValidator userProfileUpdateRequestValidatorMock;
     private ResponseEntity<Object> responseEntityMock;
     private UserProfileUpdatedData userProfileUpdatedData;
+    private Authentication authentication;
+    private SecurityContext securityContext;
     List<String> prdAdminRoles;
     List<String> systemUserRoles;
     private final String userIdentifier = "1234567";
+    private static final String USER_JWT = "Bearer 8gf364fg367f67";
     @InjectMocks
     private ProfessionalUserInternalController professionalUserInternalController;
     @Mock
@@ -84,6 +93,8 @@ class ProfessionalUserInternalControllerTest {
         prdAdminRoles.add("prd-admin");
         systemUserRoles = new ArrayList<>();
         systemUserRoles.add("prd-aac-system");
+        authentication = Mockito.mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
 
         MockitoAnnotations.openMocks(this);
     }
@@ -108,11 +119,20 @@ class ProfessionalUserInternalControllerTest {
         organisation.setUsers(users);
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+            .claim("aClaim", "aClaim")
+            .claim("aud", Lists.newArrayList("ccd_gateway"))
+            .header("aHeader", "aHeader")
+            .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         when(professionalUserServiceMock
                 .findProfessionalUsersByOrganisation(any(Organisation.class), anyString(), any(String.class),
-                        any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
+                        any(Boolean.class), any(String.class),any())).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", userRoles));
@@ -131,7 +151,7 @@ class ProfessionalUserInternalControllerTest {
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
-                        any(String.class), any(Boolean.class), any(String.class));
+                        any(String.class), any(Boolean.class), any(String.class),any());
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
@@ -151,7 +171,7 @@ class ProfessionalUserInternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
-                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
+                any(String.class), any(Boolean.class), any(String.class),any())).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
@@ -170,7 +190,7 @@ class ProfessionalUserInternalControllerTest {
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true,
-                        "");
+                        "",null);
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
@@ -189,7 +209,7 @@ class ProfessionalUserInternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
-                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
+                any(String.class), any(Boolean.class), any(String.class),any())).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
         when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
@@ -208,7 +228,7 @@ class ProfessionalUserInternalControllerTest {
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(organisation, userIdentifier,"true", true,
-                        "");
+                        "",null);
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }

@@ -106,7 +106,7 @@ public class ProfessionalUserInternalController extends SuperController {
             status = ACTIVE;
         }
         return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status, page,
-                size);
+                size,null);
     }
 
     @Operation(

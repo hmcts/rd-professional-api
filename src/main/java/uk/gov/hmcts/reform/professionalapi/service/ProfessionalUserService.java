@@ -22,11 +22,13 @@ public interface ProfessionalUserService {
     ProfessionalUser findProfessionalUserByUserIdentifier(String userIdentifier);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String userIdentifier,
-                                                             String showDeleted, boolean rolesRequired, String status);
+                                                             String showDeleted, boolean rolesRequired,
+                                                               String status,String searchString);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation existingOrganisation,
                                                                            String showDeleted, boolean rolesRequired,
-                                                                           String status, Pageable pageable);
+                                                                           String status, Pageable pageable,
+                                                                           String searchString);
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 
