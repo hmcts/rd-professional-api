@@ -53,7 +53,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
         updateOrgStatusScenarios();
-        updateOrgAsBlockedToMakeUpdateQuerySuccessForNextRun();
     }
 
 
