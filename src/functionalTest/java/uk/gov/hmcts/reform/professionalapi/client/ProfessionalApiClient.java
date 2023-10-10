@@ -929,8 +929,7 @@ public class ProfessionalApiClient {
         OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
         organisationCreationRequest.setStatus("BLOCKED");
 
-        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
-
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier, OK);
 
     }
 
