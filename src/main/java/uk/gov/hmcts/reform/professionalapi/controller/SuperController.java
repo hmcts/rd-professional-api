@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddr
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
@@ -38,8 +39,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Org
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
@@ -223,6 +226,47 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationResponse);
     }
 
+
+    protected ResponseEntity<Object> retrieveAllOrganisationOrByIdForV2Api(String organisationIdentifier, String status,
+                                                                   Integer page, Integer size) {
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        var orgStatus = removeEmptySpaces(status);
+        long totalRecords = 1;
+
+        Object organisationResponse = null;
+        var pageable = createPageable(page, size);
+        var pageableByStatus = createPageableByStatus(page,size);
+
+        if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
+            //Received request to retrieve all organisations
+            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(pageable);
+            totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
+
+        } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
+                || (isNotEmpty(orgStatus) && isNotEmpty(orgId))) {
+            //Received request to retrieve organisation with ID
+
+            organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+            organisationResponse = organisationService.retrieveOrganisationForV2Api(orgId, true);
+
+        } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
+            //Received request to retrieve organisation with status
+
+            organisationResponse = organisationService
+                    .findByOrganisationStatusForV2Api(orgStatus.toUpperCase(), pageableByStatus);
+            totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
+        }
+
+        log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
+
+        if (pageable != null) {
+            return ResponseEntity.status(200).header("total_records",String.valueOf(totalRecords))
+                    .body(organisationResponse);
+        }
+        return ResponseEntity.status(200).body(organisationResponse);
+    }
+
+
     private Pageable createPageable(Integer page, Integer size) {
         Pageable pageable = null;
         if (page != null || size != null) {
@@ -271,6 +315,19 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false, true, false));
     }
 
+    protected ResponseEntity<Object> retrievePaymentAccountByUserEmailForV2Api(String email) {
+
+        validateEmail(email);
+        var organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
+
+        checkOrganisationAndPbaExists(organisation);
+
+        return ResponseEntity
+                .status(200)
+                .body(new OrganisationPbaResponseV2(organisation,
+                        false, true, false,true));
+    }
+
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
         Boolean  isOrgApprovalRequest = false;
@@ -313,6 +370,10 @@ public abstract class SuperController {
                         loggingComponentName);
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
+        }
+        // deleting the orgAttribute array to add new changes
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            organisationService.deleteOrgAttribute(orgCreationRequestV2.getOrgAttributes(), organisationIdentifier);
         }
         organisationService.updateOrganisation(organisationCreationRequest, orgId,isOrgApprovalRequest);
         return ResponseEntity.status(200).build();
