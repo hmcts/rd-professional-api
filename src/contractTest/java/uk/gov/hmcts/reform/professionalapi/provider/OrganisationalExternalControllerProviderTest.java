@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
@@ -103,6 +104,9 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
     Authentication authentication;
     @Mock
     SecurityContext securityContext;
+
+    @Autowired
+    OrgAttributeRepository orgAttributeRepository;
 
     @Override
     void setController() {

@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 
 import java.util.List;
@@ -135,7 +134,7 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponse(
             responseCode = "200",
             description = "Details of an Organisation",
-            content = @Content(schema = @Schema(implementation = OrganisationsDetailResponse.class))
+            content = @Content(schema = @Schema(implementation = OrganisationEntityResponse.class))
     )
     @ApiResponse(
             responseCode = "400",
