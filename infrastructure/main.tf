@@ -114,6 +114,7 @@ module "db-professional-ref-data-v15" {
   product              = var.product-V15
   name               = join("-", [var.product-V15, var.component-V15])
 }
+
 resource "azurerm_postgresql_flexible_server" "pgsql_server" {
   administrator_login = join("@", ["dbrefdata", join("-", [var.product-V15, var.component-V15])])
 }
