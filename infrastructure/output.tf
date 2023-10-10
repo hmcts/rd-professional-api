@@ -3,5 +3,5 @@ output "resourceGroup" {
 }
 
 output "username" {
-  value = module.db-professional-ref-data-v15.username
+  value = join("@", ["dbrefdata", join("-", [var.product-V15, var.component-V15])])
 }
