@@ -842,6 +842,31 @@ public class ProfessionalApiClient {
 
     }
 
+    public Map<String, Object> searchOrganisationUsersBySearchStringExternal(HttpStatus status,
+                                                                       RequestSpecification requestSpecification,
+                                                                       String searchString) {
+
+        Response response = requestSpecification
+            .get("/refdata/external/v1/organisations/users?searchString=" + searchString)
+            .andReturn();
+
+        log.info("{}:: find users by status: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+            .assertThat()
+            .statusCode(status.value());
+        if (HttpStatus.UNAUTHORIZED.equals(status)) {
+            response.getHeader("UnAuthorized-Token-Error")
+                .contains("Authentication Exception");
+        }
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
+    }
+
     public Map<String, Object> retrieveOrganisationByOrgIdExternal(HttpStatus status,
                                                                    RequestSpecification requestSpecification) {
 

@@ -145,6 +145,8 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         findUsersByNonPumAndNoStatusProvidedShouldBeSuccess();
         findUsersByPumAndNoStatusProvidedShouldBeSuccess();
         findUsersByPumAndWithStatusProvidedShouldBeSuccess();
+        findUsersByPumAndWithSearchStringProvidedShouldBeSuccess();
+        findUsersByPumAndWithSearchStringEmptyProvidedShouldBeSuccess();
         findUsersByPumAndWithStatusSuspendedProvidedShouldReturnNotFound();
         findUsersByInvalidUserAndNoStatusProvidedShouldReturnNotFound();
         findUsersByPcmAndNoRolesRequiredShouldBeSuccess();
@@ -236,6 +238,22 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), "Active");
+        validateRetrievedUsers(response, "ACTIVE", true);
+        log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: END");
+    }
+
+    public void findUsersByPumAndWithSearchStringProvidedShouldBeSuccess() {
+        log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersBySearchStringExternal(OK,
+            professionalApiClient.getMultipleAuthHeaders(pumBearerToken), "test");
+        validateRetrievedUsers(response, "ACTIVE", true);
+        log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: END");
+    }
+
+    public void findUsersByPumAndWithSearchStringEmptyProvidedShouldBeSuccess() {
+        log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersBySearchStringExternal(OK,
+            professionalApiClient.getMultipleAuthHeaders(pumBearerToken), "");
         validateRetrievedUsers(response, "ACTIVE", true);
         log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: END");
     }
