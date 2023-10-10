@@ -45,8 +45,6 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String superUserId;
 
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
-    String firstName = "firstName";
-    String lastName = "lastName";
 
     @Test
     @DisplayName("PRD External Test Scenarios For V2 API")
@@ -66,17 +64,18 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             superUserEmail = generateRandomEmail();
             organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
             organisationOtherOrgsCreationRequest.getSuperUser().setEmail(superUserEmail);
+            organisationOtherOrgsCreationRequest.setOrgType("external-test-org-type");
 
+            Map<String, Object> createUserResponse = professionalApiClient
+                    .createOrganisationForExternalV2(organisationOtherOrgsCreationRequest);
 
+            String organisationIdentifier = (String) createUserResponse.get("organisationIdentifier");
+            assertThat(organisationIdentifier).isNotEmpty();
             organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
-            extActiveOrgId = createAndActivateOrganisationWithGivenRequestV2(organisationOtherOrgsCreationRequest,
-                    hmctsAdmin);
+            professionalApiClient.updateOrganisationForExternalV2(organisationOtherOrgsCreationRequest,
+                    organisationIdentifier, OK);
 
-            Map<String, Object> searchResponse = professionalApiClient
-                    .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
-            List<Map<String, Object>> professionalUsersResponses =
-                    (List<Map<String, Object>>) searchResponse.get("users");
-            superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+            extActiveOrgId = (String) createUserResponse.get("organisationIdentifier");
         }
     }
 
@@ -116,7 +115,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgType")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo("external-test-org-type");
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPfmShouldBeSuccess :: END");
         responseValidate(response);
@@ -128,7 +127,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgType")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo("external-test-org-type");
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPomShouldBeSuccess :: END");
     }

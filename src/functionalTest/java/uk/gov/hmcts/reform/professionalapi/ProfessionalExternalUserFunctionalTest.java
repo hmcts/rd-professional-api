@@ -109,7 +109,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
             extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
             Map<String, Object> searchResponse = professionalApiClient
-                    .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
+                    .createOrganisationForExternalV2(organisationCreationRequest);
             List<Map<String, Object>> professionalUsersResponses =
                     (List<Map<String, Object>>) searchResponse.get("users");
             superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");

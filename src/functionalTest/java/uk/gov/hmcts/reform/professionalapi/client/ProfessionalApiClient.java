@@ -325,6 +325,26 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> createOrganisationForExternalV2(
+                                                        OrganisationCreationRequest organisationCreationRequest) {
+        Response response = getS2sTokenHeaders()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v2/organisations")
+                .andReturn();
+
+        if (response.statusCode() != CREATED.value()) {
+            log.info("{}:: Create organisation response: {}", loggingComponentName, response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> createOrganisationV2() {
         return createOrganisationV2(createOrganisationRequestForV2());
     }
