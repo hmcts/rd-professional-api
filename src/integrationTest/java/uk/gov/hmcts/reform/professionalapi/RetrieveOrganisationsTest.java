@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -14,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.BLOCKED;
@@ -91,6 +96,59 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    void persists_and_returns_other_organisation_v2_api_details() {
+
+        String orgIdentifierResponse = createOtherOrganisationRequest("PENDING");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveSingleOrganisationForV2Api(orgIdentifierResponse, hmctsAdmin);
+
+        assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
+        assertThat(orgResponse.get(ORG_IDENTIFIER)).isEqualTo(orgIdentifierResponse);
+
+        assertThat(orgResponse.get("name")).isEqualTo("some-org-name");
+        assertThat(orgResponse.get("sraId")).isEqualTo("sra-id");
+        assertThat(orgResponse.get("sraRegulated")).isEqualTo(false);
+        assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
+        assertThat(orgResponse.get("companyNumber")).isNotNull();
+        assertNotNull(orgResponse.get("dateReceived"));
+        assertNull(orgResponse.get("dateApproved"));
+
+        Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
+        assertThat(superUser.get("firstName")).isEqualTo("some-fname");
+        assertThat(superUser.get("lastName")).isEqualTo("some-lname");
+        assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
+
+        List<String> accounts = ((List<String>)  orgResponse.get("paymentAccount"));
+        assertThat(accounts.size()).isZero();
+
+        List<String> pendingPaymentAccount = ((List<String>)  orgResponse.get("pendingPaymentAccount"));
+        assertThat(pendingPaymentAccount.size()).isOne();
+
+        Map<String, Object> contactInfo = ((List<Map<String, Object>>) orgResponse.get("contactInformation")).get(0);
+        assertThat(contactInfo.get("addressLine1")).isEqualTo("addressLine1");
+        assertThat(contactInfo.get("addressLine2")).isEqualTo("addressLine2");
+        assertThat(contactInfo.get("addressLine3")).isEqualTo("addressLine3");
+        assertThat(contactInfo.get("county")).isEqualTo("county");
+        assertThat(contactInfo.get("country")).isEqualTo("country");
+        assertThat(contactInfo.get("townCity")).isEqualTo("town-city");
+        assertThat(contactInfo.get("postCode")).isEqualTo("some-post-code");
+        assertThat(contactInfo.get("uprn")).isEqualTo("uprn");
+        assertNotNull(contactInfo.get("addressId"));
+        assertNotNull(contactInfo.get("created"));
+
+
+        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo.get("dxAddress")).get(0);
+        assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
+        assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
+
+        //RetrieveOrganisationsTest:Received response to retrieve an organisation details
+        assertThat(orgResponse.get("orgType")).isEqualTo("Doctor");
+        assertThat(orgResponse.get("orgAttributes")).isNotNull();
+    }
+
+
+    @Test
     @SuppressWarnings("unchecked")
     void persists_and_returns_organisation_with_pagination() {
 
@@ -117,6 +175,46 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> orgResponse3 =
             professionalReferenceDataClient.retrieveAllOrganisationsWithPagination("1", "5", hmctsAdmin);
+
+        int orgResponse1Size = ((List<Organisation>) orgResponse1.get("organisations")).size();
+        int orgResponse2Size = ((List<Organisation>) orgResponse2.get("organisations")).size();
+        int orgResponse3Size = ((List<Organisation>) orgResponse3.get("organisations")).size();
+
+        assertThat(orgResponse1).containsEntry("http_status","200 OK");
+        assertThat(orgResponse2).containsEntry("http_status","200 OK");
+        assertThat(orgResponse3).containsEntry("http_status","200 OK");
+        assertThat(orgResponse1Size).isEqualTo(2);
+        assertThat(orgResponse2Size).isEqualTo(3);
+        assertThat(orgResponse3Size).isEqualTo(5);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void persists_and_returns_other_organisation_for_v2_api_with_pagination() {
+
+        String orgIdentifierResponse1 = createOtherOrganisationRequest("PENDING");
+        String orgIdentifier2 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier3 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier4 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier5 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        assertThat(orgIdentifierResponse1).isNotEmpty();
+        assertThat(orgIdentifier2).isNotEmpty();
+        assertThat(orgIdentifier3).isNotEmpty();
+        assertThat(orgIdentifier4).isNotEmpty();
+        assertThat(orgIdentifier5).isNotEmpty();
+
+        Map<String, Object> orgResponse1 =
+                professionalReferenceDataClient.retrieveAllOrganisationsWithPaginationForV2Api("1", "2", hmctsAdmin);
+
+        Map<String, Object> orgResponse2 =
+                professionalReferenceDataClient.retrieveAllOrganisationsWithPaginationForV2Api("1", "3", hmctsAdmin);
+
+        Map<String, Object> orgResponse3 =
+                professionalReferenceDataClient.retrieveAllOrganisationsWithPaginationForV2Api("1", "5", hmctsAdmin);
 
         int orgResponse1Size = ((List<Organisation>) orgResponse1.get("organisations")).size();
         int orgResponse2Size = ((List<Organisation>) orgResponse2.get("organisations")).size();
@@ -177,6 +275,19 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    void retrieve_other_organisations_for_v2_api_with_invalid_pagination() {
+        String orgIdentifierResponse = createOtherOrganisationRequest("PENDING");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationsWithPaginationForV2Api("0", null, hmctsAdmin);
+
+        assertThat(orgResponse).containsEntry("http_status", "400");
+        assertThat(orgResponse.get("response_body").toString())
+                .contains("Default page number should start with page 1");
+    }
+
+    @Test
     void retrieve_organisations_with_invalid_pagination_size() {
         String orgIdentifierResponse = createOrganisationRequest("PENDING");
         assertThat(orgIdentifierResponse).isNotEmpty();
@@ -190,9 +301,31 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    void retrieve_other_organisations_for_v2_api_with_invalid_pagination_size() {
+        String orgIdentifierResponse = createOtherOrganisationRequest("PENDING");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationsWithPaginationForV2Api("1", "0", hmctsAdmin);
+
+        assertThat(orgResponse).containsEntry("http_status", "400");
+        assertThat(orgResponse.get("response_body").toString())
+                .contains("Page size must not be less than one");
+    }
+
+    @Test
     void return_organisation_payload_with_200_status_code_for_pui_case_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiCaseManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
+                puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
+    }
+
+    @Test
+    void return_other_organisation_for_v2_api_payload_with_200_status_code_for_pui_case_manager_user_organisation_id() {
+        String userId = settingUpOtherOrganisation(puiCaseManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(userId,
                 puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
@@ -221,6 +354,30 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    void return_organisation_payload_with_200_status_code_with_pending_pbas_v2() {
+        String organisationIdentifier = createOtherOrganisationRequest("PENDING");
+        assertThat(organisationIdentifier).isNotNull();
+
+        String userId = updateOrgAndInviteUser(organisationIdentifier, puiCaseManager);
+        assertThat(userId).isNotNull();
+
+        Optional<PaymentAccount> orgPbas = paymentAccountRepository.findByPbaNumber("PBA1234567");
+        assertThat(orgPbas).isPresent();
+        PaymentAccount pendingPba = orgPbas.get();
+        pendingPba.setPbaStatus(PbaStatus.PENDING);
+        paymentAccountRepository.save(pendingPba);
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveExternalOrganisationWithPendingPbasForV2Api(userId, "PENDING",
+                        puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
+        assertThat(response.get("pendingPaymentAccount")).isNotNull();
+        assertThat(response.get("orgType")).isEqualTo("Doctor");
+        assertThat(response.get("orgAttributes")).isNotNull();
+    }
+
+    @Test
     void return_organisation_payload_with_200_status_code_for_pui_finance_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiFinanceManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
@@ -230,9 +387,27 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    void return_other_organisation_v2_api_payload_with_200_status_code_for_pui_finance_manager_user_organisation_id() {
+        String userId = settingUpOtherOrganisation(puiFinanceManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(userId,
+                puiFinanceManager);
+        assertThat(response.get("http_status").toString().contains(OK.name()));
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
+    }
+
+    @Test
     void return_organisation_payload_with_200_status_code_for_pui_organisation_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiOrgManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
+                puiOrgManager);
+        assertThat(response.get("http_status").toString().contains(OK.name()));
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
+    }
+
+    @Test
+    void return_other_organisation_payload_with_200_status_code_for_pui_organisation_manager_user_organisation_id() {
+        String userId = settingUpOtherOrganisation(puiOrgManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(userId,
                 puiOrgManager);
         assertThat(response.get("http_status").toString().contains(OK.name()));
         assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
@@ -648,6 +823,80 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
+    }
+
+    private String createOtherOrganisationRequest(String status) {
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = null;
+        organisationCreationRequest = otherOrganisationRequestWithAllFields();
+        organisationCreationRequest.setStatus(status);
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisationV2(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
+    }
+
+    private String createOtherOrganisationRequest() {
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = otherOrganisationRequestWithAllFields();
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisationV2(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
+    }
+
+    protected String settingUpOtherOrganisation(String role) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOtherOrganisationRequest();
+        return updateOrgAndInviteUser(organisationIdentifier, role);
+    }
+
+
+
+    private OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFields() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey");
+        orgAttributeRequest.setValue("testValue");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
+                new OrganisationOtherOrgsCreationRequest("some-org-name",
+                        "PENDING",
+                        "test",
+                        "sra-id",
+                        "false",
+                        "comNum",
+                        "company-url",
+                        aUserCreationRequest()
+                                .firstName("some-fname")
+                                .lastName("some-lname")
+                                .email("someone@somewhere.com")
+                                .build(),
+                        paymentAccounts,
+                        Collections
+                                .singletonList(aContactInformationCreationRequest()
+                                        .addressLine1("addressLine1")
+                                        .addressLine2("addressLine2")
+                                        .addressLine3("addressLine3")
+                                        .country("country")
+                                        .county("county")
+                                        .townCity("town-city")
+                                        .uprn("uprn")
+                                        .postCode("some-post-code")
+                                        .dxAddress(Collections
+                                                .singletonList(dxAddressCreationRequest()
+                                                        .dxNumber("DX 1234567890")
+                                                        .dxExchange("dxExchange").build()))
+                                        .build()),
+                        "Doctor",
+                        orgAttributeRequests);
+
+        return organisationOtherOrgsCreationRequest;
+
     }
 
     @Test

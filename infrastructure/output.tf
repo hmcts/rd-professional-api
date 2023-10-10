@@ -5,3 +5,4 @@ output "resourceGroup" {
 output "username" {
   value = azurerm_resource_group.rg.username
 }
+
