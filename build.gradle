@@ -536,31 +536,21 @@ dependencyManagement {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
         }
-
-//        Resolves CVE-2023-4586
-        dependencySet(group: 'io.netty', version: '4.1.100.Final') {
-            entry 'netty-buffer'
-            entry 'netty-codec'
-            entry 'netty-codec-http'
-            entry 'netty-codec-socks'
-            entry 'netty-common'
-            entry 'netty-handler'
-            entry 'netty-handler-proxy'
-            entry 'netty-resolver'
-            entry 'netty-transport'
-            entry 'netty-transport-classes-epoll'
-            entry 'netty-transport-classes-kqueue'
-            entry 'netty-transport-native-epoll'
-            entry 'netty-transport-native-kqueue'
-            entry 'netty-transport-native-unix-common'
-        }
-
     }
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+//        Resolves CVE-2023-4586
+        if (details.requested.group == 'io.netty') {
+            details.useVersion "4.1.100.Final"
+        }
+    }
 }
 
 dependencyUpdates.resolutionStrategy = {
