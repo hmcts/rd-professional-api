@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.io.IOException;
@@ -69,6 +70,9 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @Autowired
     OrganisationRepository organisationRepository;
+
+    @Autowired
+    SingletonOrgTypeRepository singletonOrgTypeRepository;
 
     @Autowired
     UserProfileFeignClient userProfileFeignClientMock;

@@ -30,7 +30,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SingletonOrgType;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
@@ -39,6 +41,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -79,6 +82,7 @@ class OrganisationInternalControllerV2Test {
     private UserProfileFeignClient userProfileFeignClient;
 
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+    private final SingletonOrgTypeRepository singletonOrgTypeRepository = mock(SingletonOrgTypeRepository.class);
 
     private List<PrdEnum> prdEnumList;
 
@@ -294,6 +298,7 @@ class OrganisationInternalControllerV2Test {
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
+        when(singletonOrgTypeRepository.findByOrgType("Doctor")).thenReturn(Optional.of(new SingletonOrgType()));
 
 
         String orgId = "AK57L4T";

@@ -36,6 +36,7 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
@@ -163,7 +164,7 @@ public class AuthorizationFunctionalTest {
                 .createOrganisationV2(organisationCreationRequest);
         String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
+        professionalApiClient.updateOrganisationForExternalV2(organisationCreationRequest,  organisationIdentifier, OK);
         return organisationIdentifier;
     }
 
@@ -274,7 +275,7 @@ public class AuthorizationFunctionalTest {
     public String searchUserStatus(String orgIdentifier, String userId) {
 
         Map<String, Object> searchResponse = professionalApiClient
-                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, OK);
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
 
         return professionalUsersResponses.stream()

@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SingletonOrgType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
@@ -60,6 +61,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -132,6 +134,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
 
+    @Autowired
+    SingletonOrgTypeRepository singletonOrgTypeRepository;
+
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
@@ -160,7 +165,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addDefaultMfaStatusToOrganisation(organisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false, false);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false,
+                false);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -472,7 +478,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         OrganisationsDetailResponseV2 organisationsDetailResponse = new OrganisationsDetailResponseV2(
-                resultingOrganisations, true, true, false,true);
+                resultingOrganisations, true, true, false,
+                true);
         organisationsDetailResponse.setTotalRecords(totalRecords);
         return organisationsDetailResponse;
     }
@@ -494,7 +501,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
-        return new OrganisationEntityResponseV2(organisation, true, isPendingPbaRequired, false, true);
+        return new OrganisationEntityResponseV2(organisation, true, isPendingPbaRequired,
+                false, true);
     }
 
     @Override
@@ -543,6 +551,30 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
+        //Setting the org Type before settinf the status of the organisation
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            String orgTypeInRequest = orgCreationRequestV2.getOrgType();
+            Optional<SingletonOrgType> isOrgTypePresentInSingleTonOrgTable = singletonOrgTypeRepository
+                    .findByOrgType(orgTypeInRequest);
+
+            //When org Type is present in Singleton table
+            if (isOrgTypePresentInSingleTonOrgTable.isPresent()) {
+                var organisationList = organisationRepository.findByOrgTypeAndStatus(orgTypeInRequest,
+                        ACTIVE);
+
+                if (organisationList.isEmpty()) {
+                    organisation.setOrgType(orgTypeInRequest);
+                } else if (organisationList.size() == 1 && organisationList.get(0)
+                        .getOrganisationIdentifier().equals(organisationIdentifier)) {
+                    organisation.setOrgType(orgTypeInRequest);
+                } else {
+                    throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest + " is already Approved");
+                }
+            } else {
+                organisation.setOrgType(orgTypeInRequest);
+            }
+        }
+
         //Into update Organisation service
         organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
         organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
@@ -553,14 +585,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
 
-        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            organisation.setOrgType(orgCreationRequestV2.getOrgType());
-        }
 
-        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
-
-        }
 
         if (TRUE.equals(isOrgApprovalRequest)) {
             organisation.setDateApproved(LocalDateTime.now());
@@ -568,6 +593,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         var savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
+
+        }
         if (isNotEmpty(savedOrganisation.getPaymentAccounts())
                 && organisationCreationRequest.getStatus().equals("ACTIVE")) {
             updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
@@ -614,7 +643,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
-        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
+        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired,
+                false);
     }
 
     @Override

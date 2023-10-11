@@ -173,6 +173,70 @@ public class ProfessionalApiClient {
             .contactInformation(contactInfoList);
     }
 
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder
+                                                        createOrganisationRequestForExternalOrg() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456777")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456788")
+                .dxExchange("dxExchange").build());
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123452222")
+                .dxExchange("dxExchange").build());
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456333")
+                .dxExchange("dxExchange").build());
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .uprn("uprn1")
+                .dxAddress(dx1)
+                .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+                .addressLine1("addLine1")
+                .addressLine2("addLine2")
+                .addressLine3("addLine3")
+                .uprn("uprn")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx2)
+                .build());
+
+        return someMinimalOrganisationRequest()
+                .name(randomAlphabetic(10))
+                .status("PENDING")
+                .sraId(randomAlphabetic(10) + "sra-id-number1")
+                .sraRegulated("false")
+                .companyUrl(randomAlphabetic(10) + "company-url")
+                .companyNumber(randomAlphabetic(5) + "tst")
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(generateRandomEmail().toLowerCase())
+                        .build())
+                .contactInformation(contactInfoList);
+    }
+
     public static OrganisationOtherOrgsCreationRequest createOrganisationRequestForV2() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
@@ -325,6 +389,26 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> createOrganisationForExternalV2(
+                                                        OrganisationCreationRequest organisationCreationRequest) {
+        Response response = getS2sTokenHeaders()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v2/organisations")
+                .andReturn();
+
+        if (response.statusCode() != CREATED.value()) {
+            log.info("{}:: Create organisation response: {}", loggingComponentName, response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> createOrganisationV2() {
         return createOrganisationV2(createOrganisationRequestForV2());
     }
@@ -332,7 +416,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> createOrganisationV2(OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
         Response response = getS2sTokenHeaders()
                 .body(organisationCreationRequest)
-                .post("/refdata/external/v2/organisations")
+                .post("/refdata/internal/v2/organisations")
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
@@ -902,10 +986,42 @@ public class ProfessionalApiClient {
 
     }
 
+    public void updateOrganisationV2ForNotActiveOrgType(String organisationIdentifier, String role) {
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("ACTIVE");
+        organisationCreationRequest.setOrgType("HMCTS-GOV");
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
+
+
+    }
+
+    public void updateOrganisationV2ForReviewStatus(String organisationIdentifier, String role) {
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("REVIEW");
+        organisationCreationRequest.setOrgType("REVIEW-ORG-TYPE");
+        organisationCreationRequest.setStatusMessage("Compy in Review Status");
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
+
+    }
+
+    public void updateOrganisationAsNoActiveV2(String organisationIdentifier, String role) {
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("BLOCKED");
+
+        updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier, OK);
+
+    }
+
     public void updateOrganisationV2(String organisationIdentifier, String role) {
 
         OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
         organisationCreationRequest.setStatus("ACTIVE");
+        organisationCreationRequest.setOrgType("HMRC-GOV");
 
         updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
     }
@@ -929,6 +1045,45 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
+    }
+
+    public void updateOrganisationForExternalV2(OrganisationOtherOrgsCreationRequest organisationCreationRequest,
+                                     String organisationIdentifier, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v2/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("{}:: Update organisation response: {}", loggingComponentName, response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+    }
+
+    public Map<String, Object> updateOrganisationV2Api(OrganisationOtherOrgsCreationRequest organisationCreationRequest,
+
+                                              String organisationIdentifier,String role, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v2/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("{}:: Update organisation response: {}", loggingComponentName, response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        if (HttpStatus.OK == expectedStatus) {
+            return response.as(Map.class);
+        } else if (BAD_REQUEST == expectedStatus) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
     }
 
     public void updateOrganisation(String organisationIdentifier, String role) {

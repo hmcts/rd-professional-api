@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepos
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -31,6 +32,9 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
 
     @MockBean
     protected ClientRegistrationRepository clientRegistrationRepository;
+
+    @MockBean
+    protected SingletonOrgTypeRepository singletonOrgTypeRepository;
 
     @MockBean
     FeatureToggleService featureToggleService;
