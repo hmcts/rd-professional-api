@@ -24,7 +24,7 @@ variable "component-V15" {
 variable "pgsql_admin_username" {
   description = "Admin username"
   type        = string
-  default     = "dbrefdata@rd-commondata-api-postgres-db-v15"
+  default     = "dbrefdata@rd-professional-api-postgres-db-v15"
 }
 
 variable "location" {
