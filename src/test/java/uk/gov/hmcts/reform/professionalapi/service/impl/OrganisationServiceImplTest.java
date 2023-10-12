@@ -415,7 +415,6 @@ class OrganisationServiceImplTest {
     @Test
     void test_addSuperUserToOrganisation() {
         Organisation organisationMock = mock(Organisation.class);
-        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
         var newProfessionalUser = new ProfessionalUser(superUserCreationRequest.getFirstName(),
                 superUserCreationRequest.getLastName(),
                 superUserCreationRequest.getEmail().toLowerCase(),organisationMock);
@@ -428,6 +427,9 @@ class OrganisationServiceImplTest {
 
         List<UserAttribute> attributes = new ArrayList<>();
         attributes.add(userAttribute);
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         when(userAttributeServiceMock.addUserAttributesToSuperUser(professionalUser,
@@ -1112,7 +1114,6 @@ class OrganisationServiceImplTest {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
-        List<Organisation> organisations = new ArrayList<>();
         Organisation organisation1 = new Organisation("someother-org-name", null,
                 "PENDING", null, null, null);
         organisation1.setId(UUID.randomUUID());
@@ -1121,6 +1122,7 @@ class OrganisationServiceImplTest {
         organisation.setUsers(users);
         sut.saveOrganisation(organisation);
         sut.saveOrganisation(organisation1);
+        List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
         organisations.add(organisation1);
 
