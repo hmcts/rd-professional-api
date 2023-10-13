@@ -20,30 +20,30 @@ import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
     @JsonProperty
-    private OrganisationStatus status;
+    protected OrganisationStatus status;
     @JsonProperty
-    private String statusMessage;
+    protected String statusMessage;
     @JsonProperty
-    private String sraId;
+    protected String sraId;
     @JsonProperty
-    private Boolean sraRegulated;
+    protected Boolean sraRegulated;
     @JsonProperty
-    private String companyNumber;
+    protected String companyNumber;
     @JsonProperty
-    private String companyUrl;
+    protected String companyUrl;
     @JsonProperty
-    private SuperUserResponse superUser;
+    protected SuperUserResponse superUser;
     @JsonProperty
-    private List<String> paymentAccount;
+    protected List<String> paymentAccount;
     @JsonProperty
-    private List<String> pendingPaymentAccount = new ArrayList<>();
+    protected List<String> pendingPaymentAccount = new ArrayList<>();
     @JsonProperty
     @DateTimeFormat
-    private LocalDateTime dateReceived;
+    protected LocalDateTime dateReceived;
     @JsonProperty
     @DateTimeFormat
     @JsonInclude(ALWAYS)
-    private LocalDateTime dateApproved = null;
+    protected LocalDateTime dateApproved = null;
 
 
 
@@ -58,7 +58,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     }
 
     @SuppressWarnings("java:S6204")
-    private void getOrganisationEntityResponse(
+    protected void getOrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
             Boolean isRequiredPendingPbas, Boolean isRequiredAllPbas) {
 
