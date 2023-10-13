@@ -41,7 +41,7 @@ public class BulkCustomerDetailsInternalController extends SuperController {
 
     @Operation(
             summary = "Retrieves organisation details for bulk customer",
-            description = "**IDAM Roles to access API** : <br> prd-admin",
+            description = "**IDAM Roles to access API** : <br> caseworker-civil-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
@@ -74,7 +74,7 @@ public class BulkCustomerDetailsInternalController extends SuperController {
             content = @Content
     )
 
-    @Secured("prd-admin")
+    @Secured("caseworker-civil-admin")
     @PostMapping(
             produces = APPLICATION_JSON_VALUE
     )
