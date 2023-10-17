@@ -14,8 +14,7 @@ public class ProfessionalApiConstants {
             = "The given organisationIdentifier must be 7 Alphanumeric Characters";
     public static final String ORGANISATION_IDENTIFIER_FORMAT_REGEX = "^[A-Z0-9]{7}$";
 
-    public static final String EMAIL_SEARCH_REGEX = "^[a-zA-Z0-9@_'`\\-+.]+$";
-    public static final String SEARCHSTRING_FORMAT_REGEX = EMAIL_SEARCH_REGEX;
+    public static final String SEARCHSTRING_FORMAT_REGEX =  "^[a-zA-ZÀ-ÖØ-öø-ÿ0-9@_'`\\-+.]+$";
     public static final String NO_ORG_FOUND_FOR_GIVEN_ID
             = "No Organisation was found with the given organisationIdentifier ";
     public static final String ORG_NOT_ACTIVE_NO_USERS_RETURNED
