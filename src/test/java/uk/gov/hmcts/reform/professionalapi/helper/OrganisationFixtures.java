@@ -3,10 +3,13 @@ package uk.gov.hmcts.reform.professionalapi.helper;
 import org.apache.commons.lang.RandomStringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,6 +91,106 @@ public class OrganisationFixtures {
                         .dxNumber("DX 1234567890")
                         .dxExchange("dxExchange").build()))
                 .build()));
+    }
+
+    public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFields() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey");
+        orgAttributeRequest.setValue("testValue");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
+                new OrganisationOtherOrgsCreationRequest("some-org-name",
+                        "PENDING",
+                        "test",
+                        "sra-id",
+                        "false",
+                        "comNum",
+                        "company-url",
+                        aUserCreationRequest()
+                                .firstName("some-fname")
+                                .lastName("some-lname")
+                                .email("someone@somewhere.com")
+                                .build(),
+                        paymentAccounts,
+                        Collections
+                                .singletonList(aContactInformationCreationRequest()
+                                        .addressLine1("addressLine1")
+                                        .addressLine2("addressLine2")
+                                        .addressLine3("addressLine3")
+                                        .country("country")
+                                        .county("county")
+                                        .townCity("town-city")
+                                        .uprn("uprn")
+                                        .postCode("some-post-code")
+                                        .dxAddress(Collections
+                                                .singletonList(dxAddressCreationRequest()
+                                                        .dxNumber("DX 1234567890")
+                                                        .dxExchange("dxExchange").build()))
+                                        .build()),
+                        "Doctor",
+                        orgAttributeRequests);
+
+        return organisationOtherOrgsCreationRequest;
+
+    }
+
+    public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFieldsAreUpdated() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey1");
+        orgAttributeRequest.setValue("testValue1");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
+                new OrganisationOtherOrgsCreationRequest("some-org-name1",
+                        "ACTIVE",
+                        "test",
+                        "sra-id1",
+                        "true",
+                        "comNum",
+                        "company-url1",
+                        aUserCreationRequest()
+                                .firstName("some-fname")
+                                .lastName("some-lname")
+                                .email("someone@somewhere.com")
+                                .build(),
+                        paymentAccounts,
+                        Collections
+                                .singletonList(aContactInformationCreationRequest()
+                                        .addressLine1("addressLine1")
+                                        .addressLine2("addressLine2")
+                                        .addressLine3("addressLine3")
+                                        .country("country")
+                                        .county("county")
+                                        .townCity("town-city")
+                                        .uprn("uprn")
+                                        .postCode("some-post-code")
+                                        .dxAddress(Collections
+                                                .singletonList(dxAddressCreationRequest()
+                                                        .dxNumber("DX 1234567890")
+                                                        .dxExchange("dxExchange").build()))
+                                        .build()),
+                        "Doctor1",
+                        orgAttributeRequests);
+
+        return organisationOtherOrgsCreationRequest;
+
     }
 
     public static OrganisationCreationRequest
