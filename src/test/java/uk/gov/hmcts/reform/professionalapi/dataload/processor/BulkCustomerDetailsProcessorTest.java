@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -110,8 +109,9 @@ public class BulkCustomerDetailsProcessorTest {
 
         Organisation organisationOne = new Organisation();
         organisationOne.setId(UUID.fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee44"));
+        organisationOne.setOrganisationIdentifier("ASDEFF");
         organisationOne.setCompanyNumber("325");
-        when(organisationRepository.findById(any())).thenReturn(Optional.of(organisationOne));
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisationOne);
         processor.process(exchange);
         verify(processor, times(1)).process(exchange);
 
@@ -137,7 +137,7 @@ public class BulkCustomerDetailsProcessorTest {
         Organisation organisationOne = new Organisation();
         organisationOne.setId(UUID.fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee44"));
         organisationOne.setCompanyNumber("325");
-        when(organisationRepository.findById(any())).thenReturn(Optional.empty());
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
         when(((ConfigurableApplicationContext)
             applicationContext).getBeanFactory()).thenReturn(configurableListableBeanFactory);
 

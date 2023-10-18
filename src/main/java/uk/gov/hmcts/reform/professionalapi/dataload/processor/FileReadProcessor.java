@@ -79,6 +79,7 @@ public class FileReadProcessor implements Processor {
     public void process(Exchange exchange) {
         log.info("{}:: FileReadProcessor starts::", logComponentName);
         final String blobFilePath = (String) exchange.getProperty(BLOBPATH);
+        log.info("{}:: BLOBPATH::", blobFilePath);
         final CamelContext context = exchange.getContext();
         final ConsumerTemplate consumer = context.createConsumerTemplate();
         RouteProperties routeProperties = (RouteProperties) exchange.getIn().getHeader(ROUTE_DETAILS);

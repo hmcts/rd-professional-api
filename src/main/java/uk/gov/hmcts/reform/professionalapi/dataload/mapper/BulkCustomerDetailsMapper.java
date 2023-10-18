@@ -18,7 +18,7 @@ public class BulkCustomerDetailsMapper implements IMapper {
         BulkCustomerDetails bulkCustomerDetails = (BulkCustomerDetails) bulkCustomerDetailsObj;
         Map<String, Object> bulkCustomerDetailsParamMap = new HashMap<>();
         bulkCustomerDetailsParamMap.put("id", UUID.randomUUID());
-        bulkCustomerDetailsParamMap.put("organisation_id", UUID.fromString(bulkCustomerDetails.getOrganisationId()));
+        bulkCustomerDetailsParamMap.put("organisation_id", bulkCustomerDetails.getOrganisationId());
         bulkCustomerDetailsParamMap.put("bulk_customer_id", trim(bulkCustomerDetails.getBulkCustomerId()));
         bulkCustomerDetailsParamMap.put("sidam_id", trim(bulkCustomerDetails.getSidamId()));
         bulkCustomerDetailsParamMap.put("pba_number", trim(bulkCustomerDetails.getPbaNumber()));

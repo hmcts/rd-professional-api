@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
@@ -91,8 +91,8 @@ public class BulkCustomerDetailsProcessor extends JsrValidationBaseProcessor<Bul
 
     private List<BulkCustomerDetails> getValidCategories(List<BulkCustomerDetails> bulkCustomerDetails) {
         return bulkCustomerDetails.stream()
-            .filter(bulkCustomerDetail -> organisationRepository
-                .findById(UUID.fromString(bulkCustomerDetail.getOrganisationId())).isPresent()).toList();
+            .filter(bulkCustomerDetail -> ObjectUtils.isNotEmpty(organisationRepository
+                .findByOrganisationIdentifier(bulkCustomerDetail.getOrganisationId()))).toList();
 
     }
 }

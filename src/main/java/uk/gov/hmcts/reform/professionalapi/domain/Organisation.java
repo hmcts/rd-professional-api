@@ -189,4 +189,5 @@ public class Organisation implements Serializable {
     public boolean isOrganisationStatusActive() {
         return OrganisationStatus.ACTIVE == getStatus();
     }
+
 }

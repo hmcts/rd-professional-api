@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.professionalapi.dataload.binder.BulkCustomerDetails;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.trim;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +38,6 @@ public class BulkCustomerDetailsMapperTest {
         expected.put("pba_number", trim(bulkCustomerDetails.getPbaNumber()));
         Map<String, Object> actual = bulkCustomerDetailsMapper.getMap(bulkCustomerDetails);
         verify(bulkCustomerDetailsMapper, times(1)).getMap(bulkCustomerDetails);
-        assertThat(actual.get("organisation_id")).isEqualTo(UUID.fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee44"));
+        assertThat(actual.get("organisation_id")).isEqualTo(("046b6c7f-0b8a-43b9-b35d-6489e6daee44"));
     }
 }
