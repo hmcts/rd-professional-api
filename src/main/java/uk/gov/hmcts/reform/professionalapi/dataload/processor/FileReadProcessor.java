@@ -55,6 +55,12 @@ public class FileReadProcessor implements Processor {
     @Value("${file-read-time-out}")
     private int fileReadTimeOut;
 
+    @Value("${azure.storage.account-key}")
+    private String azureKey;
+
+    @Value("${idam.s2s-auth.totp_secret}")
+    private String s2sSecret;
+
     @Value("${logging-component-name:data_ingestion}")
     private String logComponentName;
 
@@ -80,6 +86,8 @@ public class FileReadProcessor implements Processor {
         log.info("{}:: FileReadProcessor starts::", logComponentName);
         final String blobFilePath = (String) exchange.getProperty(BLOBPATH);
         log.info("{}:: BLOBPATH::", blobFilePath);
+        log.info("{}:: azureKey starts::",azureKey);
+        log.info("{}:: s2sSecret starts::",s2sSecret);
         final CamelContext context = exchange.getContext();
         final ConsumerTemplate consumer = context.createConsumerTemplate();
         RouteProperties routeProperties = (RouteProperties) exchange.getIn().getHeader(ROUTE_DETAILS);
