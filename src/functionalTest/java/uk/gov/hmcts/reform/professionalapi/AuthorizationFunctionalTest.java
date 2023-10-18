@@ -58,6 +58,9 @@ public class AuthorizationFunctionalTest {
     @Value("${prd.security.roles.hmcts-admin}")
     protected String hmctsAdmin;
 
+    @Value("${prd.security.roles.caseworker-civil-admin}")
+    protected String civilAdmin;
+
     @Value("${prd.security.roles.pui-user-manager}")
     protected String puiUserManager;
 

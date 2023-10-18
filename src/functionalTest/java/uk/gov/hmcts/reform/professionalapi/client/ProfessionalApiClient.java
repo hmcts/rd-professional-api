@@ -392,7 +392,8 @@ public class ProfessionalApiClient {
     }
 
 
-    public Map<String, Object> retrieveOrganisationForBulkCustomerDetails(String bulkCustomerId, String idamId,
+    public Map<String, Object> retrieveOrganisationForBulkCustomerDetails(String bulkCustomerId, String role,
+                                                                          String idamId,
                                                                           HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal().body("")
                 .post("/refdata/internal/v1/bulkCustomer?" + "bulkCustomerId=" + bulkCustomerId + "&idamId="

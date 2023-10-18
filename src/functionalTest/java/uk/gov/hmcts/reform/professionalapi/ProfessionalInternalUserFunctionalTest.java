@@ -676,7 +676,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfk";
         String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf4";
         Map<String, Object> organisations = professionalApiClient
-                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, sidamId, OK);
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, civilAdmin,sidamId, OK);
 
         assertThat(organisations).isNotNull().hasSize(3);
         assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a855");
@@ -694,7 +694,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfj";
         String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf6";
         Map<String, Object> organisations = professionalApiClient
-                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, sidamId, OK);
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, civilAdmin, sidamId, OK);
 
         assertThat(organisations).isNotNull().hasSize(3);
         assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a857");
@@ -712,7 +712,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfl";
         String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf5";
         Map<String, Object> organisations = professionalApiClient
-                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, sidamId, NOT_FOUND);
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId,civilAdmin, sidamId, NOT_FOUND);
 
         assertThat(organisations.get("status")).toString().contains("No Organisations found");
 
