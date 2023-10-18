@@ -8,6 +8,8 @@ java:
     POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     LAUNCH_DARKLY_ENV: "preview"
     CONTAINER_NAME: rd-prd-data
+    SCHEDULER_ENABLED: true
+    CRON_EXPRESSION: "* 30 16 * * *"
   postgresql:
     enabled: true
     auth:
