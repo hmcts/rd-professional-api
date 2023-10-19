@@ -88,3 +88,4 @@ variable "pgsql_server_configuration" {
     }
   ]
 }
+
