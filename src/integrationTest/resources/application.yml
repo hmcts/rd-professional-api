@@ -130,7 +130,3 @@ route:
     csv-binder-object: BulkCustomerDetails
     csv-headers-expected: Organisation_ID,Bulk_Customer_ID,Sidam_ID,PBA
     header-validation-enabled: true
-
-azure:
-  storage:
-    account-key: ${ACCOUNT_KEY:ACCOUNT_KEY}

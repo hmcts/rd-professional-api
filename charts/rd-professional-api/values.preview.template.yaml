@@ -9,7 +9,7 @@ java:
     LAUNCH_DARKLY_ENV: "preview"
     CONTAINER_NAME: rd-prd-data
     SCHEDULER_ENABLED: true
-    CRON_EXPRESSION: "* 15 11 * * *"
+    CRON_EXPRESSION: "* 15 13 * * *"
   postgresql:
     enabled: true
     auth:
@@ -33,7 +33,7 @@ java:
           alias: CONTAINER_NAME
 
 blobstorage:
-  resourceGroup: rd-rd-aat
+  resourceGroup: rd-prd-aat
   teamName: "RD"
   location: uksouth
   setup:
