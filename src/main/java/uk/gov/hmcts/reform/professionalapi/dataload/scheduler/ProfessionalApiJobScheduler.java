@@ -36,6 +36,12 @@ public class ProfessionalApiJobScheduler {
     @Value("${prd.scheduler.enabled:true}")
     private boolean isSchedulerEnabled;
 
+    @Value("${azure.storage.account-key}")
+    private String azureKey;
+
+    @Value("${idam.s2s-auth.totp_secret}")
+    private String s2sSecret;
+
     @Value("${professional-user-details-start-route}")
     private String startRoute;
 
@@ -74,6 +80,8 @@ public class ProfessionalApiJobScheduler {
     public void loadProfessioanlDataJob()throws Exception  {
 
         log.info("PRD load started....."+isSchedulerEnabled);
+        log.info("{}:: azureKey starts::",azureKey);
+        log.info("{}:: s2sSecret starts::",s2sSecret);
         Boolean doAudit=Boolean.TRUE;
         if (isSchedulerEnabled) {
             LocalDateTime jobStartTime = now();

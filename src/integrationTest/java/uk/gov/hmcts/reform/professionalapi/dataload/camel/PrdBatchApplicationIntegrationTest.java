@@ -65,6 +65,9 @@ class PrdBatchApplicationIntegrationTest extends AuthorizationDataloadEnabledInt
     @RefreshScope
     void testTasklet() throws Exception {
         ReflectionTestUtils.setField(professionalApiJobScheduler, "isSchedulerEnabled", true);
+        ReflectionTestUtils.setField(professionalApiJobScheduler, "isSchedulerEnabled", true);
+        ReflectionTestUtils.setField(professionalApiJobScheduler, "azureKey", "azurekey");
+        ReflectionTestUtils.setField(professionalApiJobScheduler, "s2sSecret", "s2sSecret");
 
         professionalApiJobScheduler.loadProfessioanlDataJob();
 
