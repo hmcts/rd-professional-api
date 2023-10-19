@@ -2,6 +2,9 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.DockerImage
+import uk.gov.hmcts.contino.Kubectl
+import uk.gov.hmcts.pipeline.TeamConfig
 
 def type = "java"
 def product = "rd"
@@ -137,6 +140,21 @@ withPipeline(type, product, component) {
    }
 
     afterSuccess('functionalTest:preview') {
+        def sleepTime = (env.BRANCH_NAME.startsWith("PR")) ? '210s' : '120s'
+        sh "sleep ${sleepTime}"
+        if (env.BRANCH_NAME.startsWith("PR")) {
+            withAksClient('nonprod', product) {
+
+                def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
+                def subscription = env.SUBSCRIPTION_NAME
+                def aksServiceName = dockerImage.getAksServiceName().toLowerCase()
+                def namespace = new TeamConfig(this).getNameSpace(product)
+                def kubectl = new Kubectl(this, subscription, namespace)
+                kubectl.login()
+                env.BLOB_ACCOUNT_NAME = kubectl.getSecret("storage-account-${aksServiceName}-blobstorage", namespace, "{.data.storage_account_name}")
+                env.BLOB_ACCOUNT_KEY = kubectl.getSecret("storage-secret-${aksServiceName}-blobstorage", namespace, "{.data.accessKey}")
+            }
+        }
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
         publishHTML target: [
             allowMissing         : true,

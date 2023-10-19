@@ -31,6 +31,17 @@ java:
           alias: ACCOUNT_KEY
         - name: CONTAINER-NAME
           alias: CONTAINER_NAME
+  secrets:
+    BLOB_ACCOUNT_NAME:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: storageAccountName
+    BLOB_ACCESS_KEY:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: accessKey
+    BLOB_SERVICE_ENDPOINT:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: primaryBlobServiceEndPoint
+
 blobstorage:
   resourceGroup: rd-aso-preview-rg
   teamName: "RD"
