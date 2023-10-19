@@ -9,7 +9,7 @@ java:
     LAUNCH_DARKLY_ENV: "preview"
     CONTAINER_NAME: rd-prd-data
     SCHEDULER_ENABLED: true
-    CRON_EXPRESSION: "* 40 10 * * *"
+    CRON_EXPRESSION: "* 15 11 * * *"
   postgresql:
     enabled: true
     auth:
