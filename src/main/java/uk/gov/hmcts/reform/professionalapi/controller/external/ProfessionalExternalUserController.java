@@ -32,8 +32,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.Optional;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -44,9 +42,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_1;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_3;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SEARCHSTRING_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 @RequestMapping(
