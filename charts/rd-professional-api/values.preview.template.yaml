@@ -9,7 +9,7 @@ java:
     LAUNCH_DARKLY_ENV: "preview"
     CONTAINER_NAME: rd-prd-data
     SCHEDULER_ENABLED: true
-    CRON_EXPRESSION: "* 15 09 * * *"
+    CRON_EXPRESSION: "* 50 09 * * *"
   postgresql:
     enabled: true
     auth:
@@ -31,3 +31,22 @@ java:
           alias: ACCOUNT_KEY
         - name: CONTAINER-NAME
           alias: CONTAINER_NAME
+  secrets:
+    BLOB_ACCOUNT_NAME:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: storageAccountName
+    BLOB_ACCESS_KEY:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: accessKey
+    BLOB_SERVICE_ENDPOINT:
+      secretRef: storage-secret-{{ .Release.Name }}-blobstorage
+      key: primaryBlobServiceEndPoint
+
+blobstorage:
+  resourceGroup: rd-aso-preview-rg
+  teamName: "RD"
+  location: uksouth
+  setup:
+    containers:
+      - rd-prd-data
+  enabled: true
