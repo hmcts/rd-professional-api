@@ -93,10 +93,10 @@ public class ProfessionalUserReqValidator {
             var pattern = Pattern.compile(SEARCHSTRING_FORMAT_REGEX);
             var matcher = pattern.matcher(searchString);
             if (!matcher.matches()) {
-                throw new InvalidRequest("No input values given for the request");
+                throw new InvalidRequest("Invalid Pattern for SearchString");
             }
         } else {
-            throw new InvalidRequest("No input values given for the request");
+            throw new InvalidRequest("SearchString Should contain Minimum 3 Characters in length");
         }
     }
 }
