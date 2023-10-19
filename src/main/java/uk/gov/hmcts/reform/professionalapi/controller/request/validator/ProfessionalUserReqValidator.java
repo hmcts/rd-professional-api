@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_MISMATCH;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SEARCHSTRING_FORMAT_REGEX;
 
 @Component
 @Slf4j
@@ -84,5 +86,17 @@ public class ProfessionalUserReqValidator {
 
         }
         return !emptyRoles.isEmpty();
+    }
+
+    public void validateSearhString(String searchString) {
+        if (searchString.length() >= 3) {
+            var pattern = Pattern.compile(SEARCHSTRING_FORMAT_REGEX);
+            var matcher = pattern.matcher(searchString);
+            if (!matcher.matches()) {
+                throw new InvalidRequest("No input values given for the request");
+            }
+        } else {
+            throw new InvalidRequest("No input values given for the request");
+        }
     }
 }

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -119,12 +120,11 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(value = "userIdentifier", required = false) String userIdentifier,
             @Parameter(hidden = true) @UserId String userId,
             @RequestParam(value = "searchString", required = false)
-                @Size(min = 3,message = "SearchString must have at least 3 character")
-            @Pattern(regexp = SEARCHSTRING_FORMAT_REGEX, message
-                = ORG_ID_VALIDATION_ERROR_MESSAGE)
                 String searchString) {
 
-
+        if (!StringUtils.isBlank(searchString)) {
+            profExtUsrReqValidator.validateSearhString(searchString);
+        }
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(idamRepository.getUserInfo(getUserToken())
