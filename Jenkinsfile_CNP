@@ -140,6 +140,18 @@ withPipeline(type, product, component) {
    }
 
     afterSuccess('functionalTest:preview') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+        publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "target/site/serenity/",
+            reportFiles          : "index.html",
+            reportName           : "Functional Tests Report"
+        ]
+    }
+
+    afterSuccess('akschartsinstall') {
         def sleepTime = (env.BRANCH_NAME.startsWith("PR")) ? '210s' : '120s'
         sh "sleep ${sleepTime}"
         if (env.BRANCH_NAME.startsWith("PR")) {
@@ -156,14 +168,7 @@ withPipeline(type, product, component) {
             }
         }
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "target/site/serenity/",
-            reportFiles          : "index.html",
-            reportName           : "Functional Tests Report"
-        ]
+
     }
 
     afterSuccess('pact-provider-verification') {
