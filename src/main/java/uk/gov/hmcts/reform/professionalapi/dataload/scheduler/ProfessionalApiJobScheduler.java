@@ -73,7 +73,7 @@ public class ProfessionalApiJobScheduler {
         lockAtLeastFor = "${prd.scheduler.lockAtLeastFor}")
     public void loadProfessioanlDataJob()throws Exception  {
 
-        log.info("PRD load started....."+isSchedulerEnabled);
+        log.info("PRD load started......."+isSchedulerEnabled);
         Boolean doAudit=Boolean.TRUE;
         if (isSchedulerEnabled) {
             LocalDateTime jobStartTime = now();
