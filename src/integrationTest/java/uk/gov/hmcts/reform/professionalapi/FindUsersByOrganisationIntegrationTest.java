@@ -141,6 +141,14 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
     }
 
     @Test
+    void retrieve_search_two_characters_for_an_organisation_with_pui_user_manager_role_should_return_400() {
+        String id = settingUpOrganisationSpecialCharacters("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationBySearchString(
+            "false", "Active", puiUserManager, id,"te");
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
     void retrieve_deleted_users_for_an_organisation_with_pui_user_manager_role_should_return_400() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus(
