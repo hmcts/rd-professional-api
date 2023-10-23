@@ -148,6 +148,18 @@ class ProfessionalUserReqValidatorTest {
     }
 
     @Test
+    void test_validateSearchRequestThrows400ForTwoCharSearch() {
+        assertThrows(InvalidRequest.class, () ->
+            profUserReqValidator.validateSearchString("se"));
+    }
+
+    @Test
+    void test_validateSearchRequestThrows400ForEmptySearch() {
+        assertThrows(InvalidRequest.class, () ->
+            profUserReqValidator.validateSearchString(""));
+    }
+
+    @Test
     void test_validateModifyRolesRequestDoesNotThrow400WhenRequestIsValid() {
         assertDoesNotThrow(() ->
                 profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString()));
