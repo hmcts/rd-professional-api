@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Integration")})
-class SwaggerPublisher extends AuthorizationEnabledIntegrationTest {
+class SwaggerPublisherTest extends AuthorizationEnabledIntegrationTest {
 
-    private static final Logger LOG = getLogger(SwaggerPublisher.class);
+    private static final Logger LOG = getLogger(SwaggerPublisherTest.class);
 
     private static final String SWAGGER_DOC_JSON_FILE = "/tmp/swagger-specs.json";
 

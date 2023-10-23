@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
@@ -49,6 +50,9 @@ public class BaseRepository {
     public UserAttributeRepository userAttributeRepository;
     @Autowired
     public OrganisationMfaStatusRepository organisationMfaStatusRepository;
+
+    @Autowired
+    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
     public ContactInformation contactInformation;
     public DxAddress dxAddress;
@@ -114,6 +118,7 @@ public class BaseRepository {
         userAttributeRepository.deleteAll();
         userAccountMapRepository.deleteAll();
         professionalUserRepository.deleteAll();
+        bulkCustomerDetailsRepository.deleteAll();
         paymentAccountRepository.deleteAll();
         organisationRepository.deleteAll();
         prdEnumRepository.deleteAll();

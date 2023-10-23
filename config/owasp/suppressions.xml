@@ -43,13 +43,14 @@ file name: launchdarkly-java-server-sdk-5.10.7.jar (shaded: org.yaml:snakeyaml:1
         <notes>Removing this once fixed by DTSRD-792</notes>
         <cve>CVE-2023-34442</cve>
         <cve>CVE-2022-45046</cve>
+        <cve>CVE-2023-44487</cve>
+        <cve>CVE-2023-5072</cve>
+        <cve>CVE-2023-5590</cve>
+        <cve>CVE-2023-41080</cve>
         <cve>CVE-2023-4586</cve>
         <cve>CVE-2023-42794</cve>
         <cve>CVE-2023-42795</cve>
         <cve>CVE-2023-45648</cve>
-        <cve>CVE-2023-44487</cve>
-        <cve>CVE-2023-5072</cve>
-        <cve>CVE-2023-5590</cve>
     </suppress>
 
 </suppressions>

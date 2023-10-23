@@ -13,6 +13,9 @@ public class ProfessionalApiConstants {
     public static final String ORG_ID_VALIDATION_ERROR_MESSAGE
             = "The given organisationIdentifier must be 7 Alphanumeric Characters";
     public static final String ORGANISATION_IDENTIFIER_FORMAT_REGEX = "^[A-Z0-9]{7}$";
+
+    public static final String ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX = "[^A-Za-z0-9-]";
+
     public static final String NO_ORG_FOUND_FOR_GIVEN_ID
             = "No Organisation was found with the given organisationIdentifier ";
     public static final String ORG_NOT_ACTIVE_NO_USERS_RETURNED
@@ -88,6 +91,9 @@ public class ProfessionalApiConstants {
     public static final String LOG_TWO_ARG_PLACEHOLDER = "{}:: {}";
 
     public static final String RD_PROFESSIONAL_MULTI_PBA_LD_FLAG = "rd-professional-multi-pba";
+
+    public static final String RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG = "rd-professional-bulk-customer-details";
+
     public static final String PRD_MFA_LD_FLAG = "prd-mfa-flag";
     public static final String RD_PROFESSIONAL_MULTIPLE_ADDRESS = "rd-professional-multiple-address";
     public static final String ERROR_MSG_ORG_ADDRESS = "Organisation should have at least one address";
