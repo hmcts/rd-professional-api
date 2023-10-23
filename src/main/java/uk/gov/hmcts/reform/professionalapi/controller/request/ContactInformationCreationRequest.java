@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Builder(builderMethodName = "aContactInformationCreationRequest")
@@ -15,7 +15,7 @@ public class ContactInformationCreationRequest {
 
     private final String uprn;
 
-    @NotNull@NotEmpty
+    @NotNull @NotEmpty
     private final String addressLine1;
 
     private final String addressLine2;

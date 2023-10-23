@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import feign.Request;
 import feign.Response;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +43,6 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

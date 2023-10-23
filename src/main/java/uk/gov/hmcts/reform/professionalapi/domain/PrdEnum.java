@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Size;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.validation.constraints.Size;
 
 @NoArgsConstructor
 @Entity

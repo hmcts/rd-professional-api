@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import feign.FeignException;
 import feign.Response;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -64,7 +65,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;

@@ -744,7 +744,7 @@ class ProfessionalUserServiceImplTest {
         ResponseEntity<NewUserResponse> newResponse = professionalUserService
                 .findUserStatusByEmailAddress(professionalUser.getEmailAddress());
 
-        assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
+        assertThat(newResponse.getStatusCode().value()).isEqualTo(404);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());

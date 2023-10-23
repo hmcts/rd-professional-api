@@ -156,7 +156,7 @@ public class ProfessionalReferenceDataClient {
             throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
                 APP_EXT_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
-        HttpStatus status = responseEntity.getStatusCode();
+        HttpStatus status = (HttpStatus) responseEntity.getStatusCode();
         objectMapper.registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
@@ -176,7 +176,7 @@ public class ProfessionalReferenceDataClient {
             throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
                 APP_EXT_V2_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
-        HttpStatus status = responseEntity.getStatusCode();
+        HttpStatus status = (HttpStatus) responseEntity.getStatusCode();
         objectMapper.registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
@@ -796,7 +796,7 @@ public class ProfessionalReferenceDataClient {
         responseEntity = getRequestForInternalWithGivenResponseType(urlPath, role,
                 OrganisationsWithPbaStatusResponse[].class, isUnauthorised);
 
-        HttpStatus status = responseEntity.getStatusCode();
+        HttpStatus status = (HttpStatus) responseEntity.getStatusCode();
         objectMapper.registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
             return Arrays.asList(objectMapper.convertValue(

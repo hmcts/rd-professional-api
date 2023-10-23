@@ -2,6 +2,7 @@ spring:
   flyway.locations: classpath:db/migration
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     properties:
       hibernate:
