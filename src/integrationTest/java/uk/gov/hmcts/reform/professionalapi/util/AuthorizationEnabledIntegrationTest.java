@@ -167,7 +167,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected FeatureToggleServiceImpl featureToggleService;
 
     @MockBean
-    public static JwtDecoder jwtDecoder;
+    protected JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
@@ -278,7 +278,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         paymentAccountRepository.deleteAll();
         orgAttributeRepository.deleteAll();
         organisationRepository.deleteAll();
-        JwtDecoderMockBuilder.resetJwtDecoder();
     }
 
     protected String settingUpOrganisation(String role) {
