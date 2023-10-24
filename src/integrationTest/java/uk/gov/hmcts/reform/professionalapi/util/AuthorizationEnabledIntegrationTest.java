@@ -171,7 +171,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @BeforeEach
     public void setUpClient() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
+        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration, jwtDecoder);
         when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
     }
 
