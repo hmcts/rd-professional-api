@@ -39,7 +39,6 @@ def versions = [
         lombok          : '1.18.22',
         pitest          : '1.7.4',
         reformLogging   : '6.0.1',
-        serenity        : '2.0.76',
         pact_version    : '4.1.7',
         launchDarklySdk : '5.10.9',
         junit           : '5.9.2',
@@ -404,6 +403,8 @@ dependencies {
         exclude group: "org.hamcrest", module: "hamcrest-library"
     }
 
+    testImplementation 'net.serenity-bdd:serenity-rest-assured:3.8.1'
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: '3.8.1'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
