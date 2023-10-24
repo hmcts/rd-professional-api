@@ -3,7 +3,7 @@ spring:
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
@@ -70,3 +70,19 @@ syncInterval: 60
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 loggingComponentName: RD_Professional_API
+security:
+  anonymousPaths:
+    - "/"
+    - "/health"
+    - "/health/readiness"
+    - "/health/liveness"
+    - "/actuator/**"
+    - "/loggers/**"
+    - "/swagger-ui.html"
+    - "/swagger-resources/**"
+    - "/v3/**"
+    - "/swagger-ui/**"
+    - "/webjars/springfox-swagger-ui/**"
+    - "/csrf"
+    - "/error"
+    - "/favicon.ico"
