@@ -89,7 +89,6 @@ security:
     - "/loggers/**"
     - "/swagger-ui.html"
     - "/swagger-resources/**"
-    - "/v3/api-docs"
     - "/v3/**"
     - "/swagger-ui/**"
     - "/webjars/springfox-swagger-ui/**"
