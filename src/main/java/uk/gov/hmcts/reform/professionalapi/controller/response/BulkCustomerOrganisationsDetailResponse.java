@@ -20,7 +20,7 @@ public class BulkCustomerOrganisationsDetailResponse {
     private final String paymentAccount;
 
     public BulkCustomerOrganisationsDetailResponse(BulkCustomerDetails bulkCustomerDetails) {
-        organisationId = bulkCustomerDetails.getOrganisation().getId().toString();
+        organisationId = bulkCustomerDetails.getOrganisation().getOrganisationIdentifier();
         organisationName = bulkCustomerDetails.getOrganisation().getName();
         paymentAccount = bulkCustomerDetails.getPbaNumber();
     }

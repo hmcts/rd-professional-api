@@ -42,7 +42,12 @@ public class BulkCustomerDetails implements Serializable {
     @Size(max = 255)
     private String pbaNumber;
 
+    @Column(name = "organisation_id")
+    @Size(max = 7)
+    private String organisationId;
+
     @ManyToOne
-    @JoinColumn(name = "ORGANISATION_ID", nullable = false)
+    @JoinColumn(name = "organisation_id", referencedColumnName = "ORGANISATION_IDENTIFIER",
+        insertable = false, updatable = false, nullable = false)
     private Organisation organisation;
 }
