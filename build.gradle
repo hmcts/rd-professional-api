@@ -589,6 +589,8 @@ bootJar {
 }
 
 configurations.all {
+    exclude group: 'com.vaadin.external.google', module: 'android-json'
+
     resolutionStrategy.eachDependency { details ->
         // Remedy for CVE-2020-8908, ensures launchdarkly uses correct version
         if (details.requested.group == 'com.google.guava'
