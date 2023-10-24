@@ -154,6 +154,12 @@ class ProfessionalUserReqValidatorTest {
     }
 
     @Test
+    void test_validateSearchRequestThrows400ForSpecialCharSearch() {
+        assertThrows(InvalidRequest.class, () ->
+            profUserReqValidator.validateSearchString("sear!"));
+    }
+
+    @Test
     void test_validateSearchRequestThrows400ForEmptySearch() {
         assertThrows(InvalidRequest.class, () ->
             profUserReqValidator.validateSearchString(""));
