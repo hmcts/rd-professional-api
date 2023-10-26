@@ -105,7 +105,7 @@ public class ProfessionalUserInternalController extends SuperController {
             String searchString) {
 
         if (!StringUtils.isBlank(searchString)) {
-            profExtUsrReqValidator.validateSearhString(searchString);
+            profExtUsrReqValidator.validateSearchString(searchString);
         }
         var status = EMPTY;
         if (isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles())) {
