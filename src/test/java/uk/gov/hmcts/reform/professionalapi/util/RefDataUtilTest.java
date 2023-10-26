@@ -428,6 +428,40 @@ class RefDataUtilTest {
             .isEqualTo(professionalUsersResponse);
     }
 
+
+    @Test
+    void test_filterUsersBySearchStringErrorsWithoutRoles() {
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse
+                = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName", "testLname",
+                "some@email.com", organisation));
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse1
+                = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName1", "lName1",
+                "some1@email.com", organisation));
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse2
+                = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName2", "lName2",
+                "some2@email.com", organisation));
+
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
+
+        List<ProfessionalUsersResponseWithoutRoles> userProfiles = asList(professionalUsersResponse,
+                professionalUsersResponse1, professionalUsersResponse2);
+
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                = new ProfessionalUsersEntityResponseWithoutRoles();
+        professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(APPLICATION_JSON);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
+                header, HttpStatus.OK);
+
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles11
+                = (ProfessionalUsersEntityResponseWithoutRoles) RefDataUtil.filterUsersBySearchString(realResponseEntity,
+                "test");
+    }
+
     @Test
     void test_filterUsersBySearchStringForLastNameWithoutRoles() {
         ProfessionalUsersResponseWithoutRoles professionalUsersResponse
@@ -588,6 +622,53 @@ class RefDataUtilTest {
 
         assertThrows(ResourceNotFoundException.class,() ->
                 RefDataUtil.filterUsersByStatus(realResponseEntity, "Active"));
+    }
+
+    @Test
+    void test_filterUsersBySearchStringWhereNoUsersFoundThrowsResourceNotFoundException() {
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(APPLICATION_JSON);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header,
+                HttpStatus.OK);
+
+        assertThrows(ResourceNotFoundException.class,() ->
+                RefDataUtil.filterUsersBySearchString(realResponseEntity, "Active"));
+    }
+
+    @Test
+    void test_filterUsersBySearchStringWhenStatusCodeIsNot200() {
+        ProfessionalUsersResponse professionalUsersResponse
+                = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse1
+                = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1",
+                "some1@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse2
+                = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2",
+                "some2@email.com", organisation));
+
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
+
+        List<ProfessionalUsersResponse> userProfiles = asList(professionalUsersResponse, professionalUsersResponse1,
+                professionalUsersResponse2);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(APPLICATION_JSON);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header,
+                HttpStatus.BAD_REQUEST);
+
+        assertThrows(ExternalApiException.class, () ->
+                RefDataUtil.filterUsersBySearchString(realResponseEntity, "Active"));
+
     }
 
     @Test
