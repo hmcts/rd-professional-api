@@ -362,8 +362,8 @@ public class RefDataUtil {
         }
     }
 
-    public static void checkListIsEmptyWithSearchString(List<? extends ProfessionalUsersResponseWithoutRoles> filteredUsers,
-                                        String searchString) {
+    public static void checkListIsEmptyWithSearchString(List<? extends ProfessionalUsersResponseWithoutRoles>
+                                                                filteredUsers, String searchString) {
         if (CollectionUtils.isEmpty(filteredUsers)) {
             throw new ResourceNotFoundException("No users found with searchString :" + searchString);
         }

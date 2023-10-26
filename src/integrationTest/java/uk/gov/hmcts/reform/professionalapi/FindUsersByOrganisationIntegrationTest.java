@@ -232,8 +232,8 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
     @Test
     void retrieve_all_users_for_an_organisation_internal_with_SearchString() {
         String id = settingUpOrganisationInternal("pui-user-manager");
-        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationInternalBySearchString(
-                id, hmctsAdmin, "test");
+        Map<String, Object> response = professionalReferenceDataClient
+                .findAllUsersForOrganisationInternalBySearchString(id, hmctsAdmin, "test");
 
         validateUsers(response, 3, true);
 
@@ -243,8 +243,8 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
     @Test
     void retrieve_search_string_with_email_internal_with_pui_user_manager_role_should_return_200() {
         String id = settingUpOrganisationInternal("pui-user-manager");
-        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationInternalBySearchString(
-                id, hmctsAdmin, "dummy");
+        Map<String, Object> response = professionalReferenceDataClient
+                .findAllUsersForOrganisationInternalBySearchString(id, hmctsAdmin, "dummy");
         validateUsers(response, 3, true);
     }
 
