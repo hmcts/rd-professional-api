@@ -53,7 +53,6 @@ def versions = [
         logback         : '1.2.13'
 ]
 
-
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
 def jarName = 'rd-professional-api.jar'
 
