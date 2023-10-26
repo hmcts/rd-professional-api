@@ -46,8 +46,7 @@ def versions = [
         log4j           : '2.20.0',
         reformS2sClient : '5.1.0',
         feign           : '3.8.0',
-        bytebuddy       : '1.12.7',
-        testContainer_postgresql: '1.17.6'
+        bytebuddy       : '1.12.7'
 ]
 
 
