@@ -842,6 +842,23 @@ public class ProfessionalApiClient {
 
     }
 
+
+    public Map<String, Object> searchOrganisationUsersBySearchStringInternal(String organisationId, String role,
+                                                                             String showDeleted, HttpStatus status,
+                                                                             String searchString) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?searchString="
+                        + searchString)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response.body().as(Map.class);
+
+    }
+
     public Map<String, Object> searchOrganisationUsersBySearchStringExternal(HttpStatus status,
                                                                        RequestSpecification requestSpecification,
                                                                        String searchString) {

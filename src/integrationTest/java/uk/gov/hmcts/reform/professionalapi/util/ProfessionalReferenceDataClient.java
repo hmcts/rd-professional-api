@@ -253,6 +253,14 @@ public class ProfessionalReferenceDataClient {
             role, id, showDeleted, status,searchString);
     }
 
+    public Map<String, Object> findAllUsersForOrganisationInternalBySearchString(String organisationIdentifier,
+                                                                                 String role,String searchString) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier
+                        + "/users?searchString={searchString}",
+                role, searchString);
+    }
+
+
     public Map<String, Object> findUsersByOrganisationWithReturnRoles(String returnRoles, String role, String id) {
         return getRequestForExternal(APP_EXT_BASE_PATH + "/users?returnRoles={returnRoles}", role, id,
                 returnRoles);

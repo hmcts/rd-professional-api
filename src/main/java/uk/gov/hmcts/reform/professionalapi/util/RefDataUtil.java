@@ -313,7 +313,7 @@ public class RefDataUtil {
             .filter(user -> verifySearchString(user,searchString))
             .collect(Collectors.toList());
 
-        checkListIsEmpty(filteredUsers, searchString);
+        checkListIsEmptyWithSearchString(filteredUsers, searchString);
 
         professionalUsersEntityResponse.setUserProfiles(filteredUsers);
         return professionalUsersEntityResponse;
@@ -359,6 +359,13 @@ public class RefDataUtil {
                                         String status) {
         if (CollectionUtils.isEmpty(filteredUsers)) {
             throw new ResourceNotFoundException("No users found with status :" + status);
+        }
+    }
+
+    public static void checkListIsEmptyWithSearchString(List<? extends ProfessionalUsersResponseWithoutRoles> filteredUsers,
+                                        String searchString) {
+        if (CollectionUtils.isEmpty(filteredUsers)) {
+            throw new ResourceNotFoundException("No users found with searchString :" + searchString);
         }
     }
 

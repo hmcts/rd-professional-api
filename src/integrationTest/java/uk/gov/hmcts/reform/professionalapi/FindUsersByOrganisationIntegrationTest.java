@@ -234,6 +234,27 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
     }
 
     @Test
+    void retrieve_all_users_for_an_organisation_internal_with_SearchString() {
+        String id = settingUpOrganisationInternal("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationInternalBySearchString(
+                id, hmctsAdmin, "test");
+
+        validateUsers(response, 3, true);
+
+
+    }
+
+    @Test
+    void retrieve_search_string_with_email_internal_with_pui_user_manager_role_should_return_200() {
+        String id = settingUpOrganisationInternal("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationInternalBySearchString(
+                id, hmctsAdmin, "dummy");
+        validateUsers(response, 3, true);
+    }
+
+
+
+    @Test
     void ac1_find_all_active_users_without_roles_for_an_organisation_should_return_200() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles(

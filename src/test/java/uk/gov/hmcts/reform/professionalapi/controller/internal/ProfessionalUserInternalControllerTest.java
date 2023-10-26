@@ -143,7 +143,8 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actual = professionalUserInternalController
                 .findUsersByOrganisation(organisation
-                        .getOrganisationIdentifier(), userIdentifier,"true", true, null, null);
+                        .getOrganisationIdentifier(), userIdentifier,"true",
+                        true, null, null,null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -182,7 +183,7 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier, "true",
-                        true, null, null);
+                        true, null, null,null);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -220,7 +221,7 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier,"true",
-                        true, null, null);
+                        true, null, null,null);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
