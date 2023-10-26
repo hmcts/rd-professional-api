@@ -119,7 +119,7 @@ public class ProfessionalExternalUserController extends SuperController {
                 String searchString) {
 
         if (!StringUtils.isBlank(searchString)) {
-            profExtUsrReqValidator.validateSearhString(searchString);
+            profExtUsrReqValidator.validateSearchString(searchString);
         }
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 

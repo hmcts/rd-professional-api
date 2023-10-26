@@ -504,6 +504,45 @@ class RefDataUtilTest {
             .isEqualTo(professionalUsersResponse2);
     }
 
+
+    @Test
+    void test_filterUsersBySearchStringForSpecialCharacters() {
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse
+            = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName", "lname",
+            "some+@email.com", organisation));
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse1
+            = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fNa-me1", "lNa+me1",
+            "some+1@email.com", organisation));
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse2
+            = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName2", "lName2",
+            "test2@email.com", organisation));
+
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
+
+        List<ProfessionalUsersResponseWithoutRoles> userProfiles = asList(professionalUsersResponse,
+            professionalUsersResponse1, professionalUsersResponse2);
+
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+            = new ProfessionalUsersEntityResponseWithoutRoles();
+        professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(APPLICATION_JSON);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
+            header, HttpStatus.OK);
+
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles11
+            = (ProfessionalUsersEntityResponseWithoutRoles) RefDataUtil.filterUsersBySearchString(realResponseEntity,
+            "a+m");
+        assertThat(professionalUsersEntityResponseWithoutRoles11).isNotNull();
+
+        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles()).hasSize(1);
+        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(0))
+            .isEqualTo(professionalUsersResponse1);
+    }
+
     @Test
     void test_filterUsersByStatusWhenStatusCodeIsNot200() {
         ProfessionalUsersResponse professionalUsersResponse

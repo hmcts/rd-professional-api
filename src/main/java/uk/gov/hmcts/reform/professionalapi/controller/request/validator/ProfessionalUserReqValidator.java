@@ -88,7 +88,7 @@ public class ProfessionalUserReqValidator {
         return !emptyRoles.isEmpty();
     }
 
-    public void validateSearhString(String searchString) {
+    public void validateSearchString(String searchString) {
         if (searchString.length() >= 3) {
             var pattern = Pattern.compile(SEARCHSTRING_FORMAT_REGEX);
             var matcher = pattern.matcher(searchString);
