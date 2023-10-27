@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.dataload.route.DataLoadRoute;
 import uk.gov.hmcts.reform.professionalapi.dataload.util.PrdDataExecutor;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdDataloadSchedulerJob;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdDataloadSchedulerJobRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PrdSchedularAuditRepository;
 import uk.gov.hmcts.reform.professionalapi.util.PrdDataLoadSchedulerAudit;
 
 import java.time.LocalDate;
@@ -49,6 +49,9 @@ public class ProfessionalApiJobScheduler {
     PrdDataloadSchedulerJobRepository prdDataloadSchedulerJob;
 
     @Autowired
+    PrdSchedularAuditRepository prdSchedularAuditRepository;
+
+    @Autowired
     PrdDataLoadSchedulerAudit prdDataLoadSchedulerAudit;
 
     @Autowired
@@ -78,45 +81,37 @@ public class ProfessionalApiJobScheduler {
         if (isSchedulerEnabled) {
             LocalDateTime jobStartTime = now();
 
-            PrdDataloadSchedulerJob latestEntry = prdDataloadSchedulerJob.findFirstByOrderByIdDesc();
+            LocalDateTime latestEntry = prdSchedularAuditRepository.findLatestSchedularEndTime();
 
             System.out.println("Value of Latestnetyr: "+latestEntry);
 
             if(Optional.ofNullable(latestEntry).isPresent()) {
 
-                LocalDate startDate = Optional.ofNullable(latestEntry.getJobStartTime()).isPresent() ? latestEntry
-                    .getJobStartTime().toLocalDate() : null;
-                LocalDate endDate = Optional.ofNullable(latestEntry.getJobEndTime()).isPresent() ? latestEntry
-                    .getJobEndTime().toLocalDate() : null;
+                LocalDate LastRunDate = latestEntry.toLocalDate();
                 LocalDate currentDate = jobStartTime.toLocalDate();
 
-                if (currentDate.equals(startDate) || currentDate.equals(endDate)) {
+                if (currentDate.equals(LastRunDate)) {
                     log.info("PRD load failed since job has already ran for the day");
+                    return;
                 }
-                return;
+
             }
-            PrdDataloadSchedulerJob audit = new PrdDataloadSchedulerJob();
-            audit.setJobStartTime(jobStartTime);
-            audit.setPublishingStatus("INPROGRESS");
-
-
-            prdDataLoadSchedulerAudit.auditSchedulerJobStatus(audit);
 
             log.info("ProfessionalApiJobScheduler.loadPrdData Job execution in progress");
             if (i==0)
             {
-                loadPrdData(Boolean.TRUE);
+                loadPrdData_fresh(Boolean.TRUE);
             }
             else
             {
-                loadPrdDataa(Boolean.TRUE);
+                loadPrdData(Boolean.TRUE);
             }
             log.info("ProfessionalApiJobScheduler.loadPrdData Job execution completed successful");
 
         }
     }
 
-    private void loadPrdDataa(Boolean aTrue) throws Exception {
+    private void loadPrdData(Boolean aTrue) throws Exception {
 
         aTrue = (isEmpty(aTrue)) ? Boolean.FALSE : aTrue;
         camelContext.start();
@@ -126,7 +121,7 @@ public class ProfessionalApiJobScheduler {
 
     }
 
-    private void loadPrdData(Boolean doAudit) throws Exception {
+    private void loadPrdData_fresh(Boolean doAudit) throws Exception {
         log.info("Started to load the data");
         doAudit = (isEmpty(doAudit)) ? Boolean.FALSE : doAudit;
         camelContext.getGlobalOptions().put(SCHEDULER_START_TIME, String.valueOf(new Date().getTime()));
