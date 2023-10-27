@@ -173,7 +173,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (!StringUtils.isBlank(searchString)) {
             //Filtering users by status
 
-            Object response = filterUsersBySearchString(responseEntity, searchString.toLowerCase());
+            Object response = filterUsersBySearchString(responseEntity, searchString.trim().toLowerCase());
             responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(),
                 responseEntity.getStatusCode());
         }
