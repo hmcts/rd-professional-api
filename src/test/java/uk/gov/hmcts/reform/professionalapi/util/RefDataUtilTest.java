@@ -458,8 +458,8 @@ class RefDataUtilTest {
                 header, HttpStatus.OK);
 
         ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles11
-                = (ProfessionalUsersEntityResponseWithoutRoles) RefDataUtil.filterUsersBySearchString(realResponseEntity,
-                "test");
+                = (ProfessionalUsersEntityResponseWithoutRoles) RefDataUtil
+                .filterUsersBySearchString(realResponseEntity, "test");
     }
 
     @Test
