@@ -119,7 +119,7 @@ public class ProfessionalExternalUserController extends SuperController {
                 String searchString) {
 
         if (!StringUtils.isBlank(searchString)) {
-            profExtUsrReqValidator.validateSearchString(searchString);
+            profExtUsrReqValidator.validateSearchString(searchString.trim());
         }
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
@@ -136,7 +136,7 @@ public class ProfessionalExternalUserController extends SuperController {
         }
 
         return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
-                page, size,searchString);
+                page, size,searchString.trim());
     }
 
     @Operation(
