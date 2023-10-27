@@ -136,7 +136,7 @@ public class ProfessionalExternalUserController extends SuperController {
         }
 
         return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
-                page, size,searchString.trim());
+                page, size,searchString);
     }
 
     @Operation(
