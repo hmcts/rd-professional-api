@@ -66,6 +66,18 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             superUserEmail = generateRandomEmail();
             organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
             organisationOtherOrgsCreationRequest.getSuperUser().setEmail(superUserEmail);
+            organisationOtherOrgsCreationRequest.setOrgType("external-test-org-type");
+
+            Map<String, Object> createUserResponse = professionalApiClient
+                    .createOrganisationForExternalV2(organisationOtherOrgsCreationRequest);
+
+            String organisationIdentifier = (String) createUserResponse.get("organisationIdentifier");
+            assertThat(organisationIdentifier).isNotEmpty();
+            organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
+            professionalApiClient.updateOrganisationForExternalV2(organisationOtherOrgsCreationRequest,
+                    organisationIdentifier, OK);
+
+            extActiveOrgId = (String) createUserResponse.get("organisationIdentifier");
 
 
             organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
@@ -116,7 +128,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgType")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo("external-test-org-type");
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPfmShouldBeSuccess :: END");
         responseValidate(response);
@@ -128,7 +140,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgType")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo("external-test-org-type");
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPomShouldBeSuccess :: END");
     }

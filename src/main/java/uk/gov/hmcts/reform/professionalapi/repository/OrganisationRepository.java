@@ -25,6 +25,8 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     Organisation findByName(String name);
 
+    List<Organisation> findByOrgTypeAndStatus(String orgType, OrganisationStatus status);
+
     Organisation findByOrganisationIdentifier(String id);
 
     Organisation findByCompanyNumber(String companyNumber);

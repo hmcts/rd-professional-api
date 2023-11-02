@@ -48,11 +48,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreati
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SingletonOrgType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -110,6 +113,12 @@ public abstract class SuperController {
     protected ProfessionalUserRepository professionalUserRepository;
     @Autowired
     protected PaymentAccountService paymentAccountService;
+
+    @Autowired
+    OrganisationRepository organisationRepository;
+    @Autowired
+    SingletonOrgTypeRepository singletonOrgTypeRepository;
+
     @Autowired
     protected PrdEnumService prdEnumService;
     @Autowired
@@ -356,6 +365,25 @@ public abstract class SuperController {
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             //Organisation is getting activated
             isOrgApprovalRequest = true;
+
+            // Handling 409 error for v2 response since it will again try to create user profile for scenario
+            // updated in RDCC-7061
+
+            if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+                String orgTypeInRequest = orgCreationRequestV2.getOrgType();
+                Optional<SingletonOrgType> isOrgTypePresentInSingleTonOrgTable = singletonOrgTypeRepository
+                                                        .findByOrgType(orgTypeInRequest);
+
+                if (isOrgTypePresentInSingleTonOrgTable.isPresent()) {
+                    var organisationList = organisationRepository
+                            .findByOrgTypeAndStatus(orgTypeInRequest, ACTIVE);
+                    if (organisationList.size() == 1 && !organisationList.get(0)
+                            .getOrganisationIdentifier().equals(organisationIdentifier)) {
+                        throw new InvalidRequest("Singleton Organisation of " + orgTypeInRequest
+                                                                            + " is already Approved");
+                    }
+                }
+            }
             ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, null, true,
                     false);
             if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {

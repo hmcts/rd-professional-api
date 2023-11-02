@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus.ACTIVE;
 
 @SerenityTest
 @SpringBootTest
@@ -34,10 +36,12 @@ import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.c
 class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFunctionalTest {
 
     String intActiveOrgId;
+    String orgIdentifierForSuccess;
     String superUserEmail;
     String invitedUserEmail;
     String invitedUserId;
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
+
 
     @Test
     @DisplayName("PRD Internal Test Scenarios For V2 API")
@@ -48,14 +52,68 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         createOrganisationScenario();
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
+        updateOrgStatusScenarios();
+        updateOrgAsBlockedToMakeUpdateQuerySuccessForNextRun();
     }
+
+
+    public void  updateOrgStatusScenarios() {
+        updateOrgStatusShouldBeSuccess();
+        updateOrgStatusShouldThrowErrorForAlreadyApprovedOrgType();
+    }
+
+    public void updateOrgStatusShouldBeSuccess() {
+        log.info("updateOrgStatusShouldBeSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisationV2();
+        orgIdentifierForSuccess = (String) response.get("organisationIdentifier");
+        String statusMessage = "test";
+
+        professionalApiClient.updateOrganisationV2ForNotActiveOrgType(orgIdentifierForSuccess, hmctsAdmin);
+
+        Map<String, Object> orgResponse = professionalApiClient
+                .retrieveOrganisationDetails(orgIdentifierForSuccess, hmctsAdmin, OK);
+        assertEquals(ACTIVE.toString(), orgResponse.get("status"));
+        assertEquals(statusMessage, orgResponse.get("statusMessage"));
+
+        log.info("updateOrgStatusShouldBeSuccess :: END");
+    }
+
+    // Added this api to update org as Blocked for next run
+    //If not  updated it will check for org and if it is active functional test case will fail
+    public void updateOrgAsBlockedToMakeUpdateQuerySuccessForNextRun() {
+        professionalApiClient.updateOrganisationAsNoActiveV2(orgIdentifierForSuccess,hmctsAdmin);
+        professionalApiClient.updateOrganisationAsNoActiveV2(intActiveOrgId,hmctsAdmin);
+
+    }
+
+    public void updateOrgStatusShouldThrowErrorForAlreadyApprovedOrgType() {
+        log.info("updateOrgStatusShouldBeSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisationV2();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = createOrganisationRequestForV2();
+        organisationCreationRequest.setStatus("ACTIVE");
+        organisationCreationRequest.setOrgType("HMRC-GOV");
+        Map<String, Object> orgResponse = professionalApiClient
+                .updateOrganisationV2Api(organisationCreationRequest,orgIdentifier, hmctsAdmin,HttpStatus.BAD_REQUEST);
+
+        assertEquals("3 : There is a problem with your request. Please check and try again",
+                                    orgResponse.get("errorMessage"));
+        assertEquals("Singleton Organisation of HMRC-GOV is already Approved",
+                orgResponse.get("errorDescription"));
+
+
+        log.info("updateOrgStatusShouldBeSuccess :: END");
+    }
+
 
     public void setUpTestData() {
         superUserEmail = generateRandomEmail();
         invitedUserEmail = generateRandomEmail();
         organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
         organisationOtherOrgsCreationRequest.getSuperUser().setEmail(superUserEmail);
-
         intActiveOrgId = createAndUpdateOrganisationToActiveForV2(hmctsAdmin, organisationOtherOrgsCreationRequest);
 
         List<String> roles = new ArrayList<>();
@@ -184,10 +242,9 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         Map<String, Object> response = professionalApiClient.createOrganisationV2();
         String orgIdentifier = (String) response.get("organisationIdentifier");
-        String statusMessage = "Company in review";
 
         professionalApiClient
-                .updateOrganisationToReviewV2(orgIdentifier, statusMessage, hmctsAdmin);
+                .updateOrganisationV2ForReviewStatus(orgIdentifier,hmctsAdmin);
         Map<String, Object> orgresponse = professionalApiClient
                 .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
 

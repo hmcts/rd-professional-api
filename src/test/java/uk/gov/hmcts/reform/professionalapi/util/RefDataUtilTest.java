@@ -1199,8 +1199,7 @@ class RefDataUtilTest {
 
         List<Organisation> orgResponse = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                 mock(RetrieveUserProfilesRequest.class), "true", activeOrganisationDetails);
-        assertThat(orgResponse).isNotNull()
-                                .isEmpty();
+        assertThat(orgResponse).isNotNull().isEmpty();
         assertThat(response.body()).isNotNull();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
@@ -1230,12 +1229,10 @@ class RefDataUtilTest {
 
         List<Organisation> orgResponse = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                 mock(RetrieveUserProfilesRequest.class), "true", activeOrganisationDetails);
-        assertThat(orgResponse).isNotNull()
-                                .isEmpty();
+        assertThat(orgResponse).isNotNull().isEmpty();
         assertEquals(HttpStatus.MULTIPLE_CHOICES.value(),realResponse.status());
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
-
 
     @Test
     void test_getMultipleUserProfilesFromUp_ResponseStatusIs400() throws JsonProcessingException {
@@ -1263,7 +1260,6 @@ class RefDataUtilTest {
         verify(response, times(4)).status();
         verify(response, times(1)).close();
     }
-
 
     @Test
     void test_GetSingleUserIdFromUserProfileForException() {

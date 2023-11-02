@@ -241,12 +241,31 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void can_update_organisation_status_lowercase_active_should_returns_status_200() {
-        updateAndValidateOrganisation(createOrganisationRequest(), "active", "Company approved", 200);
+        updateAndValidateOrganisation(createOrganisationRequest(), "active", "Company approved",
+                200);
+    }
+
+    @Test
+    void can_update_organisation_if_org_type_present_in_singleton_org_type_table_should_returns_status_200() {
+        updateAndValidateOrganisationWithOrgTypeForV2Api(createOrganisationRequestForV2(), "ACTIVE",
+                "Company approved", "Doctor",200);
+    }
+
+
+
+
+    @Test
+    void can_not_update_if_org_type_present_in_singleton_org_type_table_and_active_in_org_table_return_status_400() {
+        updateAndValidateOrganisationWithOrgTypeForV2Api(createOrganisationRequestForV2(), "ACTIVE",
+                "Company approved", "Doctor",200);
+        updateAndValidateOrganisationWithOrgTypeForV2Api(createOrganisationRequestForV2(), "ACTIVE",
+                "Company approved", "Doctor",400);
     }
 
     @Test
     void can_update_organisation_status_for_v2_lowercase_active_should_returns_status_200() {
-        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(), "active", "Company approved", 200);
+        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(), "active",
+                "Company approved", 200);
     }
 
 
@@ -486,6 +505,65 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
         }
         return persistedOrganisation;
     }
+
+    public Organisation updateAndValidateOrganisationWithOrgTypeForV2Api(String organisationIdentifier, String status,
+                                                              String statusMessage,String orgType, Integer httpStatus) {
+        userProfileCreateUserWireMock(HttpStatus.resolve(httpStatus));
+        OrganisationOtherOrgsCreationRequest organisationUpdateRequest =
+                otherOrganisationRequestWithAllFieldsAreUpdated();
+
+        organisationUpdateRequest.setStatus(status);
+        organisationUpdateRequest.setStatusMessage(statusMessage);
+        organisationUpdateRequest.setOrgType(orgType);
+
+        Organisation persistedOrganisation = null;
+        Map<String, Object> responseForOrganisationUpdate =
+                professionalReferenceDataClient.updateOrganisationForV2Api(organisationUpdateRequest, hmctsAdmin,
+                        organisationIdentifier);
+
+        persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(organisationIdentifier);
+
+        if (httpStatus == 200) {
+            assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
+            assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.valueOf(status.toUpperCase()));
+            if (nonNull(statusMessage)) {
+                assertThat(persistedOrganisation.getStatusMessage()).isEqualTo(statusMessage);
+            }
+            assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id1");
+            assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.TRUE);
+            assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
+            assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
+            assertThat(persistedOrganisation.getOrgType()).isEqualTo("Doctor");
+            assertThat(persistedOrganisation.getOrgAttributes().get(0).getKey()).isEqualTo("testKey1");
+            assertThat(persistedOrganisation.getOrgAttributes().get(0).getValue()).isEqualTo("testValue1");
+            if (OrganisationStatus.ACTIVE.toString() == status) {
+                LocalDateTime localDate = LocalDateTime.now();
+
+                SuperUser professionalUser = persistedOrganisation.getUsers().get(0);
+                assertThat(professionalUser.getUserIdentifier()).isNotNull();
+                assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
+                assertThat(localDate).hasSameClassAs(persistedOrganisation.getDateApproved());
+            }
+
+        } else {
+            if (responseForOrganisationUpdate.get("http_status") instanceof String) {
+                assertThat(responseForOrganisationUpdate.get("http_status"))
+                        .isEqualTo(String.valueOf(httpStatus.intValue()));
+            } else {
+                assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
+            }
+
+            if (persistedOrganisation != null && !(OrganisationStatus.PENDING.toString().equals(status)
+                    || OrganisationStatus.REVIEW.toString().equals(status))) {
+                SuperUser professionalUser = persistedOrganisation.getUsers().get(0);
+                assertThat(professionalUser.getUserIdentifier()).isNull();
+                assertThat(persistedOrganisation.getStatus()).isNotEqualTo(OrganisationStatus.ACTIVE);
+            }
+        }
+        return persistedOrganisation;
+    }
+
 
     public Organisation updateAndValidateOrganisationForV2Api(String organisationIdentifier, String status,
                                                       String statusMessage, Integer httpStatus) {
