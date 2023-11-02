@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.SingletonOrgTypeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
@@ -55,6 +56,9 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     @MockBean
     OrganisationServiceImpl organisationService;
 
+
+    @Autowired
+    SingletonOrgTypeRepository singletonOrgTypeRepository;
 
     public static final String ORG_NAME = "Org-Name";
     public static final String SRA_ID = "sra-id";
