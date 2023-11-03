@@ -57,7 +57,7 @@ where organisation_id in
 
 delete from organisation
 where company_number like '%com'
-and company_url like '%-url'
-and sra_id like '%-number1';
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1';
 
 commit;
