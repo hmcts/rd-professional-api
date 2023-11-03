@@ -115,6 +115,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findUsersByInternalUserWithRolesShouldReturnSuccess();
         findUsersByInternalUserWithoutRolesShouldReturnSuccess();
         findUsersByInternalUserWithPaginationShouldReturnSuccess();
+        findUsersByInternalUserWithSearchStringProvidedShouldBeSuccess();
+        findUsersByInternalUserWithSearchStringEmptyProvidedShouldBeSuccess();
     }
 
     public void findOrganisationScenarios() {
@@ -226,6 +228,25 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
         assertThat(professionalUsersResponses2.size()).isEqualTo(1);
         log.info("findUsersByInternalUserWithPaginationShouldReturnSuccess :: END");
+    }
+
+
+    public void findUsersByInternalUserWithSearchStringProvidedShouldBeSuccess() {
+        log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient
+                .searchOrganisationUsersBySearchStringInternal(intActiveOrgId, hmctsAdmin, "False",
+                        OK,"test");
+        validateRetrievedUsers(response, "ACTIVE", true);
+        log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: END");
+    }
+
+    public void findUsersByInternalUserWithSearchStringEmptyProvidedShouldBeSuccess() {
+        log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient
+                .searchOrganisationUsersBySearchStringInternal(intActiveOrgId, hmctsAdmin, "False",
+                        OK,"");
+        validateRetrievedUsers(response, "ACTIVE", true);
+        log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: END");
     }
 
     public void findOrganisationByIdByInternalUserShouldBeSuccess() {

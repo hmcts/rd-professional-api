@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import feign.FeignException;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -257,6 +258,27 @@ public class RefDataUtil {
         }
     }
 
+    public static Object filterUsersBySearchString(ResponseEntity<Object> responseEntity, String searchString) {
+
+        if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
+
+            if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
+
+                return filterSearchStringWithRoles(
+                    (ProfessionalUsersEntityResponse) requireNonNull(responseEntity.getBody()), searchString);
+
+            } else {
+
+                return filterSearchStringWithRolesoutRoles(
+                    (ProfessionalUsersEntityResponseWithoutRoles) requireNonNull(responseEntity.getBody()),
+                    searchString);
+            }
+
+        } else {
+            throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_MESSAGE_UP_FAILED);
+        }
+    }
+
     public static ProfessionalUsersEntityResponse filterUsersByStatusWithRoles(
             ProfessionalUsersEntityResponse professionalUsersEntityResponse, String status) {
         List<ProfessionalUsersResponse> filteredUsers = professionalUsersEntityResponse
@@ -284,10 +306,66 @@ public class RefDataUtil {
         return professionalUsersEntityResponseWithoutRoles;
     }
 
+    public static ProfessionalUsersEntityResponse filterSearchStringWithRoles(
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse, String searchString) {
+        List<ProfessionalUsersResponse> filteredUsers = professionalUsersEntityResponse
+            .getUsers().stream()
+            .filter(user -> verifySearchString(user,searchString))
+            .collect(Collectors.toList());
+
+        checkListIsEmptyWithSearchString(filteredUsers, searchString);
+
+        professionalUsersEntityResponse.setUserProfiles(filteredUsers);
+        return professionalUsersEntityResponse;
+    }
+
+
+
+    public static ProfessionalUsersEntityResponseWithoutRoles filterSearchStringWithRolesoutRoles(
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles,
+        String searchString) {
+        List<ProfessionalUsersResponseWithoutRoles> filteredUsers
+            = professionalUsersEntityResponseWithoutRoles.getUserProfiles().stream()
+            .filter(user -> verifySearchString(user,searchString))
+            .collect(Collectors.toList());
+
+        checkListIsEmpty(filteredUsers, searchString);
+
+        professionalUsersEntityResponseWithoutRoles.setUserProfiles(filteredUsers);
+        return professionalUsersEntityResponseWithoutRoles;
+    }
+
+    private static boolean verifySearchString(ProfessionalUsersResponseWithoutRoles user, String searchString) {
+
+        if ((!StringUtils.isBlank(user.getFirstName()) && user.getFirstName().toLowerCase().contains(searchString))
+            || (!StringUtils.isBlank(user.getLastName()) && user.getLastName().toLowerCase().contains(searchString))
+            || (!StringUtils.isBlank(user.getEmail()) && user.getEmail().toLowerCase().contains(searchString))) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean verifySearchString(ProfessionalUsersResponse user, String searchString) {
+
+        if ((!StringUtils.isBlank(user.getFirstName()) && user.getFirstName().toLowerCase().contains(searchString))
+            || (!StringUtils.isBlank(user.getLastName()) && user.getLastName().toLowerCase().contains(searchString))
+            || (!StringUtils.isBlank(user.getEmail()) && user.getEmail().toLowerCase().contains(searchString))) {
+            return true;
+        }
+        return false;
+    }
+
     public static void checkListIsEmpty(List<? extends ProfessionalUsersResponseWithoutRoles> filteredUsers,
                                         String status) {
         if (CollectionUtils.isEmpty(filteredUsers)) {
             throw new ResourceNotFoundException("No users found with status :" + status);
+        }
+    }
+
+    public static void checkListIsEmptyWithSearchString(List<? extends ProfessionalUsersResponseWithoutRoles>
+                                                                filteredUsers, String searchString) {
+        if (CollectionUtils.isEmpty(filteredUsers)) {
+            throw new ResourceNotFoundException("No users found with searchString :" + searchString);
         }
     }
 

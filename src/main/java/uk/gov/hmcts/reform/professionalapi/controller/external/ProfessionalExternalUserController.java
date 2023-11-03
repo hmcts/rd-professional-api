@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -112,9 +114,13 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
             @RequestParam(value = "userIdentifier", required = false) String userIdentifier,
-            @Parameter(hidden = true) @UserId String userId) {
+            @Parameter(hidden = true) @UserId String userId,
+            @RequestParam(value = "searchString", required = false)
+                String searchString) {
 
-
+        if (!StringUtils.isBlank(searchString)) {
+            profExtUsrReqValidator.validateSearchString(searchString.trim());
+        }
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(idamRepository.getUserInfo(getUserToken())
@@ -130,7 +136,7 @@ public class ProfessionalExternalUserController extends SuperController {
         }
 
         return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
-                page, size);
+                page, size,searchString);
     }
 
     @Operation(

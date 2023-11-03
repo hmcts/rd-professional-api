@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -18,40 +21,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    @Test
-    void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,
-                "True", hmctsAdmin);
-        validateUsers(response, 3, true);
-    }
 
-    @Test
-    void can_retrieve_users_with_showDeleted_false_should_return_status_200() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"INVALID","","False","True"})
+    void can_retrieve_users_with_showDeleted_different_should_return_status_200(String showDeleted) {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,
-                "False", hmctsAdmin);
+            showDeleted, hmctsAdmin);
         validateUsers(response, 3, true);
-    }
 
-    @Test
-    void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,
-                null, hmctsAdmin);
-        validateUsers(response, 3, true);
-    }
-
-    @Test
-    void can_retrieve_users_with_showDeleted_invalid_should_return_status_200() {
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,
-                "INVALID", hmctsAdmin);
-        validateUsers(response, 3, true);
     }
 
     @Test
@@ -89,7 +69,7 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
                 .findUsersByOrganisation(organisationIdentifier, "True", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users"))).isNotEmpty();
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(2);
@@ -101,7 +81,7 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
         assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo("DELETED");
         assertThat(professionalUsersResponse.get("idamStatusCode")).isEqualTo("404");
         assertThat(professionalUsersResponse.get("idamMessage")).isEqualTo("16 Resource not found");
-        assertThat(((List) professionalUsersResponse.get("roles")).size()).isEqualTo(0);
+        assertThat(((List) professionalUsersResponse.get("roles"))).isEmpty();
 
         HashMap professionalUsersResponse1 = professionalUsersResponses.get(0);
         assertThat(professionalUsersResponse1.get("idamStatusCode")).isEqualTo("0");
@@ -122,6 +102,38 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus(
                 "false", "Active", puiUserManager, id);
         validateUsers(response, 2, true);
+    }
+
+    @Test
+    void retrieve_search_string_for_an_organisation_with_pui_user_manager_role_should_return_200() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationBySearchString(
+            "false", "Active", puiUserManager, id,"test");
+        validateUsers(response, 2, true);
+    }
+
+    @Test
+    void retrieve_search_string_with_email_with_pui_user_manager_role_should_return_200() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationBySearchString(
+            "false", "Active", puiUserManager, id,"dummy");
+        validateUsers(response, 2, true);
+    }
+
+    @Test
+    void retrieve_search_two_characters_for_an_organisation_with_pui_user_manager_role_should_return_400() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationBySearchString(
+            "false", "Active", puiUserManager, id,"te");
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    void retrieve_search_special_characters_for_an_organisation_with_pui_user_manager_role_should_return_400() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationBySearchString(
+            "false", "Active", puiUserManager, id,"test!");
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
@@ -181,13 +193,13 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,
                 "False", hmctsAdmin);
 
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(3);
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users"))).hasSize(3);
 
         Map<String, Object> response2 = professionalReferenceDataClient
                 .findUsersByOrganisationWithPaginationInformation(organisationIdentifier, "False",
                         hmctsAdmin);
 
-        assertThat(((List<ProfessionalUsersResponse>) response2.get("users")).size()).isEqualTo(3);
+        assertThat(((List<ProfessionalUsersResponse>) response2.get("users"))).hasSize(3);
     }
 
     @Test
@@ -213,9 +225,30 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationAndUserIdentifier(
                 organisationIdentifier, hmctsAdmin, profUser.get("userIdentifier").toString());
 
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users"))).isNotEmpty();
 
     }
+
+    @Test
+    void retrieve_all_users_for_an_organisation_internal_with_SearchString() {
+        String id = settingUpOrganisationInternal("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient
+                .findAllUsersForOrganisationInternalBySearchString(id, hmctsAdmin, "test");
+
+        validateUsers(response, 3, true);
+
+
+    }
+
+    @Test
+    void retrieve_search_string_with_email_internal_with_pui_user_manager_role_should_return_200() {
+        String id = settingUpOrganisationInternal("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient
+                .findAllUsersForOrganisationInternalBySearchString(id, hmctsAdmin, "dummy");
+        validateUsers(response, 3, true);
+    }
+
+
 
     @Test
     void ac1_find_all_active_users_without_roles_for_an_organisation_should_return_200() {
@@ -225,20 +258,15 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
         validateUsers(response, 2, false);
     }
 
-    @Test
-    void ac2_find_all_active_users_with_roles_for_an_organisation_should_return_200() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"true",""})
+    void ac3_find_all_active_users_with_or_no_param_given_for_an_organisation_should_return_200(String returnRoles) {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles(
-                "true", puiCaseManager, id);
+            returnRoles, puiCaseManager, id);
         validateUsers(response, 2, true);
-    }
 
-    @Test
-    void ac3_find_all_active_users_with_no_param_given_for_an_organisation_should_return_200() {
-        String id = settingUpOrganisation("pui-user-manager");
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles(
-                "", puiCaseManager, id);
-        validateUsers(response, 2, true);
     }
 
     @Test
@@ -261,7 +289,7 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(expectedUserCount);
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users"))).hasSize(expectedUserCount);
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
 
         professionalUsersResponses.stream().forEach(user -> {
@@ -272,7 +300,7 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
             assertThat(user.get("idamStatus")).isNotNull();
             if (rolesReturned) {
                 if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
-                    assertThat(((List) user.get("roles")).size()).isEqualTo(1);
+                    assertThat(((List) user.get("roles"))).hasSize(1);
                 } else {
                     assertThat(((List) user.get("roles"))).isEmpty();
                 }

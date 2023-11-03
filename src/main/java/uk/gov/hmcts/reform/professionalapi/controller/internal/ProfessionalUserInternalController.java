@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -99,14 +100,19 @@ public class ProfessionalUserInternalController extends SuperController {
             @Parameter(name = "returnRoles")
             @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
             @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "size", required = false) Integer size
-    ) {
+            @RequestParam(value = "size", required = false) Integer size,
+            @RequestParam(value = "searchString", required = false)
+            String searchString) {
+
+        if (!StringUtils.isBlank(searchString)) {
+            profExtUsrReqValidator.validateSearchString(searchString);
+        }
         var status = EMPTY;
         if (isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles())) {
             status = ACTIVE;
         }
         return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status, page,
-                size);
+                size,searchString);
     }
 
     @Operation(

@@ -292,6 +292,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return updateOrgAndInviteUser(organisationIdentifier, role);
     }
 
+
+    protected String settingUpOrganisationInternal(String role) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrgAndInviteUser(organisationIdentifier, role);
+        return organisationIdentifier;
+    }
+
     protected Pair<String, String> settingUpMinimalFieldOrganisation(String role) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();

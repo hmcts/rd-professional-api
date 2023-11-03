@@ -87,6 +87,7 @@ import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_ERROR_BODY_START;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
@@ -140,7 +141,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
-    private static final String SHOW_DELETED = "false";
 
     @Override
     @Transactional
@@ -165,8 +165,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addDefaultMfaStatusToOrganisation(organisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false,
-                false);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false, false);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -349,7 +348,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     .toList());
             updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
-                    SHOW_DELETED, activeOrganisationDtls);
+                    FALSE, activeOrganisationDtls);
 
         }
         return updatedOrganisationDetails;
@@ -403,7 +402,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     .toList());
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
                     retrieveUserProfilesRequest,
-                    SHOW_DELETED, activeOrganisationDetails);
+                FALSE, activeOrganisationDetails);
         }
 
         resultingOrganisations.addAll(pendingOrganisations);
@@ -463,11 +462,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
-                    = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
-                    .toList());
+                = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
+                .toList());
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
-                    retrieveUserProfilesRequest,
-                    SHOW_DELETED, activeOrganisationDetails);
+                retrieveUserProfilesRequest,
+                FALSE, activeOrganisationDetails);
         }
 
         resultingOrganisations.addAll(pendingOrganisations);
@@ -478,8 +477,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         OrganisationsDetailResponseV2 organisationsDetailResponse = new OrganisationsDetailResponseV2(
-                resultingOrganisations, true, true, false,
-                true);
+                resultingOrganisations, true, true, false,true);
         organisationsDetailResponse.setTotalRecords(totalRecords);
         return organisationsDetailResponse;
     }
@@ -501,8 +499,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
-        return new OrganisationEntityResponseV2(organisation, true, isPendingPbaRequired,
-                false, true);
+        return new OrganisationEntityResponseV2(organisation, true, isPendingPbaRequired, false, true);
     }
 
     @Override
@@ -585,7 +582,9 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
 
-
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            organisation.setOrgType(orgCreationRequestV2.getOrgType());
+        }
 
         if (TRUE.equals(isOrgApprovalRequest)) {
             organisation.setDateApproved(LocalDateTime.now());
@@ -595,8 +594,9 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
-
         }
+
+
         if (isNotEmpty(savedOrganisation.getPaymentAccounts())
                 && organisationCreationRequest.getStatus().equals("ACTIVE")) {
             updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
@@ -643,8 +643,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
-        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired,
-                false);
+        return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired, false);
     }
 
     @Override

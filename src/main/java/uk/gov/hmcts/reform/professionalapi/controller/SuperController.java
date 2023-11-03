@@ -188,8 +188,7 @@ public abstract class SuperController {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
         }
 
-        var organisationResponse = organisationService
-                                                .createOrganisationFrom(organisationCreationRequest);
+        var organisationResponse = organisationService.createOrganisationFrom(organisationCreationRequest);
 
         //Received response to create a new organisation
         return ResponseEntity
@@ -322,8 +321,7 @@ public abstract class SuperController {
 
         return ResponseEntity
                 .status(200)
-                .body(new OrganisationPbaResponse(organisation, false, true,
-                        false));
+                .body(new OrganisationPbaResponse(organisation, false, true, false));
     }
 
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmailForV2Api(String email) {
@@ -362,7 +360,6 @@ public abstract class SuperController {
 
         var superUser = existingOrganisation.getUsers().get(0);
         var professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
-
         if ((existingOrganisation.getStatus().isPending() || existingOrganisation.getStatus().isReview())
                 && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
@@ -402,6 +399,7 @@ public abstract class SuperController {
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
+        // deleting the orgAttribute array to add new changes
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             organisationService.deleteOrgAttribute(orgCreationRequestV2.getOrgAttributes(), organisationIdentifier);
         }
@@ -545,7 +543,7 @@ public abstract class SuperController {
 
     protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String userIdentifier,
                                                                String showDeleted, Boolean returnRoles, String status,
-                                                               Integer page, Integer size) {
+                                                               Integer page, Integer size,String searchString) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -560,10 +558,10 @@ public abstract class SuperController {
             Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService
                     .findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles,
-                            status, pageable);
+                            status, pageable,searchString);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
-                    userIdentifier, showDeleted, returnRoles, status);
+                    userIdentifier, showDeleted, returnRoles, status,searchString);
         }
         return responseEntity;
     }

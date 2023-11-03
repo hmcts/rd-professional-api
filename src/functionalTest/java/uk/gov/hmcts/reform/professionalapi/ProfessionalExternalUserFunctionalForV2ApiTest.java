@@ -45,6 +45,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String superUserId;
 
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
+    String firstName = "firstName";
+    String lastName = "lastName";
 
     @Test
     @DisplayName("PRD External Test Scenarios For V2 API")

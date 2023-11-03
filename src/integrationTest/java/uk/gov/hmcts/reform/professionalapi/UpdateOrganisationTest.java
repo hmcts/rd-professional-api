@@ -32,8 +32,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void updates_non_existing_organisation_returns_status_404() {
         updateAndValidateOrganisation("AA11NNF", "ACTIVE", null,404);
-        updateAndValidateOrganisationForV2Api("AA11NNF", "ACTIVE", null,
-                404);
+        updateAndValidateOrganisationForV2Api("AA11NNF", "ACTIVE", null,404);
     }
 
     @Test
@@ -45,8 +44,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void updates_organisation_with_invalid_organisation_identifier_returns_status_400() {
         updateAndValidateOrganisation("1234ab12", "ACTIVE", null, 400);
-        updateAndValidateOrganisationForV2Api("1234ab12", "ACTIVE", null,
-                400);
+        updateAndValidateOrganisationForV2Api("1234ab12", "ACTIVE", null, 400);
     }
 
     @Test
@@ -56,8 +54,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void can_update_organisation_status_for_v2_from_pending_to_active_should_returns_status_200() {
-        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(), "ACTIVE", null,
-                200);
+        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(), "ACTIVE", null, 200);
     }
 
 
@@ -74,10 +71,8 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"ACTIVE", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"BLOCKED", null,
-                200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"ACTIVE", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"BLOCKED", null, 200);
     }
 
     @Test
@@ -91,10 +86,8 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     void can_update_organisation_status_from_active_to_deleted_for_v2_should_returns_status_200() {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "ACTIVE", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "DELETED", null,
-                200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "ACTIVE", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "DELETED", null, 200);
     }
 
     @Test
@@ -105,8 +98,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void can_update_organisation_status_from_pending_to_deleted_for_v2_should_returns_status_200() {
-        updateAndValidateOrganisationForV2Api(createOrganisationRequest(), "DELETED", null,
-                200);
+        updateAndValidateOrganisationForV2Api(createOrganisationRequest(), "DELETED", null, 200);
     }
 
     @Test
@@ -119,8 +111,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     void can_update_organisation_status_from_pending_to_pending_for_v2_should_returns_status_200() {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "PENDING", null,
-                200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "PENDING", null, 200);
     }
 
     @Test
@@ -134,10 +125,8 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     void can_update_organisation_status_from_active_to_active_for_v2_should_returns_status_200() {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "ACTIVE", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "ACTIVE", null,
-                200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "ACTIVE", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "ACTIVE", null, 200);
     }
 
     @Test
@@ -152,10 +141,8 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     void can_update_organisation_status_from_blocked_to_blocked_for_v2_should_returns_status_200() {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "BLOCKED", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "BLOCKED", null,
-                200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "BLOCKED", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "BLOCKED", null, 200);
     }
 
     @Test
@@ -170,10 +157,8 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"DELETED", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"ACTIVE", null,
-                400);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"DELETED", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"ACTIVE", null, 400);
     }
 
     @Test
@@ -187,10 +172,8 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     void can_not_update_organisation_status_from_deleted_to_pending_for_v2_should_returns_status_400() {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "DELETED", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "PENDING", null,
-                400);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "DELETED", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "PENDING", null, 400);
     }
 
     @Test
@@ -204,10 +187,8 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     void can_not_update_organisation_status_from_deleted_to_blocked_for_v2_should_returns_status_400() {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "DELETED", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "BLOCKED", null,
-                400);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "DELETED", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "BLOCKED", null, 400);
     }
 
     @Test
@@ -223,10 +204,8 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     void can_not_update_organisation_status_from_deleted_to_deleted_for_v2_should_returns_status_400() {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"DELETED", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"DELETED", null,
-                400);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"DELETED", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"DELETED", null, 400);
     }
 
     @Test
@@ -241,28 +220,23 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
         String organisationIdentifierV2 = createOrganisationRequestForV2();
 
 
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"ACTIVE", null,
-                200);
-        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "PENDING", null,
-                400);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2,"ACTIVE", null, 200);
+        updateAndValidateOrganisationForV2Api(organisationIdentifierV2, "PENDING", null, 400);
     }
 
     @Test
     void can_update_organisation_status_from_pending_to_review_should_returns_status_200() {
-        updateAndValidateOrganisation(createOrganisationRequest(), "REVIEW", "Company in review",
-                200);
+        updateAndValidateOrganisation(createOrganisationRequest(), "REVIEW", "Company in review", 200);
     }
 
     @Test
     void can_update_organisation_status_from_pending_to_review_for_v2_should_returns_status_200() {
-        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(), "REVIEW",
-                "Company in review", 200);
+        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(), "REVIEW", "Company in review", 200);
     }
 
     @Test
     void can_update_organisation_status_uppercase_active_should_returns_status_200() {
-        updateAndValidateOrganisation(createOrganisationRequest(), "ACTIVE", "Company approved",
-                200);
+        updateAndValidateOrganisation(createOrganisationRequest(), "ACTIVE", "Company approved", 200);
     }
 
     @Test
@@ -276,6 +250,9 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
         updateAndValidateOrganisationWithOrgTypeForV2Api(createOrganisationRequestForV2(), "ACTIVE",
                 "Company approved", "Doctor",200);
     }
+
+
+
 
     @Test
     void can_not_update_if_org_type_present_in_singleton_org_type_table_and_active_in_org_table_return_status_400() {
@@ -309,18 +286,14 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void can_not_update_organisation_status_empty_returns_status_400() {
-        updateAndValidateOrganisation(createOrganisationRequest(), StringUtils.EMPTY, "empty status",
-                400);
-        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(), StringUtils.EMPTY,
-                "empty status", 400);
+        updateAndValidateOrganisation(createOrganisationRequest(), StringUtils.EMPTY, "empty status", 400);
+        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(), StringUtils.EMPTY, "empty status", 400);
     }
 
     @Test
     void can_not_update_organisation_status_null_returns_status_400() {
-        updateAndValidateOrganisation(createOrganisationRequest(),null, "null status",
-                400);
-        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(),null,
-                "null status", 400);
+        updateAndValidateOrganisation(createOrganisationRequest(),null, "null status", 400);
+        updateAndValidateOrganisationForV2Api(createOrganisationRequestForV2(),null, "null status", 400);
     }
 
     @Test
@@ -377,8 +350,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void entities_other_than_organisation_should_remain_unchanged_if_updated_and_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE",
-                null,
+        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", null,
                 200);
 
         List<PaymentAccount> pbaAccounts = persistedOrganisation.getPaymentAccounts();

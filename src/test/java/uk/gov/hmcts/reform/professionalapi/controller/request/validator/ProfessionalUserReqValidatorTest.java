@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -145,6 +147,31 @@ class ProfessionalUserReqValidatorTest {
 
         assertThrows(InvalidRequest.class, () ->
                 profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, uuid));
+    }
+
+    @Test
+    void test_validateSearchRequestThrows400ForTwoCharSearch() {
+        assertThrows(InvalidRequest.class, () ->
+            profUserReqValidator.validateSearchString("se"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"@+-'.`","@+-","se-","se+"})
+    void test_validateSearchRequestThrow200ForSpecialCharacters(String specialCharacter) {
+        profUserReqValidator.validateSearchString(specialCharacter);
+        assertTrue(true);
+    }
+
+    @Test
+    void test_validateSearchRequestThrows400ForSpecialCharSearch() {
+        assertThrows(InvalidRequest.class, () ->
+            profUserReqValidator.validateSearchString("sear!"));
+    }
+
+    @Test
+    void test_validateSearchRequestThrows400ForEmptySearch() {
+        assertThrows(InvalidRequest.class, () ->
+            profUserReqValidator.validateSearchString(""));
     }
 
     @Test
