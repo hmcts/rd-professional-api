@@ -78,17 +78,6 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                     organisationIdentifier, OK);
 
             extActiveOrgId = (String) createUserResponse.get("organisationIdentifier");
-
-
-            organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
-            extActiveOrgId = createAndActivateOrganisationWithGivenRequestV2(organisationOtherOrgsCreationRequest,
-                    hmctsAdmin);
-
-            Map<String, Object> searchResponse = professionalApiClient
-                    .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
-            List<Map<String, Object>> professionalUsersResponses =
-                    (List<Map<String, Object>>) searchResponse.get("users");
-            superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
         }
     }
 
