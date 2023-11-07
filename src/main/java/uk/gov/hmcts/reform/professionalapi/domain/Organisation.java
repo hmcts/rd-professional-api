@@ -73,6 +73,9 @@ public class Organisation implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation", optional = false, fetch = FetchType.LAZY)
     private OrganisationMfaStatus organisationMfaStatus;
 
+    @OneToMany(targetEntity = OrgAttribute.class, mappedBy = "organisation")
+    private List<OrgAttribute> orgAttributes = new ArrayList<>();
+
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
@@ -83,6 +86,9 @@ public class Organisation implements Serializable {
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
+
+    @Column(name = "ORG_TYPE")
+    private String orgType;
 
     @CreatedDate
     @Column(name = "CREATED")
@@ -142,6 +148,14 @@ public class Organisation implements Serializable {
         return id;
     }
 
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public List<OrgAttribute> getOrgAttributes() {
+        return orgAttributes;
+    }
+
     public String getName() {
         return name;
     }
@@ -189,4 +203,9 @@ public class Organisation implements Serializable {
     public boolean isOrganisationStatusActive() {
         return OrganisationStatus.ACTIVE == getStatus();
     }
+
+    public void addAttribute(OrgAttribute orgAttribute) {
+        orgAttributes.add(orgAttribute);
+    }
+
 }

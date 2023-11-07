@@ -56,9 +56,8 @@ where organisation_id in
 );
 
 delete from organisation
-where id not in
-(
- select organisation_id from professional_user
-);
+where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1';
 
 commit;
