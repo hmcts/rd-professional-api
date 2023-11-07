@@ -1,0 +1,18 @@
+java:
+  environment:
+    POSTGRES_HOST: rd-professional-api-postgres-db-v15-{{ .Values.global.environment }}.postgres.database.azure.com
+  keyVaults:
+    rd:
+      secrets:
+        - name: professional-api-POSTGRES-DATABASE-V15
+          alias: POSTGRES_NAME
+        - name: professional-api-POSTGRES-HOST-V15
+          alias: POSTGRES_HOST
+        - name: professional-api-POSTGRES-PORT-V15
+          alias: POSTGRES_PORT
+        - name: professional-api-POSTGRES-USER-V15
+          alias: POSTGRES_USERNAME
+        - name: professional-api-POSTGRES-PASS-V15
+          alias: POSTGRES_PASSWORD
+
+
