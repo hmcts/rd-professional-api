@@ -29,8 +29,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 def vaultOverrides = [
-        'preview' : 'aat',
-        'spreview': 'saat'
+        'preview' : 'demo',
+        'spreview': 'sdemo'
 ]
 
 // Configure branches to sync with master branch
