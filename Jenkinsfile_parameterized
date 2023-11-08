@@ -9,7 +9,7 @@ properties([
       string(name: 'ENVIRONMENT', defaultValue: 'sandbox', description: 'Environment where code should be build and deployed'),
       choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in'),
       string(name: 'S2S_URL_TO_TEST', defaultValue: 'http://rpe-service-auth-provider-sandbox.service.core-compute-sandbox.internal', description: 'S2S component URL'),
-      string(name: 'IDAM_URL_TO_TEST', defaultValue: 'https://idam-api.preview.platform.hmcts.net', description: 'IDAM component URL'),
+      string(name: 'IDAM_URL_TO_TEST', defaultValue: 'https://idam-api.demo.platform.hmcts.net', description: 'IDAM component URL'),
       string(name: 'OAUTH2_CLIENT_ID_TO_TEST', defaultValue: 'rd-professional-api', description: 'OAUTH2 client id'),
       string(name: 'OAUTH2_CLIENT_SECRET_TO_TEST', defaultValue: '*****', description: 'OAUTH2 client secret'),
       string(name: 'OAUTH2_REDIRECT_URI_TO_TEST', defaultValue: '*****', description: 'OAUTH2 redirect uri'),
@@ -37,8 +37,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 def vaultOverrides = [
-    'preview' : 'aat',
-    'spreview': 'saat'
+    'preview' : 'demo',
+    'spreview': 'sdemo'
 ]
 
 withParameterizedPipeline(type, product, component, 'sandbox', 'sandbox') {
