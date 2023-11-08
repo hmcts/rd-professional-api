@@ -37,8 +37,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 def vaultOverrides = [
-    'preview' : 'aat',
-    'spreview': 'saat'
+    'preview' : 'demo',
+    'spreview': 'sdemo'
 ]
 
 withParameterizedPipeline(type, product, component, 'sandbox', 'sandbox') {

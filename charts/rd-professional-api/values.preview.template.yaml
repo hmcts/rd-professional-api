@@ -2,10 +2,6 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   environment:
-    POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-    POSTGRES_NAME: "{{ .Values.postgresql.auth.database}}"
-    POSTGRES_USERNAME: "{{ .Values.postgresql.auth.username}}"
-    POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     LAUNCH_DARKLY_ENV: "preview"
   postgresql:
     enabled: true
@@ -22,3 +18,13 @@ java:
           alias: azure.application-insights.instrumentation-key
         - name: professional-api-s2s-secret
           alias: PROFESSIONAL_API_S2S_SECRET
+        - name: professional-api-POSTGRES-DATABASE-V15
+          alias: POSTGRES_DB
+        - name: professional-api-POSTGRES-HOST-V15
+          alias: POSTGRES_HOST
+        - name: professional-api-POSTGRES-PORT-V15
+          alias: POSTGRES_PORT
+        - name: professional-api-POSTGRES-USER-V15
+          alias: POSTGRES_USERNAME
+        - name: professional-api-POSTGRES-PASS-V15
+          alias: POSTGRES_PASSWORD
