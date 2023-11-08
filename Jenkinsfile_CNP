@@ -61,8 +61,8 @@ withPipeline(type, product, component) {
     }
 
     before('functionalTest:aat') {
-        env.execution_environment = "aat"
-        env.TEST_URL = "http://rd-professional-api-aat.aat.hmcts.platform.net"
+        env.execution_environment = "demo"
+        env.TEST_URL = "http://rd-professional-api-demo.demo.hmcts.platform.net"
     }
 
     before('smoketest:preview') {
@@ -71,8 +71,8 @@ withPipeline(type, product, component) {
     }
 
     before('smoketest:aat') {
-        env.execution_environment = "aat"
-        env.TEST_URL = "http://rd-professional-api-aat.aat.platform.hmcts.net"
+        env.execution_environment = "demo"
+        env.TEST_URL = "http://rd-professional-api-demo.demo.platform.hmcts.net"
     }
 
     // Sync demo and perftest with master branch
