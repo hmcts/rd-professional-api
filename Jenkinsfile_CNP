@@ -8,10 +8,10 @@ def product = "rd"
 def component = "professional-api"
 /* The below Key Vault secrets will be used for functional and smoke tests */
 def secrets = [
-        's2s-${env}': [
+        's2s-demo': [
                 secret('microservicekey-rd-professional-api', 'PROFESSIONAL_API_S2S_SECRET')
         ],
-        'rd-${env}' : [
+        'rd-demo' : [
                 secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
                 secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
                 secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
@@ -52,12 +52,12 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     enableAksStagingDeployment()
     
-    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-demo.service.core-compute-aat.internal"
+    env.IDAM_URL = "https://idam-api.demo.platform.hmcts.net"
 
     before('functionalTest:preview') {
         env.execution_environment = "demo"
-        env.TEST_URL = "http://rd-professional-api-preview.preview.hmcts.platform.net"
+        env.TEST_URL = "http://rd-professional-api-demo.demo.hmcts.platform.net"
     }
 
     before('functionalTest:aat') {
@@ -67,7 +67,7 @@ withPipeline(type, product, component) {
 
     before('smoketest:preview') {
         env.execution_environment = "demo"
-        env.TEST_URL = "http://rd-professional-api-preview.preview.platform.hmcts.net"
+        env.TEST_URL = "http://rd-professional-api-demo.demo.platform.hmcts.net"
     }
 
     before('smoketest:aat') {
