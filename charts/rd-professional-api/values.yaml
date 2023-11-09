@@ -15,8 +15,6 @@ java:
     AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     LAUNCH_DARKLY_ENV: "{{ .Values.global.environment }}"
   image: 'hmctspublic.azurecr.io/rd/professional-api:latest'
-global:
-  environment: demo
   keyVaults:
     rd:
       secrets:

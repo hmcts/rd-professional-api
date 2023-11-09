@@ -8,14 +8,19 @@ def product = "rd"
 def component = "professional-api"
 /* The below Key Vault secrets will be used for functional and smoke tests */
 def secrets = [
-        's2s-demo': [
+        's2s-${env}': [
                 secret('microservicekey-rd-professional-api', 'PROFESSIONAL_API_S2S_SECRET')
         ],
-        'rd-demo' : [
+        'rd-${env}' : [
                 secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
                 secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
                 secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
-                secret('LD-SDK-KEY', 'LD_SDK_KEY')
+                secret('LD-SDK-KEY', 'LD_SDK_KEY'),
+                secret('professional-api-POSTGRES-DATABASE-V15', 'POSTGRES_DB'),
+                secret('professional-api-POSTGRES-HOST-V15', 'POSTGRES_HOST'),
+                secret('professional-api-POSTGRES-PORT-V15', 'POSTGRES_PORT'),
+                secret('professional-api-POSTGRES-USER-V15', 'POSTGRES_USERNAME'),
+                secret('professional-api-POSTGRES-PASS-V15', 'POSTGRES_PASSWORD')
         ]
 ]
 
@@ -55,23 +60,23 @@ withPipeline(type, product, component) {
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
 
     before('functionalTest:preview') {
-        env.execution_environment = "demo"
+        env.execution_environment = "preview"
         env.TEST_URL = "http://rd-professional-api-preview.preview.hmcts.platform.net"
     }
 
     before('functionalTest:aat') {
-        env.execution_environment = "demo"
-        env.TEST_URL = "http://rd-professional-api-demo.demo.hmcts.platform.net"
+        env.execution_environment = "aat"
+        env.TEST_URL = "http://rd-professional-api-aat.aat.hmcts.platform.net"
     }
 
     before('smoketest:preview') {
-        env.execution_environment = "demo"
+        env.execution_environment = "preview"
         env.TEST_URL = "http://rd-professional-api-preview.preview.platform.hmcts.net"
     }
 
     before('smoketest:aat') {
-        env.execution_environment = "demo"
-        env.TEST_URL = "http://rd-professional-api-demo.demo.platform.hmcts.net"
+        env.execution_environment = "aat"
+        env.TEST_URL = "http://rd-professional-api-aat.aat.platform.hmcts.net"
     }
 
     // Sync demo and perftest with master branch
