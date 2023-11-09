@@ -8,10 +8,10 @@ def product = "rd"
 def component = "professional-api"
 /* The below Key Vault secrets will be used for functional and smoke tests */
 def secrets = [
-        's2s-${env}': [
+        s2s-${env}: [
                 secret('microservicekey-rd-professional-api', 'PROFESSIONAL_API_S2S_SECRET')
         ],
-        'rd-${env}' : [
+        rd-${env} : [
                 secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
                 secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
                 secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
