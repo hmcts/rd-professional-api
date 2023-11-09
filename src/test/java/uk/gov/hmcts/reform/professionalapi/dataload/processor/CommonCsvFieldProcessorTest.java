@@ -9,8 +9,10 @@ import uk.gov.hmcts.reform.professionalapi.dataload.domain.CommonCsvField;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,7 +37,7 @@ class CommonCsvFieldProcessorTest {
         commonCsvFieldProcessor.process(exchangeMock);
 
         verify(commonCsvFieldProcessor).process(exchangeMock);
-
+        verify(exchangeMock.getMessage(),times(1)).setBody(any());
     }
 
     @Test
@@ -45,6 +47,7 @@ class CommonCsvFieldProcessorTest {
         commonCsvFieldProcessor.process(exchangeMock);
 
         verify(commonCsvFieldProcessor).process(exchangeMock);
+        verify(exchangeMock.getMessage(),times(1)).setBody(any());
 
     }
 }

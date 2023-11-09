@@ -271,7 +271,15 @@ pitest {
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
-            'uk.gov.hmcts.reform.professionalapi.Application'
+            'uk.gov.hmcts.reform.professionalapi.Application',
+            'uk.gov.hmcts.reform.professionalapi.dataload.config.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.binder.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.route.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.service.dto.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.scheduler.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.processor.JsrValidationBaseProcessor',
+            'uk.gov.hmcts.reform.professionalapi.dataload.processor.HeaderValidationProcessor',
+            'uk.gov.hmcts.reform.professionalapi.dataload.validator.*'
     ]
     threads = 10
     enableDefaultIncrementalAnalysis = true

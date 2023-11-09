@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.dataload.helper.JrdTestSupport.createRoutePropertiesMock;
@@ -55,6 +56,8 @@ public class ParentStateCheckProcessorTest {
                     .auditStatus(FAILURE).build());
             parentStateCheckProcessor.process(exchangeMock);
             verify(parentStateCheckProcessor).process(exchangeMock);
+            verify(exchangeMock,times(1)).getMessage();
+            verify(exchangeMock.getMessage(),times(1)).setHeader(any(),any());
         }
     }
 
@@ -63,5 +66,7 @@ public class ParentStateCheckProcessorTest {
     public void testProcessSetParentHeaderTrue() {
         parentStateCheckProcessor.process(exchangeMock);
         verify(parentStateCheckProcessor).process(exchangeMock);
+        verify(exchangeMock,times(1)).getMessage();
+        verify(exchangeMock.getMessage(),times(1)).setHeader(any(),any());
     }
 }

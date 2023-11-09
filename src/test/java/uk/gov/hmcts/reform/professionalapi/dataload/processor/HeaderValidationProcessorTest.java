@@ -19,8 +19,10 @@ import java.util.HashMap;
 import static org.apache.camel.spring.util.ReflectionUtils.setField;
 import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +59,7 @@ public class HeaderValidationProcessorTest {
         when(applicationContextMock.getBean(routePropertiesMock.getBinder())).thenReturn(BinderObject.class);
         headerValidationProcessor.process(exchangeMock);
         verify(headerValidationProcessor).process(exchangeMock);
+        verify(exchangeMock.getMessage(),times(1)).setBody(any());
     }
 
     @SneakyThrows
@@ -72,6 +75,7 @@ public class HeaderValidationProcessorTest {
         BinderObject binderObject = new BinderObject();
         when(applicationContextMock.getBean(routePropertiesMock.getBinder())).thenReturn(binderObject);
         assertThrows(RouteFailedException.class, () -> headerValidationProcessor.process(exchangeMock));
+        verify(exchangeMock.getIn(),times(1)).setHeader(any(),any());
         verify(headerValidationProcessor).process(exchangeMock);
     }
 

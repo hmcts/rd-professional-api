@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.dataload.route.DataLoadRoute;
 import uk.gov.hmcts.reform.professionalapi.dataload.util.PrdDataExecutor;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdDataloadSchedulerJobRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdSchedularAuditRepository;
-import uk.gov.hmcts.reform.professionalapi.util.PrdDataLoadSchedulerAudit;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,9 +49,6 @@ public class ProfessionalApiJobScheduler {
 
     @Autowired
     PrdSchedularAuditRepository prdSchedularAuditRepository;
-
-    @Autowired
-    PrdDataLoadSchedulerAudit prdDataLoadSchedulerAudit;
 
     @Autowired
     DataLoadRoute dataLoadRoute;

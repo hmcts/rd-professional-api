@@ -23,6 +23,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
 
@@ -69,5 +71,7 @@ public class ExceptionProcessorTest extends CamelTestSupport {
         when(((ConfigurableApplicationContext)
             applicationContext).getBeanFactory()).thenReturn(configurableListableBeanFactory);
         exceptionProcessor.process(exchangeMock);
+        verify(auditService,times(1)).auditException(any(),any());
+        verify(fileResponseProcessor,times(1)).process(any());
     }
 }

@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.BLOBPATH;
@@ -86,6 +87,8 @@ public class FileReaderTest {
         doNothing().when(auditService).auditException(any(), any());
         fileReadProcessor.process(exchangeMock);
         verify(fileReadProcessor).process(exchangeMock);
+        verify(exchangeMock.getMessage(),times(1)).setHeader(any(),any());
+        verify(exchangeMock.getMessage(),times(1)).setBody(any());
     }
 
     @Test
@@ -129,6 +132,7 @@ public class FileReaderTest {
         when(consumerTemplate.receiveBody(anyString(), anyInt())).thenReturn("testbody");
         assertThrows(RouteFailedException.class, () -> fileReadProcessor.process(exchangeMock));
         verify(fileReadProcessor).process(exchangeMock);
+        verify(exchangeMock.getMessage(),times(1)).setHeader(any(),any());
     }
 
     @Test

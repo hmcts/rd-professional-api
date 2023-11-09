@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spring.util.ReflectionUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,10 +25,11 @@ public class FileResponseProcessorTest {
     Exchange exchangeMock = mock(Exchange.class);
 
     FileStatus fileStatus = mock(FileStatus.class);
-
     CamelContext camelContext = spy(new DefaultCamelContext());
 
     FileResponseProcessor fileResponseProcessor = spy(new FileResponseProcessor());
+
+    Processor processor = spy(Processor.class);
 
     Message messageMock = mock(Message.class);
 

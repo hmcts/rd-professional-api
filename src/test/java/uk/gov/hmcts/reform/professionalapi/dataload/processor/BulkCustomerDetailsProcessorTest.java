@@ -13,9 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -49,8 +47,7 @@ public class BulkCustomerDetailsProcessorTest {
 
     Exchange exchange = new DefaultExchange(camelContext);
 
-    @SpyBean
-    @Qualifier("JsrValidatorInitializerDataload")
+    @Spy
     JsrValidatorInitializer<BulkCustomerDetails> lovServiceJsrValidatorInitializer
         = new JsrValidatorInitializer<>();
 
@@ -143,9 +140,10 @@ public class BulkCustomerDetailsProcessorTest {
 
         processor.process(exchange);
         verify(processor, times(1)).process(exchange);
-
         List actualLovServiceList = (List) exchange.getMessage().getBody();
         Assertions.assertEquals(0, actualLovServiceList.size());
+        verify(lovServiceJsrValidatorInitializer,times(1)).auditJsrExceptions(any(),any(),any(),any());
+
     }
 
     private List<BulkCustomerDetails> getBulkCustomerDetails() {

@@ -13,16 +13,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BulkCustomerDetailsTest {
 
     private BulkCustomerDetails bulkCustomerDetails;
-    private final Organisation organisation = new Organisation();
+
 
 
     @BeforeEach
     void setUp() {
+
+
         bulkCustomerDetails = new BulkCustomerDetails();
         bulkCustomerDetails.setBulkCustomerId("6601e79e-3169-461d-a751-59a33a5sdfd");
         bulkCustomerDetails.setId(UUID.randomUUID());
         bulkCustomerDetails.setPbaNumber("pba-1234567");
         bulkCustomerDetails.setSidamId("6601e79e-3169-461d-a751-59a33a5sdfd");
+        bulkCustomerDetails.setOrganisationId("orgId");
+        Organisation organisation = new Organisation("some-name", OrganisationStatus.ACTIVE,
+            "sra-id", "company-number", Boolean.FALSE, "company-url");
         bulkCustomerDetails.setOrganisation(organisation);
 
     }
@@ -33,6 +38,14 @@ class BulkCustomerDetailsTest {
         assertThat(bulkCustomerDetails.getPbaNumber()).isEqualTo("pba-1234567");
         assertThat(bulkCustomerDetails.getId()).isNotNull();
         assertThat(bulkCustomerDetails.getSidamId()).isEqualTo("6601e79e-3169-461d-a751-59a33a5sdfd");
-        assertThat(bulkCustomerDetails.getOrganisation()).isNotNull();
+        assertThat(bulkCustomerDetails.getOrganisation().getName()).isEqualTo("some-name");
+        assertThat(bulkCustomerDetails.getOrganisation().getSraId())
+            .isEqualTo("sra-id");
+        assertThat(bulkCustomerDetails.getOrganisation().getCompanyNumber())
+            .isEqualTo("company-number");
+        assertThat(bulkCustomerDetails.getOrganisation().getCompanyUrl())
+            .isEqualTo("company-url");
+        assertThat(bulkCustomerDetails.getOrganisationId())
+            .isEqualTo("orgId");
     }
 }
