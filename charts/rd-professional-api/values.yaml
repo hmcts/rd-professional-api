@@ -15,6 +15,8 @@ java:
     CCD_URL: http://ccd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     LAUNCH_DARKLY_ENV: "{{ .Values.global.environment }}"
+    SCHEDULER_ENABLED: false
+    CRON_EXPRESSION: "* */10 * * * *"
   image: 'hmctspublic.azurecr.io/rd/professional-api:latest'
   keyVaults:
     rd:
