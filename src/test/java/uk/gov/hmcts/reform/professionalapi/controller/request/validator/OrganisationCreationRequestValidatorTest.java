@@ -36,10 +36,12 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
@@ -236,6 +238,13 @@ class OrganisationCreationRequestValidatorTest {
 
         assertThrows(InvalidRequest.class, () ->
             organisationCreationRequestValidator.validateForEmptyOrNullInput("","idamId"));
+    }
+
+    @Test
+    void test_isRegexSatisfied() {
+
+        assertFalse(organisationCreationRequestValidator
+            .isRegexSatisfied("Valid1",ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX));
     }
 
     @Test
