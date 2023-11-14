@@ -403,7 +403,7 @@ dependencies {
     testImplementation group: 'org.apache.camel', name: 'camel-test-spring-junit5', version: versions.camel
     testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-    implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-alpha-3'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-rc-1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
@@ -558,7 +558,7 @@ dependencyManagement {
         // CVE-2021-25122
         // CVE-2021-42340
         // CVE-2023-28709
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.80') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.81') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -579,6 +579,24 @@ dependencyManagement {
         dependencySet(group: 'org.springframework.cloud', version: '3.1.5') {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
+        }
+
+//        Resolves CVE-2023-4586
+        dependencySet(group: 'io.netty', version: '4.1.100.Final') {
+            entry 'netty-buffer'
+            entry 'netty-codec'
+            entry 'netty-codec-http'
+            entry 'netty-codec-socks'
+            entry 'netty-common'
+            entry 'netty-handler'
+            entry 'netty-handler-proxy'
+            entry 'netty-resolver'
+            entry 'netty-transport'
+            entry 'netty-transport-classes-epoll'
+            entry 'netty-transport-classes-kqueue'
+            entry 'netty-transport-native-epoll'
+            entry 'netty-transport-native-kqueue'
+            entry 'netty-transport-native-unix-common'
         }
 
     }

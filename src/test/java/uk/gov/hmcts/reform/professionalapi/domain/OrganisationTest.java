@@ -37,6 +37,7 @@ class OrganisationTest {
         organisation.setContactInformations(contactInformations);
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
         organisation.setStatusMessage("statusMessage");
+        organisation.setOrgType("testOrgType");
         organisation.setBulkCustomerDetails(List.of(bulkCustomerDetails));
 
         assertThat(organisation.isOrganisationStatusActive()).isTrue();
@@ -61,6 +62,18 @@ class OrganisationTest {
             .isEqualTo(bulkCustomerDetails.getPbaNumber());
         assertThat(organisation.getBulkCustomerDetails().get(0).getSidamId())
             .isEqualTo(bulkCustomerDetails.getSidamId());
+        assertThat(organisation.getOrgType()).isEqualTo("testOrgType");
+    }
+
+    @Test
+    void test_adds_org_attributes_correctly() {
+        OrgAttribute orgAttributes = new OrgAttribute();
+        Organisation organisation = new Organisation();
+        organisation.addAttribute(orgAttributes);
+
+        assertThat(organisation.getOrgAttributes()).containsExactly(orgAttributes);
+        assertThat(organisation.getOrgAttributes()).isNotEmpty();
+
     }
 
     @Test
@@ -118,5 +131,21 @@ class OrganisationTest {
         organisation.setBulkCustomerDetails(bulkCustomerDetailsList);
 
         assertThat(organisation.getBulkCustomerDetails()).isNotNull();
+    }
+
+    @Test
+    void test_organisation_orgType_orgAttributes_correctly() {
+        OrgAttribute orgAttribute = new OrgAttribute();
+        List<OrgAttribute> orgAttributes = new ArrayList<>();
+        orgAttribute.setKey("TestKey");
+        orgAttribute.setValue("TestValue");
+        orgAttributes.add(orgAttribute);
+        Organisation organisation = new Organisation();
+        organisation.setOrgType("Doctor");
+        organisation.setOrgAttributes(orgAttributes);
+        organisation.addAttribute(orgAttribute);
+        assertThat(organisation.getOrgType()).isNotNull();
+        assertThat(organisation.getOrgType()).isEqualTo("Doctor");
+        assertThat(organisation.getOrgAttributes()).isNotNull();
     }
 }

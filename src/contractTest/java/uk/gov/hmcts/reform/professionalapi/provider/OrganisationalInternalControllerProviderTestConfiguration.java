@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProf
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -39,6 +40,9 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
 
     @MockBean
     PaymentAccountRepository paymentAccountRepository;
+
+    @MockBean
+    OrgAttributeRepository orgAttributeRepository;
 
     @MockBean
     DxAddressRepository dxAddressRepository;

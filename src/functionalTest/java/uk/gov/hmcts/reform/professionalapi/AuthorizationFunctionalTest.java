@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
@@ -142,6 +143,13 @@ public class AuthorizationFunctionalTest {
         return activateOrganisation(response, role);
     }
 
+    protected String createAndUpdateOrganisationToActiveForV2(String role,
+                                                OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
+
+        Map<String, Object> response = professionalApiClient.createOrganisationV2(organisationCreationRequest);
+        return activateOrganisationV2(response, role);
+    }
+
     protected String createAndctivateOrganisationWithGivenRequest(
             OrganisationCreationRequest organisationCreationRequest, String role) {
         Map<String, Object> organisationCreationResponse = professionalApiClient
@@ -152,10 +160,27 @@ public class AuthorizationFunctionalTest {
         return organisationIdentifier;
     }
 
+    protected String createAndActivateOrganisationWithGivenRequestV2(
+            OrganisationOtherOrgsCreationRequest organisationCreationRequest, String role) {
+        Map<String, Object> organisationCreationResponse = professionalApiClient
+                .createOrganisationV2(organisationCreationRequest);
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        professionalApiClient.updateOrganisationV2(organisationCreationRequest, role, organisationIdentifier);
+        return organisationIdentifier;
+    }
+
     protected String activateOrganisation(Map<String, Object> organisationCreationResponse, String role) {
         String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
         professionalApiClient.updateOrganisation(organisationIdentifier,role);
+        return organisationIdentifier;
+    }
+
+    protected String activateOrganisationV2(Map<String, Object> organisationCreationResponse, String role) {
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        professionalApiClient.updateOrganisationV2(organisationIdentifier,role);
         return organisationIdentifier;
     }
 
@@ -282,6 +307,31 @@ public class AuthorizationFunctionalTest {
 
     }
 
+    public void responseValidateV2(Map<String, Object> orgResponse) {
+
+        orgResponse.forEach((k,v) -> {
+
+            if ("organisationIdentifier".equals(k) && "http_status".equals(k)
+                    && "name".equals(k) &&  "status".equals(k)
+                    && "superUser".equals(k) && "paymentAccount".equals(k)) {
+
+                Assertions.assertThat(v.toString()).isNotEmpty();
+                Assertions.assertThat(v.toString().contains("Ok"));
+                Assertions.assertThat(v.toString().contains("some-org-name"));
+                Assertions.assertThat(v.toString().equals("ACTIVE"));
+                Assertions.assertThat(v.toString()).isNotEmpty();
+                Assertions.assertThat(v.toString()).contains("dateCreated");
+                Assertions.assertThat(v.toString()).contains("dateApproved");
+                Assertions.assertThat(v.toString()).contains("Doctor");
+                Assertions.assertThat(v.toString()).contains("testKey");
+                Assertions.assertThat(v.toString()).contains("testValue");
+
+            }
+
+        });
+
+    }
+
     public UserProfileUpdatedData deleteRoleRequest(String role) {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName = new RoleName(role);
@@ -318,6 +368,25 @@ public class AuthorizationFunctionalTest {
         assertThat(response.get("superUser")).isNotNull();
         assertThat(response.get("paymentAccount")).isNotNull();
         assertThat(response.get("contactInformation")).isNotNull();
+        verifyContactInfoCreatedDateSorting(response.get("contactInformation"));
+
+    }
+
+    public void validateSingleOrgResponseForV2(Map<String, Object> response, String status) {
+
+        Assertions.assertThat(response.size()).isPositive();
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get("name")).isNotNull();
+        assertThat(response).containsEntry("status", status);
+        assertThat(response.get("sraId")).isNotNull();
+        assertThat(response.get("sraRegulated")).isNotNull();
+        assertThat(response.get("companyNumber")).isNotNull();
+        assertThat(response.get("companyUrl")).isNotNull();
+        assertThat(response.get("superUser")).isNotNull();
+        assertThat(response.get("paymentAccount")).isNotNull();
+        assertThat(response.get("contactInformation")).isNotNull();
+        assertThat(response.get("orgType")).isNotNull();
+        assertThat(response.get("orgAttributes")).isNotNull();
         verifyContactInfoCreatedDateSorting(response.get("contactInformation"));
 
     }
