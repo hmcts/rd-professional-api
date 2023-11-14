@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import feign.Request;
 import feign.Response;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -16,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInter
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
@@ -30,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -39,8 +44,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -64,6 +71,10 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     PaymentAccountRepository paymentAccountRepository;
+
+
+    @Autowired
+    ProfessionalUserRepository professionalUserRepository;
 
     @Autowired
     ProfessionalUserService professionalUserService;
@@ -287,6 +298,17 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(organisationRepository.findByPbaStatus(any())).thenReturn(List.of(organisation));
     }
 
+    //PACT test to delete user profile as part of ticket RDCC-7097
+    //@State({"A user profile delete request from prd"})
+    public void deleteUserProfile() throws JsonProcessingException {
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapperOne = new ObjectMapper();
+        String deleteBody = mapperOne.writeValueAsString(newUserResponse);
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
+    }
+
     private Organisation getOrganisationWithPbaStatus() {
         PaymentAccount paymentAccount = new PaymentAccount();
         paymentAccount.setPbaNumber("PBA12345");
@@ -306,4 +328,14 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         organisation.setUsers(Collections.singletonList(superUser));
         return organisation;
     }
+
+    @NotNull
+    private Map<String, Collection<String>> getResponseHeaders() {
+        Map<String, Collection<String>> responseHeaders = Maps.newHashMap();
+        responseHeaders.put("Content-Type",
+                Collections.singletonList("application/json"));
+        return responseHeaders;
+    }
+
+
 }
