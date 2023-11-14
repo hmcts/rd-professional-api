@@ -14,4 +14,3 @@ INSERT INTO organisation (id,name,status,sra_regulated,company_number,last_updat
 
 insert into organisation_mfa_status (organisation_id, created, last_updated, mfa_status)
 VALUES ('046b6c7f-0b8a-43b9-b35d-6489e6daee91','2019-08-16 15:00:41.418','2019-08-16 15:00:41.419','EMAIL');
-
