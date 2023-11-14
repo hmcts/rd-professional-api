@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
@@ -228,6 +229,28 @@ class OrganisationCreationRequestValidatorTest {
 
         assertThrows(InvalidRequest.class, () ->
                 organisationCreationRequestValidator.requestContactInformation(contactList1));
+    }
+
+    @Test
+    void test_validateForEmptyOrNullInput() {
+
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateForEmptyOrNullInput("","idamId"));
+    }
+
+    @Test
+    void test_validateBulkCustomerRequest() {
+
+        BulkCustomerRequest bulkCustomerRequest = BulkCustomerRequest
+            .abulkCustomerRequest().bulkCustomerId("").idamId("idamId").build();
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateBulkCustomerRequest(bulkCustomerRequest));
+    }
+
+    @Test
+    void test_validateInputForSpecialCharacter() {
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateInputForSpecialCharacter("££"));
     }
 
     @Test
