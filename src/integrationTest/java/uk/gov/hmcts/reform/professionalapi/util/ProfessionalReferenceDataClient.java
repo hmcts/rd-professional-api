@@ -8,39 +8,21 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -162,7 +144,7 @@ public class ProfessionalReferenceDataClient {
             throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
                 APP_EXT_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
-        HttpStatus status = (HttpStatus) responseEntity.getStatusCode();
+        HttpStatusCode status =  responseEntity.getStatusCode();
         objectMapper.registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
@@ -182,7 +164,7 @@ public class ProfessionalReferenceDataClient {
             throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
                 APP_EXT_V2_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
-        HttpStatus status = (HttpStatus) responseEntity.getStatusCode();
+        HttpStatusCode status = responseEntity.getStatusCode();
         objectMapper.registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
@@ -802,13 +784,13 @@ public class ProfessionalReferenceDataClient {
         responseEntity = getRequestForInternalWithGivenResponseType(urlPath, role,
                 OrganisationsWithPbaStatusResponse[].class, isUnauthorised);
 
-        HttpStatus status = (HttpStatus) responseEntity.getStatusCode();
+        HttpStatusCode status =  responseEntity.getStatusCode();
         objectMapper.registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         if (status.is2xxSuccessful()) {
             return Arrays.asList(objectMapper.convertValue(
                     responseEntity.getBody(), OrganisationsWithPbaStatusResponse[].class));
         } else {
-            return getErrorResponseMap(responseEntity, status);
+            return getErrorResponseMap(responseEntity, (HttpStatus) status);
         }
     }
 

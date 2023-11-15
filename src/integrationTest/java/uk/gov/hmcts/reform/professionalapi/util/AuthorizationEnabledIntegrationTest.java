@@ -158,7 +158,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACTIVE = "ACTIVE";
     protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE =
             "User status must be Active to perform this operation";
-    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access Denied";
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
     public static final String APPLICATION_JSON = "application/json";
@@ -315,26 +315,26 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public String createOrganisationRequest() {
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
     public String createOrganisationWithMinimumFieldRequest() {
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
     public String createOrganisationRequestWithRequest(OrganisationCreationRequest organisationCreationRequest) {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
     public String createOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
