@@ -25,6 +25,11 @@ spring:
       default_schema: dbrefdata
   application:
     name: Professional Reference Data API
+  profiles:
+    include:
+      - lib
+      - camel-routes-common
+      - prd-user-details-router
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
@@ -119,6 +124,12 @@ prd:
       pui-organisation-manager: pui-organisation-manager
       pui-finance-manager: pui-finance-manager
       pui-case-manager: pui-case-manager
+  scheduler:
+    cronExpression: ${CRON_EXPRESSION:* */10 * * * *}
+    enabled: ${SCHEDULER_ENABLED:false}
+    lockAtLeastFor: ${Lock_AT_Least_For:PT10M}
+    lockAtMostFor: ${Lock_AT_Most_For:PT20M}
+    defaultLockAtMostFor: ${Default_Lock_At_Most_For:PT30M}
 
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
@@ -149,3 +160,11 @@ launchdarkly:
     key: ${LD_SDK_KEY:}
     environment: ${LAUNCH_DARKLY_ENV:local}
     user: rd
+
+
+azure:
+  storage:
+    account-name: ${ACCOUNT_NAME:ACCOUNT_NAME}
+    account-key: ${ACCOUNT_KEY:ACCOUNT_KEY}
+    container-name: ${CONTAINER_NAME:CONTAINER_NAME}
+    blob-url-suffix: ${BLOB_URL_SUFFIX:BLOB_URL_SUFFIX}

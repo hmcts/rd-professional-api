@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_RETRIEVE_PBA_EXTERNAL_V2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_RETRIEVE_PBA_INTERNAL_V2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_UPDATE_INTERNAL_V2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTIPLE_ADDRESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTI_PBA_LD_FLAG;
 
@@ -79,6 +80,9 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
             PRD_RETRIEVE_EXTERNAL_V2);
         launchDarklyMap.put("OrganisationExternalControllerV2.createOrganisationUsingExternalController",
             PRD_CREATE_EXTERNAL_V2);
+        launchDarklyMap.put("BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomer",
+                RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG);
+
     }
 
     @Override

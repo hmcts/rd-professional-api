@@ -6,6 +6,7 @@ java:
     POSTGRES_HOST: rd-professional-api-postgres-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
     POSTGRES_USERNAME: dbrefdata@rd-professional-api-postgres-db-v11-{{ .Values.global.environment }}
     POSTGRES_PORT: 5432
+    CONTAINER_NAME: rd-prd-data
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     USER_PROFILE_URL: http://rd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     OIDC_ISSUER_URL: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
@@ -14,6 +15,8 @@ java:
     CCD_URL: http://ccd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     LAUNCH_DARKLY_ENV: "{{ .Values.global.environment }}"
+    SCHEDULER_ENABLED: false
+    CRON_EXPRESSION: "* */10 * * * *"
   image: 'hmctspublic.azurecr.io/rd/professional-api:latest'
   keyVaults:
     rd:
@@ -24,6 +27,10 @@ java:
           alias: app-insights-connection-string
         - name: LD-SDK-KEY
           alias: LD_SDK_KEY
+        - name: rd-prd-storage-account-name
+          alias: ACCOUNT_NAME
+        - name: rd-prd-storage-account-primary-key
+          alias: ACCOUNT_KEY
         - name: professional-api-s2s-secret
           alias: PROFESSIONAL_API_S2S_SECRET
   autoscaling:
