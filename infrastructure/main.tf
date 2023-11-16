@@ -81,4 +81,7 @@ module "db-professional-ref-data-v11" {
   database_name      = "dbrefdata"
   common_tags        = var.common_tags
   postgresql_version = "11"
+  sku_name           = var.sku_name
+  sku_capacity       = var.sku_capacity
+  sku_tier           = "GeneralPurpose"
 }

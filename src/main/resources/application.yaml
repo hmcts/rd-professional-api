@@ -65,7 +65,7 @@ spring:
       idleTimeout: 600000
       poolName: PRDHikariCP
       maxLifetime: 1800000
-      connectionTimeout: 30000
+      connectionTimeout: 5000
     tomcat:
       max-active: 10
       max-idle: 10

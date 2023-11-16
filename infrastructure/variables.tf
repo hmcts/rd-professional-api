@@ -32,3 +32,11 @@ variable "team_name" {
   type    = string
   default = "RD"
 }
+
+variable sku_name {
+  default = "GP_Gen5_2"
+}
+
+variable sku_capacity {
+  default = "2"
+}
