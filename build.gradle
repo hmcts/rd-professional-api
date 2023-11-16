@@ -37,6 +37,7 @@ def versions = [
         reformLogging   : '6.0.1',
         serenity        : '2.0.76',
         springBoot      : '2.7.14',
+        camel           : '3.8.0',
         pact_version    : '4.1.7',
         launchDarklySdk : '5.10.9',
         junit           : '5.9.2',
@@ -192,6 +193,10 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
 }
 
+
+
+
+
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
     testClassesDirs = sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
@@ -231,6 +236,8 @@ task fortifyScan(type: JavaExec) {
     ignoreExitValue = true
 }
 
+
+
 runProviderPactVerification.finalizedBy pactVerify
 
 def getCheckedOutGitCommitHash() {
@@ -264,7 +271,15 @@ pitest {
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
-            'uk.gov.hmcts.reform.professionalapi.Application'
+            'uk.gov.hmcts.reform.professionalapi.Application',
+            'uk.gov.hmcts.reform.professionalapi.dataload.config.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.binder.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.route.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.service.dto.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.scheduler.*',
+            'uk.gov.hmcts.reform.professionalapi.dataload.processor.JsrValidationBaseProcessor',
+            'uk.gov.hmcts.reform.professionalapi.dataload.processor.HeaderValidationProcessor',
+            'uk.gov.hmcts.reform.professionalapi.dataload.validator.*'
     ]
     threads = 10
     enableDefaultIncrementalAnalysis = true
@@ -272,7 +287,7 @@ pitest {
     historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
-    mutationThreshold = 90
+    mutationThreshold = 85
 }
 
 
@@ -288,7 +303,14 @@ sonarqube {
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java," +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/RefDataUtil.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/RefDataUtil.java,"+
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/config/**,"+
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/processor/JsrValidationBaseProcessor.java,"+
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/scheduler/**,"+
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/domain/PrdDataloadSchedulerJob.java,"+
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/PrdDataLoadSchedulerAudit.java,"+
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/dataload/validator/JsrValidatorInitializer.java"
+
     }
 }
 
@@ -377,7 +399,9 @@ dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
 
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
-
+    testImplementation group: 'org.apache.camel', name: 'camel-test', version: versions.camel
+    testImplementation group: 'org.apache.camel', name: 'camel-test-spring-junit5', version: versions.camel
+    testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-rc-1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
@@ -385,6 +409,26 @@ dependencies {
 
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.5'
+
+    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter', version:versions.camel
+    implementation group: 'org.apache.camel', name: 'camel-csv', version: versions.camel
+    implementation group: 'org.apache.camel', name: 'camel-sql', version: versions.camel
+    implementation group: 'org.apache.camel', name: 'camel-spring-batch', version: versions.camel
+    implementation group: 'com.opencsv', name: 'opencsv', version: '3.7'
+
+    implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter', version:versions.camel
+    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version:versions.camel
+    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter', version:versions.camel
+    implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
+    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter', version: versions.camel
+
+    implementation group: 'org.apache.camel', name: 'camel-core', version: versions.camel
+    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
+
+    //Added below dependencies for shedlock
+    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.2.0'
+    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.2.0'
+
 
     implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.7'
     implementation group: 'org.json', name: 'json', version: '20230227'

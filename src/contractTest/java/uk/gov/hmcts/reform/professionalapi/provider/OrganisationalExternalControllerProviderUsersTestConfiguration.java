@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
@@ -43,6 +44,9 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
 
     @MockBean
     OrganisationRepository organisationRepository;
+
+    @MockBean
+    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
     @MockBean
     PaymentAccountRepository paymentAccountRepository;

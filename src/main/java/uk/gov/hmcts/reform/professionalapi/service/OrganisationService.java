@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -25,6 +26,9 @@ public interface OrganisationService {
     OrganisationResponse createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest);
 
     OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable);
+
+    BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
+                                                                                       String idamId);
 
     OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(Pageable pageable);
 
