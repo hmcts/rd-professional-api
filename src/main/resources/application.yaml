@@ -19,10 +19,10 @@ spring:
     open-in-view: ${JPA_OPEN_IN_VIEW:true}
     properties:
       hibernate:
-        default_schema: dbrefdata
         jdbc:
           lob:
             non_contextual_creation: true
+      default_schema: dbrefdata
   application:
     name: Professional Reference Data API
   profiles:
