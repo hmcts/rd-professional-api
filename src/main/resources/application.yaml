@@ -16,11 +16,13 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+    open-in-view: ${JPA_OPEN_IN_VIEW:true}
     properties:
       hibernate:
         jdbc:
           lob:
             non_contextual_creation: true
+        default_schema: dbrefdata
   application:
     name: Professional Reference Data API
   main:
@@ -54,11 +56,11 @@ spring:
       charSet: UTF-8
     hikari:
       minimumIdle: 2
-      maximumPoolSize: 10
+      maximumPoolSize: ${HIKARI_MAX_POOL_SIZE:50}
       idleTimeout: 600000
       poolName: PRDHikariCP
       maxLifetime: 1800000
-      connectionTimeout: 30000
+      connectionTimeout: 5000
     tomcat:
       max-active: 10
       max-idle: 10
