@@ -5,6 +5,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        default_schema: dbrefdata
         enable_lazy_load_no_trans: true
 
   datasource:
