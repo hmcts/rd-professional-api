@@ -167,7 +167,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected FeatureToggleServiceImpl featureToggleService;
 
     @MockBean
-    public static JwtDecoder jwtDecoder;
+    public JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
