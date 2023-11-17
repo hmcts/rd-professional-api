@@ -65,7 +65,6 @@ class PrdBatchApplicationIntegrationTest extends AuthorizationDataloadEnabledInt
     @Test
     @RefreshScope
     void testTasklet() throws Exception {
-        auditServiceimpl.setArchivalFileNames(Lists.newArrayList("classpath:sourceFiles/bulk_customer_ids.csv"));
         ReflectionTestUtils.setField(professionalApiJobScheduler, "isSchedulerEnabled", true);
         professionalApiJobScheduler.loadProfessioanlDataJob();
 

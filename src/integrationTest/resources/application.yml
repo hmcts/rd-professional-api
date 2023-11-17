@@ -98,7 +98,7 @@ aggregation-strategy-timeout: 2000
 archival-route: direct:ProfessionalDataArchival
 archival-path: ${archival.path}
 active-blob-path: azure-blob://${azure.storage.account-name}/prd-ref-data
-archival-file-names: ${archival.file.names:}
+archival-file-names: ${archival.file.names}
 archival-cred: credentials=#credsreg&operation=updateBlockBlob
 archival-date-format: dd-MM-yyyy--HH-mm
 file-read-time-out: 180000
