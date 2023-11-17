@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public interface PrdSchedularAuditRepository extends JpaRepository<PrdDataSchedularAudit, Long> {
 
 
-    @Query(value = "SELECT MAX(scheduler_end_time) FROM dataload_schedular_audit "
+    @Query(value = "SELECT MAX(scheduler_end_time) FROM dbrefdata.dataload_schedular_audit "
         + " WHERE scheduler_name = 'PRD Route' ", nativeQuery = true)
     LocalDateTime findLatestSchedularEndTime();
 

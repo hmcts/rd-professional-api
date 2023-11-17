@@ -1,10 +1,13 @@
 spring:
-  flyway.locations: classpath:db/migration
+  flyway:
+    schemas: DBREFDATA
+    locations: classpath:db/migration
 
   jpa:
     show-sql: true
     properties:
       hibernate:
+        default_schema: dbrefdata
         enable_lazy_load_no_trans: true
   main:
     allow-bean-definition-overriding: true
@@ -27,11 +30,11 @@ spring:
 
 auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
 
-select-dataload-schedular-audit: SELECT * FROM dataload_schedular_audit
+select-dataload-schedular-audit: SELECT * FROM dbrefdata.dataload_schedular_audit
 
-select-bulk_customer: SELECT * FROM bulk_customer_details
+select-bulk_customer: SELECT * FROM dbrefdata.bulk_customer_details
 
-delete-bulk_customer: DELETE FROM bulk_customer_details
+delete-bulk_customer: DELETE FROM dbrefdata.bulk_customer_details
 
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 
@@ -100,15 +103,15 @@ archival-cred: credentials=#credsreg&operation=updateBlockBlob
 archival-date-format: dd-MM-yyyy--HH-mm
 file-read-time-out: 180000
 batchjob-name: ProfessionalDataLoad
-scheduler-audit-select: select count(*) from dataload_schedular_audit where date(scheduler_start_time) = current_date
-invalid-exception-sql: insert into dataload_exception_records(table_name,scheduler_start_time,scheduler_name,error_description,updated_timestamp) values(?, ?, ?, ?, ?)
-invalid-jsr-sql: insert into dataload_exception_records(table_name,scheduler_start_time,scheduler_name,key,field_in_error,error_description,updated_timestamp,row_id) values(?, ?, ?, ?, ?, ?, ?,?)
-scheduler-insert-sql: insert into dataload_schedular_audit (scheduler_name,file_name, scheduler_start_time,scheduler_end_time,status) values(?,?,?,?,?)
+scheduler-audit-select: select count(*) from dbrefdata.dataload_schedular_audit where date(scheduler_start_time) = current_date
+invalid-exception-sql: insert into dbrefdata.dataload_exception_records(table_name,scheduler_start_time,scheduler_name,error_description,updated_timestamp) values(?, ?, ?, ?, ?)
+invalid-jsr-sql: insert into dbrefdata.dataload_exception_records(table_name,scheduler_start_time,scheduler_name,key,field_in_error,error_description,updated_timestamp,row_id) values(?, ?, ?, ?, ?, ?, ?,?)
+scheduler-insert-sql: insert into dbrefdata.dataload_schedular_audit (scheduler_name,file_name, scheduler_start_time,scheduler_end_time,status) values(?,?,?,?,?)
 audit-enable: true
 logging-component-name: RD_Professional_API
 component:
   name: Professional Reference Data API
-flag-code-query: select id from user_details
+flag-code-query: select id from dbrefdata.user_details
 
 professional-user-details-start-route: direct:Professional-UserDetails
 professional-user-details-route-task: userDetailsRouteTask
@@ -120,9 +123,9 @@ route:
     file-name: ${parent.file.name:''}
     table-name: bulk_customer_details
     truncate-sql:
-      sql:truncate table bulk_customer_details
+      sql:truncate table dbrefdata.bulk_customer_details
     insert-sql:
-      sql:insert into bulk_customer_details (id,organisation_id,bulk_customer_id,sidam_id,pba_number)
+      sql:insert into dbrefdata.bulk_customer_details (id,organisation_id,bulk_customer_id,sidam_id,pba_number)
       values (:#id, :#organisation_id,:#bulk_customer_id,:#sidam_id,:#pba_number)
     blob-path: ${parent.file.path}
     processor-class: BulkCustomerDetailsProcessor

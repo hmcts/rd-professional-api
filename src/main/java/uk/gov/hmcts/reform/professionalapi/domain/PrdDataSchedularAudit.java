@@ -17,7 +17,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 
-
 @Entity(name = "dataloadSchedularAudit")
 @Table(name = "dataload_schedular_audit")
 @Getter
