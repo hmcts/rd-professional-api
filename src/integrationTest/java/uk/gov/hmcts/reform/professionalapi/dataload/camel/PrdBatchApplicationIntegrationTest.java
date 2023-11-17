@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.camel;
 
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
