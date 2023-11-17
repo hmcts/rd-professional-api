@@ -35,7 +35,7 @@ import static javax.persistence.GenerationType.AUTO;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
-@Entity(name = "organisation")
+@Entity
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
