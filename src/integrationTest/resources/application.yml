@@ -122,7 +122,7 @@ route:
     file-name: ${parent.file.name:''}
     table-name: bulk_customer_details
     truncate-sql:
-      sql:truncate dbrefdata.table bulk_customer_details
+      sql:truncate table dbrefdata.bulk_customer_details
     insert-sql:
       sql:insert into dbrefdata.bulk_customer_details (id,organisation_id,bulk_customer_id,sidam_id,pba_number)
       values (:#id, :#organisation_id,:#bulk_customer_id,:#sidam_id,:#pba_number)
