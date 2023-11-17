@@ -71,6 +71,8 @@ public class ProfessionalReferenceDataClient {
     private String issuer;
     private long expiration;
 
+    private String baseV2IntUrl;
+
     public Map<String, String> bearerTokenMap = new HashMap<>();
 
 
@@ -79,6 +81,7 @@ public class ProfessionalReferenceDataClient {
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
         this.baseV2Url = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH;
+        this.baseV2IntUrl = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH;
         this.issuer = issuer;
         this.expiration = tokenExpirationInterval;
     }
@@ -131,7 +134,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveExternalOrganisationForV2Api(String id, String role) {
-        return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
+        return getRequestForExternal(APP_EXT_V2_BASE_PATH, role, id);
     }
 
     public Map<String, Object> retrieveExternalOrganisationWithPendingPbas(String id, String pbaStatus, String role) {
@@ -898,6 +901,21 @@ public class ProfessionalReferenceDataClient {
         }
 
         return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
+        return postRequest(baseV2IntUrl, request, null, null);
+    }
+
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeader(String email, String role) {
+        return getRequestToGetEmailFromHeader("/refdata/internal/v2/organisations" + "/pbas",
+                role, "", email);
+    }
+
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers(String email, String role,
+                                                                                         String userId) {
+        return getRequestToGetEmailFromHeader("/refdata/external/v2/organisations" + "/pbas",
+                role, userId, email);
     }
 
 }

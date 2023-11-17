@@ -69,4 +69,144 @@ class CreateOrgWithOtherOrg extends AuthorizationEnabledIntegrationTest {
         assertThat(persistedOrganisation.getOrgType()).isEqualTo("Doctor");
         assertThat(persistedOrganisation.getOrgAttributes().size()).isEqualTo(1);
     }
+
+    @Test
+    void create_organisation_with_minimal_and_mandatory_parameters_for_int_otherOrgs() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey");
+        orgAttributeRequest.setValue("testValue");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest = new
+                OrganisationOtherOrgsCreationRequest("some-org-name","PENDING","test",
+                "sra-id","false","comNum",
+                "company-url",aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email("someone@somewhere.com")
+                .build(),
+                paymentAccounts,
+                Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .uprn("uprn")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()),"Doctor",orgAttributeRequests);
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisationIntV2(organisationOtherOrgsCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrgType()).isEqualTo("Doctor");
+        assertThat(persistedOrganisation.getOrgAttributes().size()).isEqualTo(1);
+    }
+
+    @Test
+    void returns_error_message_when_org_type_is_null_for_V2_external_otherOrgs() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey");
+        orgAttributeRequest.setValue("testValue");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest = new
+                OrganisationOtherOrgsCreationRequest("some-org-name","PENDING","test",
+                "sra-id","false","comNum",
+                "company-url",aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email("someone@somewhere.com")
+                .build(),
+                paymentAccounts,
+                Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .uprn("uprn")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()),null,orgAttributeRequests);
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisationV2(organisationOtherOrgsCreationRequest);
+
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat((String) response.get("response_body")).contains("orgType must not be null/empty");
+
+    }
+
+    @Test
+    void returns_error_message_when_org_type_is_null_for_V2_internal_otherOrgs() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey");
+        orgAttributeRequest.setValue("testValue");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest = new
+                OrganisationOtherOrgsCreationRequest("some-org-name","PENDING","test",
+                "sra-id","false","comNum",
+                "company-url",aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email("someone@somewhere.com")
+                .build(),
+                paymentAccounts,
+                Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("country")
+                        .county("county")
+                        .townCity("town-city")
+                        .uprn("uprn")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()),null,orgAttributeRequests);
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisationIntV2(organisationOtherOrgsCreationRequest);
+
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat((String) response.get("response_body")).contains("orgType must not be null/empty");
+
+    }
 }

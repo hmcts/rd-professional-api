@@ -143,6 +143,57 @@ public class OrganisationFixtures {
 
     }
 
+    public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFieldsForSingletonOrgType() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234568");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey");
+        orgAttributeRequest.setValue("testValue");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
+                new OrganisationOtherOrgsCreationRequest("some-org-name-singleton",
+                        "PENDING",
+                        "test",
+                        "sra-id1",
+                        "false",
+                        "comNum1",
+                        "company-url",
+                        aUserCreationRequest()
+                                .firstName("singleton-fname")
+                                .lastName("singleton-lname")
+                                .email("singleton@somewhere.com")
+                                .build(),
+                        paymentAccounts,
+                        Collections
+                                .singletonList(aContactInformationCreationRequest()
+                                        .addressLine1("addressLine1")
+                                        .addressLine2("addressLine2")
+                                        .addressLine3("addressLine3")
+                                        .country("country")
+                                        .county("county")
+                                        .townCity("town-city")
+                                        .uprn("uprn")
+                                        .postCode("some-post-code")
+                                        .dxAddress(Collections
+                                                .singletonList(dxAddressCreationRequest()
+                                                        .dxNumber("DX 1234567890")
+                                                        .dxExchange("dxExchange").build()))
+                                        .build()),
+                        "HMRC-GOV",
+                        orgAttributeRequests);
+
+        return organisationOtherOrgsCreationRequest;
+
+    }
+
+
     public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFieldsAreUpdated() {
 
         Set<String> paymentAccounts = new HashSet<>();
