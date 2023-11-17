@@ -97,15 +97,15 @@ aggregation-strategy-timeout: 2000
 archival-route: direct:ProfessionalDataArchival
 archival-path: ${archival.path}
 active-blob-path: azure-blob://${azure.storage.account-name}/prd-ref-data
-archival-file-names: ${archival.file.names}
+archival-file-names: ${archival.file.names:}
 archival-cred: credentials=#credsreg&operation=updateBlockBlob
 archival-date-format: dd-MM-yyyy--HH-mm
 file-read-time-out: 180000
 batchjob-name: ProfessionalDataLoad
 scheduler-audit-select: select count(*) from dataload_schedular_audit where date(scheduler_start_time) = current_date
-invalid-exception-sql: insert into dataload_exception_records(table_name,scheduler_start_time,scheduler_name,error_description,updated_timestamp) values(?, ?, ?, ?, ?)
-invalid-jsr-sql: insert into dataload_exception_records(table_name,scheduler_start_time,scheduler_name,key,field_in_error,error_description,updated_timestamp,row_id) values(?, ?, ?, ?, ?, ?, ?,?)
-scheduler-insert-sql: insert into dataload_schedular_audit (scheduler_name,file_name, scheduler_start_time,scheduler_end_time,status) values(?,?,?,?,?)
+invalid-exception-sql: insert into dbrefdata.dataload_exception_records(table_name,scheduler_start_time,scheduler_name,error_description,updated_timestamp) values(?, ?, ?, ?, ?)
+invalid-jsr-sql: insert into dbrefdata.dataload_exception_records(table_name,scheduler_start_time,scheduler_name,key,field_in_error,error_description,updated_timestamp,row_id) values(?, ?, ?, ?, ?, ?, ?,?)
+scheduler-insert-sql: insert into dbrefdata.dataload_schedular_audit (scheduler_name,file_name, scheduler_start_time,scheduler_end_time,status) values(?,?,?,?,?)
 audit-enable: true
 logging-component-name: RD_Professional_API
 component:
@@ -122,9 +122,9 @@ route:
     file-name: ${parent.file.name:''}
     table-name: bulk_customer_details
     truncate-sql:
-      sql:truncate table bulk_customer_details
+      sql:truncate dbrefdata.table bulk_customer_details
     insert-sql:
-      sql:insert into bulk_customer_details (id,organisation_id,bulk_customer_id,sidam_id,pba_number)
+      sql:insert into dbrefdata.bulk_customer_details (id,organisation_id,bulk_customer_id,sidam_id,pba_number)
       values (:#id, :#organisation_id,:#bulk_customer_id,:#sidam_id,:#pba_number)
     blob-path: ${parent.file.path}
     processor-class: BulkCustomerDetailsProcessor
