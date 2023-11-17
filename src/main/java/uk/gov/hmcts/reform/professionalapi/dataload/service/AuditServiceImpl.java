@@ -158,6 +158,10 @@ public class AuditServiceImpl implements IAuditService {
                 .orElse(false);
     }
 
+    public void setArchivalFileNames(List<String> archivalFileNames) {
+        this.archivalFileNames = archivalFileNames;
+    }
+
     private List<Audit> getPreviousDayAudits() {
         return jdbcTemplate.query(prevDayAuditDetails,
             (ResultSet rs, int rowNum) -> {
