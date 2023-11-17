@@ -12,6 +12,6 @@ import java.util.UUID;
 public interface OrgAttributeRepository extends JpaRepository<OrgAttribute, UUID> {
 
     @Modifying
-    @Query(value = "delete from org_attributes org where org.ORGANISATION_ID in (:val)",nativeQuery = true)
+    @Query(value = "delete from dbrefdata.org_attributes org where org.ORGANISATION_ID in (:val)",nativeQuery = true)
     void deleteByOrganistion(UUID val);
 }
