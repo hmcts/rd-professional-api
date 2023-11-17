@@ -12,16 +12,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import static javax.persistence.GenerationType.AUTO;
 
-@Entity
+@Entity(name = "org_attributes")
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "org_attributes")
 public class OrgAttribute implements Serializable {
 
     @Id

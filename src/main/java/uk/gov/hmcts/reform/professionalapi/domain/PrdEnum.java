@@ -11,7 +11,7 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
 @NoArgsConstructor
-@Entity
+@Entity(name = "prd_enum")
 public class PrdEnum implements Serializable {
 
     @EmbeddedId
