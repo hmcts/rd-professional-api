@@ -151,8 +151,8 @@ public class ProfessionalApiConstants {
     public static final String DELETE_ORG_ADD_404_MESSAGE_5 = "OR<br>";
     public static final String DELETE_ORG_ADD_404_MESSAGE_6 = "id1, id2 does not belong to given org.";
 
-    public static final String FIND_BY_PBA_STATUS_1 = "select o from dbrefdata.Organisation o join "
-            + "fetch dbrefdata.payment_account p \n";
+    public static final String FIND_BY_PBA_STATUS_1 = "select o from Organisation o join "
+            + "fetch payment_account p \n";
     public static final String FIND_BY_PBA_STATUS_2 = "on p.organisationId = o.id \n";
     public static final String FIND_BY_PBA_STATUS_3 = "where p.pbaStatus = :pbaStatus \n";
     public static final String FIND_BY_PBA_STATUS_4 = "order by p.created asc";
