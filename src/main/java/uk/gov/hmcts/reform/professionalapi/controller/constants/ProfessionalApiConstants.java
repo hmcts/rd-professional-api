@@ -153,8 +153,8 @@ public class ProfessionalApiConstants {
 
     public static final String FIND_BY_PBA_STATUS_1 = "select * from dbrefdata.organisation o join "
             + "fetch dbrefdata.payment_account p \n";
-    public static final String FIND_BY_PBA_STATUS_2 = "on p.organisationId = o.id \n";
-    public static final String FIND_BY_PBA_STATUS_3 = "where p.pbaStatus = :pbaStatus \n";
+    public static final String FIND_BY_PBA_STATUS_2 = "on p.organisation_id = o.id \n";
+    public static final String FIND_BY_PBA_STATUS_3 = "where p.pba_status = :pbaStatus \n";
     public static final String FIND_BY_PBA_STATUS_4 = "order by p.created asc";
 
     public static final String GET_USERS_BY_ORG_1 = "**IDAM Roles to access API** : \n pui-finance-manager,";

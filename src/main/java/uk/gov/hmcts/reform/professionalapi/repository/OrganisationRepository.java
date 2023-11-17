@@ -44,6 +44,7 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
 
-    @Query(FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2 + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4)
+    @Query(value = FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2
+            + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4, nativeQuery = true)
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
 }
