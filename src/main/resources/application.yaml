@@ -16,7 +16,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
-    open-in-view: ${JPA_OPEN_IN_VIEW:true}
+    open-in-view: false
     properties:
       hibernate:
         default_schema: dbrefdata
