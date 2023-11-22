@@ -45,7 +45,7 @@ spring:
             client-secret: ${PROFESSIONAL_API_S2S_SECRET:}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
-  flyway.schemas: DBREFDATA
+  flyway.schemas: dbrefdata
   flyway.locations: classpath:db/migration,classpath:db/postgres
   cache:
     cache-names: token
