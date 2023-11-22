@@ -8,12 +8,10 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 @NoArgsConstructor
 @Entity(name = "prd_enum")
-@Table(name = "prd_enum")
 public class PrdEnum implements Serializable {
 
     @EmbeddedId
