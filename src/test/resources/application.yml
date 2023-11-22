@@ -4,7 +4,7 @@ spring:
     locations: classpath:db/migration
 
   jpa:
-    open-in-view: ${JPA_OPEN_IN_VIEW:true}
+    open-in-view: ${JPA_OPEN_IN_VIEW:false}
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
