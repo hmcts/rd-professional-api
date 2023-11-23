@@ -167,11 +167,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected FeatureToggleServiceImpl featureToggleService;
 
     @MockBean
-    public static JwtDecoder jwtDecoder;
+    public JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
+        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration, jwtDecoder);
         when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
     }
 
@@ -278,7 +278,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         paymentAccountRepository.deleteAll();
         orgAttributeRepository.deleteAll();
         organisationRepository.deleteAll();
-        JwtDecoderMockBuilder.resetJwtDecoder();
     }
 
     protected String settingUpOrganisation(String role) {

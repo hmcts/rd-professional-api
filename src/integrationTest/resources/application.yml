@@ -1,5 +1,7 @@
 spring:
-  flyway.locations: classpath:db/migration
+  flyway:
+    schemas: DBREFDATA
+    locations: classpath:db/migration
 
   jpa:
     show-sql: true
