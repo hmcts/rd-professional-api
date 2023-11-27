@@ -128,7 +128,7 @@ class SuperControllerTest {
         organisationsDetailResponseV2 = new OrganisationsDetailResponseV2(singletonList(organisation),
                 false, false, true,true);
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
-                "lastName", IdamStatus.ACTIVE.name(), null, null);
+                "lastName", IdamStatus.ACTIVE.name(), null, null, null);
 
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);

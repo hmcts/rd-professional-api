@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -38,6 +39,9 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @MockBean
     ServiceAuthFilter serviceAuthFilter;
 
+    @MockBean
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
+
     @Primary
     @Bean
     protected ProfessionalUserService professionalUserService() {
@@ -46,7 +50,8 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
                 userAttributeRepository,
                 prdEnumRepository,
                 userAttributeService,
-                userProfileFeignClient);
+                userProfileFeignClient,
+                userConfiguredAccessRepository);
     }
 
     @MockBean

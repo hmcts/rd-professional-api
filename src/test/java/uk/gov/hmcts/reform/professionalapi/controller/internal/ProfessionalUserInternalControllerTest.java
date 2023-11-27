@@ -71,7 +71,7 @@ class ProfessionalUserInternalControllerTest {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
-                "lastName", IdamStatus.ACTIVE.name(), null, null);
+                "lastName", IdamStatus.ACTIVE.name(), null, null, null);
 
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);

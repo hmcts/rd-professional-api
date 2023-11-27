@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
@@ -82,6 +83,8 @@ class ProfessionalUserServiceImplTest {
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
     private final FeignException feignExceptionMock = mock(FeignException.class);
+    private final UserConfiguredAccessRepository userConfiguredAccessRepository
+            = mock(UserConfiguredAccessRepository.class);
 
     private final RefDataUtil refDataUtil = mock(RefDataUtil.class);
 
@@ -95,7 +98,7 @@ class ProfessionalUserServiceImplTest {
 
     private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
             organisationRepository, professionalUserRepository, userAttributeRepository,
-            prdEnumRepository, userAttributeService, userProfileFeignClient);
+            prdEnumRepository, userAttributeService, userProfileFeignClient, userConfiguredAccessRepository);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname", "some-email", organisation);
