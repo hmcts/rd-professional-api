@@ -6,11 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.dataload.config.AzureBlobConfig;
 import uk.gov.hmcts.reform.professionalapi.dataload.config.BlobStorageCredentials;
 import uk.gov.hmcts.reform.professionalapi.dataload.config.DataloadConfig;
@@ -27,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.dataload.support.IntegrationTestSupport.setSourcePath;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 @ContextConfiguration(classes = {DataloadConfig.class,BlobStorageCredentials.class,AzureBlobConfig.class},
     initializers = ConfigDataApplicationContextInitializer.class)
@@ -37,17 +43,27 @@ class PrdBatchApplicationIntegrationTest extends AuthorizationDataloadEnabledInt
     @Autowired
     protected OrganisationRepository organisationRepository;
 
+    private OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+
     @Autowired
     DataSource dataSource;
 
     @Value("${select-bulk_customer}")
     protected String bulkCustomerSql;
 
+    protected static final String ORG_IDENTIFIER = "organisationIdentifier";
+
+    @Value("${prd.security.roles.hmcts-admin}")
+    protected String hmctsAdmin;
+
     @Value("${delete-bulk_customer}")
     protected String bulkCustomerSqlDelete;
 
     @Value("${select-dataload-schedular-audit}")
     String selectDataLoadSchedulerAudit;
+
+    @MockBean
+    public static JwtDecoder jwtDecoder;
 
     public static final String FILE_STATUS = "status";
 
@@ -64,6 +80,17 @@ class PrdBatchApplicationIntegrationTest extends AuthorizationDataloadEnabledInt
     @Test
     @RefreshScope
     void testTasklet() throws Exception {
+
+        /*Map<String, Object> responseOrg =
+            professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) responseOrg.get(ORG_IDENTIFIER);
+
+        professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status("ACTIVE").build(),
+            hmctsAdmin, orgIdentifierResponse);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);*/
+        mockJwtToken("caseworker-civil-admin");
         ReflectionTestUtils.setField(professionalApiJobScheduler, "isSchedulerEnabled", true);
         professionalApiJobScheduler.loadProfessioanlDataJob();
 
@@ -71,7 +98,35 @@ class PrdBatchApplicationIntegrationTest extends AuthorizationDataloadEnabledInt
         List<Map<String, Object>> dataLoadSchedulerAudit = jdbcTemplate
             .queryForList(selectDataLoadSchedulerAudit);
         assertEquals(SUCCESS, dataLoadSchedulerAudit.get(0).get(FILE_STATUS));
+
+        BulkCustomerRequest bulkCustomerRequest=BulkCustomerRequest.abulkCustomerRequest()
+            .bulkCustomerId("bulkcustomerid")
+            .idamId("sidamid1")
+            .build();
+        var response =
+            professionalReferenceBulkCustomerClient.fetchBulkCustomerDetails(bulkCustomerRequest,
+                "caseworker-civil-admin",null);
+
+        var bulkCustomer = (List<Map<String, String>>)response.get("body");
     }
+
+    /*@Test
+    void should_return_404_when_adding_new_user_to_an_pending_organisation() {
+
+        BulkCustomerRequest bulkCustomerRequest=BulkCustomerRequest.abulkCustomerRequest()
+            .bulkCustomerId("bulkcustomerid")
+            .idamId("sidamid1")
+            .build();
+       var response =
+            professionalReferenceDataClient.fetchBulkCustomerDetails(bulkCustomerRequest,
+                "caseworker-civil-admin");
+
+        var bulkCustomer = (List<Map<String, String>>)response.get("body");
+
+       *//* Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);*//*
+
+    }*/
 
     static void validateExceptionDbRecordCount(JdbcTemplate jdbcTemplate,
                                                String queryName, int expectedCount,
