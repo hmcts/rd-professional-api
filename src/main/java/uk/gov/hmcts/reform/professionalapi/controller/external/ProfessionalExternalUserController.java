@@ -184,8 +184,12 @@ public class ProfessionalExternalUserController extends SuperController {
     ) {
 
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of(origin));
+        ResponseEntity<Object> response = modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId,
+                Optional.of(origin));
 
+        professionalUserService.modifyUserConfiguredAccess(userProfileUpdatedData, userId);
+
+        return response;
     }
 
     @Operation(

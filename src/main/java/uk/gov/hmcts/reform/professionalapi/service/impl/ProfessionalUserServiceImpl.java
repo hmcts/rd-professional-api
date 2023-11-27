@@ -21,16 +21,20 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
+import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccessId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -38,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -58,6 +63,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     UserAttributeServiceImpl userAttributeService;
     UserProfileFeignClient userProfileFeignClient;
 
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
+
     @Autowired
     public ProfessionalUserServiceImpl(
             OrganisationRepository organisationRepository,
@@ -65,7 +72,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
             UserAttributeServiceImpl userAttributeService,
-            UserProfileFeignClient userProfileFeignClient) {
+            UserProfileFeignClient userProfileFeignClient,
+            UserConfiguredAccessRepository userConfiguredAccessRepository) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
@@ -73,6 +81,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         this.prdEnumRepository = prdEnumRepository;
         this.userAttributeService = userAttributeService;
         this.userProfileFeignClient = userProfileFeignClient;
+        this.userConfiguredAccessRepository = userConfiguredAccessRepository;
     }
 
     @Transactional
@@ -122,7 +131,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String userIdentifier,
-                                                            String showDeleted, boolean rolesRequired, String status) {
+                                                                      String showDeleted, boolean rolesRequired,
+                                                                      String status) {
         var professionalUsers = userIdentifier != null
                 ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userIdentifier)
                 : professionalUserRepository.findByOrganisation(organisation);
@@ -207,6 +217,44 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status() > 0 ? ex.status() : 500),
                     ERROR_MESSAGE_UP_FAILED);
         }
+    }
+
+    @Override
+    public void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
+                                           String userId) {
+
+        Optional<UserConfiguredAccess> foundAccess = null;
+        ProfessionalUser professionalUser = this.findProfessionalUserByUserIdentifier(userId);
+        try {
+            foundAccess = userConfiguredAccessRepository
+                    .findByUserConfiguredAccessId_ProfessionalUser_Id(professionalUser.getId());
+            if (foundAccess.isPresent()) {
+                userConfiguredAccessRepository.delete(foundAccess.get());
+            }
+        } catch (Exception ex) {
+            throw new ExternalApiException(HttpStatus.valueOf(500), "001 error while deleting user access records");
+        }
+
+        try {
+            List<UserConfiguredAccess> all = userProfileUpdatedData.getAccessTypes().stream()
+                    .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                    .collect(Collectors.toList());
+            userConfiguredAccessRepository.saveAll(all);
+        } catch (Exception ex) {
+            throw new ExternalApiException(HttpStatus.valueOf(500), "002 error while creating user access records");
+        }
+    }
+
+    private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser, AccessType accessType) {
+        UserConfiguredAccess uca = new UserConfiguredAccess();
+        UserConfiguredAccessId ucaId = new UserConfiguredAccessId(
+                professionalUser, accessType.getJurisdictionId(),
+                accessType.getOrganisationProfileId(), accessType.getAccessTypeId()
+        );
+        uca.setUserConfiguredAccessId(ucaId);
+        uca.setEnabled(accessType.getEnabled());
+
+        return uca;
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
