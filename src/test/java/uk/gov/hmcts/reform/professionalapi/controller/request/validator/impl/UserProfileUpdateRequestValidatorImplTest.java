@@ -104,7 +104,7 @@ class UserProfileUpdateRequestValidatorImplTest {
         assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo(IdamStatus.ACTIVE.name());
         assertThat(actualModifyProfileData.getRolesAdd()).isNull();
         assertThat(actualModifyProfileData.getRolesDelete()).isNull();
-        assertThat(actualModifyProfileData.getAccessTypes().size()).isEqualTo(1);
+        assertThat(actualModifyProfileData.getAccessTypes()).hasSize(1);
     }
 
     @Test

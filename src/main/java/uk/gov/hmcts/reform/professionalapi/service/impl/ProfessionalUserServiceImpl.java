@@ -223,7 +223,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
                                            String userId) {
 
-        Optional<UserConfiguredAccess> foundAccess = null;
+        Optional<UserConfiguredAccess> foundAccess = Optional.empty();
         ProfessionalUser professionalUser = findProfessionalUserByUserIdentifier(userId);
         try {
             foundAccess = userConfiguredAccessRepository
