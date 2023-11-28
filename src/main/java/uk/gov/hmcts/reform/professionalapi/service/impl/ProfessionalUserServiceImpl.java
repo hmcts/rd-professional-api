@@ -235,13 +235,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(500), "001 error while deleting user access records");
         }
 
-        try {
-            List<UserConfiguredAccess> all = userProfileUpdatedData.getAccessTypes().stream()
-                    .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                    .collect(Collectors.toList());
-            userConfiguredAccessRepository.saveAll(all);
-        } catch (Exception ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(500), "002 error while creating user access records");
+        if (userProfileUpdatedData.getAccessTypes() != null) {
+            try {
+                    List<UserConfiguredAccess> all = userProfileUpdatedData.getAccessTypes().stream()
+                            .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                            .collect(Collectors.toList());
+                    userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), "002 error while creating user access records");
+            }
         }
     }
 
