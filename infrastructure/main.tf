@@ -134,6 +134,7 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-V15" {
   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 }
 
+
 resource "azurerm_key_vault_secret" "POSTGRES_PORT-V15" {
   name          = join("-", [var.component, "POSTGRES-PORT-V15"])
   value         = "5432"
