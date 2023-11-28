@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileRes
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleDeletionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -63,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -899,6 +902,124 @@ class ProfessionalUserServiceImplTest {
 
         assertThat(response).isNotNull();
         verify(professionalUser, times(1)).getUserIdentifier();
+    }
+
+    @Test
+    void test_modifyUserConfiguredAccessForAddedAccessType() {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        Set<AccessType> accessTypes = new HashSet<>();
+        AccessType accessType1 = new AccessType();
+        accessTypes.add(accessType1);
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setAccessTypes(accessTypes);
+        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
+
+        Optional<UserConfiguredAccess> optUca = Optional.of(userConfiguredAccess);
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        professionalUserService.modifyUserConfiguredAccess(userProfileUpdatedData,
+                uuidStr);
+
+
+        verify(userConfiguredAccessRepository, times(1)).delete(userConfiguredAccess);
+        verify(userConfiguredAccessRepository, times(1)).saveAll(any());
+    }
+
+    @Test
+    void test_modifyUserConfiguredAccessForNullAccessType() {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
+
+        Optional<UserConfiguredAccess> optUca = Optional.of(userConfiguredAccess);
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        professionalUserService.modifyUserConfiguredAccess(userProfileUpdatedData,
+                uuidStr);
+
+
+        verify(userConfiguredAccessRepository, times(1)).delete(userConfiguredAccess);
+        verify(userConfiguredAccessRepository, times(0)).saveAll(any());
+    }
+
+    @Test
+    void test_modifyUserConfiguredAccessForDeleteFail() {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        Set<AccessType> accessTypes = new HashSet<>();
+        AccessType accessType1 = new AccessType();
+        accessTypes.add(accessType1);
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setAccessTypes(accessTypes);
+        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
+
+        Optional<UserConfiguredAccess> optUca = Optional.of(userConfiguredAccess);
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        doThrow(new IllegalArgumentException()).when(userConfiguredAccessRepository).delete(userConfiguredAccess);
+
+        try {
+            professionalUserService.modifyUserConfiguredAccess(userProfileUpdatedData,
+                    uuidStr);
+        } catch (ExternalApiException eae) {
+            assertThat(eae.getHttpStatus().value()).isEqualTo(500);
+            assertThat(eae.getMessage()).contains("001");
+        }
+
+        verify(userConfiguredAccessRepository, times(0)).saveAll(any());
+    }
+
+    @Test
+    void test_modifyUserConfiguredAccessForSaveFail() {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        Set<AccessType> accessTypes = new HashSet<>();
+        AccessType accessType1 = new AccessType();
+        accessTypes.add(accessType1);
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setAccessTypes(accessTypes);
+        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
+
+        Optional<UserConfiguredAccess> optUca = Optional.of(userConfiguredAccess);
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        doThrow(new IllegalArgumentException()).when(userConfiguredAccessRepository).saveAll(any());
+
+        try {
+            professionalUserService.modifyUserConfiguredAccess(userProfileUpdatedData,
+                    uuidStr);
+        } catch (ExternalApiException eae) {
+            assertThat(eae.getHttpStatus().value()).isEqualTo(500);
+            assertThat(eae.getMessage()).contains("002");
+        }
+
+        verify(userConfiguredAccessRepository, times(1)).delete(userConfiguredAccess);
     }
 
     void callModifyRolesForUser(HttpStatus status) {
