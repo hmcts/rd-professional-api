@@ -108,6 +108,21 @@ class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
+    void test_ValidateRequestForAccessTypesEmpty() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+                IdamStatus.ACTIVE.name(), null, null, new HashSet<>());
+
+        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
+        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
+        assertThat(actualModifyProfileData).isNotNull();
+        assertThat(actualModifyProfileData.getEmail()).isNull();
+        assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo(IdamStatus.ACTIVE.name());
+        assertThat(actualModifyProfileData.getRolesAdd()).isNull();
+        assertThat(actualModifyProfileData.getRolesDelete()).isNull();
+        assertThat(actualModifyProfileData.getAccessTypes()).isNull();
+    }
+
+    @Test
     void test_ThrowErrorIfValidateRequestIsEmpty() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 null, null, null, null);

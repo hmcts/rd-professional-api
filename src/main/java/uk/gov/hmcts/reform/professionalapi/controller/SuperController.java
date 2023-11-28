@@ -422,7 +422,8 @@ public abstract class SuperController {
 
         var organisationMinimalInfoResponses =
                 organisations.stream()
-                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address)).toList();
+                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address))
+                        .collect(Collectors.toList());
 
         return ResponseEntity.status(200).body(organisationMinimalInfoResponses);
     }
