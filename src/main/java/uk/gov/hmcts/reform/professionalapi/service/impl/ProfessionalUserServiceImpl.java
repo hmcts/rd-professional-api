@@ -224,7 +224,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                            String userId) {
 
         Optional<UserConfiguredAccess> foundAccess = null;
-        ProfessionalUser professionalUser = this.findProfessionalUserByUserIdentifier(userId);
+        ProfessionalUser professionalUser = findProfessionalUserByUserIdentifier(userId);
         try {
             foundAccess = userConfiguredAccessRepository
                     .findByUserConfiguredAccessId_ProfessionalUser_Id(professionalUser.getId());
@@ -237,10 +237,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         if (userProfileUpdatedData.getAccessTypes() != null) {
             try {
-                    List<UserConfiguredAccess> all = userProfileUpdatedData.getAccessTypes().stream()
-                            .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                            .collect(Collectors.toList());
-                    userConfiguredAccessRepository.saveAll(all);
+                List<UserConfiguredAccess> all = userProfileUpdatedData.getAccessTypes().stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                        .collect(Collectors.toList());
+                userConfiguredAccessRepository.saveAll(all);
             } catch (Exception ex) {
                 throw new ExternalApiException(HttpStatus.valueOf(500), "002 error while creating user access records");
             }
