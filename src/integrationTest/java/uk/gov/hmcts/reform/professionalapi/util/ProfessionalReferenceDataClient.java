@@ -608,14 +608,14 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> modifyUserConfiguredAcessOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
-                                                             String orgId, String userIdentifier, String hmctsAdmin) {
+                                                             String orgId, String userIdentifier, String role) {
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/users/"
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/users/"
                 + userIdentifier;
 
         try {
             HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,
-                    getMultipleAuthHeaders(hmctsAdmin));
+                    getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);

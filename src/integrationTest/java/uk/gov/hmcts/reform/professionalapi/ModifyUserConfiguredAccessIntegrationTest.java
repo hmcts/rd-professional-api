@@ -8,9 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,43 +20,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    void ac1_modify_user_configured_access_for_an_active_organisation_with_prd_admin_role_should_return_200() {
-
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(puiCaseManager);
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+    void ac1_modify_user_configured_access_for_an_active_organisation_with_puiUserManager_role_should_return_200() {
 
         updateUserProfileRolesMock(HttpStatus.OK);
-
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
-                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
-                        hmctsAdmin);
-
-        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
-        UserProfileUpdatedData userProfileUpdatedData = createModifyUserConfiguredAccessData();
-
+        String email = randomAlphabetic(5) + "@email.com";
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserConfiguredAccessData(email, 0);
+        String userIdentifier = settingUpOrganisation(puiUserManager);
         Map<String, Object> response = professionalReferenceDataClient
-                .modifyUserConfiguredAcessOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier,
-                        hmctsAdmin);
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-
     }
 
-    private UserProfileUpdatedData createModifyUserConfiguredAccessData() {
+    @Test
+    void ac2_modify_user_configured_access_for_an_active_organisation_with_puiUserManager_role_should_return_200() {
+
+        updateUserProfileRolesMock(HttpStatus.OK);
+        String email = randomAlphabetic(5) + "@email.com";
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserConfiguredAccessData(email, 2);
+        String userIdentifier = settingUpOrganisation(puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+    }
+
+    private UserProfileUpdatedData createModifyUserConfiguredAccessData(String email, int numAccessTypes) {
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        AccessType accessType1 = new AccessType();
-        AccessType accessType2 = new AccessType();
         Set<AccessType> accessTypes = new HashSet<>();
-        accessTypes.add(accessType1);
-        accessTypes.add(accessType2);
+        for (int i = 0; i < numAccessTypes; i++) {
+            AccessType accessType = new AccessType("Jurisdiction" + numAccessTypes,
+                    "Organisation" + numAccessTypes,
+                    "AccessType" + numAccessTypes, true);
+            accessTypes.add(accessType);
+        }
 
+        userProfileUpdatedData.setEmail(email);
         userProfileUpdatedData.setAccessTypes(accessTypes);
         userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
         userProfileUpdatedData.setRolesAdd(new HashSet<>());
