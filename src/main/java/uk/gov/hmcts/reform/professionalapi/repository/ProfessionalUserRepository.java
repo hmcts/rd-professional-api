@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,4 +32,5 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
             nativeQuery = true)
     int findByUserCountByOrganisationId(@Param("organisationId") UUID organisationId);
 
+    Page<ProfessionalUser> findByLastUpdatedBefore(LocalDateTime lastUpdated, Pageable pageable);
 }

@@ -170,4 +170,19 @@ public class ProfessionalUserInternalController extends SuperController {
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of(origin));
 
     }
+
+    @GetMapping(
+            path = "/users",
+            produces = APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Object> getRefreshUsers(
+            @RequestParam(value = "since", required = false) String since,
+            @RequestParam(value = "userId", required = false) String userId,
+            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "size") Integer size
+    ) {
+        organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId);
+
+        return fetchUsersForRefresh(since, userId, page, size);
+    }
 }

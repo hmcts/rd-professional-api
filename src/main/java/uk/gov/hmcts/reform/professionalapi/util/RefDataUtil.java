@@ -25,17 +25,21 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfiles
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
+import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -416,6 +420,42 @@ public class RefDataUtil {
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
         return newResponseEntity;
+    }
+
+    public static GetRefreshUsersResponse buildGetRefreshUsersResponse(Page<ProfessionalUser> professionalUsersPage,
+                                                                   List<ProfessionalUser> professionalUsers,
+                                                                   List<UserConfiguredAccess> userConfiguredAccesses) {
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse();
+        getRefreshUsersResponse.setMoreAvailable(professionalUsersPage != null && !professionalUsersPage.isLast());
+        List<RefreshUser> refreshUserList = new ArrayList<>();
+
+        for (ProfessionalUser professionalUser : professionalUsers) {
+            RefreshUser refreshUser = new RefreshUser();
+            refreshUser.setUserIdentifier(professionalUser.getUserIdentifier());
+            refreshUser.setLastUpdated(professionalUser.getLastUpdated());
+            refreshUser.setOrganisationIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
+            refreshUser.setAccessTypes(new ArrayList<>());
+            refreshUserList.add(refreshUser);
+
+            for (UserConfiguredAccess uca : userConfiguredAccesses) {
+                List<AccessType> accessTypes = new ArrayList<>();
+                String ucaUserIdentifier = uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier();
+
+                if (ucaUserIdentifier.equals(professionalUser.getUserIdentifier())) {
+                    AccessType accessType = new AccessType();
+                    accessType.setJurisdictionId(uca.getUserConfiguredAccessId().getJurisdictionId());
+                    accessType.setOrganisationProfileId(uca.getUserConfiguredAccessId().getOrganisationProfileId());
+                    accessType.setAccessTypeId(uca.getUserConfiguredAccessId().getAccessTypeId());
+
+                    accessTypes.add(accessType);
+                    refreshUser.setAccessTypes(accessTypes);
+                }
+            }
+        }
+
+        getRefreshUsersResponse.setUsers(refreshUserList);
+
+        return getRefreshUsersResponse;
     }
 
     @Value("${loggingComponentName}")

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
@@ -26,22 +27,28 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
@@ -52,6 +59,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
 
@@ -62,6 +70,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ProfessionalUserServiceImpl(
             OrganisationRepository organisationRepository,
             ProfessionalUserRepository professionalUserRepository,
+            UserConfiguredAccessRepository userConfiguredAccessRepository,
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
             UserAttributeServiceImpl userAttributeService,
@@ -69,6 +78,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
+        this.userConfiguredAccessRepository = userConfiguredAccessRepository;
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
         this.userAttributeService = userAttributeService;
@@ -90,6 +100,59 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
         return professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
+    }
+
+    @Override
+    public ResponseEntity<Object> findRefreshUsers(String since, String userId, Pageable pageable) {
+        ResponseEntity<Object> res = null;
+
+        if (since != null) {
+            res = findRefreshUsersBySinceWithPageable(since, pageable);
+        }
+
+        if (userId != null) {
+            res = findRefreshUsersByUserId(userId);
+        }
+
+        return res;
+    }
+
+    public ResponseEntity<Object> findRefreshUsersBySinceWithPageable(String since, Pageable pageable) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
+        LocalDateTime formattedSince = LocalDateTime.parse(since, formatter);
+        Page<ProfessionalUser> professionalUsersPage =
+                professionalUserRepository.findByLastUpdatedBefore(formattedSince, pageable);
+        List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
+
+        List<UUID> uuids = professionalUsers.stream()
+                .map(ProfessionalUser::getId)
+                .collect(Collectors.toList());
+        List<UserConfiguredAccess> userConfiguredAccesses
+                = userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_IdIn(uuids);
+
+        GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
+                        professionalUsersPage, professionalUsers, userConfiguredAccesses
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    public ResponseEntity<Object> findRefreshUsersByUserId(String userId) {
+        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
+        List<UserConfiguredAccess> userConfiguredAccesses;
+
+        if (professionalUser != null) {
+            userConfiguredAccesses = userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(
+                    professionalUser.getId()
+            );
+        } else {
+            throw new ResourceNotFoundException("Professional user with identifier: " + userId + " not found");
+        }
+
+        GetRefreshUsersResponse res =
+                RefDataUtil.buildGetRefreshUsersResponse(null, List.of(professionalUser), userConfiguredAccesses);
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @Override

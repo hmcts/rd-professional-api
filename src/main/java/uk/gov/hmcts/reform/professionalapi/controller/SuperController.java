@@ -82,6 +82,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
@@ -606,6 +607,12 @@ public abstract class SuperController {
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
         return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
+    }
+
+    protected ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size) {
+        Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER));
+
+        return professionalUserService.findRefreshUsers(since, userId, pageable);
     }
 
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {
