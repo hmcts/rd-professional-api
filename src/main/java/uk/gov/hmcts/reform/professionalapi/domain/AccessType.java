@@ -24,4 +24,17 @@ public class AccessType {
         this.accessTypeId = accessTypeId;
         this.enabled = enabled;
     }
+
+    public static AccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        AccessType accessType = new AccessType();
+        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
+        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
+                .getOrganisationProfileId());
+        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
+        accessType.setEnabled(userConfiguredAccess.getEnabled());
+
+        return accessType;
+    }
+
+
 }

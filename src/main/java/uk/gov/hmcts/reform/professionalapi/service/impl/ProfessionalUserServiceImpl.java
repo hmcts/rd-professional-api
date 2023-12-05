@@ -44,7 +44,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
 
 @Service
 @Slf4j
@@ -112,7 +113,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         ResponseEntity<Object> responseEntity
                 = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                organisation.getStatus(),
+                pagedProfessionalUsers.toList());
 
         var headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
                 responseEntity);
@@ -131,13 +134,17 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
         return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                organisation.getStatus(),
+                professionalUsers);
     }
 
     @SuppressWarnings("unchecked")
     private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest,
                                                         String showDeleted, boolean rolesRequired, String status,
-                                                        String organisationIdentifier) {
+                                                        String organisationIdentifier,
+                                                        OrganisationStatus organisationStatus,
+                                                        List<ProfessionalUser> professionalUsers) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
@@ -153,7 +160,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgIdInGetUserResponse(responseEntity, organisationIdentifier);
+                responseEntity = setOrgInfoInGetUserResponse(responseEntity, organisationIdentifier,
+                        organisationStatus, List.of("SOLICITOR"));
+                responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
+                //[organisationProfileID]
             }
 
         } catch (FeignException ex) {

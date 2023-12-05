@@ -81,7 +81,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -1137,8 +1137,8 @@ class RefDataUtilTest {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
-        ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity,
-                "ABCD123");
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity,
+                "ABCD123", OrganisationStatus.ACTIVE, List.of("organisationStatus"));
         assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
@@ -1155,8 +1155,8 @@ class RefDataUtilTest {
         professionalUsersEntityResponseWithoutRoles.setUserProfiles(professionalUsersEntityResponsesWithoutRoles);
         ResponseEntity<Object> responseEntity
                 = ResponseEntity.status(200).body(professionalUsersEntityResponseWithoutRoles);
-        ResponseEntity<Object> responseEntityOutput
-                = setOrgIdInGetUserResponse(responseEntity, "ABCD123");
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity, "ABCD123",
+                OrganisationStatus.ACTIVE, List.of("organisationStatus"));
         assertThat(responseEntityOutput.getBody())
                 .isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
         ProfessionalUsersEntityResponseWithoutRoles output

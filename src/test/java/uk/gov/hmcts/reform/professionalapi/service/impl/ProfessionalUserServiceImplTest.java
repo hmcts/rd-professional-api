@@ -116,6 +116,7 @@ class ProfessionalUserServiceImplTest {
         prdEnums.add(anEnum);
 
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
     }
