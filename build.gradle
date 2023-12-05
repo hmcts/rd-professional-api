@@ -19,7 +19,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.sonarqube' version '3.3'
-    id 'org.springframework.boot' version '2.7.14'
+    id 'org.springframework.boot' version '2.7.18'
     id "org.flywaydb.flyway" version "8.5.4"
     id 'au.com.dius.pact' version '4.1.7'// do not change, otherwise serenity report fails
     id 'org.owasp.dependencycheck' version '8.0.1'
@@ -36,14 +36,15 @@ def versions = [
         pitest          : '1.7.4',
         reformLogging   : '6.0.1',
         serenity        : '2.0.76',
-        springBoot      : '2.7.14',
+        springBoot      : '2.7.18',
         camel           : '3.8.0',
         pact_version    : '4.1.7',
         launchDarklySdk : '5.10.9',
         junit           : '5.9.2',
         junitPlatform   : '1.9.2',
         log4j           : '2.17.1',
-        springVersion   : '5.3.27'
+        springVersion   : '5.3.27',
+        bouncycastle    : '1.77'
 ]
 
 
@@ -193,10 +194,6 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
 }
 
-
-
-
-
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
     testClassesDirs = sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
@@ -235,7 +232,6 @@ task fortifyScan(type: JavaExec) {
     // This is a temporary fix to prevent the nightly build from failing if the Fortify scan detects issues
     ignoreExitValue = true
 }
-
 
 
 runProviderPactVerification.finalizedBy pactVerify
@@ -336,7 +332,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.7.10'
 
-    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
+    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: versions.bouncycastle
     implementation group: 'org.springframework', name: 'spring-core', version: versions.springVersion
     implementation group: 'org.springframework', name: 'spring-beans', version: versions.springVersion
     implementation group: 'org.springframework', name: 'spring-aop', version: versions.springVersion
@@ -408,7 +404,7 @@ dependencies {
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.5'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.7'
 
     implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter', version:versions.camel
     implementation group: 'org.apache.camel', name: 'camel-csv', version: versions.camel
@@ -558,7 +554,7 @@ dependencyManagement {
         // CVE-2021-25122
         // CVE-2021-42340
         // CVE-2023-28709
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.81') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.83') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -635,6 +631,26 @@ configurations.all {
         if (details.requested.group == 'com.google.guava'
                 && details.requested.name == 'guava') {
             details.useVersion "32.1.1-jre"
+        }
+    }
+
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.bouncycastle'
+                && (details.requested.name == 'bcpkix-jdk18on'
+                || details.requested.name == 'bcprov-jdk18on')
+        ){
+            details.useVersion versions.bouncycastle
+        }
+    }
+}
+
+dependencies {
+    modules {
+        module("org.bouncycastle:bcpkix-jdk15on") {
+            replacedBy("org.bouncycastle:bcpkix-jdk18on")
+        }
+        module("org.bouncycastle:bcprov-jdk15on") {
+            replacedBy("org.bouncycastle:bcprov-jdk18on")
         }
     }
 }
