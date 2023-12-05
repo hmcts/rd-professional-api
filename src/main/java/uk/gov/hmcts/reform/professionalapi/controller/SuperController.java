@@ -610,9 +610,17 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size) {
-        Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER));
+        ResponseEntity<Object> responseEntity;
 
-        return professionalUserService.findRefreshUsers(since, userId, pageable);
+        if (page != null && userId == null) {
+            Pageable pageable =
+                    createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER));
+            responseEntity = professionalUserService.findRefreshUsers(since, pageable);
+        } else {
+            responseEntity = professionalUserService.findSingleRefreshUser(userId);
+        }
+
+        return responseEntity;
     }
 
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {

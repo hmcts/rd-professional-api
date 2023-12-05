@@ -103,21 +103,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> findRefreshUsers(String since, String userId, Pageable pageable) {
-        ResponseEntity<Object> res = null;
-
-        if (since != null) {
-            res = findRefreshUsersBySinceWithPageable(since, pageable);
-        }
-
-        if (userId != null) {
-            res = findRefreshUsersByUserId(userId);
-        }
-
-        return res;
-    }
-
-    public ResponseEntity<Object> findRefreshUsersBySinceWithPageable(String since, Pageable pageable) {
+    public ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
         LocalDateTime formattedSince = LocalDateTime.parse(since, formatter);
         Page<ProfessionalUser> professionalUsersPage =
@@ -131,13 +117,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 = userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_IdIn(uuids);
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-                        professionalUsersPage, professionalUsers, userConfiguredAccesses
+                professionalUsersPage, professionalUsers, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
-    public ResponseEntity<Object> findRefreshUsersByUserId(String userId) {
+    @Override
+    public ResponseEntity<Object> findSingleRefreshUser(String userId) {
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
         List<UserConfiguredAccess> userConfiguredAccesses;
 

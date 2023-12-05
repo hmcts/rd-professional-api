@@ -39,6 +39,8 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
 
-    ResponseEntity<Object>  findRefreshUsers(String since, String userId, Pageable pageable);
+    ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable);
+
+    ResponseEntity<Object> findSingleRefreshUser(String userId);
 }
 
