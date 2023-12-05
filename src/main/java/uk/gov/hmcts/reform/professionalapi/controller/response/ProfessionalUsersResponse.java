@@ -5,9 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -26,6 +28,8 @@ public class ProfessionalUsersResponse extends ProfessionalUsersResponseWithoutR
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
+        this.accessTypes = user.getUserConfiguredAccesses().stream().map(uca -> fromUserConfiguredAccess(uca))
+                .collect(Collectors.toList());
         this.roles = user.getRoles();
         this.idamStatus = user.getIdamStatus() ==  null ? "" :  user.getIdamStatus().toString();
         this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();

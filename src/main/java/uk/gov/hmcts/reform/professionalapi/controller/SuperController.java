@@ -542,7 +542,7 @@ public abstract class SuperController {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
                     userIdentifier, showDeleted, returnRoles, status);
         }
-        return responseEntity;
+            return responseEntity;
     }
 
     protected ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomerId(
