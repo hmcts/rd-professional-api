@@ -43,7 +43,8 @@ def versions = [
         junit           : '5.9.2',
         junitPlatform   : '1.9.2',
         log4j           : '2.17.1',
-        springVersion   : '5.3.27'
+        springVersion   : '5.3.27',
+        bouncycastle    : '1.77'
 ]
 
 
@@ -193,10 +194,6 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
 }
 
-
-
-
-
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
     testClassesDirs = sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
@@ -235,7 +232,6 @@ task fortifyScan(type: JavaExec) {
     // This is a temporary fix to prevent the nightly build from failing if the Fortify scan detects issues
     ignoreExitValue = true
 }
-
 
 
 runProviderPactVerification.finalizedBy pactVerify
@@ -336,7 +332,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.7.10'
 
-    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
+    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: versions.bouncycastle
     implementation group: 'org.springframework', name: 'spring-core', version: versions.springVersion
     implementation group: 'org.springframework', name: 'spring-beans', version: versions.springVersion
     implementation group: 'org.springframework', name: 'spring-aop', version: versions.springVersion
@@ -635,6 +631,26 @@ configurations.all {
         if (details.requested.group == 'com.google.guava'
                 && details.requested.name == 'guava') {
             details.useVersion "32.1.1-jre"
+        }
+    }
+
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.bouncycastle'
+                && (details.requested.name == 'bcpkix-jdk18on'
+                || details.requested.name == 'bcprov-jdk18on')
+        ){
+            details.useVersion versions.bouncycastle
+        }
+    }
+}
+
+dependencies {
+    modules {
+        module("org.bouncycastle:bcpkix-jdk15on") {
+            replacedBy("org.bouncycastle:bcpkix-jdk18on")
+        }
+        module("org.bouncycastle:bcprov-jdk15on") {
+            replacedBy("org.bouncycastle:bcprov-jdk18on")
         }
     }
 }
