@@ -23,6 +23,16 @@ class AccessTypeTest {
     }
 
     @Test
+    void test_AccessType() {
+        AccessType accessType = new AccessType("jurisdictionId", "organisationProfileId", "accessTypeId", true);
+
+        assertTrue(accessType.getEnabled());
+        assertThat(accessType.getJurisdictionId()).isEqualTo("jurisdictionId");
+        assertThat(accessType.getOrganisationProfileId()).isEqualTo("organisationProfileId");
+        assertThat(accessType.getAccessTypeId()).isEqualTo("accessTypeId");
+    }
+
+    @Test
     void test_fromUserConfiguredAccessNoArgs() {
         ProfessionalUser professionalUser = new ProfessionalUser();
         UserConfiguredAccessId userConfiguredAccessId = new UserConfiguredAccessId(professionalUser,
