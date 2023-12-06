@@ -50,7 +50,7 @@ public class ProfessionalApiJobScheduler {
     @Autowired
     PrdSchedularAuditRepository prdSchedularAuditRepository;
 
-    @Autowired
+    @Autowired(required=true)
     DataLoadRoute dataLoadRoute;
 
     @Autowired

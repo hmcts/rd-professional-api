@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.sql.DataSource;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.dataload.support.IntegrationTestSupport.setSourcePath;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SUCCESS;
+
 
 @ContextConfiguration(classes = {DataloadConfig.class,BlobStorageCredentials.class,AzureBlobConfig.class},
     initializers = ConfigDataApplicationContextInitializer.class)
@@ -36,9 +36,6 @@ class PrdBatchApplicationIntegrationTest extends AuthorizationDataloadEnabledInt
 
     @Autowired
     protected OrganisationRepository organisationRepository;
-
-    @Autowired
-    DataSource dataSource;
 
     @Value("${select-bulk_customer}")
     protected String bulkCustomerSql;

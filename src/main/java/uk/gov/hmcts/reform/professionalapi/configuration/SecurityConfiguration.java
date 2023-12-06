@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -35,7 +34,6 @@ import javax.inject.Inject;
 @Configuration
 @ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
 @Slf4j
 @SuppressWarnings("unchecked")
 public class SecurityConfiguration {
@@ -67,8 +65,8 @@ public class SecurityConfiguration {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().requestMatchers(anonymousPaths.toArray(String[]::new))
-                .requestMatchers("/refdata/external/v1/organisations/mfa");
+        return web -> web.ignoring().requestMatchers(anonymousPaths.toArray(new String[0]))
+                    .requestMatchers("/refdata/external/v1/organisations/mfa");
     }
 
     @Inject
@@ -107,6 +105,7 @@ public class SecurityConfiguration {
 
     @Bean
     JwtDecoder jwtDecoder() {
+
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
         // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment

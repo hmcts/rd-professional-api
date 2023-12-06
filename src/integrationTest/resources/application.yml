@@ -1,8 +1,11 @@
 spring:
-  schemas: DBREFDATA
-  flyway.locations: classpath:db/testmigration
+  flyway:
+    schemas: DBREFDATA
+    locations: classpath:db/testmigration
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
     properties:
       hibernate:
         default_schema: dbrefdata
@@ -90,23 +93,6 @@ defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 loggingComponentName: RD_Professional_API
 
-security:
-  anonymousPaths:
-    - "/"
-    - "/health"
-    - "/health/readiness"
-    - "/health/liveness"
-    - "/actuator/**"
-    - "/loggers/**"
-    - "/swagger-ui.html"
-    - "/swagger-resources/**"
-    - "/v3/**"
-    - "/swagger-ui/**"
-    - "/webjars/springfox-swagger-ui/**"
-    - "/csrf"
-    - "/error"
-    - "/favicon.ico"
-
 
 aggregation-strategy-completion-size: 100
 aggregation-strategy-timeout: 2000
@@ -148,4 +134,3 @@ route:
     csv-binder-object: BulkCustomerDetails
     csv-headers-expected: Organisation_ID,Bulk_Customer_ID,Sidam_ID,PBA
     header-validation-enabled: true
-

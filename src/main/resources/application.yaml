@@ -52,7 +52,7 @@ spring:
     caffeine:
       spec: maximumSize=50,expireAfterWrite=1m
 
-### database configuration
+  ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5428}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
