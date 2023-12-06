@@ -45,18 +45,23 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,6 +74,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,6 +88,8 @@ class ProfessionalUserServiceImplTest {
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
     private final FeignException feignExceptionMock = mock(FeignException.class);
+    private final UserConfiguredAccessRepository userConfiguredAccessRepository
+            = mock(UserConfiguredAccessRepository.class);
 
     private final RefDataUtil refDataUtil = mock(RefDataUtil.class);
 
@@ -94,8 +102,8 @@ class ProfessionalUserServiceImplTest {
             false);
 
     private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
-            organisationRepository, professionalUserRepository, userAttributeRepository,
-            prdEnumRepository, userAttributeService, userProfileFeignClient);
+            organisationRepository, professionalUserRepository, userConfiguredAccessRepository,
+            userAttributeRepository, prdEnumRepository, userAttributeService, userProfileFeignClient);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname", "some-email", organisation);
@@ -911,5 +919,82 @@ class ProfessionalUserServiceImplTest {
                 .hasMessageContaining(ERROR_MESSAGE_UP_FAILED);
         assertThat(((ExternalApiException) thrown).getHttpStatus()).isEqualTo(status);
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_findRefreshUsers() {
+        Pageable pageableMock = mock(Pageable.class);
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+        Page<ProfessionalUser> professionalUserPage = mock(Page.class);
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        ProfessionalUser professionalUser1 = new ProfessionalUser("fName", "lName",
+                "some1@email.com", organisation);
+        professionalUserList.add(professionalUser);
+        professionalUserList.add(professionalUser1);
+
+        when(professionalUserRepository.findByLastUpdatedBefore(any(), eq(pageableMock)))
+                .thenReturn(professionalUserPage);
+
+        when(professionalUserPage.getContent()).thenReturn(professionalUserList);
+
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_IdIn(any()))
+                .thenReturn(Collections.emptyList());
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023, 12 ,6, 13,36,25);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
+        String since = currentDateTime.format(formatter);
+
+        ResponseEntity<Object> responseEntity = professionalUserService.findRefreshUsers(since, pageableMock);
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepository, times(1))
+                .findByLastUpdatedBefore(any(), any());
+        verify(userConfiguredAccessRepository, times(1)).findByUserConfiguredAccessId_ProfessionalUser_IdIn(any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_findSingleRefreshUser() {
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setId(UUID.randomUUID());
+
+        when(professionalUserRepository.findByUserIdentifier(any()))
+                .thenReturn(professionalUser);
+
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))
+                .thenReturn(Collections.emptyList());
+
+        ResponseEntity<Object> responseEntity = professionalUserService.findSingleRefreshUser(userIdentifier);
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepository, times(1))
+                .findByUserIdentifier(any());
+        verify(userConfiguredAccessRepository, times(1)).findByUserConfiguredAccessId_ProfessionalUser_Id(any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_findSingleRefreshUser_ThrowsResourceNotFoundException() {
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setId(UUID.randomUUID());
+
+        when(professionalUserRepository.findByUserIdentifier(any()))
+                .thenReturn(null);
+
+        Throwable throwable = assertThrows(ResourceNotFoundException.class, () ->
+                professionalUserService.findSingleRefreshUser(userIdentifier));
+        assertEquals(throwable.getMessage(), "Professional user with identifier: " + userIdentifier + " not found");
+
+        verify(professionalUserRepository, times(1))
+                .findByUserIdentifier(any());
     }
 }

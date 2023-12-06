@@ -142,4 +142,28 @@ class OrganisationIdentifierValidatorImplTest {
         assertDoesNotThrow(() ->
                 organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND));
     }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWhenBothParamsNull() {
+        assertThrows(InvalidRequest.class,() ->
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(null, null));
+    }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWhenBothParamsPresent() {
+        assertThrows(InvalidRequest.class,() ->
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("since", "uid"));
+    }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWithBadDateTimeFormat() {
+        assertThrows(InvalidRequest.class,() ->
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("Bad date time pattern", null));
+    }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWithValidFormat() {
+        assertDoesNotThrow(() ->
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("2023-12-05 14:49:53", null));
+    }
 }

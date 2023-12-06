@@ -13,4 +13,11 @@ public class AccessType {
     private String organisationProfileId;
     private String accessTypeId;
     private boolean enabled;
+
+    public AccessType(String jurisdictionId, String organisationProfileId, String accessTypeId, boolean enabled) {
+        this.jurisdictionId = jurisdictionId;
+        this.organisationProfileId = organisationProfileId;
+        this.accessTypeId = accessTypeId;
+        this.enabled = enabled;
+    }
 }

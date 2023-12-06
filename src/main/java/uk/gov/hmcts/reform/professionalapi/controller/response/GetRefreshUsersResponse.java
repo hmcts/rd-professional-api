@@ -14,4 +14,9 @@ public class GetRefreshUsersResponse {
 
     private List<RefreshUser> users;
     private boolean moreAvailable;
+
+    public GetRefreshUsersResponse(List<RefreshUser> users, boolean moreAvailable) {
+        this.users = users;
+        this.moreAvailable = moreAvailable;
+    }
 }

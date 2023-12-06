@@ -16,4 +16,14 @@ public class RefreshUser {
     private LocalDateTime lastUpdated;
     private String organisationIdentifier;
     private List<AccessType> accessTypes;
+
+    public RefreshUser(String userIdentifier,
+                       LocalDateTime lastUpdated,
+                       String organisationIdentifier,
+                       List<AccessType> accessTypes) {
+        this.userIdentifier = userIdentifier;
+        this.lastUpdated = lastUpdated;
+        this.organisationIdentifier = organisationIdentifier;
+        this.accessTypes = accessTypes;
+    }
 }

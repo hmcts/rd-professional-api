@@ -434,11 +434,11 @@ public class RefDataUtil {
             refreshUser.setUserIdentifier(professionalUser.getUserIdentifier());
             refreshUser.setLastUpdated(professionalUser.getLastUpdated());
             refreshUser.setOrganisationIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
-            refreshUser.setAccessTypes(new ArrayList<>());
             refreshUserList.add(refreshUser);
 
+            List<AccessType> accessTypes = new ArrayList<>();
+
             for (UserConfiguredAccess uca : userConfiguredAccesses) {
-                List<AccessType> accessTypes = new ArrayList<>();
                 String ucaUserIdentifier = uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier();
 
                 if (ucaUserIdentifier.equals(professionalUser.getUserIdentifier())) {
@@ -446,11 +446,10 @@ public class RefDataUtil {
                     accessType.setJurisdictionId(uca.getUserConfiguredAccessId().getJurisdictionId());
                     accessType.setOrganisationProfileId(uca.getUserConfiguredAccessId().getOrganisationProfileId());
                     accessType.setAccessTypeId(uca.getUserConfiguredAccessId().getAccessTypeId());
-
                     accessTypes.add(accessType);
-                    refreshUser.setAccessTypes(accessTypes);
                 }
             }
+            refreshUser.setAccessTypes(accessTypes);
         }
 
         getRefreshUsersResponse.setUsers(refreshUserList);
