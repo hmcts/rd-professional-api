@@ -816,6 +816,7 @@ class RefDataUtilTest {
 
         assertThat(orgResponse).isNotNull();
         assertThat(orgResponse.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
+        assertThat(orgResponse.get(0).getStatus()).isEqualTo(organisation.getStatus());
         assertThat(orgResponse.get(0).getName()).isEqualTo("Org-Name");
         assertThat(orgResponse.get(0).getSraId()).isEqualTo("sra-id");
         assertThat(orgResponse.get(0).getCompanyNumber()).isEqualTo("companyN");
@@ -1137,11 +1138,14 @@ class RefDataUtilTest {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
-        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity,
-                "ABCD123", OrganisationStatus.ACTIVE, List.of("organisationStatus"));
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity, "ABCD123",
+                OrganisationStatus.ACTIVE, List.of("organisationProfileId1,organisationProfileId2".split(",")));
         assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+        assertThat(output.getOrganisationStatus()).isEqualTo(OrganisationStatus.ACTIVE.name());
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId1");
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId2");
     }
 
     @Test
@@ -1156,12 +1160,15 @@ class RefDataUtilTest {
         ResponseEntity<Object> responseEntity
                 = ResponseEntity.status(200).body(professionalUsersEntityResponseWithoutRoles);
         ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity, "ABCD123",
-                OrganisationStatus.ACTIVE, List.of("organisationStatus"));
+                OrganisationStatus.ACTIVE, List.of("organisationProfileId1,organisationProfileId2".split(",")));
         assertThat(responseEntityOutput.getBody())
                 .isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
         ProfessionalUsersEntityResponseWithoutRoles output
                 = (ProfessionalUsersEntityResponseWithoutRoles) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+        assertThat(output.getOrganisationStatus()).isEqualTo(OrganisationStatus.ACTIVE.name());
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId1");
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId2");
     }
 
     @Test

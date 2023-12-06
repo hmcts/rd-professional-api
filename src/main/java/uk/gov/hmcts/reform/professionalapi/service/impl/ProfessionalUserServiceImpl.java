@@ -5,6 +5,7 @@ import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,6 +51,9 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInG
 @Service
 @Slf4j
 public class ProfessionalUserServiceImpl implements ProfessionalUserService {
+
+    @Value("${group-access.organisation-profile-ids}")
+    protected String organisationProfileIds;
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
@@ -161,9 +165,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 responseEntity = setOrgInfoInGetUserResponse(responseEntity, organisationIdentifier,
-                        organisationStatus, List.of("SOLICITOR"));
+                        organisationStatus, List.of(organisationProfileIds.split(",")));
                 responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
-                //[organisationProfileID]
             }
 
         } catch (FeignException ex) {

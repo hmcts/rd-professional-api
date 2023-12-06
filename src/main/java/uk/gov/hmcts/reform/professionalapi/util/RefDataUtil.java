@@ -474,6 +474,8 @@ public class RefDataUtil {
             professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
 
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
+            professionalUsersEntityResponseWithoutRoles.setOrganisationStatus(organisationStatus.name());
+            professionalUsersEntityResponseWithoutRoles.setOrganisationProfileIds(organisationProfileIds);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
