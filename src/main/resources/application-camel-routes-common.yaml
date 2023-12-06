@@ -1,0 +1,20 @@
+aggregation-strategy-completion-size: 100
+aggregation-strategy-timeout: 2000
+archival-route: direct:ProfessionalDataArchival
+archival-path: azure-blob://${azure.storage.account-name}/rd-common-data-archive
+active-blob-path: azure-blob://${azure.storage.account-name}/rd-common-data
+archival-file-names: BulkCustomerIDs.csv
+archival-cred: credentials=#credsreg&operation=updateBlockBlob
+archival-date-format: dd-MM-yyyy--HH-mm
+file-read-time-out: 180000
+batchjob-name: ProfessionalDataLoad
+scheduler-audit-select: select count(*) from dbrefdata.dataload_schedular_audit where date(scheduler_start_time) = current_date
+invalid-exception-sql: insert into dbrefdata.dataload_exception_records(table_name,scheduler_start_time,scheduler_name,error_description,updated_timestamp) values(?, ?, ?, ?, ?)
+invalid-jsr-sql: insert into dbrefdata.dataload_exception_records(table_name,scheduler_start_time,scheduler_name,key,field_in_error,error_description,updated_timestamp,row_id) values(?, ?, ?, ?, ?, ?, ?,?)
+scheduler-insert-sql: insert into dbrefdata.dataload_schedular_audit (scheduler_name,file_name, scheduler_start_time,scheduler_end_time,status) values(?,?,?,?,?)
+audit-enable: true
+logging-component-name: RD_Professional_Data
+component:
+  name: Professional Reference Data API
+flag-code-query: select id from dbrefdata.user_details
+

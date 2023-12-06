@@ -524,6 +524,31 @@ public class ProfessionalApiClient {
 
     }
 
+
+    public Map<String, Object> retrieveOrganisationForBulkCustomerDetails(String bulkCustomerId, String role,
+                                                                          String idamId,
+                                                                          HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal().body("")
+                .post("/refdata/internal/v1/bulkCustomer?" + "bulkCustomerId=" + bulkCustomerId + "&idamId="
+                                                    + idamId)
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("{}:: Retrieve organisation response: {}", loggingComponentName, response.statusCode());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
+    }
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrieveAllOrganisations(String role) {
         Response response = getMultipleAuthHeadersInternal()

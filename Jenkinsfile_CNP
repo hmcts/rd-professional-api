@@ -12,6 +12,9 @@ def secrets = [
                 secret('microservicekey-rd-professional-api', 'PROFESSIONAL_API_S2S_SECRET')
         ],
         'rd-${env}' : [
+                secret('ACCOUNT-KEY-PREVIEW', 'ACCOUNT_KEY_PREVIEW'),
+                secret('rd-prd-storage-account-name', 'ACCOUNT_NAME'),
+                secret('rd-prd-storage-account-primary-key', 'ACCOUNT_KEY'),
                 secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
                 secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
                 secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
@@ -235,7 +238,6 @@ withPipeline(type, product, component) {
                 ]
                 steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
-
     onMaster() {
         enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
     }

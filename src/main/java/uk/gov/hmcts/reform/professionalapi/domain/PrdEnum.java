@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
-@Entity
+@Entity(name = "prd_enum")
 public class PrdEnum implements Serializable {
 
     @EmbeddedId

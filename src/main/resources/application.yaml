@@ -16,13 +16,20 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+    open-in-view: ${JPA_OPEN_IN_VIEW:true}
     properties:
       hibernate:
+        default_schema: dbrefdata
         jdbc:
           lob:
             non_contextual_creation: true
   application:
     name: Professional Reference Data API
+  profiles:
+    include:
+      - lib
+      - camel-routes-common
+      - prd-user-details-router
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
@@ -38,6 +45,7 @@ spring:
             client-secret: ${PROFESSIONAL_API_S2S_SECRET:}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
+  flyway.schemas: dbrefdata
   flyway.locations: classpath:db/migration,classpath:db/postgres
   cache:
     cache-names: token
@@ -54,11 +62,11 @@ spring:
       charSet: UTF-8
     hikari:
       minimumIdle: 2
-      maximumPoolSize: 10
+      maximumPoolSize: ${HIKARI_MAX_POOL_SIZE:50}
       idleTimeout: 600000
       poolName: PRDHikariCP
       maxLifetime: 1800000
-      connectionTimeout: 30000
+      connectionTimeout: 5000
     tomcat:
       max-active: 10
       max-idle: 10
@@ -116,6 +124,12 @@ prd:
       pui-organisation-manager: pui-organisation-manager
       pui-finance-manager: pui-finance-manager
       pui-case-manager: pui-case-manager
+  scheduler:
+    cronExpression: ${CRON_EXPRESSION:* */10 * * * *}
+    enabled: ${SCHEDULER_ENABLED:false}
+    lockAtLeastFor: ${Lock_AT_Least_For:PT10M}
+    lockAtMostFor: ${Lock_AT_Most_For:PT20M}
+    defaultLockAtMostFor: ${Default_Lock_At_Most_For:PT30M}
 
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
@@ -146,3 +160,11 @@ launchdarkly:
     key: ${LD_SDK_KEY:}
     environment: ${LAUNCH_DARKLY_ENV:local}
     user: rd
+
+
+azure:
+  storage:
+    account-name: ${ACCOUNT_NAME:ACCOUNT_NAME}
+    account-key: ${ACCOUNT_KEY:ACCOUNT_KEY}
+    container-name: ${CONTAINER_NAME:CONTAINER_NAME}
+    blob-url-suffix: ${BLOB_URL_SUFFIX:BLOB_URL_SUFFIX}

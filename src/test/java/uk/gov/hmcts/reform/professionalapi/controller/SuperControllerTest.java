@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
@@ -76,6 +77,8 @@ class SuperControllerTest {
     private final SuperController superController = mock(SuperController.class, CALLS_REAL_METHODS);
 
     private OrganisationsDetailResponse organisationsDetailResponse;
+
+    private BulkCustomerOrganisationsDetailResponse bulkCustomerOrganisationsDetailResponse;
 
     private OrganisationsDetailResponseV2 organisationsDetailResponseV2;
     private OrganisationService organisationServiceMock;

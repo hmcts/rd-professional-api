@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Professi
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
@@ -84,6 +86,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateBulkCustomerRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
@@ -97,6 +100,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDelete
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeLeadingAndTailingSpaces;
 
 @RestController
 @Slf4j
@@ -186,6 +190,9 @@ public abstract class SuperController {
                 .status(201)
                 .body(organisationResponse);
     }
+
+
+
 
     protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status,
                                                                    Integer page, Integer size) {
@@ -537,6 +544,30 @@ public abstract class SuperController {
         }
         return responseEntity;
     }
+
+    protected ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomerId(
+                                                                            BulkCustomerRequest bulkCustomerRequest) {
+        var bulkCustId = removeLeadingAndTailingSpaces(bulkCustomerRequest.getBulkCustomerId());
+        var sidamId = removeLeadingAndTailingSpaces(bulkCustomerRequest.getIdamId());
+
+
+
+        organisationCreationRequestValidator.validateForEmptyOrNullInput(bulkCustId, sidamId);
+        validateBulkCustomerRequest(bulkCustomerRequest);
+        organisationCreationRequestValidator.validateInputForSpecialCharacter(bulkCustId);
+        organisationCreationRequestValidator.validateInputForSpecialCharacter(sidamId);
+
+        log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomerId Valdiation success", loggingComponentName);
+
+        BulkCustomerOrganisationsDetailResponse bulkCustomerDetailResponse = null;
+
+        if (StringUtils.isNotEmpty(bulkCustId) && StringUtils.isNotEmpty(sidamId)) {
+            bulkCustomerDetailResponse = organisationService
+                    .retrieveOrganisationDetailsForBulkCustomer(bulkCustId,sidamId);
+        }
+        return ResponseEntity.status(200).body(bulkCustomerDetailResponse);
+    }
+
 
     protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
                                                             String orgId, String userId) {

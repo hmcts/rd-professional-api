@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +16,10 @@ import java.util.UUID;
 
 import static jakarta.persistence.GenerationType.AUTO;
 
-@Entity
+@Entity(name = "org_attributes")
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "org_attributes")
 public class OrgAttribute implements Serializable {
 
     @Id

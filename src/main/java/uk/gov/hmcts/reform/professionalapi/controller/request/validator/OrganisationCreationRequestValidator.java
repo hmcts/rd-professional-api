@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
@@ -24,9 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
@@ -135,6 +139,36 @@ public class OrganisationCreationRequestValidator {
             throw new EmptyResultDataAccessException(1);
         }
     }
+
+
+    public void validateForEmptyOrNullInput(String bulkCustomerId, String idamId) {
+        if (isEmptyValue(bulkCustomerId) || isEmptyValue(idamId)) {
+            throw new InvalidRequest("Invalid Request");
+        }
+    }
+
+
+    public static void validateBulkCustomerRequest(BulkCustomerRequest bulkCustomerRequest) {
+        if (StringUtils.isBlank(bulkCustomerRequest.getBulkCustomerId())
+                || StringUtils.isBlank(bulkCustomerRequest.getIdamId())
+                || null == bulkCustomerRequest.getBulkCustomerId()
+                || null == bulkCustomerRequest.getIdamId()) {
+            throw new InvalidRequest("Mandatory fields are blank or null");
+        }
+
+    }
+
+    public void validateInputForSpecialCharacter(String inputRequest) {
+        if (isRegexSatisfied(inputRequest, ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
+            throw new InvalidRequest("Invalid Request");
+        }
+    }
+
+    public static boolean isRegexSatisfied(String stringToEvaluate, String regex) {
+        Matcher matcher = Pattern.compile(regex).matcher(stringToEvaluate);
+        return matcher.find();
+    }
+
 
     public void isOrganisationActive(Organisation organisation) {
 
@@ -268,6 +302,7 @@ public class OrganisationCreationRequestValidator {
         }
 
     }
+
 
     public boolean isEmptyValue(String value) {
         return value != null && value.trim().isEmpty();

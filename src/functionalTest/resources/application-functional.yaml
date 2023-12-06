@@ -10,10 +10,11 @@ oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:}
 idam.auth.clientId: ${OAUTH2_CLIENT_ID:}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}
 s2s-secret: ${PROFESSIONAL_API_S2S_SECRET:}
-
+spring.jpa.properties.hibernate.default_schema: dbrefdata
 spring.flyway.enabled: false
 ## Secure roles configuration 1
 prd.security.roles.hmcts-admin: prd-admin
+prd.security.roles.caseworker-civil-admin: caseworker-civil-admin
 prd.security.roles.pui-user-manager: pui-user-manager
 prd.security.roles.pui-organisation-manager: pui-organisation-manager
 prd.security.roles.pui-finance-manager: pui-finance-manager
