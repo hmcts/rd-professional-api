@@ -44,13 +44,11 @@ def versions = [
         launchDarklySdk : '5.10.9',
         junit           : '5.9.2',
         junitPlatform   : '1.9.2',
-
         log4j           : '2.20.0',
         reformS2sClient : '5.1.0',
         feign           : '3.8.0',
         bytebuddy       : '1.12.7',
-        testContainer_postgresql: '1.17.6',
-         bouncycastle    : '1.77',
+        bouncycastle    : '1.77',
         logback         : '1.2.13'
 ]
 
