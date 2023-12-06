@@ -171,4 +171,4 @@ azure:
     blob-url-suffix: ${BLOB_URL_SUFFIX:BLOB_URL_SUFFIX}
 
 group-access:
-  organisation-profile-ids: ${GROUP_ACCESS_ORGANISATION_PROFILE_IDS:SOLICITOR}
+  organisation-profile-ids: ${GROUP_ACCESS_ORGANISATION_PROFILE_IDS:SOLICITOR_PROFILE}
