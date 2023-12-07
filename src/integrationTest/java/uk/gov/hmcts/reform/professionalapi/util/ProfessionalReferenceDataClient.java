@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -61,6 +62,7 @@ public class ProfessionalReferenceDataClient {
     private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI"
             + "6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private final Integer prdApiPort;
+    private final JwtDecoder jwtDecode;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate = new RestTemplate();
     private String baseUrl;
@@ -74,8 +76,11 @@ public class ProfessionalReferenceDataClient {
     public Map<String, String> bearerTokenMap = new HashMap<>();
 
 
-    public ProfessionalReferenceDataClient(int port, String issuer, Long tokenExpirationInterval) {
+    public ProfessionalReferenceDataClient(int port, String issuer,
+                                           Long tokenExpirationInterval,
+                                           JwtDecoder jwtDecode) {
         this.prdApiPort = port;
+        this.jwtDecode = jwtDecode;
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
         this.baseV2Url = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH;
@@ -664,7 +669,7 @@ public class ProfessionalReferenceDataClient {
 
     public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
         String[] bearerTokenArray = bearerToken.split(" ");
-        when(JwtDecoderMockBuilder.getJwtDecoder().decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
+        when(jwtDecode.decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
     }
 
 

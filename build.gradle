@@ -48,8 +48,8 @@ def versions = [
         reformS2sClient : '5.1.0',
         feign           : '3.8.0',
         bytebuddy       : '1.12.7',
-        bouncycastle    : '1.77',
-        logback         : '1.2.13'
+        bouncycastle    : '1.77'
+
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
@@ -393,11 +393,11 @@ dependencies {
 
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
 
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
+
     testImplementation group: 'org.apache.camel', name: 'camel-test', version: versions.camel
     testImplementation group: 'org.apache.camel', name: 'camel-test-spring-junit5', version: versions.camel
     testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
+
 
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-rc-1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
@@ -574,6 +574,11 @@ dependencyManagement {
         dependencySet(group: 'commons-fileupload', version: '1.5') {
             entry 'commons-fileupload'
         }
+        //CVE-2021-22044
+        dependencySet(group: 'org.springframework.cloud', version: '3.1.5') {
+            entry 'spring-cloud-starter-openfeign'
+            entry 'spring-cloud-openfeign-core'
+        }
 
 //        Resolves CVE-2023-4586
         dependencySet(group: 'io.netty', version: '4.1.100.Final') {
@@ -638,7 +643,16 @@ configurations.all {
         }
     }
 }
-
+dependencies {
+    modules {
+        module("org.bouncycastle:bcpkix-jdk15on") {
+            replacedBy("org.bouncycastle:bcpkix-jdk18on")
+        }
+        module("org.bouncycastle:bcprov-jdk15on") {
+            replacedBy("org.bouncycastle:bcprov-jdk18on")
+        }
+    }
+}
 // this is required to force Java running on the Azure Windows Server OS into using
 // UTF-8 as the default character set instead of windows-1252 which causes issues.
 // this setting only applies when running via gradle bootRun -- see web.config for the
