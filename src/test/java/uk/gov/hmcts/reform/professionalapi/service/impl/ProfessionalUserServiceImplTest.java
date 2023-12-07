@@ -918,9 +918,11 @@ class ProfessionalUserServiceImplTest {
         accessTypes.add(accessType1);
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         userProfileUpdatedData.setAccessTypes(accessTypes);
-        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
 
-        Optional<UserConfiguredAccess> optUca = Optional.of(userConfiguredAccess);
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
+
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
                 .thenReturn(optUca);
 
@@ -928,7 +930,7 @@ class ProfessionalUserServiceImplTest {
                 uuidStr);
 
 
-        verify(userConfiguredAccessRepository, times(1)).delete(userConfiguredAccess);
+        verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
         verify(userConfiguredAccessRepository, times(1)).saveAll(any());
     }
 
@@ -941,9 +943,10 @@ class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
         when(professionalUserMock.getId()).thenReturn(uuid);
 
-        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
 
-        Optional<UserConfiguredAccess> optUca = Optional.of(userConfiguredAccess);
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
                 .thenReturn(optUca);
 
@@ -952,7 +955,7 @@ class ProfessionalUserServiceImplTest {
                 uuidStr);
 
 
-        verify(userConfiguredAccessRepository, times(1)).delete(userConfiguredAccess);
+        verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
         verify(userConfiguredAccessRepository, times(0)).saveAll(any());
     }
 
@@ -970,13 +973,14 @@ class ProfessionalUserServiceImplTest {
         accessTypes.add(accessType1);
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         userProfileUpdatedData.setAccessTypes(accessTypes);
-        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
 
-        Optional<UserConfiguredAccess> optUca = Optional.of(userConfiguredAccess);
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
                 .thenReturn(optUca);
 
-        doThrow(new IllegalArgumentException()).when(userConfiguredAccessRepository).delete(userConfiguredAccess);
+        doThrow(new IllegalArgumentException()).when(userConfiguredAccessRepository).deleteAll(optUca);
 
         try {
             professionalUserService.modifyUserConfiguredAccess(userProfileUpdatedData,
@@ -1003,9 +1007,11 @@ class ProfessionalUserServiceImplTest {
         accessTypes.add(accessType1);
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         userProfileUpdatedData.setAccessTypes(accessTypes);
-        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
 
-        Optional<UserConfiguredAccess> optUca = Optional.of(userConfiguredAccess);
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
+
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
                 .thenReturn(optUca);
 
@@ -1019,7 +1025,7 @@ class ProfessionalUserServiceImplTest {
             assertThat(eae.getMessage()).contains("002");
         }
 
-        verify(userConfiguredAccessRepository, times(1)).delete(userConfiguredAccess);
+        verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
     }
 
     void callModifyRolesForUser(HttpStatus status) {
