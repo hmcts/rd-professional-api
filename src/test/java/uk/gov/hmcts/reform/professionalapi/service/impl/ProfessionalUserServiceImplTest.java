@@ -45,7 +45,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
@@ -54,7 +53,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -88,8 +86,6 @@ class ProfessionalUserServiceImplTest {
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
     private final FeignException feignExceptionMock = mock(FeignException.class);
-    private final UserConfiguredAccessRepository userConfiguredAccessRepository
-            = mock(UserConfiguredAccessRepository.class);
 
     private final RefDataUtil refDataUtil = mock(RefDataUtil.class);
 
@@ -102,7 +98,7 @@ class ProfessionalUserServiceImplTest {
             false);
 
     private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
-            organisationRepository, professionalUserRepository, userConfiguredAccessRepository,
+            organisationRepository, professionalUserRepository,
             userAttributeRepository, prdEnumRepository, userAttributeService, userProfileFeignClient);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
@@ -940,9 +936,6 @@ class ProfessionalUserServiceImplTest {
 
         when(professionalUserPage.getContent()).thenReturn(professionalUserList);
 
-        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_IdIn(any()))
-                .thenReturn(Collections.emptyList());
-
         LocalDateTime currentDateTime = LocalDateTime.of(2023, 12 ,6, 13,36,25);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
         String since = currentDateTime.format(formatter);
@@ -954,7 +947,6 @@ class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByLastUpdatedBefore(any(), any());
-        verify(userConfiguredAccessRepository, times(1)).findByUserConfiguredAccessId_ProfessionalUser_IdIn(any());
     }
 
     @Test
@@ -967,9 +959,6 @@ class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByUserIdentifier(any()))
                 .thenReturn(professionalUser);
 
-        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))
-                .thenReturn(Collections.emptyList());
-
         ResponseEntity<Object> responseEntity = professionalUserService.findSingleRefreshUser(userIdentifier);
 
         assertThat(responseEntity.getBody()).isNotNull();
@@ -977,7 +966,6 @@ class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByUserIdentifier(any());
-        verify(userConfiguredAccessRepository, times(1)).findByUserConfiguredAccessId_ProfessionalUser_Id(any());
     }
 
     @Test

@@ -33,13 +33,13 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,7 +59,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
-    UserConfiguredAccessRepository userConfiguredAccessRepository;
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
 
@@ -70,7 +69,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ProfessionalUserServiceImpl(
             OrganisationRepository organisationRepository,
             ProfessionalUserRepository professionalUserRepository,
-            UserConfiguredAccessRepository userConfiguredAccessRepository,
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
             UserAttributeServiceImpl userAttributeService,
@@ -78,7 +76,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
-        this.userConfiguredAccessRepository = userConfiguredAccessRepository;
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
         this.userAttributeService = userAttributeService;
@@ -110,11 +107,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 professionalUserRepository.findByLastUpdatedBefore(formattedSince, pageable);
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
 
-        List<UUID> uuids = professionalUsers.stream()
-                .map(ProfessionalUser::getId)
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+                .map(ProfessionalUser::getUserConfiguredAccesses)
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-        List<UserConfiguredAccess> userConfiguredAccesses
-                = userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_IdIn(uuids);
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
                 professionalUsersPage, professionalUsers, userConfiguredAccesses
@@ -129,9 +125,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         List<UserConfiguredAccess> userConfiguredAccesses;
 
         if (professionalUser != null) {
-            userConfiguredAccesses = userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(
-                    professionalUser.getId()
-            );
+            userConfiguredAccesses = professionalUser.getUserConfiguredAccesses();
         } else {
             throw new ResourceNotFoundException("Professional user with identifier: " + userId + " not found");
         }
