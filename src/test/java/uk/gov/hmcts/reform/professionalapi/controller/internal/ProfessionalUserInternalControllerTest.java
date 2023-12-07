@@ -15,11 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -52,6 +52,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 
 @ExtendWith(MockitoExtension.class)
@@ -266,7 +267,9 @@ class ProfessionalUserInternalControllerTest {
 
         Integer page = 0;
         Integer size = 10;
-        Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER));
+        Pageable pageable = createPageableObject(page, size,
+                Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
+                .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
 

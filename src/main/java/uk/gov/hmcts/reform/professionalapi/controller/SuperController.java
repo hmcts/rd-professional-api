@@ -86,6 +86,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateBulkCustomerRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
@@ -614,7 +615,8 @@ public abstract class SuperController {
 
         if (page != null && userId == null) {
             Pageable pageable =
-                    createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER));
+                    createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
+                            .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
             responseEntity = professionalUserService.findRefreshUsers(since, pageable);
         } else {
             responseEntity = professionalUserService.findSingleRefreshUser(userId);

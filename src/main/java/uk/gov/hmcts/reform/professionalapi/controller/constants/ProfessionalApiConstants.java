@@ -175,4 +175,5 @@ public class ProfessionalApiConstants {
     public static final String INVALID_SINCE_TIMESTAMP = "Field 'since' is in a invalid format. Expected format: ";
     public static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String NESTED_ORG_IDENTIFIER = "organisation.organisationIdentifier";
+    public static final String USER_IDENTIFIER = "userIdentifier";
 }

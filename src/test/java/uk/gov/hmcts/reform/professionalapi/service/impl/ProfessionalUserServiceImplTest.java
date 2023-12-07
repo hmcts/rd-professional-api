@@ -59,8 +59,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -936,7 +936,7 @@ class ProfessionalUserServiceImplTest {
 
         when(professionalUserPage.getContent()).thenReturn(professionalUserList);
 
-        LocalDateTime currentDateTime = LocalDateTime.of(2023, 12 ,6, 13,36,25);
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
         String since = currentDateTime.format(formatter);
 
