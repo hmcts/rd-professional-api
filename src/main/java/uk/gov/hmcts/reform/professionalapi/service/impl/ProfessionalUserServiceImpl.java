@@ -223,13 +223,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
                                            String userId) {
 
-        Optional<UserConfiguredAccess> foundAccess = Optional.empty();
         ProfessionalUser professionalUser = findProfessionalUserByUserIdentifier(userId);
         try {
-            foundAccess = userConfiguredAccessRepository
+            List<UserConfiguredAccess> foundAccess = userConfiguredAccessRepository
                     .findByUserConfiguredAccessId_ProfessionalUser_Id(professionalUser.getId());
-            if (foundAccess.isPresent()) {
-                userConfiguredAccessRepository.delete(foundAccess.get());
+            if (!foundAccess.isEmpty()) {
+                userConfiguredAccessRepository.deleteAll(foundAccess);
             }
         } catch (Exception ex) {
             throw new ExternalApiException(HttpStatus.valueOf(500), "001 error while deleting user access records");
