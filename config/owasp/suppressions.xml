@@ -56,9 +56,21 @@ file name: launchdarkly-java-server-sdk-5.10.7.jar (shaded: org.yaml:snakeyaml:1
     </suppress>
 
     <suppress>
-        <cve>CVE-2023-5072</cve>
-        <cve>CVE-2023-5590</cve>
-        <cve>CVE-2023-4586</cve>
+        <notes><![CDATA[
+             file name: launchdarkly-java-server-sdk-5.1.1.jar (shaded: com.google.guava:guava:28.2-jre)
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
+        <cve>CVE-2020-8908</cve>
+    </suppress>
+    <suppress>
+        <notes>Removing this once fixed by DTSRD-792</notes>
+        <cve>CVE-2023-34442</cve>
+        <cve>CVE-2022-45046</cve>
+        <cve>CVE-2023-33202</cve>
+        <cve>CVE-2023-34055</cve>
+        <cve>CVE-2023-46589</cve>
+        <cve>CVE-2023-34055</cve>
+        <cve>CVE-2023-6378</cve>
     </suppress>
 
 </suppressions>
