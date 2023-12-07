@@ -426,11 +426,9 @@ public class RefDataUtil {
                 .getUserProfiles()) {
             for (ProfessionalUser pu : professionalUsers) {
                 if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
-                    if (professionalUsersResponse.getAccessTypes() == null) {
-                        professionalUsersResponse.setAccessTypes(new ArrayList<>());
-                    }
                     professionalUsersResponse.getAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
                             .map(uca -> AccessType.fromUserConfiguredAccess(uca)).collect(toList()));
+                    professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
                 }
             }
         }
@@ -441,11 +439,9 @@ public class RefDataUtil {
         for (ProfessionalUsersResponse professionalUsersResponse : professionalUsersEntityResponse.getUsers()) {
             for (ProfessionalUser pu : professionalUsers) {
                 if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
-                    if (professionalUsersResponse.getAccessTypes() == null) {
-                        professionalUsersResponse.setAccessTypes(new ArrayList<>());
-                    }
                     professionalUsersResponse.getAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
                             .map(uca -> AccessType.fromUserConfiguredAccess(uca)).collect(toList()));
+                    professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
                 }
             }
         }

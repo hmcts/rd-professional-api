@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -113,6 +114,7 @@ class RefDataUtilTest {
         professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
         professionalUser.setOrganisation(organisation);
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setLastUpdated(LocalDateTime.of(2023, 12, 31, 23, 59, 59, 987654321));
         userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         userAccountMap = new UserAccountMap(userAccountMapId);
         profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName",
@@ -1169,6 +1171,12 @@ class RefDataUtilTest {
         assertThat(output.getOrganisationStatus()).isEqualTo(OrganisationStatus.ACTIVE.name());
         assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId1");
         assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId2");
+        assertThat(output.getUserProfiles()).hasSize(1);
+        assertThat(output.getUserProfiles().get(0).getEmail()).isEqualTo("soMeone@somewhere.com");
+        assertThat(output.getUserProfiles().get(0).getLastName()).isEqualTo("some-lname");
+        assertThat(output.getUserProfiles().get(0).getFirstName()).isEqualTo("some-fname");
+        assertThat(output.getUserProfiles().get(0).getLastUpdated().toString())
+                .isEqualTo("2023-12-31T23:59:59.987654321");
     }
 
     @Test

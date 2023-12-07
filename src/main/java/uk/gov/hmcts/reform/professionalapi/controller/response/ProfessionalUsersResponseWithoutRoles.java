@@ -7,6 +7,8 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -25,7 +27,9 @@ public class ProfessionalUsersResponseWithoutRoles {
     @JsonProperty
     public String idamStatus;
     @JsonProperty
-    public List<AccessType> accessTypes;
+    private LocalDateTime lastUpdated;
+    @JsonProperty
+    public List<AccessType> accessTypes = new ArrayList<>();
 
     public ProfessionalUsersResponseWithoutRoles(ProfessionalUser user) {
         this.userIdentifier = user.getUserIdentifier();
@@ -33,9 +37,7 @@ public class ProfessionalUsersResponseWithoutRoles {
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
         this.idamStatus = user.getIdamStatus() == null ? "" : user.getIdamStatus().toString();
+        this.lastUpdated = user.getLastUpdated();
     }
 
-    public void setAccessTypes(List<AccessType> accessTypes) {
-        this.accessTypes = accessTypes;
-    }
 }
