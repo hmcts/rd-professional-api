@@ -1029,4 +1029,93 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     }
 
+    @Test
+    void return_404_when_invalid_status_send_in_the_request_param_for_v2() {
+
+        String organisationIdentifier = createOrganisationRequest("ACTIVE");
+        assertThat(organisationIdentifier).isNotEmpty();
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusForV2ApiTest("ACTIV", hmctsAdmin);
+        assertThat(orgResponse.get("http_status").toString().contains("404"));
+    }
+
+    @Test
+    void persists_and_return_empty_organisation_details_for_v2_when_no_status_found_in_the_db() {
+
+        String organisationIdentifier = createOtherOrganisationRequest("ACTIVE");
+        assertThat(organisationIdentifier).isNotEmpty();
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusForV2ApiTest(OrganisationStatus
+                        .ACTIVE.name(), puiCaseManager);
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
+    public void get_organisations_details_for_v2_by_invalid_status_param_returns_400() {
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusForV2ApiTest("INVALID,ACTIVE", hmctsAdmin);
+
+        assertThat(orgResponse.get("http_status").toString()).contains("400");
+    }
+
+
+    @Test
+    void error_if_organisation_id_invalid_for_v2_api() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisationForV2Api("123",
+                hmctsAdmin);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    void error_if_organisation_id_invalid_for_v2_ext_api() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(null,
+                puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    void error_if_organisation_id_not_found_for_v2_api() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisationForV2Api("11AA116",
+                hmctsAdmin);
+        assertThat(response.get("http_status")).isEqualTo("404");
+    }
+
+    @Test
+    void forbidden_status_when_user_try_access_organisation_id_without_role_access_for_v2() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisationForV2Api("11AA116",
+                "dummyrole");
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    void forbidden_for_v2_if_pui_case_manager_user_try_access_organisation_id_without_role_access() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api("11AA116",
+                puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    void forbidden_for_v2_if_pui_user_manager_try_access_organisation_id_without_role_access() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api("11AA116",
+                puiUserManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    void forbidden_for_v2_if_user_does_not_exist_in_org_pui_finance_manager_try_access_organisation_id() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api("11AA116",
+                puiFinanceManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    void forbidden_for_v2_if_user_is_null_in_org_pui_finance_manager_try_access_organisation_id() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(null,
+                puiFinanceManager);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+
+
 }
