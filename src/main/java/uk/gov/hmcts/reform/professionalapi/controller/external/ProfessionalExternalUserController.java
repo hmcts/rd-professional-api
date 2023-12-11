@@ -134,7 +134,7 @@ public class ProfessionalExternalUserController extends SuperController {
     }
 
     @Operation(
-            summary = "Modify the Roles or Status of a User with the given ID",
+            summary = "Modify the User Configured Acces and Roles or Status of a User with the given ID",
             description = "**IDAM Roles to access API** : <br> pui-user-manager",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
@@ -175,7 +175,7 @@ public class ProfessionalExternalUserController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured("pui-user-manager")
-    public ResponseEntity<Object> modifyRolesForExistingUserOfExternalOrganisation(
+    public ResponseEntity<Object> modifyUserConfiguredAccessAndRolesForExistingUserOfExternalOrganisation(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "userProfileUpdatedData")
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @Parameter(hidden = true) @OrgId String orgId,
@@ -183,9 +183,8 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") String origin
     ) {
 
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of(origin));
-
+        return professionalUserService
+                .modifyUserConfiguredAccessAndRoles(userProfileUpdatedData, userId, Optional.of(origin));
     }
 
     @Operation(

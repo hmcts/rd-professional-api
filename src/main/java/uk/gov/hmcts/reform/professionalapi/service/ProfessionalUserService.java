@@ -42,5 +42,8 @@ public interface ProfessionalUserService {
     ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable);
 
     ResponseEntity<Object> findSingleRefreshUser(String userId);
+
+    ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
+                                                              String userId, Optional<String> origin);
 }
 
