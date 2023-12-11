@@ -1,9 +1,10 @@
 spring:
-  flyway.locations: classpath:db/migration
+  flyway:
+    schemas: DBREFDATA
+    locations: classpath:db/migration
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
+    open-in-view: ${JPA_OPEN_IN_VIEW:true}
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
@@ -11,12 +12,12 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+    show-sql: true
 
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:dbrefdata
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
-
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
