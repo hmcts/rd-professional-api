@@ -161,6 +161,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
+    protected static final String LAST_UPDATED = "lastUpdated";
+    protected static final String ACCESS_TYPES = "accessTypes";
     public static final String APPLICATION_JSON = "application/json";
 
     @MockBean
@@ -399,6 +401,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
         List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
         return users.get(0).getId().toString();
+    }
+
+    public String retrieveSuperUserIdentifierFromOrganisationId(String orgId) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        return users.get(0).getUserIdentifier();
     }
 
     public String retrieveOrganisationIdFromSuperUserId(String userId) {
