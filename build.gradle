@@ -631,7 +631,7 @@ resolutionStrategy.eachDependency { details ->
         details.useVersion versions.bouncycastle
     }
 }
-}
+
 
 dependencies {
     modules {
