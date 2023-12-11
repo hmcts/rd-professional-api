@@ -39,6 +39,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -258,8 +259,8 @@ class ProfessionalUserInternalControllerTest {
     void test_GetRefreshUsersWithSince() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         AccessType accessType = new AccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", List.of(accessType));
-        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(accessType));
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(Set.of(refreshUser), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
@@ -289,8 +290,8 @@ class ProfessionalUserInternalControllerTest {
     void test_GetRefreshUsers_SingleUser() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         AccessType accessType = new AccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", List.of(accessType));
-        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(accessType));
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(Set.of(refreshUser), false);
 
         Integer page = 0;
         Integer size = 10;

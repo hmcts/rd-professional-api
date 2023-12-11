@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +14,7 @@ public class GetRefreshUsersResponseTest {
     @Test
     void test_should_hold_values_after_creation() {
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse();
-        getRefreshUsersResponse.setUsers(new ArrayList<>());
+        getRefreshUsersResponse.setUsers(new HashSet<>());
         getRefreshUsersResponse.setMoreAvailable(false);
 
         assertThat(getRefreshUsersResponse.getUsers()).isNotNull();

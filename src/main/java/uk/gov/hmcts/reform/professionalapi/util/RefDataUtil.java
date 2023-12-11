@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -427,7 +428,7 @@ public class RefDataUtil {
                                                                    List<UserConfiguredAccess> userConfiguredAccesses) {
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse();
         getRefreshUsersResponse.setMoreAvailable(professionalUsersPage != null && !professionalUsersPage.isLast());
-        List<RefreshUser> refreshUserList = new ArrayList<>();
+        Set<RefreshUser> refreshUserList = new HashSet<>();
 
         for (ProfessionalUser professionalUser : professionalUsers) {
             RefreshUser refreshUser = new RefreshUser();
@@ -436,7 +437,7 @@ public class RefDataUtil {
             refreshUser.setOrganisationIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
             refreshUserList.add(refreshUser);
 
-            List<AccessType> accessTypes = new ArrayList<>();
+            Set<AccessType> accessTypes = new HashSet<>();
 
             for (UserConfiguredAccess uca : userConfiguredAccesses) {
                 String ucaUserIdentifier = uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier();
@@ -459,7 +460,7 @@ public class RefDataUtil {
 
     public static GetRefreshUsersResponse buildEmptyGetRefreshUsersResponse() {
         GetRefreshUsersResponse response = new GetRefreshUsersResponse();
-        response.setUsers(new ArrayList<>());
+        response.setUsers(new HashSet<>());
         return response;
     }
 
