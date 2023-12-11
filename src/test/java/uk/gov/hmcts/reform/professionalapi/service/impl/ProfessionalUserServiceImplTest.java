@@ -60,7 +60,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -98,8 +97,8 @@ class ProfessionalUserServiceImplTest {
             false);
 
     private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
-            organisationRepository, professionalUserRepository,
-            userAttributeRepository, prdEnumRepository, userAttributeService, userProfileFeignClient);
+            organisationRepository, professionalUserRepository, userAttributeRepository,
+            prdEnumRepository, userAttributeService, userProfileFeignClient);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname", "some-email", organisation);
@@ -963,24 +962,6 @@ class ProfessionalUserServiceImplTest {
 
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        verify(professionalUserRepository, times(1))
-                .findByUserIdentifier(any());
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void test_findSingleRefreshUser_ThrowsResourceNotFoundException() {
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
-                "some@email.com", organisation);
-        professionalUser.setId(UUID.randomUUID());
-
-        when(professionalUserRepository.findByUserIdentifier(any()))
-                .thenReturn(null);
-
-        Throwable throwable = assertThrows(ResourceNotFoundException.class, () ->
-                professionalUserService.findSingleRefreshUser(userIdentifier));
-        assertEquals(throwable.getMessage(), "Professional user with identifier: " + userIdentifier + " not found");
 
         verify(professionalUserRepository, times(1))
                 .findByUserIdentifier(any());

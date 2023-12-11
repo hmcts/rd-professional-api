@@ -457,6 +457,12 @@ public class RefDataUtil {
         return getRefreshUsersResponse;
     }
 
+    public static GetRefreshUsersResponse buildEmptyGetRefreshUsersResponse() {
+        GetRefreshUsersResponse response = new GetRefreshUsersResponse();
+        response.setUsers(new ArrayList<>());
+        return response;
+    }
+
     @Value("${loggingComponentName}")
     public void setLoggingComponentName(String loggingComponentName) {
         RefDataUtil.loggingComponentName = loggingComponentName;
