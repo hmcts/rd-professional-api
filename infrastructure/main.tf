@@ -7,6 +7,7 @@ locals {
   s2s_rg_prefix               = "rpe-service-auth-provider"
   s2s_key_vault_name          = var.env == "preview" || var.env == "spreview" ? join("-", ["s2s", "aat"]) : join("-", ["s2s", var.env])
   s2s_vault_resource_group    = var.env == "preview" || var.env == "spreview" ? join("-", [local.s2s_rg_prefix, "aat"]) : join("-", [local.s2s_rg_prefix, var.env])
+
 }
 
 data "azurerm_key_vault" "rd_key_vault" {
@@ -104,6 +105,7 @@ module "db-professional-ref-data-v16" {
       name = "dbrefdata"
     }
   ]
+
   subnet_suffix        = "expanded"
   pgsql_version        = "16"
   product              = var.product-v16
