@@ -19,7 +19,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -27,19 +26,16 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
@@ -51,7 +47,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -91,7 +86,6 @@ class SuperControllerTest {
     private PrdEnumRepository prdEnumRepository;
     private Organisation organisation;
     private ProfessionalUser professionalUser;
-    private UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private UserProfileUpdatedData userProfileUpdatedData;
@@ -116,7 +110,6 @@ class SuperControllerTest {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-        userProfileUpdateRequestValidator = mock(UserProfileUpdateRequestValidator.class);
         professionalUserRepository = mock(ProfessionalUserRepository.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
@@ -127,8 +120,6 @@ class SuperControllerTest {
                 false, false, true);
         organisationsDetailResponseV2 = new OrganisationsDetailResponseV2(singletonList(organisation),
                 false, false, true,true);
-        userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
-                "lastName", IdamStatus.ACTIVE.name(), null, null, null);
 
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
@@ -446,33 +437,6 @@ class SuperControllerTest {
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
-    }
-
-    @Test
-    void testModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
-        roleAdditionResponse.setIdamMessage("some nessage");
-        roleAdditionResponse.setIdamStatusCode("200");
-        modifyUserRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(modifyUserRolesResponse);
-        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(body);
-
-        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData))
-                .thenReturn(userProfileUpdatedData);
-        when(professionalUserServiceMock.modifyRolesForUser(any(), any(), any())).thenReturn(responseEntity);
-
-        String userId = UUID.randomUUID().toString();
-        ResponseEntity<Object> actualData = superController.modifyRolesForUserOfOrganisation(userProfileUpdatedData,
-                userId, Optional.of("EXUI"));
-
-        assertThat(actualData).isNotNull();
-        assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        verify(userProfileUpdateRequestValidator, times(1)).validateRequest(userProfileUpdatedData);
-        verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData,
-                userId, Optional.of("EXUI"));
     }
 
     @Test

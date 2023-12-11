@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -51,7 +50,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
@@ -63,7 +61,6 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -128,8 +125,6 @@ public abstract class SuperController {
     protected PaymentAccountValidator paymentAccountValidator;
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
-    @Autowired
-    protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
     @Autowired
     protected MfaStatusService mfaStatusService;
     @Autowired
@@ -599,14 +594,6 @@ public abstract class SuperController {
 
         //delete the passed pba account numbers from the organisation
         paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
-    }
-
-    protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
-                                                                      String userId, Optional<String> origin) {
-
-        userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
-
-        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
     }
 
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {

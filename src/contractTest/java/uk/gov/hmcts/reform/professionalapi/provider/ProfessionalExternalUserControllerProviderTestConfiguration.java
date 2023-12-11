@@ -42,6 +42,9 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @MockBean
     UserConfiguredAccessRepository userConfiguredAccessRepository;
 
+    @MockBean
+    UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
+
     @Primary
     @Bean
     protected ProfessionalUserService professionalUserService() {
@@ -51,7 +54,8 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
                 prdEnumRepository,
                 userAttributeService,
                 userProfileFeignClient,
-                userConfiguredAccessRepository);
+                userConfiguredAccessRepository,
+                userProfileUpdateRequestValidator);
     }
 
     @MockBean
