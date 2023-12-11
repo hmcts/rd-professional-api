@@ -260,7 +260,7 @@ class ProfessionalUserInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         AccessType accessType = new AccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
         RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(accessType));
-        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(Set.of(refreshUser), false);
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
@@ -291,7 +291,7 @@ class ProfessionalUserInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         AccessType accessType = new AccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
         RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(accessType));
-        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(Set.of(refreshUser), false);
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         Integer page = 0;
         Integer size = 10;
