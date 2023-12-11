@@ -39,7 +39,7 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
 
-    void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData, String userId);
-
+    ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
+                                                              String userId, Optional<String> origin);
 }
 

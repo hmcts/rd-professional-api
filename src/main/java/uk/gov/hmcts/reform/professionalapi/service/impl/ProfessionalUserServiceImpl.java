@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
@@ -55,15 +56,17 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGet
 @Slf4j
 public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
+    public static final String ERROR_USER_CONFIGURED_DELETE = "001 error while deleting user access records";
+    public static final String ERROR_USER_CONFIGURED_CREATE = "002 error while creating user access records";
+
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
-
     UserAttributeServiceImpl userAttributeService;
     UserProfileFeignClient userProfileFeignClient;
-
     UserConfiguredAccessRepository userConfiguredAccessRepository;
+    UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
     @Autowired
     public ProfessionalUserServiceImpl(
@@ -73,7 +76,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             PrdEnumRepository prdEnumRepository,
             UserAttributeServiceImpl userAttributeService,
             UserProfileFeignClient userProfileFeignClient,
-            UserConfiguredAccessRepository userConfiguredAccessRepository) {
+            UserConfiguredAccessRepository userConfiguredAccessRepository,
+            UserProfileUpdateRequestValidator userProfileUpdateRequestValidator) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
@@ -82,6 +86,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         this.userAttributeService = userAttributeService;
         this.userProfileFeignClient = userProfileFeignClient;
         this.userConfiguredAccessRepository = userConfiguredAccessRepository;
+        this.userProfileUpdateRequestValidator = userProfileUpdateRequestValidator;
     }
 
     @Transactional
@@ -206,8 +211,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return professionalUserRepository.save(updatedProfessionalUser);
     }
 
-    @Override
-    public ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData,
+    private ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
                                                      String userId, Optional<String> origin) {
         try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId,
                 origin.orElse(""))) {
@@ -219,43 +223,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
     }
 
+    @Transactional
     @Override
-    public void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
-                                           String userId) {
+    public ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
+                                                                     String userId, Optional<String> origin) {
+        checkUserStatusIsActiveByUserId(userId);
+        modifyUserConfiguredAccess(userProfileUpdatedData, userId);
 
-        ProfessionalUser professionalUser = findProfessionalUserByUserIdentifier(userId);
-        try {
-            List<UserConfiguredAccess> foundAccess = userConfiguredAccessRepository
-                    .findByUserConfiguredAccessId_ProfessionalUser_Id(professionalUser.getId());
-            if (!foundAccess.isEmpty()) {
-                userConfiguredAccessRepository.deleteAll(foundAccess);
-            }
-        } catch (Exception ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(500), "001 error while deleting user access records");
-        }
-
-        if (userProfileUpdatedData.getAccessTypes() != null) {
-            try {
-                List<UserConfiguredAccess> all = userProfileUpdatedData.getAccessTypes().stream()
-                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .collect(Collectors.toList());
-                userConfiguredAccessRepository.saveAll(all);
-            } catch (Exception ex) {
-                throw new ExternalApiException(HttpStatus.valueOf(500), "002 error while creating user access records");
-            }
-        }
-    }
-
-    private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser, AccessType accessType) {
-        UserConfiguredAccess uca = new UserConfiguredAccess();
-        UserConfiguredAccessId ucaId = new UserConfiguredAccessId(
-                professionalUser, accessType.getJurisdictionId(),
-                accessType.getOrganisationProfileId(), accessType.getAccessTypeId()
-        );
-        uca.setUserConfiguredAccessId(ucaId);
-        uca.setEnabled(accessType.getEnabled());
-
-        return uca;
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
@@ -295,4 +270,52 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new AccessDeniedException(ERROR_MESSAGE_USER_MUST_BE_ACTIVE);
         }
     }
+
+    public ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData,
+                                                                    String userId, Optional<String> origin) {
+
+        userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
+
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+    }
+
+    private void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
+                                            String userId) {
+
+        ProfessionalUser professionalUser = findProfessionalUserByUserIdentifier(userId);
+        try {
+            List<UserConfiguredAccess> foundAccess = userConfiguredAccessRepository
+                    .findByUserConfiguredAccessId_ProfessionalUser_Id(professionalUser.getId());
+            if (!foundAccess.isEmpty()) {
+                userConfiguredAccessRepository.deleteAll(foundAccess);
+            }
+        } catch (Exception ex) {
+            throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_DELETE);
+        }
+
+        if (userProfileUpdatedData.getAccessTypes() != null) {
+            try {
+                List<UserConfiguredAccess> all = userProfileUpdatedData.getAccessTypes().stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                        .collect(Collectors.toList());
+                userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
+            }
+        }
+    }
+
+    private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser, AccessType accessType) {
+        UserConfiguredAccess uca = new UserConfiguredAccess();
+        UserConfiguredAccessId ucaId = new UserConfiguredAccessId(
+                professionalUser, accessType.getJurisdictionId(),
+                accessType.getOrganisationProfileId(), accessType.getAccessTypeId()
+        );
+        uca.setUserConfiguredAccessId(ucaId);
+        uca.setEnabled(accessType.getEnabled());
+
+        return uca;
+    }
+
+
 }
