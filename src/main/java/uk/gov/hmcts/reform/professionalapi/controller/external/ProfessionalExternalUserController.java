@@ -183,9 +183,8 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") String origin
     ) {
 
-        ResponseEntity<Object> response = professionalUserService
+        return professionalUserService
                 .modifyUserConfiguredAccessAndRoles(userProfileUpdatedData, userId, Optional.of(origin));
-        return response;
     }
 
     @Operation(
