@@ -23,7 +23,6 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-        default_schema: dbrefdata
   application:
     name: Professional Reference Data API
   profiles:
