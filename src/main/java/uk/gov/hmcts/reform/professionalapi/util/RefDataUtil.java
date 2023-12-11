@@ -435,7 +435,6 @@ public class RefDataUtil {
             refreshUser.setUserIdentifier(professionalUser.getUserIdentifier());
             refreshUser.setLastUpdated(professionalUser.getLastUpdated());
             refreshUser.setOrganisationIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
-            refreshUserList.add(refreshUser);
 
             Set<AccessType> accessTypes = new HashSet<>();
 
@@ -447,10 +446,13 @@ public class RefDataUtil {
                     accessType.setJurisdictionId(uca.getUserConfiguredAccessId().getJurisdictionId());
                     accessType.setOrganisationProfileId(uca.getUserConfiguredAccessId().getOrganisationProfileId());
                     accessType.setAccessTypeId(uca.getUserConfiguredAccessId().getAccessTypeId());
+                    accessType.setEnabled(uca.getEnabled());
                     accessTypes.add(accessType);
                 }
             }
             refreshUser.setAccessTypes(accessTypes);
+
+            refreshUserList.add(refreshUser);
         }
 
         getRefreshUsersResponse.setUsers(refreshUserList);
