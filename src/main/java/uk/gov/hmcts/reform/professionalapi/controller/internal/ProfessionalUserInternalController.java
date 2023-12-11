@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 
 
@@ -170,6 +172,39 @@ public class ProfessionalUserInternalController extends SuperController {
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of(origin));
 
     }
+
+    @Operation(
+            summary = "Retrieves list of users required for a refresh",
+            description = "**Bearer token not required to access API. Only a valid s2s token**",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization")
+            }
+    )
+    @Parameter(
+            name = "since",
+            description = "Timestamp to fetch users before. Expected format: " + SINCE_TIMESTAMP_FORMAT
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "List of Users and their details",
+            content = @Content(array = @ArraySchema(schema =
+            @Schema(implementation = GetRefreshUsersResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid request has been provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
 
     @GetMapping(
             path = "/users",
