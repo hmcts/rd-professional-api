@@ -428,14 +428,14 @@ public class RefDataUtil {
                                                                    List<UserConfiguredAccess> userConfiguredAccesses) {
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse();
         getRefreshUsersResponse.setMoreAvailable(professionalUsersPage != null && !professionalUsersPage.isLast());
-        Set<RefreshUser> refreshUserList = new HashSet<>();
+        Set<RefreshUser> refreshUserSet = new HashSet<>();
 
         for (ProfessionalUser professionalUser : professionalUsers) {
             RefreshUser refreshUser = new RefreshUser();
             refreshUser.setUserIdentifier(professionalUser.getUserIdentifier());
             refreshUser.setLastUpdated(professionalUser.getLastUpdated());
             refreshUser.setOrganisationIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
-            refreshUserList.add(refreshUser);
+            refreshUserSet.add(refreshUser);
 
             Set<AccessType> accessTypes = new HashSet<>();
 
@@ -453,7 +453,7 @@ public class RefDataUtil {
             refreshUser.setAccessTypes(accessTypes);
         }
 
-        getRefreshUsersResponse.setUsers(refreshUserList);
+        getRefreshUsersResponse.setUsers(refreshUserSet);
 
         return getRefreshUsersResponse;
     }
