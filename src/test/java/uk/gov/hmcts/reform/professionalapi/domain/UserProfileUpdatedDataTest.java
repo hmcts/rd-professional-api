@@ -24,8 +24,12 @@ class UserProfileUpdatedDataTest {
         rolesDelete.add(roleName1);
         rolesDelete.add(roleName2);
 
+        AccessType accessType1 = new AccessType("jurisdictionId", "organisationProfileId", "accessTypeId", false);
+        Set<AccessType> accessTypes = new HashSet<>();
+        accessTypes.add(accessType1);
+
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("test@test.com",
-                "fname", "lname", "ACTIVE", rolesAdd, rolesDelete);
+                "fname", "lname", "ACTIVE", rolesAdd, rolesDelete, accessTypes);
         userProfileUpdatedData.setRolesAdd(rolesAdd);
         userProfileUpdatedData.setRolesDelete(rolesDelete);
 

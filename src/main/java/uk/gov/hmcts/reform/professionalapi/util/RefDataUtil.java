@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -427,7 +428,7 @@ public class RefDataUtil {
             for (ProfessionalUser pu : professionalUsers) {
                 if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
                     professionalUsersResponse.getAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
-                            .map(uca -> AccessType.fromUserConfiguredAccess(uca)).collect(toList()));
+                            .map(uca -> fromUserConfiguredAccess(uca)).collect(toList()));
                     professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
                 }
             }
@@ -440,7 +441,7 @@ public class RefDataUtil {
             for (ProfessionalUser pu : professionalUsers) {
                 if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
                     professionalUsersResponse.getAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
-                            .map(uca -> AccessType.fromUserConfiguredAccess(uca)).collect(toList()));
+                            .map(uca -> fromUserConfiguredAccess(uca)).collect(toList()));
                     professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
                 }
             }
@@ -520,10 +521,16 @@ public class RefDataUtil {
             String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
             throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
-
-
-
     }
 
+    public static AccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        AccessType accessType = new AccessType();
+        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
+        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
+                .getOrganisationProfileId());
+        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
+        accessType.setEnabled(userConfiguredAccess.getEnabled());
 
+        return accessType;
+    }
 }

@@ -1,51 +1,30 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(MockitoExtension.class)
 class AccessTypeTest {
 
-    @Test
-    void test_fromUserConfiguredAccess() {
-        ProfessionalUser professionalUser = new ProfessionalUser();
-        UserConfiguredAccessId userConfiguredAccessId = new UserConfiguredAccessId(professionalUser,
-                "jurisdictionId", "organisationProfileId", "accessTypeId");
-        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess(userConfiguredAccessId, true);
-
-        AccessType accessType = AccessType.fromUserConfiguredAccess(userConfiguredAccess);
-
-        assertTrue(accessType.getEnabled());
-        assertThat(accessType.getJurisdictionId()).isEqualTo("jurisdictionId");
-        assertThat(accessType.getOrganisationProfileId()).isEqualTo("organisationProfileId");
-        assertThat(accessType.getAccessTypeId()).isEqualTo("accessTypeId");
-    }
+    private static final String ACCESS_TYPE_ID = "accessTypeId1";
+    private static final String JURISDICTION = "jurisdiction1";
+    private static final String ORG_PROFILE_ID = "organisationProfileId1";
+    private static final Boolean ENABLED = true;
 
     @Test
-    void test_AccessType() {
-        AccessType accessType = new AccessType("jurisdictionId", "organisationProfileId", "accessTypeId", true);
+    void test_should_hold_values_after_creation() {
+        AccessType accessType = new AccessType();
+        accessType.setAccessTypeId(ACCESS_TYPE_ID);
+        accessType.setJurisdictionId(JURISDICTION);
+        accessType.setOrganisationProfileId(ORG_PROFILE_ID);
+        accessType.setEnabled(ENABLED);
 
-        assertTrue(accessType.getEnabled());
-        assertThat(accessType.getJurisdictionId()).isEqualTo("jurisdictionId");
-        assertThat(accessType.getOrganisationProfileId()).isEqualTo("organisationProfileId");
-        assertThat(accessType.getAccessTypeId()).isEqualTo("accessTypeId");
-    }
-
-    @Test
-    void test_fromUserConfiguredAccessNoArgs() {
-        ProfessionalUser professionalUser = new ProfessionalUser();
-        UserConfiguredAccessId userConfiguredAccessId = new UserConfiguredAccessId(professionalUser,
-                "jurisdictionId", "organisationProfileId", "accessTypeId");
-        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
-        userConfiguredAccess.setUserConfiguredAccessId(userConfiguredAccessId);
-        userConfiguredAccess.setEnabled(true);
-
-        AccessType accessType = AccessType.fromUserConfiguredAccess(userConfiguredAccess);
-
-        assertTrue(accessType.getEnabled());
-        assertThat(accessType.getJurisdictionId()).isEqualTo("jurisdictionId");
-        assertThat(accessType.getOrganisationProfileId()).isEqualTo("organisationProfileId");
-        assertThat(accessType.getAccessTypeId()).isEqualTo("accessTypeId");
+        assertThat(accessType.getAccessTypeId()).isEqualTo(ACCESS_TYPE_ID);
+        assertThat(accessType.getJurisdictionId()).isEqualTo(JURISDICTION);
+        assertThat(accessType.getOrganisationProfileId()).isEqualTo(ORG_PROFILE_ID);
+        assertThat(accessType.getEnabled()).isEqualTo(ENABLED);
     }
 }
