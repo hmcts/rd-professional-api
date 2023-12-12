@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.otherOrganisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.otherOrganisationRequestWithAllFieldsAreUpdated;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.otherOrganisationRequestWithAllFieldsForSingletonOrgType;
 
 class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -346,6 +347,41 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     }
 
+    @Test
+    void return_error_when_organisaton_is_already_active_for_v2() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        OrganisationOtherOrgsCreationRequest organisationUpdateRequestV2 = otherOrganisationRequestWithAllFields();
+
+        organisationUpdateRequestV2.setStatusMessage("Active Organisation");
+        organisationUpdateRequestV2.setOrgType("HMRC-GOV");
+        organisationUpdateRequestV2.setStatus("ACTIVE");
+
+        String organisationIdentifier = createOrganisationRequestForV2();
+        professionalReferenceDataClient.updateOrganisationForV2Api(organisationUpdateRequestV2, hmctsAdmin,
+            organisationIdentifier);
+
+        OrganisationOtherOrgsCreationRequest organisationUpdateRequest =
+            otherOrganisationRequestWithAllFieldsForSingletonOrgType();
+        organisationUpdateRequest.setStatusMessage("Active Organisation");
+        organisationUpdateRequest.setStatus("ACTIVE");
+
+        String organisationIdentifier1 = createOrganisationRequestForSingletonOrgType();
+        Map<String, Object> responseForUpdateActiveOrgnaisation =
+            professionalReferenceDataClient.updateOrganisationForV2Api(organisationUpdateRequest, hmctsAdmin,
+                organisationIdentifier1);
+
+        assertThat(responseForUpdateActiveOrgnaisation.get("http_status")).isEqualTo("400");
+
+    }
+
+    public String createOrganisationRequestForSingletonOrgType() {
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest =
+            otherOrganisationRequestWithAllFieldsForSingletonOrgType();
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+            .createOrganisationV2(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
+    }
 
     @Test
     void entities_other_than_organisation_should_remain_unchanged_if_updated_and_should_returns_status_200() {
