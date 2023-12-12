@@ -26,8 +26,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
@@ -42,11 +44,13 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceI
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -874,5 +878,24 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         organisationUpdateRequest.setStatus(status);
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
+    }
+
+    public UserProfileUpdatedData createModifyUserConfiguredAccessData(String email, int numAccessTypes) {
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        Set<AccessType> accessTypes = new HashSet<>();
+        for (int i = 0; i < numAccessTypes; i++) {
+            AccessType accessType = new AccessType("Jurisdiction" + i,
+                    "Organisation" + i,
+                    "AccessType" + i, true);
+            accessTypes.add(accessType);
+        }
+
+        userProfileUpdatedData.setEmail(email);
+        userProfileUpdatedData.setAccessTypes(accessTypes);
+        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
+        userProfileUpdatedData.setRolesAdd(new HashSet<>());
+        userProfileUpdatedData.setRolesDelete(new HashSet<>());
+        return userProfileUpdatedData;
     }
 }
