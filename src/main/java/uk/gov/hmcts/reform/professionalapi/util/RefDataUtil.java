@@ -31,7 +31,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
+import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
@@ -359,7 +361,7 @@ public class RefDataUtil {
                 if (errorResponse != null) {
                     log.error("{}:: Response from UserProfileByEmail service call {}",
                         loggingComponentName, errorResponse.getErrorDescription());
-                }                
+                }
                 newUserResponse = new NewUserResponse();
             }
 
@@ -393,13 +395,69 @@ public class RefDataUtil {
         return deleteOrganisationResponse;
     }
 
-    public static ResponseEntity<Object> setOrgIdInGetUserResponse(ResponseEntity<Object> responseEntity,
-                                                                   String organisationIdentifier) {
+    public static ResponseEntity<Object> setCaseAccessInGetUserResponse(ResponseEntity<Object> responseEntity,
+                                                                        List<ProfessionalUser> professionalUsers) {
+        ResponseEntity<Object> newResponseEntity;
+        if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
+            ProfessionalUsersEntityResponse professionalUsersEntityResponse
+                    = (ProfessionalUsersEntityResponse) requireNonNull(responseEntity.getBody());
+
+            addAllAccessTypes(professionalUsersEntityResponse, professionalUsers);
+
+            newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(),
+                    responseEntity.getStatusCode());
+        } else {
+            ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                    = (ProfessionalUsersEntityResponseWithoutRoles) requireNonNull(responseEntity.getBody());
+
+            addAllAccessTypes(professionalUsersEntityResponseWithoutRoles, professionalUsers);
+
+            newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
+                    responseEntity.getHeaders(),
+                    responseEntity.getStatusCode());
+
+        }
+        return newResponseEntity;
+    }
+
+    private static void addAllAccessTypes(ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponse,
+                                   List<ProfessionalUser> professionalUsers) {
+        for (ProfessionalUsersResponseWithoutRoles professionalUsersResponse : professionalUsersEntityResponse
+                .getUserProfiles()) {
+            for (ProfessionalUser pu : professionalUsers) {
+                if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
+                    professionalUsersResponse.getAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
+                            .map(uca -> AccessType.fromUserConfiguredAccess(uca)).collect(toList()));
+                    professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
+                }
+            }
+        }
+    }
+
+    private static void addAllAccessTypes(ProfessionalUsersEntityResponse professionalUsersEntityResponse,
+                                          List<ProfessionalUser> professionalUsers) {
+        for (ProfessionalUsersResponse professionalUsersResponse : professionalUsersEntityResponse.getUsers()) {
+            for (ProfessionalUser pu : professionalUsers) {
+                if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
+                    professionalUsersResponse.getAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
+                            .map(uca -> AccessType.fromUserConfiguredAccess(uca)).collect(toList()));
+                    professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
+                }
+            }
+        }
+    }
+
+    public static ResponseEntity<Object> setOrgInfoInGetUserResponse(ResponseEntity<Object> responseEntity,
+                                                                   String organisationIdentifier,
+                                                                   OrganisationStatus organisationStatus,
+                                                                   List<String> organisationProfileIds) {
         ResponseEntity<Object> newResponseEntity;
         if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
             ProfessionalUsersEntityResponse professionalUsersEntityResponse
                     = (ProfessionalUsersEntityResponse) requireNonNull(responseEntity.getBody());
             professionalUsersEntityResponse.setOrganisationIdentifier(organisationIdentifier);
+            professionalUsersEntityResponse.setOrganisationStatus(organisationStatus.name());
+            professionalUsersEntityResponse.setOrganisationProfileIds(organisationProfileIds);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(),
                     responseEntity.getStatusCode());
         } else {
@@ -412,6 +470,8 @@ public class RefDataUtil {
             professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
 
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
+            professionalUsersEntityResponseWithoutRoles.setOrganisationStatus(organisationStatus.name());
+            professionalUsersEntityResponseWithoutRoles.setOrganisationProfileIds(organisationProfileIds);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
