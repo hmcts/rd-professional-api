@@ -9,8 +9,8 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +45,8 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         professionalReferenceDataClient
                 .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier(userIdentifier, 0, 10);
+        Map<String, Object> response = professionalReferenceDataClient
+                .findRefreshUsersWithUserIdentifier(userIdentifier, 0, 10);
         validateResponse(response, 1, 1);
     }
 
@@ -61,7 +62,8 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         professionalReferenceDataClient
                 .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier(userIdentifier, 0, 10);
+        Map<String, Object> response = professionalReferenceDataClient
+                .findRefreshUsersWithUserIdentifier(userIdentifier, 0, 10);
         validateResponse(response, 1, 2);
     }
 

@@ -252,11 +252,13 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findRefreshUsersWithSince(String since, Integer page, Integer size) {
-        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&page={page}&size={size}", since, page, size);
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&page={page}&size={size}", since,
+                page, size);
     }
 
     public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId, Integer page, Integer size) {
-        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}&page={page}&size={size}", userId, page, size);
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}&page={page}&size={size}",
+                userId, page, size);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
