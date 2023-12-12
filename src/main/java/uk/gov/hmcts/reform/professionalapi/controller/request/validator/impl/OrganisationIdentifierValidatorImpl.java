@@ -139,7 +139,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     private boolean isSinceInValidFormat(String since) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 
         try {
             LocalDateTime.parse(since, formatter);

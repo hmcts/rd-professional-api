@@ -15,7 +15,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
 
 class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -26,7 +25,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
 
         LocalDateTime dateTime = LocalDateTime.now();
         dateTime = dateTime.plusHours(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         String since = dateTime.format(formatter);
 
         Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 0, 10);
@@ -74,7 +73,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
 
         LocalDateTime dateTime = LocalDateTime.now();
         dateTime = dateTime.minusHours(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         String since = dateTime.format(formatter);
 
         Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 0, 10);

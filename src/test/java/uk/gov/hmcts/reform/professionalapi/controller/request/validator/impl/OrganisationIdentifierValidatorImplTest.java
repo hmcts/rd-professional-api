@@ -164,6 +164,6 @@ class OrganisationIdentifierValidatorImplTest {
     @Test
     void test_validateGetRefreshUsersParamsWithValidFormat() {
         assertDoesNotThrow(() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("2023-12-05 14:49:53", null));
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("2023-12-05T14:49:53", null));
     }
 }

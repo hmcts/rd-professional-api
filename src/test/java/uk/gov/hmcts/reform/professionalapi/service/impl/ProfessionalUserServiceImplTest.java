@@ -76,7 +76,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @ExtendWith(MockitoExtension.class)
@@ -1197,7 +1196,7 @@ class ProfessionalUserServiceImplTest {
         when(professionalUserPage.getContent()).thenReturn(professionalUserList);
 
         LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         String since = currentDateTime.format(formatter);
 
         ResponseEntity<Object> responseEntity = professionalUserService.findRefreshUsers(since, pageableMock);
