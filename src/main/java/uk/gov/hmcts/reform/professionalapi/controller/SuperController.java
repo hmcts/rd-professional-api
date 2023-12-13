@@ -601,7 +601,7 @@ public abstract class SuperController {
     protected ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size) {
         ResponseEntity<Object> responseEntity;
 
-        if (page != null && userId == null) {
+        if (since != null && page != null && size != null) {
             Pageable pageable =
                     createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
                             .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));

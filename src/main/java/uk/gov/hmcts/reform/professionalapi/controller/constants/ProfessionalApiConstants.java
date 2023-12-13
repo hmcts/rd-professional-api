@@ -170,10 +170,9 @@ public class ProfessionalApiConstants {
     public static final String ORG_TYPE_INVALID = "Org Type is invalid - can only contain Alphabetic,"
             + " empty space, ', - characters and must be less than 256 characters";
 
-    public static final String INVALID_MANDATORY_PARAMETER
-            = "Exactly one of the following parameters must be provided: 'since' or 'userId'";
-    public static final String INVALID_PAGE_INFORMATION = "Invalid page information";
-    public static final String INVALID_SINCE_TIMESTAMP = "Field 'since' is in a invalid format. Expected format: ";
+    public static final String INVALID_MANDATORY_PARAMETER = "001 missing/invalid parameter";
+    public static final String INVALID_PAGE_INFORMATION = "002 missing/invalid page information";
+    public static final String INVALID_SINCE_TIMESTAMP = "003 Field 'since' is in a invalid format. Expected format: ";
     public static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-ddTHH:mm:ss";
     public static final String NESTED_ORG_IDENTIFIER = "organisation.organisationIdentifier";
     public static final String USER_IDENTIFIER = "userIdentifier";

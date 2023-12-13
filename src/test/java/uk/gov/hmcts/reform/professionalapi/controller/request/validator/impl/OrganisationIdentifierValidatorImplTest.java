@@ -150,15 +150,15 @@ class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    void test_validateGetRefreshUsersParamsWhenBothParamsPresent() {
-        assertThrows(InvalidRequest.class,() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("since", "uid", null, null));
+    void test_validateGetRefreshUsersParamsWithInvalidPage() {
+        assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
+                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, null));
     }
 
     @Test
-    void test_validateGetRefreshUsersParamsWithInvalidPagination() {
+    void test_validateGetRefreshUsersParamsWithInvalidSize() {
         assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
-                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, null));
+                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, 0, null));
     }
 
     @Test
