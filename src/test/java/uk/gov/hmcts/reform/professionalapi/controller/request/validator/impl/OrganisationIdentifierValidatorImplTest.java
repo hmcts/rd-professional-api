@@ -157,14 +157,14 @@ class OrganisationIdentifierValidatorImplTest {
 
     @Test
     void test_validateGetRefreshUsersParamsWithInvalidPagination() {
-        assertThrows(InvalidRequest.class,() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, null));
+        assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
+                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, null));
     }
 
     @Test
     void test_validateGetRefreshUsersParamsWithBadDateTimeFormat() {
-        assertThrows(InvalidRequest.class,() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("Bad date time pattern", null, null, null));
+        assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
+                .validateGetRefreshUsersParams("Bad date time pattern", null, null, null));
     }
 
     @Test
