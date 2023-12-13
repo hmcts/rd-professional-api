@@ -438,18 +438,12 @@ public class RefDataUtil {
 
             Set<AccessType> accessTypes = new HashSet<>();
 
-            for (UserConfiguredAccess uca : userConfiguredAccesses) {
-                String ucaUserIdentifier = uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier();
+            accessTypes.addAll(userConfiguredAccesses.stream()
+                    .filter(uca -> uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier()
+                            .equals(professionalUser.getUserIdentifier()))
+                    .map(AccessType::fromUserConfiguredAccess)
+                    .collect(toList()));
 
-                if (ucaUserIdentifier.equals(professionalUser.getUserIdentifier())) {
-                    AccessType accessType = new AccessType();
-                    accessType.setJurisdictionId(uca.getUserConfiguredAccessId().getJurisdictionId());
-                    accessType.setOrganisationProfileId(uca.getUserConfiguredAccessId().getOrganisationProfileId());
-                    accessType.setAccessTypeId(uca.getUserConfiguredAccessId().getAccessTypeId());
-                    accessType.setEnabled(uca.getEnabled());
-                    accessTypes.add(accessType);
-                }
-            }
             refreshUser.setAccessTypes(accessTypes);
 
             refreshUserList.add(refreshUser);
