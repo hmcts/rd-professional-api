@@ -213,10 +213,10 @@ public class ProfessionalUserInternalController extends SuperController {
     public ResponseEntity<Object> getRefreshUsers(
             @RequestParam(value = "since", required = false) String since,
             @RequestParam(value = "userId", required = false) String userId,
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size
     ) {
-        organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId);
+        organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId, page, size);
 
         return fetchUsersForRefresh(since, userId, page, size);
     }

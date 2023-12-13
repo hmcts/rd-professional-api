@@ -26,6 +26,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MANDATORY_PARAMETER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_PAGE_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_SINCE_TIMESTAMP;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_TWO_ARG_PLACEHOLDER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
@@ -126,7 +127,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         validateOrganisationIsActive(org.get(), BAD_REQUEST);
     }
 
-    public void validateGetRefreshUsersParams(String since, String userId) {
+    public void validateGetRefreshUsersParams(String since, String userId, Integer page, Integer size) {
         if ((since == null && userId == null) || (since != null && userId != null)) {
             throw new InvalidRequest(INVALID_MANDATORY_PARAMETER);
         }
@@ -134,6 +135,9 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         if (since != null) {
             if (!isSinceInValidFormat(since)) {
                 throw new InvalidRequest(INVALID_SINCE_TIMESTAMP + SINCE_TIMESTAMP_FORMAT);
+            }
+            if (!isPageAndSizeValid(page, size)) {
+                throw new InvalidRequest(INVALID_PAGE_INFORMATION);
             }
         }
     }
@@ -148,5 +152,9 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
 
         return true;
+    }
+
+    private boolean isPageAndSizeValid(Integer page, Integer size) {
+        return page != null && page >= 0 && size != null && size >= 1;
     }
 }

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class GetRefreshUsersResponseTest {
+class GetRefreshUsersResponseTest {
 
     @Test
     void test_should_hold_values_after_creation() {

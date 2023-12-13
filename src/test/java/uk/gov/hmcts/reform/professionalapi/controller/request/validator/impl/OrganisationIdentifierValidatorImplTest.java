@@ -146,24 +146,30 @@ class OrganisationIdentifierValidatorImplTest {
     @Test
     void test_validateGetRefreshUsersParamsWhenBothParamsNull() {
         assertThrows(InvalidRequest.class,() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(null, null));
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(null, null, null, null));
     }
 
     @Test
     void test_validateGetRefreshUsersParamsWhenBothParamsPresent() {
         assertThrows(InvalidRequest.class,() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("since", "uid"));
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("since", "uid", null, null));
+    }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWithInvalidPagination() {
+        assertThrows(InvalidRequest.class,() ->
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, null));
     }
 
     @Test
     void test_validateGetRefreshUsersParamsWithBadDateTimeFormat() {
         assertThrows(InvalidRequest.class,() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("Bad date time pattern", null));
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("Bad date time pattern", null, null, null));
     }
 
     @Test
     void test_validateGetRefreshUsersParamsWithValidFormat() {
         assertDoesNotThrow(() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("2023-12-05T14:49:53", null));
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("2023-12-05T14:49:53", null, 0, 1));
     }
 }
