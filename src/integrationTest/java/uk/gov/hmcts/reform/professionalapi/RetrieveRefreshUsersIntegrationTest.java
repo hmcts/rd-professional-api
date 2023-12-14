@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 
 class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -25,8 +25,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
 
         LocalDateTime dateTime = LocalDateTime.now();
         dateTime = dateTime.plusHours(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-        String since = dateTime.format(formatter);
+        String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
         Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 0, 10);
         validateResponse(response, 1, 0);
@@ -73,8 +72,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
 
         LocalDateTime dateTime = LocalDateTime.now();
         dateTime = dateTime.minusHours(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-        String since = dateTime.format(formatter);
+        String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
         Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 0, 10);
         validateResponse(response, 0, 0);

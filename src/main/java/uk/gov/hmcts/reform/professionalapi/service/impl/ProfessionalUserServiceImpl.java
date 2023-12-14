@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,6 +51,7 @@ import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
@@ -112,8 +112,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable) {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-        LocalDateTime formattedSince = LocalDateTime.parse(since, formatter);
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
         Page<ProfessionalUser> professionalUsersPage =
                 professionalUserRepository.findByLastUpdatedBefore(formattedSince, pageable);
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();

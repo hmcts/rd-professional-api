@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +49,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
@@ -257,8 +257,7 @@ class ProfessionalUserInternalControllerTest {
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-        String since = currentDateTime.format(formatter);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
 
         Integer page = 0;
         Integer size = 10;

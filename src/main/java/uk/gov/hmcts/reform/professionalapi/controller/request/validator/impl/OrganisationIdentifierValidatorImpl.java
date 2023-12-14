@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +27,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MANDATORY_PARAMETER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_PAGE_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_SINCE_TIMESTAMP;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_TWO_ARG_PLACEHOLDER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
@@ -143,10 +143,8 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     private boolean isSinceInValidFormat(String since) {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-
         try {
-            LocalDateTime.parse(since, formatter);
+            LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
         } catch (DateTimeParseException e) {
             return false;
         }

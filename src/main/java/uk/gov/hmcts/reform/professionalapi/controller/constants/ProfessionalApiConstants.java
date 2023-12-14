@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.constants;
 
+import java.time.format.DateTimeFormatter;
+
 public class ProfessionalApiConstants {
 
     private ProfessionalApiConstants() {
@@ -176,4 +178,5 @@ public class ProfessionalApiConstants {
     public static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-ddTHH:mm:ss";
     public static final String NESTED_ORG_IDENTIFIER = "organisation.organisationIdentifier";
     public static final String USER_IDENTIFIER = "userIdentifier";
+    public static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 }

@@ -441,7 +441,7 @@ public class RefDataUtil {
             accessTypes.addAll(userConfiguredAccesses.stream()
                     .filter(uca -> uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier()
                             .equals(professionalUser.getUserIdentifier()))
-                    .map(AccessType::fromUserConfiguredAccess)
+                    .map(RefDataUtil::fromUserConfiguredAccess)
                     .collect(toList()));
 
             refreshUser.setAccessTypes(accessTypes);
@@ -458,6 +458,17 @@ public class RefDataUtil {
         GetRefreshUsersResponse response = new GetRefreshUsersResponse();
         response.setUsers(new ArrayList<>());
         return response;
+    }
+
+    public static AccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        AccessType accessType = new AccessType();
+        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
+        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
+                .getOrganisationProfileId());
+        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
+        accessType.setEnabled(userConfiguredAccess.getEnabled());
+
+        return accessType;
     }
 
     @Value("${loggingComponentName}")
