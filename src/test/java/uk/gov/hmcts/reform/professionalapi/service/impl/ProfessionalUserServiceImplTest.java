@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -43,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleDeletionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -982,10 +982,10 @@ class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
         when(professionalUserMock.getId()).thenReturn(uuid);
 
-        Set<AccessType> accessTypes = new HashSet<>();
-        AccessType accessType1 = new AccessType();
-        accessTypes.add(accessType1);
-        userProfileUpdatedData.setAccessTypes(accessTypes);
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
 
         UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
         UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
@@ -1028,10 +1028,10 @@ class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
         when(professionalUserMock.getId()).thenReturn(uuid);
 
-        Set<AccessType> accessTypes = new HashSet<>();
-        AccessType accessType1 = new AccessType();
-        accessTypes.add(accessType1);
-        userProfileUpdatedData.setAccessTypes(accessTypes);
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
 
         UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
         UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
@@ -1111,11 +1111,11 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        Set<AccessType> accessTypes = new HashSet<>();
-        AccessType accessType1 = new AccessType();
-        accessTypes.add(accessType1);
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        userProfileUpdatedData.setAccessTypes(accessTypes);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
         UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
         UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
         List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
@@ -1153,11 +1153,11 @@ class ProfessionalUserServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        Set<AccessType> accessTypes = new HashSet<>();
-        AccessType accessType1 = new AccessType();
-        accessTypes.add(accessType1);
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        userProfileUpdatedData.setAccessTypes(accessTypes);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
         UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
         UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
         List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
