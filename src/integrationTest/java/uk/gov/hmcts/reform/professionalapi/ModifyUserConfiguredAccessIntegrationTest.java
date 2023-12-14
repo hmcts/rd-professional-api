@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -48,16 +48,16 @@ class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledInte
     private UserProfileUpdatedData createModifyUserConfiguredAccessData(String email, int numAccessTypes) {
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        Set<AccessType> accessTypes = new HashSet<>();
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
         for (int i = 0; i < numAccessTypes; i++) {
-            AccessType accessType = new AccessType("Jurisdiction" + numAccessTypes,
+            UserAccessType userAccessType = new UserAccessType("Jurisdiction" + numAccessTypes,
                     "Organisation" + numAccessTypes,
                     "AccessType" + numAccessTypes, true);
-            accessTypes.add(accessType);
+            userAccessTypes.add(userAccessType);
         }
 
         userProfileUpdatedData.setEmail(email);
-        userProfileUpdatedData.setAccessTypes(accessTypes);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
         userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
         userProfileUpdatedData.setRolesAdd(new HashSet<>());
         userProfileUpdatedData.setRolesDelete(new HashSet<>());
