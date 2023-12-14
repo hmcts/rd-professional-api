@@ -31,12 +31,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
-import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
@@ -427,7 +427,7 @@ public class RefDataUtil {
                 .getUserProfiles()) {
             for (ProfessionalUser pu : professionalUsers) {
                 if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
-                    professionalUsersResponse.getAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
+                    professionalUsersResponse.getUserAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
                             .map(uca -> fromUserConfiguredAccess(uca)).collect(toList()));
                     professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
                 }
@@ -440,7 +440,7 @@ public class RefDataUtil {
         for (ProfessionalUsersResponse professionalUsersResponse : professionalUsersEntityResponse.getUsers()) {
             for (ProfessionalUser pu : professionalUsers) {
                 if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
-                    professionalUsersResponse.getAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
+                    professionalUsersResponse.getUserAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
                             .map(uca -> fromUserConfiguredAccess(uca)).collect(toList()));
                     professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
                 }
@@ -523,8 +523,8 @@ public class RefDataUtil {
         }
     }
 
-    public static AccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
-        AccessType accessType = new AccessType();
+    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        UserAccessType accessType = new UserAccessType();
         accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
         accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
                 .getOrganisationProfileId());
@@ -533,4 +533,6 @@ public class RefDataUtil {
 
         return accessType;
     }
+
+
 }

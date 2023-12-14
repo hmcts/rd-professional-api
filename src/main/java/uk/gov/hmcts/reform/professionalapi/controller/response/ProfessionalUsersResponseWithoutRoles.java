@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class ProfessionalUsersResponseWithoutRoles {
     @JsonProperty
     private LocalDateTime lastUpdated;
     @JsonProperty
-    public List<AccessType> accessTypes = new ArrayList<>();
+    public List<UserAccessType> userAccessTypes = new ArrayList<>();
 
     public ProfessionalUsersResponseWithoutRoles(ProfessionalUser user) {
         this.userIdentifier = user.getUserIdentifier();
