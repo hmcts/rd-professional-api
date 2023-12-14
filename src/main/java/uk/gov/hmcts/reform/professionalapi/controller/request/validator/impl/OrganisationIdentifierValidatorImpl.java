@@ -153,6 +153,6 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     private boolean isPageAndSizeValid(Integer page, Integer size) {
-        return page != null && page >= 0 && size != null && size >= 1;
+        return page != null && page >= 1 && size != null && size >= 1;
     }
 }

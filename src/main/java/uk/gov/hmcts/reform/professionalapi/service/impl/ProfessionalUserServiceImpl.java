@@ -120,7 +120,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         if (since != null && page != null && size != null) {
             Pageable pageable =
-                    createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
+                    createPageableObject(page - 1, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
                             .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
             responseEntity = findRefreshUsers(since, pageable);
         } else {

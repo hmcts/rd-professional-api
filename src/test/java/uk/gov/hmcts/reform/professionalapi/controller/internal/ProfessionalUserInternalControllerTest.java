@@ -255,7 +255,7 @@ class ProfessionalUserInternalControllerTest {
         LocalDateTime currentDateTime = LocalDateTime.now();
         String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
 
-        Integer page = 0;
+        Integer page = 1;
         Integer size = 10;
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);

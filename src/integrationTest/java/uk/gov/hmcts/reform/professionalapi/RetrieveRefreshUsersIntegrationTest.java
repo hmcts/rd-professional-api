@@ -27,7 +27,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         dateTime = dateTime.plusHours(1);
         String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 0, 10);
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 1, 10);
         validateResponse(response, 1, 0);
     }
 
@@ -44,7 +44,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
                 .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
         Map<String, Object> response = professionalReferenceDataClient
-                .findRefreshUsersWithUserIdentifier(userIdentifier, 0, 10);
+                .findRefreshUsersWithUserIdentifier(userIdentifier);
         validateResponse(response, 1, 1);
     }
 
@@ -61,7 +61,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
                 .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
         Map<String, Object> response = professionalReferenceDataClient
-                .findRefreshUsersWithUserIdentifier(userIdentifier, 0, 10);
+                .findRefreshUsersWithUserIdentifier(userIdentifier);
         validateResponse(response, 1, 2);
     }
 
@@ -74,7 +74,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         dateTime = dateTime.minusHours(1);
         String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 0, 10);
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 1, 10);
         validateResponse(response, 0, 0);
     }
 
@@ -83,7 +83,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier("123", 0, 10);
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier("123");
         validateResponse(response, 0, 0);
     }
 

@@ -256,9 +256,9 @@ public class ProfessionalReferenceDataClient {
                 page, size);
     }
 
-    public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId, Integer page, Integer size) {
-        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}&page={page}&size={size}",
-                userId, page, size);
+    public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}",
+                userId);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
