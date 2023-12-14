@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -25,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
@@ -248,8 +248,8 @@ class ProfessionalUserInternalControllerTest {
     @Test
     void test_GetRefreshUsersWithSince() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        AccessType accessType = new AccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(accessType));
+        UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(userAccessType));
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -276,8 +276,8 @@ class ProfessionalUserInternalControllerTest {
     @Test
     void test_GetRefreshUsers_SingleUser() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        AccessType accessType = new AccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(accessType));
+        UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(userAccessType));
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);

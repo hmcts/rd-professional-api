@@ -32,12 +32,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
-import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
@@ -436,15 +436,15 @@ public class RefDataUtil {
             refreshUser.setLastUpdated(professionalUser.getLastUpdated());
             refreshUser.setOrganisationIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
 
-            Set<AccessType> accessTypes = new HashSet<>();
+            Set<UserAccessType> userAccessTypes = new HashSet<>();
 
-            accessTypes.addAll(userConfiguredAccesses.stream()
+            userAccessTypes.addAll(userConfiguredAccesses.stream()
                     .filter(uca -> uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier()
                             .equals(professionalUser.getUserIdentifier()))
                     .map(RefDataUtil::fromUserConfiguredAccess)
                     .collect(toList()));
 
-            refreshUser.setAccessTypes(accessTypes);
+            refreshUser.setUserAccessTypes(userAccessTypes);
 
             refreshUserList.add(refreshUser);
         }
@@ -460,8 +460,8 @@ public class RefDataUtil {
         return response;
     }
 
-    public static AccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
-        AccessType accessType = new AccessType();
+    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        UserAccessType accessType = new UserAccessType();
         accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
         accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
                 .getOrganisationProfileId());

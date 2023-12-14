@@ -34,7 +34,7 @@ public class UserProfileUpdatedData {
                                   @JsonProperty(value = "idamStatus") String idamStatus,
                                   @JsonProperty(value = "rolesAdd") Set<RoleName> rolesAdd,
                                   @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete,
-                                  @JsonProperty(value = "accessTypes") Set<UserAccessType> userAccessTypes
+                                  @JsonProperty(value = "userAccessTypes") Set<UserAccessType> userAccessTypes
     ) {
         this.email = email;
         this.firstName = firstName;

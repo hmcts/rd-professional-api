@@ -87,7 +87,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         validateResponse(response, 0, 0);
     }
 
-    void validateResponse(Map<String, Object> response, int expectedUsers, int expectedAccessTypes) {
+    void validateResponse(Map<String, Object> response, int expectedUsers, int expectedUserAccessTypes) {
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertNotNull(response.get("users"));
         assertThat((List<RefreshUser>) response.get("users")).size().isEqualTo(expectedUsers);
@@ -98,16 +98,16 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
             assertNotNull(user.get(USER_IDENTIFIER));
             assertNotNull(user.get(LAST_UPDATED));
             assertNotNull(user.get(ORG_IDENTIFIER));
-            assertNotNull(user.get(ACCESS_TYPES));
+            assertNotNull(user.get(USER_ACCESS_TYPES));
 
-            List<LinkedHashMap> accessTypes = (List<LinkedHashMap>) user.get("accessTypes");
+            List<LinkedHashMap> userAccessTypes = (List<LinkedHashMap>) user.get("userAccessTypes");
 
-            assertThat(accessTypes).size().isEqualTo(expectedAccessTypes);
-            accessTypes.forEach(accessType -> {
-                assertNotNull(accessType.get("jurisdictionId"));
-                assertNotNull(accessType.get("organisationProfileId"));
-                assertNotNull(accessType.get("accessTypeId"));
-                assertNotNull(accessType.get("enabled"));
+            assertThat(userAccessTypes).size().isEqualTo(expectedUserAccessTypes);
+            userAccessTypes.forEach(userAccessType -> {
+                assertNotNull(userAccessType.get("jurisdictionId"));
+                assertNotNull(userAccessType.get("organisationProfileId"));
+                assertNotNull(userAccessType.get("accessTypeId"));
+                assertNotNull(userAccessType.get("enabled"));
             });
         });
 

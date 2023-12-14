@@ -15,15 +15,15 @@ public class RefreshUser {
     private String userIdentifier;
     private LocalDateTime lastUpdated;
     private String organisationIdentifier;
-    private Set<AccessType> accessTypes;
+    private Set<UserAccessType> userAccessTypes;
 
     public RefreshUser(String userIdentifier,
                        LocalDateTime lastUpdated,
                        String organisationIdentifier,
-                       Set<AccessType> accessTypes) {
+                       Set<UserAccessType> userAccessTypes) {
         this.userIdentifier = userIdentifier;
         this.lastUpdated = lastUpdated;
         this.organisationIdentifier = organisationIdentifier;
-        this.accessTypes = accessTypes;
+        this.userAccessTypes = userAccessTypes;
     }
 }

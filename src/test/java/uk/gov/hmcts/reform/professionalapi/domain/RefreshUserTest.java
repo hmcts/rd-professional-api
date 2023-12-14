@@ -18,11 +18,11 @@ class RefreshUserTest {
         refreshUser.setUserIdentifier("user-identifier");
         refreshUser.setLastUpdated(LocalDateTime.now());
         refreshUser.setOrganisationIdentifier("org-identifier");
-        refreshUser.setAccessTypes(new HashSet<>());
+        refreshUser.setUserAccessTypes(new HashSet<>());
 
         assertThat(refreshUser.getUserIdentifier()).isEqualTo("user-identifier");
         assertThat(refreshUser.getLastUpdated()).isNotNull();
         assertThat(refreshUser.getOrganisationIdentifier()).isEqualTo("org-identifier");
-        assertThat(refreshUser.getAccessTypes()).isNotNull();
+        assertThat(refreshUser.getUserAccessTypes()).isNotNull();
     }
 }
