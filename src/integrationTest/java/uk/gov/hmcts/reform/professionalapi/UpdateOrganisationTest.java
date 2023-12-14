@@ -430,7 +430,7 @@ class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
     public String createOrganisationRequestForV2() {
         OrganisationOtherOrgsCreationRequest organisationCreationRequest = otherOrganisationRequestWithAllFields();
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
-                .createOrganisation(organisationCreationRequest);
+                .createOrganisationV2(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
