@@ -21,9 +21,10 @@ public class UserProfileUpdateRequestValidatorImpl implements UserProfileUpdateR
             throw new InvalidRequest(ErrorConstants.INVALID_REQUEST.getErrorMessage());
         }
 
-        if (userProfileUpdatedData.getAccessTypes() != null && !userProfileUpdatedData.getAccessTypes().isEmpty()) {
+        if (userProfileUpdatedData.getUserAccessTypes() != null
+                && !userProfileUpdatedData.getUserAccessTypes().isEmpty()) {
             validatedData.setIdamStatus(userProfileUpdatedData.getIdamStatus());
-            validatedData.setAccessTypes(userProfileUpdatedData.getAccessTypes());
+            validatedData.setUserAccessTypes(userProfileUpdatedData.getUserAccessTypes());
             return validatedData;
         }
 
