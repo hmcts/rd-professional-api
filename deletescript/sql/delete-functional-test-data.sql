@@ -2,79 +2,77 @@ delete from user_attribute
 where professional_user_id in
 (
 select id from professional_user where organisation_id in (
-select org.id from organisation org, professional_user up
-where up.email_address like any (values('%@prdfunctestuser.com'))
-and org.id=up.organisation_id)
+select id from organisation where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1'
+)
 );
 
 delete from user_account_map
 where professional_user_id in
 (
  select up.id from organisation org , professional_user up
- where up.organisation_id = org.id
- and up.email_address like any (values('%@prdfunctestuser.com'))
+ where up.organisation_id in (select id from organisation where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1')
 );
 
 delete from payment_account
 where organisation_id in
 (
- select org.id from organisation org , professional_user up
- where up.organisation_id = org.id
- and up.email_address like any (values('%@prdfunctestuser.com'))
+ select id from organisation where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1'
 );
 
 delete from dx_address
 where contact_information_id in
 (
  select contactinfo.id from organisation org , contact_information contactinfo, professional_user up
- where up.organisation_id = org.id and contactinfo.organisation_id = org.id
- and up.email_address like any (values('%@prdfunctestuser.com'))
+ where up.organisation_id in (select id from organisation where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1')
 );
 
 delete from contact_information
 where organisation_id in
 (
- select org.id from organisation org , professional_user up
- where up.organisation_id = org.id
- and up.email_address like any (values('%@prdfunctestuser.com'))
+ select id from organisation where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1'
 );
 
 delete from organisation_mfa_status
 where organisation_id in
 (
- select org.id from organisation org , professional_user up
- where up.organisation_id = org.id
- and up.email_address like any (values('%@prdfunctestuser.com'))
+select id from organisation where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1'
+
 );
 
 delete from professional_user
 where organisation_id in
 (
- select org.id from organisation org , professional_user up
- where up.organisation_id = org.id
- and up.email_address like any (values('%@prdfunctestuser.com'))
+select id from organisation where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1'
+
 );
+
 
 delete from org_attributes
 where organisation_id in
 (
- select id from organisation
-where  sra_id  like any (values('%sra-id-number1'))
-
-);
-
-delete from org_attributes
-where organisation_id in
-(
- select id from organisation
-where  sra_id  like any (values('%idamtest_%'))
+ select id from organisation where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1'
 );
 
 
 delete from organisation
-where id not in
-(
- select organisation_id from professional_user
-);
+where company_number like '%com'
+and company_url like '%company-url'
+and sra_id like '%sra-id-number1';
 
 commit;
