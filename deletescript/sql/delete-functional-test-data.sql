@@ -55,9 +55,26 @@ where organisation_id in
  and up.email_address like any (values('%@prdfunctestuser.com'))
 );
 
+delete from org_attributes
+where organisation_id in
+(
+ select id from organisation
+where  sra_id  like any (values('%sra-id-number1'))
+
+);
+
+delete from org_attributes
+where organisation_id in
+(
+ select id from organisation
+where  sra_id  like any (values('%idamtest_%'))
+);
+
+
 delete from organisation
-where company_number like '%com'
-and company_url like '%company-url'
-and sra_id like '%sra-id-number1';
+where id not in
+(
+ select organisation_id from professional_user
+);
 
 commit;
