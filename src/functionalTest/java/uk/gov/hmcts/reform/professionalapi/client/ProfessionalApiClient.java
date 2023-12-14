@@ -310,7 +310,7 @@ public class ProfessionalApiClient {
     @SuppressWarnings("unchecked")
     public Map<String, Object> createOrganisation(OrganisationCreationRequest organisationCreationRequest) {
         Response response = getS2sTokenHeaders()
-            .body(organisationCreationRequest).log().all()
+            .body(organisationCreationRequest)
             .post("/refdata/external/v1/organisations")
             .andReturn();
 
@@ -318,7 +318,7 @@ public class ProfessionalApiClient {
             log.info("{}:: Create organisation response: {}", loggingComponentName, response.asString());
         }
 
-        response.then().log().all()
+        response.then()
             .assertThat()
             .statusCode(CREATED.value());
 
