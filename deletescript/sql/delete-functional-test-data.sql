@@ -11,9 +11,9 @@ where
                     join organisation o on
                         pu.organisation_id = o.id
             where
-                    o.company_url like '%prd-func-test-company-url'
-              and o."name" like '%prd-func-test-name'
-              and o.sra_id like '%prd-func-test-sra-id'
+                  o.company_url like '%-prd-func-test-company-url'
+              and o.name like '%-prd-func-test-name'
+              and o.sra_id like '%-prd-func-test-sra-id'
         );
 
 delete
@@ -29,9 +29,9 @@ where
                     join organisation o on
                         pu.organisation_id = o.id
             where
-                    o.company_url like '%prd-func-test-company-url'
-              and o."name" like '%prd-func-test-name'
-              and o.sra_id like '%prd-func-test-sra-id'
+                  o.company_url like '%-prd-func-test-company-url'
+              and o.name like '%-prd-func-test-name'
+              and o.sra_id like '%-prd-func-test-sra-id'
         );
 
 delete
@@ -45,9 +45,9 @@ where
             from
                 organisation o
             where
-                    o.company_url like '%prd-func-test-company-url'
-              and o."name" like '%prd-func-test-name'
-              and o.sra_id like '%prd-func-test-sra-id'
+                  o.company_url like '%-prd-func-test-company-url'
+              and o.name like '%-prd-func-test-name'
+              and o.sra_id like '%-prd-func-test-sra-id'
         );
 
 delete
@@ -63,9 +63,9 @@ where
                     join contact_information c on
                         o.id = c.organisation_id
             where
-                    o.company_url like '%prd-func-test-company-url'
-              and o."name" like '%prd-func-test-name'
-              and o.sra_id like '%prd-func-test-sra-id'
+                  o.company_url like '%-prd-func-test-company-url'
+              and o.name like '%-prd-func-test-name'
+              and o.sra_id like '%-prd-func-test-sra-id'
         );
 
 delete
@@ -79,9 +79,9 @@ where
             from
                 organisation o
             where
-                    o.company_url like '%prd-func-test-company-url'
-              and o."name" like '%prd-func-test-name'
-              and o.sra_id like '%prd-func-test-sra-id'
+                  o.company_url like '%-prd-func-test-company-url'
+              and o.name like '%-prd-func-test-name'
+              and o.sra_id like '%-prd-func-test-sra-id'
         );
 
 delete
@@ -95,9 +95,9 @@ where
             from
                 organisation o
             where
-                    o.company_url like '%prd-func-test-company-url'
-              and o."name" like '%prd-func-test-name'
-              and o.sra_id like '%prd-func-test-sra-id'
+                  o.company_url like '%-prd-func-test-company-url'
+              and o.name like '%-prd-func-test-name'
+              and o.sra_id like '%-prd-func-test-sra-id'
 
         );
 
@@ -112,9 +112,9 @@ where
             from
                 organisation o
             where
-                    o.company_url like '%prd-func-test-company-url'
-              and o."name" like '%prd-func-test-name'
-              and o.sra_id like '%prd-func-test-sra-id'
+                  o.company_url like '%-prd-func-test-company-url'
+              and o.name like '%-prd-func-test-name'
+              and o.sra_id like '%-prd-func-test-sra-id'
 
         );
 
@@ -130,9 +130,9 @@ where
             from
                 organisation o
             where
-                    o.company_url like '%prd-func-test-company-url'
-              and o."name" like '%prd-func-test-name'
-              and o.sra_id like '%prd-func-test-sra-id'
+                  o.company_url like '%-prd-func-test-company-url'
+              and o.name like '%-prd-func-test-name'
+              and o.sra_id like '%-prd-func-test-sra-id'
 
         );
 
@@ -141,8 +141,8 @@ delete
 from
     organisation o
 where
-        o.company_url like '%prd-func-test-company-url'
-  and o."name" like '%prd-func-test-name'
-  and o.sra_id like '%prd-func-test-sra-id';
+      o.company_url like '%-prd-func-test-company-url'
+  and o.name like '%-prd-func-test-name'
+  and o.sra_id like '%-prd-func-test-sra-id';
 
 commit;
