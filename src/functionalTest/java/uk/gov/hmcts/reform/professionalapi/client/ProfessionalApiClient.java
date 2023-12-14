@@ -158,7 +158,7 @@ public class ProfessionalApiClient {
             .build());
 
         return someMinimalOrganisationRequest()
-            .name(randomAlphabetic(10)+ "-prd-func-test-name")
+            .name(randomAlphabetic(10) + "-prd-func-test-name")
             .status("PENDING")
             .sraId(randomAlphabetic(10) + "-prd-func-test-sra-id")
             .sraRegulated("false")
@@ -231,7 +231,7 @@ public class ProfessionalApiClient {
         String superUserEmail = generateRandomEmail();
 
         OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
-                new OrganisationOtherOrgsCreationRequest(randomAlphabetic(10)+"-prd-func-test-name",
+                new OrganisationOtherOrgsCreationRequest(randomAlphabetic(10) + "-prd-func-test-name",
                         "PENDING",
                         "test",
                         randomAlphabetic(10) + "-prd-func-test-sra-id",
