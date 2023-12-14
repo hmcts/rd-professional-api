@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
 
@@ -48,6 +49,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         createOrganisationScenario();
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
+        deleteOtherOrganisationScenarios();
+
     }
 
     public void setUpTestData() {
@@ -228,8 +231,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    //@ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
+    //@ExtendWith(FeatureToggleConditionExtension.class)
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisationV2();
@@ -238,5 +241,30 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         assertThat(organisations).isNotNull().hasSize(1);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
+    }
+
+    public void deleteOtherOrganisationScenarios() {
+        deletePendingOtherOrganisationShouldReturnSuccess();
+        deleteActiveOtherOrganisationShouldReturnSuccess();
+    }
+
+
+    public void deletePendingOtherOrganisationShouldReturnSuccess() {
+        log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.createOrganisationV2();
+        String pendingOrgIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(pendingOrgIdentifier).isNotEmpty();
+        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetailsForV2(pendingOrgIdentifier, hmctsAdmin, NOT_FOUND);
+        log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: END");
+    }
+
+    public void deleteActiveOtherOrganisationShouldReturnSuccess() {
+        log.info("deleteActiveOtherOrganisationShouldReturnSuccess :: STARTED");
+        String orgIdentifierResponse = createAndUpdateOrganisationToActiveForV2(hmctsAdmin,professionalApiClient
+                .createOrganisationRequestForV2());
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetailsForV2(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
+        log.info("deleteActiveOtherOrganisationShouldReturnSuccess :: END");
     }
 }
