@@ -39,9 +39,7 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
 
-    ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable);
-
-    ResponseEntity<Object> findSingleRefreshUser(String userId);
+    ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size);
 
     ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
                                                               String userId, Optional<String> origin);

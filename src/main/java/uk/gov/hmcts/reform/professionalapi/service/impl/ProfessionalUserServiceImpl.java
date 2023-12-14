@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -52,7 +53,10 @@ import javax.transaction.Transactional;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
 
@@ -111,6 +115,21 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
+    public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size) {
+        ResponseEntity<Object> responseEntity;
+
+        if (since != null && page != null && size != null) {
+            Pageable pageable =
+                    createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
+                            .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
+            responseEntity = findRefreshUsers(since, pageable);
+        } else {
+            responseEntity = findSingleRefreshUser(userId);
+        }
+
+        return responseEntity;
+    }
+
     public ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable) {
         LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
         Page<ProfessionalUser> professionalUsersPage =
@@ -129,7 +148,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
-    @Override
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
         List<UserConfiguredAccess> userConfiguredAccesses;

@@ -79,11 +79,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateBulkCustomerRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
@@ -596,21 +594,6 @@ public abstract class SuperController {
 
         //delete the passed pba account numbers from the organisation
         paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
-    }
-
-    protected ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size) {
-        ResponseEntity<Object> responseEntity;
-
-        if (since != null && page != null && size != null) {
-            Pageable pageable =
-                    createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
-                            .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
-            responseEntity = professionalUserService.findRefreshUsers(since, pageable);
-        } else {
-            responseEntity = professionalUserService.findSingleRefreshUser(userId);
-        }
-
-        return responseEntity;
     }
 
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {

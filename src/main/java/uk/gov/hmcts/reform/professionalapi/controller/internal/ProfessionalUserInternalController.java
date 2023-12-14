@@ -218,6 +218,6 @@ public class ProfessionalUserInternalController extends SuperController {
     ) {
         organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId, page, size);
 
-        return fetchUsersForRefresh(since, userId, page, size);
+        return professionalUserService.fetchUsersForRefresh(since, userId, page, size);
     }
 }

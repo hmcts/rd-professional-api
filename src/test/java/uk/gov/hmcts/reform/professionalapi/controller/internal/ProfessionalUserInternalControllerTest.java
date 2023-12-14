@@ -9,8 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -43,6 +41,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -50,9 +49,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserInternalControllerTest {
@@ -261,13 +257,11 @@ class ProfessionalUserInternalControllerTest {
 
         Integer page = 0;
         Integer size = 10;
-        Pageable pageable = createPageableObject(page, size,
-                Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
-                .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
 
-        when(professionalUserServiceMock.findRefreshUsers(any(), any())).thenReturn(responseEntity);
+        when(professionalUserServiceMock.fetchUsersForRefresh(any(), eq(null), any(), any()))
+                .thenReturn(responseEntity);
 
         ResponseEntity<Object> actualData = professionalUserInternalController
                 .getRefreshUsers(since, null, page, size);
@@ -276,7 +270,7 @@ class ProfessionalUserInternalControllerTest {
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(professionalUserServiceMock, times(1))
-                .findRefreshUsers(since, pageable);
+                .fetchUsersForRefresh(since, null, page, size);
     }
 
     @Test
@@ -286,20 +280,18 @@ class ProfessionalUserInternalControllerTest {
         RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", Set.of(accessType));
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
-        Integer page = 0;
-        Integer size = 10;
-
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
 
-        when(professionalUserServiceMock.findSingleRefreshUser(any())).thenReturn(responseEntity);
+        when(professionalUserServiceMock.fetchUsersForRefresh(eq(null), any(), eq(null), eq(null)))
+                .thenReturn(responseEntity);
 
         ResponseEntity<Object> actualData = professionalUserInternalController
-                .getRefreshUsers(null, "uid", page, size);
+                .getRefreshUsers(null, "uid", null, null);
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(professionalUserServiceMock, times(1))
-                .findSingleRefreshUser("uid");
+                .fetchUsersForRefresh(null, "uid", null, null);
     }
 }
