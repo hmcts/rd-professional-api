@@ -24,12 +24,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
-import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccessId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -352,9 +352,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_DELETE);
         }
 
-        if (userProfileUpdatedData.getAccessTypes() != null) {
+        if (userProfileUpdatedData.getUserAccessTypes() != null) {
             try {
-                List<UserConfiguredAccess> all = userProfileUpdatedData.getAccessTypes().stream()
+                List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
                         .map(a -> mapToUserConfiguredAccess(professionalUser, a))
                         .collect(Collectors.toList());
                 userConfiguredAccessRepository.saveAll(all);
@@ -364,14 +364,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
     }
 
-    private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser, AccessType accessType) {
+    private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser,
+                                                           UserAccessType userAccessType) {
         UserConfiguredAccess uca = new UserConfiguredAccess();
         UserConfiguredAccessId ucaId = new UserConfiguredAccessId(
-                professionalUser, accessType.getJurisdictionId(),
-                accessType.getOrganisationProfileId(), accessType.getAccessTypeId()
+                professionalUser, userAccessType.getJurisdictionId(),
+                userAccessType.getOrganisationProfileId(), userAccessType.getAccessTypeId()
         );
         uca.setUserConfiguredAccessId(ucaId);
-        uca.setEnabled(accessType.getEnabled());
+        uca.setEnabled(userAccessType.getEnabled());
 
         return uca;
     }

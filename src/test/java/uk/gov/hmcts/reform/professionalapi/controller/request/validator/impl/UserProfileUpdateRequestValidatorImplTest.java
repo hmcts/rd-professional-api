@@ -7,8 +7,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.domain.AccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.HashSet;
@@ -29,11 +29,11 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     private final Set<RoleName> rolesData = new HashSet<>();
     private final Set<RoleName> rolesToDeleteData = new HashSet<>();
-    private final Set<AccessType> accessTypes = new HashSet<>();
+    private final Set<UserAccessType> userAccessTypes = new HashSet<>();
     private RoleName roleName1;
     private RoleName roleName2;
     private RoleName roleToDeleteName;
-    private AccessType accessType1;
+    private UserAccessType userAccessType1;
 
     @BeforeEach
     void setUp() {
@@ -45,8 +45,8 @@ class UserProfileUpdateRequestValidatorImplTest {
         rolesData.add(roleName2);
         rolesToDeleteData.add(roleToDeleteName);
 
-        accessType1 = new AccessType();
-        accessTypes.add(accessType1);
+        userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
     }
 
     @Test
@@ -95,7 +95,7 @@ class UserProfileUpdateRequestValidatorImplTest {
     @Test
     void test_ValidateRequestForAccessTypes() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
-                IdamStatus.ACTIVE.name(), null, null, accessTypes);
+                IdamStatus.ACTIVE.name(), null, null, userAccessTypes);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
@@ -104,7 +104,7 @@ class UserProfileUpdateRequestValidatorImplTest {
         assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo(IdamStatus.ACTIVE.name());
         assertThat(actualModifyProfileData.getRolesAdd()).isNull();
         assertThat(actualModifyProfileData.getRolesDelete()).isNull();
-        assertThat(actualModifyProfileData.getAccessTypes()).hasSize(1);
+        assertThat(actualModifyProfileData.getUserAccessTypes()).hasSize(1);
     }
 
     @Test
@@ -119,7 +119,7 @@ class UserProfileUpdateRequestValidatorImplTest {
         assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo(IdamStatus.ACTIVE.name());
         assertThat(actualModifyProfileData.getRolesAdd()).isNull();
         assertThat(actualModifyProfileData.getRolesDelete()).isNull();
-        assertThat(actualModifyProfileData.getAccessTypes()).isNull();
+        assertThat(actualModifyProfileData.getUserAccessTypes()).isNull();
     }
 
     @Test

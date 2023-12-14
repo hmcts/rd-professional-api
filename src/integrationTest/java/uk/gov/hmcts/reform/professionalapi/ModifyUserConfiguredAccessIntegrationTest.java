@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -39,5 +41,4 @@ class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledInte
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
     }
-
 }
