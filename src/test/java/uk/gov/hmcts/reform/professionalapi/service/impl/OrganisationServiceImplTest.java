@@ -124,6 +124,9 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationServiceImplTest {
 
+    private static final String SINCE_STR = "2019-08-16T15:00:41";
+    private static final LocalDateTime FORMATTED_SINCE = LocalDateTime.parse(SINCE_STR, ISO_DATE_TIME_FORMATTER);
+
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final OrgAttributeRepository orgAttributeRepository = mock(OrgAttributeRepository.class);
 
@@ -940,6 +943,44 @@ class OrganisationServiceImplTest {
 
 
     @Test
+    void test_RetrieveAnOrganisationsByWhenStatusActiveWithSince() throws Exception {
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+
+        organisation.setStatus(ACTIVE);
+        organisation.setUsers(users);
+        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), FORMATTED_SINCE))
+                .thenReturn(organisations);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        OrganisationsDetailResponse organisationDetailResponse
+                = sut.findByOrganisationStatus(FORMATTED_SINCE, ACTIVE.name(), null);
+
+        assertThat(organisationDetailResponse).isNotNull();
+    }
+
+    @Test
     void test_RetrieveAnOrganisationsByWhenStatusActive_for_v2_api() throws Exception {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
@@ -1123,11 +1164,9 @@ class OrganisationServiceImplTest {
         organisations.add(organisation);
         organisations.add(organisation1);
 
-        String since = "2019-08-16T15:00:41";
-        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
         when(organisationRepository.findByLastUpdatedGreaterThanEqual(any())).thenReturn(organisations);
 
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(formattedSince, null);
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(FORMATTED_SINCE, null);
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getOrganisations()).hasSize(1);
@@ -1159,10 +1198,8 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(any(), any(), any()))
                 .thenReturn(orgPage);
 
-        String since = "2019-08-16T15:00:41";
-        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
-
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(formattedSince, pageable);
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(FORMATTED_SINCE,
+                pageable);
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isEqualTo(2);
@@ -1322,6 +1359,61 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(1))
             .findByStatusIn(Collections.emptyList(), pageable);
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_RetrieveAnOrganisationsByStatusAndPaginationWithSince() throws JsonProcessingException {
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+
+        organisation.setStatus(ACTIVE);
+        organisation.setUsers(users);
+        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
+        var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+
+        Pageable pageable = PageRequest.of(1,2, Sort.by(order).and(Sort.by(name)));
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), FORMATTED_SINCE,
+                pageable)).thenReturn(orgPage);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), FORMATTED_SINCE,
+                pageable).getContent())
+                .thenReturn(organisations);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(Collections.emptyList(),
+                FORMATTED_SINCE, pageable)).thenReturn(orgPage);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(Collections.emptyList(),
+                FORMATTED_SINCE, pageable).getContent())
+                .thenReturn(organisations);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), FORMATTED_SINCE,
+                pageable).getTotalElements()).thenReturn(1L);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        OrganisationsDetailResponse organisationDetailResponse
+                = sut.findByOrganisationStatus(FORMATTED_SINCE, ACTIVE.name(), pageable);
+        assertThat(organisationDetailResponse).isNotNull();
+        assertThat(organisationDetailResponse.getTotalRecords()).isEqualTo(1L);
 
     }
 
