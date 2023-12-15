@@ -134,7 +134,7 @@ public class ProfessionalExternalUserController extends SuperController {
     }
 
     @Operation(
-            summary = "Modify the User Configured Acces and Roles or Status of a User with the given ID",
+            summary = "Modify the User Configured Access and Roles or Status of a User with the given ID",
             description = "**IDAM Roles to access API** : <br> pui-user-manager",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),

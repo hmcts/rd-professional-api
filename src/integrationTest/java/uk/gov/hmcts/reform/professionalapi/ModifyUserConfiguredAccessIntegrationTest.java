@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -15,8 +14,6 @@ import java.util.Set;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-@Slf4j
 class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
@@ -50,9 +47,9 @@ class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledInte
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         Set<UserAccessType> userAccessTypes = new HashSet<>();
         for (int i = 0; i < numAccessTypes; i++) {
-            UserAccessType userAccessType = new UserAccessType("Jurisdiction" + numAccessTypes,
-                    "Organisation" + numAccessTypes,
-                    "AccessType" + numAccessTypes, true);
+            UserAccessType userAccessType = new UserAccessType("Jurisdiction" + i,
+                    "Organisation" + i,
+                    "AccessType" + i, true);
             userAccessTypes.add(userAccessType);
         }
 
@@ -63,6 +60,5 @@ class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledInte
         userProfileUpdatedData.setRolesDelete(new HashSet<>());
         return userProfileUpdatedData;
     }
-
 
 }
