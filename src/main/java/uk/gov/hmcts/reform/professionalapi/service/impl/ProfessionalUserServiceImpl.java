@@ -135,6 +135,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         Page<ProfessionalUser> professionalUsersPage =
                 professionalUserRepository.findByLastUpdatedBefore(formattedSince, pageable);
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
+        long totalRecords = professionalUsersPage.getTotalElements();
 
         List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
@@ -145,7 +146,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 professionalUsersPage, professionalUsers, userConfiguredAccesses
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("total_records", String.valueOf(totalRecords))
+                .body(res);
     }
 
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
@@ -159,8 +162,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             return ResponseEntity.status(HttpStatus.OK).body(RefDataUtil.buildEmptyGetRefreshUsersResponse());
         }
 
-        GetRefreshUsersResponse res =
-                RefDataUtil.buildGetRefreshUsersResponse(null, List.of(professionalUser), userConfiguredAccesses);
+        GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
+                null, List.of(professionalUser), userConfiguredAccesses
+        );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }

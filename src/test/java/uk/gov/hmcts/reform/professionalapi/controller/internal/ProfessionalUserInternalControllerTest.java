@@ -257,7 +257,9 @@ class ProfessionalUserInternalControllerTest {
         Integer page = 1;
         Integer size = 10;
 
-        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200)
+                .header("total_records", "1")
+                .body(getRefreshUsersResponse);
 
         when(professionalUserServiceMock.fetchUsersForRefresh(any(), eq(null), any(), any()))
                 .thenReturn(responseEntity);
@@ -267,6 +269,7 @@ class ProfessionalUserInternalControllerTest {
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actualData.getHeaders().get("total_records")).isNotNull();
 
         verify(professionalUserServiceMock, times(1))
                 .fetchUsersForRefresh(since, null, page, size);
@@ -289,6 +292,7 @@ class ProfessionalUserInternalControllerTest {
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actualData.getHeaders().get("total_records")).isNull();
 
         verify(professionalUserServiceMock, times(1))
                 .fetchUsersForRefresh(null, "uid", null, null);

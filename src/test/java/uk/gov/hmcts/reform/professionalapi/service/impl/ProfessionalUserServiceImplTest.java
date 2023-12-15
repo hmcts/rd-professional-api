@@ -1202,6 +1202,7 @@ class ProfessionalUserServiceImplTest {
 
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().get("total_records")).isNotNull();
 
         verify(professionalUserRepository, times(1))
                 .findByLastUpdatedBefore(any(), any());
@@ -1221,6 +1222,7 @@ class ProfessionalUserServiceImplTest {
 
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().get("total_records")).isNull();
 
         verify(professionalUserRepository, times(1))
                 .findByUserIdentifier(any());
