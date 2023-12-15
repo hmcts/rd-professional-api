@@ -142,4 +142,12 @@ class OrganisationIdentifierValidatorImplTest {
         assertDoesNotThrow(() ->
                 organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND));
     }
+
+    @Test
+    void test_validateSince() {
+        assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl.validateSince("bad format"));
+        organisationIdentifierValidatorImpl.validateSince(null);
+        organisationIdentifierValidatorImpl.validateSince("2023-12-05T14:49:53");
+    }
+
 }

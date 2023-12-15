@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public interface OrganisationService {
 
     OrganisationResponse createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest);
 
-    OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable);
+    OrganisationsDetailResponse retrieveAllOrganisations(LocalDateTime formattedSince, Pageable pageable);
 
     BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                        String idamId);
@@ -44,7 +45,8 @@ public interface OrganisationService {
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
-    OrganisationsDetailResponse findByOrganisationStatus(String status, Pageable pageable);
+    OrganisationsDetailResponse findByOrganisationStatus(LocalDateTime formattedSince, String status,
+                                                         Pageable pageable);
 
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
 

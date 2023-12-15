@@ -166,20 +166,20 @@ class SuperControllerTest {
     void test_retrieveAllOrganisationOrById() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveAllOrganisations(null)).thenReturn(organisationsDetailResponse);
+        when(organisationServiceMock.retrieveAllOrganisations(null, null)).thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = superController.retrieveAllOrganisationOrById(null, null, null, null);
+        ResponseEntity<?> actual = superController.retrieveAllOrganisationsOrById(null, null, null, null, null);
 
         assertThat(actual.getBody()).isEqualTo(organisationsDetailResponse);
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null, null);
     }
 
     @Test
     void test_retrieveAllOrganisationWithPagination0_shouldThrowException() {
         assertThrows(InvalidRequest.class, () ->
-            superController.retrieveAllOrganisationOrById(null, null, 0, null));
+            superController.retrieveAllOrganisationsOrById(null, null, null, 0, null));
     }
 
 
@@ -191,7 +191,7 @@ class SuperControllerTest {
                 .thenReturn(organisationsDetailResponseV2);
 
         ResponseEntity<?> actual = superController
-                .retrieveAllOrganisationOrByIdForV2Api(null, null, null, null);
+                .retrieveAllOrganisationsOrByIdForV2Api(null, null, null, null);
 
         assertThat(actual.getBody()).isEqualTo(organisationsDetailResponseV2);
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -203,7 +203,7 @@ class SuperControllerTest {
     void test_retrieveAllOrganisationForV2ApiWithPagination0_shouldThrowException() {
         assertThrows(InvalidRequest.class, () ->
                 superController
-                        .retrieveAllOrganisationOrByIdForV2Api(null, null, 0, null));
+                        .retrieveAllOrganisationsOrByIdForV2Api(null, null, 0, null));
     }
 
     @Test

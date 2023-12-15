@@ -139,7 +139,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
             @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
 
-        return retrieveAllOrganisationOrByIdForV2Api(id, status, page, size);
+        return retrieveAllOrganisationsOrByIdForV2Api(id, status, page, size);
     }
 
     @Operation(
