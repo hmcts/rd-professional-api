@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Setter
 @Getter
@@ -15,12 +15,12 @@ public class RefreshUser {
     private String userIdentifier;
     private LocalDateTime lastUpdated;
     private String organisationIdentifier;
-    private Set<UserAccessType> userAccessTypes;
+    private List<UserAccessType> userAccessTypes;
 
     public RefreshUser(String userIdentifier,
                        LocalDateTime lastUpdated,
                        String organisationIdentifier,
-                       Set<UserAccessType> userAccessTypes) {
+                       List<UserAccessType> userAccessTypes) {
         this.userIdentifier = userIdentifier;
         this.lastUpdated = lastUpdated;
         this.organisationIdentifier = organisationIdentifier;

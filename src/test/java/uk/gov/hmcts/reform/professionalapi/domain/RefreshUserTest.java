@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +18,7 @@ class RefreshUserTest {
         refreshUser.setUserIdentifier("user-identifier");
         refreshUser.setLastUpdated(LocalDateTime.now());
         refreshUser.setOrganisationIdentifier("org-identifier");
-        refreshUser.setUserAccessTypes(new HashSet<>());
+        refreshUser.setUserAccessTypes(new ArrayList<>());
 
         assertThat(refreshUser.getUserIdentifier()).isEqualTo("user-identifier");
         assertThat(refreshUser.getLastUpdated()).isNotNull();

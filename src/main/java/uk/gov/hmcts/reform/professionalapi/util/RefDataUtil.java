@@ -44,7 +44,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -436,13 +435,13 @@ public class RefDataUtil {
             refreshUser.setLastUpdated(professionalUser.getLastUpdated());
             refreshUser.setOrganisationIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
 
-            Set<UserAccessType> userAccessTypes = new HashSet<>();
+            List<UserAccessType> userAccessTypes = new ArrayList<>();
 
             userAccessTypes.addAll(userConfiguredAccesses.stream()
                     .filter(uca -> uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier()
                             .equals(professionalUser.getUserIdentifier()))
                     .map(RefDataUtil::fromUserConfiguredAccess)
-                    .collect(toList()));
+                    .toList());
 
             refreshUser.setUserAccessTypes(userAccessTypes);
 
