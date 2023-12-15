@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
@@ -49,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +70,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -87,6 +90,7 @@ class SuperControllerTest {
     private PrdEnumServiceImpl prdEnumServiceMock;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
     private ProfessionalUserRepository professionalUserRepository;
     private PrdEnumRepository prdEnumRepository;
     private Organisation organisation;
@@ -118,6 +122,7 @@ class SuperControllerTest {
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         userProfileUpdateRequestValidator = mock(UserProfileUpdateRequestValidator.class);
         professionalUserRepository = mock(ProfessionalUserRepository.class);
+        organisationIdentifierValidatorImplMock = mock(OrganisationIdentifierValidatorImpl.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -174,6 +179,44 @@ class SuperControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null, null);
+    }
+
+    @Test
+    void test_retrieveAllOrganisationsOrByIdWithSince() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        when(organisationServiceMock.retrieveAllOrganisations(any(LocalDateTime.class), any()))
+                .thenReturn(organisationsDetailResponse);
+
+        String since = "2019-08-16T15:00:41";
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<?> actual = superController.retrieveAllOrganisationsOrById(null, since,
+                null, null, null);
+
+        assertThat(actual.getBody()).isEqualTo(organisationsDetailResponse);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisations(formattedSince, null);
+    }
+
+    @Test
+    void test_retrieveAllOrganisationsOrByIdWithSinceAndStatus() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        String since = "2019-08-16T15:00:41";
+        String status = "ACTIVE";
+        OrganisationsDetailResponse response = new OrganisationsDetailResponse(singletonList(organisation),
+                false, false, true);
+        response.setTotalRecords(100L);
+        when(organisationServiceMock.findByOrganisationStatus(any(), any(), any())).thenReturn(response);
+
+        ResponseEntity<?> actual = superController.retrieveAllOrganisationsOrById(null, since,
+                status, 1, 200);
+
+        assertThat(actual.getBody()).isEqualTo(response);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(1);
     }
 
     @Test

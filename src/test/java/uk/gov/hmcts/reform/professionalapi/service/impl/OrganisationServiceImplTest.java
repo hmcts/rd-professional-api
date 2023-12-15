@@ -107,6 +107,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
@@ -1103,6 +1104,74 @@ class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findAll();
+    }
+
+    @Test
+    void test_retrieveAllActiveOrganisationsWithSince() {
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+        Organisation organisation1 = new Organisation("pending-org-name", null,
+                "PENDING", null, null, null);
+        organisation1.setId(UUID.randomUUID());
+        organisation1.setUsers(users);
+        organisation.setStatus(OrganisationStatus.PENDING);
+        organisation.setUsers(users);
+        sut.saveOrganisation(organisation);
+        sut.saveOrganisation(organisation1);
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        organisations.add(organisation1);
+
+        String since = "2019-08-16T15:00:41";
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+        when(organisationRepository.findByLastUpdatedGreaterThanEqual(any())).thenReturn(organisations);
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(formattedSince, null);
+
+        assertThat(organisationDetailResponse).isNotNull();
+        assertThat(organisationDetailResponse.getOrganisations()).hasSize(1);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_retrieveAllOrganisationsWithPaginationAndSince() {
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+        Organisation organisation1 = new Organisation("someother-org-name", null,
+                "PENDING", null, null, null);
+        organisation1.setId(UUID.randomUUID());
+        organisation1.setUsers(users);
+        organisation.setStatus(OrganisationStatus.PENDING);
+        organisation.setUsers(users);
+        sut.saveOrganisation(organisation);
+        sut.saveOrganisation(organisation1);
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        organisations.add(organisation1);
+
+        Pageable pageable = mock(Pageable.class);
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(orgPage.getContent()).thenReturn(organisations);
+        when(orgPage.getTotalElements()).thenReturn(2L);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(any(), any(), any()))
+                .thenReturn(orgPage);
+
+        String since = "2019-08-16T15:00:41";
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations(formattedSince, pageable);
+
+        assertThat(organisationDetailResponse).isNotNull();
+        assertThat(organisationDetailResponse.getTotalRecords()).isEqualTo(2);
+
+        assertThat(organisations.get(0).getName()).isEqualTo("some-org-name");
+        assertThat(organisations.get(1).getName()).isEqualTo("someother-org-name");
+        assertThat(organisations.get(0).getUsers()).isNotEmpty();
+        assertThat(organisations.get(0).getUsers().get(ZERO_INDEX).getUserIdentifier()).isNotNull();
+
     }
 
     @Test
