@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -11,7 +10,6 @@ import java.util.Map;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
 class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
