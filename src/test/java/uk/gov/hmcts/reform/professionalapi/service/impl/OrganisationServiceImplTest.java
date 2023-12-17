@@ -1708,7 +1708,7 @@ class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
         verify(organisationRepository, times(1)).deleteById(any());
         verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
-        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteById(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
 
@@ -1722,7 +1722,7 @@ class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
         verify(organisationRepository, times(1)).deleteById(any());
         verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
-        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteById(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
 
@@ -1759,7 +1759,7 @@ class OrganisationServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
         verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
         verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
-        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteById(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
 
