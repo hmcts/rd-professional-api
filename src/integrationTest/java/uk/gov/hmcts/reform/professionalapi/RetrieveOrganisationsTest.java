@@ -1138,7 +1138,8 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     void forbidden_if_pui_case_manager_user_try_access_organisation_by_user_id_without_role_access() {
         String userId = settingUpOrganisation(puiCaseManager);
 
-        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId(userId, puiCaseManager);
+        Map<String, Object> response = professionalReferenceDataClient
+                .findOrganisationsByUserId(userId, puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 }
