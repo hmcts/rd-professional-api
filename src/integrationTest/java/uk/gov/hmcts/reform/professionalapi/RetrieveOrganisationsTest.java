@@ -1120,6 +1120,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void should_return_organisation_details_of_user() {
         String userId = settingUpOrganisation(puiCaseManager);
+
         Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId(userId, hmctsAdmin);
         assertNotNull(response);
         assertEquals(response.get("name"), "some-org-name1");
@@ -1128,8 +1129,16 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void should_throw_access_denied_exception_when_professional_user_not_found() {
         settingUpOrganisation(puiCaseManager);
-        Map<String, Object> response = (Map<String, Object>) professionalReferenceDataClient
-                .findOrganisationsByUserId("123", hmctsAdmin);
+
+        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId("123", hmctsAdmin);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    void forbidden_if_pui_case_manager_user_try_access_organisation_by_user_id_without_role_access() {
+        String userId = settingUpOrganisation(puiCaseManager);
+
+        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId(userId, puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 }
