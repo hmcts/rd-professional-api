@@ -904,21 +904,25 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Object findOrganisationsByUserId(String userId, String role, boolean isUnauthorised)
-            throws JsonProcessingException {
+    public Map<String, Object> findOrganisationsByUserId(String userId, String role) {
+        ResponseEntity<Map> responseEntity;
 
-        ResponseEntity<Object> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/orgDetails/" + userId;
+        try {
+            String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/orgDetails/" + userId;
 
-        responseEntity = getRequestForInternalWithGivenResponseType(urlPath, role,
-                OrganisationEntityResponse.class, isUnauthorised);
-
-        HttpStatus status = responseEntity.getStatusCode();
-        if (status.is2xxSuccessful()) {
-            return responseEntity.getBody();
-        } else {
-            return getErrorResponseMap(responseEntity, status);
+            HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role, userId));
+            responseEntity = restTemplate
+                    .exchange(urlPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
         }
+        return getResponse(responseEntity);
     }
 
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -1120,19 +1118,18 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void should_return_organisation_details_of_user() throws JsonProcessingException {
+    void should_return_organisation_details_of_user() {
         String userId = settingUpOrganisation(puiCaseManager);
-        OrganisationEntityResponse response = (OrganisationEntityResponse) professionalReferenceDataClient
-                .findOrganisationsByUserId(userId, hmctsAdmin, true);
+        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId(userId, hmctsAdmin);
         assertNotNull(response);
-        assertEquals(ORG_IDENTIFIER, response.getOrganisationIdentifier());
+        assertEquals(response.get("name"), "some-org-name1");
     }
 
     @Test
-    void should_throw_access_denied_exception_when_professional_user_not_found() throws JsonProcessingException {
+    void should_throw_access_denied_exception_when_professional_user_not_found() {
         settingUpOrganisation(puiCaseManager);
         Map<String, Object> response = (Map<String, Object>) professionalReferenceDataClient
-                .findOrganisationsByUserId("123", hmctsAdmin, true);
+                .findOrganisationsByUserId("123", hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 }

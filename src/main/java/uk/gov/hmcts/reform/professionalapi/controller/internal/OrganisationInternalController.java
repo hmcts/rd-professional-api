@@ -670,7 +670,7 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<Object> retrieveOrganisationByUserId(@PathVariable("userId") @NotBlank String userId) {
+    public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(@PathVariable("userId") @NotBlank String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
 }

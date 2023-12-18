@@ -650,7 +650,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public ResponseEntity<Object> retrieveOrganisationByUserId(String userId) {
+    public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId) {
         ProfessionalUser  professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
         if (professionalUser == null) {
             log.error("{}:: ProfessionalUserUser info null::", loggingComponentName);

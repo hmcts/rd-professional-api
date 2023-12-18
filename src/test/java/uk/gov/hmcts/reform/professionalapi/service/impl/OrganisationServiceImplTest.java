@@ -2322,9 +2322,9 @@ class OrganisationServiceImplTest {
         professionalUser.setOrganisation(organisation);
         when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(professionalUser);
 
-        ResponseEntity<Object> result = sut.retrieveOrganisationByUserId(userId);
+        ResponseEntity<OrganisationEntityResponse> result = sut.retrieveOrganisationByUserId(userId);
         assertNotNull(result.getBody());
-        OrganisationEntityResponse organisationEntityResponse = (OrganisationEntityResponse) result.getBody();
+        OrganisationEntityResponse organisationEntityResponse = result.getBody();
         assertEquals(organisationEntityResponse.getOrganisationIdentifier(), organisation.getOrganisationIdentifier());
     }
 
