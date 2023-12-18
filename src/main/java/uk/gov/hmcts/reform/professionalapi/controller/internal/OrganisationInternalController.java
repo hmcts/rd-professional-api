@@ -666,7 +666,7 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @GetMapping(
-            path = "/orgDetails/{userId}}",
+            path = "/orgDetails/{userId}",
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
