@@ -604,6 +604,14 @@ dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
 }
 
+dependencyCheck {
+    analyzers {
+        nodeAudit {
+            yarnEnabled = false
+        }
+    }
+}
+
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
