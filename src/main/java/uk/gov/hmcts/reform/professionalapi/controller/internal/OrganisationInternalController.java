@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -651,16 +652,11 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponse(
             responseCode = "200",
             description = "",
-            content = @Content(schema = @Schema(implementation = OrganisationsWithPbaStatusResponse.class))
-    )
-    @ApiResponse(
-            responseCode = "401",
-            description = "",
-            content = @Content
+            content = @Content(schema = @Schema(implementation = OrganisationEntityResponse.class))
     )
     @ApiResponse(
             responseCode = "403",
-            description = "",
+            description = "Forbidden Error: Access denied",
             content = @Content
     )
     @ApiResponse(
@@ -670,7 +666,7 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @GetMapping(
-            path = "/orgDetails/}",
+            path = "/orgDetails/{userId}}",
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
