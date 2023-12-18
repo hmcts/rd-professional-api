@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -26,6 +28,7 @@ import java.util.Set;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -1116,4 +1119,20 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(response.get("http_status")).isEqualTo("400");
     }
 
+    @Test
+    void should_return_organisation_details_of_user() throws JsonProcessingException {
+        String userId = settingUpOrganisation(puiCaseManager);
+        OrganisationEntityResponse response = (OrganisationEntityResponse) professionalReferenceDataClient
+                .findOrganisationsByUserId(userId, hmctsAdmin, true);
+        assertNotNull(response);
+        assertEquals(ORG_IDENTIFIER, response.getOrganisationIdentifier());
+    }
+
+    @Test
+    void should_throw_access_denied_exception_when_professional_user_not_found() throws JsonProcessingException {
+        settingUpOrganisation(puiCaseManager);
+        Map<String, Object> response = (Map<String, Object>) professionalReferenceDataClient
+                .findOrganisationsByUserId("123", hmctsAdmin, true);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
 }

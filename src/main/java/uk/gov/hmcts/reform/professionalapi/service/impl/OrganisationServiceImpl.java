@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -87,6 +88,7 @@ import java.util.stream.Stream;
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -645,6 +647,19 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
         return new BulkCustomerOrganisationsDetailResponse(bulkCustomerDetails);
+    }
+
+    @Override
+    public ResponseEntity<Object> retrieveOrganisationByUserId(String userId) {
+        ProfessionalUser  professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
+        if (professionalUser == null) {
+            log.error("{}:: ProfessionalUserUser info null::", loggingComponentName);
+            throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
+        }
+        Organisation organisation = professionalUser.getOrganisation();
+        return ResponseEntity
+                .status(200)
+                .body(new OrganisationEntityResponse(organisation, true, false, false));
     }
 
     private static void validatebulkCustomerDetails(BulkCustomerDetails bulkCustomerDetails) {

@@ -71,4 +71,6 @@ public interface OrganisationService {
 
     void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier);
 
+    ResponseEntity<Object> retrieveOrganisationByUserId(String userId);
+
 }

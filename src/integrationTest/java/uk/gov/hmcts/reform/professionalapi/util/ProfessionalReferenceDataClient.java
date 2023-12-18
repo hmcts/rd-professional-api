@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -901,6 +902,23 @@ public class ProfessionalReferenceDataClient {
         }
 
         return getResponse(responseEntity);
+    }
+
+    public Object findOrganisationsByUserId(String userId, String role, boolean isUnauthorised)
+            throws JsonProcessingException {
+
+        ResponseEntity<Object> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/orgDetails/" + userId;
+
+        responseEntity = getRequestForInternalWithGivenResponseType(urlPath, role,
+                OrganisationEntityResponse.class, isUnauthorised);
+
+        HttpStatus status = responseEntity.getStatusCode();
+        if (status.is2xxSuccessful()) {
+            return responseEntity.getBody();
+        } else {
+            return getErrorResponseMap(responseEntity, status);
+        }
     }
 
 }

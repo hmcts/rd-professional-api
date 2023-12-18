@@ -638,4 +638,43 @@ public class OrganisationInternalController extends SuperController {
                 .status(updatePbaStatusResponse.getStatusCode())
                 .body(updatePbaStatusResponse);
     }
+
+    @Operation(
+            summary = "Retrieves the organisation details of a user",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
+    )
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "",
+            content = @Content(schema = @Schema(implementation = OrganisationsWithPbaStatusResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
+    @GetMapping(
+            path = "/orgDetails/}",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<Object> retrieveOrganisationByUserId(@PathVariable("userId") @NotBlank String userId) {
+        return organisationService.retrieveOrganisationByUserId(userId);
+    }
 }

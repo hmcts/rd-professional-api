@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -2314,4 +2315,23 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotEmpty();
     }
 
+    @Test
+    void shouldReturnOrganisationByUserId() {
+        String userId = "userId123";
+        professionalUser.setUserIdentifier(userId);
+        professionalUser.setOrganisation(organisation);
+        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(professionalUser);
+
+        ResponseEntity<Object> result = sut.retrieveOrganisationByUserId(userId);
+        assertNotNull(result.getBody());
+        OrganisationEntityResponse organisationEntityResponse = (OrganisationEntityResponse) result.getBody();
+        assertEquals(organisationEntityResponse.getOrganisationIdentifier(), organisation.getOrganisationIdentifier());
+    }
+
+    @Test
+    void shouldThrowAccessDeniedWhenProfessionalUserNotFound() {
+        String userId = "userId123";
+        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(null);
+        assertThrows(AccessDeniedException.class, () -> sut.retrieveOrganisationByUserId(userId));
+    }
 }
