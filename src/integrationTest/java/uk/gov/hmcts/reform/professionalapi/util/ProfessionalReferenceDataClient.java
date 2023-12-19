@@ -125,7 +125,8 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
 
-    public Map<String, Object> retrieveAllOrganisationsWithPaginationSince(String page, String size, String role, String since) {
+    public Map<String, Object> retrieveAllOrganisationsWithPaginationSince(String page, String size, String role,
+                                                                           String since) {
         return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}&since={since}", role, page, size, since);
     }
 
@@ -221,7 +222,8 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
     }
 
-    public Map<String, Object> retrieveAllOrganisationDetailsByStatusSinceTest(String status, String role, String since) {
+    public Map<String, Object> retrieveAllOrganisationDetailsByStatusSinceTest(String status, String role,
+                                                                               String since) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}&&since={since}", role, status, since);
     }
 

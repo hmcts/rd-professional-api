@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
+    static final int SINCE_PAUSE_SECONDS = 2;
 
     @SuppressWarnings("unchecked")
     @Test
@@ -201,7 +202,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         String orgIdentifier2 = createAndActivateOrganisationWithGivenRequest(
                 someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
 
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(SINCE_PAUSE_SECONDS);
         final LocalDateTime sinceValue = LocalDateTime.now();
         final String since = sinceValue.format(DATE_TIME_FORMATTER);
 
@@ -217,8 +218,8 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgIdentifier4).isNotEmpty();
         assertThat(orgIdentifier5).isNotEmpty();
 
-        Map<String, Object> orgResponse3 =
-                professionalReferenceDataClient.retrieveAllOrganisationsWithPaginationSince("1", "5", hmctsAdmin, since);
+        Map<String, Object> orgResponse3 = professionalReferenceDataClient
+                .retrieveAllOrganisationsWithPaginationSince("1", "5", hmctsAdmin, since);
 
         int orgResponse3Size = ((List<Organisation>) orgResponse3.get("organisations")).size();
 
@@ -637,7 +638,8 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void persists_and_returns_all_organisations_details_by_pending_and_active_status_since() throws InterruptedException {
+    public void persists_and_returns_all_organisations_details_by_pending_and_active_status_since()
+            throws InterruptedException {
 
         String organisationIdentifier = createOrganisationRequest("PENDING");
         String organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(
@@ -646,7 +648,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(organisationIdentifier).isNotEmpty();
         assertThat(organisationIdentifier1).isNotEmpty();
 
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(SINCE_PAUSE_SECONDS);
         final LocalDateTime sinceValue = LocalDateTime.now();
         final String since = sinceValue.format(DATE_TIME_FORMATTER);
 
@@ -1081,9 +1083,9 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     void  persists_and_return_an_active_org_with_since() throws InterruptedException {
         userProfileCreateUserWireMock(CREATED);
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
-        Map<String, Object> responseBefore = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(SINCE_PAUSE_SECONDS);
         final LocalDateTime sinceValue = LocalDateTime.now();
         final String since = sinceValue.format(DATE_TIME_FORMATTER);
 
@@ -1100,7 +1102,8 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> responseAfter
                 = professionalReferenceDataClient.createOrganisation(organisationRequest);
 
-        Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisationsSince(hmctsAdmin, since);
+        Map<String, Object> orgResponse =  professionalReferenceDataClient
+                .retrieveAllOrganisationsSince(hmctsAdmin, since);
 
         assertThat(orgResponse.get("http_status").toString().contains("200"));
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
