@@ -655,14 +655,20 @@ public class OrganisationInternalController extends SuperController {
             content = @Content(schema = @Schema(implementation = OrganisationEntityResponse.class))
     )
     @ApiResponse(
+            responseCode = "400",
+            description = "User id null"
+    )
+    @ApiResponse(
             responseCode = "403",
-            description = "Forbidden Error: Access denied",
-            content = @Content
+            description = "Forbidden Error: Access denied"
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Professional User not found"
     )
     @ApiResponse(
             responseCode = "500",
-            description = "Internal Server Error",
-            content = @Content
+            description = "Internal Server Error"
     )
 
     @GetMapping(
@@ -671,7 +677,7 @@ public class OrganisationInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(
-            @PathVariable("userId") @Valid @NotNull @NotBlank String userId) {
+            @PathVariable("userId") String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
 }
