@@ -905,29 +905,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .isNotNull()
                 .hasSize(2);
 
-//        Map<String, String> firstAddressDxAddress1 = firstAddressDxAddress.get(0);
-//        Map<String, String> firstAddressDxAddress2 = firstAddressDxAddress.get(1);
-
-//        String firstAddressDxNumber1  = firstAddressDxAddress1.get("dxNumber");
-//        assertThat(firstAddressDxNumber1)
-//                .isNotNull()
-//                .isEqualTo("DX 123452222");
-//
-//        String firstAddressDxExchange1 = firstAddressDxAddress1.get("dxExchange");
-//        assertThat(firstAddressDxExchange1)
-//                .isNotNull()
-//                .isEqualTo("dxExchange");
-//
-//        String firstAddressDxNumber2  = firstAddressDxAddress2.get("dxNumber");
-//        assertThat(firstAddressDxNumber2)
-//                .isNotNull()
-//                .isEqualTo("DX 123456333");
-//
-//        String firstAddressDxExchange2 = firstAddressDxAddress2.get("dxExchange");
-//        assertThat(firstAddressDxExchange2)
-//                .isNotNull()
-//                .isEqualTo("dxExchange");
-
         String secondAddressUprn = (String) contactInformation2.get("uprn");
         assertThat(secondAddressUprn)
                 .isNotNull()
@@ -981,40 +958,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(secondAddressDxAddress)
                 .isNotNull()
                 .hasSize(3);
-
-//        Map<String, String> secondAddressDxAddress1 = secondAddressDxAddress.get(0);
-//        Map<String, String> secondAddressDxAddress2 = secondAddressDxAddress.get(1);
-//        Map<String, String> secondAddressDxAddress3 = secondAddressDxAddress.get(2);
-//
-//        String secondAddressDxNumber1  = secondAddressDxAddress1.get("dxNumber");
-//        assertThat(secondAddressDxNumber1)
-//                .isNotNull()
-//                .isEqualTo("DX 1234567890");
-//
-//        String secondAddressDxExchange1 = secondAddressDxAddress1.get("dxExchange");
-//        assertThat(secondAddressDxExchange1)
-//                .isNotNull()
-//                .isEqualTo("dxExchange");
-//
-//        String secondAddressDxNumber2  = secondAddressDxAddress2.get("dxNumber");
-//        assertThat(secondAddressDxNumber2)
-//                .isNotNull()
-//                .isEqualTo("DX 123456777");
-//
-//        String secondAddressDxExchange2 = secondAddressDxAddress2.get("dxExchange");
-//        assertThat(secondAddressDxExchange2)
-//                .isNotNull()
-//                .isEqualTo("dxExchange");
-//
-//        String secondAddressDxNumber3  = secondAddressDxAddress3.get("dxNumber");
-//        assertThat(secondAddressDxNumber3)
-//                .isNotNull()
-//                .isEqualTo("DX 123456788");
-//
-//        String secondAddressDxExchange3 = secondAddressDxAddress3.get("dxExchange");
-//        assertThat(secondAddressDxExchange3)
-//                .isNotNull()
-//                .isEqualTo("dxExchange");
 
     }
 }
