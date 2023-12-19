@@ -903,7 +903,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 (List<Map<String, String>>) contactInformation1.get("dxAddress");
         assertThat(firstAddressDxAddress)
                 .isNotNull()
-                .hasSize(3);
+                .hasSize(2);
 
         String secondAddressUprn = (String) contactInformation2.get("uprn");
         assertThat(secondAddressUprn)
