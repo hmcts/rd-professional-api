@@ -125,6 +125,10 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsWithPaginationSince(String page, String size, String role, String since) {
+        return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}&since={since}", role, page, size, since);
+    }
+
     public Map<String, Object> retrieveAllOrganisationsWithPaginationForV2Api(String page, String size, String role) {
         return getRequest(APP_INT_V2_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
@@ -148,6 +152,10 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationsSince(String role, String since) {
+        return getRequest(APP_INT_BASE_PATH + "?since={since}", role, since);
     }
 
     public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
@@ -211,6 +219,10 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationDetailsByStatusSinceTest(String status, String role, String since) {
+        return getRequest(APP_INT_BASE_PATH + "?status={status}&&since={since}", role, status, since);
     }
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusForV2ApiTest(String status, String role) {

@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,6 +47,8 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 @Slf4j
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
+    static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
 
     @SuppressWarnings("unchecked")
     @Test
@@ -186,6 +191,39 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse1Size).isEqualTo(2);
         assertThat(orgResponse2Size).isEqualTo(3);
         assertThat(orgResponse3Size).isEqualTo(5);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void persists_and_returns_organisation_with_pagination_since() throws InterruptedException {
+
+        String orgIdentifierResponse1 = createOrganisationRequest("PENDING");
+        String orgIdentifier2 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+
+        TimeUnit.SECONDS.sleep(2);
+        final LocalDateTime sinceValue = LocalDateTime.now();
+        final String since = sinceValue.format(DATE_TIME_FORMATTER);
+
+        String orgIdentifier3 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier4 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        String orgIdentifier5 = createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+        assertThat(orgIdentifierResponse1).isNotEmpty();
+        assertThat(orgIdentifier2).isNotEmpty();
+        assertThat(orgIdentifier3).isNotEmpty();
+        assertThat(orgIdentifier4).isNotEmpty();
+        assertThat(orgIdentifier5).isNotEmpty();
+
+        Map<String, Object> orgResponse3 =
+                professionalReferenceDataClient.retrieveAllOrganisationsWithPaginationSince("1", "5", hmctsAdmin, since);
+
+        int orgResponse3Size = ((List<Organisation>) orgResponse3.get("organisations")).size();
+
+        assertThat(orgResponse3).containsEntry("http_status","200 OK");
+        assertThat(orgResponse3Size).isEqualTo(3);
     }
 
     @Test
@@ -593,6 +631,34 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
         assertThat(orgResponse.get("organisations").toString()).contains("status=PENDING");
+        assertThat(orgResponse.get("organisations").toString()).contains("status=ACTIVE");
+
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
+    public void persists_and_returns_all_organisations_details_by_pending_and_active_status_since() throws InterruptedException {
+
+        String organisationIdentifier = createOrganisationRequest("PENDING");
+        String organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        assertThat(organisationIdentifier1).isNotEmpty();
+
+        TimeUnit.SECONDS.sleep(2);
+        final LocalDateTime sinceValue = LocalDateTime.now();
+        final String since = sinceValue.format(DATE_TIME_FORMATTER);
+
+        String organisationIdentifier2 = createAndActivateOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .retrieveAllOrganisationDetailsByStatusSinceTest("PENDING,ACTIVE", hmctsAdmin, since);
+
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(1);
         assertThat(orgResponse.get("organisations").toString()).contains("status=ACTIVE");
 
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
@@ -1009,6 +1075,41 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(superUserSecond.get("firstName")).isEqualTo("some-fname");
         assertThat(superUserSecond.get("lastName")).isEqualTo("some-lname");
         assertThat(superUserSecond.get("email")).isEqualTo("someone@somewhere.com");
+    }
+
+    @Test
+    void  persists_and_return_an_active_org_with_since() throws InterruptedException {
+        userProfileCreateUserWireMock(CREATED);
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
+        Map<String, Object> responseBefore = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        TimeUnit.SECONDS.sleep(2);
+        final LocalDateTime sinceValue = LocalDateTime.now();
+        final String since = sinceValue.format(DATE_TIME_FORMATTER);
+
+        OrganisationCreationRequest organisationRequest = anOrganisationCreationRequest()
+                .name("some-org-name-after")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname")
+                        .lastName("lname1")
+                        .email("someone11@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine2").build())).build();
+
+        Map<String, Object> responseAfter
+                = professionalReferenceDataClient.createOrganisation(organisationRequest);
+
+        Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisationsSince(hmctsAdmin, since);
+
+        assertThat(orgResponse.get("http_status").toString().contains("200"));
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(1);
+
+        Map<String, Object> organisationActive = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+
+        assertThat(organisationActive.get("name")).isNotNull();
+        assertThat(organisationActive.get("name")).isEqualTo("some-org-name-after");
     }
 
     @Test
