@@ -763,11 +763,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, NO_CONTENT);
 
-        orgResponse = professionalApiClient
+        professionalApiClient
                 .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
-        assertThat(orgResponse).isNotNull();
-        assertThat(orgResponse.get("status").toString()).contains(NOT_FOUND.toString());
-
     }
 
     private static void verifyOrganisationDetails(JsonPath response) {
