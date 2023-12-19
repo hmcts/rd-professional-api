@@ -1127,11 +1127,15 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void should_throw_access_denied_exception_when_professional_user_not_found() {
-        settingUpOrganisation(puiCaseManager);
+    void should_throw_bad_request_exception_when_professional_user_is_empty() {
+        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId( null, hmctsAdmin);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
 
+    @Test
+    void should_throw_not_found_exception_when_professional_user_not_found() {
         Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId("123", hmctsAdmin);
-        assertThat(response.get("http_status")).isEqualTo("403");
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     @Test

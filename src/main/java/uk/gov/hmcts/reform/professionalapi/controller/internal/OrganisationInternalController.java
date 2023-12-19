@@ -671,7 +671,7 @@ public class OrganisationInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(
-            @PathVariable("userId") @NotBlank String userId) {
+            @PathVariable("userId") @Valid @NotNull @NotBlank String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
 }
