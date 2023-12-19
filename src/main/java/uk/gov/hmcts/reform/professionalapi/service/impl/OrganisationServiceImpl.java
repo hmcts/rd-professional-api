@@ -650,7 +650,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId) {
-        if (StringUtils.isBlank(userId)) {
+        if (StringUtils.isBlank(userId) || userId.equalsIgnoreCase("null")) {
             throw new InvalidRequest("Bad Request: User Id is null");
         }
         ProfessionalUser  professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
