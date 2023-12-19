@@ -1128,7 +1128,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void should_throw_bad_request_exception_when_professional_user_is_empty() {
-        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId( null, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId(null, hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("400");
     }
 
