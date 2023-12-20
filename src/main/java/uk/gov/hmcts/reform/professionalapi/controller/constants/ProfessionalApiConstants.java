@@ -180,4 +180,6 @@ public class ProfessionalApiConstants {
     public static final String USER_IDENTIFIER = "userIdentifier";
     public static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
 
+    public static final String PROFESSIONAL_USER_404_MESSAGE = "Professional User not found:";
+
 }

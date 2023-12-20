@@ -2475,4 +2475,30 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotEmpty();
     }
 
+    @Test
+    void shouldReturnOrganisationByUserId() {
+        String userId = "userId123";
+        professionalUser.setUserIdentifier(userId);
+        professionalUser.setOrganisation(organisation);
+        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(professionalUser);
+
+        ResponseEntity<OrganisationEntityResponse> result = sut.retrieveOrganisationByUserId(userId);
+        assertNotNull(result.getBody());
+        OrganisationEntityResponse organisationEntityResponse = result.getBody();
+        assertEquals(organisationEntityResponse.getOrganisationIdentifier(), organisation.getOrganisationIdentifier());
+    }
+
+    @Test
+    void shouldThrowEmptyResultsExceptionWhenProfessionalUserNotFound() {
+        String userId = "userId123";
+        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(null);
+        assertThrows(EmptyResultDataAccessException.class, () -> sut.retrieveOrganisationByUserId(userId));
+    }
+
+    @Test
+    void shouldThrowInvalidRequestExceptionWhenUserIdIsEmpty() {
+        String userId = "";
+        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(null);
+        assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
+    }
 }

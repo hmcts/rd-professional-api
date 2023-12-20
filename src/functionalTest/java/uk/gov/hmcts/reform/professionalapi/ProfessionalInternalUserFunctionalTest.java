@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
@@ -29,11 +30,13 @@ import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
@@ -124,6 +127,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findPendingOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess();
+        findOrganisationByUserIdByInternalUserShouldBeSuccess();
     }
 
     public void retrieveOrganisationPbaScenarios() {
@@ -230,9 +234,30 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void findOrganisationByIdByInternalUserShouldBeSuccess() {
         log.info("findOrganisationByIdByInternalUserShouldBeSuccess :: STARTED");
-        validateSingleOrgResponse(professionalApiClient.retrieveOrganisationDetails(
-                intActiveOrgId, hmctsAdmin, OK), "ACTIVE");
+        var response = professionalApiClient.retrieveOrganisationDetails(
+                intActiveOrgId, hmctsAdmin, OK);
+        assertThat(response).isNotNull();
+        verifyOrganisationDetails(response);
         log.info("findOrganisationByIdByInternalUserShouldBeSuccess :: END");
+    }
+
+    public void findOrganisationByUserIdByInternalUserShouldBeSuccess() {
+        log.info("findOrganisationByUserIdByInternalUserShouldBeSuccess :: STARTED");
+        var usersByOrganisationResponse =
+                professionalApiClient.searchUsersByOrganisation(intActiveOrgId, hmctsAdmin,
+                        "False", OK, "false");
+        assertThat(usersByOrganisationResponse)
+                .isNotNull()
+                .hasSizeGreaterThanOrEqualTo(1);
+
+        var users = (List<Map<String, Object>>) usersByOrganisationResponse.get("users");
+        var userId = (String) users.get(0).get("userIdentifier");
+        var response = professionalApiClient.retrieveOrganisationByUserId(
+                userId, OK);
+
+        verifyOrganisationDetails(response);
+
+        log.info("findOrganisationByUserIdByInternalUserShouldBeSuccess :: END");
     }
 
     public void findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess() {
@@ -409,8 +434,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 pbaEditRequest, intActiveOrgId, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();
 
-        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
-        assertThat((List) org.get("paymentAccount")).contains(oldPba.toUpperCase())
+        JsonPath response = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
+        assertThat(response).isNotNull();
+        assertThat(response.getList("paymentAccount")).contains(oldPba.toUpperCase())
                 .contains(pba1.toUpperCase())
                 .contains(pba2.toUpperCase());
         log.info("editPaymentAccountsShouldReturnSuccess :: END");
@@ -511,10 +537,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         professionalApiClient.updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
 
-        Map<String, Object> orgResponse = professionalApiClient
-                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
-        assertEquals(REVIEW.toString(), orgResponse.get("status"));
-        assertEquals(statusMessage, orgResponse.get("statusMessage"));
+        JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+        assertThat(jsonPath).isNotNull();
+        assertEquals(REVIEW.toString(), jsonPath.get("status"));
+        assertEquals(statusMessage, jsonPath.get("statusMessage"));
 
         log.info("updateOrgStatusShouldBeSuccess :: END");
     }
@@ -731,18 +757,206 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         professionalApiClient
                 .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
 
-        Map<String, Object> orgResponse = professionalApiClient
-                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
-
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
         assertEquals(REVIEW.toString(), orgResponse.get("status"));
         assertEquals(statusMessage, orgResponse.get("statusMessage"));
 
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, NO_CONTENT);
 
-        orgResponse =  professionalApiClient
+        professionalApiClient
                 .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
+    }
 
-        assertThat(orgResponse.get("status")).toString().contains(NOT_FOUND.toString());
+    private static void verifyOrganisationDetails(JsonPath response) {
+        String companyUrl = response.get("companyUrl");
+        assertThat(companyUrl)
+                .isNotNull()
+                .endsWith("-prd-func-test-company-url");
 
+        String organisationIdentifier = response.get("organisationIdentifier");
+        assertThat(organisationIdentifier)
+                .isNotNull();
+
+        Map<String,String> superUser = response.get("superUser");
+        assertThat(superUser)
+                .isNotNull();
+
+        String firstName = superUser.get("firstName");
+        assertThat(firstName)
+                .isNotNull()
+                .isEqualTo("firstName");
+
+        String lastName = superUser.get("lastName");
+        assertThat(lastName)
+                .isNotNull()
+                .endsWith("lastName");
+
+        String email = superUser.get("email");
+        assertThat(email)
+                .isNotNull()
+                .endsWith("@prdfunctestuser.com");
+
+        String sraId = response.get("sraId");
+        assertThat(sraId)
+                .isNotNull()
+                .endsWith("-prd-func-test-sra-id");
+
+        String companyNumber = response.get("companyNumber");
+        assertThat(companyNumber)
+                .isNotNull()
+                .endsWith("com");
+
+        String dateReceived = response.get("dateReceived");
+        assertThat(dateReceived)
+                .isNotNull();
+
+        String dateApproved = response.get("dateApproved");
+        assertThat(dateApproved)
+                .isNotNull();
+
+        String name = response.get("name");
+        assertThat(name)
+                .isNotNull()
+                .endsWith("-prd-func-test-name");
+
+        Boolean sraRegulated = response.get("sraRegulated");
+        assertThat(sraRegulated)
+                .isNotNull()
+                .isEqualTo(false);
+
+        String status = response.get("status");
+        assertThat(status)
+                .isNotNull()
+                .isEqualTo("ACTIVE");
+
+        List<String> pendingPaymentAccount = response.getList("pendingPaymentAccount");
+        assertThat(pendingPaymentAccount)
+                .isNotNull()
+                .isEmpty();
+
+        List<Map<String,Object>> contactInformation = response.getList("contactInformation");
+        assertThat(contactInformation)
+                .isNotNull()
+                .hasSize(2);
+
+        contactInformation = contactInformation
+                .stream()
+                .sorted(Comparator.comparing(map -> (String) map.get("addressLine1")))
+                .collect(Collectors.toList());
+
+        final Map<String,Object> contactInformation1 = contactInformation.get(0);
+        final Map<String,Object> contactInformation2 = contactInformation.get(1);
+
+        String firstAddressUprn = (String) contactInformation1.get("uprn");
+        assertThat(firstAddressUprn)
+                .isNotNull()
+                .isEqualTo("uprn");
+
+        String firstAddressCountry = (String) contactInformation1.get("country");
+        assertThat(firstAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String firstAddressCreated = (String) contactInformation1.get("created");
+        assertThat(firstAddressCreated)
+                .isNotNull();
+
+        String firstAddressTownCity = (String) contactInformation1.get("townCity");
+        assertThat(firstAddressTownCity)
+                .isNotNull()
+                .isEqualTo("some-town-city");
+
+        String firstAddressCounty = (String) contactInformation1.get("county");
+        assertThat(firstAddressCounty)
+                .isNotNull()
+                .isEqualTo("some-county");
+
+        String firstAddressAddressLine1 = (String) contactInformation1.get("addressLine1");
+        assertThat(firstAddressAddressLine1)
+                .isNotNull()
+                .isEqualTo("addLine1");
+
+        assertThat(firstAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String firstAddressAddressLine2 = (String) contactInformation1.get("addressLine2");
+        assertThat(firstAddressAddressLine2)
+                .isNotNull()
+                .isEqualTo("addLine2");
+
+        String firstAddressPostCode1 = (String) contactInformation1.get("postCode");
+        assertThat(firstAddressPostCode1)
+                .isNotNull()
+                .isEqualTo("some-post-code");
+
+        String firstAddressAddressLine3 = (String) contactInformation1.get("addressLine3");
+        assertThat(firstAddressAddressLine3)
+                .isNotNull()
+                .isEqualTo("addLine3");
+
+        String firstAddressAddressId = (String) contactInformation1.get("addressId");
+        assertThat(firstAddressAddressId)
+                .isNotNull();
+
+        List<Map<String,String>> firstAddressDxAddress =
+                (List<Map<String, String>>) contactInformation1.get("dxAddress");
+        assertThat(firstAddressDxAddress)
+                .isNotNull()
+                .hasSize(2);
+
+        String secondAddressUprn = (String) contactInformation2.get("uprn");
+        assertThat(secondAddressUprn)
+                .isNotNull()
+                .isEqualTo("uprn1");
+
+        String secondAddressCountry = (String) contactInformation2.get("country");
+        assertThat(secondAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String secondAddressCreated = (String) contactInformation2.get("created");
+        assertThat(secondAddressCreated)
+                .isNotNull();
+
+        String secondAddressTownCity = (String) contactInformation2.get("townCity");
+        assertThat(secondAddressTownCity)
+                .isNotNull()
+                .isEqualTo("some-town-city");
+
+        String secondAddressCounty = (String) contactInformation2.get("county");
+        assertThat(secondAddressCounty)
+                .isNotNull()
+                .isEqualTo("some-county");
+
+        String secondAddressAddressLine1 = (String) contactInformation2.get("addressLine1");
+        assertThat(secondAddressAddressLine1)
+                .isNotNull()
+                .isEqualTo("addressLine1");
+
+        String secondAddressAddressLine2 = (String) contactInformation2.get("addressLine2");
+        assertThat(secondAddressAddressLine2)
+                .isNotNull()
+                .isEqualTo("addressLine2");
+
+        String secondAddressPostCode = (String) contactInformation2.get("postCode");
+        assertThat(secondAddressPostCode)
+                .isNotNull()
+                .isEqualTo("some-post-code");
+
+        String secondAddressAddressLine3 = (String) contactInformation2.get("addressLine3");
+        assertThat(secondAddressAddressLine3)
+                .isNotNull()
+                .isEqualTo("addressLine3");
+
+        String secondAddressAddressId = (String) contactInformation2.get("addressId");
+        assertThat(secondAddressAddressId)
+                .isNotNull();
+
+        List<Map<String,String>> secondAddressDxAddress =
+                (List<Map<String, String>>) contactInformation2.get("dxAddress");
+        assertThat(secondAddressDxAddress)
+                .isNotNull()
+                .hasSize(3);
     }
 }

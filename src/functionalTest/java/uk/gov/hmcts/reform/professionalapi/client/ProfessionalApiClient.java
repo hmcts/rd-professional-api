@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
@@ -158,11 +159,11 @@ public class ProfessionalApiClient {
             .build());
 
         return someMinimalOrganisationRequest()
-            .name(randomAlphabetic(10))
+            .name(randomAlphabetic(10) + "-prd-func-test-name")
             .status("PENDING")
-            .sraId(randomAlphabetic(10) + "sra-id-number1")
+            .sraId(randomAlphabetic(10) + "-prd-func-test-sra-id")
             .sraRegulated("false")
-            .companyUrl(randomAlphabetic(10) + "company-url")
+            .companyUrl(randomAlphabetic(10) + "-prd-func-test-company-url")
             .companyNumber(randomAlphabetic(5) + "com")
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
@@ -231,13 +232,13 @@ public class ProfessionalApiClient {
         String superUserEmail = generateRandomEmail();
 
         OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
-                new OrganisationOtherOrgsCreationRequest(randomAlphabetic(10),
+                new OrganisationOtherOrgsCreationRequest(randomAlphabetic(10) + "-prd-func-test-name",
                         "PENDING",
                         "test",
-                        randomAlphabetic(10) + "sra-id-number1",
+                        randomAlphabetic(10) + "-prd-func-test-sra-id",
                         "false",
                         randomAlphabetic(5) + "com",
-                        randomAlphabetic(10) + "company-url",
+                        randomAlphabetic(10) + "-prd-func-test-company-url",
                         aUserCreationRequest()
                                 .firstName("some-fname")
                                 .lastName("some-lname")
@@ -480,26 +481,21 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails(String id, String role, HttpStatus status) {
+    public JsonPath retrieveOrganisationDetails(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
-            .body("")
-            .get("/refdata/internal/v1/organisations?id=" + id)
-            .andReturn();
+                .body("")
+                .get("/refdata/internal/v1/organisations?id=" + id)
+                .andReturn();
 
         if (response.statusCode() != OK.value()) {
             log.info("{}:: Retrieve organisation response: {}", loggingComponentName, response.statusCode());
         }
 
         response.then()
-            .assertThat()
-            .statusCode(status.value());
+                .assertThat()
+                .statusCode(status.value());
 
-        if (HttpStatus.OK == status) {
-            return response.as(Map.class);
-        } else {
-            return new HashMap<>();
-        }
-
+        return response.body().jsonPath();
     }
 
     public Map<String, Object> retrieveOrganisationDetailsForV2(String id, String role, HttpStatus status) {
@@ -878,6 +874,21 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         return response.body().as(Map.class);
+    }
+
+    public JsonPath retrieveOrganisationByUserId(String userId, HttpStatus status) {
+
+        Response response = getMultipleAuthHeadersInternal().log().all()
+                .get("/refdata/internal/v1/organisations/orgDetails/" + userId)
+                .andReturn();
+
+        log.info("{}:: find org by userId (Internal): {}", loggingComponentName, response.statusCode());
+
+        response.then().log().all()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().jsonPath();
     }
 
     public Map<String, Object> retrieveOrganisationByOrgIdExternalV2(HttpStatus status,
