@@ -768,6 +768,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     private static void verifyOrganisationDetails(JsonPath response) {
+
         String companyUrl = response.get("companyUrl");
         assertThat(companyUrl)
                 .isNotNull()
@@ -777,7 +778,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(organisationIdentifier)
                 .isNotNull();
 
-        Map<String,String> superUser = response.get("superUser");
+        Map<String, String> superUser = response.get("superUser");
         assertThat(superUser)
                 .isNotNull();
 
@@ -834,18 +835,20 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .isNotNull()
                 .isEmpty();
 
-        List<Map<String,Object>> contactInformation = response.getList("contactInformation");
+        verifyContactInformationDetails(response);
+    }
+
+    private static void verifyContactInformationDetails(JsonPath response) {
+
+        List<Map<String, Object>> contactInformation = response.getList("contactInformation");
         assertThat(contactInformation)
                 .isNotNull()
                 .hasSize(2);
 
-        contactInformation = contactInformation
-                .stream()
-                .sorted(Comparator.comparing(map -> (String) map.get("addressLine1")))
-                .collect(Collectors.toList());
+        contactInformation = sortByValue(contactInformation, "addressLine1");
 
-        final Map<String,Object> contactInformation1 = contactInformation.get(0);
-        final Map<String,Object> contactInformation2 = contactInformation.get(1);
+        final Map<String, Object> contactInformation1 = contactInformation.get(0);
+        final Map<String, Object> contactInformation2 = contactInformation.get(1);
 
         String firstAddressUprn = (String) contactInformation1.get("uprn");
         assertThat(firstAddressUprn)
@@ -899,11 +902,36 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(firstAddressAddressId)
                 .isNotNull();
 
-        List<Map<String,String>> firstAddressDxAddress =
-                (List<Map<String, String>>) contactInformation1.get("dxAddress");
+        List<Map<String, Object>> firstAddressDxAddress =
+                (List<Map<String, Object>>) contactInformation1.get("dxAddress");
         assertThat(firstAddressDxAddress)
                 .isNotNull()
                 .hasSize(2);
+
+        firstAddressDxAddress = sortByValue(firstAddressDxAddress, "dxNumber");
+
+        final Map<String, Object> firstAddressDxAddress1 = firstAddressDxAddress.get(0);
+        final Map<String, Object> firstAddressDxAddress2 = firstAddressDxAddress.get(1);
+
+        Object firstAddressDxNumber1 = firstAddressDxAddress1.get("dxNumber");
+        assertThat(firstAddressDxNumber1)
+                .isNotNull()
+                .isEqualTo("DX 123452222");
+
+        Object firstAddressDxExchange1 = firstAddressDxAddress1.get("dxExchange");
+        assertThat(firstAddressDxExchange1)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object firstAddressDxNumber2 = firstAddressDxAddress2.get("dxNumber");
+        assertThat(firstAddressDxNumber2)
+                .isNotNull()
+                .isEqualTo("DX 123456333");
+
+        Object firstAddressDxExchange2 = firstAddressDxAddress2.get("dxExchange");
+        assertThat(firstAddressDxExchange2)
+                .isNotNull()
+                .isEqualTo("dxExchange");
 
         String secondAddressUprn = (String) contactInformation2.get("uprn");
         assertThat(secondAddressUprn)
@@ -953,10 +981,54 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(secondAddressAddressId)
                 .isNotNull();
 
-        List<Map<String,String>> secondAddressDxAddress =
-                (List<Map<String, String>>) contactInformation2.get("dxAddress");
+        List<Map<String, Object>> secondAddressDxAddress =
+                (List<Map<String, Object>>) contactInformation2.get("dxAddress");
         assertThat(secondAddressDxAddress)
                 .isNotNull()
                 .hasSize(3);
+
+        secondAddressDxAddress = sortByValue(secondAddressDxAddress, "dxNumber");
+
+        final Map<String, Object> secondAddressDxAddress1 = secondAddressDxAddress.get(0);
+        final Map<String, Object> secondAddressDxAddress2 = secondAddressDxAddress.get(1);
+        final Map<String, Object> secondAddressDxAddress3 = secondAddressDxAddress.get(2);
+
+        Object secondAddressDxNumber1 = secondAddressDxAddress1.get("dxNumber");
+        assertThat(secondAddressDxNumber1)
+                .isNotNull()
+                .isEqualTo("DX 123456777");
+
+        Object secondAddressDxExchange1 = secondAddressDxAddress1.get("dxExchange");
+        assertThat(secondAddressDxExchange1)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object secondAddressDxNumber2 = secondAddressDxAddress2.get("dxNumber");
+        assertThat(secondAddressDxNumber2)
+                .isNotNull()
+                .isEqualTo("DX 123456788");
+
+        Object secondAddressDxExchange2 = secondAddressDxAddress2.get("dxExchange");
+        assertThat(secondAddressDxExchange2)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object secondAddressDxNumber3 = secondAddressDxAddress3.get("dxNumber");
+        assertThat(secondAddressDxNumber3)
+                .isNotNull()
+                .isEqualTo("DX 1234567890");
+
+        Object secondAddressDxExchange3 = secondAddressDxAddress3.get("dxExchange");
+        assertThat(secondAddressDxExchange3)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+    }
+
+    private static List<Map<String, Object>> sortByValue(final List<Map<String, Object>> maps,
+                                                         final String key) {
+        return maps
+                .stream()
+                .sorted(Comparator.comparing(map -> (String) map.get(key)))
+                .collect(Collectors.toList());
     }
 }
