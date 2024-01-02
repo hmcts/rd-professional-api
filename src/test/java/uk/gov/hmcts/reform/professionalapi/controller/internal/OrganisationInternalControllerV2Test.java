@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 
@@ -60,6 +63,7 @@ class OrganisationInternalControllerV2Test {
     private OrganisationEntityResponseV2 organisationEntityResponse;
     private OrganisationService organisationServiceMock;
     private Organisation organisation;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
 
     private ProfessionalUserService professionalUserServiceMock;
 
@@ -97,6 +101,7 @@ class OrganisationInternalControllerV2Test {
                 "soMeone@somewhere.com", organisation);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
+        organisationIdentifierValidatorImpl = mock(OrganisationIdentifierValidatorImpl.class);
         organisationsDetailResponse =
                 new OrganisationsDetailResponseV2(singletonList(organisation),
                         false, false, true,true);
@@ -149,6 +154,25 @@ class OrganisationInternalControllerV2Test {
 
         verify(organisationServiceMock, times(1))
                 .retrieveAllOrganisationsForV2Api(null, null);
+    }
+
+    @Test
+    void test_RetrieveOrganisationsWithSince() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String since = "2019-08-16T15:00:41";
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(formattedSince, null))
+                .thenReturn(organisationsDetailResponse);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, since,
+                null, null, null);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+                .retrieveAllOrganisationsForV2Api(formattedSince, null);
     }
 
     @Test

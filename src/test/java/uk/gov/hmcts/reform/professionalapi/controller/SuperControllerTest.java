@@ -243,6 +243,24 @@ class SuperControllerTest {
     }
 
     @Test
+    void test_retrieveAllOrganisationOrByIdForV2ApiWithSince() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String since = "2019-08-16T15:00:41";
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(formattedSince, null))
+                .thenReturn(organisationsDetailResponseV2);
+
+        ResponseEntity<?> actual = superController
+                .retrieveAllOrganisationsOrByIdForV2Api(null, since, null, null, null);
+
+        assertThat(actual.getBody()).isEqualTo(organisationsDetailResponseV2);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisationsForV2Api(formattedSince, null);
+    }
+
+    @Test
     void test_retrieveAllOrganisationForV2ApiWithPagination0_shouldThrowException() {
         assertThrows(InvalidRequest.class, () ->
                 superController
