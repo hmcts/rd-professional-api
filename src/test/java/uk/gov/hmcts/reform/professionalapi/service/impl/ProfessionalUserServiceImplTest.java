@@ -1190,7 +1190,7 @@ class ProfessionalUserServiceImplTest {
         professionalUserList.add(professionalUser);
         professionalUserList.add(professionalUser1);
 
-        when(professionalUserRepository.findByLastUpdatedBefore(any(), eq(pageableMock)))
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any(), eq(pageableMock)))
                 .thenReturn(professionalUserPage);
 
         when(professionalUserPage.getContent()).thenReturn(professionalUserList);
@@ -1205,7 +1205,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity.getHeaders().get("total_records")).isNotNull();
 
         verify(professionalUserRepository, times(1))
-                .findByLastUpdatedBefore(any(), any());
+                .findByLastUpdatedGreaterThanEqual(any(), any());
     }
 
     @Test

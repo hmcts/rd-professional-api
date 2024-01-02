@@ -32,5 +32,5 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
             nativeQuery = true)
     int findByUserCountByOrganisationId(@Param("organisationId") UUID organisationId);
 
-    Page<ProfessionalUser> findByLastUpdatedBefore(LocalDateTime lastUpdated, Pageable pageable);
+    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated, Pageable pageable);
 }

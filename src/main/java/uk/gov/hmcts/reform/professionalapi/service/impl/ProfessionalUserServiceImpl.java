@@ -133,7 +133,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable) {
         LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
         Page<ProfessionalUser> professionalUsersPage =
-                professionalUserRepository.findByLastUpdatedBefore(formattedSince, pageable);
+                professionalUserRepository.findByLastUpdatedGreaterThanEqual(formattedSince, pageable);
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
         long totalRecords = professionalUsersPage.getTotalElements();
 

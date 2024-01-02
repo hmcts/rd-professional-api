@@ -24,7 +24,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
 
         LocalDateTime dateTime = LocalDateTime.now();
-        dateTime = dateTime.plusHours(1);
+        dateTime = dateTime.minusHours(1);
         String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
         Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 1, 10);
@@ -71,7 +71,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
 
         LocalDateTime dateTime = LocalDateTime.now();
-        dateTime = dateTime.minusHours(1);
+        dateTime = dateTime.plusHours(1);
         String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
         Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 1, 10);

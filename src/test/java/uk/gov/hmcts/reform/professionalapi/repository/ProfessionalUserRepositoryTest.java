@@ -76,14 +76,14 @@ class ProfessionalUserRepositoryTest extends BaseRepository {
     }
 
     @Test
-    void test_findByLastUpdatedBefore() {
+    void test_findByLastUpdatedGreaterThanEqual() {
         LocalDateTime dateTime = LocalDateTime.now();
-        dateTime = dateTime.plusHours(1);
+        dateTime = dateTime.minusHours(1);
 
         Pageable pageable = createPageableObject(0, 10, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
                 .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
 
-        Page<ProfessionalUser> profUserPage = professionalUserRepository.findByLastUpdatedBefore(
+        Page<ProfessionalUser> profUserPage = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
                 dateTime, pageable);
 
         List<ProfessionalUser> profUser = profUserPage.getContent();
