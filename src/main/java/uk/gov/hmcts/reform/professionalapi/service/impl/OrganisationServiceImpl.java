@@ -417,17 +417,18 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(Pageable pageable) {
+    public OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince,
+                                                                          Pageable pageable) {
         List<Organisation> retrievedOrganisations = null;
         long totalRecords = 0;
 
         if (pageable != null) {
-            Page<Organisation> pageableOrganisations = organisationRepository.findByStatusIn(List.of(ACTIVE, PENDING),
-                    pageable);
+            Page<Organisation> pageableOrganisations = findOrganisationsByStatusAndPageable(List.of(ACTIVE, PENDING),
+                    pageable, formattedSince);
             totalRecords = pageableOrganisations.getTotalElements();
             retrievedOrganisations = pageableOrganisations.getContent();
         } else {
-            retrievedOrganisations = organisationRepository.findAll();
+            retrievedOrganisations = findAllOrganisations(formattedSince);
             totalRecords = retrievedOrganisations.size();
 
         }
@@ -501,7 +502,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(String status, Pageable pageable) {
+    public OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(LocalDateTime since, String status,
+                                                                          Pageable pageable) {
         List<OrganisationStatus> statuses = new ArrayList<>(validateAndReturnStatusList(status));
         List<Organisation> organisations;
         List<Organisation> activeOrganisations = new ArrayList<>();
@@ -509,11 +511,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         long totalRecords = 0;
 
         if (pageable != null) {
-            Page<Organisation> orgs = organisationRepository.findByStatusIn(statuses,pageable);
+            Page<Organisation> orgs = findOrganisationsByStatusAndPageable(statuses,
+                    pageable, since);
             organisations = orgs.getContent();
             totalRecords = orgs.getTotalElements();
         } else {
-            organisations = organisationRepository.findByStatusIn(statuses);
+            organisations = findOrganisationsByStatus(statuses, since);
         }
 
         organisations.forEach(organisation -> {
@@ -676,7 +679,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
     @Override
-    public OrganisationsDetailResponse findByOrganisationStatus(LocalDateTime formattedSince, String status,
+    public OrganisationsDetailResponse findByOrganisationStatus(LocalDateTime since, String status,
                                                                 Pageable pageable) {
         List<OrganisationStatus> statuses = new ArrayList<>(validateAndReturnStatusList(status));
         List<Organisation> organisations;
@@ -685,11 +688,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         long totalRecords = 0;
 
         if (pageable != null) {
-            Page<Organisation> orgs = findOrganisationsByStatusAndPageable(statuses, pageable, formattedSince);
+            Page<Organisation> orgs = findOrganisationsByStatusAndPageable(statuses, pageable, since);
             organisations = orgs.getContent();
             totalRecords = orgs.getTotalElements();
         } else {
-            organisations = findOrganisationsByStatus(statuses, formattedSince);
+            organisations = findOrganisationsByStatus(statuses, since);
         }
 
         organisations.forEach(organisation -> {

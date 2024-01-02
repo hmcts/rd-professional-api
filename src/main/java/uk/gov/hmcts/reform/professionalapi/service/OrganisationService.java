@@ -31,12 +31,13 @@ public interface OrganisationService {
     BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                        String idamId);
 
-    OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(Pageable pageable);
+    OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
 
     OrganisationEntityResponseV2 retrieveOrganisationForV2Api(String organisationIdentifier,
                                                               boolean isPendingPbaRequired);
 
-    OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(String status, Pageable pageable);
+    OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(LocalDateTime formattedSince, String status,
+                                                                   Pageable pageable);
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 

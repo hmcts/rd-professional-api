@@ -117,7 +117,7 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     private void mockOrgDetails(Organisation organisation) {
         List<Organisation> organisationList = new ArrayList<>();
         organisationList.add(organisation);
-        when(organisationService.retrieveAllOrganisationsForV2Api(null))
+        when(organisationService.retrieveAllOrganisationsForV2Api(null, null))
             .thenReturn(new OrganisationsDetailResponseV2(
                 organisationList, true, true,
                 false,true));

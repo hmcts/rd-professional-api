@@ -230,23 +230,23 @@ class SuperControllerTest {
     void test_retrieveAllOrganisationOrByIdForV2Api() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null))
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null, null))
                 .thenReturn(organisationsDetailResponseV2);
 
         ResponseEntity<?> actual = superController
-                .retrieveAllOrganisationsOrByIdForV2Api(null, null, null, null);
+                .retrieveAllOrganisationsOrByIdForV2Api(null, null, null, null, null);
 
         assertThat(actual.getBody()).isEqualTo(organisationsDetailResponseV2);
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveAllOrganisationsForV2Api(null);
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisationsForV2Api(null, null);
     }
 
     @Test
     void test_retrieveAllOrganisationForV2ApiWithPagination0_shouldThrowException() {
         assertThrows(InvalidRequest.class, () ->
                 superController
-                        .retrieveAllOrganisationsOrByIdForV2Api(null, null, 0, null));
+                        .retrieveAllOrganisationsOrByIdForV2Api(null, null, null, 0, null));
     }
 
     @Test

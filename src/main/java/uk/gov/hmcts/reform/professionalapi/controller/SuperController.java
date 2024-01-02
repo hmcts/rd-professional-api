@@ -240,10 +240,17 @@ public abstract class SuperController {
 
 
     protected ResponseEntity<Object> retrieveAllOrganisationsOrByIdForV2Api(String organisationIdentifier,
-                                                                            String status, Integer page, Integer size) {
+                                                                            String since, String status,
+                                                                            Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
         long totalRecords = 1;
+
+        LocalDateTime formattedSince = null;
+        if (since != null) {
+            organisationIdentifierValidatorImpl.validateSince(since);
+            formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+        }
 
         Object organisationResponse = null;
         var pageable = createPageable(page, size);
@@ -251,7 +258,7 @@ public abstract class SuperController {
 
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(pageable);
+            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(formattedSince, pageable);
             totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
@@ -265,7 +272,7 @@ public abstract class SuperController {
             //Received request to retrieve organisation with status
 
             organisationResponse = organisationService
-                    .findByOrganisationStatusForV2Api(orgStatus.toUpperCase(), pageableByStatus);
+                    .findByOrganisationStatusForV2Api(formattedSince, orgStatus.toUpperCase(), pageableByStatus);
             totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
         }
 

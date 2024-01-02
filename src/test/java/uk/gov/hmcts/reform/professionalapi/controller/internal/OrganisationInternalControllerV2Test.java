@@ -138,17 +138,17 @@ class OrganisationInternalControllerV2Test {
     void test_RetrieveOrganisations() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null))
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null, null))
                 .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null,
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null,
                 null, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveAllOrganisationsForV2Api(null);
+                .retrieveAllOrganisationsForV2Api(null, null);
     }
 
     @Test
@@ -159,7 +159,7 @@ class OrganisationInternalControllerV2Test {
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, 1, null);
+                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, null, 1, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -177,7 +177,7 @@ class OrganisationInternalControllerV2Test {
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
-                .getOrganisationIdentifier(), "PENDING", null, null);
+                .getOrganisationIdentifier(), null, "PENDING", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -190,17 +190,17 @@ class OrganisationInternalControllerV2Test {
     void test_RetrieveOrganisationByStatusWithIdNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.findByOrganisationStatusForV2Api(any(), any()))
+        when(organisationServiceMock.findByOrganisationStatusForV2Api(any(), any(), any()))
                 .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(null, "PENDING", null, null);
+                .retrieveOrganisations(null,  null, "PENDING", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .findByOrganisationStatusForV2Api(OrganisationStatus.PENDING.name(), null);
+                .findByOrganisationStatusForV2Api(null, OrganisationStatus.PENDING.name(), null);
     }
 
     @Test
@@ -209,10 +209,10 @@ class OrganisationInternalControllerV2Test {
         Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
         Pageable pageable = PageRequest.of(0, 1, Sort.by(order));
 
-        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(pageable))
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null, pageable))
             .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, 1);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, null, 1);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -220,7 +220,7 @@ class OrganisationInternalControllerV2Test {
                 .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
-            .retrieveAllOrganisationsForV2Api(pageable);
+            .retrieveAllOrganisationsForV2Api(null, pageable);
     }
 
     @Test
@@ -229,11 +229,11 @@ class OrganisationInternalControllerV2Test {
         Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
         Pageable pageable = PageRequest.of(0, 20, Sort.by(order));
 
-        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(pageable))
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null, pageable))
             .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(null, null, 1, null);
+                .retrieveOrganisations(null, null, null, 1, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -241,7 +241,7 @@ class OrganisationInternalControllerV2Test {
                 .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
-            .retrieveAllOrganisationsForV2Api(pageable);
+            .retrieveAllOrganisationsForV2Api(null, pageable);
     }
 
     @Test
@@ -251,10 +251,10 @@ class OrganisationInternalControllerV2Test {
         Sort.Order name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
         Pageable pageable = PageRequest.of(0, 20, Sort.by(order).and(Sort.by(name)));
 
-        when(organisationServiceMock.findByOrganisationStatusForV2Api(any(), any()))
+        when(organisationServiceMock.findByOrganisationStatusForV2Api(any(), any(), any()))
             .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING", 1, 20);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, "PENDING", 1, 20);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -262,7 +262,7 @@ class OrganisationInternalControllerV2Test {
                 .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
-            .findByOrganisationStatusForV2Api(OrganisationStatus.PENDING.name(), pageable);
+            .findByOrganisationStatusForV2Api(null, OrganisationStatus.PENDING.name(), pageable);
     }
 
     @Test
