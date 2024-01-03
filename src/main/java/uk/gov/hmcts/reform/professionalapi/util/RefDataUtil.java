@@ -430,11 +430,6 @@ public class RefDataUtil {
         List<RefreshUser> refreshUserList = new ArrayList<>();
 
         for (ProfessionalUser professionalUser : professionalUsers) {
-            RefreshUser refreshUser = new RefreshUser();
-            refreshUser.setUserIdentifier(professionalUser.getUserIdentifier());
-            refreshUser.setLastUpdated(professionalUser.getLastUpdated());
-            refreshUser.setOrganisationIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
-
             List<UserAccessType> userAccessTypes = new ArrayList<>();
 
             userAccessTypes.addAll(userConfiguredAccesses.stream()
@@ -443,7 +438,12 @@ public class RefDataUtil {
                     .map(RefDataUtil::fromUserConfiguredAccess)
                     .toList());
 
-            refreshUser.setUserAccessTypes(userAccessTypes);
+            RefreshUser refreshUser = new RefreshUser(
+                    professionalUser.getUserIdentifier(),
+                    professionalUser.getLastUpdated(),
+                    professionalUser.getOrganisation().getOrganisationIdentifier(),
+                    userAccessTypes
+            );
 
             refreshUserList.add(refreshUser);
         }

@@ -116,18 +116,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size) {
-        ResponseEntity<Object> responseEntity;
-
         if (since != null && page != null && size != null) {
             Pageable pageable =
                     createPageableObject(page - 1, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
                             .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
-            responseEntity = findRefreshUsers(since, pageable);
-        } else {
-            responseEntity = findSingleRefreshUser(userId);
+            return findRefreshUsers(since, pageable);
         }
-
-        return responseEntity;
+        return findSingleRefreshUser(userId);
     }
 
     public ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable) {
