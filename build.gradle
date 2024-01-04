@@ -379,8 +379,6 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.5.1'
 
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
-
     implementation group: 'com.google.guava', name: 'guava', version: '32.1.1-jre'
     //Added org.glassfish to support javax.el
     implementation group: 'org.glassfish', name: 'javax.el', version: '3.0.0'
@@ -389,8 +387,6 @@ dependencies {
     implementation (group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk) {
         exclude group: 'com.google.guava', module: 'guava'
     }
-
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
 
 
     testImplementation group: 'org.apache.camel', name: 'camel-test', version: versions.camel
