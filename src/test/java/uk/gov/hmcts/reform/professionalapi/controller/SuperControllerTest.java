@@ -204,13 +204,14 @@ class SuperControllerTest {
     void test_retrieveAllOrganisationsOrByIdWithSinceAndStatus() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        String since = "2019-08-16T15:00:41";
-        String status = "ACTIVE";
         OrganisationsDetailResponse response = new OrganisationsDetailResponse(singletonList(organisation),
                 false, false, true);
         response.setTotalRecords(100L);
+        response.setMoreAvailable(true);
         when(organisationServiceMock.findByOrganisationStatus(any(), any(), any())).thenReturn(response);
 
+        String since = "2019-08-16T15:00:41";
+        String status = "ACTIVE";
         ResponseEntity<?> actual = superController.retrieveAllOrganisationsOrById(null, since,
                 status, 1, 200);
 

@@ -358,11 +358,13 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationsDetailResponse retrieveAllOrganisations(LocalDateTime formattedSince, Pageable pageable) {
         List<Organisation> retrievedOrganisations = null;
         long totalRecords = 0;
+        boolean moreAvailable = false;
 
         if (pageable != null) {
             Page<Organisation> pageableOrganisations = findOrganisationsWithPageable(formattedSince, pageable);
             totalRecords = pageableOrganisations.getTotalElements();
             retrievedOrganisations = pageableOrganisations.getContent();
+            moreAvailable = getMoreAvailable(pageableOrganisations, pageable);
         } else {
             retrievedOrganisations = findAllOrganisations(formattedSince);
             totalRecords = retrievedOrganisations.size();
@@ -413,6 +415,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(
                 resultingOrganisations, true, true, false);
         organisationsDetailResponse.setTotalRecords(totalRecords);
+        organisationsDetailResponse.setMoreAvailable(moreAvailable);
         return organisationsDetailResponse;
     }
 
@@ -421,16 +424,17 @@ public class OrganisationServiceImpl implements OrganisationService {
                                                                           Pageable pageable) {
         List<Organisation> retrievedOrganisations = null;
         long totalRecords = 0;
+        boolean moreAvailable = false;
 
         if (pageable != null) {
             Page<Organisation> pageableOrganisations = findOrganisationsByStatusAndPageable(List.of(ACTIVE, PENDING),
                     pageable, formattedSince);
             totalRecords = pageableOrganisations.getTotalElements();
             retrievedOrganisations = pageableOrganisations.getContent();
+            moreAvailable = getMoreAvailable(pageableOrganisations, pageable);
         } else {
             retrievedOrganisations = findAllOrganisations(formattedSince);
             totalRecords = retrievedOrganisations.size();
-
         }
 
         if (retrievedOrganisations.isEmpty()) {
@@ -478,6 +482,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationsDetailResponseV2 organisationsDetailResponse = new OrganisationsDetailResponseV2(
                 resultingOrganisations, true, true, false,true);
         organisationsDetailResponse.setTotalRecords(totalRecords);
+        organisationsDetailResponse.setMoreAvailable(moreAvailable);
         return organisationsDetailResponse;
     }
 
@@ -509,12 +514,14 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> activeOrganisations = new ArrayList<>();
         List<Organisation> resultOrganisations = new ArrayList<>();
         long totalRecords = 0;
+        boolean moreAvailable = false;
 
         if (pageable != null) {
             Page<Organisation> orgs = findOrganisationsByStatusAndPageable(statuses,
                     pageable, since);
             organisations = orgs.getContent();
             totalRecords = orgs.getTotalElements();
+            moreAvailable = getMoreAvailable(orgs, pageable);
         } else {
             organisations = findOrganisationsByStatus(statuses, since);
         }
@@ -538,6 +545,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 new OrganisationsDetailResponseV2(resultOrganisations,
                 true, true, false, true);
         organisationsDetailResponse.setTotalRecords(totalRecords);
+        organisationsDetailResponse.setMoreAvailable(moreAvailable);
 
         return organisationsDetailResponse;
     }
@@ -686,11 +694,13 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> activeOrganisations = new ArrayList<>();
         List<Organisation> resultOrganisations = new ArrayList<>();
         long totalRecords = 0;
+        boolean moreAvailable = false;
 
         if (pageable != null) {
             Page<Organisation> orgs = findOrganisationsByStatusAndPageable(statuses, pageable, since);
             organisations = orgs.getContent();
             totalRecords = orgs.getTotalElements();
+            moreAvailable = getMoreAvailable(orgs, pageable);
         } else {
             organisations = findOrganisationsByStatus(statuses, since);
         }
@@ -713,6 +723,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(resultOrganisations,
                 true, true, false);
         organisationsDetailResponse.setTotalRecords(totalRecords);
+        organisationsDetailResponse.setMoreAvailable(moreAvailable);
 
         return organisationsDetailResponse;
     }
@@ -993,6 +1004,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         return orgs;
+    }
+
+    private boolean getMoreAvailable(Page<Organisation> pageableOrganisations, Pageable pageable) {
+        long totalRecords = pageableOrganisations.getTotalElements();
+        int otherPagesSize = pageable.getPageSize() * (pageable.getPageNumber());
+        return (pageableOrganisations.getContent().size() + otherPagesSize) < totalRecords;
     }
 
 }

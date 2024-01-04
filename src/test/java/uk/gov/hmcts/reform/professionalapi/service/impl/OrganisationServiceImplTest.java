@@ -1203,6 +1203,7 @@ class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isEqualTo(2);
+        assertThat(organisationDetailResponse.isMoreAvailable()).isFalse();
 
         assertThat(organisations.get(0).getName()).isEqualTo("some-org-name");
         assertThat(organisations.get(1).getName()).isEqualTo("someother-org-name");
@@ -1271,6 +1272,7 @@ class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
+        assertThat(organisationDetailResponse.isMoreAvailable()).isFalse();
 
         assertThat(organisations.get(0).getName()).isEqualTo("some-org-name");
         assertThat(organisations.get(1).getName()).isEqualTo("someother-org-name");
@@ -1314,6 +1316,7 @@ class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
+        assertThat(organisationDetailResponse.isMoreAvailable()).isFalse();
         assertThat(organisations.get(0).getName()).isEqualTo("some-org-name");
         assertThat(organisations.get(1).getName()).isEqualTo("someother-org-name");
         assertThat(organisations.get(0).getUsers()).isNotEmpty();
@@ -1351,13 +1354,14 @@ class OrganisationServiceImplTest {
         when(orgPage.getContent()).thenReturn(organisations);
         when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(
                 List.of(OrganisationStatus.ACTIVE,OrganisationStatus.PENDING),
-                since, pageable).getTotalElements()).thenReturn(1L);
+                since, pageable).getTotalElements()).thenReturn(3L);
 
         OrganisationsDetailResponseV2 organisationDetailResponse = sut.retrieveAllOrganisationsForV2Api(
                 since, pageable);
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
+        assertThat(organisationDetailResponse.isMoreAvailable()).isTrue();
         assertThat(organisations.get(0).getName()).isEqualTo("some-org-name");
         assertThat(organisations.get(1).getName()).isEqualTo("someother-org-name");
         assertThat(organisations.get(0).getUsers()).isNotEmpty();
@@ -1396,7 +1400,7 @@ class OrganisationServiceImplTest {
         var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
         var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
 
-        Pageable pageable = PageRequest.of(1,2, Sort.by(order).and(Sort.by(name)));
+        Pageable pageable = PageRequest.of(0,2, Sort.by(order).and(Sort.by(name)));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable)).thenReturn(orgPage);
@@ -1418,7 +1422,7 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(1))
             .findByStatusIn(Collections.emptyList(), pageable);
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
-
+        assertThat(organisationDetailResponse.isMoreAvailable()).isFalse();
     }
 
     @Test
@@ -1450,7 +1454,7 @@ class OrganisationServiceImplTest {
         var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
         var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
 
-        Pageable pageable = PageRequest.of(1,2, Sort.by(order).and(Sort.by(name)));
+        Pageable pageable = PageRequest.of(0,2, Sort.by(order).and(Sort.by(name)));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), since,
@@ -1473,7 +1477,62 @@ class OrganisationServiceImplTest {
                 = sut.findByOrganisationStatus(since, ACTIVE.name(), pageable);
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isEqualTo(1L);
+        assertThat(organisationDetailResponse.isMoreAvailable()).isFalse();
+    }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_RetrieveAnOrganisationsByStatusAndPaginationWithSinceAndMoreAvailable() throws JsonProcessingException {
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+
+        organisation.setStatus(ACTIVE);
+        organisation.setUsers(users);
+        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
+        var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+
+        Pageable pageable = PageRequest.of(0,2, Sort.by(order).and(Sort.by(name)));
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), since,
+                pageable)).thenReturn(orgPage);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), since,
+                pageable).getContent())
+                .thenReturn(organisations);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(Collections.emptyList(),
+                since, pageable)).thenReturn(orgPage);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(Collections.emptyList(),
+                since, pageable).getContent())
+                .thenReturn(organisations);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), since,
+                pageable).getTotalElements()).thenReturn(3L);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        OrganisationsDetailResponse organisationDetailResponse
+                = sut.findByOrganisationStatus(since, ACTIVE.name(), pageable);
+        assertThat(organisationDetailResponse).isNotNull();
+        assertThat(organisationDetailResponse.getTotalRecords()).isEqualTo(3L);
+        assertThat(organisationDetailResponse.isMoreAvailable()).isTrue();
     }
 
     @Test
@@ -1502,7 +1561,7 @@ class OrganisationServiceImplTest {
                 false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
-        Pageable pageable = PageRequest.of(1,2, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
+        Pageable pageable = PageRequest.of(0,2, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable)).thenReturn(orgPage);
@@ -1524,7 +1583,7 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(1))
                 .findByStatusIn(Collections.emptyList(), pageable);
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
-
+        assertThat(organisationDetailResponse.isMoreAvailable()).isFalse();
     }
 
     @Test
@@ -1613,7 +1672,7 @@ class OrganisationServiceImplTest {
         var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
         var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
 
-        Pageable pageable = PageRequest.of(1,2, Sort.by(name).and(Sort.by(order)));
+        Pageable pageable = PageRequest.of(0,2, Sort.by(name).and(Sort.by(order)));
 
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
@@ -1630,6 +1689,7 @@ class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
+        assertThat(organisationDetailResponse.isMoreAvailable()).isFalse();
         assertThat(organisationDetailResponse.getOrganisations().get(0).getName())
                 .isEqualTo("some-blocked-org-name1");
         assertThat(organisationDetailResponse.getOrganisations().get(1).getName())
@@ -1669,7 +1729,7 @@ class OrganisationServiceImplTest {
         var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
         var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
 
-        Pageable pageable = PageRequest.of(1,2, Sort.by(name).and(Sort.by(order)));
+        Pageable pageable = PageRequest.of(0,2, Sort.by(name).and(Sort.by(order)));
 
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
@@ -1685,6 +1745,7 @@ class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
+        assertThat(organisationDetailResponse.isMoreAvailable()).isFalse();
         assertThat(organisationDetailResponse.getOrganisations().get(0).getName())
                 .isEqualTo("some-blocked-org-name1");
         assertThat(organisationDetailResponse.getOrganisations().get(1).getName())
