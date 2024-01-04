@@ -65,6 +65,8 @@ resendInterval: 60
 # sync time interval in minutes
 syncInterval: 60
 
+userProfUrl: ${USER_PROFILE_URL:http://127.0.0.1:8091}
+
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 loggingComponentName: RD_Professional_API
