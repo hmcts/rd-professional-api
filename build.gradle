@@ -31,7 +31,7 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 ext {
-    springCloudVersion = '2022.0.3'
+    springCloudVersion = '2023.0.0'
 }
 
 def versions = [
@@ -569,11 +569,6 @@ dependencyManagement {
         dependencySet(group: 'commons-fileupload', version: '1.5') {
             entry 'commons-fileupload'
         }
-        //CVE-2021-22044
-        dependencySet(group: 'org.springframework.cloud', version: '3.1.5') {
-            entry 'spring-cloud-starter-openfeign'
-            entry 'spring-cloud-openfeign-core'
-        }
 
 //        Resolves CVE-2023-4586
         dependencySet(group: 'io.netty', version: '4.1.100.Final') {
@@ -621,7 +616,6 @@ dependencyUpdates.resolutionStrategy = {
 gradle.startParameter.continueOnFailure = true
 
 bootJar {
-    loaderImplementation = org.springframework.boot.loader.tools.LoaderImplementation.CLASSIC
     archiveFileName = jarName
     manifest {
         attributes('Implementation-Version': project.version.toString())
