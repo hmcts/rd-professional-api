@@ -51,6 +51,13 @@ prd:
       pui-caa: pui-caa
       caseworker-caa: caseworker-caa
       prd-aac-system: prd-aac-system
+  scheduler:
+    cronExpression: ${CRON_EXPRESSION:* */10 * * * *}
+    enabled: ${SCHEDULER_ENABLED:false}
+    lockAtLeastFor: ${Lock_AT_Least_For:PT10M}
+    lockAtMostFor: ${Lock_AT_Most_For:PT20M}
+    defaultLockAtMostFor: ${Default_Lock_At_Most_For:PT30M}
+
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
@@ -65,9 +72,34 @@ resendInterval: 60
 # sync time interval in minutes
 syncInterval: 60
 
+feign:
+  allow:
+    headers:
+      - authorization
+      - serviceauthorization
+
+prdEnumRoleType: ADMIN_ROLE,JURISD_ID
+jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
+allowedStatus: ACTIVE
+
 userProfUrl: ${USER_PROFILE_URL:http://127.0.0.1:8091}
 
 defaultPageSize: ${DEFAULTPAGESIZE:10}
+
+resendInviteEnabled : true
+
+
+# delete organisation enabled
+deleteOrganisationEnabled : ${DELETE_ORG:false}
+
+# get Active Orgs External enabled
+activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}
+
+launchdarkly:
+  sdk:
+    key: ${LD_SDK_KEY:}
+    environment: ${LAUNCH_DARKLY_ENV:local}
+    user: rd
 
 loggingComponentName: RD_Professional_API
 security:
