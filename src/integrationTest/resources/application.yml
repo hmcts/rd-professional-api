@@ -1,12 +1,16 @@
 spring:
-  flyway.locations: classpath:db/testmigration
+  flyway:
+    schemas: DBREFDATA
+    locations: classpath:db/testmigration
 
   jpa:
     properties:
       hibernate:
+        default_schema: dbrefdata
         enable_lazy_load_no_trans: true
   main:
     allow-bean-definition-overriding: true
+    allow-circular-references: true
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:dbrefdata
@@ -52,12 +56,11 @@ prd:
       caseworker-caa: caseworker-caa
       prd-aac-system: prd-aac-system
   scheduler:
-    cronExpression: ${CRON_EXPRESSION:* */10 * * * *}
+    cronExpression: ${CRON_EXPRESSION:* */1 * * * *}
     enabled: ${SCHEDULER_ENABLED:false}
-    lockAtLeastFor: ${Lock_AT_Least_For:PT10M}
-    lockAtMostFor: ${Lock_AT_Most_For:PT20M}
-    defaultLockAtMostFor: ${Default_Lock_At_Most_For:PT30M}
-
+    lockAtLeastFor: ${Lock_AT_Least_For:PT1M}
+    lockAtMostFor: ${Lock_AT_Most_For:PT2M}
+    defaultLockAtMostFor: ${Default_Lock_At_Most_For:PT3M}
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
