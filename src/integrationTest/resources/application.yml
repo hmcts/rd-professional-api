@@ -1,9 +1,10 @@
 spring:
   flyway:
     schemas: DBREFDATA
-    locations: classpath:db/testmigration
+    locations: classpath:db/migration
 
   jpa:
+    show-sql: true
     properties:
       hibernate:
         default_schema: dbrefdata
@@ -28,6 +29,18 @@ spring:
             client-secret: DUMMY
 
 auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
+
+select-dataload-schedular-audit: SELECT * FROM dbrefdata.dataload_schedular_audit
+
+select-bulk_customer: SELECT * FROM dbrefdata.bulk_customer_details
+
+delete-bulk_customer: DELETE FROM dbrefdata.bulk_customer_details
+
+prdEnumRoleType: ADMIN_ROLE,JURISD_ID
+
+resendInviteEnabled : true
+
+allowedStatus: ACTIVE
 
 idam:
   s2s-auth:
@@ -75,21 +88,9 @@ resendInterval: 60
 # sync time interval in minutes
 syncInterval: 60
 
-feign:
-  allow:
-    headers:
-      - authorization
-      - serviceauthorization
-
-prdEnumRoleType: ADMIN_ROLE,JURISD_ID
-jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
-allowedStatus: ACTIVE
-
-userProfUrl: ${USER_PROFILE_URL:http://127.0.0.1:8091}
-
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
-resendInviteEnabled : true
+loggingComponentName: RD_Professional_API
 
 
 aggregation-strategy-completion-size: 100
@@ -132,33 +133,3 @@ route:
     csv-binder-object: BulkCustomerDetails
     csv-headers-expected: Organisation_ID,Bulk_Customer_ID,Sidam_ID,PBA
     header-validation-enabled: true
-
-# delete organisation enabled
-deleteOrganisationEnabled : ${DELETE_ORG:false}
-
-# get Active Orgs External enabled
-activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}
-
-launchdarkly:
-  sdk:
-    key: ${LD_SDK_KEY:}
-    environment: ${LAUNCH_DARKLY_ENV:local}
-    user: rd
-
-loggingComponentName: RD_Professional_API
-security:
-  anonymousPaths:
-    - "/"
-    - "/health"
-    - "/health/readiness"
-    - "/health/liveness"
-    - "/actuator/**"
-    - "/loggers/**"
-    - "/swagger-ui.html"
-    - "/swagger-resources/**"
-    - "/v3/**"
-    - "/swagger-ui/**"
-    - "/webjars/springfox-swagger-ui/**"
-    - "/csrf"
-    - "/error"
-    - "/favicon.ico"
