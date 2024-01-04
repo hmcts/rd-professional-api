@@ -101,7 +101,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
- 
+
     }
 
     public void createOrganisationScenario() {
@@ -689,7 +689,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         Map<String, Object> organisations = professionalApiClient
             .retrieveAllOrganisationsWithPagination(hmctsAdmin, "1", "2");
 
-        assertThat(organisations).isNotNull().hasSize(1);
+        assertThat(((List)organisations.get("organisations"))).isNotNull().hasSize(1);
 
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }

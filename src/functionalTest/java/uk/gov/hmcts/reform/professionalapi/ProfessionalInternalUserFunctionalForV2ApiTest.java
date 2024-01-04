@@ -63,7 +63,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
- 
+
     }
 
     public void createOrganisationScenario() {
@@ -236,7 +236,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> organisations = professionalApiClient
             .retrieveAllOrganisationsWithPaginationV2(hmctsAdmin, "1", "10");
 
-        assertThat(organisations).isNotNull().hasSize(1);
+        assertThat(((List)organisations.get("organisations"))).isNotNull().hasSize(1);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
 }
