@@ -70,6 +70,8 @@ public class ProfessionalReferenceDataClient {
 
     private String baseV2Url;
 
+    private String baseV2IntUrl;
+
     private String issuer;
     private long expiration;
 
@@ -84,6 +86,7 @@ public class ProfessionalReferenceDataClient {
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
         this.baseV2Url = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH;
+        this.baseV2IntUrl = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH;
         this.issuer = issuer;
         this.expiration = tokenExpirationInterval;
     }
@@ -150,6 +153,21 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
+    }
+
+    public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
+        return postRequest(baseV2IntUrl, request, null, null);
+    }
+
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeader(String email, String role) {
+        return getRequestToGetEmailFromHeader("/refdata/internal/v2/organisations" + "/pbas",
+            role, "", email);
+    }
+
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers(String email, String role,
+                                                                                         String userId) {
+        return getRequestToGetEmailFromHeader("/refdata/external/v2/organisations" + "/pbas",
+            role, userId, email);
     }
 
     public Map<String, Object> retrieveAllOrganisationsForV2Api(String role) {
@@ -887,6 +905,27 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> findOrganisationsByUserId(String userId, String role) {
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/orgDetails/" + userId;
+
+            HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role, userId));
+            responseEntity = restTemplate
+                    .exchange(urlPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
         return getResponse(responseEntity);
     }
 

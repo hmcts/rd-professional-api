@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -637,5 +638,46 @@ public class OrganisationInternalController extends SuperController {
         return ResponseEntity
                 .status(updatePbaStatusResponse.getStatusCode())
                 .body(updatePbaStatusResponse);
+    }
+
+    @Operation(
+            summary = "Retrieves the organisation details of a user",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
+    )
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "",
+            content = @Content(schema = @Schema(implementation = OrganisationEntityResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "User id null"
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied"
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Professional User not found"
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error"
+    )
+
+    @GetMapping(
+            path = "/orgDetails/{userId}",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(
+            @PathVariable("userId") String userId) {
+        return organisationService.retrieveOrganisationByUserId(userId);
     }
 }

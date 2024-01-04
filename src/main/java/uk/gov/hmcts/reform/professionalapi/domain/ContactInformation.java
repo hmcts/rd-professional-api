@@ -44,7 +44,7 @@ public class ContactInformation implements Serializable {
     private String addressLine1;
 
     @Column(name = "ADDRESS_LINE2")
-    @Size(max = 50)
+    @Size(max = 150)
     private String addressLine2;
 
     @Column(name = "ADDRESS_LINE3")

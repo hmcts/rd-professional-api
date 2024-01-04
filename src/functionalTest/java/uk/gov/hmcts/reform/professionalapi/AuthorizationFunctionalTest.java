@@ -355,23 +355,6 @@ public class AuthorizationFunctionalTest {
         assertThat(pbaList).hasSize(3);
     }
 
-    public void validateSingleOrgResponse(Map<String, Object> response, String status) {
-
-        Assertions.assertThat(response.size()).isPositive();
-        assertThat(response.get("organisationIdentifier")).isNotNull();
-        assertThat(response.get("name")).isNotNull();
-        assertThat(response).containsEntry("status", status);
-        assertThat(response.get("sraId")).isNotNull();
-        assertThat(response.get("sraRegulated")).isNotNull();
-        assertThat(response.get("companyNumber")).isNotNull();
-        assertThat(response.get("companyUrl")).isNotNull();
-        assertThat(response.get("superUser")).isNotNull();
-        assertThat(response.get("paymentAccount")).isNotNull();
-        assertThat(response.get("contactInformation")).isNotNull();
-        verifyContactInfoCreatedDateSorting(response.get("contactInformation"));
-
-    }
-
     public void validateSingleOrgResponseForV2(Map<String, Object> response, String status) {
 
         Assertions.assertThat(response.size()).isPositive();
