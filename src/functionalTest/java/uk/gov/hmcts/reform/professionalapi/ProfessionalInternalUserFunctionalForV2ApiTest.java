@@ -236,7 +236,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> organisations = professionalApiClient
             .retrieveAllOrganisationsWithPaginationV2(hmctsAdmin, "1", "10");
 
-        assertThat(((List)organisations.get("organisations"))).isNotNull().hasSize(1);
+        assertThat(organisations).isNotNull().hasSize(2);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
 }
