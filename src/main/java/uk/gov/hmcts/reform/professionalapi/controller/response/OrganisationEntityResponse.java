@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
@@ -44,8 +45,21 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @DateTimeFormat
     @JsonInclude(ALWAYS)
     protected LocalDateTime dateApproved = null;
+    @JsonProperty
+    @DateTimeFormat
+    @JsonInclude(ALWAYS)
+    protected LocalDateTime lastUpdated = null;
+    @JsonProperty
+    protected List<String> organisationProfileIds;
 
-
+    private static final String[][] ORG_TYPE_TO_ORG_PROFILE_ID = {
+            {"SOLICITOR_ORG", "SOLICITOR_PROFILE"},
+            {"LOCAL_AUTHORITY_ORG", "SOLICITOR_PROFILE"},
+            {"OTHER_ORG", "SOLICITOR_PROFILE"},
+            {"OGD_DWP_ORG", "OGD_DWP_PROFILE"},
+            {"OGD_HO_ORG", "OGD_HO_PROFILE"},
+            {"OGD_OTHER_ORG", "SOLICITOR_PROFILE"}
+    };
 
     public OrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
@@ -105,6 +119,23 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
 
         this.dateReceived = organisation.getCreated();
         this.dateApproved = organisation.getDateApproved();
+        this.lastUpdated = organisation.getLastUpdated();
+        this.organisationProfileIds = getOrganisationProfileIds(organisation);
 
+    }
+
+    private List<String> getOrganisationProfileIds(Organisation organisation) {
+        HashMap<String, String> orgTypeToOrgProfileId = new HashMap<>();
+        for (String[] orgTypes : ORG_TYPE_TO_ORG_PROFILE_ID) {
+            orgTypeToOrgProfileId.put(orgTypes[0], orgTypes[1]);
+        }
+
+        List<String> allOrganisationProfileIds = new ArrayList<>();
+        String organisationProfileId = orgTypeToOrgProfileId.get(organisation.getOrgType());
+        if (organisationProfileId != null && !allOrganisationProfileIds.contains(organisationProfileId)) {
+            allOrganisationProfileIds.add(organisationProfileId);
+        }
+
+        return allOrganisationProfileIds;
     }
 }

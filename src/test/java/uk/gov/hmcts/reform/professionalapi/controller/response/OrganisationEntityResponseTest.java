@@ -23,6 +23,19 @@ class OrganisationEntityResponseTest {
     }
 
     @Test
+    void test_OrganisationEntityResponseWithProfileId() {
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
+        organisation.setOrgType("SOLICITOR_ORG");
+
+        OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(organisation,
+                false, false, true);
+
+        assertThat(organisationEntityResponse).isNotNull();
+        assertThat(organisationEntityResponse.organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+    }
+
+    @Test
     void test_OrganisationEntityResponse_organisation_null() {
 
         OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(null,
