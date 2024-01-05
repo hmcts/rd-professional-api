@@ -829,7 +829,7 @@ public class ProfessionalApiClient {
                                                                        HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
-            .get("/refdata/internal/v1/organisations/" + organisationId + "/users")
+            .get("/refdata/internal/v1/organisations/" + organisationId + "/users/")
             .andReturn();
 
         response.then()
