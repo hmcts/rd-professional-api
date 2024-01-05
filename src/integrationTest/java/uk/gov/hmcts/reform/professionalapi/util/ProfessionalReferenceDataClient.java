@@ -152,7 +152,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveAllOrganisations(String role) {
-        return getRequest(APP_INT_BASE_PATH + "/", role);
+        return getRequest(APP_INT_BASE_PATH, role);
     }
 
     public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
