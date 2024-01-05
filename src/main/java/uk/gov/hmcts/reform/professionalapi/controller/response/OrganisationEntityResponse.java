@@ -8,9 +8,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import java.time.LocalDateTime;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static java.util.Objects.nonNull;
@@ -52,14 +54,15 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @JsonProperty
     protected List<String> organisationProfileIds;
 
-    private static final String[][] ORG_TYPE_TO_ORG_PROFILE_ID = {
-            {"SOLICITOR_ORG", "SOLICITOR_PROFILE"},
-            {"LOCAL_AUTHORITY_ORG", "SOLICITOR_PROFILE"},
-            {"OTHER_ORG", "SOLICITOR_PROFILE"},
-            {"OGD_DWP_ORG", "OGD_DWP_PROFILE"},
-            {"OGD_HO_ORG", "OGD_HO_PROFILE"},
-            {"OGD_OTHER_ORG", "SOLICITOR_PROFILE"}
-    };
+    private static final String DEFAULT_ORG_PROFILE_ID = "SOLICITOR_PROFILE";
+    private static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
+            new SimpleEntry<String, List<String>>("SOLICITOR_ORG", List.of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("LOCAL_AUTHORITY_ORG", List.of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("OTHER_ORG", List.of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("OGD_DWP_ORG", List.of("OGD_DWP_PROFILE")),
+            new SimpleEntry<String, List<String>>("OGD_HO_ORG", List.of("OGD_HO_PROFILE")),
+            new SimpleEntry<String, List<String>>("OGD_OTHER_ORG", List.of("SOLICITOR_PROFILE"))
+    );
 
     public OrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
@@ -125,17 +128,9 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     }
 
     private List<String> getOrganisationProfileIds(Organisation organisation) {
-        HashMap<String, String> orgTypeToOrgProfileId = new HashMap<>();
-        for (String[] orgTypes : ORG_TYPE_TO_ORG_PROFILE_ID) {
-            orgTypeToOrgProfileId.put(orgTypes[0], orgTypes[1]);
+        if (organisation.getOrgType() == null) {
+            return Arrays.asList(DEFAULT_ORG_PROFILE_ID);
         }
-
-        List<String> allOrganisationProfileIds = new ArrayList<>();
-        String organisationProfileId = orgTypeToOrgProfileId.get(organisation.getOrgType());
-        if (organisationProfileId != null && !allOrganisationProfileIds.contains(organisationProfileId)) {
-            allOrganisationProfileIds.add(organisationProfileId);
-        }
-
-        return allOrganisationProfileIds;
+        return ORG_TYPE_TO_ORG_PROFILE_IDS.get(organisation.getOrgType());
     }
 }
