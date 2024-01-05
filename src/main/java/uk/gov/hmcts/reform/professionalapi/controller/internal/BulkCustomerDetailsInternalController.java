@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +79,7 @@ public class BulkCustomerDetailsInternalController extends SuperController {
     public ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomer(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description =
                                                                     "retrieveOrganisationDetailsForBulkCustomer")
-            @Valid @NotNull @RequestBody BulkCustomerRequest bulkCustomerRequest) {
+            @Validated @NotNull @RequestBody BulkCustomerRequest bulkCustomerRequest) {
 
         log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomer", loggingComponentName);
 

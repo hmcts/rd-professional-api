@@ -7,12 +7,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -116,7 +116,7 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-            @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
+            @Validated @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for external user
         return createOrganisationFrom(organisationCreationRequest);
@@ -278,7 +278,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured("pui-user-manager")
     public ResponseEntity<Object> addUserToOrganisationUsingExternalController(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "newUserCreationRequest")
-            @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
+            @Validated @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @Parameter(hidden = true) @OrgId String organisationIdentifier,
             @Parameter(hidden = true) @UserId String userId) {
 
@@ -390,7 +390,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured({"pui-finance-manager"})
     public void deletePaymentAccountsOfOrganisation(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
-            @Valid @NotNull @RequestBody PbaRequest deletePbaRequest,
+            @Validated @NotNull @RequestBody PbaRequest deletePbaRequest,
             @Parameter(hidden = true) @OrgId String organisationIdentifier,
             @Parameter(hidden = true) @UserId String userId) {
 
@@ -471,7 +471,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured("pui-finance-manager")
     public ResponseEntity<Object> addPaymentAccountsToOrganisation(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "pbaRequest")
-            @Valid @NotNull @RequestBody PbaRequest pbaRequest,
+            @Validated @NotNull @RequestBody PbaRequest pbaRequest,
             @Parameter(hidden = true) @OrgId String organisationIdentifier,
             @Parameter(hidden = true) @UserId String userId) {
 
@@ -530,7 +530,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<Void> addContactInformationsToOrganisation(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
-            @Valid @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
+            @Validated @NotNull @RequestBody List<ContactInformationCreationRequest> contactInformationCreationRequests,
             @Parameter(hidden = true) @OrgId String organisationIdentifier) {
 
 
@@ -604,7 +604,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured({"pui-organisation-manager"})
     public void deleteMultipleAddressesOfOrganisation(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deleteRequest")
-            @Valid @NotNull @RequestBody List<DeleteMultipleAddressRequest> deleteRequest,
+            @Validated @NotNull @RequestBody List<DeleteMultipleAddressRequest> deleteRequest,
             @Parameter(hidden = true) @OrgId String organisationIdentifier) {
 
         deleteMultipleAddressOfGivenOrganisation(deleteRequest, organisationIdentifier);
