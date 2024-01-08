@@ -7,7 +7,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        default_schema: dbrefdata
+        default_schema: DBREFDATA
         enable_lazy_load_no_trans: true
   main:
     allow-bean-definition-overriding: true
