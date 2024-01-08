@@ -248,7 +248,8 @@ class ProfessionalUserInternalControllerTest {
     void test_GetRefreshUsersWithSince() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", List.of(userAccessType));
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", OrganisationStatus.ACTIVE,
+                List.of("a", "b"), List.of(userAccessType), null);
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -279,7 +280,8 @@ class ProfessionalUserInternalControllerTest {
     void test_GetRefreshUsers_SingleUser() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", List.of(userAccessType));
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", OrganisationStatus.ACTIVE,
+                List.of("a", "b"), List.of(userAccessType), null);
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);

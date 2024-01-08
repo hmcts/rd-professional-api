@@ -438,11 +438,18 @@ public class RefDataUtil {
                     .map(RefDataUtil::fromUserConfiguredAccess)
                     .toList());
 
+            List<String> organisationProfileIds = userAccessTypes.stream()
+                    .map(UserAccessType::getOrganisationProfileId)
+                    .collect(toList());
+
             RefreshUser refreshUser = new RefreshUser(
                     professionalUser.getUserIdentifier(),
                     professionalUser.getLastUpdated(),
                     professionalUser.getOrganisation().getOrganisationIdentifier(),
-                    userAccessTypes
+                    professionalUser.getOrganisation().getStatus(),
+                    organisationProfileIds,
+                    userAccessTypes,
+                    professionalUser.getDeleted()
             );
 
             refreshUserList.add(refreshUser);

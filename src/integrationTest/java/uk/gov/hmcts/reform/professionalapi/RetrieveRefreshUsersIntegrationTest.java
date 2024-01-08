@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 
 class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -98,7 +99,10 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
             assertNotNull(user.get(USER_IDENTIFIER));
             assertNotNull(user.get(LAST_UPDATED));
             assertNotNull(user.get(ORG_IDENTIFIER));
+            assertNotNull(user.get(ORG_STATUS));
+            assertNotNull(user.get(ORG_PROFILE_IDS));
             assertNotNull(user.get(USER_ACCESS_TYPES));
+            assertNull(user.get(DATE_TIME_DELETED));
 
             List<LinkedHashMap> userAccessTypes = (List<LinkedHashMap>) user.get("userAccessTypes");
 

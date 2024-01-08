@@ -6,6 +6,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,11 +19,17 @@ class RefreshUserTest {
         refreshUser.setUserIdentifier("user-identifier");
         refreshUser.setLastUpdated(LocalDateTime.now());
         refreshUser.setOrganisationIdentifier("org-identifier");
+        refreshUser.setOrganisationStatus(OrganisationStatus.ACTIVE);
+        refreshUser.setOrganisationProfileIds(List.of("a", "b"));
         refreshUser.setUserAccessTypes(new ArrayList<>());
+        refreshUser.setDateTimeDeleted(null);
 
         assertThat(refreshUser.getUserIdentifier()).isEqualTo("user-identifier");
         assertThat(refreshUser.getLastUpdated()).isNotNull();
         assertThat(refreshUser.getOrganisationIdentifier()).isEqualTo("org-identifier");
+        assertThat(refreshUser.getOrganisationStatus()).isNotNull();
+        assertThat(refreshUser.getOrganisationStatus()).isNotNull();
         assertThat(refreshUser.getUserAccessTypes()).isNotNull();
+        assertThat(refreshUser.getDateTimeDeleted()).isNull();
     }
 }
