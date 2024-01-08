@@ -643,15 +643,16 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
             throws InterruptedException {
 
         String organisationIdentifier = createOrganisationRequest("PENDING");
+        TimeUnit.SECONDS.sleep(SINCE_PAUSE_SECONDS);
+        final LocalDateTime sinceValue = LocalDateTime.now();
+        final String since = sinceValue.format(DATE_TIME_FORMATTER);
+
         String organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(
                 someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
 
         assertThat(organisationIdentifier).isNotEmpty();
         assertThat(organisationIdentifier1).isNotEmpty();
 
-        TimeUnit.SECONDS.sleep(SINCE_PAUSE_SECONDS);
-        final LocalDateTime sinceValue = LocalDateTime.now();
-        final String since = sinceValue.format(DATE_TIME_FORMATTER);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .retrieveAllOrganisationDetailsByStatusSinceTest("PENDING,ACTIVE", hmctsAdmin, since);
