@@ -85,3 +85,59 @@ module "db-professional-ref-data-v11" {
   sku_capacity       = var.sku_capacity
   sku_tier           = "GeneralPurpose"
 }
+
+# Create the database server v16
+# Name and resource group name will be defaults (<product>-<component>-<env> and <product>-<component>-data-<env> respectively)
+module "db-professional-ref-data-v16" {
+  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+
+  providers = {
+    azurerm.postgres_network = azurerm.postgres_network
+  }
+
+  admin_user_object_id = var.jenkins_AAD_objectId
+  business_area        = "cft"
+  common_tags          = var.common_tags
+  component            = var.component-v16
+  env                  = var.env
+  pgsql_databases = [
+    {
+      name = "dbrefdata"
+    }
+  ]
+
+  subnet_suffix        = "expanded"
+  pgsql_version        = "16"
+  product              = var.product-v16
+  name               = join("-", [var.product-v16, var.component-v16])
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-USER-v16" {
+  name          = join("-", [var.component, "POSTGRES-USER-v16"])
+  value         = module.db-professional-ref-data-v16.username
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_HOST-v16" {
+  name          = join("-", [var.component, "POSTGRES-HOST-v16"])
+  value         = module.db-professional-ref-data-v16.fqdn
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-PASS-v16" {
+  name          = join("-", [var.component, "POSTGRES-PASS-v16"])
+  value         = module.db-professional-ref-data-v16.password
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-v16" {
+  name          = join("-", [var.component, "POSTGRES-DATABASE-v16"])
+  value         = "dbrefdata"
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT-v16" {
+  name          = join("-", [var.component, "POSTGRES-PORT-v16"])
+  value         = "5432"
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
