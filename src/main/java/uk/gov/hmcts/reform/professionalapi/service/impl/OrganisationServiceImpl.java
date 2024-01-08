@@ -364,7 +364,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             Page<Organisation> pageableOrganisations = findOrganisationsWithPageable(formattedSince, pageable);
             totalRecords = pageableOrganisations.getTotalElements();
             retrievedOrganisations = pageableOrganisations.getContent();
-            moreAvailable = getMoreAvailable(pageableOrganisations, pageable);
+            moreAvailable = getMoreAvailable(pageableOrganisations);
         } else {
             retrievedOrganisations = findAllOrganisations(formattedSince);
             totalRecords = retrievedOrganisations.size();
@@ -431,7 +431,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     pageable, formattedSince);
             totalRecords = pageableOrganisations.getTotalElements();
             retrievedOrganisations = pageableOrganisations.getContent();
-            moreAvailable = getMoreAvailable(pageableOrganisations, pageable);
+            moreAvailable = getMoreAvailable(pageableOrganisations);
         } else {
             retrievedOrganisations = findAllOrganisations(formattedSince);
             totalRecords = retrievedOrganisations.size();
@@ -521,7 +521,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     pageable, since);
             organisations = orgs.getContent();
             totalRecords = orgs.getTotalElements();
-            moreAvailable = getMoreAvailable(orgs, pageable);
+            moreAvailable = getMoreAvailable(orgs);
         } else {
             organisations = findOrganisationsByStatus(statuses, since);
         }
@@ -700,7 +700,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             Page<Organisation> orgs = findOrganisationsByStatusAndPageable(statuses, pageable, since);
             organisations = orgs.getContent();
             totalRecords = orgs.getTotalElements();
-            moreAvailable = getMoreAvailable(orgs, pageable);
+            moreAvailable = getMoreAvailable(orgs);
         } else {
             organisations = findOrganisationsByStatus(statuses, since);
         }
@@ -958,58 +958,45 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private List<Organisation> findAllOrganisations(LocalDateTime formattedSince) {
-        List<Organisation> retrievedOrganisations = null;
         if (formattedSince == null) {
-            retrievedOrganisations = organisationRepository.findAll();
+            return organisationRepository.findAll();
         } else {
-            retrievedOrganisations = organisationRepository.findByLastUpdatedGreaterThanEqual(formattedSince);
+            return organisationRepository.findByLastUpdatedGreaterThanEqual(formattedSince);
         }
-
-        return retrievedOrganisations;
     }
 
     private Page<Organisation> findOrganisationsWithPageable(LocalDateTime formattedSince, Pageable pageable) {
-        Page<Organisation> pageableOrganisations = null;
         if (formattedSince == null) {
-            pageableOrganisations = organisationRepository.findByStatusIn(
+            return organisationRepository.findByStatusIn(
                     List.of(ACTIVE, PENDING), pageable);
         } else {
-            pageableOrganisations = organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(
+            return organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(
                     List.of(ACTIVE, PENDING), formattedSince, pageable);
         }
-
-        return  pageableOrganisations;
     }
 
     private List<Organisation> findOrganisationsByStatus(List<OrganisationStatus> statuses,
                                                          LocalDateTime formattedSince) {
-        List<Organisation> organisations;
         if (formattedSince == null) {
-            organisations = organisationRepository.findByStatusIn(statuses);
+            return organisationRepository.findByStatusIn(statuses);
         } else {
-            organisations = organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(statuses,
+            return organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(statuses,
                     formattedSince);
         }
-        return organisations;
     }
 
     private Page<Organisation> findOrganisationsByStatusAndPageable(List<OrganisationStatus> statuses,
                                                                     Pageable pageable, LocalDateTime formattedSince) {
-        Page<Organisation> orgs = null;
         if (formattedSince == null) {
-            orgs = organisationRepository.findByStatusIn(statuses,pageable);
+            return organisationRepository.findByStatusIn(statuses,pageable);
         } else {
-            orgs = organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(statuses, formattedSince,
+            return organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(statuses, formattedSince,
                     pageable);
         }
-
-        return orgs;
     }
 
-    private boolean getMoreAvailable(Page<Organisation> pageableOrganisations, Pageable pageable) {
-        long totalRecords = pageableOrganisations.getTotalElements();
-        int otherPagesSize = pageable.getPageSize() * (pageable.getPageNumber());
-        return (pageableOrganisations.getContent().size() + otherPagesSize) < totalRecords;
+    private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
+        return !pageableOrganisations.isLast();
     }
 
 }

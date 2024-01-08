@@ -653,9 +653,6 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         final LocalDateTime sinceValue = LocalDateTime.now();
         final String since = sinceValue.format(DATE_TIME_FORMATTER);
 
-        String organisationIdentifier2 = createAndActivateOrganisationWithGivenRequest(
-                someMinimalOrganisationRequest().status("ACTIVE").sraId(randomAlphabetic(10)).build());
-
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .retrieveAllOrganisationDetailsByStatusSinceTest("PENDING,ACTIVE", hmctsAdmin, since);
 
@@ -664,7 +661,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(1);
         assertThat(orgResponse.get("organisations").toString()).contains("status=ACTIVE");
 
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("http_status").toString()).contains("OK");
     }
 
     @Test
@@ -1106,7 +1103,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> orgResponse =  professionalReferenceDataClient
                 .retrieveAllOrganisationsSince(hmctsAdmin, since);
 
-        assertThat(orgResponse.get("http_status").toString().contains("200"));
+        assertThat(orgResponse.get("http_status").toString()).contains("200");
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(1);
 

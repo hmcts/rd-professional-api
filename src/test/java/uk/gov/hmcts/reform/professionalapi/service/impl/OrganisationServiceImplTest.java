@@ -1192,6 +1192,7 @@ class OrganisationServiceImplTest {
 
         Pageable pageable = mock(Pageable.class);
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.isLast()).thenReturn(true);
 
         when(orgPage.getContent()).thenReturn(organisations);
         when(orgPage.getTotalElements()).thenReturn(2L);
@@ -1261,6 +1262,7 @@ class OrganisationServiceImplTest {
 
         Pageable pageable = mock(Pageable.class);
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.isLast()).thenReturn(true);
 
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE, OrganisationStatus.PENDING),
             pageable)).thenReturn(orgPage);
@@ -1305,6 +1307,7 @@ class OrganisationServiceImplTest {
 
         Pageable pageable = mock(Pageable.class);
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.isLast()).thenReturn(true);
 
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE, OrganisationStatus.PENDING),
                 pageable)).thenReturn(orgPage);
@@ -1402,6 +1405,7 @@ class OrganisationServiceImplTest {
 
         Pageable pageable = PageRequest.of(0,2, Sort.by(order).and(Sort.by(name)));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.isLast()).thenReturn(true);
 
         when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable)).thenReturn(orgPage);
         when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable).getContent())
@@ -1456,6 +1460,7 @@ class OrganisationServiceImplTest {
 
         Pageable pageable = PageRequest.of(0,2, Sort.by(order).and(Sort.by(name)));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.isLast()).thenReturn(true);
 
         when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(List.of(ACTIVE), since,
                 pageable)).thenReturn(orgPage);
@@ -1563,6 +1568,7 @@ class OrganisationServiceImplTest {
 
         Pageable pageable = PageRequest.of(0,2, Sort.by(Sort.DEFAULT_DIRECTION, ORG_NAME));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.isLast()).thenReturn(true);
 
         when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable)).thenReturn(orgPage);
         when(organisationRepository.findByStatusIn(List.of(ACTIVE), pageable).getContent())
@@ -1675,6 +1681,7 @@ class OrganisationServiceImplTest {
         Pageable pageable = PageRequest.of(0,2, Sort.by(name).and(Sort.by(order)));
 
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.isLast()).thenReturn(true);
 
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.PENDING, REVIEW,BLOCKED), pageable))
                 .thenReturn(orgPage);
@@ -1685,7 +1692,6 @@ class OrganisationServiceImplTest {
         String status = "PENDING,REVIEW,blocked";
         OrganisationsDetailResponse organisationDetailResponse
                 = sut.findByOrganisationStatus(null, status, pageable);
-        Organisation organisationMock = mock(Organisation.class);
 
         assertThat(organisationDetailResponse).isNotNull();
         assertThat(organisationDetailResponse.getTotalRecords()).isPositive();
@@ -1732,6 +1738,7 @@ class OrganisationServiceImplTest {
         Pageable pageable = PageRequest.of(0,2, Sort.by(name).and(Sort.by(order)));
 
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.isLast()).thenReturn(true);
 
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.PENDING, REVIEW,BLOCKED), pageable))
                 .thenReturn(orgPage);
