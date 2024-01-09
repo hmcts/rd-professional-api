@@ -1708,6 +1708,7 @@ class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
         verify(organisationRepository, times(1)).deleteById(any());
         verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
 
@@ -1721,6 +1722,7 @@ class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
         verify(organisationRepository, times(1)).deleteById(any());
         verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
 
@@ -1757,6 +1759,7 @@ class OrganisationServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
         verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
         verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
 
@@ -1794,6 +1797,7 @@ class OrganisationServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
         verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
         verify(orgAttributeRepository, times(0)).deleteByOrganistion(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(0)).deleteByOrganistion(any());
 
     }
 
@@ -1809,6 +1813,7 @@ class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage())
                 .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
         verify(organisationRepository, times(0)).deleteById(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(0)).deleteByOrganistion(any());
         verify(orgAttributeRepository, times(0)).deleteByOrganistion(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
         verify(userProfileFeignClient, times(0)).getUserProfileByEmail(anyString());
@@ -1840,6 +1845,7 @@ class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Error while invoking UP");
         verify(organisationRepository, times(0)).deleteById(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(0)).deleteByOrganistion(any());
         verify(orgAttributeRepository, times(0)).deleteByOrganistion(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
@@ -1869,6 +1875,7 @@ class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage())
                 .isEqualTo(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
         verify(organisationRepository, times(0)).deleteById(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(0)).deleteByOrganistion(any());
         verify(orgAttributeRepository, times(0)).deleteByOrganistion(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
@@ -1896,6 +1903,7 @@ class OrganisationServiceImplTest {
                 deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789"));
 
         verify(organisationRepository, times(0)).deleteById(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(0)).deleteByOrganistion(any());
         verify(orgAttributeRepository, times(0)).deleteByOrganistion(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
