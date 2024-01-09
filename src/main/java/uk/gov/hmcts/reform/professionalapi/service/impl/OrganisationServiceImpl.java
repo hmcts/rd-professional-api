@@ -96,6 +96,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PROFESSIONAL_USER_404_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl.validateAndReturnStatusList;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
@@ -645,6 +646,22 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
         return new BulkCustomerOrganisationsDetailResponse(bulkCustomerDetails);
+    }
+
+    @Override
+    public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId) {
+        if (StringUtils.isBlank(userId) || userId.equalsIgnoreCase("null")) {
+            throw new InvalidRequest("Bad Request: User Id is null");
+        }
+        ProfessionalUser  professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
+        if (professionalUser == null) {
+            log.error("{}:: ProfessionalUserUser info null::", loggingComponentName);
+            throw new EmptyResultDataAccessException(PROFESSIONAL_USER_404_MESSAGE, 1);
+        }
+        Organisation organisation = professionalUser.getOrganisation();
+        return ResponseEntity
+                .status(200)
+                .body(new OrganisationEntityResponse(organisation, true, false, false));
     }
 
     private static void validatebulkCustomerDetails(BulkCustomerDetails bulkCustomerDetails) {
