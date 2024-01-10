@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessReposi
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +76,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
@@ -1191,5 +1193,57 @@ class ProfessionalUserServiceImplTest {
                 .hasMessageContaining(ERROR_MESSAGE_UP_FAILED);
         assertThat(((ExternalApiException) thrown).getHttpStatus()).isEqualTo(status);
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_findRefreshUsers() {
+        Pageable pageableMock = mock(Pageable.class);
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+        Page<ProfessionalUser> professionalUserPage = mock(Page.class);
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        ProfessionalUser professionalUser1 = new ProfessionalUser("fName", "lName",
+                "some1@email.com", organisation);
+        professionalUserList.add(professionalUser);
+        professionalUserList.add(professionalUser1);
+
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any(), eq(pageableMock)))
+                .thenReturn(professionalUserPage);
+
+        when(professionalUserPage.getContent()).thenReturn(professionalUserList);
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<Object> responseEntity = professionalUserService.findRefreshUsers(since, pageableMock);
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().get("total_records")).isNotNull();
+
+        verify(professionalUserRepository, times(1))
+                .findByLastUpdatedGreaterThanEqual(any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_findSingleRefreshUser() {
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setId(UUID.randomUUID());
+
+        when(professionalUserRepository.findByUserIdentifier(any()))
+                .thenReturn(professionalUser);
+
+        ResponseEntity<Object> responseEntity = professionalUserService.findSingleRefreshUser(userIdentifier);
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().get("total_records")).isNull();
+
+        verify(professionalUserRepository, times(1))
+                .findByUserIdentifier(any());
     }
 }

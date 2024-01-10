@@ -16,18 +16,22 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,12 +40,14 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserInternalControllerTest {
@@ -236,5 +242,59 @@ class ProfessionalUserInternalControllerTest {
                 userId, Optional.of("EXUI"));
         verify(organisationIdentifierValidatorMock, times(1))
                 .validateOrganisationExistsWithGivenOrgId("123456A");
+    }
+
+    @Test
+    void test_GetRefreshUsersWithSince() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", List.of(userAccessType));
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        Integer page = 1;
+        Integer size = 10;
+
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200)
+                .header("total_records", "1")
+                .body(getRefreshUsersResponse);
+
+        when(professionalUserServiceMock.fetchUsersForRefresh(any(), eq(null), any(), any()))
+                .thenReturn(responseEntity);
+
+        ResponseEntity<Object> actualData = professionalUserInternalController
+                .getRefreshUsers(since, null, page, size);
+
+        assertThat(actualData).isNotNull();
+        assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actualData.getHeaders().get("total_records")).isNotNull();
+
+        verify(professionalUserServiceMock, times(1))
+                .fetchUsersForRefresh(since, null, page, size);
+    }
+
+    @Test
+    void test_GetRefreshUsers_SingleUser() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", List.of(userAccessType));
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
+
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
+
+        when(professionalUserServiceMock.fetchUsersForRefresh(eq(null), any(), eq(null), eq(null)))
+                .thenReturn(responseEntity);
+
+        ResponseEntity<Object> actualData = professionalUserInternalController
+                .getRefreshUsers(null, "uid", null, null);
+
+        assertThat(actualData).isNotNull();
+        assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actualData.getHeaders().get("total_records")).isNull();
+
+        verify(professionalUserServiceMock, times(1))
+                .fetchUsersForRefresh(null, "uid", null, null);
     }
 }

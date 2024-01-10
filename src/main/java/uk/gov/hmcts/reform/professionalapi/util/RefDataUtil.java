@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfiles
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
@@ -479,6 +481,54 @@ public class RefDataUtil {
         return newResponseEntity;
     }
 
+    public static GetRefreshUsersResponse buildGetRefreshUsersResponse(Page<ProfessionalUser> professionalUsersPage,
+                                                                   List<ProfessionalUser> professionalUsers,
+                                                                   List<UserConfiguredAccess> userConfiguredAccesses) {
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse();
+        getRefreshUsersResponse.setMoreAvailable(professionalUsersPage != null && !professionalUsersPage.isLast());
+        List<RefreshUser> refreshUserList = new ArrayList<>();
+
+        for (ProfessionalUser professionalUser : professionalUsers) {
+            List<UserAccessType> userAccessTypes = new ArrayList<>();
+
+            userAccessTypes.addAll(userConfiguredAccesses.stream()
+                    .filter(uca -> uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier()
+                            .equals(professionalUser.getUserIdentifier()))
+                    .map(RefDataUtil::fromUserConfiguredAccess)
+                    .toList());
+
+            RefreshUser refreshUser = new RefreshUser(
+                    professionalUser.getUserIdentifier(),
+                    professionalUser.getLastUpdated(),
+                    professionalUser.getOrganisation().getOrganisationIdentifier(),
+                    userAccessTypes
+            );
+
+            refreshUserList.add(refreshUser);
+        }
+
+        getRefreshUsersResponse.setUsers(refreshUserList);
+
+        return getRefreshUsersResponse;
+    }
+
+    public static GetRefreshUsersResponse buildEmptyGetRefreshUsersResponse() {
+        GetRefreshUsersResponse response = new GetRefreshUsersResponse();
+        response.setUsers(new ArrayList<>());
+        return response;
+    }
+
+    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        UserAccessType accessType = new UserAccessType();
+        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
+        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
+                .getOrganisationProfileId());
+        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
+        accessType.setEnabled(userConfiguredAccess.getEnabled());
+
+        return accessType;
+    }
+
     @Value("${loggingComponentName}")
     public void setLoggingComponentName(String loggingComponentName) {
         RefDataUtil.loggingComponentName = loggingComponentName;
@@ -521,17 +571,6 @@ public class RefDataUtil {
             String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
             throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
-    }
-
-    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
-        UserAccessType accessType = new UserAccessType();
-        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
-        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
-                .getOrganisationProfileId());
-        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
-        accessType.setEnabled(userConfiguredAccess.getEnabled());
-
-        return accessType;
     }
 
 }

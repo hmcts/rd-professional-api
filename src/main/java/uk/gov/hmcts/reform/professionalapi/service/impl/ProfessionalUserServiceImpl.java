@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
@@ -40,7 +42,9 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessReposi
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,7 +53,11 @@ import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
@@ -109,6 +117,56 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
         return professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
+    }
+
+    @Override
+    public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size) {
+        if (since != null && page != null && size != null) {
+            Pageable pageable =
+                    createPageableObject(page - 1, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
+                            .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
+            return findRefreshUsers(since, pageable);
+        }
+        return findSingleRefreshUser(userId);
+    }
+
+    public ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable) {
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+        Page<ProfessionalUser> professionalUsersPage =
+                professionalUserRepository.findByLastUpdatedGreaterThanEqual(formattedSince, pageable);
+        List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
+        long totalRecords = professionalUsersPage.getTotalElements();
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+                .map(ProfessionalUser::getUserConfiguredAccesses)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
+                professionalUsersPage, professionalUsers, userConfiguredAccesses
+        );
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("total_records", String.valueOf(totalRecords))
+                .body(res);
+    }
+
+    public ResponseEntity<Object> findSingleRefreshUser(String userId) {
+        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
+        List<UserConfiguredAccess> userConfiguredAccesses;
+
+        if (professionalUser != null) {
+            userConfiguredAccesses = professionalUser.getUserConfiguredAccesses();
+        } else {
+            log.debug("Professional user with identifier: {} not found", userId);
+            return ResponseEntity.status(HttpStatus.OK).body(RefDataUtil.buildEmptyGetRefreshUsersResponse());
+        }
+
+        GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
+                null, List.of(professionalUser), userConfiguredAccesses
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @Override
