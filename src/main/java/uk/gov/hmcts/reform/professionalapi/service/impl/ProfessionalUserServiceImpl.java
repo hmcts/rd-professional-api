@@ -5,6 +5,7 @@ import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,11 +51,15 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
 
 @Service
 @Slf4j
 public class ProfessionalUserServiceImpl implements ProfessionalUserService {
+
+    @Value("${group-access.organisation-profile-ids}")
+    protected String organisationProfileIds;
 
     public static final String ERROR_USER_CONFIGURED_DELETE = "001 error while deleting user access records";
     public static final String ERROR_USER_CONFIGURED_CREATE = "002 error while creating user access records";
@@ -126,7 +131,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         ResponseEntity<Object> responseEntity
                 = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                organisation.getStatus(),
+                pagedProfessionalUsers.toList());
 
         var headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
                 responseEntity);
@@ -146,13 +153,17 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
         return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                organisation.getStatus(),
+                professionalUsers);
     }
 
     @SuppressWarnings("unchecked")
     private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest,
                                                         String showDeleted, boolean rolesRequired, String status,
-                                                        String organisationIdentifier) {
+                                                        String organisationIdentifier,
+                                                        OrganisationStatus organisationStatus,
+                                                        List<ProfessionalUser> professionalUsers) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
@@ -168,7 +179,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgIdInGetUserResponse(responseEntity, organisationIdentifier);
+                responseEntity = setOrgInfoInGetUserResponse(responseEntity, organisationIdentifier,
+                        organisationStatus, List.of(organisationProfileIds.split(",")));
+                responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
             }
 
         } catch (FeignException ex) {

@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProf
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -126,8 +128,11 @@ class ProfessionalUserServiceImplTest {
         prdEnums.add(anEnum);
 
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        ReflectionTestUtils.setField(professionalUserService, "organisationProfileIds",
+                "organisationProfileId1,organisationProfileId2");
     }
 
     @Test
@@ -222,6 +227,12 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         assertThat(professionalUsersEntityResponse1.getOrganisationIdentifier())
                 .isEqualTo(organisation.getOrganisationIdentifier());
+        assertThat(professionalUsersEntityResponse1.getOrganisationStatus())
+                .isEqualTo(organisation.getStatus().name());
+        assertThat(professionalUsersEntityResponse1.getOrganisationProfileIds())
+                .contains("organisationProfileId1");
+        assertThat(professionalUsersEntityResponse1.getOrganisationProfileIds())
+                .contains("organisationProfileId2");
         assertThat(professionalUsersEntityResponse1.getUsers()).hasSize(2);
         professionalUsersEntityResponse1.getUsers().forEach(userProfile -> {
             assertThat(userProfile.getIdamStatus()).isEqualToIgnoringCase("active");
@@ -564,9 +575,17 @@ class ProfessionalUserServiceImplTest {
         ResponseEntity responseEntity = professionalUserService
                 .findProfessionalUsersByOrganisationWithPageable(organisation, "false", false,
                         "Active", pageableMock);
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                = ((ProfessionalUsersEntityResponseWithoutRoles)responseEntity.getBody());
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
+        assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationStatus())
+                .isEqualTo(organisation.getStatus().name());
+        assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationProfileIds())
+                .contains("organisationProfileId1");
+        assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationProfileIds())
+                .contains("organisationProfileId2");
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
