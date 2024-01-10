@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
@@ -279,6 +280,19 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
     }
 
+    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
+        if (userAccessTypes != null) {
+            try {
+                List<UserConfiguredAccess> all = userAccessTypes.stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                        .collect(Collectors.toList());
+                userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
+            }
+        }
+    }
+
     private void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
                                             String userId) {
 
@@ -293,16 +307,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_DELETE);
         }
 
-        if (userProfileUpdatedData.getUserAccessTypes() != null) {
-            try {
-                List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
-                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .collect(Collectors.toList());
-                userConfiguredAccessRepository.saveAll(all);
-            } catch (Exception ex) {
-                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
-            }
-        }
+        saveAllUserAccessTypes(professionalUser, userProfileUpdatedData.getUserAccessTypes());
     }
 
     private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser,
