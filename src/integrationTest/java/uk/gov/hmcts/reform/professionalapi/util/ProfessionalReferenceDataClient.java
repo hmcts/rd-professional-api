@@ -924,4 +924,25 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    public Map<String, Object> findOrganisationsByUserId(String userId, String role) {
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/orgDetails/" + userId;
+
+            HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role, userId));
+            responseEntity = restTemplate
+                    .exchange(urlPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+        return getResponse(responseEntity);
+    }
+
 }

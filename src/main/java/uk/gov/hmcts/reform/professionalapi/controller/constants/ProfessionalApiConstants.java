@@ -170,4 +170,6 @@ public class ProfessionalApiConstants {
     public static final String ORG_TYPE_INVALID = "Org Type is invalid - can only contain Alphabetic,"
             + " empty space, ', - characters and must be less than 256 characters";
 
+    public static final String PROFESSIONAL_USER_404_MESSAGE = "Professional User not found:";
+
 }
