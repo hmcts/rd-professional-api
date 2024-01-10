@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,14 +20,17 @@ class NewUserCreationRequestTest {
         userRoles.add("pui-user-manager");
 
 
+        HashSet<UserAccessType> userAccessTypes = new HashSet<>();
+        userAccessTypes.add(new UserAccessType());
         NewUserCreationRequest newUserCreationRequest =
                 new NewUserCreationRequest("some-name", "some-last-name",
-                        "some@email.com",  userRoles, false);
+                        "some@email.com",  userRoles, false, userAccessTypes);
 
         assertThat(newUserCreationRequest.getFirstName()).isEqualTo("some-name");
         assertThat(newUserCreationRequest.getLastName()).isEqualTo("some-last-name");
         assertThat(newUserCreationRequest.getEmail()).isEqualTo("some@email.com");
         assertThat(newUserCreationRequest.getRoles()).hasSize(1);
+        assertThat(newUserCreationRequest.getUserAccessTypes()).hasSize(1);
     }
 
 
