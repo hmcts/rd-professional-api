@@ -58,7 +58,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGet
 public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public static final String ERROR_USER_CONFIGURED_DELETE = "001 error while deleting user access records";
-    public static final String ERROR_USER_CONFIGURED_CREATE = "002 error while creating user access records";
+    public static final String ERROR_USER_CONFIGURED_CREATE = "002 error while creating new user access records";
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
