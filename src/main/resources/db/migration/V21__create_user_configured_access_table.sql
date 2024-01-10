@@ -1,4 +1,3 @@
--- dataload_schedular_job definition
 create table user_configured_access(
 	professional_user_id uuid NOT NULL,
 	jurisdiction_id varchar(70) NOT NULL,
