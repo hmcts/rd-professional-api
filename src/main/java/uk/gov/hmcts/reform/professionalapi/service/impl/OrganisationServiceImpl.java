@@ -749,7 +749,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
                                                                 DeleteOrganisationResponse deleteOrganisationResponse,
                                                                 String prdAdminUserId) {
-
+        bulkCustomerDetailsRepository.deleteByOrganistion(organisation.getOrganisationIdentifier());
         orgAttributeRepository.deleteByOrganistion(organisation.getId());
         organisationRepository.deleteById(organisation.getId());
         deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
