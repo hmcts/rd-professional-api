@@ -193,16 +193,16 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<Object> retrieveAllOrganisationsOrById(String organisationIdentifier, String since,
+    protected ResponseEntity<Object> retrieveAllOrganisationsOrById(String organisationIdentifier, String lastUpdatedSince,
                                                                     String status, Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
         long totalRecords = 1;
 
         LocalDateTime formattedSince = null;
-        if (since != null) {
-            organisationIdentifierValidatorImpl.validateSince(since);
-            formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
         }
 
         Object organisationResponse = null;
@@ -240,16 +240,16 @@ public abstract class SuperController {
 
 
     protected ResponseEntity<Object> retrieveAllOrganisationsOrByIdForV2Api(String organisationIdentifier,
-                                                                            String since, String status,
+                                                                            String lastUpdatedSince, String status,
                                                                             Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
         long totalRecords = 1;
 
         LocalDateTime formattedSince = null;
-        if (since != null) {
-            organisationIdentifierValidatorImpl.validateSince(since);
-            formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
         }
 
         Object organisationResponse = null;
