@@ -193,7 +193,8 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<Object> retrieveAllOrganisationsOrById(String organisationIdentifier, String lastUpdatedSince,
+    protected ResponseEntity<Object> retrieveAllOrganisationsOrById(String organisationIdentifier,
+                                                                    String lastUpdatedSince,
                                                                     String status, Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
