@@ -8,17 +8,17 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import java.time.LocalDateTime;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.DEFAULT_ORG_PROFILE_ID;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.ORG_TYPE_TO_ORG_PROFILE_IDS;
 
 public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
@@ -53,16 +53,6 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     protected LocalDateTime lastUpdated = null;
     @JsonProperty
     protected List<String> organisationProfileIds;
-
-    private static final String DEFAULT_ORG_PROFILE_ID = "SOLICITOR_PROFILE";
-    private static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
-            new SimpleEntry<String, List<String>>("SOLICITOR_ORG", List.of("SOLICITOR_PROFILE")),
-            new SimpleEntry<String, List<String>>("LOCAL_AUTHORITY_ORG", List.of("SOLICITOR_PROFILE")),
-            new SimpleEntry<String, List<String>>("OTHER_ORG", List.of("SOLICITOR_PROFILE")),
-            new SimpleEntry<String, List<String>>("OGD_DWP_ORG", List.of("OGD_DWP_PROFILE")),
-            new SimpleEntry<String, List<String>>("OGD_HO_ORG", List.of("OGD_HO_PROFILE")),
-            new SimpleEntry<String, List<String>>("OGD_OTHER_ORG", List.of("SOLICITOR_PROFILE"))
-    );
 
     public OrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
