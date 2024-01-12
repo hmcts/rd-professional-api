@@ -378,7 +378,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         String lastName = "someLastName";
         String firstName = "1Aaron";
         Set<UserAccessType> userAccessTypes = new HashSet<>();
-        userAccessTypes.add(new UserAccessType("jurisdictionId", "organisationProfileId", "accessTypeId", false));
+        String random = randomAlphabetic(10);
+        userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
+                "accessTypeId" + random, false));
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
