@@ -98,9 +98,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         refreshUsers.forEach(user -> {
             assertNotNull(user.get(USER_IDENTIFIER));
             assertNotNull(user.get(LAST_UPDATED));
-            assertNotNull(user.get(ORG_IDENTIFIER));
-            assertNotNull(user.get(ORG_STATUS));
-            assertNotNull(user.get(ORG_PROFILE_IDS));
+            assertNotNull(user.get(ORG_INFO));
             assertNotNull(user.get(USER_ACCESS_TYPES));
             assertNull(user.get(DATE_TIME_DELETED));
 

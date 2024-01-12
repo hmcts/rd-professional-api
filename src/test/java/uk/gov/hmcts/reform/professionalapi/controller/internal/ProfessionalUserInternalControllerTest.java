@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Org
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationInfo;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
@@ -248,8 +249,9 @@ class ProfessionalUserInternalControllerTest {
     void test_GetRefreshUsersWithSince() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", OrganisationStatus.ACTIVE,
-                List.of("SOLICITOR_PROFILE"), List.of(userAccessType), null);
+        OrganisationInfo orgInfo =
+                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("SOLICITOR"));
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -280,8 +282,9 @@ class ProfessionalUserInternalControllerTest {
     void test_GetRefreshUsers_SingleUser() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", OrganisationStatus.ACTIVE,
-                List.of("SOLICITOR_PROFILE"), List.of(userAccessType), null);
+        OrganisationInfo orgInfo =
+                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("SOLICITOR"));
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);

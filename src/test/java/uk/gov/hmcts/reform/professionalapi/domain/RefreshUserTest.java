@@ -15,20 +15,19 @@ class RefreshUserTest {
 
     @Test
     void test_should_hold_values_after_creation() {
+        OrganisationInfo orgInfo =
+                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("PROFILE"));
+
         RefreshUser refreshUser = new RefreshUser();
         refreshUser.setUserIdentifier("user-identifier");
         refreshUser.setLastUpdated(LocalDateTime.now());
-        refreshUser.setOrganisationIdentifier("org-identifier");
-        refreshUser.setOrganisationStatus(OrganisationStatus.ACTIVE);
-        refreshUser.setOrganisationProfileIds(List.of("a", "b"));
+        refreshUser.setOrganisationInfo(orgInfo);
         refreshUser.setUserAccessTypes(new ArrayList<>());
         refreshUser.setDateTimeDeleted(null);
 
         assertThat(refreshUser.getUserIdentifier()).isEqualTo("user-identifier");
         assertThat(refreshUser.getLastUpdated()).isNotNull();
-        assertThat(refreshUser.getOrganisationIdentifier()).isEqualTo("org-identifier");
-        assertThat(refreshUser.getOrganisationStatus()).isNotNull();
-        assertThat(refreshUser.getOrganisationStatus()).isNotNull();
+        assertThat(refreshUser.getOrganisationInfo()).isNotNull();
         assertThat(refreshUser.getUserAccessTypes()).isNotNull();
         assertThat(refreshUser.getDateTimeDeleted()).isNull();
     }

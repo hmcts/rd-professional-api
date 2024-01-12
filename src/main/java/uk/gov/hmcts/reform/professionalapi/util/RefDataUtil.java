@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationInfo;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
@@ -456,14 +457,17 @@ public class RefDataUtil {
                     .map(RefDataUtil::fromUserConfiguredAccess)
                     .toList());
 
-            List<String> organisationProfileIds = getOrganisationProfileIds(professionalUser.getOrganisation());
+            OrganisationInfo organisationInfo = new OrganisationInfo(
+                    professionalUser.getOrganisation().getOrganisationIdentifier(),
+                    professionalUser.getOrganisation().getStatus(),
+                    professionalUser.getOrganisation().getLastUpdated(),
+                    getOrganisationProfileIds(professionalUser.getOrganisation())
+            );
 
             RefreshUser refreshUser = new RefreshUser(
                     professionalUser.getUserIdentifier(),
                     professionalUser.getLastUpdated(),
-                    professionalUser.getOrganisation().getOrganisationIdentifier(),
-                    professionalUser.getOrganisation().getStatus(),
-                    organisationProfileIds,
+                    organisationInfo,
                     userAccessTypes,
                     professionalUser.getDeleted()
             );

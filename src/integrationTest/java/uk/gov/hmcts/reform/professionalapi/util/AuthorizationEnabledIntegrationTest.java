@@ -165,8 +165,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
-    protected static final String ORG_STATUS = "organisationStatus";
-    protected static final String ORG_PROFILE_IDS = "organisationProfileIds";
+    protected static final String ORG_INFO = "organisationInfo";
     protected static final String DATE_TIME_DELETED = "dateTimeDeleted";
     protected static final String LAST_UPDATED = "lastUpdated";
     protected static final String USER_ACCESS_TYPES = "userAccessTypes";
