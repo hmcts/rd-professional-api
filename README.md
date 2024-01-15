@@ -12,7 +12,7 @@ https://tools.hmcts.net/confluence/display/RTRD/Professional+Reference+Data
 
 ### Prerequisites
 
-To run the project you will need to have the following installed:
+To run the project you will need to have the following installed: 
 
 * Java 17
 * Docker (optional)
