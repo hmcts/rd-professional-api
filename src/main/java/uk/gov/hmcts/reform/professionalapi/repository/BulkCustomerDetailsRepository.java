@@ -19,7 +19,8 @@ public interface BulkCustomerDetailsRepository extends JpaRepository<BulkCustome
 
 
     @Modifying
-    @Query(value = "delete from dbrefdata.bulk_customer_details blk where blk.ORGANISATION_ID in (:val)",nativeQuery = true)
+    @Query(value = "delete from dbrefdata.bulk_customer_details blk where blk.ORGANISATION_ID in (:val)",
+            nativeQuery = true)
     void deleteByOrganistion(String val);
 
 }
