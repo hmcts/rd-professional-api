@@ -25,7 +25,7 @@ class BulKCustmerDetailsAPITest extends AuthorizationEnabledIntegrationTest {
     @Test
     void retrieveBulkCustomerDetailsSuccess() {
 
-        String orgIdentifier = setUpdataForBulkCustomer(ACTIVE, "bulkCustomerId", "sidamId",
+        final String orgIdentifier = setUpdataForBulkCustomer(ACTIVE, "bulkCustomerId", "sidamId",
                 "PBA1234567");
 
         BulkCustomerRequest bulkCustomerRequest = new BulkCustomerRequest();
@@ -47,7 +47,7 @@ class BulKCustmerDetailsAPITest extends AuthorizationEnabledIntegrationTest {
     @Test
     void retrieveBulkCustomerDetailsWithoutPaymentAccountSuccess() {
 
-        String orgIdentifier = setUpdataForBulkCustomer(ACTIVE, "bulkCustomerId",
+        final String orgIdentifier = setUpdataForBulkCustomer(ACTIVE, "bulkCustomerId",
                 "sidamId",
                 "PBAjh1234567");
 

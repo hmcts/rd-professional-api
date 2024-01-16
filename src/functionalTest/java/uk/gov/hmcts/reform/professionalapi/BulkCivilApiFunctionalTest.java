@@ -71,7 +71,7 @@ public class BulkCivilApiFunctionalTest {
     private int port;
 
 
-    private String baseUrl= "http://localhost";
+    private String baseUrl = "http://localhost";
 
     protected static String  s2sToken;
 
@@ -89,9 +89,9 @@ public class BulkCivilApiFunctionalTest {
 
 
     @BeforeEach
-    public  void init(){
+    public  void init() {
 
-        baseUrl=baseUrl.concat(":").concat(port+"");
+        baseUrl = baseUrl.concat(":").concat(port + "");
         SerenityRest.useRelaxedHTTPSValidation();
         SerenityRest.setDefaultParser(Parser.JSON);
 
@@ -110,7 +110,7 @@ public class BulkCivilApiFunctionalTest {
 
     @Test
     @DisplayName("PRD Bulk Customer API Test Scenarios")
-    void testBulkCustomerAPIScenarios() {
+    void testBulkCustomerApiScenarios() {
         retrieveBulkCustomerDetailsSuccess();
         retrieveBulkCustomerDetailsWithoutPaymentAccountSuccess();
         retrieveBulkCustomerDetailsWithoutActiveOrganisation();
@@ -167,7 +167,7 @@ public class BulkCivilApiFunctionalTest {
 
     void retrieveBulkCustomerDetailsWithoutActiveOrganisation() {
 
-       setUpDataForBulkCustomer(OrganisationStatus.PENDING,"bulkCustomerId3","sidamId3",
+        setUpDataForBulkCustomer(OrganisationStatus.PENDING,"bulkCustomerId3","sidamId3",
                "PBA1234569", "W98ZZ03", "Test Org");
 
 
@@ -272,7 +272,8 @@ public class BulkCivilApiFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = "BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomer", withFeature = false)
+    @ToggleEnable(mapKey = "BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomer",
+            withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void retrieveBulkCustomerDetailsWithLaunchDarklyFlagOff() {
         BulkCustomerRequest bulkCustomerRequest = new BulkCustomerRequest();
@@ -315,7 +316,7 @@ public class BulkCivilApiFunctionalTest {
     }
 
     private void setUpDataForBulkCustomer(OrganisationStatus orgStatus, String bulkCustomerId, String sidamId,
-                                          String pbaNumber , String organisationId , String orgName) {
+                                          String pbaNumber, String organisationId, String orgName) {
 
 
         Organisation org = new Organisation();
@@ -330,7 +331,7 @@ public class BulkCivilApiFunctionalTest {
         pba.setOrganisation(organisation);
         pba.setPbaStatus(PbaStatus.ACCEPTED);
         pba.setPbaNumber(pbaNumber);
-        if(isNotEmpty(pbaNumber)) {
+        if (isNotEmpty(pbaNumber)) {
             paymentAccountRepository.save(pba);
         }
 
