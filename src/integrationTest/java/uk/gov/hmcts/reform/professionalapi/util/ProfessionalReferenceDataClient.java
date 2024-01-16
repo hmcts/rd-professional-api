@@ -125,7 +125,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveBulkOrganisation(BulkCustomerRequest request, String role) {
-        return postRequest(baseBulkIntUrl , request,role , null);
+        return postRequest(baseBulkIntUrl, request, role, null);
     }
 
 
