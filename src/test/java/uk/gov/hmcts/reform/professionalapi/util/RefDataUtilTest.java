@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,6 +48,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1313,5 +1316,29 @@ class RefDataUtilTest {
         assertThat(result).hasSameClassAs(Map.of("String",
                 new Organisation("name", OrganisationStatus.ACTIVE,
                         "sraId", "companyNumber", Boolean.TRUE, "companyUrl")));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "2024-01-11T16:59:50.696615964,1704992390696615964",
+            "2024-01-11T16:59:50.733116011,1704992390733116011",
+            "2024-01-11T16:59:50.835116393,1704992390835116393"
+    })
+    public void testGenerateRecordNumberAsNanoSec(LocalDateTime dateTime, long expected) {
+        long result = RefDataUtil.generateRecordNumberAsNanoSec(dateTime);
+
+        assertEquals(expected, result);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1704992390696615964,2024-01-11T16:59:50.696615964",
+            "1704992390733116011,2024-01-11T16:59:50.733116011",
+            "1704992390835116393,2024-01-11T16:59:50.835116393"
+    })
+    public void testConvertRecordNumberToLocalDateTime(long recordNumber, LocalDateTime expected) {
+        LocalDateTime result = RefDataUtil.convertRecordNumberToLocalDateTime(recordNumber);
+
+        assertEquals(expected, result);
     }
 }
