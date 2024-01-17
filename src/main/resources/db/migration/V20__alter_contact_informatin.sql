@@ -1,0 +1,1 @@
+ALTER TABLE contact_information ALTER COLUMN address_line2 TYPE VARCHAR(150);

@@ -178,4 +178,5 @@ public class ProfessionalApiConstants {
     public static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-ddTHH:mm:ss";
     public static final String CREATED = "created";
     public static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+    public static final String PROFESSIONAL_USER_404_MESSAGE = "Professional User not found:";
 }

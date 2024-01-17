@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
@@ -102,6 +103,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Autowired
     protected OrgAttributeRepository orgAttributeRepository;
+
+    @MockBean
+    protected BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
     @Autowired
     protected UserAttributeRepository userAttributeRepository;
