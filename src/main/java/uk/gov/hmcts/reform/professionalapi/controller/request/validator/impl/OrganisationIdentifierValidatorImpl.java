@@ -127,7 +127,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         validateOrganisationIsActive(org.get(), BAD_REQUEST);
     }
 
-    public void validateGetRefreshUsersParams(String since, String userId, Integer page, Integer size) {
+    public void validateGetRefreshUsersParams(String since, String userId, Integer size) {
         if (since == null && userId == null) {
             throw new InvalidRequest(INVALID_MANDATORY_PARAMETER);
         }
@@ -136,7 +136,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             if (!isSinceInValidFormat(since)) {
                 throw new InvalidRequest(INVALID_SINCE_TIMESTAMP + SINCE_TIMESTAMP_FORMAT);
             }
-            if (!isPageAndSizeValid(page, size)) {
+            if (!isSizeValid(size)) {
                 throw new InvalidRequest(INVALID_PAGE_INFORMATION);
             }
         }
@@ -152,7 +152,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         return true;
     }
 
-    private boolean isPageAndSizeValid(Integer page, Integer size) {
-        return page != null && page >= 1 && size != null && size >= 1;
+    private boolean isSizeValid(Integer size) {
+        return size == null || size >= 1;
     }
 }

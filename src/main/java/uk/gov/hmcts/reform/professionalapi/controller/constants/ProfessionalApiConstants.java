@@ -176,7 +176,6 @@ public class ProfessionalApiConstants {
     public static final String INVALID_PAGE_INFORMATION = "002 missing/invalid page information";
     public static final String INVALID_SINCE_TIMESTAMP = "003 Field 'since' is in a invalid format. Expected format: ";
     public static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-ddTHH:mm:ss";
-    public static final String NESTED_ORG_IDENTIFIER = "organisation.organisationIdentifier";
-    public static final String USER_IDENTIFIER = "userIdentifier";
+    public static final String CREATED = "created";
     public static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 }

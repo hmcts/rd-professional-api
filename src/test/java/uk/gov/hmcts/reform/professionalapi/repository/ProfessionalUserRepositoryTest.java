@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.CREATED;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 
 @RunWith(SpringRunner.class)
@@ -80,8 +79,7 @@ class ProfessionalUserRepositoryTest extends BaseRepository {
         LocalDateTime dateTime = LocalDateTime.now();
         dateTime = dateTime.minusHours(1);
 
-        Pageable pageable = createPageableObject(0, 10, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
-                .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
+        Pageable pageable = createPageableObject(0, 10, Sort.by(Sort.DEFAULT_DIRECTION, CREATED));
 
         Page<ProfessionalUser> profUserPage = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
                 dateTime, pageable);

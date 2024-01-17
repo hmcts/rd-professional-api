@@ -169,6 +169,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String DATE_TIME_DELETED = "dateTimeDeleted";
     protected static final String LAST_UPDATED = "lastUpdated";
     protected static final String USER_ACCESS_TYPES = "userAccessTypes";
+    protected static final String RECORD_NUMBER = "recordNumber";
     public static final String APPLICATION_JSON = "application/json";
 
     @MockBean

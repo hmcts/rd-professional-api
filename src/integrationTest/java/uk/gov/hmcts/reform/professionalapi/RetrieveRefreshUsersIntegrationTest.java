@@ -28,7 +28,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         dateTime = dateTime.minusHours(1);
         String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 1, 10);
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 10);
         validateResponse(response, 1, 0);
     }
 
@@ -75,7 +75,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         dateTime = dateTime.plusHours(1);
         String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 1, 10);
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 10);
         validateResponse(response, 0, 0);
     }
 
@@ -101,6 +101,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
             assertNotNull(user.get(ORG_INFO));
             assertNotNull(user.get(USER_ACCESS_TYPES));
             assertNull(user.get(DATE_TIME_DELETED));
+            assertNotNull(user.get(RECORD_NUMBER));
 
             List<LinkedHashMap> userAccessTypes = (List<LinkedHashMap>) user.get("userAccessTypes");
 

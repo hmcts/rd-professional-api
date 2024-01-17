@@ -251,14 +251,15 @@ class ProfessionalUserInternalControllerTest {
         UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
         OrganisationInfo orgInfo =
                 new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("SOLICITOR"));
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null,
+                1704992595714L);
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
 
         Integer page = 1;
-        Integer size = 10;
+        long searchAfter = 1704992595714L;
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200)
                 .header("total_records", "1")
@@ -268,14 +269,14 @@ class ProfessionalUserInternalControllerTest {
                 .thenReturn(responseEntity);
 
         ResponseEntity<Object> actualData = professionalUserInternalController
-                .getRefreshUsers(since, null, page, size);
+                .getRefreshUsers(since, null, page, searchAfter);
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
         assertThat(actualData.getHeaders().get("total_records")).isNotNull();
 
         verify(professionalUserServiceMock, times(1))
-                .fetchUsersForRefresh(since, null, page, size);
+                .fetchUsersForRefresh(since, null, page, searchAfter);
     }
 
     @Test
@@ -284,7 +285,8 @@ class ProfessionalUserInternalControllerTest {
         UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
         OrganisationInfo orgInfo =
                 new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("SOLICITOR"));
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null,
+                1704992595714L);
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
