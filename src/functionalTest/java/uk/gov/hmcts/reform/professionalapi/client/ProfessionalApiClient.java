@@ -658,23 +658,6 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-
-    public Map<String, Object> retrievePaymentAccountsByEmailV2ForExternal(String email, String role) {
-        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
-                .getcwdAdminOpenIdToken("pui-user-manager"), email)
-                .body("")
-                .get("/refdata/external/v2/organisations/pbas")
-                .andReturn();
-
-        log.info("{}:: Retrieve organisation (Internal) response: {}", loggingComponentName, response.statusCode());
-
-        response.then()
-                .assertThat()
-                .statusCode(OK.value());
-
-        return response.body().as(Map.class);
-    }
-
     @SuppressWarnings("unchecked")
     public void retrievePaymentAccountsWithoutEmailForInternal() {
         Response response = getMultipleAuthHeadersInternal()
