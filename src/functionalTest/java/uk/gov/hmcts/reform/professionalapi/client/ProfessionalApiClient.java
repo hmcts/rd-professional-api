@@ -641,6 +641,40 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+
+    public Map<String, Object> retrievePaymentAccountsByEmailForExternalV2(HttpStatus status,
+                                                                           RequestSpecification requestSpecification,
+                                                                           String email) {
+        Response response = requestSpecification.header(USER_EMAIL_HEADER, email)
+                .get("refdata/external/v2/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (External) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+    }
+
+
+    public Map<String, Object> retrievePaymentAccountsByEmailV2ForExternal(String email, String role) {
+        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
+                .getcwdAdminOpenIdToken("pui-user-manager"), email)
+                .body("")
+                .get("/refdata/external/v2/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (Internal) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
     @SuppressWarnings("unchecked")
     public void retrievePaymentAccountsWithoutEmailForInternal() {
         Response response = getMultipleAuthHeadersInternal()
@@ -728,6 +762,23 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+
+    public Map<String, Object> retrievePaymentAccountsByEmailFromHeaderV2ForExternal(HttpStatus status,
+                                                          RequestSpecification requestSpecification,
+                                                                                     String email) {
+        Response response = requestSpecification.header(USER_EMAIL_HEADER, email)
+                .get("refdata/external/v2/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (External) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
 
         return response.body().as(Map.class);
     }

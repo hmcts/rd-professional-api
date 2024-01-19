@@ -170,7 +170,28 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
     public void retrieveOrganisationPbaScenarios() {
+        findOrganisationPbaWithEmailByExternalUserShouldBeSuccess();
+        findOrganisationPbaWithEmailThroughHeaderByExternalUserShouldBeSuccess();
         findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequestV2();
+    }
+
+    public void findOrganisationPbaWithEmailByExternalUserShouldBeSuccess() {
+        log.info("findOrganisationPbaWithEmailByExternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmailForExternalV2(
+                OK,professionalApiClient.getMultipleAuthHeaders(pumBearerToken),superUserEmail.toLowerCase());
+
+        validatePbaResponse(orgResponse);
+        log.info("findOrganisationPbaWithEmailByExternalUserShouldBeSuccess :: END");
+    }
+
+    public void findOrganisationPbaWithEmailThroughHeaderByExternalUserShouldBeSuccess() {
+        log.info("findOrganisationPbaWithEmailThroughHeaderByExternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> orgResponse = professionalApiClient
+                .retrievePaymentAccountsByEmailFromHeaderV2ForExternal(OK,professionalApiClient
+                        .getMultipleAuthHeaders(pumBearerToken),superUserEmail.toLowerCase());
+
+        validatePbaResponse(orgResponse);
+        log.info("findOrganisationPbaWithEmailThroughHeaderByExternalUserShouldBeSuccess :: END");
     }
 
     public void findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequestV2() {
