@@ -103,7 +103,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     protected OrgAttributeRepository orgAttributeRepository;
 
-    @MockBean
+    @Autowired
     protected BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
     @Autowired
@@ -284,6 +284,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
         orgAttributeRepository.deleteAll();
+        bulkCustomerDetailsRepository.deleteAll();
         organisationRepository.deleteAll();
         JwtDecoderMockBuilder.resetJwtDecoder();
     }
