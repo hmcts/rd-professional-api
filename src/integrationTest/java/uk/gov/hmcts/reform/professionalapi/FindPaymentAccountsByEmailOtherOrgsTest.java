@@ -335,7 +335,8 @@ public class FindPaymentAccountsByEmailOtherOrgsTest extends RetrieveOrganisatio
     void get_request_returns_correct_payment_accounts_associated_with_email_fromHeader_external_regOtherOrgs() {
         String userId = settingUpOtherOrganisation(puiUserManager);
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers("someone@somewhere.com", puiUserManager, userId);
+                .findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers("someone@somewhere.com",
+                        puiUserManager, userId);
         assertThat(orgResponse).isNotEmpty();
         responseValidate_regOtherOrgs(orgResponse);
 
@@ -345,7 +346,8 @@ public class FindPaymentAccountsByEmailOtherOrgsTest extends RetrieveOrganisatio
     void get_request_returns_404_when_unknown_email_passed_in_header_external_regOtherOrgs() {
         String userId = settingUpOtherOrganisation(puiUserManager);
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers("dummy23@dummy.com", puiUserManager, userId);
+                .findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers("dummy23@dummy.com",
+                        puiUserManager, userId);
         assertThat(orgResponse.get("http_status")).isEqualTo("404");
         assertThat((String)orgResponse.get("response_body")).contains(ERROR_MSG_NO_ORGANISATION_FOUND);
     }
