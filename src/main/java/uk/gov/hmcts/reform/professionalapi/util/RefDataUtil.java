@@ -359,7 +359,7 @@ public class RefDataUtil {
                 if (errorResponse != null) {
                     log.error("{}:: Response from UserProfileByEmail service call {}",
                         loggingComponentName, errorResponse.getErrorDescription());
-                }                
+                }
                 newUserResponse = new NewUserResponse();
             }
 
