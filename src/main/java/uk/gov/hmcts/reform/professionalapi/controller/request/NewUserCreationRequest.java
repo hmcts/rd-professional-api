@@ -30,7 +30,7 @@ public class NewUserCreationRequest {
             @JsonProperty("email") String emailAddress,
             @JsonProperty("roles") List<String> roles,
             @JsonProperty("resendInvite") boolean resendInvite,
-            @JsonProperty(value = "userAccessTypes") Set<UserAccessType> userAccessTypes
+            @JsonProperty("userAccessTypes") Set<UserAccessType> userAccessTypes
     ) {
 
         this.firstName = firstName;

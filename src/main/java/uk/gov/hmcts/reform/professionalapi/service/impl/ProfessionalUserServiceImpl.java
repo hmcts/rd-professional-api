@@ -312,15 +312,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser,
                                                            UserAccessType userAccessType) {
-        UserConfiguredAccess uca = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
         UserConfiguredAccessId ucaId = new UserConfiguredAccessId(
                 professionalUser, userAccessType.getJurisdictionId(),
                 userAccessType.getOrganisationProfileId(), userAccessType.getAccessTypeId()
         );
-        uca.setUserConfiguredAccessId(ucaId);
-        uca.setEnabled(userAccessType.getEnabled());
+        userConfiguredAccess.setUserConfiguredAccessId(ucaId);
+        userConfiguredAccess.setEnabled(userAccessType.getEnabled());
 
-        return uca;
+        return userConfiguredAccess;
     }
 
 
