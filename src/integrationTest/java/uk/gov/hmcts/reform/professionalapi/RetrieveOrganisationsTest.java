@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -226,6 +227,16 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(orgResponse3).containsEntry("http_status","200 OK");
         assertThat(orgResponse3Size).isEqualTo(3);
+        assertThat((Boolean) orgResponse3.get("moreAvailable")).isEqualTo(false);
+        assertThat(((List<HashMap>) orgResponse3.get("organisations")).get(0).get("lastUpdated")).isNotNull();
+        assertThat(((List<HashMap>) orgResponse3.get("organisations")).get(1).get("lastUpdated")).isNotNull();
+        assertThat(((List<HashMap>) orgResponse3.get("organisations")).get(2).get("lastUpdated")).isNotNull();
+        assertThat(((ArrayList)((List<HashMap>) orgResponse3.get("organisations")).get(0)
+                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
+        assertThat(((ArrayList)((List<HashMap>) orgResponse3.get("organisations")).get(1)
+                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
+        assertThat(((ArrayList)((List<HashMap>) orgResponse3.get("organisations")).get(2)
+                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
     }
 
     @Test
@@ -660,8 +671,9 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("organisations")).isNotNull();
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(1);
-        assertThat(orgResponse.get("organisations").toString()).contains("status=ACTIVE");
-
+        assertThat(((List<HashMap>) orgResponse.get("organisations")).get(0).get("lastUpdated")).isNotNull();
+        assertThat(((ArrayList)((List<HashMap>) orgResponse.get("organisations")).get(0)
+                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
         assertThat(orgResponse.get("http_status").toString()).contains("OK");
     }
 
@@ -1107,6 +1119,9 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("http_status").toString()).contains("200");
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(1);
+        assertThat(((List<HashMap>) orgResponse.get("organisations")).get(0).get("lastUpdated")).isNotNull();
+        assertThat(((ArrayList)((List<HashMap>) orgResponse.get("organisations")).get(0)
+                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
 
         Map<String, Object> organisationActive = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
 
