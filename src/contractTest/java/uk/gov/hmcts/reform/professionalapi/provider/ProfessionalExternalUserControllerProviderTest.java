@@ -198,7 +198,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         List<UserConfiguredAccess> allUserConfiguredAccess = new ArrayList<>();
         allUserConfiguredAccess.add(new UserConfiguredAccess());
-        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(professionalUser.getId()))
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))
                 .thenReturn(allUserConfiguredAccess);
         verify(userConfiguredAccessRepository).deleteAll(allUserConfiguredAccess);
 
