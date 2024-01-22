@@ -78,6 +78,12 @@ variable "jenkins_AAD_objectId" {
   description = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
+variable "force_user_permissions_trigger" {
+  default     = ""
+  type        = string
+  description = "Update this to a new value to force the user permissions script to run again"
+}
+
 variable "pgsql_server_configuration" {
   description = "Postgres server configuration"
   type        = list(object({ name : string, value : string }))
