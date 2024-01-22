@@ -33,10 +33,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
@@ -51,6 +53,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
@@ -86,6 +89,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
     @Autowired
     MfaStatusService mfaStatusService;
+
+    @Autowired
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
@@ -189,6 +195,12 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+
+        List<UserConfiguredAccess> allUserConfiguredAccess = new ArrayList<>();
+        allUserConfiguredAccess.add(new UserConfiguredAccess());
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(professionalUser.getId()))
+                .thenReturn(allUserConfiguredAccess);
+        verify(userConfiguredAccessRepository).deleteAll(allUserConfiguredAccess);
 
         return professionalUser;
     }
