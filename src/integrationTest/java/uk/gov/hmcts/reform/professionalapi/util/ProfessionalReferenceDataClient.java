@@ -18,6 +18,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
@@ -55,6 +56,8 @@ public class ProfessionalReferenceDataClient {
 
     private static final String APP_EXT_BASE_PATH = "/refdata/external/v1/organisations";
 
+    private static final String APP_INT_BULK = "/refdata/internal/v1/bulkCustomer";
+
     private static final String APP_EXT_V2_BASE_PATH = "/refdata/external/v2/organisations";
     private static final String APP_INT_V2_BASE_PATH = "/refdata/internal/v2/organisations";
     private static final String APP_INT_BASE_PATH = "/refdata/internal/v1/organisations";
@@ -67,6 +70,9 @@ public class ProfessionalReferenceDataClient {
     private String baseIntUrl;
 
     private String baseV2Url;
+
+
+    private String baseBulkIntUrl;
 
     private String baseV2IntUrl;
 
@@ -82,6 +88,7 @@ public class ProfessionalReferenceDataClient {
         this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
         this.baseV2Url = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH;
         this.baseV2IntUrl = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH;
+        this.baseBulkIntUrl = "http://localhost:" + prdApiPort + APP_INT_BULK;
         this.issuer = issuer;
         this.expiration = tokenExpirationInterval;
     }
@@ -109,6 +116,17 @@ public class ProfessionalReferenceDataClient {
                 role, userId, email);
     }
 
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeader(String email, String role) {
+        return getRequestToGetEmailFromHeader("/refdata/internal/v2/organisations" + "/pbas",
+                role, "", email);
+    }
+
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers(String email, String role,
+                                                                                         String userId) {
+        return getRequestToGetEmailFromHeader("/refdata/external/v2/organisations" + "/pbas",
+                role, userId, email);
+    }
+
     public Map<String, Object> findMFAByUserID(String professionalUserID) {
         return getRequestWithoutAuthHeaders(APP_EXT_BASE_PATH + "/mfa?user_id={userIdentifier}", professionalUserID);
     }
@@ -116,6 +134,12 @@ public class ProfessionalReferenceDataClient {
     public Map<String, Object> retrieveSingleOrganisation(String id, String role) {
         return getRequest(APP_INT_BASE_PATH + "?id={id}", role, id);
     }
+
+    public Map<String, Object> retrieveBulkOrganisation(BulkCustomerRequest request, String role) {
+        return postRequest(baseBulkIntUrl, request, role, null);
+    }
+
+
 
     public Map<String, Object> retrieveSingleOrganisationForV2Api(String id, String role) {
         return getRequest(APP_INT_V2_BASE_PATH + "?id={id}", role, id);
@@ -152,17 +176,6 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
         return postRequest(baseV2IntUrl, request, null, null);
-    }
-
-    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeader(String email, String role) {
-        return getRequestToGetEmailFromHeader("/refdata/internal/v2/organisations" + "/pbas",
-            role, "", email);
-    }
-
-    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers(String email, String role,
-                                                                                         String userId) {
-        return getRequestToGetEmailFromHeader("/refdata/external/v2/organisations" + "/pbas",
-            role, userId, email);
     }
 
     public Map<String, Object> retrieveAllOrganisationsForV2Api(String role) {
