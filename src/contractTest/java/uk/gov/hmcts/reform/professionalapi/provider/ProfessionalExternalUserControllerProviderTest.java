@@ -109,6 +109,12 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         setupInteractionsForProfessionalUser();
     }
 
+    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID})
+    public void toUpdateUserRolesAndAccessTypesForIdentifier() throws IOException {
+
+        setupInteractionsForProfessionalUserWithUserAccessTypes();
+    }
+
     @State({"Professional users exist for an Active organisation"})
     public void toRetrieveAllActiveOrganisations() throws IOException {
 
@@ -139,6 +145,67 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     }
 
     private ProfessionalUser setupInteractionsForProfessionalUser() throws JsonProcessingException {
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Collections.singletonList("pui-case-manager"))
+                .header("aHeader", "aHeader")
+                .build();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("someUid")
+                .roles(Arrays.asList("pui-case-manager")).build());
+
+        String name = "name";
+        String sraId = "sraId";
+        String companyNumber = "companyNumber";
+        String companyUrl = "companyUrl";
+
+        ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
+        professionalUser.setEmailAddress("someUserIdentifier");
+
+        UserProfile profile = getUserProfile();
+
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+        String body = objectMapper.writeValueAsString(userProfileResponse);
+
+        when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(200).build());
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier("a123dfgr46");
+        newUserResponse.setIdamStatus("ACTIVE");
+        String newUserResponseBody = objectMapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
+
+
+        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
+
+        when(professionalUserRepositoryMock.findByOrganisation(organisation))
+                .thenReturn(Arrays.asList(professionalUser));
+
+
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamMessage("some message");
+        roleAdditionResponse.setIdamStatusCode("200");
+        modifyUserRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+
+        String bodyModifyUserRoles = objectMapper.writeValueAsString(modifyUserRolesResponse);
+
+        when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+
+        return professionalUser;
+    }
+
+    private ProfessionalUser setupInteractionsForProfessionalUserWithUserAccessTypes() throws JsonProcessingException {
         Jwt jwt =   Jwt.withTokenValue(USER_JWT)
                 .claim("aClaim", "aClaim")
                 .claim("aud", Collections.singletonList("pui-case-manager"))
