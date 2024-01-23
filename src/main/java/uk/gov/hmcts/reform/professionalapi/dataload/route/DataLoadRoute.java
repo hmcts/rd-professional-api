@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import javax.sql.DataSource;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.WordUtils.uncapitalize;
@@ -63,9 +62,6 @@ public class DataLoadRoute {
 
     @Autowired
     FileResponseProcessor fileResponseProcessor;
-
-    @Autowired
-    DataSource dataSource;
 
     @Autowired
     ParentStateCheckProcessor parentStateCheckProcessor;
