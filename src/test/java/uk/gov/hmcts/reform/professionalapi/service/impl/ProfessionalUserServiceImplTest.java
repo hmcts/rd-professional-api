@@ -1239,20 +1239,20 @@ class ProfessionalUserServiceImplTest {
         professionalUser.setCreated(LocalDateTime.now());
         professionalUserList.add(professionalUser);
 
-        when(professionalUserRepository.findByLastUpdatedGreaterThanEqualAndCreatedGreaterThan(any(), any()))
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(any(), any()))
                 .thenReturn(professionalUserList);
 
         LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
         String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
 
         ResponseEntity<Object> responseEntity = professionalUserService
-                .fetchUsersForRefresh(since, null, null, 1704992390733116L);
+                .fetchUsersForRefresh(since, null, null, UUID.randomUUID());
 
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(professionalUserRepository, times(1))
-                .findByLastUpdatedGreaterThanEqualAndCreatedGreaterThan(any(), any());
+                .findByLastUpdatedGreaterThanEqualAndIdGreaterThan(any(), any());
     }
 
     @Test
@@ -1271,7 +1271,6 @@ class ProfessionalUserServiceImplTest {
 
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getHeaders().get("total_records")).isNull();
 
         verify(professionalUserRepository, times(1))
                 .findByUserIdentifier(any());

@@ -42,9 +42,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -472,14 +469,16 @@ public class RefDataUtil {
                     professionalUser.getLastUpdated(),
                     organisationInfo,
                     userAccessTypes,
-                    professionalUser.getDeleted(),
-                    generateRecordNumberAsNanoSec(professionalUser.getCreated())
+                    professionalUser.getDeleted()
             );
 
             refreshUserList.add(refreshUser);
         }
 
         getRefreshUsersResponse.setUsers(refreshUserList);
+        if (!refreshUserList.isEmpty()) {
+            getRefreshUsersResponse.setLastRecordInPage(professionalUsers.get(professionalUsers.size() - 1).getId());
+        }
 
         return getRefreshUsersResponse;
     }
@@ -488,21 +487,6 @@ public class RefDataUtil {
         GetRefreshUsersResponse response = new GetRefreshUsersResponse();
         response.setUsers(new ArrayList<>());
         return response;
-    }
-
-    public static long generateRecordNumberAsNanoSec(LocalDateTime dateTime) {
-        Instant instant = dateTime.atZone(ZoneId.of("UTC")).toInstant();
-
-        return (instant.getEpochSecond() * 1_000_000_000L) + instant.getNano();
-    }
-
-    public static LocalDateTime convertRecordNumberToLocalDateTime(long recordNumber) {
-        long epochSeconds = recordNumber / 1_000_000_000L;
-        int nanoSeconds = (int) (recordNumber % 1_000_000_000L);
-
-        Instant instant = Instant.ofEpochSecond(epochSeconds, nanoSeconds);
-
-        return instant.atZone(ZoneId.of("UTC")).toLocalDateTime();
     }
 
     public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {

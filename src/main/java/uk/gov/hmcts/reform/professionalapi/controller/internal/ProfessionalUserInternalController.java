@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.Optional;
+import java.util.UUID;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -216,7 +217,7 @@ public class ProfessionalUserInternalController extends SuperController {
             @RequestParam(value = "since", required = false) String since,
             @RequestParam(value = "userId", required = false) String userId,
             @RequestParam(value = "size", required = false) Integer size,
-            @RequestParam(value = "searchAfter", required = false) Long searchAfter
+            @RequestParam(value = "searchAfter", required = false) UUID searchAfter
     ) {
         organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId, size);
 

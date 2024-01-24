@@ -128,7 +128,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     public void validateGetRefreshUsersParams(String since, String userId, Integer size) {
-        if (since == null && userId == null) {
+        if ((since == null && userId == null) || (since != null && userId != null)) {
             throw new InvalidRequest(INVALID_MANDATORY_PARAMETER);
         }
 

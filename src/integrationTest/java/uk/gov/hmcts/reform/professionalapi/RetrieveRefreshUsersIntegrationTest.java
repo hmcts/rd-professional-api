@@ -101,7 +101,6 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
             assertNotNull(user.get(ORG_INFO));
             assertNotNull(user.get(USER_ACCESS_TYPES));
             assertNull(user.get(DATE_TIME_DELETED));
-            assertNotNull(user.get(RECORD_NUMBER));
 
             List<LinkedHashMap> userAccessTypes = (List<LinkedHashMap>) user.get("userAccessTypes");
 
@@ -114,6 +113,9 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
             });
         });
 
+        if (expectedUsers > 0) {
+            assertNotNull(response.get("lastRecordInPage"));
+        }
         assertNotNull(response.get("moreAvailable"));
     }
 }

@@ -24,13 +24,11 @@ class RefreshUserTest {
         refreshUser.setOrganisationInfo(orgInfo);
         refreshUser.setUserAccessTypes(new ArrayList<>());
         refreshUser.setDateTimeDeleted(null);
-        refreshUser.setRecordNumber(1704992595714L);
 
         assertThat(refreshUser.getUserIdentifier()).isEqualTo("user-identifier");
         assertThat(refreshUser.getLastUpdated()).isNotNull();
         assertThat(refreshUser.getOrganisationInfo()).isNotNull();
         assertThat(refreshUser.getUserAccessTypes()).isNotNull();
         assertThat(refreshUser.getDateTimeDeleted()).isNull();
-        assertThat(refreshUser.getRecordNumber()).isEqualTo(1704992595714L);
     }
 }

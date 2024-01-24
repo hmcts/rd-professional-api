@@ -19,19 +19,16 @@ public class RefreshUser {
     private List<UserAccessType> userAccessTypes;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime dateTimeDeleted;
-    private long recordNumber;
 
     public RefreshUser(String userIdentifier,
                        LocalDateTime lastUpdated,
                        OrganisationInfo organisationInfo,
                        List<UserAccessType> userAccessTypes,
-                       LocalDateTime dateTimeDeleted,
-                       long recordNumber) {
+                       LocalDateTime dateTimeDeleted) {
         this.userIdentifier = userIdentifier;
         this.lastUpdated = lastUpdated;
         this.organisationInfo = organisationInfo;
         this.userAccessTypes = userAccessTypes;
         this.dateTimeDeleted = dateTimeDeleted;
-        this.recordNumber = recordNumber;
     }
 }

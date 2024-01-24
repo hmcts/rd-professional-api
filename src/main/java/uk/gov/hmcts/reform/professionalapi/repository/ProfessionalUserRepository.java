@@ -36,10 +36,10 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     Page<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated, Pageable pageable);
 
-    List<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndCreatedGreaterThan(LocalDateTime lastUpdated,
-                                                                                  LocalDateTime searchAfter);
+    List<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
+                                                                                  UUID searchAfter);
 
-    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndCreatedGreaterThan(LocalDateTime lastUpdated,
-                                                                                  LocalDateTime searchAfter,
+    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
+                                                                                  UUID searchAfter,
                                                                                   Pageable pageable);
 }

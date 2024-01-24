@@ -50,7 +50,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.CREATED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
@@ -114,10 +113,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer size, Long searchAfter) {
+    public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer size, UUID searchAfter) {
         if (since != null) {
             if (size != null) {
-                Pageable pageable = createPageableObject(0, size, Sort.by(Sort.DEFAULT_DIRECTION, CREATED));
+                Pageable pageable = createPageableObject(0, size, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
                 return findRefreshUsersPageable(since, pageable, searchAfter);
             }
             return findRefreshUsers(since, searchAfter);
@@ -125,7 +124,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return findSingleRefreshUser(userId);
     }
 
-    public ResponseEntity<Object> findRefreshUsers(String since, Long searchAfter) {
+    public ResponseEntity<Object> findRefreshUsers(String since, UUID searchAfter) {
         LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
 
         List<ProfessionalUser> professionalUsers;
@@ -135,10 +134,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                     formattedSince
             );
         } else {
-            LocalDateTime formattedSearchAfter = RefDataUtil.convertRecordNumberToLocalDateTime(searchAfter);
-
-            professionalUsers = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndCreatedGreaterThan(
-                    formattedSince, formattedSearchAfter
+            professionalUsers = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
+                    formattedSince, searchAfter
             );
         }
 
@@ -154,7 +151,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
-    public ResponseEntity<Object> findRefreshUsersPageable(String since, Pageable pageable, Long searchAfter) {
+    public ResponseEntity<Object> findRefreshUsersPageable(String since, Pageable pageable, UUID searchAfter) {
         LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
 
         Page<ProfessionalUser> professionalUsersPage;
@@ -164,11 +161,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                     formattedSince, pageable
             );
         } else {
-            LocalDateTime formattedSearchAfter = RefDataUtil.convertRecordNumberToLocalDateTime(searchAfter);
-
-            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndCreatedGreaterThan(
-                            formattedSince, formattedSearchAfter, pageable
-                    );
+            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
+                    formattedSince, searchAfter, pageable
+            );
         }
 
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
