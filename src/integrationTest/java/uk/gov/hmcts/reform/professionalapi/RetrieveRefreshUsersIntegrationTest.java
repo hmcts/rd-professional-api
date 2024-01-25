@@ -80,12 +80,12 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
     }
 
     @Test
-    void retrieve_refresh_users_using_invalid_user_identifier_should_no_users_and_status_2000() {
+    void retrieve_refresh_users_using_invalid_user_identifier_should_return_status_404() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
 
         Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier("123");
-        validateResponse(response, 0, 0);
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     void validateResponse(Map<String, Object> response, int expectedUsers, int expectedUserAccessTypes) {
