@@ -1213,9 +1213,9 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchOrganisationUsersByUserIdentifierExternal(HttpStatus status,
-                                                                               RequestSpecification requestSpecification,
-                                                                               String userIdentifier) {
+    public Map<String, Object> searchOrganisationUsersByUserIdExternal(HttpStatus status,
+                                                                       RequestSpecification requestSpecification,
+                                                                       String userIdentifier) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?userIdentifier=" + userIdentifier)
