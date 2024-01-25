@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
@@ -90,6 +91,14 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         suspendUserScenarios();
     }
 
+    @Test
+    @DisplayName("PRD Group Access External Test Scenarios")
+    void testExternalUserGroupAccessScenario() {
+        setUpOrgTestDataForGroupAccess();
+        setUpUserBearerTokens(List.of(puiUserManager));
+        addNewUserAccessTypeScenarios();
+        updateAndAddNewUserAccessTypeScenarios();
+    }
     public void setUpOrgTestData() {
         if (isEmpty(extActiveOrgId)) {
             log.info("Setting up organization...");
@@ -116,6 +125,25 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         }
     }
 
+    public void setUpOrgTestDataForGroupAccess() {
+        if (isEmpty(extActiveOrgId)) {
+            log.info("Setting up organization...");
+            superUserEmail = generateRandomEmail();
+            organisationCreationRequest = createOrganisationRequest()
+                    .superUser(aUserCreationRequest()
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .email(superUserEmail)
+                            .build())
+                    .paymentAccount(Set.of("PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
+                            "PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
+                            "PBA".concat(RandomStringUtils.randomAlphanumeric(7))))
+                    .build();
+
+            organisationCreationRequest.setStatus("ACTIVE");
+            extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+        }
+    }
     public void setUpUserBearerTokens(List<String> roles) {
         if (roles.contains(puiUserManager)) {
             pumBearerToken = inviteUser(puiUserManager);
@@ -165,6 +193,14 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess();
     }
 
+    public void findUsersByUserIdentifierWithUserAccessType() {
+        findUserWithAccessTypeShouldBeSuccess();
+    }
+
+    public void findUsersByUserIdentifierWithUserAccessTypesAndRoles() {
+        findUserWithAccessTypesAndRoleShouldBeSuccess();
+    }
+
     public void findUserStatusByEmailScenarios() {
         findUserStatusByEmailByPumShouldBeSuccess();
         findUserStatusByEmailInHeaderByPumShouldBeSuccess();
@@ -182,6 +218,15 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         addRolesByPendingExtUserShouldReturnForbidden();
     }
 
+    public void addNewUserAccessTypeScenarios() {
+        addUserAccessTypeShouldBeSuccess();
+        findUsersByUserIdentifierWithUserAccessType();;
+    }
+
+    public void updateAndAddNewUserAccessTypeScenarios() {
+        addOrUpdateUserAccessTypeShouldBeSuccess();
+        findUsersByUserIdentifierWithUserAccessTypesAndRoles();;
+    }
     public void suspendUserScenarios() {
         suspendUserByPumShouldBeSuccess();
     }
@@ -368,6 +413,22 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findActiveOrganisationByPumShouldBeSuccess :: END");
     }
 
+    public void findUserWithAccessTypeShouldBeSuccess() {
+        log.info("findUserWithAccessTypeShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdentifierExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        validateAccessTypesInRetrievedUser(response, "ACTIVE", true);
+        log.info("findUserWithAccessTypeShouldBeSuccess :: END");
+    }
+
+    public void findUserWithAccessTypesAndRoleShouldBeSuccess() {
+        log.info("findUserWithAccessTypesAndRoleShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdentifierExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        validateAccessTypesAndRolesInRetrievedUser(response, "ACTIVE", true);
+        log.info("findUserWithAccessTypesAndRoleShouldBeSuccess :: END");
+    }
+
     public void findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess() {
         log.info("findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess :: STARTED");
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
@@ -420,6 +481,41 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         List<String> roles = (List<String>) professionalUsersResponse.get("roles");
         assertThat(roles).contains(puiOrgManager);
         log.info("addRolesByPumShouldBeSuccess :: END");
+    }
+
+    public void addUserAccessTypeShouldBeSuccess() {
+        log.info("addUserAccessTypeShouldBeSuccess :: STARTED");
+        UserAccessType userAccessType = new UserAccessType();
+        userAccessType.setAccessTypeId("testAccessTypeId");
+        userAccessType.setJurisdictionId("testJurisdictionId");
+        userAccessType.setOrganisationProfileId("testOrganisationProfileId");
+        userAccessType.setEnabled(true);
+        professionalApiClient.modifyUserToExistingUserForExternal(OK, addOrUpdateUserAccessType(userAccessType),
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        log.info("addUserAccessTypeShouldBeSuccess :: END");
+    }
+
+    public void addOrUpdateUserAccessTypeShouldBeSuccess() {
+        log.info("addOrUpdateUserAccessTypeShouldBeSuccess :: STARTED");
+        UserAccessType userAccessType2 = new UserAccessType();
+        userAccessType2.setAccessTypeId("testAccessTypeId2");
+        userAccessType2.setJurisdictionId("testJurisdictionId2");
+        userAccessType2.setOrganisationProfileId("testOrganisationProfileId2");
+        userAccessType2.setEnabled(false);
+
+        UserAccessType userAccessType3 = new UserAccessType();
+        userAccessType3.setAccessTypeId("testAccessTypeId3");
+        userAccessType3.setJurisdictionId("testJurisdictionId3");
+        userAccessType3.setOrganisationProfileId("testOrganisationProfileId3");
+        userAccessType3.setEnabled(true);
+
+        Set<UserAccessType> userAccessTypeSet = new HashSet<>();
+        userAccessTypeSet.add(userAccessType2);
+        userAccessTypeSet.add(userAccessType3);
+
+        professionalApiClient.modifyUserToExistingUserForExternal(OK, addOrUpdateUserAccessTypeAndRole(puiOrgManager, userAccessTypeSet),
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        log.info("addOrUpdateUserAccessTypeShouldBeSuccess :: END");
     }
 
     public void deleteRolesByPumShouldBeSuccess() {
