@@ -10,11 +10,15 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccessId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class PactUtils {
@@ -113,5 +117,25 @@ public class PactUtils {
         su.setLastName("some-lname");
         su.setUserIdentifier("someUserIdentifier");
         return su;
+    }
+
+    public static List<UserConfiguredAccess> getUserConfiguredAccesses(ProfessionalUser professionalUser) {
+        final UserConfiguredAccessId userConfiguredAccessId =
+                new UserConfiguredAccessId(professionalUser,
+                        "jurisdictionId1",
+                        "organisationProfileId1",
+                        "accessTypeId1");
+        final UserConfiguredAccess userConfiguredAccess =
+                new UserConfiguredAccess(userConfiguredAccessId,true);
+        return List.of(userConfiguredAccess);
+    }
+
+    public static Set<UserAccessType> getUserAccessTypes() {
+        UserAccessType userAccessType = new UserAccessType(
+                        "jurisdictionId1",
+                        "organisationProfileId1",
+                        "accessTypeId1",
+                        true);
+        return Set.of(userAccessType);
     }
 }

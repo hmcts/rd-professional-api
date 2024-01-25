@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
@@ -263,8 +264,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
 
-        List<UserConfiguredAccess> allUserConfiguredAccess = new ArrayList<>();
-        allUserConfiguredAccess.add(new UserConfiguredAccess());
+        List<UserConfiguredAccess> allUserConfiguredAccess = PactUtils.getUserConfiguredAccesses(professionalUser);
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))
                 .thenReturn(allUserConfiguredAccess);
         verify(userConfiguredAccessRepository).deleteAll(allUserConfiguredAccess);
