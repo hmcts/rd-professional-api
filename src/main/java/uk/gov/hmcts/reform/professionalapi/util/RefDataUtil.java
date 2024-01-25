@@ -483,12 +483,6 @@ public class RefDataUtil {
         return getRefreshUsersResponse;
     }
 
-    public static GetRefreshUsersResponse buildEmptyGetRefreshUsersResponse() {
-        GetRefreshUsersResponse response = new GetRefreshUsersResponse();
-        response.setUsers(new ArrayList<>());
-        return response;
-    }
-
     public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
         UserAccessType accessType = new UserAccessType();
         accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());

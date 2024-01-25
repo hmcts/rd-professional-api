@@ -187,8 +187,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (professionalUser != null) {
             userConfiguredAccesses = professionalUser.getUserConfiguredAccesses();
         } else {
-            log.debug("Professional user with identifier: {} not found", userId);
-            return ResponseEntity.status(HttpStatus.OK).body(RefDataUtil.buildEmptyGetRefreshUsersResponse());
+            throw new ResourceNotFoundException("User does not exist");
         }
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
