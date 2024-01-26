@@ -335,69 +335,65 @@ public class AuthorizationFunctionalTest {
 
     public void validateAccessTypesInRetrievedUser(Map<String, Object> searchResponse, String expectedStatus,
                                                    Boolean rolesReturned) {
-        assertThat(searchResponse.get("users")).asList().isNotEmpty();
-        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
-        assertThat(searchResponse.get("organisationProfileIds")).isNotNull();
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsersResponses).isNotEmpty();
+        assertThat(professionalUsersResponses).hasSize(1);
+
         List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses.get(0).get("userAccessTypes");
-
         assertThat(userAccessTypeList).isNotEmpty();
+        assertThat(userAccessTypeList).isNotNull();
+
+        HashMap userMap = professionalUsersResponses.get(0);
+        assertThat(userMap).isNotEmpty();
+        validateUserResponse(userMap, searchResponse);
+
+        if (rolesReturned) {
+            assertThat(userMap.get("roles")).isNotNull();
+            assertThat(userMap.get("roles")).asList().hasSize(1);
+        } else {
+            assertThat(userMap.get("roles")).isNull();
+        }
         assertThat(userAccessTypeList).hasSize(1);
-
-        professionalUsersResponses.forEach(user -> {
-            assertThat(user.get("idamStatus")).isNotNull();
-            assertThat(user.get("userIdentifier")).isNotNull();
-            assertThat(user.get("firstName")).isNotNull();
-            assertThat(user.get("lastName")).isNotNull();
-            assertThat(user.get("email")).isNotNull();
-            assertThat(user.get("lastUpdated")).isNotNull();
-            if (!expectedStatus.equals("any")) {
-                assertThat(user.get("idamStatus").equals(expectedStatus));
-            }
-            if (rolesReturned) {
-                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
-                    assertThat(user.get("roles")).isNotNull();
-                } else {
-                    assertThat(user.get("roles")).isNull();
-                }
-            }
-        });
-
         assertEquals("testJurisdictionId", userAccessTypeList.get(0).get("jurisdictionId"));
         assertEquals("testOrganisationProfileId", userAccessTypeList.get(0).get("organisationProfileId"));
         assertEquals("testAccessTypeId", userAccessTypeList.get(0).get("accessTypeId"));
         assertEquals(true, userAccessTypeList.get(0).get("enabled"));
     }
 
-    public void validateAccessTypesAndRolesInRetrievedUser(Map<String, Object> searchResponse, String expectedStatus,
+    public void validateAccessTypesAndRolesInRetrievedUser(Map<String, Object> searchResponse,
                                                            Boolean rolesReturned) {
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsersResponses).isNotEmpty();
+        assertThat(professionalUsersResponses).hasSize(1);
+
+        List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses.get(0).get("userAccessTypes");
+        assertThat(userAccessTypeList).isNotEmpty();
+        assertThat(userAccessTypeList).isNotNull();
+
+        HashMap userMap = professionalUsersResponses.get(0);
+        assertThat(userMap).isNotEmpty();
+        validateUserResponse(userMap, searchResponse);
+        assertThat(userAccessTypeList).hasSize(2);
+
+        if (rolesReturned) {
+            assertThat(userMap.get("roles")).isNotNull();
+            assertThat(userMap.get("roles")).asList().hasSize(2);
+        } else {
+            assertThat(userMap.get("roles")).isNull();
+        }
+    }
+
+    public void validateUserResponse(HashMap userMap, Map<String, Object> searchResponse) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
         assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
         assertThat(searchResponse.get("organisationProfileIds")).isNotNull();
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-        List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses.get(0).get("userAccessTypes");
-
-        assertThat(userAccessTypeList).isNotEmpty();
-        assertThat(userAccessTypeList).isNotNull();
-        assertThat(userAccessTypeList).hasSize(2);
-
-        professionalUsersResponses.forEach(user -> {
-            assertThat(user.get("idamStatus")).isNotNull();
-            assertThat(user.get("userIdentifier")).isNotNull();
-            assertThat(user.get("firstName")).isNotNull();
-            assertThat(user.get("lastName")).isNotNull();
-            assertThat(user.get("email")).isNotNull();
-            assertThat(user.get("lastUpdated")).isNotNull();
-            if (rolesReturned) {
-                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
-                    assertThat(user.get("roles")).isNotNull();
-                    assertThat(user.get("roles")).asList().hasSize(2);
-                } else {
-                    assertThat(user.get("roles")).isNull();
-
-                }
-            }
-        });
+        assertThat(userMap.get("idamStatus")).isNotNull();
+        assertThat(userMap.get("userIdentifier")).isNotNull();
+        assertThat(userMap.get("firstName")).isNotNull();
+        assertThat(userMap.get("lastName")).isNotNull();
+        assertThat(userMap.get("email")).isNotNull();
+        assertThat(userMap.get("lastUpdated")).isNotNull();
+        assertThat(userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name()));
     }
 
     public UserProfileUpdatedData deleteRoleRequest(String role) {

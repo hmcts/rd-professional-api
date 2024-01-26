@@ -94,7 +94,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD Group Access External Test Scenarios")
     void testExternalUserGroupAccessScenario() {
-        setUpOrgTestDataForGroupAccess();
+        setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager));
         addNewUserAccessTypeScenarios();
         updateAndAddNewUserAccessTypeScenarios();
@@ -123,26 +123,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
             List<Map<String, Object>> professionalUsersResponses =
                     (List<Map<String, Object>>) searchResponse.get("users");
             superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
-        }
-    }
-
-    public void setUpOrgTestDataForGroupAccess() {
-        if (isEmpty(extActiveOrgId)) {
-            log.info("Setting up organization...");
-            superUserEmail = generateRandomEmail();
-            organisationCreationRequest = createOrganisationRequest()
-                    .superUser(aUserCreationRequest()
-                            .firstName(firstName)
-                            .lastName(lastName)
-                            .email(superUserEmail)
-                            .build())
-                    .paymentAccount(Set.of("PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
-                            "PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
-                            "PBA".concat(RandomStringUtils.randomAlphanumeric(7))))
-                    .build();
-
-            organisationCreationRequest.setStatus("ACTIVE");
-            extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
         }
     }
 
@@ -428,7 +408,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findUserWithAccessTypesAndRoleShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
-        validateAccessTypesAndRolesInRetrievedUser(response, "ACTIVE", true);
+        validateAccessTypesAndRolesInRetrievedUser(response,  true);
         log.info("findUserWithAccessTypesAndRoleShouldBeSuccess :: END");
     }
 
