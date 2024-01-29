@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,6 +21,7 @@ public class NewUserCreationRequest {
     private String email;
     private List<String> roles;
     private boolean resendInvite;
+    private Set<UserAccessType> userAccessTypes;
 
     @JsonCreator
     public NewUserCreationRequest(
@@ -26,12 +29,15 @@ public class NewUserCreationRequest {
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String emailAddress,
             @JsonProperty("roles") List<String> roles,
-            @JsonProperty("resendInvite") boolean resendInvite) {
+            @JsonProperty("resendInvite") boolean resendInvite,
+            @JsonProperty("userAccessTypes") Set<UserAccessType> userAccessTypes
+    ) {
 
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = StringUtils.isBlank(emailAddress) ? emailAddress : emailAddress.toLowerCase();
         this.roles = roles;
         this.resendInvite = resendInvite;
+        this.userAccessTypes = userAccessTypes;
     }
 }

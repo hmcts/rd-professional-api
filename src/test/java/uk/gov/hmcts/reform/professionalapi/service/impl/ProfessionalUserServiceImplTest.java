@@ -1180,6 +1180,42 @@ class ProfessionalUserServiceImplTest {
         verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
     }
 
+    @Test
+    void test_ErrorOnsaveAllUserAccessTypes() {
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        UserAccessType userAccessType2 = new UserAccessType();
+        userAccessTypes.add(userAccessType2);
+
+        doThrow(new IllegalArgumentException()).when(userConfiguredAccessRepository).saveAll(any());
+
+        try {
+            professionalUserService.saveAllUserAccessTypes(professionalUser,
+                    userAccessTypes);
+        } catch (ExternalApiException eae) {
+            assertThat(eae.getHttpStatus().value()).isEqualTo(500);
+            assertThat(eae.getMessage()).contains("002");
+        }
+
+        verify(userConfiguredAccessRepository, times(1)).saveAll(any());
+    }
+
+    @Test
+    void test_saveAllUserAccessTypes() {
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        UserAccessType userAccessType2 = new UserAccessType();
+        userAccessTypes.add(userAccessType2);
+
+        professionalUserService.saveAllUserAccessTypes(professionalUser,
+                userAccessTypes);
+
+        verify(userConfiguredAccessRepository, times(1)).saveAll(any());
+    }
+
+
     void callModifyRolesForUser(HttpStatus status) {
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
 

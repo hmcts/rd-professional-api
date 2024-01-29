@@ -130,7 +130,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void should_return_400_when_UP_fails_while_adding_new_user_to_an_active_organisation() {
+    void should_return_500_when_UP_fails_while_adding_new_user_to_an_active_organisation() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
@@ -152,7 +152,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
                         inviteUserCreationRequest("somenewuser@email.com", userRoles), hmctsAdmin,
                         userIdentifier);
 
-        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+        assertThat(newUserResponse.get("http_status")).isEqualTo("500");
         assertThat(newUserResponse).isNotNull();
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);

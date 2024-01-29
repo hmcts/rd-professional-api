@@ -33,10 +33,13 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
@@ -51,6 +54,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
@@ -87,6 +91,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     @Autowired
     MfaStatusService mfaStatusService;
 
+    @Autowired
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
+
     private ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
 
@@ -101,6 +108,12 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     public void toUpdateUserRolesForIdentifier() throws IOException {
 
         setupInteractionsForProfessionalUser();
+    }
+
+    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID})
+    public void toUpdateUserRolesAndAccessTypesForIdentifier() throws IOException {
+
+        setupInteractionsForProfessionalUserWithUserAccessTypes();
     }
 
     @State({"Professional users exist for an Active organisation"})
@@ -189,6 +202,72 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+
+        return professionalUser;
+    }
+
+    private ProfessionalUser setupInteractionsForProfessionalUserWithUserAccessTypes() throws JsonProcessingException {
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Collections.singletonList("pui-case-manager"))
+                .header("aHeader", "aHeader")
+                .build();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("someUid")
+                .roles(Arrays.asList("pui-case-manager")).build());
+
+        String name = "name";
+        String sraId = "sraId";
+        String companyNumber = "companyNumber";
+        String companyUrl = "companyUrl";
+
+        ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
+        professionalUser.setEmailAddress("someUserIdentifier");
+
+        UserProfile profile = getUserProfile();
+
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+        String body = objectMapper.writeValueAsString(userProfileResponse);
+
+        when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(200).build());
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier("a123dfgr46");
+        newUserResponse.setIdamStatus("ACTIVE");
+        String newUserResponseBody = objectMapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
+
+
+        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
+
+        when(professionalUserRepositoryMock.findByOrganisation(organisation))
+                .thenReturn(Arrays.asList(professionalUser));
+
+
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamMessage("some message");
+        roleAdditionResponse.setIdamStatusCode("200");
+        modifyUserRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+
+        String bodyModifyUserRoles = objectMapper.writeValueAsString(modifyUserRolesResponse);
+
+        when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+
+        List<UserConfiguredAccess> allUserConfiguredAccess = PactUtils.getUserConfiguredAccesses(professionalUser);
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))
+                .thenReturn(allUserConfiguredAccess);
+        verify(userConfiguredAccessRepository).deleteAll(allUserConfiguredAccess);
 
         return professionalUser;
     }
