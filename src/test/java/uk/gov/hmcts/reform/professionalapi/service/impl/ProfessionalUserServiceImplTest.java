@@ -1233,19 +1233,41 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void test_findRefreshUsers() {
-        Pageable pageableMock = mock(Pageable.class);
+    void test_fetchUsersForRefresh() {
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUserList.add(professionalUser);
+
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any()))
+                .thenReturn(professionalUserList);
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<Object> responseEntity = professionalUserService.fetchUsersForRefresh(since, null, null, null);
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepository, times(1))
+                .findByLastUpdatedGreaterThanEqual(any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_fetchUsersForRefreshPageable() {
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = mock(Page.class);
 
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation);
-        ProfessionalUser professionalUser1 = new ProfessionalUser("fName", "lName",
-                "some1@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
         professionalUserList.add(professionalUser);
-        professionalUserList.add(professionalUser1);
 
-        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any(), eq(pageableMock)))
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any(), any()))
                 .thenReturn(professionalUserPage);
 
         when(professionalUserPage.getContent()).thenReturn(professionalUserList);
@@ -1253,14 +1275,39 @@ class ProfessionalUserServiceImplTest {
         LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
         String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
 
-        ResponseEntity<Object> responseEntity = professionalUserService.findRefreshUsers(since, pageableMock);
+        ResponseEntity<Object> responseEntity =
+                professionalUserService.fetchUsersForRefresh(since, null, 10, null);
 
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getHeaders().get("total_records")).isNotNull();
 
         verify(professionalUserRepository, times(1))
                 .findByLastUpdatedGreaterThanEqual(any(), any());
+    }
+
+    @Test
+    void test_fetchUsersForRefreshWithSearchAfter() {
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUserList.add(professionalUser);
+
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(any(), any()))
+                .thenReturn(professionalUserList);
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<Object> responseEntity = professionalUserService
+                .fetchUsersForRefresh(since, null, null, UUID.randomUUID());
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepository, times(1))
+                .findByLastUpdatedGreaterThanEqualAndIdGreaterThan(any(), any());
     }
 
     @Test
@@ -1269,15 +1316,16 @@ class ProfessionalUserServiceImplTest {
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation);
         professionalUser.setId(UUID.randomUUID());
+        professionalUser.setCreated(LocalDateTime.now());
 
         when(professionalUserRepository.findByUserIdentifier(any()))
                 .thenReturn(professionalUser);
 
-        ResponseEntity<Object> responseEntity = professionalUserService.findSingleRefreshUser(userIdentifier);
+        ResponseEntity<Object> responseEntity = professionalUserService
+                .fetchUsersForRefresh(null, userIdentifier, null, null);
 
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getHeaders().get("total_records")).isNull();
 
         verify(professionalUserRepository, times(1))
                 .findByUserIdentifier(any());

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Org
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationInfo;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
@@ -248,39 +249,41 @@ class ProfessionalUserInternalControllerTest {
     void test_GetRefreshUsersWithSince() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", List.of(userAccessType));
-        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
+        OrganisationInfo orgInfo =
+                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("SOLICITOR"));
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser),
+                UUID.randomUUID(), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
-
         Integer page = 1;
-        Integer size = 10;
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200)
-                .header("total_records", "1")
                 .body(getRefreshUsersResponse);
 
         when(professionalUserServiceMock.fetchUsersForRefresh(any(), eq(null), any(), any()))
                 .thenReturn(responseEntity);
 
         ResponseEntity<Object> actualData = professionalUserInternalController
-                .getRefreshUsers(since, null, page, size);
+                .getRefreshUsers(since, null, page, null);
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
-        assertThat(actualData.getHeaders().get("total_records")).isNotNull();
 
         verify(professionalUserServiceMock, times(1))
-                .fetchUsersForRefresh(since, null, page, size);
+                .fetchUsersForRefresh(since, null, page, null);
     }
 
     @Test
     void test_GetRefreshUsers_SingleUser() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
-        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), "orgId", List.of(userAccessType));
-        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser), false);
+        OrganisationInfo orgInfo =
+                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("SOLICITOR"));
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser),
+                UUID.randomUUID(), false);
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
 
@@ -292,7 +295,6 @@ class ProfessionalUserInternalControllerTest {
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
-        assertThat(actualData.getHeaders().get("total_records")).isNull();
 
         verify(professionalUserServiceMock, times(1))
                 .fetchUsersForRefresh(null, "uid", null, null);

@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationInfo;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -78,6 +80,23 @@ public class RefDataUtil {
     private static int defaultPageSize;
 
     private static String loggingComponentName;
+
+    private static final String DEFAULT_ORG_PROFILE_ID = "SOLICITOR_PROFILE";
+    private static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
+            new SimpleEntry<String, List<String>>("SOLICITOR_ORG", List.of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("LOCAL_AUTHORITY_ORG", List.of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("OTHER_ORG", List.of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("OGD_DWP_ORG", List.of("OGD_DWP_PROFILE")),
+            new SimpleEntry<String, List<String>>("OGD_HO_ORG", List.of("OGD_HO_PROFILE")),
+            new SimpleEntry<String, List<String>>("OGD_OTHER_ORG", List.of("SOLICITOR_PROFILE"))
+    );
+
+    private static List<String> getOrganisationProfileIds(Organisation organisation) {
+        if (organisation.getOrgType() == null) {
+            return List.of(DEFAULT_ORG_PROFILE_ID);
+        }
+        return ORG_TYPE_TO_ORG_PROFILE_IDS.get(organisation.getOrgType());
+    }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
         return userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
@@ -497,25 +516,30 @@ public class RefDataUtil {
                     .map(RefDataUtil::fromUserConfiguredAccess)
                     .toList());
 
+            OrganisationInfo organisationInfo = new OrganisationInfo(
+                    professionalUser.getOrganisation().getOrganisationIdentifier(),
+                    professionalUser.getOrganisation().getStatus(),
+                    professionalUser.getOrganisation().getLastUpdated(),
+                    getOrganisationProfileIds(professionalUser.getOrganisation())
+            );
+
             RefreshUser refreshUser = new RefreshUser(
                     professionalUser.getUserIdentifier(),
                     professionalUser.getLastUpdated(),
-                    professionalUser.getOrganisation().getOrganisationIdentifier(),
-                    userAccessTypes
+                    organisationInfo,
+                    userAccessTypes,
+                    professionalUser.getDeleted()
             );
 
             refreshUserList.add(refreshUser);
         }
 
         getRefreshUsersResponse.setUsers(refreshUserList);
+        if (!refreshUserList.isEmpty()) {
+            getRefreshUsersResponse.setLastRecordInPage(professionalUsers.get(professionalUsers.size() - 1).getId());
+        }
 
         return getRefreshUsersResponse;
-    }
-
-    public static GetRefreshUsersResponse buildEmptyGetRefreshUsersResponse() {
-        GetRefreshUsersResponse response = new GetRefreshUsersResponse();
-        response.setUsers(new ArrayList<>());
-        return response;
     }
 
     public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {

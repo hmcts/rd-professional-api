@@ -282,9 +282,9 @@ public class ProfessionalReferenceDataClient {
                 returnRoles);
     }
 
-    public Map<String, Object> findRefreshUsersWithSince(String since, Integer page, Integer size) {
-        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&page={page}&size={size}", since,
-                page, size);
+    public Map<String, Object> findRefreshUsersWithSince(String since, Integer pageSize) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&pageSize={pageSize}", since,
+                pageSize);
     }
 
     public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
