@@ -146,24 +146,24 @@ class OrganisationIdentifierValidatorImplTest {
     @Test
     void test_validateGetRefreshUsersParamsWhenBothParamsNull() {
         assertThrows(InvalidRequest.class,() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(null, null, null));
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(null, null, null, null));
     }
 
     @Test
     void test_validateGetRefreshUsersParamsWithInvalidSize() {
         assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
-                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1));
+                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, UUID.randomUUID()));
     }
 
     @Test
     void test_validateGetRefreshUsersParamsWithBadDateTimeFormat() {
         assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
-                .validateGetRefreshUsersParams("Bad date time pattern", null, null));
+                .validateGetRefreshUsersParams("Bad date time pattern", null, null, null));
     }
 
     @Test
     void test_validateGetRefreshUsersParamsWithValidFormat() {
-        assertDoesNotThrow(() ->
-                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams("2023-12-05T14:49:53", null, 1));
+        assertDoesNotThrow(() -> organisationIdentifierValidatorImpl
+                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, 1, null));
     }
 }

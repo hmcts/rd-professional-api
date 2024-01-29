@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -127,7 +128,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         validateOrganisationIsActive(org.get(), BAD_REQUEST);
     }
 
-    public void validateGetRefreshUsersParams(String since, String userId, Integer size) {
+    public void validateGetRefreshUsersParams(String since, String userId, Integer pageSize, UUID searchAfter) {
         if ((since == null && userId == null) || (since != null && userId != null)) {
             throw new InvalidRequest(INVALID_MANDATORY_PARAMETER);
         }
@@ -136,8 +137,10 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             if (!isSinceInValidFormat(since)) {
                 throw new InvalidRequest(INVALID_SINCE_TIMESTAMP + SINCE_TIMESTAMP_FORMAT);
             }
-            if (!isSizeValid(size)) {
-                throw new InvalidRequest(INVALID_PAGE_INFORMATION);
+            if (searchAfter != null) {
+                if (pageSize == null || pageSize <= 0) {
+                    throw new InvalidRequest(INVALID_PAGE_INFORMATION);
+                }
             }
         }
     }
@@ -150,9 +153,5 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
 
         return true;
-    }
-
-    private boolean isSizeValid(Integer size) {
-        return size == null || size >= 1;
     }
 }
