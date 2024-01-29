@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class RefreshUser {
 
     private String userIdentifier;
@@ -19,16 +21,4 @@ public class RefreshUser {
     private List<UserAccessType> userAccessTypes;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime dateTimeDeleted;
-
-    public RefreshUser(String userIdentifier,
-                       LocalDateTime lastUpdated,
-                       OrganisationInfo organisationInfo,
-                       List<UserAccessType> userAccessTypes,
-                       LocalDateTime dateTimeDeleted) {
-        this.userIdentifier = userIdentifier;
-        this.lastUpdated = lastUpdated;
-        this.organisationInfo = organisationInfo;
-        this.userAccessTypes = userAccessTypes;
-        this.dateTimeDeleted = dateTimeDeleted;
-    }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,15 +12,10 @@ import java.util.UUID;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class GetRefreshUsersResponse {
 
     private List<RefreshUser> users;
     private UUID lastRecordInPage;
     private boolean moreAvailable;
-
-    public GetRefreshUsersResponse(List<RefreshUser> users, UUID lastRecordInPage, boolean moreAvailable) {
-        this.users = users;
-        this.lastRecordInPage = lastRecordInPage;
-        this.moreAvailable = moreAvailable;
-    }
 }
