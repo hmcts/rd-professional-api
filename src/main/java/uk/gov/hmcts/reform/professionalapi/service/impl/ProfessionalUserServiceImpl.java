@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
@@ -54,8 +55,6 @@ import javax.transaction.Transactional;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NESTED_ORG_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
@@ -120,22 +119,61 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size) {
-        if (since != null && page != null && size != null) {
-            Pageable pageable =
-                    createPageableObject(page - 1, size, Sort.by(Sort.DEFAULT_DIRECTION, NESTED_ORG_IDENTIFIER)
-                            .and(Sort.by(Sort.DEFAULT_DIRECTION, USER_IDENTIFIER)));
-            return findRefreshUsers(since, pageable);
+    public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize,
+                                                       UUID searchAfter) {
+        if (since != null) {
+            if (pageSize != null) {
+                Pageable pageable = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
+                return findRefreshUsersPageable(since, pageable, searchAfter);
+            }
+            return findRefreshUsers(since, searchAfter);
         }
         return findSingleRefreshUser(userId);
     }
 
-    public ResponseEntity<Object> findRefreshUsers(String since, Pageable pageable) {
+    public ResponseEntity<Object> findRefreshUsers(String since, UUID searchAfter) {
         LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
-        Page<ProfessionalUser> professionalUsersPage =
-                professionalUserRepository.findByLastUpdatedGreaterThanEqual(formattedSince, pageable);
+
+        List<ProfessionalUser> professionalUsers;
+
+        if (searchAfter == null) {
+            professionalUsers = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
+                    formattedSince
+            );
+        } else {
+            professionalUsers = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
+                    formattedSince, searchAfter
+            );
+        }
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+                .map(ProfessionalUser::getUserConfiguredAccesses)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
+                null, professionalUsers, userConfiguredAccesses
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    public ResponseEntity<Object> findRefreshUsersPageable(String since, Pageable pageable, UUID searchAfter) {
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        Page<ProfessionalUser> professionalUsersPage;
+
+        if (searchAfter == null) {
+            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
+                    formattedSince, pageable
+            );
+        } else {
+            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
+                    formattedSince, searchAfter, pageable
+            );
+        }
+
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
-        long totalRecords = professionalUsersPage.getTotalElements();
 
         List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
@@ -146,9 +184,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 professionalUsersPage, professionalUsers, userConfiguredAccesses
         );
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .header("total_records", String.valueOf(totalRecords))
-                .body(res);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
@@ -158,8 +194,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (professionalUser != null) {
             userConfiguredAccesses = professionalUser.getUserConfiguredAccesses();
         } else {
-            log.debug("Professional user with identifier: {} not found", userId);
-            return ResponseEntity.status(HttpStatus.OK).body(RefDataUtil.buildEmptyGetRefreshUsersResponse());
+            throw new ResourceNotFoundException("User does not exist");
         }
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
@@ -387,6 +422,19 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         uca.setEnabled(userAccessType.getEnabled());
 
         return uca;
+    }
+
+    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
+        if (userAccessTypes != null) {
+            try {
+                List<UserConfiguredAccess> all = userAccessTypes.stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                        .collect(Collectors.toList());
+                userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
+            }
+        }
     }
 
 

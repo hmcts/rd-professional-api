@@ -6,10 +6,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -33,13 +35,15 @@ public interface ProfessionalUserService {
     ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId,
                                               Optional<String> origin);
 
+    void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes);
+
     ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String email);
 
     void checkUserStatusIsActiveByUserId(String userId);
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
 
-    ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer page, Integer size);
+    ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize, UUID searchAfter);
 
     ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
                                                               String userId, Optional<String> origin);

@@ -15,10 +15,10 @@ public class UserAccessType {
     private String accessTypeId;
     private Boolean enabled;
 
-    public UserAccessType(@JsonProperty(value = "jurisdictionId") String jurisdictionId,
-                          @JsonProperty(value = "organisationProfileId") String organisationProfileId,
-                          @JsonProperty(value = "accessTypeId") String accessTypeId,
-                          @JsonProperty(value = "enabled") Boolean enabled) {
+    public UserAccessType(@JsonProperty("jurisdictionId") String jurisdictionId,
+                          @JsonProperty("organisationProfileId") String organisationProfileId,
+                          @JsonProperty("accessTypeId") String accessTypeId,
+                          @JsonProperty("enabled") Boolean enabled) {
         this.jurisdictionId = jurisdictionId;
         this.organisationProfileId = organisationProfileId;
         this.accessTypeId = accessTypeId;

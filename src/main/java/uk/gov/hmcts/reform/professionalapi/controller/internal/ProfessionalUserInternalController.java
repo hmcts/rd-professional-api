@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.Optional;
+import java.util.UUID;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -174,7 +175,8 @@ public class ProfessionalUserInternalController extends SuperController {
     }
 
     @Operation(
-            summary = "Retrieves list of users required for a refresh",
+            summary = "Retrieves the details of all users with a last updated date/time >= since, "
+                    + "or a single user by user identifier",
             description = "**Bearer token not required to access API. Only a valid s2s token**",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization")
@@ -182,7 +184,8 @@ public class ProfessionalUserInternalController extends SuperController {
     )
     @Parameter(
             name = "since",
-            description = "Timestamp to fetch users before. Expected format: " + SINCE_TIMESTAMP_FORMAT
+            description = "Timestamp to fetch users with last updated date/time >= since, "
+                    + "expected format: " + SINCE_TIMESTAMP_FORMAT
     )
     @ApiResponse(
             responseCode = "200",
@@ -213,11 +216,11 @@ public class ProfessionalUserInternalController extends SuperController {
     public ResponseEntity<Object> getRefreshUsers(
             @RequestParam(value = "since", required = false) String since,
             @RequestParam(value = "userId", required = false) String userId,
-            @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "size", required = false) Integer size
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "searchAfter", required = false) UUID searchAfter
     ) {
-        organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId, page, size);
+        organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId, pageSize, searchAfter);
 
-        return professionalUserService.fetchUsersForRefresh(since, userId, page, size);
+        return professionalUserService.fetchUsersForRefresh(since, userId, pageSize, searchAfter);
     }
 }

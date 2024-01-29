@@ -169,6 +169,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
+    protected static final String ORG_INFO = "organisationInfo";
+    protected static final String DATE_TIME_DELETED = "dateTimeDeleted";
     protected static final String LAST_UPDATED = "lastUpdated";
     protected static final String USER_ACCESS_TYPES = "userAccessTypes";
     public static final String APPLICATION_JSON = "application/json";
@@ -381,11 +383,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         String lastName = "someLastName";
         String firstName = "1Aaron";
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        String random = randomAlphabetic(10);
+        userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
+                "accessTypeId" + random, false));
+
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
+                .userAccessTypes(userAccessTypes)
                 .build();
 
         return userCreationRequest;

@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 
 class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -27,7 +28,7 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         dateTime = dateTime.minusHours(1);
         String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 1, 10);
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 10);
         validateResponse(response, 1, 0);
     }
 
@@ -74,17 +75,17 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         dateTime = dateTime.plusHours(1);
         String since = dateTime.format(ISO_DATE_TIME_FORMATTER);
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 1, 10);
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithSince(since, 10);
         validateResponse(response, 0, 0);
     }
 
     @Test
-    void retrieve_refresh_users_using_invalid_user_identifier_should_no_users_and_status_2000() {
+    void retrieve_refresh_users_using_invalid_user_identifier_should_return_status_404() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
 
         Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier("123");
-        validateResponse(response, 0, 0);
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     void validateResponse(Map<String, Object> response, int expectedUsers, int expectedUserAccessTypes) {
@@ -97,8 +98,9 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         refreshUsers.forEach(user -> {
             assertNotNull(user.get(USER_IDENTIFIER));
             assertNotNull(user.get(LAST_UPDATED));
-            assertNotNull(user.get(ORG_IDENTIFIER));
+            assertNotNull(user.get(ORG_INFO));
             assertNotNull(user.get(USER_ACCESS_TYPES));
+            assertNull(user.get(DATE_TIME_DELETED));
 
             List<LinkedHashMap> userAccessTypes = (List<LinkedHashMap>) user.get("userAccessTypes");
 
@@ -111,6 +113,9 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
             });
         });
 
+        if (expectedUsers > 0) {
+            assertNotNull(response.get("lastRecordInPage"));
+        }
         assertNotNull(response.get("moreAvailable"));
     }
 }
