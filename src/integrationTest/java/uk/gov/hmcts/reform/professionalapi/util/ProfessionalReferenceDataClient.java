@@ -116,6 +116,17 @@ public class ProfessionalReferenceDataClient {
                 role, userId, email);
     }
 
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeader(String email, String role) {
+        return getRequestToGetEmailFromHeader("/refdata/internal/v2/organisations" + "/pbas",
+                role, "", email);
+    }
+
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers(String email, String role,
+                                                                                         String userId) {
+        return getRequestToGetEmailFromHeader("/refdata/external/v2/organisations" + "/pbas",
+                role, userId, email);
+    }
+
     public Map<String, Object> findMFAByUserID(String professionalUserID) {
         return getRequestWithoutAuthHeaders(APP_EXT_BASE_PATH + "/mfa?user_id={userIdentifier}", professionalUserID);
     }
@@ -165,17 +176,6 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
         return postRequest(baseV2IntUrl, request, null, null);
-    }
-
-    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeader(String email, String role) {
-        return getRequestToGetEmailFromHeader("/refdata/internal/v2/organisations" + "/pbas",
-            role, "", email);
-    }
-
-    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers(String email, String role,
-                                                                                         String userId) {
-        return getRequestToGetEmailFromHeader("/refdata/external/v2/organisations" + "/pbas",
-            role, userId, email);
     }
 
     public Map<String, Object> retrieveAllOrganisationsForV2Api(String role) {
