@@ -534,5 +534,4 @@ public class RefDataUtil {
         return accessType;
     }
 
-
 }
