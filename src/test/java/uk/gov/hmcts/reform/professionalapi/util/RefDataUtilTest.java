@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,7 +82,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -113,6 +114,7 @@ class RefDataUtilTest {
         professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
         professionalUser.setOrganisation(organisation);
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setLastUpdated(LocalDateTime.of(2023, 12, 31, 23, 59, 59, 987654321));
         userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         userAccountMap = new UserAccountMap(userAccountMapId);
         profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName",
@@ -816,6 +818,7 @@ class RefDataUtilTest {
 
         assertThat(orgResponse).isNotNull();
         assertThat(orgResponse.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
+        assertThat(orgResponse.get(0).getStatus()).isEqualTo(organisation.getStatus());
         assertThat(orgResponse.get(0).getName()).isEqualTo("Org-Name");
         assertThat(orgResponse.get(0).getSraId()).isEqualTo("sra-id");
         assertThat(orgResponse.get(0).getCompanyNumber()).isEqualTo("companyN");
@@ -1137,11 +1140,14 @@ class RefDataUtilTest {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
-        ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity,
-                "ABCD123");
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity, "ABCD123",
+                OrganisationStatus.ACTIVE, List.of("organisationProfileId1,organisationProfileId2".split(",")));
         assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+        assertThat(output.getOrganisationStatus()).isEqualTo(OrganisationStatus.ACTIVE.name());
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId1");
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId2");
     }
 
     @Test
@@ -1155,13 +1161,22 @@ class RefDataUtilTest {
         professionalUsersEntityResponseWithoutRoles.setUserProfiles(professionalUsersEntityResponsesWithoutRoles);
         ResponseEntity<Object> responseEntity
                 = ResponseEntity.status(200).body(professionalUsersEntityResponseWithoutRoles);
-        ResponseEntity<Object> responseEntityOutput
-                = setOrgIdInGetUserResponse(responseEntity, "ABCD123");
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity, "ABCD123",
+                OrganisationStatus.ACTIVE, List.of("organisationProfileId1,organisationProfileId2".split(",")));
         assertThat(responseEntityOutput.getBody())
                 .isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
         ProfessionalUsersEntityResponseWithoutRoles output
                 = (ProfessionalUsersEntityResponseWithoutRoles) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+        assertThat(output.getOrganisationStatus()).isEqualTo(OrganisationStatus.ACTIVE.name());
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId1");
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId2");
+        assertThat(output.getUserProfiles()).hasSize(1);
+        assertThat(output.getUserProfiles().get(0).getEmail()).isEqualTo("soMeone@somewhere.com");
+        assertThat(output.getUserProfiles().get(0).getLastName()).isEqualTo("some-lname");
+        assertThat(output.getUserProfiles().get(0).getFirstName()).isEqualTo("some-fname");
+        assertThat(output.getUserProfiles().get(0).getLastUpdated().toString())
+                .isEqualTo("2023-12-31T23:59:59.987654321");
     }
 
     @Test
