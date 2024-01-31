@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccessId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 import java.util.ArrayList;
@@ -17,12 +19,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
+
 public class PactUtils {
 
     private PactUtils() {
     }
 
     public static final String PROFESSIONAL_USER_ID = "123456";
+    public static final String ORGANISATION_IDENTIFIER = "HM2OHHS";
     public static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
     public static Organisation getMinimalOrganisation() {
@@ -114,4 +119,37 @@ public class PactUtils {
         su.setUserIdentifier("someUserIdentifier");
         return su;
     }
+
+    public static List<UserConfiguredAccess> getUserConfiguredAccesses(ProfessionalUser professionalUser) {
+        final UserConfiguredAccessId userConfiguredAccessId =
+                new UserConfiguredAccessId(professionalUser,
+                        "jurisdictionId1",
+                        "organisationProfileId1",
+                        "accessTypeId1");
+        final UserConfiguredAccess userConfiguredAccess =
+                new UserConfiguredAccess(userConfiguredAccessId,true);
+        return List.of(userConfiguredAccess);
+    }
+
+    public static Organisation setUpOrganisation(String name, String sraId, String companyNumber, String companyUrl) {
+        Organisation organisation = new Organisation();
+        organisation.setName(name);
+        organisation.setCompanyNumber(companyNumber);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setSraId(sraId);
+        organisation.setSraRegulated(true);
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+        organisation.setCompanyUrl(companyUrl);
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn("uprn");
+        contactInformation.setAddressLine1("addressLine1");
+        contactInformation.setAddressLine2("addressLine2");
+        contactInformation.setCountry("country");
+        contactInformation.setPostCode("HA5 1BJ");
+        organisation.setContactInformations(asList(contactInformation));
+
+        return organisation;
+    }
+
+
 }
