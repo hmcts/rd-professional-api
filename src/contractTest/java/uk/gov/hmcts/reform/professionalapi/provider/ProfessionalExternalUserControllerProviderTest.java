@@ -57,6 +57,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
 
 @Provider("referenceData_professionalExternalUsers")
@@ -114,6 +115,13 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     public void toUpdateUserRolesAndAccessTypesForIdentifier() throws IOException {
 
         setupInteractionsForProfessionalUserWithUserAccessTypes();
+    }
+
+    @State({"Professional User exists for get Organisation with user access types with identifier "
+            + ORGANISATION_IDENTIFIER})
+    public void toGetOrganisationUserAndAccessTypesForIdentifier() throws IOException {
+
+        setupInteractionsForGetProfessionalUserWithUserAccessTypes();
     }
 
     @State({"Professional users exist for an Active organisation"})
@@ -204,6 +212,54 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
                 .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
 
         return professionalUser;
+    }
+
+    private void setupInteractionsForGetProfessionalUserWithUserAccessTypes() throws JsonProcessingException {
+        Jwt jwt = Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Collections.singletonList("pui-case-manager"))
+                .header("aHeader", "aHeader")
+                .build();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("someUid")
+                .roles(Arrays.asList("pui-case-manager")).build());
+
+        organisation = new Organisation();
+        organisation.setName("name");
+        organisation.setCompanyNumber("companyNumber");
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setSraId("sraId");
+        organisation.setSraRegulated(true);
+        organisation.setCompanyUrl("companyUrl");
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+        organisation.setOrgType("SOLICITOR_ORG");
+
+        ProfessionalUser profile1 = PactUtils.getProfessionalUser(organisation, 1);
+        profile1.setUserConfiguredAccesses(List.of(PactUtils.getUserConfiguredAccess(profile1, 1),
+                PactUtils.getUserConfiguredAccess(profile1, 2)));
+        ProfessionalUser profile2 = PactUtils.getProfessionalUser(organisation, 2);
+        profile2.setUserConfiguredAccesses(List.of(PactUtils.getUserConfiguredAccess(profile1, 3),
+                PactUtils.getUserConfiguredAccess(profile1, 4)));
+        List<ProfessionalUser> professionalUsers = List.of(profile1, profile2);
+        when(professionalUserRepositoryMock.findByOrganisation(any())).thenReturn(professionalUsers);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile1);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        ProfessionalUsersResponse userProfileResponse2 = new ProfessionalUsersResponse(profile2);
+        userProfileResponse2.setUserIdentifier(UUID.randomUUID().toString());
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        userProfiles.add(userProfileResponse2);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClientMock.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
     }
 
     private ProfessionalUser setupInteractionsForProfessionalUserWithUserAccessTypes() throws JsonProcessingException {

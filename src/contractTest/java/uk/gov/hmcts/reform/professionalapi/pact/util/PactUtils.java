@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccessId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -103,6 +104,15 @@ public class PactUtils {
                 "companyUrl");
     }
 
+    public static ProfessionalUser getProfessionalUser(Organisation organisation, int i) {
+        ProfessionalUser professionalUser = new ProfessionalUser("firstName" + i, "lastName" + i,
+                "email" + 1 + "@org.com", organisation);
+        professionalUser.setId(UUID.randomUUID());
+        professionalUser.setLastUpdated(LocalDateTime.now());
+        return professionalUser;
+
+    }
+
     public static Organisation getOrgWithMfaStatus() {
         Organisation organisation = getMinimalOrganisation();
         OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
@@ -120,15 +130,18 @@ public class PactUtils {
         return su;
     }
 
-    public static List<UserConfiguredAccess> getUserConfiguredAccesses(ProfessionalUser professionalUser) {
+    public static UserConfiguredAccess getUserConfiguredAccess(ProfessionalUser professionalUser, int i) {
         final UserConfiguredAccessId userConfiguredAccessId =
                 new UserConfiguredAccessId(professionalUser,
-                        "jurisdictionId1",
-                        "organisationProfileId1",
-                        "accessTypeId1");
-        final UserConfiguredAccess userConfiguredAccess =
-                new UserConfiguredAccess(userConfiguredAccessId,true);
-        return List.of(userConfiguredAccess);
+                        "jurisdictionId" + 1,
+                        "organisationProfileId" + 1,
+                        "accessTypeId" + 1);
+        return new UserConfiguredAccess(userConfiguredAccessId,true);
+    }
+
+    public static List<UserConfiguredAccess> getUserConfiguredAccesses(ProfessionalUser professionalUser) {
+        final UserConfiguredAccess userConfiguredAccess1 = getUserConfiguredAccess(professionalUser, 1);
+        return List.of(userConfiguredAccess1);
     }
 
     public static Organisation setUpOrganisation(String name, String sraId, String companyNumber, String companyUrl) {
@@ -150,6 +163,4 @@ public class PactUtils {
 
         return organisation;
     }
-
-
 }
