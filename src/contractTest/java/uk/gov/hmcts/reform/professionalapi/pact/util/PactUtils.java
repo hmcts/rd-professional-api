@@ -28,6 +28,7 @@ public class PactUtils {
     }
 
     public static final String PROFESSIONAL_USER_ID = "123456";
+    public static final String PROFESSIONAL_USER_ID2 = "234567";
     public static final String ORGANISATION_IDENTIFIER = "HM2OHHS";
     public static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
@@ -108,6 +109,9 @@ public class PactUtils {
         ProfessionalUser professionalUser = new ProfessionalUser("firstName" + i, "lastName" + i,
                 "email" + 1 + "@org.com", organisation);
         professionalUser.setId(UUID.randomUUID());
+        professionalUser.setUserIdentifier("someUid" +  i);
+        professionalUser.setIdamStatus(IdamStatus.ACTIVE);
+        professionalUser.setIdamStatusCode("200");
         professionalUser.setLastUpdated(LocalDateTime.now());
         return professionalUser;
 

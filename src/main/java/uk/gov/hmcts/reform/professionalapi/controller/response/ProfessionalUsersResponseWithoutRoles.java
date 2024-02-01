@@ -27,7 +27,7 @@ public class ProfessionalUsersResponseWithoutRoles {
     @JsonProperty
     public String idamStatus;
     @JsonProperty
-    private LocalDateTime lastUpdated;
+    public LocalDateTime lastUpdated;
     @JsonProperty
     public List<UserAccessType> userAccessTypes = new ArrayList<>();
 
