@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -50,7 +49,7 @@ class ProfessionalUserInternalControllerTest {
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
     private Organisation organisation;
-    private OrganisationIdentifierValidator organisationIdentifierValidatorMock;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorMock;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private UserProfileUpdateRequestValidator userProfileUpdateRequestValidatorMock;
     private ResponseEntity<Object> responseEntityMock;
@@ -71,7 +70,7 @@ class ProfessionalUserInternalControllerTest {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
-                "lastName", IdamStatus.ACTIVE.name(), null, null);
+                "lastName", IdamStatus.ACTIVE.name(), null, null, null);
 
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
@@ -226,20 +225,16 @@ class ProfessionalUserInternalControllerTest {
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(body);
         when(professionalUserServiceMock.modifyRolesForUser(any(), any(), any())).thenReturn(responseEntity);
 
-        when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedData))
-                .thenReturn(userProfileUpdatedData);
-
         String userId = UUID.randomUUID().toString();
         ResponseEntity<Object> actualData = professionalUserInternalController
-                .modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId,
-                        "EXUI");
+                .modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId, "EXUI");
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData,
                 userId, Optional.of("EXUI"));
-        verify(userProfileUpdateRequestValidatorMock, times(1))
-                .validateRequest(userProfileUpdatedData);
+        verify(organisationIdentifierValidatorMock, times(1))
+                .validateOrganisationExistsWithGivenOrgId("123456A");
     }
 }

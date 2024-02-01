@@ -167,7 +167,7 @@ public class ProfessionalUserInternalController extends SuperController {
         organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(orgId);
 
         //Received request to update user roles of an organisation
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of(origin));
+        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, Optional.of(origin));
 
     }
 }
