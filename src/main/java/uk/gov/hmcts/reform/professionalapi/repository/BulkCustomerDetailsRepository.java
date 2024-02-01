@@ -12,14 +12,15 @@ import java.util.UUID;
 @Repository
 public interface BulkCustomerDetailsRepository extends JpaRepository<BulkCustomerDetails, UUID> {
 
-    @Query(value = "SELECT * FROM  bulk_customer_details bcd WHERE bcd.bulk_customer_id = :bulkCustomerId "
+    @Query(value = "SELECT * FROM  dbrefdata.bulk_customer_details bcd WHERE bcd.bulk_customer_id = :bulkCustomerId "
             + "and bcd.sidam_id = :idamId", nativeQuery = true)
     BulkCustomerDetails findByBulkCustomerId(@Param("bulkCustomerId")String bulkCustomerId,
                                              @Param("idamId") String idamId);
 
 
     @Modifying
-    @Query(value = "delete from bulk_customer_details blk where blk.ORGANISATION_ID in (:val)",nativeQuery = true)
+    @Query(value = "delete from dbrefdata.bulk_customer_details blk where blk.ORGANISATION_ID in (:val)",
+            nativeQuery = true)
     void deleteByOrganistion(String val);
 
 }
