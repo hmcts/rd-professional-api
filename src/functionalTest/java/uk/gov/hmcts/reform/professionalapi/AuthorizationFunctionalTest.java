@@ -205,6 +205,39 @@ public class AuthorizationFunctionalTest {
         return userCreationRequest;
     }
 
+    protected NewUserCreationRequest createUserRequest(List<String> userRoles, boolean hasAccessTypes) {
+
+        String userEmail = generateRandomEmail();
+        String lastName = "someLastName";
+        String firstName = "someFirstName";
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        NewUserCreationRequest userCreationRequest;
+
+        if (hasAccessTypes) {
+            userAccessTypes
+                    .add(new UserAccessType("testJurisdictionId",
+                            "testOrganisationProfileId",
+                            "testAccessTypeId", true));
+            userCreationRequest = aNewUserCreationRequest()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(userEmail)
+                    .roles(userRoles)
+                    .userAccessTypes(userAccessTypes)
+                    .build();
+        } else {
+            userCreationRequest = aNewUserCreationRequest()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(userEmail)
+                    .roles(userRoles)
+                    .userAccessTypes(null)
+                    .build();
+        }
+
+        return userCreationRequest;
+    }
+
     public UserProfileUpdatedData getUserStatusUpdateRequest(IdamStatus status) {
         UserProfileUpdatedData data = new UserProfileUpdatedData();
         data.setFirstName("UpdatedFirstName");
@@ -340,14 +373,27 @@ public class AuthorizationFunctionalTest {
     }
 
     public void validateAccessTypesInRetrievedUser(Map<String, Object> searchResponse, String expectedStatus,
-                                                   Boolean rolesReturned) {
+                                                   Boolean rolesReturned, Boolean hasAccessType,
+                                                   String expectedUserIdentifier) {
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
         assertThat(professionalUsersResponses).isNotEmpty();
         assertThat(professionalUsersResponses).hasSize(1);
+        assertThat(professionalUsersResponses.get(0).get("idamStatus")).isEqualTo(expectedStatus);
+        assertThat(professionalUsersResponses.get(0).get("userIdentifier")).isEqualTo(expectedUserIdentifier);
 
-        List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses.get(0).get("userAccessTypes");
-        assertThat(userAccessTypeList).isNotEmpty();
-        assertThat(userAccessTypeList).isNotNull();
+        if (hasAccessType) {
+            List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses
+                    .get(0).get("userAccessTypes");
+
+            assertThat(userAccessTypeList).isNotEmpty();
+            assertThat(userAccessTypeList).isNotNull();
+            assertThat(userAccessTypeList).hasSize(1);
+            assertEquals("testJurisdictionId", userAccessTypeList.get(0).get("jurisdictionId"));
+            assertEquals("testOrganisationProfileId",
+                    userAccessTypeList.get(0).get("organisationProfileId"));
+            assertEquals("testAccessTypeId", userAccessTypeList.get(0).get("accessTypeId"));
+            assertEquals(true, userAccessTypeList.get(0).get("enabled"));
+        }
 
         HashMap userMap = professionalUsersResponses.get(0);
         assertThat(userMap).isNotEmpty();
@@ -359,11 +405,6 @@ public class AuthorizationFunctionalTest {
         } else {
             assertThat(userMap.get("roles")).isNull();
         }
-        assertThat(userAccessTypeList).hasSize(1);
-        assertEquals("testJurisdictionId", userAccessTypeList.get(0).get("jurisdictionId"));
-        assertEquals("testOrganisationProfileId", userAccessTypeList.get(0).get("organisationProfileId"));
-        assertEquals("testAccessTypeId", userAccessTypeList.get(0).get("accessTypeId"));
-        assertEquals(true, userAccessTypeList.get(0).get("enabled"));
     }
 
     public void validateAccessTypesAndRolesInRetrievedUser(Map<String, Object> searchResponse,
