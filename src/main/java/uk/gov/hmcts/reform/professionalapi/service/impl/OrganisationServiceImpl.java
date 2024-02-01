@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -103,6 +105,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 
 @Service
 @Slf4j
@@ -149,7 +152,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation newOrganisation = new Organisation(
                 RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()),
-                OrganisationStatus.PENDING,
+                PENDING,
                 RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()),
                 RefDataUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()),
                 Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated()
@@ -341,7 +344,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
         });
 
-        if (!CollectionUtils.isEmpty(activeOrganisations)) {
+        if (!isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                     = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted()
@@ -395,7 +398,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         List<Organisation> updatedActiveOrganisations = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(activeOrganisations)) {
+        if (!isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                     = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
@@ -462,7 +465,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         List<Organisation> updatedActiveOrganisations = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(activeOrganisations)) {
+        if (!isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                 = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
@@ -507,6 +510,55 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIds(List<String> organisationIdentifiers,
+                                                                           UUID searchAfter) {
+        boolean orgIdFilterProvided = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
+        boolean searchAfterProvided = searchAfter != null;
+
+        List<Organisation> organisations = new ArrayList<>();
+
+        if(orgIdFilterProvided && searchAfterProvided) {
+            organisations = organisationRepository.findByOrgTypeInAndIdGreaterThan(organisationIdentifiers, searchAfter);
+        }
+
+        if(orgIdFilterProvided && !searchAfterProvided) {
+            organisations = organisationRepository.findByOrgTypeIn(organisationIdentifiers);
+        }
+
+        if(!orgIdFilterProvided && searchAfterProvided) {
+            organisations = organisationRepository.findByIdGreaterThan(searchAfter);
+        }
+
+        return new MultipleOrganisationsResponse(organisations, false);
+    }
+
+    @Override
+    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationIdentifiers,
+                                                                                       Integer pageSize,
+                                                                                       UUID searchAfter){
+        Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
+        boolean orgIdFilterProvided = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
+        boolean searchAfterProvided = searchAfter != null;
+
+        Page<Organisation> orgs = null;
+
+        if(orgIdFilterProvided && searchAfterProvided) {
+            orgs = organisationRepository.findByOrgTypeInAndIdGreaterThan(organisationIdentifiers, searchAfter, pageableObject);
+        }
+
+        if(orgIdFilterProvided && !searchAfterProvided) {
+            orgs = organisationRepository.findByOrgTypeIn(organisationIdentifiers, pageableObject);
+        }
+
+        if(!orgIdFilterProvided && searchAfterProvided) {
+            orgs = organisationRepository.findByIdGreaterThan(searchAfter, pageableObject);
+        }
+        List<Organisation> organisations = orgs.getContent();
+        boolean hasMore = orgs.isLast();
+        return new MultipleOrganisationsResponse(organisations, hasMore);
+    }
+
+    @Override
     public OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(LocalDateTime since, String status,
                                                                           Pageable pageable) {
         List<OrganisationStatus> statuses = new ArrayList<>(validateAndReturnStatusList(status));
@@ -534,7 +586,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
         });
         resultOrganisations.addAll(retrieveActiveOrganisationDetails(activeOrganisations));
-        if (CollectionUtils.isEmpty(resultOrganisations)) {
+        if (isEmpty(resultOrganisations)) {
             throw new EmptyResultDataAccessException(ONE);
         }
         if (pageable != null) {
@@ -713,7 +765,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
         });
         resultOrganisations.addAll(retrieveActiveOrganisationDetails(activeOrganisations));
-        if (CollectionUtils.isEmpty(resultOrganisations)) {
+        if (isEmpty(resultOrganisations)) {
             throw new EmptyResultDataAccessException(ONE);
         }
         if (pageable != null) {
@@ -741,7 +793,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                         ? deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId)
                         : deleteOrganisationResponse;
             default:
-                throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
+                throw new EmptyResultDataAccessException(ONE);
         }
 
     }
@@ -766,7 +818,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (ProfessionalApiConstants.USER_COUNT == professionalUserRepository
                 .findByUserCountByOrganisationId(organisation.getId())) {
             var user = organisation.getUsers()
-                    .get(ProfessionalApiConstants.ZERO_INDEX).toProfessionalUser();
+                    .get(ZERO_INDEX).toProfessionalUser();
             var newUserResponse = RefDataUtil
                     .findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
 
@@ -942,7 +994,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public void validateOrganisationIsActive(Organisation existingOrganisation) {
-        if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
+        if (ACTIVE != existingOrganisation.getStatus()) {
             log.error(LOG_ERROR_BODY_START, loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }

@@ -18,15 +18,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -304,6 +296,19 @@ public class ProfessionalReferenceDataClient {
     public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
         return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}",
                 userId);
+    }
+
+    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, Integer pageSize, UUID searchAfter) {
+        StringBuilder sb = new StringBuilder(baseIntUrl)
+                .append("/getOrganisationsByProfile?");
+        if(pageSize != null){
+            sb.append("pageSize=").append(pageSize);
+        }
+        if(searchAfter != null){
+            sb.append("&searchAfter=").append(searchAfter);
+        }
+        String uriPath = sb.toString();
+        return postRequest(uriPath, request, null, null);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
