@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -119,6 +120,8 @@ public abstract class SuperController {
     protected OrganisationCreationRequestValidator organisationCreationRequestValidator;
     @Autowired
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    @Autowired
+    protected OrganisationByProfileIdsRequestValidatorImpl organisationByProfileIdsRequestValidatorImpl;
     @Autowired
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired
