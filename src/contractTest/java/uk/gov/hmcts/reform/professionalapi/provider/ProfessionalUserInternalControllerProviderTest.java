@@ -9,12 +9,15 @@ import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.ProfessionalUserInternalController;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccessId;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -30,9 +33,16 @@ public class ProfessionalUserInternalControllerProviderTest extends WebMvcProvid
     ProfessionalUserRepository professionalUserRepositoryMock;
 
     @State({"A user identifier for a PRD internal user request"})
-    public void toRetrieveRefreshUser() {
+    public void toRetrieveRefreshUserUsingUserIdentifier() {
+        Organisation organisation = getMinimalOrganisation();
+        organisation.setLastUpdated(LocalDateTime.now());
+
         ProfessionalUser professionalUser = new ProfessionalUser("firstName", "lastName",
-                "email@org.com", getMinimalOrganisation());
+                "email@org.com", organisation);
+
+        professionalUser.setUserIdentifier("123");
+        professionalUser.setId(UUID.randomUUID());
+        professionalUser.setLastUpdated(LocalDateTime.now());
 
         UserConfiguredAccessId userConfiguredAccessId = new UserConfiguredAccessId(
                 professionalUser,
