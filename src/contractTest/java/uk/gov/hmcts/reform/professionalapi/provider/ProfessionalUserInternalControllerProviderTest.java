@@ -43,6 +43,19 @@ public class ProfessionalUserInternalControllerProviderTest extends WebMvcProvid
     }
 
     @SuppressWarnings("unchecked")
+    @State({"A since & page size for a PRD internal user request"})
+    public void toRetrieveRefreshUserUsingSinceAndPagination() {
+        ProfessionalUser professionalUser = setupProfessionalUserWithOrganisation();
+
+        Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
+
+        when(professionalUserRepositoryMock.findByLastUpdatedGreaterThanEqual(
+                any(LocalDateTime.class), any(Pageable.class))
+        ).thenReturn(professionalUserPage);
+        when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
+    }
+
+    @SuppressWarnings("unchecked")
     @State({"A since, searchAfter & page size for a PRD internal user request"})
     public void toRetrieveRefreshUserUsingSinceSearchAfterAndPagination() {
         ProfessionalUser professionalUser = setupProfessionalUserWithOrganisation();
