@@ -27,6 +27,14 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     Organisation findByOrganisationIdentifier(String id);
 
+    List<Organisation> findByOrgTypeIn(List<String> ids);
+
+    Page<Organisation> findByOrgTypeIn(List<String> ids, Pageable pageable);
+
+    List<Organisation> findByOrgTypeInAndIdGreaterThan(List<String> ids, UUID searchAfter);
+
+    Page<Organisation> findByOrgTypeInAndIdGreaterThan(List<String> ids, UUID searchAfter, Pageable pageable);
+
     Organisation findByCompanyNumber(String companyNumber);
 
     Organisation findByUsers(ProfessionalUser user);
@@ -43,6 +51,10 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
+
+    List<Organisation> findByIdGreaterThan(UUID searchAfter);
+
+    Page<Organisation> findByIdGreaterThan(UUID searchAfter, Pageable pageable);
 
     @Query(FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2 + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4)
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
