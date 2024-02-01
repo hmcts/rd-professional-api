@@ -18,6 +18,14 @@ public class ProfessionalUsersEntityResponse {
     private String organisationIdentifier;
 
     @JsonProperty
+    @Setter
+    private String organisationStatus;
+
+    @JsonProperty
+    @Setter
+    private List<String> organisationProfileIds;
+
+    @JsonProperty
     private List<ProfessionalUsersResponse> users = new ArrayList<>();
 
     @JsonSetter("userProfiles")

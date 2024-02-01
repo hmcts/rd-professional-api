@@ -56,6 +56,9 @@ public class ProfessionalUser implements Serializable {
     @OneToMany(mappedBy = "professionalUser", cascade = CascadeType.ALL)
     private List<UserAttribute> userAttributes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "userConfiguredAccessId.professionalUser", cascade = CascadeType.ALL)
+    private List<UserConfiguredAccess> userConfiguredAccesses = new ArrayList<>();
+
     @Column(name = "DELETED")
     private LocalDateTime deleted;
 
