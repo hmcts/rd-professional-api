@@ -240,13 +240,13 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     public void addNewUserToAnOrganisationShouldBeSuccess(boolean hasAccessType) {
-        log.info("inviteUserUserToAnOrganisationShouldBeSuccess :: STARTED");
+        log.info("addNewUserToAnOrganisationShouldBeSuccess :: STARTED");
         Map<String, Object> newUserResponse = professionalApiClient
                     .addNewUserToAnOrganisationExternal(createUserRequest(asList(puiCaseManager), hasAccessType),
                             professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
         newAddedUserId = newUserResponse.get("userIdentifier").toString();
-        log.info("inviteUserUserToAnOrganisationShouldBeSuccess :: END");
+        log.info("addNewUserToAnOrganisationShouldBeSuccess :: END");
     }
 
     public void inviteUserBySuperUserShouldBeSuccess() {
@@ -432,12 +432,12 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     public void findUserWithIdShouldBeSuccess(Boolean hasAccessType) {
-        log.info("findUserWithAccessTypeShouldBeSuccess :: STARTED");
+        log.info("findUserWithIdShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), newAddedUserId);
         validateAccessTypesInRetrievedUser(response, "PENDING",
                 false, hasAccessType, newAddedUserId);
-        log.info("findUserWithAccessTypeShouldBeSuccess :: END");
+        log.info("findUserWithIdShouldBeSuccess :: END");
     }
 
     public void findUserWithAccessTypesAndRoleShouldBeSuccess() {
