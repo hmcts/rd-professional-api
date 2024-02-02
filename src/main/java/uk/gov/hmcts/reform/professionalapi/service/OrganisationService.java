@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -66,6 +67,9 @@ public interface OrganisationService {
 
     void addContactInformationsToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest, String organisationIdentifier);
+
+    ResponseEntity<ContactInformationResponse>  updateContactInformationForOrganisation(
+        List<ContactInformationCreationRequest> contactInformationCreationRequest, String organisationIdentifier);
 
     void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet);
 
