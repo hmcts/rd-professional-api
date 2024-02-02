@@ -74,7 +74,6 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -331,14 +330,14 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public void addContactInformationToOrganisation(
-        List<ContactInformationCreationRequest> contactInformationCreationRequest,
-        Organisation organisation) {
+            List<ContactInformationCreationRequest> contactInformationCreationRequest,
+            Organisation organisation) {
 
         if (contactInformationCreationRequest != null) {
             contactInformationCreationRequest.forEach(contactInfo -> {
                 ContactInformation newContactInformation = new ContactInformation();
                 newContactInformation = setNewContactInformationFromRequest(newContactInformation, contactInfo,
-                    organisation);
+                        organisation);
 
                 var contactInformation = contactInformationRepository.save(newContactInformation);
 
@@ -347,7 +346,6 @@ public class OrganisationServiceImpl implements OrganisationService {
             });
         }
     }
-
 
     public ContactInformation setNewContactInformationFromRequest(ContactInformation contactInformation,
                                                                   ContactInformationCreationRequest contactInfo,
@@ -929,7 +927,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
     }
-
 
 
 
