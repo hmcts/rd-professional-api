@@ -54,10 +54,10 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID2;
 
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
@@ -110,7 +110,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         setupInteractionsForProfessionalUser();
     }
 
-    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID})
+    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID2})
     public void toUpdateUserRolesAndAccessTypesForIdentifier() throws IOException {
 
         setupInteractionsForProfessionalUserWithUserAccessTypes();
@@ -246,7 +246,8 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
-        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(any())).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID2)).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
 
         when(professionalUserRepositoryMock.findByOrganisation(organisation))
@@ -267,7 +268,6 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         List<UserConfiguredAccess> allUserConfiguredAccess = PactUtils.getUserConfiguredAccesses(professionalUser);
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))
                 .thenReturn(allUserConfiguredAccess);
-        verify(userConfiguredAccessRepository).deleteAll(allUserConfiguredAccess);
 
         return professionalUser;
     }

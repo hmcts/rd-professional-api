@@ -27,6 +27,7 @@ public class PactUtils {
     }
 
     public static final String PROFESSIONAL_USER_ID = "123456";
+    public static final String PROFESSIONAL_USER_ID2 = "234567";
     public static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
     public static Organisation getMinimalOrganisation() {
