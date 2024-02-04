@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.microsoft.azure.storage.CloudStorageAccount;
 import feign.FeignException;
 import feign.Request;
@@ -686,7 +687,6 @@ class RefDataUtilTest {
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
-        ObjectMapper mapper = new ObjectMapper();
         Response response = Response.builder().status(301).reason("").headers(header).body(null, UTF_8)
                 .request(mock(Request.class)).build();
         when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
@@ -849,6 +849,7 @@ class RefDataUtilTest {
 
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
 
@@ -889,6 +890,7 @@ class RefDataUtilTest {
 
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
 
@@ -923,6 +925,7 @@ class RefDataUtilTest {
         professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
         Response realResponse = Response.builder().status(300).reason("").headers(header).body(body, UTF_8)
@@ -1205,7 +1208,6 @@ class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        ObjectMapper mapper = new ObjectMapper();
         String body = "{" + "}";
         Response response = Response.builder().status(500).reason("service failed").headers(header).body(body, UTF_8)
                 .request(mock(Request.class)).build();
