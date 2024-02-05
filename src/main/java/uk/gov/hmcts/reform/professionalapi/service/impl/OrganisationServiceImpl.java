@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -529,6 +528,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisations = organisationRepository.findByIdGreaterThan(searchAfter);
         }
 
+        if(!orgIdFilterProvided && !searchAfterProvided){
+            organisations = organisationRepository.findAll();
+        }
+
         return new MultipleOrganisationsResponse(organisations, false);
     }
 
@@ -554,7 +557,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             orgs = organisationRepository.findByIdGreaterThan(searchAfter, pageableObject);
         }
         List<Organisation> organisations = orgs.getContent();
-        boolean hasMore = orgs.isLast();
+        boolean hasMore = !orgs.isLast();
         return new MultipleOrganisationsResponse(organisations, hasMore);
     }
 
