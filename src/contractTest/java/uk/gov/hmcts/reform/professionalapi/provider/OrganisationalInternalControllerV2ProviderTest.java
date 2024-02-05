@@ -157,6 +157,36 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
     }
 
+    @State("Active organisations V2 exists for a logged in user using lastUpdatedSince")
+    public void setActiveOrganisationsV2ForLoggedInUserUsingLastUpdatedSince() throws IOException {
+
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
+        addSuperUser(organisation);
+        organisation.setOrganisationIdentifier("M0AEAP0");
+        organisation.setLastUpdated(LocalDateTime.of(2023, 11, 20, 15, 51, 33));
+        organisation.setDateApproved(LocalDateTime.of(2023, 11, 19, 15, 51, 33));
+
+        when(organisationRepository.findByLastUpdatedGreaterThanEqual(any()))
+                .thenReturn(List.of(organisation));
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+    }
+
     private void mockOrgDetails(Organisation organisation) {
         List<Organisation> organisationList = new ArrayList<>();
         organisationList.add(organisation);
