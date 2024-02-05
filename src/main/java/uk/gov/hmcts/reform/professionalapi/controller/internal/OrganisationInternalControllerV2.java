@@ -93,6 +93,8 @@ public class OrganisationInternalControllerV2 extends SuperController {
         return createOrganisationFrom(organisationCreationRequest);
     }
 
+
+
     @Operation(
             summary = "Retrieves all Organisations filtered by given Status or one Organisation if ID is given",
             description = "**IDAM Roles to access API** : <br> prd-admin",
