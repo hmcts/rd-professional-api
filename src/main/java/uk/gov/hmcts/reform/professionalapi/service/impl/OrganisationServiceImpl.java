@@ -31,7 +31,17 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.response.*;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -502,19 +512,19 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         List<Organisation> organisations = new ArrayList<>();
 
-        if(orgIdFilterProvided && searchAfterProvided) {
+        if (orgIdFilterProvided && searchAfterProvided) {
             organisations = organisationRepository.findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter);
         }
 
-        if(orgIdFilterProvided && !searchAfterProvided) {
+        if (orgIdFilterProvided && !searchAfterProvided) {
             organisations = organisationRepository.findByOrgTypeIn(organisationProfileIds);
         }
 
-        if(!orgIdFilterProvided && searchAfterProvided) {
+        if (!orgIdFilterProvided && searchAfterProvided) {
             organisations = organisationRepository.findByIdGreaterThan(searchAfter);
         }
 
-        if(!orgIdFilterProvided && !searchAfterProvided){
+        if (!orgIdFilterProvided && !searchAfterProvided) {
             organisations = organisationRepository.findAll();
         }
 
@@ -522,26 +532,31 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationProfileIds,
-                                                                                       Integer pageSize,
-                                                                                       UUID searchAfter){
+    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(
+            List<String> organisationProfileIds,
+            Integer pageSize,
+            UUID searchAfter) {
         Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
         boolean orgIdFilterProvided = organisationProfileIds != null && !organisationProfileIds.isEmpty();
         boolean searchAfterProvided = searchAfter != null;
 
         Page<Organisation> orgs = null;
 
-        if(orgIdFilterProvided && searchAfterProvided) {
-            orgs = organisationRepository.
-                    findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter, pageableObject);
+        if (orgIdFilterProvided && searchAfterProvided) {
+            orgs = organisationRepository
+                    .findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter, pageableObject);
         }
 
-        if(orgIdFilterProvided && !searchAfterProvided) {
+        if (orgIdFilterProvided && !searchAfterProvided) {
             orgs = organisationRepository.findByOrgTypeIn(organisationProfileIds, pageableObject);
         }
 
-        if(!orgIdFilterProvided && searchAfterProvided) {
+        if (!orgIdFilterProvided && searchAfterProvided) {
             orgs = organisationRepository.findByIdGreaterThan(searchAfter, pageableObject);
+        }
+
+        if (orgs == null) {
+            return new MultipleOrganisationsResponse(new ArrayList<>(), false);
         }
         List<Organisation> organisations = orgs.getContent();
         boolean hasMore = !orgs.isLast();
