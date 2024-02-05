@@ -516,19 +516,19 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         List<Organisation> organisations = new ArrayList<>();
 
-        if(orgIdFilterProvided && searchAfterProvided) {
+        if (orgIdFilterProvided && searchAfterProvided) {
             organisations = organisationRepository.findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter);
         }
 
-        if(orgIdFilterProvided && !searchAfterProvided) {
+        if (orgIdFilterProvided && !searchAfterProvided) {
             organisations = organisationRepository.findByOrgTypeIn(organisationProfileIds);
         }
 
-        if(!orgIdFilterProvided && searchAfterProvided) {
+        if (!orgIdFilterProvided && searchAfterProvided) {
             organisations = organisationRepository.findByIdGreaterThan(searchAfter);
         }
 
-        if(!orgIdFilterProvided && !searchAfterProvided){
+        if (!orgIdFilterProvided && !searchAfterProvided) {
             organisations = organisationRepository.findAll();
         }
 
@@ -536,26 +536,31 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationProfileIds,
-                                                                                       Integer pageSize,
-                                                                                       UUID searchAfter){
+    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(
+            List<String> organisationProfileIds,
+            Integer pageSize,
+            UUID searchAfter) {
         Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
         boolean orgIdFilterProvided = organisationProfileIds != null && !organisationProfileIds.isEmpty();
         boolean searchAfterProvided = searchAfter != null;
 
         Page<Organisation> orgs = null;
 
-        if(orgIdFilterProvided && searchAfterProvided) {
-            orgs = organisationRepository.
-                    findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter, pageableObject);
+        if (orgIdFilterProvided && searchAfterProvided) {
+            orgs = organisationRepository
+                    .findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter, pageableObject);
         }
 
-        if(orgIdFilterProvided && !searchAfterProvided) {
+        if (orgIdFilterProvided && !searchAfterProvided) {
             orgs = organisationRepository.findByOrgTypeIn(organisationProfileIds, pageableObject);
         }
 
-        if(!orgIdFilterProvided && searchAfterProvided) {
+        if (!orgIdFilterProvided && searchAfterProvided) {
             orgs = organisationRepository.findByIdGreaterThan(searchAfter, pageableObject);
+        }
+
+        if (orgs == null) {
+            return new MultipleOrganisationsResponse(new ArrayList<>(), false);
         }
         List<Organisation> organisations = orgs.getContent();
         boolean hasMore = !orgs.isLast();

@@ -28,8 +28,22 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.request.*;
-import uk.gov.hmcts.reform.professionalapi.controller.response.*;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
@@ -711,11 +725,13 @@ public class OrganisationInternalController extends SuperController {
             @Parameter(name = "pageSize") @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @Parameter(name = "searchAfter") @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
 
-        organisationByProfileIdsRequestValidatorImpl.Validate(pageSize, searchAfter);
+        organisationByProfileIdsRequestValidatorImpl.validate(pageSize, searchAfter);
 
         MultipleOrganisationsResponse response = pageSize == null
-                ? organisationService.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest.getOrganisationProfileIds(), searchAfter)
-                : organisationService.retrieveOrganisationsByProfileIdsWithPageable(organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
+                ? organisationService.retrieveOrganisationsByProfileIds(
+                        organisationByProfileIdsRequest.getOrganisationProfileIds(), searchAfter)
+                : organisationService.retrieveOrganisationsByProfileIdsWithPageable(
+                        organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
