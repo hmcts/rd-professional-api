@@ -18,7 +18,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     private final String solicitorOrgType = "SOLICITOR-ORG";
+    private final String solicitorProfileId = "SOLICITOR_PROFILE";
     private final String ogdHoOrgType = "OGD-HO-ORG";
+    private final String ogdHoProfileId = "OGD_HO_PROFILE";
 
     @BeforeEach
     public void setup() {
@@ -72,6 +74,13 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+
+        List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
+
+        boolean allMatch = organisationInfoMapList.stream()
+                .allMatch(org -> ((List<String>) org.get("organisationProfileId")).contains(solicitorOrgType));
+
+        assertThat(allMatch).isTrue();
     }
 
     @Test
