@@ -67,8 +67,6 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         boolean expectedHasMoreRecords = false;
         int expectedOrganisationsCount = 2;
 
-        // TODO: seed some organisations with a variety of orgType values
-
         // act
         Map<String, Object> response = professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest, pageSize, searchAfter);
 
@@ -94,8 +92,6 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = true;
-
-        // TODO: seed some organisations with a variety of orgType values
 
         // act
         Map<String, Object> response = professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest, pageSize, searchAfter);
@@ -125,8 +121,6 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "400";
         String expectedErrorMessage = "Invalid pageSize";
-
-        // TODO: seed some organisations with a variety of orgType values
 
         // act
         Map<String, Object> response = professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest, pageSize, searchAfter);

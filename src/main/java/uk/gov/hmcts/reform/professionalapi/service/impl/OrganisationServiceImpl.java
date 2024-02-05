@@ -509,19 +509,19 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIds(List<String> organisationIdentifiers,
+    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIds(List<String> organisationProfileIds,
                                                                            UUID searchAfter) {
-        boolean orgIdFilterProvided = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
+        boolean orgIdFilterProvided = organisationProfileIds != null && !organisationProfileIds.isEmpty();
         boolean searchAfterProvided = searchAfter != null;
 
         List<Organisation> organisations = new ArrayList<>();
 
         if(orgIdFilterProvided && searchAfterProvided) {
-            organisations = organisationRepository.findByOrgTypeInAndIdGreaterThan(organisationIdentifiers, searchAfter);
+            organisations = organisationRepository.findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter);
         }
 
         if(orgIdFilterProvided && !searchAfterProvided) {
-            organisations = organisationRepository.findByOrgTypeIn(organisationIdentifiers);
+            organisations = organisationRepository.findByOrgTypeIn(organisationProfileIds);
         }
 
         if(!orgIdFilterProvided && searchAfterProvided) {
@@ -536,21 +536,22 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationIdentifiers,
+    public MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationProfileIds,
                                                                                        Integer pageSize,
                                                                                        UUID searchAfter){
         Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
-        boolean orgIdFilterProvided = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
+        boolean orgIdFilterProvided = organisationProfileIds != null && !organisationProfileIds.isEmpty();
         boolean searchAfterProvided = searchAfter != null;
 
         Page<Organisation> orgs = null;
 
         if(orgIdFilterProvided && searchAfterProvided) {
-            orgs = organisationRepository.findByOrgTypeInAndIdGreaterThan(organisationIdentifiers, searchAfter, pageableObject);
+            orgs = organisationRepository.
+                    findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter, pageableObject);
         }
 
         if(orgIdFilterProvided && !searchAfterProvided) {
-            orgs = organisationRepository.findByOrgTypeIn(organisationIdentifiers, pageableObject);
+            orgs = organisationRepository.findByOrgTypeIn(organisationProfileIds, pageableObject);
         }
 
         if(!orgIdFilterProvided && searchAfterProvided) {

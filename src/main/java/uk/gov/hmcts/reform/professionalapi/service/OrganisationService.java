@@ -37,10 +37,10 @@ public interface OrganisationService {
     OrganisationEntityResponseV2 retrieveOrganisationForV2Api(String organisationIdentifier,
                                                               boolean isPendingPbaRequired);
 
-    MultipleOrganisationsResponse retrieveOrganisationsByProfileIds(List<String> organisationIdentifiers,
+    MultipleOrganisationsResponse retrieveOrganisationsByProfileIds(List<String> organisationProfileIds,
                                                                     UUID searchAfter);
 
-    MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationIdentifiers,
+    MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationProfileIds,
                                                                                 Integer pageSize,
                                                                                 UUID searchAfter);
 

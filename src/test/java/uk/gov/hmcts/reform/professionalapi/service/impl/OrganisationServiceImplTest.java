@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -119,6 +120,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVI
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -2660,5 +2662,138 @@ class OrganisationServiceImplTest {
         String userId = "";
         when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(null);
         assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
+    }
+
+    @Test
+    void shouldRetrieveOrganisationsByProfileIds(){
+        // arrange
+        String profileId = "SOLICITOR-ORG";
+        List<String> profileIds = new ArrayList<>();
+        profileIds.add(profileId);
+
+        UUID searchAfter = null;
+
+        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(profileIds, searchAfter)).thenReturn(organisations);
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIds(profileIds, searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldRetrieveOrganisationsByProfileIdsWithNullProfileIds(){
+        // arrange
+        UUID searchAfter = null;
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIds(null, searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldRetrieveOrganisationsByProfileIdsWithSearchAfter(){
+        // arrange
+        String profileId = "SOLICITOR-ORG";
+        List<String> profileIds = new ArrayList<>();
+        profileIds.add(profileId);
+
+        UUID searchAfter = UUID.randomUUID();
+
+        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(profileIds, searchAfter)).thenReturn(organisations);
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIds(profileIds, searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldRetrieveOrganisationsByProfileIdsWithEmptyProfileIds(){
+        // arrange
+        List<String> profileIds = new ArrayList<>();
+        UUID searchAfter = null;
+
+        when(organisationRepository.findAll()).thenReturn(organisations);
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIds(profileIds, searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldRetrieveOrganisationsByProfileIdsWithPagingWithPageSizeAndSearchAfter(){
+        // arrange
+        List<String> profileIds = new ArrayList<>();
+        Integer pageSize = 1;
+        UUID searchAfter = UUID.randomUUID();
+        Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+        when(orgPage.getContent()).thenReturn(organisations);
+
+        when(organisationRepository.findByIdGreaterThan(searchAfter, pageableObject)).thenReturn(orgPage);
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize, searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter(){
+        // arrange
+        String profileId = "SOLICITOR-ORG";
+        List<String> profileIds = new ArrayList<>();
+        profileIds.add(profileId);
+        Integer pageSize = 1;
+        UUID searchAfter = null;
+        Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(profileIds, pageableObject)).thenReturn(orgPage);
+        when(orgPage.getContent()).thenReturn(organisations);
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize, searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndEmptyProfileIds(){
+        // arrange
+        String profileId = "SOLICITOR-ORG";
+        List<String> profileIds = new ArrayList<>();
+        Integer pageSize = 1;
+        UUID searchAfter = UUID.randomUUID();
+        Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByIdGreaterThan(searchAfter, pageableObject)).thenReturn(orgPage);
+        when(orgPage.getContent()).thenReturn(organisations);
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize, searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
     }
 }
