@@ -40,8 +40,11 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
+    OrganisationResponse updateOrganisationNameOrSRA(
+        OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier);
+
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
-                                            String organisationIdentifier,Boolean isOrgApprovalRequest);
+                                            String organisationIdentifier, Boolean isOrgApprovalRequest);
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 

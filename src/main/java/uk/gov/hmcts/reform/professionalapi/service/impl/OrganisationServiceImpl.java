@@ -87,6 +87,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -590,6 +591,23 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisationsDetailResponse.setTotalRecords(totalRecords);
 
         return organisationsDetailResponse;
+    }
+
+    @Override
+    public OrganisationResponse updateOrganisationNameOrSRA(
+        OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
+
+        var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        if(isNotBlank(organisationCreationRequest.getName())){
+            existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
+        }
+        if(isNotBlank(organisationCreationRequest.getSraId())){
+            existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
+        }
+
+        var savedOrganisation = organisationRepository.save(existingOrganisation);
+
+        return new OrganisationResponse(savedOrganisation);
     }
 
     @Override

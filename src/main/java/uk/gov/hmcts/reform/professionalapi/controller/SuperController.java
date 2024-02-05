@@ -71,6 +71,7 @@ import javax.servlet.http.HttpServletRequest;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -333,6 +334,22 @@ public abstract class SuperController {
                 .status(200)
                 .body(new OrganisationPbaResponseV2(organisation,
                         false, true, false,true));
+    }
+
+    protected ResponseEntity<Object> updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
+                                                            String organisationIdentifier) {
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+
+        if(isNotBlank(organisationCreationRequest.getSraId())){
+            organisationCreationRequestValidator.validateOrganisationSRAIdInRequest(organisationCreationRequest);
+        }
+        if(isNotBlank(organisationCreationRequest.getName())){
+            organisationCreationRequestValidator.validateOrganisationNameInRequest(organisationCreationRequest);
+        }
+
+        organisationService.updateOrganisationNameOrSRA(organisationCreationRequest, orgId);
+        return ResponseEntity.status(200).build();
     }
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
