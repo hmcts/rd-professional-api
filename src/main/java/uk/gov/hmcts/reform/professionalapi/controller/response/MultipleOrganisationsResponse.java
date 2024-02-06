@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class MultipleOrganisationsResponse {
 
     private List<OrganisationByProfileResponse> organisationInfo;
