@@ -560,23 +560,21 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
-        List<String> orgTypes = new ArrayList<>();
-        if (organisationProfileIds == null) {
-            return orgTypes;
-        }
-        for (String profileId : organisationProfileIds) {
-            if (organisationProfileIds.contains("SOLICITOR_PROFILE")) {
-                orgTypes.add("SOLICITOR-ORG");
-            } else if (organisationProfileIds.contains("OGD_DWP_PROFILE")) {
-                orgTypes.add("OGD-DWP-ORG");
-            } else if (organisationProfileIds.contains("OGD_HO_PROFILE")) {
-                orgTypes.add("OGD-HO-ORG");
-            } else {
-                orgTypes.add(profileId);
-            }
-        }
-
-
+        List<String> orgTypes = Optional.ofNullable(organisationProfileIds)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(profileId -> {
+                    switch (profileId) {
+                        case "SOLICITOR_PROFILE":
+                            return "SOLICITOR-ORG";
+                        case "OGD_DWP_PROFILE":
+                            return "OGD-DWP-ORG";
+                        case "OGD_HO_PROFILE":
+                            return "OGD-HO-ORG";
+                        default:
+                            return profileId;
+                    }
+                }).collect(Collectors.toList());
 
         // TODO: what are the matching org types for the following profile ids?
         // OGD_HMRC_PROFILE
