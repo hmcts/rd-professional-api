@@ -576,12 +576,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                     }
                 }).collect(Collectors.toList());
 
-        // TODO: what are the matching org types for the following profile ids?
-        // OGD_HMRC_PROFILE
-        // OGD_CICA_PROFILE
-        // OGD_CAFCASS_PROFILE_ENGLAND
-        // OGD_CAFCASS_PROFILE_CYMRU
-
         return orgTypes;
     }
 
