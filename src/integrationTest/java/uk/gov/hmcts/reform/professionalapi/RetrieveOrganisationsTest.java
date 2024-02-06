@@ -49,8 +49,9 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 @Slf4j
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
-    static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(SINCE_TIMESTAMP_FORMAT);
+    static final String LAST_UPDATED_SINCE_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
+            .ofPattern(LAST_UPDATED_SINCE_TIMESTAMP_FORMAT);
     static final int SINCE_PAUSE_SECONDS = 2;
 
     @SuppressWarnings("unchecked")
