@@ -44,7 +44,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponseAndSort;
 
 @Service
 @Slf4j
@@ -153,7 +153,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgIdInGetUserResponse(responseEntity, organisationIdentifier);
+                responseEntity = setOrgIdInGetUserResponseAndSort(responseEntity, organisationIdentifier);
             }
 
         } catch (FeignException ex) {

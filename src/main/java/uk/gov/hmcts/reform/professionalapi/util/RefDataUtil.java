@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -393,22 +394,29 @@ public class RefDataUtil {
         return deleteOrganisationResponse;
     }
 
-    public static ResponseEntity<Object> setOrgIdInGetUserResponse(ResponseEntity<Object> responseEntity,
-                                                                   String organisationIdentifier) {
+    public static ResponseEntity<Object> setOrgIdInGetUserResponseAndSort(ResponseEntity<Object> responseEntity,
+                                                                          String organisationIdentifier) {
         ResponseEntity<Object> newResponseEntity;
-        if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
+        Object response = responseEntity.getBody();
+        if (response instanceof ProfessionalUsersEntityResponse) {
             ProfessionalUsersEntityResponse professionalUsersEntityResponse
                     = (ProfessionalUsersEntityResponse) requireNonNull(responseEntity.getBody());
             professionalUsersEntityResponse.setOrganisationIdentifier(organisationIdentifier);
+            List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUsers();
+            if (userProfiles != null) {
+                userProfiles.sort(Comparator.comparing(ProfessionalUsersResponse::getFirstName,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
+            }
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(),
                     responseEntity.getStatusCode());
         } else {
-            Object response = responseEntity.getBody();
             List<ProfessionalUsersResponseWithoutRoles> userProfiles = response == null
                     ? new ArrayList<>()
                     : ((ProfessionalUsersEntityResponseWithoutRoles) response).getUserProfiles();
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
                     = new ProfessionalUsersEntityResponseWithoutRoles();
+            userProfiles.sort(Comparator.comparing(ProfessionalUsersResponseWithoutRoles::getFirstName,
+                    Comparator.nullsLast(Comparator.naturalOrder())));
             professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
 
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
