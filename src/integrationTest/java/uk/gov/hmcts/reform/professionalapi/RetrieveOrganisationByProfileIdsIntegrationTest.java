@@ -30,7 +30,6 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     private final String solicitorOrgType = "SOLICITOR-ORG";
     private final String solicitorProfileId = "SOLICITOR_PROFILE";
     private final String ogdHoOrgType = "OGD-HO-ORG";
-    private final String ogdHoProfileId = "OGD_HO_PROFILE";
 
     @Autowired
     private OrganisationRepository organisationRepository;
@@ -80,7 +79,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     void when_profile_ids_provided_should_return_matching_organisations_and_status_200() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorOrgType));
+        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
         Integer pageSize = null;
         UUID searchAfter = null;
 
@@ -99,7 +98,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
 
         boolean allMatch = organisationInfoMapList.stream()
-                .allMatch(org -> ((List<String>) org.get("organisationProfileId")).contains(solicitorOrgType));
+                .allMatch(org -> ((List<String>) org.get("organisationProfileId")).contains(solicitorProfileId));
         assertThat(allMatch).isTrue();
     }
 
@@ -107,7 +106,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     void when_profile_ids_and_page_size_is_provided_should_matching_organisations_as_page_and_status_200() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorOrgType));
+        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
         Integer pageSize = 1;
         UUID searchAfter = null;
         int expectedOrganisationsCount = 1;
@@ -137,7 +136,11 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         typedResponse.setMoreAvailable(actualHasMoreRecords);
         typedResponse.setOrganisationInfo(actualOrganisationInfo);
-        typedResponse.setLastRecordInPage(UUID.fromString((String) response.get("lastRecordInPage")));
+        if (response.get("lastRecordInPage") != null) {
+            typedResponse.setLastRecordInPage(UUID.fromString((String) response.get("lastRecordInPage")));
+        } else {
+            typedResponse.setLastRecordInPage(null);
+        }
 
         assertThat(typedResponse.getOrganisationInfo().size()).isEqualTo(expectedOrganisationsCount);
         assertThat(typedResponse.isMoreAvailable()).isEqualTo(expectedHasMoreRecords);
@@ -147,7 +150,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     void when_an_invalid_page_size_is_provided_should_return_status_400_and_error_messages() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorOrgType));
+        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
         Integer pageSize = -1;
         UUID searchAfter = null;
 
@@ -169,7 +172,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     void when_an_search_after_is_provided_should_return_status_400_and_error_messages() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorOrgType));
+        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
         Integer pageSize = 1;
         UUID searchAfter = UUID.fromString("00000000-0000-0000-0000-000000000000");
 

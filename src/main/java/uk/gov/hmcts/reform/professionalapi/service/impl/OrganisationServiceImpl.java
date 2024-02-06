@@ -72,15 +72,7 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -507,17 +499,19 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public MultipleOrganisationsResponse retrieveOrganisationsByProfileIds(List<String> organisationProfileIds,
                                                                            UUID searchAfter) {
-        boolean orgIdFilterProvided = organisationProfileIds != null && !organisationProfileIds.isEmpty();
+        List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
+
+        boolean orgIdFilterProvided = !orgTypes.isEmpty();
         boolean searchAfterProvided = searchAfter != null;
 
         List<Organisation> organisations = new ArrayList<>();
 
         if (orgIdFilterProvided && searchAfterProvided) {
-            organisations = organisationRepository.findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter);
+            organisations = organisationRepository.findByOrgTypeInAndIdGreaterThan(orgTypes, searchAfter);
         }
 
         if (orgIdFilterProvided && !searchAfterProvided) {
-            organisations = organisationRepository.findByOrgTypeIn(organisationProfileIds);
+            organisations = organisationRepository.findByOrgTypeIn(orgTypes);
         }
 
         if (!orgIdFilterProvided && searchAfterProvided) {
@@ -536,6 +530,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             List<String> organisationProfileIds,
             Integer pageSize,
             UUID searchAfter) {
+        List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
+
         Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
         boolean orgIdFilterProvided = organisationProfileIds != null && !organisationProfileIds.isEmpty();
         boolean searchAfterProvided = searchAfter != null;
@@ -544,11 +540,11 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (orgIdFilterProvided && searchAfterProvided) {
             orgs = organisationRepository
-                    .findByOrgTypeInAndIdGreaterThan(organisationProfileIds, searchAfter, pageableObject);
+                    .findByOrgTypeInAndIdGreaterThan(orgTypes, searchAfter, pageableObject);
         }
 
         if (orgIdFilterProvided && !searchAfterProvided) {
-            orgs = organisationRepository.findByOrgTypeIn(organisationProfileIds, pageableObject);
+            orgs = organisationRepository.findByOrgTypeIn(orgTypes, pageableObject);
         }
 
         if (!orgIdFilterProvided && searchAfterProvided) {
@@ -561,6 +557,35 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> organisations = orgs.getContent();
         boolean hasMore = !orgs.isLast();
         return new MultipleOrganisationsResponse(organisations, hasMore);
+    }
+
+    private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
+        List<String> orgTypes = new ArrayList<>();
+        if (organisationProfileIds == null) {
+            return orgTypes;
+        }
+        if (organisationProfileIds.contains("SOLICITOR_PROFILE")) {
+            orgTypes.add("SOLICITOR-ORG");
+            orgTypes.add("LOCAL-AUTHORITY-ORG");
+            orgTypes.add("OTHER-ORG");
+            orgTypes.add("OGD-OTHER-ORG");
+        }
+
+        if (organisationProfileIds.contains("OGD_DWP_PROFILE")) {
+            orgTypes.add("OGD-DWP-ORG");
+        }
+
+        if (organisationProfileIds.contains("OGD_HO_PROFILE")) {
+            orgTypes.add("OGD-HO-ORG");
+        }
+
+        // TODO: what are the maatching org types for the following profile ids?
+        // OGD_HMRC_PROFILE
+        // OGD_CICA_PROFILE
+        // OGD_CAFCASS_PROFILE_ENGLAND
+        // OGD_CAFCASS_PROFILE_CYMRU
+
+        return orgTypes;
     }
 
     @Override
