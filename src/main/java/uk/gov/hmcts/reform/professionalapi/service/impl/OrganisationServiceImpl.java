@@ -570,9 +570,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
         if (organisationProfileIds.contains("SOLICITOR_PROFILE")) {
             orgTypes.add("SOLICITOR-ORG");
-            orgTypes.add("LOCAL-AUTHORITY-ORG");
-            orgTypes.add("OTHER-ORG");
-            orgTypes.add("OGD-OTHER-ORG");
         }
 
         if (organisationProfileIds.contains("OGD_DWP_PROFILE")) {
@@ -583,7 +580,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             orgTypes.add("OGD-HO-ORG");
         }
 
-        // TODO: what are the maatching org types for the following profile ids?
+        // TODO: what are the matching org types for the following profile ids?
         // OGD_HMRC_PROFILE
         // OGD_CICA_PROFILE
         // OGD_CAFCASS_PROFILE_ENGLAND
