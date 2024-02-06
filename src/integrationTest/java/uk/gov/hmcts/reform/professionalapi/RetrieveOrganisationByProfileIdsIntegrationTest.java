@@ -103,6 +103,33 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     }
 
     @Test
+    void when_non_matching_profile_ids_provided_should_return_no_organisations_and_status_200() {
+        // arrange
+        OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
+        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of("A"));
+        Integer pageSize = null;
+        UUID searchAfter = null;
+
+        String expectedStatus = "200 OK";
+        boolean expectedHasMoreRecords = false;
+        int expectedOrganisationsCount = 0;
+
+        // act
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest,
+                        pageSize, searchAfter);
+
+        // assert
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+
+        List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
+
+        boolean allMatch = organisationInfoMapList.stream()
+                .allMatch(org -> ((List<String>) org.get("organisationProfileId")).contains(solicitorProfileId));
+        assertThat(allMatch).isTrue();
+    }
+
+    @Test
     void when_profile_ids_and_page_size_is_provided_should_matching_organisations_as_page_and_status_200() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
