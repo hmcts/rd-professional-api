@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationByProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
@@ -29,8 +32,13 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     private final String ogdHoOrgType = "OGD-HO-ORG";
     private final String ogdHoProfileId = "OGD_HO_PROFILE";
 
+    @Autowired
+    private OrganisationRepository organisationRepository;
+
     @BeforeEach
     public void setup() {
+        organisationRepository.deleteAll();
+
         OrganisationOtherOrgsCreationRequest request1 = this.createUniqueOrganisationRequest("TstSO1", "SRA123",
                 "PBA1234561", "super-email1@gmail.com", solicitorOrgType);
         professionalReferenceDataClient.createOrganisationV2(request1);
@@ -57,7 +65,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 5; // 4 seeded in setup and 1
+        int expectedOrganisationsCount = 4;
 
         // act
         Map<String, Object> response =
@@ -121,12 +129,18 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         String actualStatus = (String) response.get("http_status");
         assertThat(actualStatus).isEqualTo(expectedStatus);
 
+        MultipleOrganisationsResponse typedResponse = new MultipleOrganisationsResponse();
         boolean actualHasMoreRecords = (boolean) response.get("moreAvailable");
-        assertThat(actualHasMoreRecords).isEqualTo(expectedHasMoreRecords);
 
         List<OrganisationByProfileResponse> actualOrganisationInfo =
                 (List<OrganisationByProfileResponse>) response.get("organisationInfo");
-        assertThat(actualOrganisationInfo.size()).isEqualTo(expectedOrganisationsCount);
+
+        typedResponse.setMoreAvailable(actualHasMoreRecords);
+        typedResponse.setOrganisationInfo(actualOrganisationInfo);
+        typedResponse.setLastRecordInPage(UUID.fromString((String) response.get("lastRecordInPage")));
+
+        assertThat(typedResponse.getOrganisationInfo().size()).isEqualTo(expectedOrganisationsCount);
+        assertThat(typedResponse.isMoreAvailable()).isEqualTo(expectedHasMoreRecords);
     }
 
     @Test
