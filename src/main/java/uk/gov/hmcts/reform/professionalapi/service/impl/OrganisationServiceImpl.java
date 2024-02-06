@@ -282,6 +282,21 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
+    @Override
+    public List<ContactInformation>  retrieveContactInformationByOrganisationId(String organisationIdentifier) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
+
+        return existingContactInformationList;
+
+    }
+
+    @Override
+    @Transactional
+    public void deleteDxAddressForOrganisation(String dxAddresses, UUID id) {
+        dxAddressRepository.deleteByContactInfoId(dxAddresses,id);
+    }
 
     @Override
     public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
