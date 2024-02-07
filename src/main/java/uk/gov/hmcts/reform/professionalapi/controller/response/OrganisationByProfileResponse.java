@@ -14,12 +14,12 @@ public class OrganisationByProfileResponse {
     private String organisationIdentifier;
     private String status;
     private LocalDateTime lastUpdated;
-    private List<String> organisationProfileId;
+    private List<String> organisationProfileIds;
 
     public OrganisationByProfileResponse(Organisation organisation) {
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
         this.status = organisation.getStatus().name();
         this.lastUpdated = organisation.getLastUpdated();
-        this.organisationProfileId = RefDataUtil.getOrganisationProfileIds(organisation);
+        this.organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
     }
 }
