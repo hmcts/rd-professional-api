@@ -300,6 +300,34 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
     }
 
+    @SuppressWarnings("unchecked")
+    @State("A page size & list of organisation profiles for a PRD internal organisation request")
+    public void setUpOrganisationWithPageSize() {
+        Organisation organisation = getOrganisation();
+        organisation.setOrgType("SOLICITOR-ORG");
+        organisation.setId(UUID.randomUUID());
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), any(Pageable.class))).thenReturn(organisationPage);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+    }
+
+    @SuppressWarnings("unchecked")
+    @State("A page size, search after & list of organisation profiles for a PRD internal organisation request")
+    public void setUpOrganisationWithPageSizeAndSearchAfter() {
+        Organisation organisation = getOrganisation();
+        organisation.setOrgType("SOLICITOR-ORG");
+        organisation.setId(UUID.randomUUID());
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(anyList(), any(UUID.class), any(Pageable.class)))
+                .thenReturn(organisationPage);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+    }
 
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
