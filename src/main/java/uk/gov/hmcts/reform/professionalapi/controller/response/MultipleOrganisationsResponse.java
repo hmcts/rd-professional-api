@@ -21,9 +21,9 @@ public class MultipleOrganisationsResponse {
     public MultipleOrganisationsResponse(List<Organisation> organisations, boolean moreAvailable) {
         this.organisationInfo = organisations.stream().map(OrganisationByProfileResponse::new).toList();
 
-        this.lastRecordInPage = Optional.ofNullable(organisations)
-                .filter(orgs -> !orgs.isEmpty())
-                .map(orgs -> orgs.get(orgs.size() - 1).getId())
+        this.lastRecordInPage = Optional.of(organisations)
+                .filter(organisation -> !organisation.isEmpty())
+                .map(organisation -> organisation.get(organisation.size() - 1).getId())
                 .orElse(null);
 
         this.moreAvailable = moreAvailable;
