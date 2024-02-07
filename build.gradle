@@ -218,9 +218,10 @@ task runProviderPactVerification(type: Test) {
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-    if (project.hasProperty('pact.verifier.publishResults')) {
-        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-    }
+//    if (project.hasProperty('pact.verifier.publishResults')) {
+//        systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+//    }
+    systemProperty 'pact.verifier.publishResults', 'true'  // FOR TESTING - TO REVERT PRIOR TO MASTER MERGE
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/reform/professionalapi/provider/**"
 }
