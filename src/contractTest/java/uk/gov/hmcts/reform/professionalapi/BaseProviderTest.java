@@ -13,7 +13,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}",
     port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "master")})
+    @VersionSelector(tag = "GA-55_PRM_P2_orgs_with_stale_profiles")})
+// FOR TESTING - TO REVERT PRIOR TO MASTER MERGE
 @IgnoreNoPactsToVerify
 public abstract class BaseProviderTest {
 
