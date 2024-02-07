@@ -371,10 +371,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return orgIdentifier;
     }
 
-    public NewUserCreationRequest inviteUserCreationRequest(String userEmail, List<String> userRoles) {
-
-        String lastName = "someLastName";
-        String firstName = "1Aaron";
+    public NewUserCreationRequest inviteUserCreationRequest(String userEmail,
+                                                            String lastName,
+                                                            String firstName,
+                                                            List<String> userRoles) {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -383,7 +383,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .build();
 
         return userCreationRequest;
+    }
 
+    public NewUserCreationRequest inviteUserCreationRequest(String userEmail, List<String> userRoles) {
+        return inviteUserCreationRequest(userEmail, "someLastName", "1Aaron", userRoles);
     }
 
     public NewUserCreationRequest reInviteUserCreationRequest(String userEmail, List<String> userRoles) {

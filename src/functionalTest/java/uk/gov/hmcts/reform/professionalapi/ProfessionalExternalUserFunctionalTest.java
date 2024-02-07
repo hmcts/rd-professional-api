@@ -286,6 +286,50 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findUsersBySystemAdminWithoutRolesRequiredShouldBeSuccess :: END");
     }
 
+    public void findBySuperUserAndSearchOrganisationUsersByStatusShouldBeSuccess() {
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+                professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                        superUserRoles(), firstName, lastName, email));
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
+                .status("ACTIVE").build();
+        createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"),
+                "lastName2", "firstName2");
+
+        Map<String, Object> newUserResponse = professionalApiClient
+                .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+
+        NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList("caseworker"),
+                "lastName1", "firstName1");
+
+        Map<String, Object> newUserResponse2 = professionalApiClient
+                .addNewUserToAnOrganisationExternal(newUserCreationRequest2, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse2).isNotNull();
+        assertThat(newUserResponse2.get("userIdentifier")).isNotNull();
+
+        Map<String, Object> response = professionalApiClient
+                .searchOrganisationUsersByReturnRolesParamExternal(OK,
+                        professionalApiClient.getMultipleAuthHeaders(pcmBearerToken), "false");
+        assertThat(response.get("users")).asList().isNotEmpty();
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
+
+        HashMap firstUser = professionalUsersResponses.get(0);
+        assertThat(firstUser.get("firstName")).isEqualTo("firstName1");
+        assertThat(firstUser.get("lastName")).isEqualTo("lastName1");
+
+        HashMap secondUser = professionalUsersResponses.get(1);
+        assertThat(secondUser.get("firstName")).isEqualTo("firstName2");
+        assertThat(secondUser.get("lastName")).isEqualTo("lastName2");
+
+    }
+
     public void findOrgByPfmShouldBeSuccess() {
         log.info("findOrgByPfmShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
