@@ -449,7 +449,7 @@ public class RefDataUtil {
         }
     }
 
-    public static ResponseEntity<Object> setOrgInfoInGetUserResponse(ResponseEntity<Object> responseEntity,
+    public static ResponseEntity<Object> setOrgInfoInGetUserResponseAndSort(ResponseEntity<Object> responseEntity,
                                                                    String organisationIdentifier,
                                                                    OrganisationStatus organisationStatus,
                                                                    List<String> organisationProfileIds) {
