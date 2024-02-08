@@ -47,9 +47,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusRe
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -699,9 +697,7 @@ public class OrganisationInternalController extends SuperController {
         @Valid @NotNull @RequestBody ContactInformationCreationRequest contactInformationCreationRequest,
         @PathVariable("orgId") @NotBlank  String orgId) {
 
-        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
-        contactInformationCreationRequests.add(contactInformationCreationRequest);
-        organisationCreationRequestValidator.validateContactInformations(contactInformationCreationRequests);
+        organisationCreationRequestValidator.validateContactInformations(Arrays.asList(contactInformationCreationRequest));
 
         var organisation = Optional.ofNullable(organisationService
             .getOrganisationByOrgIdentifier(orgId));
