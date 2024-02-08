@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.repository;
 import feign.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -31,6 +32,22 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     @Query(value = "SELECT count(*) FROM dbrefdata.professional_user pu WHERE pu.organisation_id = :organisationId",
             nativeQuery = true)
     int findByUserCountByOrganisationId(@Param("organisationId") UUID organisationId);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN :organisationIdentifiers AND pu.deleted IS NULL")
+    List<ProfessionalUser> findByOrganisationIdentifierInAndDeletedNotNull(@Param("organisationIdentifiers") List<String> organisationIdentifiers);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN :organisationIdentifiers")
+    List<ProfessionalUser> findByOrganisationIdentifierIn(@Param("organisationIdentifiers") List<String> organisationIdentifiers);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN :organisationIdentifiers")
+    Page<ProfessionalUser> findByOrganisationIdentifierIn(@Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.deleted IS NULL")
+    Page<ProfessionalUser> findAllAndDeletedIsNull(Pageable pageable);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN " +
+            ":organisationIdentifiers and pu.deleted IS NULL")
+    Page<ProfessionalUser> findByOrganisationIdentifierInAndDeletedIsNull(@Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
 
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);
 

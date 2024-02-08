@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -1007,4 +1008,20 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(UsersInOrganisationsByOrganisationIdentifiersRequest request, boolean showDeleted, Integer pageSize, UUID searchAfterUser, UUID searchAfterOrganisation) {
+        StringBuilder sb = new StringBuilder(baseV2IntUrl)
+                .append("/users?");
+        sb.append("&showDeleted=").append(showDeleted);
+        if (pageSize != null) {
+            sb.append("&pageSize=").append(pageSize);
+        }
+        if (searchAfterUser != null) {
+            sb.append("&searchAfterUser=").append(searchAfterUser);
+        }
+        if (searchAfterOrganisation != null) {
+            sb.append("&searchAfterOrg=").append(searchAfterOrganisation);
+        }
+        String uriPath = sb.toString();
+        return postRequest(uriPath, request, null, null);
+    }
 }
