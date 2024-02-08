@@ -320,14 +320,19 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(response.get("users")).asList().isNotEmpty();
         assertThat(response.get("organisationIdentifier")).isNotNull();
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
+        assertThat(professionalUsersResponses.size()).isEqualTo(3);
 
         HashMap firstUser = professionalUsersResponses.get(0);
-        assertThat(firstUser.get("firstName")).isEqualTo("firstName1");
-        assertThat(firstUser.get("lastName")).isEqualTo("lastName1");
+        assertThat(firstUser.get("firstName")).isEqualTo("firstName");
+        assertThat(firstUser.get("lastName")).isEqualTo("lastName");
 
         HashMap secondUser = professionalUsersResponses.get(1);
-        assertThat(secondUser.get("firstName")).isEqualTo("firstName2");
-        assertThat(secondUser.get("lastName")).isEqualTo("lastName2");
+        assertThat(secondUser.get("firstName")).isEqualTo("firstName1");
+        assertThat(secondUser.get("lastName")).isEqualTo("lastName1");
+
+        HashMap thirdUser = professionalUsersResponses.get(2);
+        assertThat(thirdUser.get("firstName")).isEqualTo("firstName2");
+        assertThat(thirdUser.get("lastName")).isEqualTo("lastName2");
 
     }
 
