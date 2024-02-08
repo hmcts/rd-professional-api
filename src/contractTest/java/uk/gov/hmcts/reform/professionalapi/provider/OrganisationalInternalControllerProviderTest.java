@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -50,6 +51,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -199,8 +201,12 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         organisation.setLastUpdated(LocalDateTime.of(2023, 11, 20, 15, 51, 33));
         organisation.setDateApproved(LocalDateTime.of(2023, 11, 19, 15, 51, 33));
 
-        when(organisationRepository.findByLastUpdatedGreaterThanEqual(any()))
-                .thenReturn(List.of(organisation));
+        Page<Organisation> pageable = Mockito.mock(Page.class);
+        when(pageable.getContent()).thenReturn(List.of(organisation));
+        when(pageable.getTotalElements()).thenReturn(1l);
+        when(pageable.isLast()).thenReturn(true);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(any(), any(), any()))
+                .thenReturn(pageable);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
