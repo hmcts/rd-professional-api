@@ -51,7 +51,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -203,7 +202,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         Page<Organisation> pageable = Mockito.mock(Page.class);
         when(pageable.getContent()).thenReturn(List.of(organisation));
-        when(pageable.getTotalElements()).thenReturn(1l);
+        when(pageable.getTotalElements()).thenReturn(1L);
         when(pageable.isLast()).thenReturn(true);
         when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(any(), any(), any()))
                 .thenReturn(pageable);
