@@ -1213,6 +1213,31 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> searchOrganisationUsersByUserIdExternal(HttpStatus status,
+                                                                       RequestSpecification requestSpecification,
+                                                                       String userIdentifier) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?userIdentifier=" + userIdentifier)
+                .andReturn();
+
+        log.info("{}:: find users by User Identifier: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        if (HttpStatus.UNAUTHORIZED.equals(status)) {
+            response.getHeader("UnAuthorized-Token-Error")
+                    .contains("Authentication Exception");
+        }
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
+    }
+
     public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status,
                                                                             RequestSpecification requestSpecification) {
 

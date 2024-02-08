@@ -5,6 +5,7 @@ import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +52,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
 
 @Service
 @Slf4j
@@ -59,6 +61,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public static final String ERROR_USER_CONFIGURED_DELETE = "001 error while deleting user access records";
     public static final String ERROR_USER_CONFIGURED_CREATE = "002 error while creating new user access records";
+
+    @Value("${group-access.organisation-profile-ids}")
+    protected String organisationProfileIds;
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
@@ -127,7 +132,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         ResponseEntity<Object> responseEntity
                 = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                organisation.getStatus(),
+                pagedProfessionalUsers.toList());
 
         var headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
                 responseEntity);
@@ -147,13 +154,17 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
         return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                organisation.getStatus(),
+                professionalUsers);
     }
 
     @SuppressWarnings("unchecked")
     private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest,
                                                         String showDeleted, boolean rolesRequired, String status,
-                                                        String organisationIdentifier) {
+                                                        String organisationIdentifier,
+                                                        OrganisationStatus organisationStatus,
+                                                        List<ProfessionalUser> professionalUsers) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
@@ -169,7 +180,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgIdInGetUserResponse(responseEntity, organisationIdentifier);
+                responseEntity = setOrgInfoInGetUserResponse(responseEntity, organisationIdentifier,
+                        organisationStatus, List.of(organisationProfileIds.split(",")));
+                responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
             }
 
         } catch (FeignException ex) {
@@ -280,19 +293,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
     }
 
-    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
-        if (userAccessTypes != null) {
-            try {
-                List<UserConfiguredAccess> all = userAccessTypes.stream()
-                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .collect(Collectors.toList());
-                userConfiguredAccessRepository.saveAll(all);
-            } catch (Exception ex) {
-                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
-            }
-        }
-    }
-
     private void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
                                             String userId) {
 
@@ -307,20 +307,42 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_DELETE);
         }
 
-        saveAllUserAccessTypes(professionalUser, userProfileUpdatedData.getUserAccessTypes());
+        if (userProfileUpdatedData.getUserAccessTypes() != null) {
+            try {
+                List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                        .collect(Collectors.toList());
+                userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
+            }
+        }
+    }
+
+    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
+        if (userAccessTypes != null) {
+            try {
+                List<UserConfiguredAccess> all = userAccessTypes.stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                        .collect(Collectors.toList());
+                userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
+            }
+        }
     }
 
     private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser,
                                                            UserAccessType userAccessType) {
-        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess();
+        UserConfiguredAccess uca = new UserConfiguredAccess();
         UserConfiguredAccessId ucaId = new UserConfiguredAccessId(
                 professionalUser, userAccessType.getJurisdictionId(),
                 userAccessType.getOrganisationProfileId(), userAccessType.getAccessTypeId()
         );
-        userConfiguredAccess.setUserConfiguredAccessId(ucaId);
-        userConfiguredAccess.setEnabled(userAccessType.getEnabled());
+        uca.setUserConfiguredAccessId(ucaId);
+        uca.setEnabled(userAccessType.getEnabled());
 
-        return userConfiguredAccess;
+        return uca;
     }
 
 

@@ -339,6 +339,69 @@ public class AuthorizationFunctionalTest {
 
     }
 
+    public void validateAccessTypesInRetrievedUser(Map<String, Object> searchResponse, String expectedStatus,
+                                                   Boolean rolesReturned) {
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsersResponses).isNotEmpty();
+        assertThat(professionalUsersResponses).hasSize(1);
+
+        List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses.get(0).get("userAccessTypes");
+        assertThat(userAccessTypeList).isNotEmpty();
+        assertThat(userAccessTypeList).isNotNull();
+
+        HashMap userMap = professionalUsersResponses.get(0);
+        assertThat(userMap).isNotEmpty();
+        validateUserResponse(userMap, searchResponse);
+
+        if (rolesReturned) {
+            assertThat(userMap.get("roles")).isNotNull();
+            assertThat(userMap.get("roles")).asList().hasSize(1);
+        } else {
+            assertThat(userMap.get("roles")).isNull();
+        }
+        assertThat(userAccessTypeList).hasSize(1);
+        assertEquals("testJurisdictionId", userAccessTypeList.get(0).get("jurisdictionId"));
+        assertEquals("testOrganisationProfileId", userAccessTypeList.get(0).get("organisationProfileId"));
+        assertEquals("testAccessTypeId", userAccessTypeList.get(0).get("accessTypeId"));
+        assertEquals(true, userAccessTypeList.get(0).get("enabled"));
+    }
+
+    public void validateAccessTypesAndRolesInRetrievedUser(Map<String, Object> searchResponse,
+                                                           Boolean rolesReturned) {
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsersResponses).isNotEmpty();
+        assertThat(professionalUsersResponses).hasSize(1);
+
+        List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses.get(0).get("userAccessTypes");
+        assertThat(userAccessTypeList).isNotEmpty();
+        assertThat(userAccessTypeList).isNotNull();
+
+        HashMap userMap = professionalUsersResponses.get(0);
+        assertThat(userMap).isNotEmpty();
+        validateUserResponse(userMap, searchResponse);
+        assertThat(userAccessTypeList).hasSize(2);
+
+        if (rolesReturned) {
+            assertThat(userMap.get("roles")).isNotNull();
+            assertThat(userMap.get("roles")).asList().hasSize(2);
+        } else {
+            assertThat(userMap.get("roles")).isNull();
+        }
+    }
+
+    public void validateUserResponse(HashMap userMap, Map<String, Object> searchResponse) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
+        assertThat(searchResponse.get("organisationProfileIds")).isNotNull();
+        assertThat(userMap.get("idamStatus")).isNotNull();
+        assertThat(userMap.get("userIdentifier")).isNotNull();
+        assertThat(userMap.get("firstName")).isNotNull();
+        assertThat(userMap.get("lastName")).isNotNull();
+        assertThat(userMap.get("email")).isNotNull();
+        assertThat(userMap.get("lastUpdated")).isNotNull();
+        assertThat(userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name()));
+    }
+
     public UserProfileUpdatedData deleteRoleRequest(String role) {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName = new RoleName(role);
@@ -354,6 +417,30 @@ public class AuthorizationFunctionalTest {
         Set<RoleName> roles = new HashSet<>();
         roles.add(roleName);
         userProfileUpdatedData.setRolesAdd(roles);
+        return userProfileUpdatedData;
+    }
+
+    public UserProfileUpdatedData addOrUpdateUserAccessType(UserAccessType userAccessType) {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        userAccessTypes.add(userAccessType);
+        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+        return userProfileUpdatedData;
+    }
+
+    public UserProfileUpdatedData addOrUpdateUserAccessTypeAndRole(String role, Set<UserAccessType> userAccessTypeSet) {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+
+        //adding new role
+        RoleName roleName = new RoleName(role);
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName);
+        userProfileUpdatedData.setRolesAdd(roles);
+
+        //adding new user access type
+        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypeSet);
         return userProfileUpdatedData;
     }
 
