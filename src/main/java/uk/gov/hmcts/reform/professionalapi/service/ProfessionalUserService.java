@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -24,7 +25,7 @@ public interface ProfessionalUserService {
     ProfessionalUser findProfessionalUserByUserIdentifier(String userIdentifier);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String userIdentifier,
-                                                             String showDeleted, boolean rolesRequired, String status);
+                                                               String showDeleted, boolean rolesRequired, String status);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation existingOrganisation,
                                                                            String showDeleted, boolean rolesRequired,
@@ -43,9 +44,13 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
 
-    ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize, UUID searchAfter);
-
     ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
                                                               String userId, Optional<String> origin);
+
+    ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize, UUID searchAfter);
+
+    UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiers(List<String> organisationIdentifiers, boolean includeDeleted);
+
+    UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser, UUID searchAfterOrganisation);
 }
 

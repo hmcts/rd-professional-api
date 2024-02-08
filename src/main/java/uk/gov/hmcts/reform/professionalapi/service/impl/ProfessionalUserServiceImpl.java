@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import feign.FeignException;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,10 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
+import uk.gov.hmcts.reform.professionalapi.controller.response.*;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -42,12 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -333,6 +326,72 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         modifyUserConfiguredAccess(userProfileUpdatedData, userId);
 
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+    }
+
+    @Override
+    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiers(List<String> organisationIdentifiers, boolean includeDeleted) {
+        List<ProfessionalUser> professionalUsers = new ArrayList<>();
+
+        boolean organisationFilter = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
+        Sort sort = Sort.by(
+                Sort.Order.asc("organisation.id"),
+                Sort.Order.asc("id")
+        );
+        if(!organisationFilter && includeDeleted) {
+            professionalUsers = professionalUserRepository.findAll(sort);
+        }
+
+        if(!organisationFilter && !includeDeleted) {
+//            professionalUsers = professionalUserRepository.findAllAndDeletedNotNull(sort);
+            throw new NotImplementedException("work out to to query this without failing initialisation");
+        }
+
+        if (organisationFilter && includeDeleted) {
+            professionalUsers = professionalUserRepository.findByOrganisationIdentifierIn(organisationIdentifiers);
+        }
+
+        if (organisationFilter && !includeDeleted) {
+            professionalUsers =
+                    professionalUserRepository.findByOrganisationIdentifierInAndDeletedNotNull(organisationIdentifiers);
+        }
+
+        return new UsersInOrganisationsByOrganisationIdentifiersResponse(professionalUsers, false);
+    }
+
+    @Override
+    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser, UUID searchAfterOrganisation) {
+        boolean organisationFilter = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
+        boolean searchAfterProvided = searchAfterUser != null && searchAfterOrganisation != null;
+        Sort sort = Sort.by(
+                Sort.Order.asc("organisation.id"),
+                Sort.Order.asc("id")
+        );
+
+        Pageable pageableObject = createPageableObject(0, pageSize, sort);
+
+        Page<ProfessionalUser> users = null;
+
+        if (!organisationFilter && includeDeleted && !searchAfterProvided) {
+            users = professionalUserRepository.findAll(pageableObject);
+        }
+
+        if (organisationFilter && includeDeleted && !searchAfterProvided) {
+            users = professionalUserRepository.findByOrganisationIdentifierIn(organisationIdentifiers, pageableObject);
+        }
+
+        if (!organisationFilter && !includeDeleted && !searchAfterProvided) {
+            users = professionalUserRepository.findAllAndDeletedIsNull(pageableObject);
+        }
+
+        if (organisationFilter && !includeDeleted && !searchAfterProvided) {
+            users = professionalUserRepository.findByOrganisationIdentifierInAndDeletedIsNull(organisationIdentifiers, pageableObject);
+        }
+
+        if (users == null) {
+            return new UsersInOrganisationsByOrganisationIdentifiersResponse(new ArrayList<>(), false);
+        }
+
+        return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
