@@ -150,6 +150,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         findUsersByPcmAndNoRolesRequiredShouldBeSuccess();
         findUsersByPcmAndWithRolesRequiredShouldBeSuccess();
         findUsersBySystemAdminWithoutRolesRequiredShouldBeSuccess();
+        findBySuperUserAndSearchOrganisationUsersByStatusShouldBeSuccess();
     }
 
     public void findOrganisationScenarios() {

@@ -372,22 +372,23 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
 
         NewUserCreationRequest userCreationRequest = inviteUserCreationRequest(randomAlphabetic(5)
                 + "@email.com", "testLastName2", "testFirstName2", userRoles);
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userProfileCreateUserWireMock("testFirstName2", "testLastName2", "dummy@email.com",
+                "testFirstName1", "testLastName1", "dummy@email.com", HttpStatus.CREATED);
         professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, userCreationRequest,
                 hmctsAdmin, userIdentifier);
         NewUserCreationRequest userCreationRequest1 = inviteUserCreationRequest(randomAlphabetic(6)
                 + "@email.com", "testLastName1", "testFirstName1", userRoles);
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userProfileCreateUserWireMock("testFirstName2", "testLastName2", "dummy@email.com",
+                "testFirstName1", "testLastName1", "dummy@email.com", HttpStatus.CREATED);
         Map<String, Object> profUser = professionalReferenceDataClient.addUserToOrganisationWithUserId(
                 organisationIdentifier, userCreationRequest1, hmctsAdmin, userIdentifier);
 
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationAndUserIdentifier(
                 organisationIdentifier, hmctsAdmin, profUser.get("userIdentifier").toString());
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(2);
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(3);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(2);
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
 
         HashMap firstUser = professionalUsersResponses.get(0);

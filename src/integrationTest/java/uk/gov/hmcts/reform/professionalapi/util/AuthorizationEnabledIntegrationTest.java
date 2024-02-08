@@ -414,6 +414,16 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     public void userProfileCreateUserWireMock(HttpStatus status)  {
+        userProfileCreateUserWireMock("testFn", "R", "dummy@email.com", "testFn", "L", "dummy@email.com", status);
+    }
+
+    public void userProfileCreateUserWireMock(String firstName,
+                                              String lastName,
+                                              String email,
+                                              String firstName2,
+                                              String lastName2,
+                                              String email2,
+                                              HttpStatus status)  {
         String body = null;
         int returnHttpStaus = status.value();
         if (status.is2xxSuccessful()) {
@@ -435,9 +445,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"testFn\","
-                + "  \"lastName\": \"R\","
-                + "  \"email\": \"dummy@email.com\","
+                + "  \"firstName\": \"" + firstName + "\","
+                + "  \"lastName\": \"" + lastName + "\","
+                + "  \"email\": \"" + email + "\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-organisation-manager\""
@@ -447,9 +457,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + "  {"
                 + "  \"userIdentifier\":\" %s" + "\","
-                + "  \"firstName\": \"testFn\","
-                + "  \"lastName\": \"L\","
-                + "  \"email\": \"dummy@email.com\","
+                + "  \"firstName\": \"" + firstName2 + "\","
+                + "  \"lastName\": \"" + lastName2 + "\","
+                + "  \"email\": \"" + email2 + "\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-case-manager\""
@@ -485,9 +495,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"testFN\","
-                + "  \"lastName\": \"R\","
-                + "  \"email\": \"dummy@email.com\","
+                + "  \"firstName\": \"" + firstName + "\","
+                + "  \"lastName\": \"" + lastName + "\","
+                + "  \"email\": \"" + email + "\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
@@ -495,9 +505,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"testFn\","
-                + "  \"lastName\": \"L\","
-                + "  \"email\": \"dummy@email.com\","
+                + "  \"firstName\": \"" + firstName2 + "\","
+                + "  \"lastName\": \"" + lastName2 + "\","
+                + "  \"email\": \"" + email2 + "\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
