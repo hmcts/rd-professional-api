@@ -722,8 +722,8 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<Object> retrieveOrganisationsByProfileIds(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
             @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
-            @Parameter(name = "pageSize") @RequestParam(value = "pageSize", required = false) Integer pageSize,
-            @Parameter(name = "searchAfter") @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
 
         organisationByProfileIdsRequestValidatorImpl.validate(pageSize, searchAfter);
 
