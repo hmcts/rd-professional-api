@@ -1215,7 +1215,6 @@ class ProfessionalUserServiceImplTest {
         verify(userConfiguredAccessRepository, times(1)).saveAll(any());
     }
 
-
     void callModifyRolesForUser(HttpStatus status) {
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
 

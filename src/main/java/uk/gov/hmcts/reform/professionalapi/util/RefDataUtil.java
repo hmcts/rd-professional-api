@@ -382,7 +382,7 @@ public class RefDataUtil {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
                 if (errorResponse != null) {
                     log.error("{}:: Response from UserProfileByEmail service call {}",
-                        loggingComponentName, errorResponse.getErrorDescription());
+                            loggingComponentName, errorResponse.getErrorDescription());
                 }
                 newUserResponse = new NewUserResponse();
             }
@@ -443,7 +443,7 @@ public class RefDataUtil {
     }
 
     private static void addAllAccessTypes(ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponse,
-                                   List<ProfessionalUser> professionalUsers) {
+                                          List<ProfessionalUser> professionalUsers) {
         for (ProfessionalUsersResponseWithoutRoles professionalUsersResponse : professionalUsersEntityResponse
                 .getUserProfiles()) {
             for (ProfessionalUser pu : professionalUsers) {
@@ -470,9 +470,9 @@ public class RefDataUtil {
     }
 
     public static ResponseEntity<Object> setOrgInfoInGetUserResponse(ResponseEntity<Object> responseEntity,
-                                                                   String organisationIdentifier,
-                                                                   OrganisationStatus organisationStatus,
-                                                                   List<String> organisationProfileIds) {
+                                                                     String organisationIdentifier,
+                                                                     OrganisationStatus organisationStatus,
+                                                                     List<String> organisationProfileIds) {
         ResponseEntity<Object> newResponseEntity;
         if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
             ProfessionalUsersEntityResponse professionalUsersEntityResponse
@@ -542,17 +542,6 @@ public class RefDataUtil {
         return getRefreshUsersResponse;
     }
 
-    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
-        UserAccessType accessType = new UserAccessType();
-        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
-        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
-                .getOrganisationProfileId());
-        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
-        accessType.setEnabled(userConfiguredAccess.getEnabled());
-
-        return accessType;
-    }
-
     @Value("${loggingComponentName}")
     public void setLoggingComponentName(String loggingComponentName) {
         RefDataUtil.loggingComponentName = loggingComponentName;
@@ -595,6 +584,17 @@ public class RefDataUtil {
             String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
             throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
+    }
+
+    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        UserAccessType accessType = new UserAccessType();
+        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
+        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
+                .getOrganisationProfileId());
+        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
+        accessType.setEnabled(userConfiguredAccess.getEnabled());
+
+        return accessType;
     }
 
 }

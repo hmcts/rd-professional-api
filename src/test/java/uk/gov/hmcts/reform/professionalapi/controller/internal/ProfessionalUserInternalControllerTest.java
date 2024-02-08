@@ -243,6 +243,8 @@ class ProfessionalUserInternalControllerTest {
                 userId, Optional.of("EXUI"));
         verify(organisationIdentifierValidatorMock, times(1))
                 .validateOrganisationExistsWithGivenOrgId("123456A");
+        verify(organisationIdentifierValidatorMock, times(1))
+                .validateOrganisationExistsWithGivenOrgId("123456A");
     }
 
     @Test
