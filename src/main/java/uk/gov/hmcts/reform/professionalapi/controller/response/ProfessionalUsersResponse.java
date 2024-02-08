@@ -30,5 +30,6 @@ public class ProfessionalUsersResponse extends ProfessionalUsersResponseWithoutR
         this.idamStatus = user.getIdamStatus() ==  null ? "" :  user.getIdamStatus().toString();
         this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();
         this.idamMessage = StringUtils.isBlank(user.getIdamMessage()) ? "" : user.getIdamMessage();
+        this.lastUpdated = user.getLastUpdated();
     }
 }

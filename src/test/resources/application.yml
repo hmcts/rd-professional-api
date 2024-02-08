@@ -22,4 +22,4 @@ spring:
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 group-access:
-  organisation-profile-ids: TEST-SOLICITOR,TEST-OGD1
+  organisation-profile-ids: SOLICITOR_PROFILE

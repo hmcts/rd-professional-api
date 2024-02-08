@@ -65,11 +65,11 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInG
 @Slf4j
 public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
-    @Value("${group-access.organisation-profile-ids}")
-    protected String organisationProfileIds;
-
     public static final String ERROR_USER_CONFIGURED_DELETE = "001 error while deleting user access records";
     public static final String ERROR_USER_CONFIGURED_CREATE = "002 error while creating new user access records";
+
+    @Value("${group-access.organisation-profile-ids}")
+    protected String organisationProfileIds;
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
@@ -436,6 +436,5 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             }
         }
     }
-
 
 }

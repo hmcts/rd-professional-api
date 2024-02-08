@@ -24,9 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
@@ -231,7 +229,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
 
     private ProfessionalUser setUpProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
-        setUpOrganisation(name, sraId, companyNumber, companyUrl);
+        organisation = PactUtils.setUpOrganisation(name, sraId, companyNumber, companyUrl);
 
         SuperUser su = new SuperUser();
         su.setEmailAddress("superUser@email.com");
@@ -259,24 +257,6 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         String companyUrl = "companyUrl";
 
         return setUpProfessionalUser(name, sraId, companyNumber, companyUrl);
-    }
-
-    private void setUpOrganisation(String name, String sraId, String companyNumber, String companyUrl) {
-        organisation = new Organisation();
-        organisation.setName(name);
-        organisation.setCompanyNumber(companyNumber);
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisation.setSraId(sraId);
-        organisation.setSraRegulated(true);
-        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
-        organisation.setCompanyUrl(companyUrl);
-        ContactInformation contactInformation = new ContactInformation();
-        contactInformation.setUprn("uprn");
-        contactInformation.setAddressLine1("addressLine1");
-        contactInformation.setAddressLine2("addressLine2");
-        contactInformation.setCountry("country");
-        contactInformation.setPostCode("HA5 1BJ");
-        organisation.setContactInformations(asList(contactInformation));
     }
 
 }

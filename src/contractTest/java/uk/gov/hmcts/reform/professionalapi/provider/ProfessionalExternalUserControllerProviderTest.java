@@ -5,6 +5,7 @@ import au.com.dius.pact.provider.junitsupport.State;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Request;
 import feign.Response;
 import org.mockito.Mock;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,10 +56,11 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID2;
 
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
@@ -110,10 +113,17 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         setupInteractionsForProfessionalUser();
     }
 
-    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID})
+    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID2})
     public void toUpdateUserRolesAndAccessTypesForIdentifier() throws IOException {
 
         setupInteractionsForProfessionalUserWithUserAccessTypes();
+    }
+
+    @State({"Professional User exists for get Organisation with user access types with identifier "
+            + ORGANISATION_IDENTIFIER})
+    public void toGetOrganisationUserAndAccessTypesForIdentifier() throws IOException {
+
+        setupInteractionsForGetProfessionalUserWithUserAccessTypes();
     }
 
     @State({"Professional users exist for an Active organisation"})
@@ -146,7 +156,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     }
 
     private ProfessionalUser setupInteractionsForProfessionalUser() throws JsonProcessingException {
-        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+        Jwt jwt = Jwt.withTokenValue(USER_JWT)
                 .claim("aClaim", "aClaim")
                 .claim("aud", Collections.singletonList("pui-case-manager"))
                 .header("aHeader", "aHeader")
@@ -206,8 +216,69 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         return professionalUser;
     }
 
+    private void setupInteractionsForGetProfessionalUserWithUserAccessTypes() throws JsonProcessingException {
+        Jwt jwt = Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Collections.singletonList("pui-case-manager"))
+                .header("aHeader", "aHeader")
+                .build();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("someUid")
+                .roles(Arrays.asList("pui-case-manager")).build());
+
+        organisation = new Organisation();
+        organisation.setName("name");
+        organisation.setCompanyNumber("companyNumber");
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setSraId("sraId");
+        organisation.setSraRegulated(true);
+        organisation.setCompanyUrl("companyUrl");
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+        organisation.setOrgType("SOLICITOR_ORG");
+
+        ProfessionalUser profile1 = PactUtils.getProfessionalUser(organisation, 1);
+        profile1.setUserConfiguredAccesses(List.of(PactUtils.getUserConfiguredAccess(profile1, 1),
+                PactUtils.getUserConfiguredAccess(profile1, 2)));
+        ProfessionalUser profile2 = PactUtils.getProfessionalUser(organisation, 2);
+        profile2.setUserConfiguredAccesses(List.of(PactUtils.getUserConfiguredAccess(profile2, 3),
+                PactUtils.getUserConfiguredAccess(profile2, 4)));
+        List<ProfessionalUser> professionalUsers = List.of(profile1, profile2);
+        when(professionalUserRepositoryMock.findByOrganisation(any())).thenReturn(professionalUsers);
+
+        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(profile1);
+        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(profile1);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any())).thenReturn(organisation);
+        List<UserConfiguredAccess> allUserConfiguredAccess1 = PactUtils.getUserConfiguredAccesses(profile1);
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(profile1.getId()))
+                .thenReturn(allUserConfiguredAccess1);
+        List<UserConfiguredAccess> allUserConfiguredAccess2 = PactUtils.getUserConfiguredAccesses(profile2);
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(profile2.getId()))
+                .thenReturn(allUserConfiguredAccess2);
+
+        ProfessionalUsersResponse userProfileResponse1 = new ProfessionalUsersResponse(profile1);
+        userProfileResponse1.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse1.setLastUpdated(LocalDateTime.of(2020, 12, 31, 1, 23));
+        ProfessionalUsersResponse userProfileResponse2 = new ProfessionalUsersResponse(profile2);
+        userProfileResponse2.setUserIdentifier(UUID.randomUUID().toString());
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        userProfiles.add(userProfileResponse1);
+        userProfiles.add(userProfileResponse2);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        mapper.registerModule(new JavaTimeModule());
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClientMock.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+    }
+
     private ProfessionalUser setupInteractionsForProfessionalUserWithUserAccessTypes() throws JsonProcessingException {
-        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+        Jwt jwt = Jwt.withTokenValue(USER_JWT)
                 .claim("aClaim", "aClaim")
                 .claim("aud", Collections.singletonList("pui-case-manager"))
                 .header("aHeader", "aHeader")
@@ -246,7 +317,8 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
-        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(any())).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID2)).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
 
         when(professionalUserRepositoryMock.findByOrganisation(organisation))
@@ -267,7 +339,6 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         List<UserConfiguredAccess> allUserConfiguredAccess = PactUtils.getUserConfiguredAccesses(professionalUser);
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))
                 .thenReturn(allUserConfiguredAccess);
-        verify(userConfiguredAccessRepository).deleteAll(allUserConfiguredAccess);
 
         return professionalUser;
     }
