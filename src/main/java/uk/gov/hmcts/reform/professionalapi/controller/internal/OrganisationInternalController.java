@@ -27,12 +27,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -44,6 +47,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusRe
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -638,6 +644,75 @@ public class OrganisationInternalController extends SuperController {
         return ResponseEntity
                 .status(updatePbaStatusResponse.getStatusCode())
                 .body(updatePbaStatusResponse);
+    }
+
+
+    @Operation(
+        summary = "Updates contact informations(address details) to organisation",
+        description = "**IDAM Roles to access API** :<br> pui-organisation-manager",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+
+    )
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Updated Contact Information",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "An invalid request has been provided",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized Error : "
+            + "The requested resource is restricted and requires authentication",
+        content = @Content
+    )
+
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+
+    @PutMapping(
+        path = "/contactInformation/{orgId}",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured({"prd-admin"})
+    public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
+        @Valid @NotNull @RequestBody ContactInformationCreationRequest contactInformationCreationRequest,
+        @PathVariable("orgId") @NotBlank  String orgId) {
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
+        contactInformationCreationRequests.add(contactInformationCreationRequest);
+        organisationCreationRequestValidator.validateContactInformations(contactInformationCreationRequests);
+
+        var organisation = Optional.ofNullable(organisationService
+            .getOrganisationByOrgIdentifier(orgId));
+
+        if (organisation.isEmpty()) {
+            throw new ResourceNotFoundException("Organisation does not exist");
+        }
+
+        return organisationService.updateContactInformationForOrganisation(
+            contactInformationCreationRequest,orgId);
+
     }
 
     @Operation(

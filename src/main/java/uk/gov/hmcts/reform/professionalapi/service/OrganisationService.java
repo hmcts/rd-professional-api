@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -24,6 +25,9 @@ import java.util.UUID;
 public interface OrganisationService {
 
     OrganisationResponse createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest);
+
+    ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        ContactInformationCreationRequest contactInformationCreationRequest, String organisationIdentifier);
 
     OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable);
 

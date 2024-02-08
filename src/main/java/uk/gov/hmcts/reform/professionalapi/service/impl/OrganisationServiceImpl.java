@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -87,10 +88,12 @@ import java.util.stream.Stream;
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_ERROR_BODY_START;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_CONTACT_FOUND_FOR_GIVEN_ORG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
@@ -277,6 +280,38 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
 
     }
+
+    @Override
+    public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        ContactInformationCreationRequest contactInfo, String organisationIdentifier) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
+        //if multiple contact informations are found they will all be updated
+        if (contactInfo != null) {
+            existingContactInformationList.forEach(existingInfo -> {
+                existingInfo.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
+                existingInfo.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
+                existingInfo.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
+                existingInfo.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
+                existingInfo.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
+                existingInfo.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
+                existingInfo.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
+                existingInfo.setOrganisation(organisation);
+                existingInfo.setLastUpdated(LocalDateTime.now());
+                ContactInformation savedContactInformation = contactInformationRepository.save(existingInfo);
+                if (savedContactInformation == null || savedContactInformation.getId() == null) {
+                    log.error(LOG_ERROR_BODY_START, loggingComponentName, ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
+                    throw new ResourceNotFoundException(NO_CONTACT_FOUND_FOR_GIVEN_ORG);
+                } else {
+                    addDxAddressToContactInformation(contactInfo.getDxAddress(), savedContactInformation);
+                }
+            });
+
+        }
+        return ResponseEntity.status(200).build();
+    }
+
 
     public void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,
