@@ -39,4 +39,22 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
             }
         }
     }
+
+    public void updateUser(ProfessionalUser existingAdmin,ProfessionalUser newAdmin){
+
+        List<UserAccountMap> userAccountMaps = userAccountMapRepository
+            .fetchByProfessionalUserId(existingAdmin.getId());
+
+        userAccountMaps.forEach(userAccountMap -> {
+            UserAccountMapId userAccountMapId = userAccountMap.getUserAccountMapId();
+            userAccountMapId.setProfessionalUser(newAdmin);
+            userAccountMap.setUserAccountMapId(userAccountMapId);
+            userAccountMapRepository.save(userAccountMap);
+        });
+        List<UserAccountMap>  userAccountM= userAccountMapRepository.fetchByProfessionalUserId(existingAdmin.getId());
+        List<UserAccountMap>  userAccountMa= userAccountMapRepository.fetchByProfessionalUserId(newAdmin.getId());
+        List<UserAccountMap>  userAccount= userAccountMapRepository.fetchByProfessionalUserId(existingAdmin.getId());
+    }
+
+
 }

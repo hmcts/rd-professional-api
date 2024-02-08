@@ -82,6 +82,15 @@ public class UserAttributeServiceImpl implements UserAttributeService {
                 || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name());
     }
 
+ public void updateUser(ProfessionalUser existingAdmin,ProfessionalUser newAdmin){
+     List<UserAttribute> userAttributes = userAttributeRepository
+         .fetchByProfessionalUserIdAndPrdEnumType(existingAdmin.getId());
+     userAttributes.forEach(userAttribute -> {
+         userAttribute.setProfessionalUser(newAdmin);
+         userAttributeRepository.save(userAttribute);
+     });
+
+ }
 
 
 

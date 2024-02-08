@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
@@ -698,21 +699,22 @@ public class OrganisationInternalController extends SuperController {
 
 
     @Operation(
-        summary = "Deletes the provided list of user accounts from the organisation.",
-        description = "**IDAM Roles to access API** : <br> - pui-finance-manager",
+        summary = "Updates the  admin user of an Organisation",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
         security = {
             @SecurityRequirement(name = "ServiceAuthorization"),
             @SecurityRequirement(name = "Authorization")
         }
     )
+
     @ApiResponse(
-        responseCode = "204",
-        description = "Successfully deleted the list of user accounts from the organisation.",
+        responseCode = "200",
+        description = "The admin user of the organisation has been successfully updated",
         content = @Content
     )
     @ApiResponse(
         responseCode = "400",
-        description = DEL_ORG_PBA_NOTES_1,
+        description = "An invalid request was provided",
         content = @Content
     )
     @ApiResponse(
@@ -723,13 +725,12 @@ public class OrganisationInternalController extends SuperController {
     )
     @ApiResponse(
         responseCode = "403",
-        description = "Forbidden Error: "
-            + "Access denied for either invalid permissions or user is pending",
+        description = "Forbidden Error: Access denied",
         content = @Content
     )
     @ApiResponse(
         responseCode = "404",
-        description = "Resource Not Found Error: The user does not exist",
+        description = "No Organisation was found with the given organisationIdentifier",
         content = @Content
     )
     @ApiResponse(
@@ -738,31 +739,16 @@ public class OrganisationInternalController extends SuperController {
         content = @Content
     )
 
-    @DeleteMapping(path = "/user/{orgId}")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Secured({"prd-admin"})
-    public ResponseEntity<DeleteUserResponse> deleteUserFromOrganisation(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
-        @Valid @NotNull @RequestBody UserDeletionRequest userDeletionRequest,
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @PathVariable("orgId") @NotBlank String organisationIdentifier,
-        @Parameter(hidden = true) @UserId String userId) {
+    @PutMapping(
+        path = "/updateadmin",
+        produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<Object> updateOrgAdmin(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "adminUpdateRequest")
+        @Valid @NotNull @RequestBody UserUpdateRequest userUpdateRequest) {
 
-        Optional<Organisation> organisation = Optional.ofNullable(organisationService
-            .getOrganisationByOrgIdentifier(organisationIdentifier));
-
-        if (organisation.isEmpty()) {
-            throw new EmptyResultDataAccessException(1);
-        }
-
-        List<String> emails = userDeletionRequest.getEmails();
-
-        var deleteUserResponse =
-            organisationService.deleteUserForOrganisation(organisation.get(), emails);
-
-        return ResponseEntity
-            .status(deleteUserResponse.getStatusCode())
-            .body(deleteUserResponse);
+        return updateOrganisationAdmin(userUpdateRequest);
 
     }
 

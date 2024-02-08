@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
@@ -60,6 +61,8 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 import java.util.List;
@@ -80,6 +83,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEFAULT_PAGE_SIZE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_EMAIL_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
@@ -114,6 +118,10 @@ public abstract class SuperController {
     protected ProfessionalUserRepository professionalUserRepository;
     @Autowired
     protected PaymentAccountService paymentAccountService;
+    @Autowired
+    protected UserAttributeService userAttributeService;
+    @Autowired
+    protected UserAccountMapService userAccountMapService;
     @Autowired
     protected PrdEnumService prdEnumService;
     @Autowired
@@ -695,6 +703,29 @@ public abstract class SuperController {
                 .collect(Collectors.toSet());
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }
+
+    protected ResponseEntity<Object> updateOrganisationAdmin(UserUpdateRequest userUpdateRequest) {
+        if (isBlank(userUpdateRequest.getExistingAdminEmail() )
+            || isBlank(userUpdateRequest.getNewAdminEmail() ) )
+        {
+            throw new InvalidRequest(ERROR_MSG_EMAIL_FOUND);
+        }
+        // call professional service to fetch prof for existing user email
+        ProfessionalUser existingAdmin = professionalUserService
+            .findProfessionalUserByEmailAddress(userUpdateRequest.getExistingAdminEmail());
+        // call professional service to fetch user for new user email
+        ProfessionalUser newAdmin = professionalUserService
+             .findProfessionalUserByEmailAddress(userUpdateRequest.getNewAdminEmail());
+        //call userattribute service to update professional_id for
+        // userattribute set to new user where id was old user and prd_enum_type = 'ADMIN_ROLE'
+        userAttributeService.updateUser(existingAdmin,newAdmin);
+        //call useraccount map service to set professional id = new id where id = old user
+        userAccountMapService.updateUser(existingAdmin,newAdmin);
+
+        return ResponseEntity.status(200).build();
+    }
+
+
 
     public String getUserToken() {
         var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
