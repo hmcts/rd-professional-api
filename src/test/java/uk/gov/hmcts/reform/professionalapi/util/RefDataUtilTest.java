@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.microsoft.azure.storage.CloudStorageAccount;
 import feign.FeignException;
 import feign.Request;
@@ -46,6 +47,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -113,6 +115,7 @@ class RefDataUtilTest {
         professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
         professionalUser.setOrganisation(organisation);
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setLastUpdated(LocalDateTime.of(2023, 12, 31, 23, 59, 59, 987654321));
         userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         userAccountMap = new UserAccountMap(userAccountMapId);
         profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName",
@@ -686,7 +689,6 @@ class RefDataUtilTest {
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
-        ObjectMapper mapper = new ObjectMapper();
         Response response = Response.builder().status(301).reason("").headers(header).body(null, UTF_8)
                 .request(mock(Request.class)).build();
         when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
@@ -816,6 +818,7 @@ class RefDataUtilTest {
 
         assertThat(orgResponse).isNotNull();
         assertThat(orgResponse.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
+        assertThat(orgResponse.get(0).getStatus()).isEqualTo(organisation.getStatus());
         assertThat(orgResponse.get(0).getName()).isEqualTo("Org-Name");
         assertThat(orgResponse.get(0).getSraId()).isEqualTo("sra-id");
         assertThat(orgResponse.get(0).getCompanyNumber()).isEqualTo("companyN");
@@ -849,6 +852,7 @@ class RefDataUtilTest {
 
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
 
@@ -889,6 +893,7 @@ class RefDataUtilTest {
 
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
 
@@ -923,6 +928,7 @@ class RefDataUtilTest {
         professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
         Response realResponse = Response.builder().status(300).reason("").headers(header).body(body, UTF_8)
@@ -1142,6 +1148,9 @@ class RefDataUtilTest {
         assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+        assertThat(output.getOrganisationStatus()).isEqualTo(OrganisationStatus.ACTIVE.name());
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId1");
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId2");
     }
 
     @Test
@@ -1181,6 +1190,15 @@ class RefDataUtilTest {
         ProfessionalUsersEntityResponseWithoutRoles output
                 = (ProfessionalUsersEntityResponseWithoutRoles) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+        assertThat(output.getOrganisationStatus()).isEqualTo(OrganisationStatus.ACTIVE.name());
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId1");
+        assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId2");
+        assertThat(output.getUserProfiles()).hasSize(1);
+        assertThat(output.getUserProfiles().get(0).getEmail()).isEqualTo("soMeone@somewhere.com");
+        assertThat(output.getUserProfiles().get(0).getLastName()).isEqualTo("some-lname");
+        assertThat(output.getUserProfiles().get(0).getFirstName()).isEqualTo("some-fname");
+        assertThat(output.getUserProfiles().get(0).getLastUpdated().toString())
+                .isEqualTo("2023-12-31T23:59:59.987654321");
     }
 
     @Test
@@ -1248,7 +1266,6 @@ class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        ObjectMapper mapper = new ObjectMapper();
         String body = "{" + "}";
         Response response = Response.builder().status(500).reason("service failed").headers(header).body(body, UTF_8)
                 .request(mock(Request.class)).build();

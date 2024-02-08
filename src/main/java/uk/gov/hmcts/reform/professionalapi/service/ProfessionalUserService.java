@@ -38,5 +38,8 @@ public interface ProfessionalUserService {
     void checkUserStatusIsActiveByUserId(String userId);
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
+
+    ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
+                                                              String userId, Optional<String> origin);
 }
 

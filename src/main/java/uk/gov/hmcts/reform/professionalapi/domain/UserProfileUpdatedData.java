@@ -25,13 +25,16 @@ public class UserProfileUpdatedData {
 
     private Set<RoleName> rolesDelete;
 
+    private Set<UserAccessType> userAccessTypes;
+
     @JsonCreator
     public UserProfileUpdatedData(@JsonProperty(value = "email") String email,
                                   @JsonProperty(value = "firstName") String firstName,
                                   @JsonProperty(value = "lastName") String lastName,
                                   @JsonProperty(value = "idamStatus") String idamStatus,
                                   @JsonProperty(value = "rolesAdd") Set<RoleName> rolesAdd,
-                                  @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete
+                                  @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete,
+                                  @JsonProperty(value = "userAccessTypes") Set<UserAccessType> userAccessTypes
     ) {
         this.email = email;
         this.firstName = firstName;
@@ -39,6 +42,7 @@ public class UserProfileUpdatedData {
         this.idamStatus = idamStatus;
         this.rolesAdd = rolesAdd;
         this.rolesDelete = rolesDelete;
+        this.userAccessTypes = userAccessTypes;
     }
 
 }
