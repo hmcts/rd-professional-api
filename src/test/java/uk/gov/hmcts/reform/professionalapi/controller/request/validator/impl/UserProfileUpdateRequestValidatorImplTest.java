@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.HashSet;
@@ -28,9 +29,11 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     private final Set<RoleName> rolesData = new HashSet<>();
     private final Set<RoleName> rolesToDeleteData = new HashSet<>();
+    private final Set<UserAccessType> userAccessTypes = new HashSet<>();
     private RoleName roleName1;
     private RoleName roleName2;
     private RoleName roleToDeleteName;
+    private UserAccessType userAccessType1;
 
     @BeforeEach
     void setUp() {
@@ -41,12 +44,15 @@ class UserProfileUpdateRequestValidatorImplTest {
         rolesData.add(roleName1);
         rolesData.add(roleName2);
         rolesToDeleteData.add(roleToDeleteName);
+
+        userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
     }
 
     @Test
     void test_ValidateRequestIfBothStatusAndRoleArePresent() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
-                IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
+                IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
@@ -61,7 +67,7 @@ class UserProfileUpdateRequestValidatorImplTest {
     @Test
     void test_ValidateRequestForStatus() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
-                IdamStatus.ACTIVE.name(), null, null);
+                IdamStatus.ACTIVE.name(), null, null, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
@@ -75,7 +81,7 @@ class UserProfileUpdateRequestValidatorImplTest {
     @Test
     void test_ValidateRequestForRoles() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
-                null, rolesData, rolesToDeleteData);
+                null, rolesData, rolesToDeleteData, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
@@ -87,9 +93,39 @@ class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
+    void test_ValidateRequestForAccessTypes() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+                IdamStatus.ACTIVE.name(), null, null, userAccessTypes);
+
+        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
+        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
+        assertThat(actualModifyProfileData).isNotNull();
+        assertThat(actualModifyProfileData.getEmail()).isNull();
+        assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo(IdamStatus.ACTIVE.name());
+        assertThat(actualModifyProfileData.getRolesAdd()).isNull();
+        assertThat(actualModifyProfileData.getRolesDelete()).isNull();
+        assertThat(actualModifyProfileData.getUserAccessTypes()).hasSize(1);
+    }
+
+    @Test
+    void test_ValidateRequestForAccessTypesEmpty() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+                IdamStatus.ACTIVE.name(), null, null, new HashSet<>());
+
+        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
+        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
+        assertThat(actualModifyProfileData).isNotNull();
+        assertThat(actualModifyProfileData.getEmail()).isNull();
+        assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo(IdamStatus.ACTIVE.name());
+        assertThat(actualModifyProfileData.getRolesAdd()).isNull();
+        assertThat(actualModifyProfileData.getRolesDelete()).isNull();
+        assertThat(actualModifyProfileData.getUserAccessTypes()).isNull();
+    }
+
+    @Test
     void test_ThrowErrorIfValidateRequestIsEmpty() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
-                null, null, null);
+                null, null, null, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         assertThrows(InvalidRequest.class, () ->
