@@ -567,9 +567,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (orgs == null) {
             return new MultipleOrganisationsResponse(new ArrayList<>(), false);
         }
-        List<Organisation> organisations = orgs.getContent();
-        boolean hasMore = !orgs.isLast();
-        return new MultipleOrganisationsResponse(organisations, hasMore);
+        return new MultipleOrganisationsResponse(orgs.getContent(), !orgs.isLast());
     }
 
     private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
