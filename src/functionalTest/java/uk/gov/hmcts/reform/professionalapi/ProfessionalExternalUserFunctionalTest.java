@@ -160,7 +160,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         findUsersByPcmAndNoRolesRequiredShouldBeSuccess();
         findUsersByPcmAndWithRolesRequiredShouldBeSuccess();
         findUsersBySystemAdminWithoutRolesRequiredShouldBeSuccess();
-        findBySuperUserAndSearchOrganisationUsersByStatusShouldBeSuccess();
     }
 
     public void findOrganisationScenarios() {
@@ -315,13 +314,11 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findUsersBySystemAdminWithoutRolesRequiredShouldBeSuccess :: END");
     }
 
-    public void findBySuperUserAndSearchOrganisationUsersByStatusShouldBeSuccess() {
-        String email = generateRandomEmail();
-
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
-                .status("ACTIVE").build();
-        String activeOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, puiCaseManager);
+    @Test
+    @DisplayName("PRD External Test Scenarios: find org users should sort based on first name")
+    public void findOrganisationUsersSorted() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiCaseManager));
 
         NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList(puiCaseManager),
                 "lastName2", "firstName2");
