@@ -116,7 +116,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                     .build();
 
             organisationCreationRequest.setStatus("ACTIVE");
-            extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+            extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
             Map<String, Object> searchResponse = professionalApiClient
                     .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
@@ -234,7 +234,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
                 .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
                 .status("ACTIVE").build();
-        createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+        createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
         NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
 
@@ -317,28 +317,25 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void findBySuperUserAndSearchOrganisationUsersByStatusShouldBeSuccess() {
         String email = generateRandomEmail();
-        RequestSpecification superUserToken =
-                professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
-                        superUserRoles(), firstName, lastName, email));
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
                 .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
                 .status("ACTIVE").build();
-        createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+        String activeOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, puiCaseManager);
 
-        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"),
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList(puiCaseManager),
                 "lastName2", "firstName2");
 
         Map<String, Object> newUserResponse = professionalApiClient
-                .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(activeOrgId, puiCaseManager, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
 
-        NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList("caseworker"),
+        NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList(puiCaseManager),
                 "lastName1", "firstName1");
 
         Map<String, Object> newUserResponse2 = professionalApiClient
-                .addNewUserToAnOrganisationExternal(newUserCreationRequest2, superUserToken, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(activeOrgId, puiCaseManager, newUserCreationRequest2, HttpStatus.CREATED);
         assertThat(newUserResponse2).isNotNull();
         assertThat(newUserResponse2.get("userIdentifier")).isNotNull();
 

@@ -151,7 +151,7 @@ public class AuthorizationFunctionalTest {
         return activateOrganisationV2(response, role);
     }
 
-    protected String createAndctivateOrganisationWithGivenRequest(
+    protected String createAndActivateOrganisationWithGivenRequest(
             OrganisationCreationRequest organisationCreationRequest, String role) {
         Map<String, Object> organisationCreationResponse = professionalApiClient
                 .createOrganisation(organisationCreationRequest);
