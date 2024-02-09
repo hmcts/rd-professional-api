@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ import java.util.Optional;
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseUtil {
     private static final ObjectMapper json = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).registerModule(new JavaTimeModule());
 
     private JsonFeignResponseUtil() {
 

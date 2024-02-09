@@ -21,3 +21,5 @@ spring:
     password: ${POSTGRES_PASSWORD:dbrefdata}
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
+group-access:
+  organisation-profile-ids: SOLICITOR_PROFILE
