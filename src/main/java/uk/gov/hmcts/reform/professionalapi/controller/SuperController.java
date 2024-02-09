@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -46,6 +47,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -58,6 +61,8 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 import java.util.List;
@@ -417,8 +422,7 @@ public abstract class SuperController {
 
         var organisationMinimalInfoResponses =
                 organisations.stream()
-                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address))
-                        .collect(Collectors.toList());
+                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address)).toList();
 
         return ResponseEntity.status(200).body(organisationMinimalInfoResponses);
     }
@@ -564,6 +568,41 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(bulkCustomerDetailResponse);
     }
 
+
+    protected void deleteDxAddressOfGivenOrganisation(DxAddressCreationRequest deletedxRequest,
+                                                      String orgId) {
+
+        if (isBlank(deletedxRequest.getDxNumber())) {
+            throw new InvalidRequest("No dx number  passed in the request");
+        }
+
+        List<ContactInformation>  contactInformationList =
+            organisationService.retrieveContactInformationByOrganisationId(orgId);
+        if (isEmpty(contactInformationList)) {
+            throw new ResourceNotFoundException("No contact information  found");
+        }
+
+        //ANY CONTACT INFORMATION FOR THE ORGANISATION THAT HAS THE GIVEN DX ADDRESS WILL BE DELETED
+        contactInformationList.forEach(contactInfo -> {
+
+            List<DxAddress> dxAddresses = contactInfo.getDxAddresses();
+            dxAddresses.forEach(dxAddress -> {
+                if (ObjectUtils.isEmpty(dxAddresses)) {
+                    throw new InvalidRequest("No dx address found for organisation");
+                }
+                if (dxAddress.getDxNumber().equals(deletedxRequest.getDxNumber())) {
+                    //delete the passed dxaddress  from the organisation
+                    organisationService.deleteDxAddressForOrganisation(dxAddress.getDxNumber(), contactInfo.getId());
+                }
+            });
+        });
+
+
+
+
+
+
+    }
 
     protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
                                                             String orgId, String userId) {

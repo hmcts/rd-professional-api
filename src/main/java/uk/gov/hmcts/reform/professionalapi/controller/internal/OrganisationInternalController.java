@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -52,6 +53,11 @@ import javax.validation.constraints.Pattern;
 
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_4;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_5;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
@@ -680,4 +686,61 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("userId") String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
+
+
+    @Operation(
+        summary = "Deletes the provided list of dx addresses from the organisation.",
+        description = "**IDAM Roles to access API** : <br> - pui-finance-manager",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Successfully deleted the list of provided payment accounts from the organisation.",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = DEL_ORG_PBA_NOTES_1 + DEL_ORG_PBA_NOTES_2 + DEL_ORG_PBA_NOTES_3
+            + DEL_ORG_PBA_NOTES_4 + DEL_ORG_PBA_NOTES_5,
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized Error : "
+            + "The requested resource is restricted and requires authentication",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: "
+            + "Access denied for either invalid permissions or user is pending",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Resource Not Found Error: The Organisation does not exist"
+            + " to delete Payment Accounts from",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @DeleteMapping(path = "/dxAddress/{orgId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Secured({"prd-admin"})
+    public void deleteDxAddressOfOrganisation(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletedxAddressRequest")
+        @Valid @NotNull @RequestBody DxAddressCreationRequest dxAddressRequest,
+        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        deleteDxAddressOfGivenOrganisation(dxAddressRequest, organisationIdentifier);
+
+    }
+
 }

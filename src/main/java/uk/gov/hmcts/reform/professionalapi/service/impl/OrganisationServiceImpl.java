@@ -63,6 +63,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -122,6 +123,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     PrdEnumRepository prdEnumRepository;
     @Autowired
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
+    @Autowired
+    UserAttributeRepository userAttributeRepository;
     @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
@@ -276,6 +279,22 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
 
+    }
+
+    @Override
+    public List<ContactInformation>  retrieveContactInformationByOrganisationId(String organisationIdentifier) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
+
+        return existingContactInformationList;
+
+    }
+
+    @Override
+    @Transactional
+    public void deleteDxAddressForOrganisation(String dxAddresses, UUID id) {
+        dxAddressRepository.deleteByContactInfoId(dxAddresses,id);
     }
 
     public void addContactInformationToOrganisation(
