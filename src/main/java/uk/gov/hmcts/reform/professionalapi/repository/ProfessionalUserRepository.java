@@ -43,11 +43,35 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     Page<ProfessionalUser> findByOrganisationIdentifierIn(@Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
 
     @Query("SELECT pu FROM professional_user pu WHERE pu.deleted IS NULL")
+    List<ProfessionalUser> findAllAndDeletedIsNull(Sort sort);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.deleted IS NULL")
     Page<ProfessionalUser> findAllAndDeletedIsNull(Pageable pageable);
 
     @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN " +
             ":organisationIdentifiers and pu.deleted IS NULL")
     Page<ProfessionalUser> findByOrganisationIdentifierInAndDeletedIsNull(@Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.deleted IS NULL AND pu.organisation.id >= " +
+            ":searchAfterOrganisation AND pu.id > :searchAfterUser ORDER BY pu.organisation.id, pu.id")
+    Page<ProfessionalUser> findAllAndDeletedIsNullAndOrganisationIdGreaterThanAndUserIdGreaterThan(@Param(
+            "searchAfterOrganisation") UUID searchAfterOrganisation, @Param("searchAfterUser") UUID searchAfterUser,
+                                                                                                   Pageable pageable);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.id >= :searchAfterOrganisation AND pu.id > " +
+            ":searchAfterUser ORDER BY pu.organisation.id, pu.id")
+    Page<ProfessionalUser> findAllAndOrganisationIdGreaterThanAndUserIdGreaterThan(@Param("searchAfterOrganisation") UUID searchAfterOrganisation,
+                                                                                   @Param("searchAfterUser") UUID searchAfterUser, Pageable pageable);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN " +
+            ":organisationIdentifiers and pu.organisation.id >= :searchAfterOrganisation AND pu.id > :searchAfterUser" +
+            " ORDER BY pu.organisation.id, pu.id")
+    Page<ProfessionalUser> findByOrganisationIdentifierInAndOrganisationIdGreaterThanAndUserIdGreaterThan(@Param("organisationIdentifiers") List<String> organisationIdentifiers, @Param("searchAfterOrganisation") UUID searchAfterOrganisation, @Param("searchAfterUser") UUID searchAfterUser, Pageable pageable);
+
+    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN " +
+            ":organisationIdentifiers and pu.deleted IS NULL AND pu.organisation.id >= :searchAfterOrganisation " +
+            "AND pu.id > :searchAfterUser ORDER BY pu.organisation.id, pu.id")
+    Page<ProfessionalUser> findByOrganisationIdentifierInAndDeletedIsNullAndOrganisationIdGreaterThanAndUserIdGreaterThan(@Param("organisationIdentifiers") List<String> organisationIdentifiers, @Param("searchAfterOrganisation") UUID searchAfterOrganisation, @Param("searchAfterUser") UUID searchAfterUser, Pageable pageable);
 
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);
 
@@ -59,4 +83,5 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
                                                                                   UUID searchAfter,
                                                                                   Pageable pageable);
+
 }

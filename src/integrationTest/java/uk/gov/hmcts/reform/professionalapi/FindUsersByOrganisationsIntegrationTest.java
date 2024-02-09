@@ -15,20 +15,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisatio
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationInfoWithUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -41,14 +35,28 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     private OrganisationRepository organisationRepository;
 
     private String organisationIdentifier1;
+    private Organisation organisation1;
     private String organisationIdentifier2;
+    private Organisation organisation2;
     private String organisationIdentifier3;
-    private Map<String, List<String>> usersInOrganisation = new HashMap<>();
+    private Organisation organisation3;
+
+    // key: organisationIdentifier, value: list of userIdentifiers
+    private Map<String, List<String>> unorderedUsersInOrganisation = new HashMap<>();
+    // key: organisationId, value: list of professionalUsers
+    private TreeMap<UUID, List<ProfessionalUser>> sortedUsersInOrganisation;
+
+    private ProfessionalUser deletedUser;
 
     @BeforeEach
     public void setup() {
         professionalUserRepository.deleteAll();
         organisationRepository.deleteAll();
+        createOrganisationsAndUsers();
+        orderOrganisationsAndUsers();
+    }
+
+    private void createOrganisationsAndUsers() {
         String solicitorOrgType = "SOLICITOR-ORG";
 
         // create organisation 1 with 1 superuser, 2 active users and 1 deleted user
@@ -74,7 +82,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String userIdentifier2Org2 = addAUserToOrganisation("user2.org2@test.com", organisationIdentifier2);
 
-        usersInOrganisation.put(organisationIdentifier2, Arrays.asList(userIdentifier1Org2, userIdentifier2Org2));
+        unorderedUsersInOrganisation.put(organisationIdentifier2, Arrays.asList(userIdentifier1Org2, userIdentifier2Org2));
 
         // create organisation 3 with 1 superuser and 2 active users
         OrganisationOtherOrgsCreationRequest newOrgRequest3 = createUniqueOrganisationRequest("TstSO3", "SRA345",
@@ -87,19 +95,41 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String userIdentifier2Org3 = addAUserToOrganisation("user2.org3@test.com", organisationIdentifier3);
 
-        usersInOrganisation.put(organisationIdentifier3, Arrays.asList(userIdentifier1Org3, userIdentifier2Org3));
+        unorderedUsersInOrganisation.put(organisationIdentifier3, Arrays.asList(userIdentifier1Org3, userIdentifier2Org3));
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String userIdentifier3Org1 = addAUserToOrganisation("user3.org1@test.com", organisationIdentifier1);
 
-        // add in a random order to check if the order is maintained
-        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(userIdentifier3Org1);
-        user.setDeleted(LocalDateTime.now());
-        user.setIdamStatus(IdamStatus.SUSPENDED);
-        professionalUserRepository.save(user);
+        // add in a 3rd professional user in a random order to check if the sorting is maintained by the API
+        deletedUser = professionalUserRepository.findByUserIdentifier(userIdentifier3Org1);
+        deletedUser.setDeleted(LocalDateTime.now());
+        deletedUser.setIdamStatus(IdamStatus.SUSPENDED);
+        professionalUserRepository.save(deletedUser);
 
-        usersInOrganisation.put(organisationIdentifier1, Arrays.asList(userIdentifier1Org1, userIdentifier2Org1,
-                userIdentifier3Org1));
+        unorderedUsersInOrganisation.put(organisationIdentifier1, Arrays.asList(userIdentifier1Org1,
+                userIdentifier2Org1));
+    }
+
+    private void orderOrganisationsAndUsers() {
+        // a bit clunky but reliable way to sort the organisations and users
+        // Java treats each GUID as a pair of signed 64-bit integers in big-endian format. 89ABCDEF01234567
+        // see https://devblogs.microsoft.com/oldnewthing/20190913-00/?p=102859
+        sortedUsersInOrganisation = new TreeMap<>();
+        organisation1 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier1);
+        organisation2 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier2);
+        organisation3 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier3);
+
+        List<Organisation> organisations = Arrays.asList(organisation1, organisation2, organisation3);
+        Collections.sort(organisations, Comparator.comparing(org -> org.getId().toString()));
+        List<String> uuids = Arrays.asList(organisation1.getId().toString(), organisation2.getId().toString(), organisation3.getId().toString());
+
+        Collections.sort(uuids);
+
+        for (Organisation organisation : organisations) {
+            List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+            Collections.sort(users, Comparator.comparing(user -> user.getId().toString()));
+            sortedUsersInOrganisation.put(organisation.getId(), users);
+        }
     }
 
     @Test
@@ -125,6 +155,27 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
                 expectedHasMoreRecords);
+
+        String json = convertMapToJson(response);
+        UsersInOrganisationsByOrganisationIdentifiersResponse typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        // assert that the order of organisations and users is maintained and the users exist in the response
+        for (OrganisationInfoWithUsersResponse orgResponse : typedResponse.getOrganisationInfo()) {
+            Organisation organisation = getMatchingOrganisationKeyByIdentifier(orgResponse.getOrganisationIdentifier());
+            assertThat(organisation).isNotNull();
+            orgResponse.getUsers().forEach(user -> assertThat(sortedUsersInOrganisation.get(organisation.getId()).stream()
+                    .anyMatch(professionalUser -> professionalUser.getUserIdentifier().equals(user.getUserIdentifier()))).isTrue());
+        }
+    }
+
+    private Organisation getMatchingOrganisationKeyByIdentifier(String organisationIdentifier) {
+        for (Organisation organisation : Arrays.asList(organisation1, organisation2, organisation3)) {
+            if (organisation.getOrganisationIdentifier().equals(organisationIdentifier)) {
+                return organisation;
+            }
+        }
+        return null;
     }
 
     @Test
@@ -166,7 +217,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
         int expectedOrganisationsCount = 2;
-        int expectedUsersCount = 6;
+        int expectedUsersCount = 7;
 
         // act
         Map<String, Object> response =
@@ -175,7 +226,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
-                expectedHasMoreRecords, usersInOrganisation.get(organisationIdentifier3));
+                expectedHasMoreRecords, unorderedUsersInOrganisation.get(organisationIdentifier3));
     }
 
     @Test
@@ -201,7 +252,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
-                expectedHasMoreRecords, usersInOrganisation.get(organisationIdentifier3));
+                expectedHasMoreRecords, unorderedUsersInOrganisation.get(organisationIdentifier3));
     }
 
     @Test
@@ -262,14 +313,14 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
         boolean showDeleted = true;
-        Integer pageSize = 4;
+        Integer pageSize = 5;
         UUID searchAfterUser = null;
         UUID searchAfterOrganisation = null;
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = true;
-        int expectedOrganisationsCount = 2; // can we predict the order of orgs or stick to one org in the filter?
-        int expectedUsersCount = 4;
+        int expectedOrganisationsCount = 2;
+        int expectedUsersCount = 5;
 
         // act
         Map<String, Object> response =
@@ -296,6 +347,129 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         boolean expectedHasMoreRecords = true;
         int expectedOrganisationsCount = 2; // TODO: can we predict the order of orgs or stick to one org in the filter?
         int expectedUsersCount = 4;
+
+        // act
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+
+        // assert
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
+                expectedHasMoreRecords);
+    }
+
+    @Test
+    void when_paged_no_org_filter_is_provided_with_search_after_user_and_search_after_org_including_deleted_return_paged_all_users_for_all_orgs_and_status_200() {
+        // arrange
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        boolean showDeleted = true;
+        Integer pageSize = 15;
+
+        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.firstEntry();
+        // skip the first user in first org (not necessarily organisation 1)
+        UUID searchAfterUser = firstEntry.getValue().get(0).getId();
+
+        UUID searchAfterOrganisation = firstEntry.getKey();
+
+        String expectedStatus = "200 OK";
+        boolean expectedHasMoreRecords = true;
+        int expectedOrganisationsCount = 3;
+        int expectedUsersCount = 9; // all but one
+
+        // act
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+
+        // assert
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
+                expectedHasMoreRecords);
+    }
+
+    @Test
+    void when_paged_no_org_filter_is_provided_with_search_after_user_and_search_after_org_excluding_deleted_return_paged_all_non_deleted_users_for_all_orgs_and_status_200() {
+        // arrange
+        // remove deleted user from list to make setup predictable
+        sortedUsersInOrganisation.get(deletedUser.getOrganisation().getId()).remove(deletedUser);
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        boolean showDeleted = false;
+        Integer pageSize = 3;
+
+        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.firstEntry();
+        // skip the first 2 users in first org (not necessarily organisation 1)
+        UUID searchAfterUser = firstEntry.getValue().get(0).getId();
+
+        UUID searchAfterOrganisation = firstEntry.getKey();
+
+        String expectedStatus = "200 OK";
+        boolean expectedHasMoreRecords = true;
+        int expectedOrganisationsCount = 2;
+        int expectedUsersCount = 3;
+
+        // act
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+
+        // assert
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
+                expectedHasMoreRecords);
+    }
+
+    @Test
+    void when_paged_org_filter_is_provided_with_search_after_user_and_search_after_org_including_deleted_return_paged_all_users_for_given_orgs_and_status_200() {
+        // arrange
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
+        boolean showDeleted = true;
+        Integer pageSize = 5;
+
+        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.firstEntry();
+        // skip the first 2 users in first org (not necessarily organisation 1)
+        UUID searchAfterUser = firstEntry.getValue().get(0).getId();
+
+        UUID searchAfterOrganisation = firstEntry.getKey();
+
+        String expectedStatus = "200 OK";
+        boolean expectedHasMoreRecords = true;
+        int expectedOrganisationsCount = 2;
+        int expectedUsersCount = 5;
+
+        // act
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+
+        // assert
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
+                expectedHasMoreRecords);
+    }
+
+    @Test
+    void when_paged_org_filter_is_provided_with_search_after_user_and_search_after_org_excluding_deleted_return_paged_all_non_deleted_users_for_given_orgs_and_status_200() {
+        // arrange
+
+        // remove deleted user from list to make setup predictable
+        sortedUsersInOrganisation.get(deletedUser.getOrganisation().getId()).remove(deletedUser);
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
+        boolean showDeleted = false;
+        Integer pageSize = 5;
+
+        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.firstEntry();
+        // skip the first 2 users in first org (not necessarily organisation 1)
+        UUID searchAfterUser = firstEntry.getValue().get(0).getId();
+
+        UUID searchAfterOrganisation = firstEntry.getKey();
+
+        String expectedStatus = "200 OK";
+        boolean expectedHasMoreRecords = true;
+        int expectedOrganisationsCount = 2;
+        int expectedUsersCount = 5;
 
         // act
         Map<String, Object> response =
