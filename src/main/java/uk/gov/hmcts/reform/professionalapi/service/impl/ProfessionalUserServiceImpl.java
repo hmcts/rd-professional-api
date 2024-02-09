@@ -345,8 +345,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         if(!organisationFilter && !includeDeleted) {
-//            professionalUsers = professionalUserRepository.findAllAndDeletedNotNull(sort);
-            throw new NotImplementedException("work out to to query this without failing initialisation");
+            professionalUsers = professionalUserRepository.findAllAndDeletedIsNull(sort);
         }
 
         if (organisationFilter && includeDeleted) {
@@ -372,22 +371,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         Pageable pageableObject = createPageableObject(0, pageSize, sort);
 
-        Page<ProfessionalUser> users = null;
+        Page<ProfessionalUser> users;
 
-        if (!organisationFilter && includeDeleted && !searchAfterProvided) {
-            users = professionalUserRepository.findAll(pageableObject);
-        }
-
-        if (organisationFilter && includeDeleted && !searchAfterProvided) {
-            users = professionalUserRepository.findByOrganisationIdentifierIn(organisationIdentifiers, pageableObject);
-        }
-
-        if (!organisationFilter && !includeDeleted && !searchAfterProvided) {
-            users = professionalUserRepository.findAllAndDeletedIsNull(pageableObject);
-        }
-
-        if (organisationFilter && !includeDeleted && !searchAfterProvided) {
-            users = professionalUserRepository.findByOrganisationIdentifierInAndDeletedIsNull(organisationIdentifiers, pageableObject);
+        if (searchAfterProvided) {
+            users = findUsersWithPageAndWithSearchAfter(organisationIdentifiers, includeDeleted, searchAfterUser,
+                    searchAfterOrganisation, pageableObject, organisationFilter);
+        } else {
+            users = findUsersWithPageAndNoSearchAfter(organisationIdentifiers, includeDeleted, pageableObject,
+                    organisationFilter);
         }
 
         if (users == null) {
@@ -395,6 +386,59 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
+    }
+
+    private Page<ProfessionalUser> findUsersWithPageAndWithSearchAfter(List<String> organisationIdentifiers,
+                                                                       boolean includeDeleted, UUID searchAfterUser,
+                                                                       UUID searchAfterOrganisation, Pageable pageableObject,
+                                                                       boolean organisationFilter) {
+        if (!organisationFilter && !includeDeleted) {
+            return professionalUserRepository.findAllAndDeletedIsNullAndOrganisationIdGreaterThanAndUserIdGreaterThan(
+                    searchAfterOrganisation, searchAfterUser, pageableObject);
+        }
+
+        if (!organisationFilter && includeDeleted) {
+            return professionalUserRepository.findAllAndOrganisationIdGreaterThanAndUserIdGreaterThan(
+                    searchAfterOrganisation, searchAfterUser, pageableObject);
+        }
+
+        if (organisationFilter && includeDeleted) {
+            return professionalUserRepository
+                    .findByOrganisationIdentifierInAndOrganisationIdGreaterThanAndUserIdGreaterThan(
+                    organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+        }
+
+        if (organisationFilter && !includeDeleted) {
+            return professionalUserRepository
+                    .findByOrganisationIdentifierInAndDeletedIsNullAndOrganisationIdGreaterThanAndUserIdGreaterThan(
+                    organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+        }
+
+        return null;
+    }
+
+    private Page<ProfessionalUser> findUsersWithPageAndNoSearchAfter(List<String> organisationIdentifiers,
+                                                                     boolean includeDeleted, Pageable pageableObject,
+                                                                     boolean organisationFilter) {
+
+        if (!organisationFilter && includeDeleted) {
+            return professionalUserRepository.findAll(pageableObject);
+        }
+
+        if (organisationFilter && includeDeleted) {
+            return professionalUserRepository.findByOrganisationIdentifierIn(organisationIdentifiers, pageableObject);
+        }
+
+        if (!organisationFilter && !includeDeleted) {
+            return professionalUserRepository.findAllAndDeletedIsNull(pageableObject);
+        }
+
+        if (organisationFilter && !includeDeleted) {
+            return  professionalUserRepository.findByOrganisationIdentifierInAndDeletedIsNull(organisationIdentifiers,
+                    pageableObject);
+        }
+
+        return null;
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
