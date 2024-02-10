@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -364,19 +365,26 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser, UUID searchAfterOrganisation) {
         boolean organisationFilter = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
         boolean searchAfterProvided = searchAfterUser != null && searchAfterOrganisation != null;
-        Sort sort = Sort.by(
-                Sort.Order.asc("organisation.id"),
-                Sort.Order.asc("id")
-        );
 
-        Pageable pageableObject = createPageableObject(0, pageSize, sort);
+
 
         Page<ProfessionalUser> users;
 
         if (searchAfterProvided) {
+            // native queries sort by so no need for a sort object
+            Sort sort = Sort.by(
+                    Sort.Order.asc("organisation.id"),
+                    Sort.Order.asc("id")
+            );
+            Pageable pageableObject = createPageableObject(0, pageSize, sort);
             users = findUsersWithPageAndWithSearchAfter(organisationIdentifiers, includeDeleted, searchAfterUser,
                     searchAfterOrganisation, pageableObject, organisationFilter);
         } else {
+            Sort sort = Sort.by(
+                    Sort.Order.asc("organisation.id"),
+                    Sort.Order.asc("id")
+            );
+            Pageable pageableObject = createPageableObject(0, pageSize, sort);
             users = findUsersWithPageAndNoSearchAfter(organisationIdentifiers, includeDeleted, pageableObject,
                     organisationFilter);
         }
@@ -393,25 +401,25 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                                                        UUID searchAfterOrganisation, Pageable pageableObject,
                                                                        boolean organisationFilter) {
         if (!organisationFilter && !includeDeleted) {
-            return professionalUserRepository.findAllAndDeletedIsNullAndOrganisationIdGreaterThanAndUserIdGreaterThan(
+            return professionalUserRepository.findUsersAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
                     searchAfterOrganisation, searchAfterUser, pageableObject);
         }
 
         if (!organisationFilter && includeDeleted) {
-            return professionalUserRepository.findAllAndOrganisationIdGreaterThanAndUserIdGreaterThan(
+            return professionalUserRepository.findUsersAfterGivenUserAndAfterGivenOrganisation(
                     searchAfterOrganisation, searchAfterUser, pageableObject);
         }
 
         if (organisationFilter && includeDeleted) {
             return professionalUserRepository
-                    .findByOrganisationIdentifierInAndOrganisationIdGreaterThanAndUserIdGreaterThan(
+                    .findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisation(
                     organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
         }
 
         if (organisationFilter && !includeDeleted) {
             return professionalUserRepository
-                    .findByOrganisationIdentifierInAndDeletedIsNullAndOrganisationIdGreaterThanAndUserIdGreaterThan(
-                    organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+                    .findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
+                            organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
         }
 
         return null;

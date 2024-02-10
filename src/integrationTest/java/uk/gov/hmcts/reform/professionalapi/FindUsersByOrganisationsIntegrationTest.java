@@ -42,9 +42,9 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     private Organisation organisation3;
 
     // key: organisationIdentifier, value: list of userIdentifiers
-    private Map<String, List<String>> unorderedUsersInOrganisation = new HashMap<>();
+    private Map<String, List<String>> unorderedUsersInOrganisation = new LinkedHashMap<>();
     // key: organisationId, value: list of professionalUsers
-    private TreeMap<UUID, List<ProfessionalUser>> sortedUsersInOrganisation;
+    private LinkedHashMap<UUID, List<ProfessionalUser>> sortedUsersInOrganisation;
 
     private ProfessionalUser deletedUser;
 
@@ -114,16 +114,13 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // a bit clunky but reliable way to sort the organisations and users
         // Java treats each GUID as a pair of signed 64-bit integers in big-endian format. 89ABCDEF01234567
         // see https://devblogs.microsoft.com/oldnewthing/20190913-00/?p=102859
-        sortedUsersInOrganisation = new TreeMap<>();
+        sortedUsersInOrganisation = new LinkedHashMap<>();
         organisation1 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier1);
         organisation2 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier2);
         organisation3 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier3);
 
         List<Organisation> organisations = Arrays.asList(organisation1, organisation2, organisation3);
         Collections.sort(organisations, Comparator.comparing(org -> org.getId().toString()));
-        List<String> uuids = Arrays.asList(organisation1.getId().toString(), organisation2.getId().toString(), organisation3.getId().toString());
-
-        Collections.sort(uuids);
 
         for (Organisation organisation : organisations) {
             List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
@@ -366,14 +363,14 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         boolean showDeleted = true;
         Integer pageSize = 15;
 
-        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.firstEntry();
+        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.entrySet().iterator().next();
         // skip the first user in first org (not necessarily organisation 1)
         UUID searchAfterUser = firstEntry.getValue().get(0).getId();
 
         UUID searchAfterOrganisation = firstEntry.getKey();
 
         String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = true;
+        boolean expectedHasMoreRecords = false; // returning everything with one page
         int expectedOrganisationsCount = 3;
         int expectedUsersCount = 9; // all but one
 
@@ -397,7 +394,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         boolean showDeleted = false;
         Integer pageSize = 3;
 
-        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.firstEntry();
+        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.entrySet().iterator().next();
         // skip the first 2 users in first org (not necessarily organisation 1)
         UUID searchAfterUser = firstEntry.getValue().get(0).getId();
 
@@ -425,18 +422,22 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
         boolean showDeleted = true;
-        Integer pageSize = 5;
+        Integer pageSize = 3;
 
-        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.firstEntry();
-        // skip the first 2 users in first org (not necessarily organisation 1)
-        UUID searchAfterUser = firstEntry.getValue().get(0).getId();
+        // get org 1 and org 2 in order
+        List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
+                getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
+        Collections.sort(orgsForTest, Comparator.comparing(org -> org.getId().toString()));
 
-        UUID searchAfterOrganisation = firstEntry.getKey();
+        List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
+        // skip the first user in first org (not necessarily organisation 1)
+        UUID searchAfterUser = professionalUsers.get(0).getId();
+        UUID searchAfterOrganisation = orgsForTest.get(0).getId();
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = true;
         int expectedOrganisationsCount = 2;
-        int expectedUsersCount = 5;
+        int expectedUsersCount = 3;
 
         // act
         Map<String, Object> response =
@@ -460,14 +461,18 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         boolean showDeleted = false;
         Integer pageSize = 5;
 
-        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.firstEntry();
-        // skip the first 2 users in first org (not necessarily organisation 1)
-        UUID searchAfterUser = firstEntry.getValue().get(0).getId();
+        // get org 1 and org 2 in order
+        List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
+                getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
+        Collections.sort(orgsForTest, Comparator.comparing(org -> org.getId().toString()));
 
-        UUID searchAfterOrganisation = firstEntry.getKey();
+        List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
+        // skip the first user in first org (not necessarily organisation 1)
+        UUID searchAfterUser = professionalUsers.get(0).getId();
+        UUID searchAfterOrganisation = orgsForTest.get(0).getId();
 
         String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = true;
+        boolean expectedHasMoreRecords = false; // only 5 users left without deleted and skipping the deleted user
         int expectedOrganisationsCount = 2;
         int expectedUsersCount = 5;
 
