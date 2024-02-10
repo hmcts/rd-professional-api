@@ -19,12 +19,20 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -73,6 +81,16 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String userIdentifier2Org1 = addAUserToOrganisation("user2.org1@test.com", organisationIdentifier1);
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String userIdentifier3Org1 = addAUserToOrganisation("user3.org1@test.com", organisationIdentifier1);
+
+        unorderedUsersInOrganisation.put(organisationIdentifier1, Arrays.asList(userIdentifier1Org1,
+                userIdentifier2Org1, userIdentifier3Org1));
+
+        deletedUser = professionalUserRepository.findByUserIdentifier(userIdentifier3Org1);
+        deletedUser.setDeleted(LocalDateTime.now());
+        deletedUser.setIdamStatus(IdamStatus.SUSPENDED);
+        professionalUserRepository.save(deletedUser);
 
         // create organisation 2 with 1 superuser and 2 active users
         OrganisationOtherOrgsCreationRequest newOrgRequest2 = createUniqueOrganisationRequest("TstSO2", "SRA234",
@@ -85,7 +103,8 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String userIdentifier2Org2 = addAUserToOrganisation("user2.org2@test.com", organisationIdentifier2);
 
-        unorderedUsersInOrganisation.put(organisationIdentifier2, Arrays.asList(userIdentifier1Org2, userIdentifier2Org2));
+        unorderedUsersInOrganisation.put(organisationIdentifier2, Arrays.asList(userIdentifier1Org2,
+                userIdentifier2Org2));
 
         // create organisation 3 with 1 superuser and 2 active users
         OrganisationOtherOrgsCreationRequest newOrgRequest3 = createUniqueOrganisationRequest("TstSO3", "SRA345",
@@ -98,19 +117,8 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String userIdentifier2Org3 = addAUserToOrganisation("user2.org3@test.com", organisationIdentifier3);
 
-        unorderedUsersInOrganisation.put(organisationIdentifier3, Arrays.asList(userIdentifier1Org3, userIdentifier2Org3));
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String userIdentifier3Org1 = addAUserToOrganisation("user3.org1@test.com", organisationIdentifier1);
-
-        // add in a 3rd professional user in a random order to check if the sorting is maintained by the API
-        deletedUser = professionalUserRepository.findByUserIdentifier(userIdentifier3Org1);
-        deletedUser.setDeleted(LocalDateTime.now());
-        deletedUser.setIdamStatus(IdamStatus.SUSPENDED);
-        professionalUserRepository.save(deletedUser);
-
-        unorderedUsersInOrganisation.put(organisationIdentifier1, Arrays.asList(userIdentifier1Org1,
-                userIdentifier2Org1));
+        unorderedUsersInOrganisation.put(organisationIdentifier3, Arrays.asList(userIdentifier1Org3,
+                userIdentifier2Org3));
     }
 
     private void orderOrganisationsAndUsers() {
@@ -164,8 +172,10 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         for (OrganisationInfoWithUsersResponse orgResponse : typedResponse.getOrganisationInfo()) {
             Organisation organisation = getMatchingOrganisationKeyByIdentifier(orgResponse.getOrganisationIdentifier());
             assertThat(organisation).isNotNull();
-            orgResponse.getUsers().forEach(user -> assertThat(sortedUsersInOrganisation.get(organisation.getId()).stream()
-                    .anyMatch(professionalUser -> professionalUser.getUserIdentifier().equals(user.getUserIdentifier()))).isTrue());
+            orgResponse.getUsers().forEach(user -> assertThat(
+                    sortedUsersInOrganisation.get(organisation.getId()).stream()
+                    .anyMatch(professionalUser -> professionalUser.getUserIdentifier()
+                            .equals(user.getUserIdentifier()))).isTrue());
         }
     }
 
@@ -637,24 +647,5 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         ProfessionalUser user = professionalUserRepository.findByUserIdentifier(userIdentifier);
         user.setIdamStatus(IdamStatus.ACTIVE);
         professionalUserRepository.saveAndFlush(user);
-
-
-//        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-//        RoleName roleName1 = new RoleName(puiCaseManager);
-//        RoleName roleName2 = new RoleName(puiOrgManager);
-//        Set<RoleName> roles = new HashSet<>();
-//        roles.add(roleName1);
-//        roles.add(roleName2);
-//
-//        userProfileUpdatedData.setRolesAdd(roles);
-//        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.toString());
-//        updateUserProfileRolesMock(HttpStatus.OK);
-//
-//        Map<String, Object> response = professionalReferenceDataClient
-//                .modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier,
-//                        hmctsAdmin);
-//
-//        assertThat(response.get("http_status")).isNotNull();
-//        assertThat(response.get("http_status")).isEqualTo("200 OK");
     }
 }

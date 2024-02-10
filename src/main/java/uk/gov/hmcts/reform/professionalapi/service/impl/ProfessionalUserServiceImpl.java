@@ -3,12 +3,10 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import feign.FeignException;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -22,7 +20,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.response.*;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -41,7 +43,12 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -330,7 +337,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiers(List<String> organisationIdentifiers, boolean includeDeleted) {
+    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiers(
+            List<String> organisationIdentifiers, boolean includeDeleted) {
         List<ProfessionalUser> professionalUsers = new ArrayList<>();
 
         boolean organisationFilter = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
@@ -338,11 +346,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 Sort.Order.asc("organisation.id"),
                 Sort.Order.asc("id")
         );
-        if(!organisationFilter && includeDeleted) {
+        if (!organisationFilter && includeDeleted) {
             professionalUsers = professionalUserRepository.findAll(sort);
         }
 
-        if(!organisationFilter && !includeDeleted) {
+        if (!organisationFilter && !includeDeleted) {
             professionalUsers = professionalUserRepository.findAllAndDeletedIsNull(sort);
         }
 
@@ -359,11 +367,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser, UUID searchAfterOrganisation) {
+    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
+            List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser,
+            UUID searchAfterOrganisation) {
         boolean organisationFilter = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
         boolean searchAfterProvided = searchAfterUser != null && searchAfterOrganisation != null;
-
-
 
         Page<ProfessionalUser> users;
 
@@ -395,7 +403,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     private Page<ProfessionalUser> findUsersWithPageAndWithSearchAfter(List<String> organisationIdentifiers,
                                                                        boolean includeDeleted, UUID searchAfterUser,
-                                                                       UUID searchAfterOrganisation, Pageable pageableObject,
+                                                                       UUID searchAfterOrganisation,
+                                                                       Pageable pageableObject,
                                                                        boolean organisationFilter) {
         if (!organisationFilter && !includeDeleted) {
             return professionalUserRepository.findUsersAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
@@ -415,7 +424,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         if (organisationFilter && !includeDeleted) {
             return professionalUserRepository
-                    .findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
+                    .findUsersInOrgByOrgIdentifierAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
                             organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
         }
 

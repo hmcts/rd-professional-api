@@ -123,7 +123,7 @@ public abstract class SuperController {
     @Autowired
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @Autowired
-    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl usersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl;
+    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl usersInOrgByIdentifierValidatorImpl;
     @Autowired
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired

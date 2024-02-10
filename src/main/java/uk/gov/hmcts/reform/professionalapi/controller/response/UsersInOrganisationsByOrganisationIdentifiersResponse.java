@@ -35,7 +35,8 @@ public class UsersInOrganisationsByOrganisationIdentifiersResponse {
                 organisationInfo = new OrganisationInfoWithUsersResponse();
                 organisationInfo.setOrganisationIdentifier(organisationIdentifier);
                 organisationInfo.setOrganisationStatus(professionalUser.getOrganisation().getStatus().name());
-                organisationInfo.setOrganisationProfileIds(RefDataUtil.getOrganisationProfileIds(professionalUser.getOrganisation()));
+                organisationInfo.setOrganisationProfileIds(RefDataUtil
+                        .getOrganisationProfileIds(professionalUser.getOrganisation()));
                 organisationInfo.setUsers(new ArrayList<>());
                 organisationInfoMap.put(organisationIdentifier, organisationInfo);
             }
@@ -48,12 +49,12 @@ public class UsersInOrganisationsByOrganisationIdentifiersResponse {
 
         this.organisationInfo = new ArrayList<>(organisationInfoMap.values());
 
-        if(professionalUsers.isEmpty()) {
+        if (professionalUsers.isEmpty()) {
             return;
         }
 
         ProfessionalUser lastUser = professionalUsers.get(professionalUsers.size() - 1);
-        if(lastUser != null) {
+        if (lastUser != null) {
             this.lastUserInPage = lastUser.getId();
             this.lastOrgInPage = lastUser.getOrganisation().getId();
         }

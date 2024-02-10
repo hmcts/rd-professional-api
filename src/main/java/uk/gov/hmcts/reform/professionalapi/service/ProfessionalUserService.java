@@ -25,7 +25,8 @@ public interface ProfessionalUserService {
     ProfessionalUser findProfessionalUserByUserIdentifier(String userIdentifier);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String userIdentifier,
-                                                               String showDeleted, boolean rolesRequired, String status);
+                                                               String showDeleted, boolean rolesRequired,
+                                                               String status);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation existingOrganisation,
                                                                            String showDeleted, boolean rolesRequired,
@@ -49,8 +50,11 @@ public interface ProfessionalUserService {
 
     ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize, UUID searchAfter);
 
-    UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiers(List<String> organisationIdentifiers, boolean includeDeleted);
+    UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiers(
+            List<String> organisationIdentifiers, boolean includeDeleted);
 
-    UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser, UUID searchAfterOrganisation);
+    UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
+            List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser,
+            UUID searchAfterOrganisation);
 }
 
