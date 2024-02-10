@@ -120,11 +120,11 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         organisation3 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier3);
 
         List<Organisation> organisations = Arrays.asList(organisation1, organisation2, organisation3);
-        Collections.sort(organisations, Comparator.comparing(org -> org.getId().toString()));
+        organisations.sort(Comparator.comparing(org -> org.getId().toString()));
 
         for (Organisation organisation : organisations) {
             List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-            Collections.sort(users, Comparator.comparing(user -> user.getId().toString()));
+            users.sort(Comparator.comparing(user -> user.getId().toString()));
             sortedUsersInOrganisation.put(organisation.getId(), users);
         }
     }
@@ -267,7 +267,6 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         int expectedOrganisationsCount = 1;
         int expectedUsersCount = 3;
 
-        // todo: how do we predict the order of orgs and users to better assert?
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
@@ -342,7 +341,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = true;
-        int expectedOrganisationsCount = 2; // TODO: can we predict the order of orgs or stick to one org in the filter?
+        int expectedOrganisationsCount = 2;
         int expectedUsersCount = 4;
 
         // act
