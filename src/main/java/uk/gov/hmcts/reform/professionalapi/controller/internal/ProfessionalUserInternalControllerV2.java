@@ -73,18 +73,22 @@ public class ProfessionalUserInternalControllerV2 extends SuperController {
     )
     public ResponseEntity<Object> findUsersByOrganisations(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationByProfileIdsRequest")
-            @Valid @NotNull @RequestBody UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
+            @Valid @NotNull
+            @RequestBody UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
             @RequestParam(value = "showDeleted", required = false) boolean showDeleted,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "searchAfterOrg", required = false) UUID searchAfterOrg,
             @RequestParam(value = "searchAfterUser", required = false) UUID searchAfterUser
     ) {
-        usersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl.validate(pageSize, searchAfterOrg,
+        usersInOrgByIdentifierValidatorImpl.validate(pageSize, searchAfterOrg,
                 searchAfterUser);
 
         UsersInOrganisationsByOrganisationIdentifiersResponse response = pageSize == null
-                ? professionalUserService.retrieveUsersByOrganisationIdentifiers(organisationByProfileIdsRequest.getOrganisationIdentifiers(), showDeleted)
-                : professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(organisationByProfileIdsRequest.getOrganisationIdentifiers(), showDeleted, pageSize, searchAfterUser, searchAfterOrg);
+                ? professionalUserService.retrieveUsersByOrganisationIdentifiers(
+                        organisationByProfileIdsRequest.getOrganisationIdentifiers(), showDeleted)
+                : professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(
+                        organisationByProfileIdsRequest.getOrganisationIdentifiers(), showDeleted, pageSize,
+                searchAfterUser, searchAfterOrg);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

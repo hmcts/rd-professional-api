@@ -1008,7 +1008,9 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(UsersInOrganisationsByOrganisationIdentifiersRequest request, boolean showDeleted, Integer pageSize, UUID searchAfterUser, UUID searchAfterOrganisation) {
+    public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(
+            UsersInOrganisationsByOrganisationIdentifiersRequest request, boolean showDeleted, Integer pageSize,
+            UUID searchAfterUser, UUID searchAfterOrganisation) {
         StringBuilder sb = new StringBuilder(baseV2IntUrl)
                 .append("/users?");
         sb.append("&showDeleted=").append(showDeleted);
