@@ -121,8 +121,6 @@ public abstract class SuperController {
     @Autowired
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @Autowired
-    protected OrganisationByProfileIdsRequestValidatorImpl organisationByProfileIdsRequestValidatorImpl;
-    @Autowired
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired
     protected PaymentAccountValidator paymentAccountValidator;
