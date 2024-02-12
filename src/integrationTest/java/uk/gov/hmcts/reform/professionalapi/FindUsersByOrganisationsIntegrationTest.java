@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -23,14 +21,23 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
-@Execution(ExecutionMode.SAME_THREAD)
 public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
@@ -47,9 +54,6 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     private Map<String, List<String>> unorderedUsersInOrganisation = new LinkedHashMap<>();
     // key: organisationId, value: list of professionalUsers
     private LinkedHashMap<UUID, LinkedList<ProfessionalUser>> sortedUsersInOrganisation;
-
-    private LinkedHashMap<UUID, LinkedList<ProfessionalUser>> sortedUsersInOrganisationByJava;
-
     private ProfessionalUser deletedUser;
 
     @BeforeEach
@@ -131,17 +135,6 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
             users.sort(Comparator.comparing(user -> user.getId().toString()));
             LinkedList<ProfessionalUser> usersLinkedList = new LinkedList<>(users);
             sortedUsersInOrganisation.put(organisation.getId(), usersLinkedList);
-        }
-
-        sortedUsersInOrganisationByJava = new LinkedHashMap<>();
-        List<Organisation> organisations2 = Arrays.asList(organisation1, organisation2, organisation3);
-        organisations.sort(Comparator.comparing(org -> org.getId()));
-
-        for (Organisation organisation : organisations2) {
-            List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-            users.sort(Comparator.comparing(user -> user.getId()));
-            LinkedList<ProfessionalUser> usersLinkedList = new LinkedList<>(users);
-            sortedUsersInOrganisationByJava.put(organisation.getId(), usersLinkedList);
         }
     }
 
@@ -437,19 +430,19 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     @Test
     void when_paged_org_filter_is_provided_with_search_after_user_and_search_after_org_including_deleted_return_paged_all_users_for_given_orgs_and_status_200() {
         // arrange
+        // org 1 has a deleted user, so it must be used in the test
+        List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
+                getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
+        Collections.sort(orgsForTest, Comparator.comparing(org -> org.getId().toString())); // cannot assume org 1 is first
+
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
         boolean showDeleted = true;
         Integer pageSize = 3;
 
-        // get org 1 and org 2 in order
-        List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
-                getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
-        Collections.sort(orgsForTest, Comparator.comparing(org -> org.getId().toString()));
-
         List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
-        // skip the first user in first org (not necessarily organisation 1)
+        // 6 users in both orgs. skip the first user in org 1. expect 2 from the first org and 1 from the second
         UUID searchAfterUser = professionalUsers.get(0).getId();
         UUID searchAfterOrganisation = orgsForTest.get(0).getId();
 
@@ -487,7 +480,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
 
         List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
         // skip the first user in first org (not necessarily organisation 1)
-        UUID searchAfterUser = professionalUsers.get(0).getId();
+        UUID searchAfterUser = professionalUsers.get(1).getId();
         UUID searchAfterOrganisation = orgsForTest.get(0).getId();
 
         String expectedStatus = "200 OK";
