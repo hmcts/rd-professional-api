@@ -374,21 +374,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         boolean searchAfterProvided = searchAfterUser != null && searchAfterOrganisation != null;
 
         Page<ProfessionalUser> users;
-
+        Sort sort = Sort.by(
+                Sort.Order.asc("organisation.id"),
+                Sort.Order.asc("id")
+        );
         if (searchAfterProvided) {
-            // native queries sort by so no need for a sort object
-            Sort sort = Sort.by(
-                    Sort.Order.asc("organisation.id"),
-                    Sort.Order.asc("id")
-            );
             Pageable pageableObject = createPageableObject(0, pageSize, sort);
             users = findUsersWithPageAndWithSearchAfter(organisationIdentifiers, includeDeleted, searchAfterUser,
                     searchAfterOrganisation, pageableObject, organisationFilter);
         } else {
-            Sort sort = Sort.by(
-                    Sort.Order.asc("organisation.id"),
-                    Sort.Order.asc("id")
-            );
             Pageable pageableObject = createPageableObject(0, pageSize, sort);
             users = findUsersWithPageAndNoSearchAfter(organisationIdentifiers, includeDeleted, pageableObject,
                     organisationFilter);

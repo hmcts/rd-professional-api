@@ -23,16 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -55,7 +46,9 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     // key: organisationIdentifier, value: list of userIdentifiers
     private Map<String, List<String>> unorderedUsersInOrganisation = new LinkedHashMap<>();
     // key: organisationId, value: list of professionalUsers
-    private LinkedHashMap<UUID, List<ProfessionalUser>> sortedUsersInOrganisation;
+    private LinkedHashMap<UUID, LinkedList<ProfessionalUser>> sortedUsersInOrganisation;
+
+    private LinkedHashMap<UUID, LinkedList<ProfessionalUser>> sortedUsersInOrganisationByJava;
 
     private ProfessionalUser deletedUser;
 
@@ -136,7 +129,19 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         for (Organisation organisation : organisations) {
             List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
             users.sort(Comparator.comparing(user -> user.getId().toString()));
-            sortedUsersInOrganisation.put(organisation.getId(), users);
+            LinkedList<ProfessionalUser> usersLinkedList = new LinkedList<>(users);
+            sortedUsersInOrganisation.put(organisation.getId(), usersLinkedList);
+        }
+
+        sortedUsersInOrganisationByJava = new LinkedHashMap<>();
+        List<Organisation> organisations2 = Arrays.asList(organisation1, organisation2, organisation3);
+        organisations.sort(Comparator.comparing(org -> org.getId()));
+
+        for (Organisation organisation : organisations2) {
+            List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+            users.sort(Comparator.comparing(user -> user.getId()));
+            LinkedList<ProfessionalUser> usersLinkedList = new LinkedList<>(users);
+            sortedUsersInOrganisationByJava.put(organisation.getId(), usersLinkedList);
         }
     }
 
@@ -375,7 +380,8 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         boolean showDeleted = true;
         Integer pageSize = 15;
 
-        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.entrySet().iterator().next();
+        Map.Entry<UUID, LinkedList<ProfessionalUser>> firstEntry =
+                sortedUsersInOrganisation.entrySet().iterator().next();
         // skip the first user in first org (not necessarily organisation 1)
         UUID searchAfterUser = firstEntry.getValue().get(0).getId();
 
@@ -406,7 +412,8 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         boolean showDeleted = false;
         Integer pageSize = 3;
 
-        Map.Entry<UUID, List<ProfessionalUser>> firstEntry = sortedUsersInOrganisation.entrySet().iterator().next();
+        Map.Entry<UUID, LinkedList<ProfessionalUser>> firstEntry =
+                sortedUsersInOrganisation.entrySet().iterator().next();
         // skip the first 2 users in first org (not necessarily organisation 1)
         UUID searchAfterUser = firstEntry.getValue().get(0).getId();
 
