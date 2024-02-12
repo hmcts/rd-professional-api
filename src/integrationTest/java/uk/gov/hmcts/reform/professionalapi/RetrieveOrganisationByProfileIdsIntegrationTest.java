@@ -107,7 +107,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
     @SuppressWarnings("unchecked")
     @Test
-    void when_non_matching_profile_ids_provided_should_return_no_organisations_and_status_200() {
+    void when_non_matching_profile_ids_provided_should_return_default_solicitor_organisations_and_status_200() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
         organisationByProfileIdsRequest.setOrganisationProfileIds(List.of("A"));
@@ -116,7 +116,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 0;
+        int expectedOrganisationsCount = 2;
 
         // act
         Map<String, Object> response =
@@ -129,7 +129,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
 
         boolean allMatch = organisationInfoMapList.stream()
-                .allMatch(org -> ((List<String>) org.get("organisationProfileId")).contains(solicitorProfileId));
+                .allMatch(org -> ((List<String>) org.get("organisationProfileIds")).contains(solicitorProfileId));
         assertThat(allMatch).isTrue();
     }
 
