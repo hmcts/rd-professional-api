@@ -1180,6 +1180,7 @@ class ProfessionalUserServiceImplTest {
         verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
     }
 
+
     @Test
     void test_ErrorOnsaveAllUserAccessTypes() {
         Set<UserAccessType> userAccessTypes = new HashSet<>();

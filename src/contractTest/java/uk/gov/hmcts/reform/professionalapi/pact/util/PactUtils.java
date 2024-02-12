@@ -136,15 +136,6 @@ public class PactUtils {
         return su;
     }
 
-    public static Set<UserAccessType> getUserAccessTypes() {
-        UserAccessType userAccessType = new UserAccessType(
-                        "jurisdictionId1",
-                        "organisationProfileId1",
-                        "accessTypeId1",
-                        true);
-        return Set.of(userAccessType);
-    }
-
     public static UserConfiguredAccess getUserConfiguredAccess(ProfessionalUser professionalUser, int i) {
         final UserConfiguredAccessId userConfiguredAccessId =
                 new UserConfiguredAccessId(professionalUser,
@@ -157,6 +148,15 @@ public class PactUtils {
     public static List<UserConfiguredAccess> getUserConfiguredAccesses(ProfessionalUser professionalUser) {
         final UserConfiguredAccess userConfiguredAccess1 = getUserConfiguredAccess(professionalUser, 1);
         return List.of(userConfiguredAccess1);
+    }
+
+    public static Set<UserAccessType> getUserAccessTypes() {
+        UserAccessType userAccessType = new UserAccessType(
+                "jurisdictionId1",
+                "organisationProfileId1",
+                "accessTypeId1",
+                true);
+        return Set.of(userAccessType);
     }
 
     public static Organisation setUpOrganisation(String name, String sraId, String companyNumber, String companyUrl) {
