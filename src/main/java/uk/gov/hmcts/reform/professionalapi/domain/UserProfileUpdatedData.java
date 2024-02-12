@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,10 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class UserProfileUpdatedData {
+
+    private String idamId;
 
     private String email;
 
@@ -28,7 +32,8 @@ public class UserProfileUpdatedData {
     private Set<UserAccessType> userAccessTypes;
 
     @JsonCreator
-    public UserProfileUpdatedData(@JsonProperty(value = "email") String email,
+    public UserProfileUpdatedData(@JsonProperty(value = "idamId") String idamId,
+                                  @JsonProperty(value = "email") String email,
                                   @JsonProperty(value = "firstName") String firstName,
                                   @JsonProperty(value = "lastName") String lastName,
                                   @JsonProperty(value = "idamStatus") String idamStatus,
@@ -36,6 +41,7 @@ public class UserProfileUpdatedData {
                                   @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete,
                                   @JsonProperty(value = "userAccessTypes") Set<UserAccessType> userAccessTypes
     ) {
+        this.idamId = idamId;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;

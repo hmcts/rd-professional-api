@@ -6,6 +6,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +30,7 @@ class UserProfileUpdatedDataTest {
         Set<UserAccessType> userAccessTypes = new HashSet<>();
         userAccessTypes.add(userAccessType1);
 
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("test@test.com", "fname", "lname",
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),"test@test.com", "fname", "lname",
                 "ACTIVE", rolesAdd, rolesDelete, userAccessTypes);
         userProfileUpdatedData.setRolesAdd(rolesAdd);
         userProfileUpdatedData.setRolesDelete(rolesDelete);

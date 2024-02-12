@@ -73,4 +73,6 @@ public interface OrganisationService {
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
 
+    ResponseEntity<Object>  updateIdamId(String existingUserIdentifier, String newUserIdentifier);
+
 }

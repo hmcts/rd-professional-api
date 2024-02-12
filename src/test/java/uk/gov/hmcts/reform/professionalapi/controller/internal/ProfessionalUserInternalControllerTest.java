@@ -69,7 +69,7 @@ class ProfessionalUserInternalControllerTest {
     void setUp() {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
-        userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
+        userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),"test@email.com", "firstName",
                 "lastName", IdamStatus.ACTIVE.name(), null, null, null);
 
         organisationServiceMock = mock(OrganisationService.class);
