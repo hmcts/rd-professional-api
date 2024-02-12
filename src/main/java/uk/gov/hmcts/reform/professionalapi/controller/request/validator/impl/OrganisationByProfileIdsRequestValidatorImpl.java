@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
-import java.util.UUID;
-
 @Component
 public class OrganisationByProfileIdsRequestValidatorImpl {
     public void validate(Integer pageSize) {

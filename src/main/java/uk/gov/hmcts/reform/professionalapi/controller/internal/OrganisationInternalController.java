@@ -729,7 +729,7 @@ public class OrganisationInternalController extends SuperController {
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
 
-        organisationByProfileIdsRequestValidatorImpl.validate(pageSize, searchAfter);
+        organisationByProfileIdsRequestValidatorImpl.validate(pageSize);
 
         MultipleOrganisationsResponse response = pageSize == null
                 ? organisationService.retrieveOrganisationsByProfileIds(

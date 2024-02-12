@@ -52,6 +52,10 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
 
+
+    @Query("SELECT o FROM Organisation o")
+    List<Organisation> findAllWithoutJoins();
+
     List<Organisation> findByIdGreaterThan(UUID searchAfter);
 
     Page<Organisation> findByIdGreaterThan(UUID searchAfter, Pageable pageable);
