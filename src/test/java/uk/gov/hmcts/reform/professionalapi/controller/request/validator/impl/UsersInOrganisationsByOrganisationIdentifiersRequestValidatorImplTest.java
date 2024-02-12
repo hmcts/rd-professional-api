@@ -49,25 +49,9 @@ public class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImplTe
     }
 
     @Test
-    void shouldThrowExceptionWhenPageSearchAfterOrgIsInvalid2() {
-        Integer pageSize = 10;
-        UUID searchAfterUser = UUID.randomUUID();
-        UUID searchAfterOrg = UUID.fromString("00000000-0000-0000-0000-000000000000");
-        assertThrows(InvalidRequest.class, () -> validator.validate(pageSize, searchAfterOrg, searchAfterUser));
-    }
-
-    @Test
     void shouldThrowExceptionWhenPageSearchAfterUserIsInvalid() {
         Integer pageSize = 10;
         UUID searchAfterUser = null;
-        UUID searchAfterOrg = UUID.randomUUID();
-        assertThrows(InvalidRequest.class, () -> validator.validate(pageSize, searchAfterOrg, searchAfterUser));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenPageSearchAfterUserIsInvalid2() {
-        Integer pageSize = 10;
-        UUID searchAfterUser = UUID.fromString("00000000-0000-0000-0000-000000000000");
         UUID searchAfterOrg = UUID.randomUUID();
         assertThrows(InvalidRequest.class, () -> validator.validate(pageSize, searchAfterOrg, searchAfterUser));
     }

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationInfoWithUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -542,7 +542,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
 
         assertThat(typedResponse.getOrganisationInfo().size()).isEqualTo(expectedOrganisationsCount);
 
-        List<ProfessionalUsersResponseWithoutRoles> allUsers = new ArrayList<>();
+        List<OrganisationUserResponse> allUsers = new ArrayList<>();
         for (OrganisationInfoWithUsersResponse organisationInfo : typedResponse.getOrganisationInfo()) {
             allUsers.addAll(organisationInfo.getUsers());
         }

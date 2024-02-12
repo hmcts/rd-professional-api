@@ -24,7 +24,10 @@ public class UsersInOrganisationsByOrganisationIdentifiersResponse {
     public UsersInOrganisationsByOrganisationIdentifiersResponse(List<ProfessionalUser> professionalUsers,
                                                                  boolean moreAvailable) {
         this.moreAvailable = moreAvailable;
+        this.organisationInfo = mapToOrganisationInfo(professionalUsers);
+    }
 
+    private List<OrganisationInfoWithUsersResponse> mapToOrganisationInfo(List<ProfessionalUser> professionalUsers) {
         Map<String, OrganisationInfoWithUsersResponse> organisationInfoMap = new HashMap<>();
 
         for (ProfessionalUser professionalUser : professionalUsers) {
@@ -32,32 +35,17 @@ public class UsersInOrganisationsByOrganisationIdentifiersResponse {
             String organisationIdentifier = professionalUser.getOrganisation().getOrganisationIdentifier();
             OrganisationInfoWithUsersResponse organisationInfo = organisationInfoMap.get(organisationIdentifier);
             if (organisationInfo == null) {
-                organisationInfo = new OrganisationInfoWithUsersResponse();
-                organisationInfo.setOrganisationIdentifier(organisationIdentifier);
-                organisationInfo.setOrganisationStatus(professionalUser.getOrganisation().getStatus().name());
-                organisationInfo.setOrganisationProfileIds(RefDataUtil
-                        .getOrganisationProfileIds(professionalUser.getOrganisation()));
-                organisationInfo.setUsers(new ArrayList<>());
+                organisationInfo = new OrganisationInfoWithUsersResponse(professionalUser.getOrganisation());
                 organisationInfoMap.put(organisationIdentifier, organisationInfo);
             }
 
-            ProfessionalUsersResponseWithoutRoles userResponse =
-                    new ProfessionalUsersResponseWithoutRoles(professionalUser);
+            organisationInfo.AddUser(professionalUser);
 
-            organisationInfo.getUsers().add(userResponse);
+            lastOrgInPage = professionalUser.getOrganisation().getId();
+            lastUserInPage = professionalUser.getId();
         }
 
-        this.organisationInfo = new ArrayList<>(organisationInfoMap.values());
-
-        if (professionalUsers.isEmpty()) {
-            return;
-        }
-
-        ProfessionalUser lastUser = professionalUsers.get(professionalUsers.size() - 1);
-        if (lastUser != null) {
-            this.lastUserInPage = lastUser.getId();
-            this.lastOrgInPage = lastUser.getOrganisation().getId();
-        }
+        return new ArrayList<>(organisationInfoMap.values());
     }
 }
 
