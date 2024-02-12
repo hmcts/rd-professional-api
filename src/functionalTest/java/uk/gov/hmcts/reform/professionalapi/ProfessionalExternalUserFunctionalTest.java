@@ -317,33 +317,35 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD External Test Scenarios: find org users should sort based on first name")
     public void findOrganisationUsersSorted() {
-        setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiCaseManager));
+        String superUserEmail = generateRandomEmail();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .superUser(aUserCreationRequest().firstName(firstName)
+                        .lastName(lastName).email(superUserEmail).build())
+                .status("ACTIVE").build();
 
-        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList(puiCaseManager),
-                "lastName2", "firstName2");
+        String extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+                hmctsAdmin);
 
-        Map<String, Object> newUserResponse = professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, puiCaseManager, newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        String bearerToken = inviteUser(puiCaseManager, extActiveOrgId, generateRandomEmail(),
+                "firstName2", "lastName2");
 
         NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList(puiCaseManager),
                 "lastName1", "firstName1");
 
         Map<String, Object> newUserResponse2 = professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, puiCaseManager, newUserCreationRequest2, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(extActiveOrgId, puiCaseManager,
+                        newUserCreationRequest2, HttpStatus.CREATED);
         assertThat(newUserResponse2).isNotNull();
         assertThat(newUserResponse2.get("userIdentifier")).isNotNull();
 
         Map<String, Object> response = professionalApiClient
                 .searchOrganisationUsersByReturnRolesParamExternal(OK,
-                        professionalApiClient.getMultipleAuthHeaders(pcmBearerToken), "false");
+                        professionalApiClient.getMultipleAuthHeaders(bearerToken), "false");
+
         assertThat(response.get("users")).asList().isNotEmpty();
         assertThat(response.get("organisationIdentifier")).isNotNull();
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
-        assertThat(professionalUsersResponses.size()).isEqualTo(7);
-        log.info("User responses <<>> " + professionalUsersResponses);
+        assertThat(professionalUsersResponses.size()).isEqualTo(3);
 
         HashMap firstUser = professionalUsersResponses.get(0);
         assertThat(firstUser.get("firstName")).isEqualTo("firstName");
@@ -594,6 +596,24 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .addNewUserToAnOrganisation(extActiveOrgId, hmctsAdmin, newUserCreationRequest, CREATED);
         assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
         activeUserId = (String) pumInternalUserResponse.get("userIdentifier");
+        return bearerToken;
+    }
+
+    public String inviteUser(String role,
+                             String orgId,
+                             String email,
+                             String firstName,
+                             String lastName) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(role);
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(userRoles);
+        newUserCreationRequest.setEmail(email);
+        String bearerToken = idamOpenIdClient.getExternalOpenIdToken(puiUserManager,
+                firstName, lastName, email);
+
+        Map<String, Object> pumInternalUserResponse = professionalApiClient
+                .addNewUserToAnOrganisation(orgId, hmctsAdmin, newUserCreationRequest, CREATED);
+        assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
         return bearerToken;
     }
 
