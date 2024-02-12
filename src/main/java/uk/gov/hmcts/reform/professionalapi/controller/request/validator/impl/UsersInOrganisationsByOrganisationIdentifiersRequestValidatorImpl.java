@@ -11,12 +11,6 @@ public class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl {
         if (pageSize != null && pageSize < 1) {
             throw new InvalidRequest("Invalid pageSize");
         }
-        if (searchAfterOrg != null && searchAfterOrg.toString().equals("00000000-0000-0000-0000-000000000000")) {
-            throw new InvalidRequest("Invalid searchAfterOrg");
-        }
-        if (searchAfterUser != null && searchAfterUser.toString().equals("00000000-0000-0000-0000-000000000000")) {
-            throw new InvalidRequest("Invalid searchAfterUser");
-        }
 
         if (searchAfterUser != null && searchAfterOrg == null) {
             throw new InvalidRequest("searchAfterOrg cannot be null when searchAfterUser is provided");
