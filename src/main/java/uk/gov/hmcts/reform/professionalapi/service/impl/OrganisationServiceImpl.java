@@ -69,6 +69,8 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
@@ -572,14 +574,14 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .stream()
                 .map(profileId -> {
                     switch (profileId) {
-                        case "SOLICITOR_PROFILE":
-                            return "SOLICITOR-ORG";
-                        case "OGD_DWP_PROFILE":
-                            return "OGD-DWP-ORG";
-                        case "OGD_HO_PROFILE":
-                            return "OGD-HO-ORG";
+                        case OrganisationProfileIdConstants.SOLICITOR_PROFILE:
+                            return OrganisationTypeConstants.SOLICITOR_ORG;
+                        case OrganisationProfileIdConstants.OGD_DWP_PROFILE:
+                            return OrganisationTypeConstants.OGD_DWP_ORG;
+                        case OrganisationProfileIdConstants.OGD_HO_PROFILE:
+                            return OrganisationTypeConstants.OGD_HO_ORG;
                         default:
-                            return profileId;
+                            return OrganisationTypeConstants.SOLICITOR_ORG;
                     }
                 }).collect(Collectors.toList());
 
