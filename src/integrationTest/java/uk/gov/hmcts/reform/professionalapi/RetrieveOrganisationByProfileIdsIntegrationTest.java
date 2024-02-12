@@ -198,28 +198,6 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         assertThat(actualResponseBody).contains(expectedErrorMessage);
     }
 
-    @Test
-    void when_an_search_after_is_provided_should_return_status_400_and_error_messages() {
-        // arrange
-        OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
-        Integer pageSize = 1;
-        UUID searchAfter = UUID.fromString("00000000-0000-0000-0000-000000000000");
-
-        String expectedStatus = "400";
-        String expectedErrorMessage = "Invalid searchAfter";
-
-        // act
-        Map<String, Object> response = professionalReferenceDataClient
-                .retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest, pageSize, searchAfter);
-
-        // assert
-        String actualStatus = (String) response.get("http_status");
-        assertThat(actualStatus).isEqualTo(expectedStatus);
-        String actualResponseBody = (String) response.get("response_body");
-        assertThat(actualResponseBody).contains(expectedErrorMessage);
-    }
-
     private OrganisationOtherOrgsCreationRequest createUniqueOrganisationRequest(String companyNumber, String sraId,
                                                                                  String paymentAccount,
                                                                                  String superUserEmail,

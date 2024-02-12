@@ -5,8 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -18,26 +16,16 @@ public class OrganisationByProfileIdsRequestValidatorImplTest {
 
     @Test
     void shouldNotThrowExceptionWhenPageSizeAndSearchAfterAreValid() {
-        assertDoesNotThrow(() -> validator.validate(10, UUID.randomUUID()));
+        assertDoesNotThrow(() -> validator.validate(10));
     }
 
     @Test
-    void shouldNotThrowExceptionWhenPageSizeIsNullAndSearchAfterIsValid() {
-        assertDoesNotThrow(() -> validator.validate(null, UUID.randomUUID()));
-    }
-
-    @Test
-    void shouldNotThrowExceptionWhenSearchAfterIsNullAndPageSizeIsValid() {
-        assertDoesNotThrow(() -> validator.validate(10, null));
-    }
-
-    @Test
-    void shouldNotThrowExceptionWhenBothPageSizeAndSearchAfterAreNull() {
-        assertDoesNotThrow(() -> validator.validate(null, null));
+    void shouldNotThrowExceptionWhenPageSizeIsNull() {
+        assertDoesNotThrow(() -> validator.validate(null));
     }
 
     @Test
     void shouldThrowExceptionWhenPageSizeIsLessThanOne() {
-        assertThrows(InvalidRequest.class, () -> validator.validate(0, UUID.randomUUID()));
+        assertThrows(InvalidRequest.class, () -> validator.validate(0));
     }
 }

@@ -532,7 +532,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         if (!orgIdFilterProvided && !searchAfterProvided) {
-            organisations = organisationRepository.findAll();
+            organisations = organisationRepository.findAllWithoutJoins();
         }
 
         return new MultipleOrganisationsResponse(organisations, false);
@@ -546,7 +546,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
 
         Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
-        boolean orgIdFilterProvided = organisationProfileIds != null && !organisationProfileIds.isEmpty();
+        boolean orgIdFilterProvided = !orgTypes.isEmpty();
         boolean searchAfterProvided = searchAfter != null;
 
         Page<Organisation> orgs = null;
