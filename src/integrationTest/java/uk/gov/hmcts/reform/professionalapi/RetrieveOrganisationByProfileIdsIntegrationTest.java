@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisat
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationByProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,9 +29,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    private final String solicitorOrgType = "SOLICITOR-ORG";
-    private final String solicitorProfileId = "SOLICITOR_PROFILE";
-    private final String ogdHoOrgType = "OGD-HO-ORG";
+    private final String solicitorOrgType =  OrganisationTypeConstants.SOLICITOR_ORG;
+    private final String solicitorProfileId = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+    private final String ogdHoOrgType = OrganisationTypeConstants.OGD_HO_ORG;
 
     @Autowired
     private OrganisationRepository organisationRepository;

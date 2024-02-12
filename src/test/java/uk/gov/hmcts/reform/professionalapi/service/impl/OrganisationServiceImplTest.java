@@ -79,6 +79,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
@@ -2663,7 +2664,7 @@ class OrganisationServiceImplTest {
     @Test
     void shouldRetrieveOrganisationsByProfileIds() {
         // arrange
-        String profileId = "SOLICITOR-ORG";
+        String profileId = OrganisationTypeConstants.SOLICITOR_ORG;
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
 
@@ -2695,7 +2696,7 @@ class OrganisationServiceImplTest {
     @Test
     void shouldRetrieveOrganisationsByProfileIdsWithSearchAfter() {
         // arrange
-        String profileId = "SOLICITOR-ORG";
+        String profileId = OrganisationTypeConstants.SOLICITOR_ORG;
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
 
@@ -2753,7 +2754,7 @@ class OrganisationServiceImplTest {
     @SuppressWarnings("unchecked")
     void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter() {
         // arrange
-        String profileId = "SOLICITOR-ORG";
+        String profileId = OrganisationTypeConstants.SOLICITOR_ORG;
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
         Integer pageSize = 1;
@@ -2777,7 +2778,7 @@ class OrganisationServiceImplTest {
     @SuppressWarnings("unchecked")
     void shouldRetrieveOrganisationsByProfileIdsWithPagingAndEmptyProfileIds() {
         // arrange
-        String profileId = "SOLICITOR-ORG";
+        String profileId = OrganisationTypeConstants.SOLICITOR_ORG;
         List<String> profileIds = new ArrayList<>();
         Integer pageSize = 1;
         UUID searchAfter = UUID.randomUUID();
