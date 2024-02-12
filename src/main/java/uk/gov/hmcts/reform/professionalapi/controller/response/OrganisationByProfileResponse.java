@@ -5,6 +5,7 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class OrganisationByProfileResponse {
     private LocalDateTime lastUpdated;
     private List<String> organisationProfileIds;
 
+    @NotNull
     public OrganisationByProfileResponse(Organisation organisation) {
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
         this.status = organisation.getStatus().name();
