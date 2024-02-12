@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -269,7 +270,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @State("A page size & list of organisation profiles for a PRD internal organisation request")
     public void setUpOrganisationWithPageSize() {
         Organisation organisation = getOrganisation();
-        organisation.setOrgType("SOLICITOR-ORG");
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
         organisation.setId(UUID.randomUUID());
         organisation.setLastUpdated(LocalDateTime.now());
 
@@ -283,7 +284,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @State("A page size, search after & list of organisation profiles for a PRD internal organisation request")
     public void setUpOrganisationWithPageSizeAndSearchAfter() {
         Organisation organisation = getOrganisation();
-        organisation.setOrgType("SOLICITOR-ORG");
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
         organisation.setId(UUID.randomUUID());
         organisation.setLastUpdated(LocalDateTime.now());
 
