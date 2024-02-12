@@ -418,17 +418,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (organisationFilter && includeDeleted) {
             return professionalUserRepository
                     .findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisation(
-                    organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId, pageableObject);
+                            organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId, pageableObject);
         }
 
-        if (organisationFilter && !includeDeleted) {
-            return professionalUserRepository
-                    .findUsersInOrgByOrgIdentifierAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
-                            organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId,
-                            pageableObject);
-        }
 
-        return null;
+        return professionalUserRepository
+                .findUsersInOrgByOrgIdentifierAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
+                        organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId,
+                        pageableObject);
+
     }
 
     private Page<ProfessionalUser> findUsersWithPageAndNoSearchAfter(List<String> organisationIdentifiers,
