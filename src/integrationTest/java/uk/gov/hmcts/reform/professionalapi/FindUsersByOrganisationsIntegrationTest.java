@@ -409,12 +409,13 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
                 sortedUsersInOrganisation.entrySet().iterator().next();
         // skip the first 2 users in first org (not necessarily organisation 1)
         UUID searchAfterUser = firstEntry.getValue().get(0).getId();
-
         UUID searchAfterOrganisation = firstEntry.getKey();
+
+        boolean isOrg1First = firstEntry.getKey().equals(organisation1.getId());
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = true;
-        int expectedOrganisationsCount = 2;
+        int expectedOrganisationsCount = isOrg1First ? 1 : 2; // org 1 has 4 users, org 2 has 3 users
         int expectedUsersCount = 3;
 
         // act
@@ -442,13 +443,15 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         Integer pageSize = 3;
 
         List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
-        // 6 users in both orgs. skip the first user in org 1. expect 2 from the first org and 1 from the second
+        // 7 users in both orgs. skip the first user in org 1. expect 2 from the first org and 1 from the second
         UUID searchAfterUser = professionalUsers.get(0).getId();
         UUID searchAfterOrganisation = orgsForTest.get(0).getId();
 
+        boolean isOrg1First = orgsForTest.get(0).getId().equals(organisation1.getId());
+
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = true;
-        int expectedOrganisationsCount = 2;
+        int expectedOrganisationsCount = isOrg1First ? 1 : 2; // org 1 has 4 users, org 2 has 3 users
         int expectedUsersCount = 3;
 
         // act
@@ -483,10 +486,12 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         UUID searchAfterUser = professionalUsers.get(1).getId();
         UUID searchAfterOrganisation = orgsForTest.get(0).getId();
 
+        boolean isOrg1First = orgsForTest.get(0).getId().equals(organisation1.getId());
+
         String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = false; // only 5 users left without deleted and skipping the deleted user
+        boolean expectedHasMoreRecords = false; // only 5 or 4 users left without deleted and skipping the first 2 users
         int expectedOrganisationsCount = 2;
-        int expectedUsersCount = 5;
+        int expectedUsersCount = isOrg1First ? 5 : 4;
 
         // act
         Map<String, Object> response =
