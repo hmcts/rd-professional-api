@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -380,6 +381,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         );
         if (searchAfterProvided) {
             Pageable pageableObject = createPageableObject(0, pageSize, sort);
+            pageableObject = PageRequest.of(0, pageSize);
             users = findUsersWithPageAndWithSearchAfter(organisationIdentifiers, includeDeleted, searchAfterUser,
                     searchAfterOrganisation, pageableObject, organisationFilter);
         } else {
@@ -400,26 +402,30 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                                                        UUID searchAfterOrganisation,
                                                                        Pageable pageableObject,
                                                                        boolean organisationFilter) {
+        String searchAfterUserId = searchAfterUser.toString();
+        String searchAfterOrganisationId = searchAfterOrganisation.toString();
+
         if (!organisationFilter && !includeDeleted) {
             return professionalUserRepository.findUsersAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
-                    searchAfterOrganisation, searchAfterUser, pageableObject);
+                    searchAfterOrganisationId, searchAfterUserId, pageableObject);
         }
 
         if (!organisationFilter && includeDeleted) {
             return professionalUserRepository.findUsersAfterGivenUserAndAfterGivenOrganisation(
-                    searchAfterOrganisation, searchAfterUser, pageableObject);
+                    searchAfterOrganisationId, searchAfterUserId, pageableObject);
         }
 
         if (organisationFilter && includeDeleted) {
             return professionalUserRepository
                     .findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisation(
-                    organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+                    organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId, pageableObject);
         }
 
         if (organisationFilter && !includeDeleted) {
             return professionalUserRepository
                     .findUsersInOrgByOrgIdentifierAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
-                            organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+                            organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId,
+                            pageableObject);
         }
 
         return null;
@@ -441,12 +447,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             return professionalUserRepository.findAllAndDeletedIsNull(pageableObject);
         }
 
-        if (organisationFilter && !includeDeleted) {
-            return  professionalUserRepository.findByOrganisationIdentifierInAndDeletedIsNull(organisationIdentifiers,
+        return  professionalUserRepository.findByOrganisationIdentifierInAndDeletedIsNull(organisationIdentifiers,
                     pageableObject);
-        }
 
-        return null;
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
