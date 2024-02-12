@@ -738,27 +738,18 @@ public class OrganisationInternalController extends SuperController {
         content = @Content
     )
 
-    @DeleteMapping(path = "/user/{orgId}")
+    @DeleteMapping(path = "/users")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"prd-admin"})
     public ResponseEntity<DeleteUserResponse> deleteUserFromOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
         @Valid @NotNull @RequestBody UserDeletionRequest userDeletionRequest,
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @PathVariable("orgId") @NotBlank String organisationIdentifier,
         @Parameter(hidden = true) @UserId String userId) {
-
-        Optional<Organisation> organisation = Optional.ofNullable(organisationService
-            .getOrganisationByOrgIdentifier(organisationIdentifier));
-
-        if (organisation.isEmpty()) {
-            throw new EmptyResultDataAccessException(1);
-        }
 
         List<String> emails = userDeletionRequest.getEmails();
 
         var deleteUserResponse =
-            organisationService.deleteUserForOrganisation(organisation.get(), emails);
+            organisationService.deleteUserForOrganisation( emails);
 
         return ResponseEntity
             .status(deleteUserResponse.getStatusCode())

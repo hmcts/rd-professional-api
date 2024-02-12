@@ -740,43 +740,33 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
-
-
     @Override
     @Transactional
-    public DeleteUserResponse deleteUserForOrganisation(Organisation organisation, List<String> emails) {
+    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
         var deleteOrganisationResponse = new DeleteOrganisationResponse();
         if(emails.isEmpty()){
             throw new InvalidRequest("Please provide both email addresses");
         }
 
-       Set<String> userIds= emails.stream().map(
+       Set<String> userIdsToBeDeleted= emails.stream().map(
            email-> {
-               ProfessionalUser professionalUser = professionalUserRepository
-                   .findByEmailAddress(RefDataUtil.removeAllSpaces(email));
-               if(professionalUser == null){
-                   throw new InvalidRequest("Email address not found");
-               }
-               return  professionalUser.getId().toString();
-           }).collect(Collectors.toSet());
+               Set<String> userIds = new HashSet<>();
+               Optional.ofNullable(professionalUserRepository
+                   .findByEmailAddress(RefDataUtil.removeAllSpaces(email))).ifPresent(professionalUser -> {
+                   userIds.add(professionalUser.getUserIdentifier());
+                   userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
+                   professionalUserRepository.delete(professionalUser);
+               });
+               return userIds.stream().iterator().next();
+           }).collect(Collectors.toSet());;
 
-        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
+        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
          deleteOrganisationResponse = RefDataUtil
             .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
          if(deleteOrganisationResponse == null){
              throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
          }
 
-        if(organisation.getStatus().isActive()) {
-            emails.forEach( email -> {
-                ProfessionalUser professionalUser =
-                    professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
-                userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
-                professionalUserRepository.delete(professionalUser);
-            });
-        }else{
-            throw new InvalidRequest("Organisation is not in an Active status cannot delete user");
-        }
         return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode()
             ,deleteOrganisationResponse.getMessage());
     }
