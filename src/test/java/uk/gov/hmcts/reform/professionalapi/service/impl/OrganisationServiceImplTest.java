@@ -1080,7 +1080,7 @@ class OrganisationServiceImplTest {
         String status = OrganisationStatus.PENDING.name();
 
         assertThrows(EmptyResultDataAccessException.class, () ->
-                sut.findByOrganisationStatus(any(), status, null));
+                sut.findByOrganisationStatus(null, status, null));
     }
 
     @Test
