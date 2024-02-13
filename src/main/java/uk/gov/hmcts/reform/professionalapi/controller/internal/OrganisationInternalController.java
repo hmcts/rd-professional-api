@@ -748,7 +748,7 @@ public class OrganisationInternalController extends SuperController {
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "adminUpdateRequest")
         @Valid @NotNull @RequestBody UserUpdateRequest userUpdateRequest) {
 
-        return updateOrganisationAdmin(userUpdateRequest);
+        return organisationService.updateOrganisationAdmin(userUpdateRequest);
 
     }
 
