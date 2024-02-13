@@ -151,8 +151,9 @@ class OrganisationIdentifierValidatorImplTest {
 
     @Test
     void test_validateGetRefreshUsersParamsWithInvalidSize() {
+        UUID uuid = UUID.randomUUID();
         assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
-                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, UUID.randomUUID()));
+                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, uuid));
     }
 
     @Test
