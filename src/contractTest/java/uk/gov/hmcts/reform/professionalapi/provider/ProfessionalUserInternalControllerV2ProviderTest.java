@@ -49,7 +49,9 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
         ProfessionalUser professionalUser = getProfessionalUser();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        when(professionalUserRepository.findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisation(anyList(), any(String.class), any(String.class), any(Pageable.class))).thenReturn(professionalUserPage);
+        when(professionalUserRepository
+                .findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisation(anyList(),
+                        any(String.class), any(String.class), any(Pageable.class))).thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
     }
 
@@ -59,7 +61,8 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
         ProfessionalUser professionalUser = getProfessionalUser();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        when(professionalUserRepository.findByOrganisationIdentifierIn(anyList(), any(Pageable.class))).thenReturn(professionalUserPage);
+        when(professionalUserRepository.findByOrganisationIdentifierIn(anyList(), any(Pageable.class)))
+                .thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
     }
 

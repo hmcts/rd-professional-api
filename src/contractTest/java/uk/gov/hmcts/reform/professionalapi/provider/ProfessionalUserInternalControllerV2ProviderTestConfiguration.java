@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 @Configuration
 public class ProfessionalUserInternalControllerV2ProviderTestConfiguration extends ProviderTestConfiguration {
     @MockBean
-    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl usersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl;
+    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl usersInOrgValidatorImpl;
 
     @MockBean
     protected ProfessionalUserServiceImpl professionalUserService;
@@ -55,6 +55,7 @@ public class ProfessionalUserInternalControllerV2ProviderTestConfiguration exten
 
     @MockBean
     UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
+
     @Primary
     @Bean
     protected ProfessionalUserService professionalUserService() {
