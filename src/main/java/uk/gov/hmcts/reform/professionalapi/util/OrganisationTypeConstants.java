@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-public class OrganisationTypeConstants {
+public final class OrganisationTypeConstants {
     public static final String SOLICITOR_ORG = "Solicitor";
     public static final String LOCAL_AUTHORITY_ORG = "Local Authority";
     public static final String PROBATE_PRACTITIONER = "Probate Practitioner";
@@ -15,6 +15,5 @@ public class OrganisationTypeConstants {
     public static final String OGD_CAFCASS_ENGLAND_ORG = "Government Organisation-CAFCASS-ENGLAND";
 
     private OrganisationTypeConstants() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }
