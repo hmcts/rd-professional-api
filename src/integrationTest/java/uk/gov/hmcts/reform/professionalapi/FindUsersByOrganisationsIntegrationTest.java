@@ -139,7 +139,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_no_org_filter_is_provided_including_deleted_return_all_users_for_all_orgs_and_status_200() {
+    void return_all_users_including_deleted_when_no_org_filter_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -177,17 +177,8 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         }
     }
 
-    private Organisation getMatchingOrganisationKeyByIdentifier(String organisationIdentifier) {
-        for (Organisation organisation : Arrays.asList(organisation1, organisation2, organisation3)) {
-            if (organisation.getOrganisationIdentifier().equals(organisationIdentifier)) {
-                return organisation;
-            }
-        }
-        return null;
-    }
-
     @Test
-    void when_no_org_filter_is_provided_excluding_deleted_return_all_non_deleted_users_for_all_orgs_and_status_200() {
+    void return_all_non_deleted_users_when_no_org_filter_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -212,7 +203,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_org_filter_is_provided_including_deleted_return_all_users_for_given_orgs_and_status_200() {
+    void return_all_users_for_given_orgs_including_deleted_when_org_filter_is_provided_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -238,7 +229,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_org_filter_is_provided_excluding_deleted_return_all_users_for_given_orgs_and_status_200() {
+    void return_all_non_deleted_users_for_given_orgs_when_org_filter_is_provided_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -264,7 +255,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_paged_no_org_filter_is_provided_including_deleted_return_paged_users_for_all_orgs_and_status_200() {
+    void return_paged_all_users_including_deleted_when_no_org_filter_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -289,7 +280,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_paged_no_org_filter_is_provided_exclude_deleted_return_paged_all_non_deleted_users_for_all_orgs_and_status_200() {
+    void return_paged_all_non_deleted_users_when_no_org_filter_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -314,7 +305,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_paged_org_filter_is_provided_including_deleted_return_all_users_for_given_orgs_and_status_200() {
+    void return_paged_all_users_including_deleted_for_given_orgs_when_org_filter_provided_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -340,7 +331,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_paged_org_filter_is_provided_excluding_deleted_return_all_users_for_given_orgs_and_status_200() {
+    void return_paged_all_non_deleted_users_for_given_orgs_when_org_filter_provided_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -366,7 +357,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_paged_no_org_filter_is_provided_with_search_after_user_and_search_after_org_including_deleted_return_paged_all_users_for_all_orgs_and_status_200() {
+    void return_paged_all_users_including_deleted_for_given_orgs_when_org_filter_and_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -396,7 +387,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_paged_no_org_filter_is_provided_with_search_after_user_and_search_after_org_excluding_deleted_return_paged_all_non_deleted_users_for_all_orgs_and_status_200() {
+    void return_paged_non_deleted_users_for_given_orgs_when_org_filter_and_search_after_is_provided() {
         // arrange
         // remove deleted user from list to make setup predictable
         sortedUsersInOrganisation.get(deletedUser.getOrganisation().getId()).remove(deletedUser);
@@ -429,7 +420,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_paged_org_filter_is_provided_with_search_after_user_and_search_after_org_including_deleted_return_paged_all_users_for_given_orgs_and_status_200() {
+    void return_small_paged_all_users_including_deleted_for_given_orgs_when_org_filter_and_search_after_is_provided() {
         // arrange
         // org 1 has a deleted user, so it must be used in the test
         List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
@@ -465,7 +456,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_paged_org_filter_is_provided_with_search_after_user_and_search_after_org_excluding_deleted_return_paged_all_non_deleted_users_for_given_orgs_and_status_200() {
+    void return_small_paged_non_deleted_users_for_given_orgs_when_org_filter_and_search_after_is_provided() {
         // arrange
 
         // remove deleted user from list to make setup predictable
@@ -504,7 +495,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void when_validation_fails_return_bad_request() {
+    void return_bad_request_with_invalid_params() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -652,5 +643,14 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         ProfessionalUser user = professionalUserRepository.findByUserIdentifier(userIdentifier);
         user.setIdamStatus(IdamStatus.ACTIVE);
         professionalUserRepository.saveAndFlush(user);
+    }
+
+    private Organisation getMatchingOrganisationKeyByIdentifier(String organisationIdentifier) {
+        for (Organisation organisation : Arrays.asList(organisation1, organisation2, organisation3)) {
+            if (organisation.getOrganisationIdentifier().equals(organisationIdentifier)) {
+                return organisation;
+            }
+        }
+        return null;
     }
 }

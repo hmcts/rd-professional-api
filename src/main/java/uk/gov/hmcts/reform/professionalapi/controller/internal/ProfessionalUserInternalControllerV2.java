@@ -77,7 +77,8 @@ public class ProfessionalUserInternalControllerV2 extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Object> findUsersByOrganisations(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Get users in organisations by organisation identifiers")
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Get users in organisations by "
+                    + "organisation identifiers")
             @Valid @NotNull
             @RequestBody UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
             @RequestParam(value = "showDeleted", required = true, defaultValue = "true") boolean showDeleted,
