@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -50,7 +49,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -150,7 +148,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
                 null, professionalUsers, userConfiguredAccesses
@@ -179,7 +177,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
                 professionalUsersPage, professionalUsers, userConfiguredAccesses
@@ -404,7 +402,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             try {
                 List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
                         .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .collect(Collectors.toList());
+                        .toList();
                 userConfiguredAccessRepository.saveAll(all);
             } catch (Exception ex) {
                 throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
@@ -431,7 +429,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             try {
                 List<UserConfiguredAccess> all = userAccessTypes.stream()
                         .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .collect(Collectors.toList());
+                        .toList();
                 userConfiguredAccessRepository.saveAll(all);
             } catch (Exception ex) {
                 throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);

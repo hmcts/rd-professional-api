@@ -137,10 +137,8 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             if (!isSinceInValidFormat(since)) {
                 throw new InvalidRequest(INVALID_SINCE_TIMESTAMP + SINCE_TIMESTAMP_FORMAT);
             }
-            if (searchAfter != null) {
-                if (pageSize == null || pageSize <= 0) {
-                    throw new InvalidRequest(INVALID_PAGE_INFORMATION);
-                }
+            if (searchAfter != null && (pageSize == null || pageSize <= 0)) {
+                throw new InvalidRequest(INVALID_PAGE_INFORMATION);
             }
         }
     }
