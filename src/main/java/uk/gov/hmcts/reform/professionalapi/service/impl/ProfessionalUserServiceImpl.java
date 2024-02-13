@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -52,7 +51,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @Service
 @Slf4j
@@ -179,7 +178,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgInfoInGetUserResponse(responseEntity, organisationIdentifier,
+                responseEntity = setOrgInfoInGetUserResponseAndSort(responseEntity, organisationIdentifier,
                         organisationStatus, List.of(organisationProfileIds.split(",")));
                 responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
             }
@@ -309,8 +308,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (userProfileUpdatedData.getUserAccessTypes() != null) {
             try {
                 List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
-                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .collect(Collectors.toList());
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a)).toList();
                 userConfiguredAccessRepository.saveAll(all);
             } catch (Exception ex) {
                 throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
