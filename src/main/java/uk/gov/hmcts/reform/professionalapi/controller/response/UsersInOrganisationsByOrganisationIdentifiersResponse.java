@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class UsersInOrganisationsByOrganisationIdentifiersResponse {
                 organisationInfoMap.put(organisationIdentifier, organisationInfo);
             }
 
-            organisationInfo.AddUser(professionalUser);
+            organisationInfo.addUser(professionalUser);
 
             lastOrgInPage = professionalUser.getOrganisation().getId();
             lastUserInPage = professionalUser.getId();

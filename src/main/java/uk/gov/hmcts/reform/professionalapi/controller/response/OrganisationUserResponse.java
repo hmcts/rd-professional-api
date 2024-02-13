@@ -30,7 +30,7 @@ public class OrganisationUserResponse {
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
         this.lastUpdated = user.getLastUpdated();
-       this.userAccessTypes =
-               user.getUserConfiguredAccesses().stream().map(uca -> fromUserConfiguredAccess(uca)).collect(toList());
+        this.userAccessTypes =
+                user.getUserConfiguredAccesses().stream().map(uca -> fromUserConfiguredAccess(uca)).collect(toList());
     }
 }

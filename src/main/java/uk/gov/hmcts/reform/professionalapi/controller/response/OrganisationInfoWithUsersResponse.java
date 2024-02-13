@@ -26,7 +26,7 @@ public class OrganisationInfoWithUsersResponse {
         this.organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
     }
 
-    public void AddUser(ProfessionalUser professionalUser) {
+    public void addUser(ProfessionalUser professionalUser) {
         OrganisationUserResponse userResponse = new OrganisationUserResponse(professionalUser);
         this.users.add(userResponse);
     }
