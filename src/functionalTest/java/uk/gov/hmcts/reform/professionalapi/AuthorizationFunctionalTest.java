@@ -151,7 +151,7 @@ public class AuthorizationFunctionalTest {
         return activateOrganisationV2(response, role);
     }
 
-    protected String createAndctivateOrganisationWithGivenRequest(
+    protected String createAndActivateOrganisationWithGivenRequest(
             OrganisationCreationRequest organisationCreationRequest, String role) {
         Map<String, Object> organisationCreationResponse = professionalApiClient
                 .createOrganisation(organisationCreationRequest);
@@ -186,10 +186,15 @@ public class AuthorizationFunctionalTest {
     }
 
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
-
-        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someFirstName";
+        return createUserRequest(userRoles, lastName, firstName);
+    }
+
+    protected NewUserCreationRequest createUserRequest(List<String> userRoles,
+                                                       String lastName,
+                                                       String firstName) {
+        String userEmail = generateRandomEmail();
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
