@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.List.of;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -81,19 +82,28 @@ public class RefDataUtil {
 
     private static String loggingComponentName;
 
+
     private static final String DEFAULT_ORG_PROFILE_ID = "SOLICITOR_PROFILE";
     private static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
-            new SimpleEntry<String, List<String>>("SOLICITOR_ORG", List.of("SOLICITOR_PROFILE")),
-            new SimpleEntry<String, List<String>>("LOCAL_AUTHORITY_ORG", List.of("SOLICITOR_PROFILE")),
-            new SimpleEntry<String, List<String>>("OTHER_ORG", List.of("SOLICITOR_PROFILE")),
-            new SimpleEntry<String, List<String>>("OGD_DWP_ORG", List.of("OGD_DWP_PROFILE")),
-            new SimpleEntry<String, List<String>>("OGD_HO_ORG", List.of("OGD_HO_PROFILE")),
-            new SimpleEntry<String, List<String>>("OGD_OTHER_ORG", List.of("SOLICITOR_PROFILE"))
+            new SimpleEntry<String, List<String>>("Solicitor", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Local Authority", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Probate Practitioner", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Barrister", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Other", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-Other", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-DWP", of("OGD_DWP_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-Home Office", of("OGD_HO_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-HMRC", of("OGD_HMRC_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-CICA", of("OGD_CICA_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-CAFCASS-CYMRU",
+                    of("OGD_CAFCASS_PROFILE_CYMRU")),
+            new SimpleEntry<String, List<String>>("Government Organisation-CAFCASS-ENGLAND",
+                    of("OGD_CAFCASS_PROFILE_ENGLAND"))
     );
 
-    private static List<String> getOrganisationProfileIds(Organisation organisation) {
+    public static List<String> getOrganisationProfileIds(Organisation organisation) {
         if (organisation.getOrgType() == null) {
-            return List.of(DEFAULT_ORG_PROFILE_ID);
+            return of(DEFAULT_ORG_PROFILE_ID);
         }
         return ORG_TYPE_TO_ORG_PROFILE_IDS.get(organisation.getOrgType());
     }
