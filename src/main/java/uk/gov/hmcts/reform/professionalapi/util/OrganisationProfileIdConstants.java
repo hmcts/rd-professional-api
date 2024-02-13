@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-public class OrganisationProfileIdConstants {
+public final class OrganisationProfileIdConstants {
     public static final String SOLICITOR_PROFILE = "SOLICITOR_PROFILE";
     public static final String OGD_DWP_PROFILE = "OGD_DWP_PROFILE";
     public static final String OGD_HO_PROFILE = "OGD_HO_PROFILE";
@@ -10,7 +10,6 @@ public class OrganisationProfileIdConstants {
     public static final String OGD_CAFCASS_PROFILE_ENGLAND = "OGD_CAFCASS_PROFILE_ENGLAND";
 
     private OrganisationProfileIdConstants() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }
 
