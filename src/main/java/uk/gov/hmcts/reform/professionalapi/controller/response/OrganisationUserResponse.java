@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromUserConfiguredAccess;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -27,5 +30,7 @@ public class OrganisationUserResponse {
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
         this.lastUpdated = user.getLastUpdated();
+       this.userAccessTypes =
+               user.getUserConfiguredAccesses().stream().map(uca -> fromUserConfiguredAccess(uca)).collect(toList());
     }
 }
