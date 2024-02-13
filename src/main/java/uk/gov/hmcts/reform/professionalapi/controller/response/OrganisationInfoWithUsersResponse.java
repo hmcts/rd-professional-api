@@ -15,14 +15,14 @@ import java.util.List;
 @NoArgsConstructor
 public class OrganisationInfoWithUsersResponse {
     private String organisationIdentifier;
-    private String organisationStatus;
+    private String status;
     private List<String> organisationProfileIds;
     private List<OrganisationUserResponse> users;
 
     public OrganisationInfoWithUsersResponse(Organisation organisation) {
         this.users = new ArrayList<>();
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
-        this.organisationStatus = organisation.getStatus().name();
+        this.status = organisation.getStatus().name();
         this.organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
     }
 
