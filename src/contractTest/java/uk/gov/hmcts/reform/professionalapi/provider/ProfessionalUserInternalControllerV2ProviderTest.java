@@ -3,19 +3,19 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.ContextConfiguration;
+import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
+import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.ProfessionalUserInternalControllerV2;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,28 +25,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserConfiguredAccesses;
 
 @Provider("referenceData_professionalInternalUsersV2")
-@Import(ProfessionalUserInternalControllerV2ProviderTestConfiguration.class)
-public class ProfessionalUserInternalControllerV2ProviderTest extends MockMvcProviderTest {
+@WebMvcTest({ProfessionalUserInternalControllerV2.class})
+@AutoConfigureMockMvc(addFilters = false)
+@ContextConfiguration(classes = {ProfessionalUserInternalControllerV2ProviderTestConfiguration.class, WebConfig.class})
+public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProviderTest {
 
     @Autowired
     ProfessionalUserRepository professionalUserRepository;
-
-    @Autowired
-    ProfessionalUserInternalControllerV2 professionalUserInternalControllerV2;
-
-    @Autowired
-    MappingJackson2HttpMessageConverter httpMessageConverter;
-
-    @Autowired
-    UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl usersInOrgByIdentifierValidatorImpl;
-
-    @Autowired
-    OrganisationServiceImpl organisationService;
-
-    @Autowired
-    ProfessionalUserServiceImpl professionalUserService;
 
     public static final String ORG_NAME = "Org-Name";
     public static final String SRA_ID = "sra-id";
@@ -55,15 +43,9 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends MockMvcPro
 
     public static final String PBA_NUMBER = "PBA1234567";
 
-    @Override
-    void setController() {
-        testTarget.setControllers(professionalUserInternalControllerV2);
-        testTarget.setMessageConverters(httpMessageConverter);
-    }
-
     @SuppressWarnings("unchecked")
-    @State("A page size & list of organisation identifiers for a PRD internal organisation request")
-    public void setUpOrganisationWithPageSize() {
+    @State("A page size, list of organisation identifiers and search after for a PRD internal user request")
+    public void setUpOrganisationWithPageSizeAndSearchAfter() {
         ProfessionalUser professionalUser = getProfessionalUser();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
@@ -71,9 +53,20 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends MockMvcPro
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
     }
 
+    @SuppressWarnings("unchecked")
+    @State("A page size, list of organisation identifiers and no search after for a PRD internal user request")
+    public void setUpOrganisationWithPageSizeAndNoSearchAfter() {
+        ProfessionalUser professionalUser = getProfessionalUser();
+        Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
+
+        when(professionalUserRepository.findByOrganisationIdentifierIn(anyList(), any(Pageable.class))).thenReturn(professionalUserPage);
+        when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
+    }
+
     private ProfessionalUser getProfessionalUser() {
         ProfessionalUser professionalUser = new ProfessionalUser();
         professionalUser.setId(UUID.randomUUID());
+        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
         professionalUser.setFirstName("some name");
         professionalUser.setLastName("last name");
         professionalUser.setEmailAddress("test@email.com");
@@ -81,12 +74,15 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends MockMvcPro
 
         professionalUser.setOrganisation(getOrganisation());
 
+        professionalUser.setUserConfiguredAccesses(getUserConfiguredAccesses(professionalUser));
+
         return professionalUser;
     }
 
     private Organisation getOrganisation() {
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
                 COMPANY_NUMBER, false, COMPANY_URL);
+        organisation.setId(UUID.randomUUID());
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
         ContactInformation contactInformation = new ContactInformation();
