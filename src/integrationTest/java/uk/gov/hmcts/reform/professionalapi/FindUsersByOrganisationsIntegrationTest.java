@@ -203,7 +203,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_all_users_for_given_orgs_including_deleted_when_org_filter_is_provided_and_no_search_after_is_provided() {
+    void return_all_users_for_given_orgs_including_deleted_when_org_filter_is_provided_and_no_search_after_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -305,7 +305,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_paged_all_users_including_deleted_for_given_orgs_when_org_filter_provided_and_no_search_after_is_provided() {
+    void return_paged_all_users_including_deleted_for_given_orgs_when_org_filter_and_no_search_after_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -331,7 +331,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_paged_all_non_deleted_users_for_given_orgs_when_org_filter_provided_and_no_search_after_is_provided() {
+    void return_paged_all_non_deleted_users_for_given_orgs_when_org_filter_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -420,12 +420,13 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_small_paged_all_users_including_deleted_for_given_orgs_when_org_filter_and_search_after_is_provided() {
+    void return_small_paged_all_users_including_deleted_for_given_orgs_when_org_filter_and_search_after_provided() {
         // arrange
         // org 1 has a deleted user, so it must be used in the test
         List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
                 getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
-        Collections.sort(orgsForTest, Comparator.comparing(org -> org.getId().toString())); // cannot assume org 1 is first
+        // cannot assume org 1 is first
+        orgsForTest.sort(Comparator.comparing(org -> org.getId().toString()));
 
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -456,7 +457,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_small_paged_non_deleted_users_for_given_orgs_when_org_filter_and_search_after_is_provided() {
+    void return_small_paged_non_deleted_users_for_given_orgs_when_org_filter_and_search_after_provided() {
         // arrange
 
         // remove deleted user from list to make setup predictable
@@ -470,7 +471,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // get org 1 and org 2 in order
         List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
                 getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
-        Collections.sort(orgsForTest, Comparator.comparing(org -> org.getId().toString()));
+        orgsForTest.sort(Comparator.comparing(org -> org.getId().toString()));
 
         List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
         // skip the first user in first org (not necessarily organisation 1)
@@ -541,7 +542,8 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
 
         for (List<String> unexpectedUserIdsInOrg : unexpectedUserIdentifiers) {
             for (String unexpectedUserIdentifier : unexpectedUserIdsInOrg) {
-                assertThat(allUsers.stream().anyMatch(user -> user.getUserIdentifier().equals(unexpectedUserIdentifier))).isFalse();
+                assertThat(allUsers.stream()
+                        .anyMatch(user -> user.getUserIdentifier().equals(unexpectedUserIdentifier))).isFalse();
             }
         }
 
