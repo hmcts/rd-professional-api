@@ -99,9 +99,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void inviteMultipleUserScenarios() {
         inviteUserByAnInternalOrgUser(generateRandomEmail());
-        inviteUserByAnInternalOrgUser(generateRandomEmail());
-        inviteUserByAnInternalOrgUser(generateRandomEmail());
-        inviteUserByAnInternalOrgUser(generateRandomEmail());
+        for (int i = 0; i < 4; i++) {
+            inviteUserByAnInternalOrgUser(generateRandomEmail());
+        }
     }
 
     public void findUserInternalScenarios() {
@@ -118,7 +118,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findByUserIdNotFound("non-existing-id");
     }
 
-    public NewUserCreationRequest inviteUserByAnInternalOrgUser(String email) {
+    public void inviteUserByAnInternalOrgUser(String email) {
         log.info("inviteUserByAnInternalOrgUser :: STARTED");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
@@ -128,7 +128,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         invitedUserId = (String) newUserResponse.get("userIdentifier");
         invitedUserIds.add(invitedUserId);
         log.info("inviteUserByAnInternalOrgUser :: END");
-        return newUserCreationRequest;
     }
 
     public void setUpTestData() {
@@ -262,7 +261,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             lastUpdateTime = (String) users.get(0).get("lastUpdated");
             lastUpdateTimes.add(lastUpdateTime);
             lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
-            validateRetrievedUsersDetails(testResults);
+            validateRetrievedUsersDetails(testResults, null);
         }
         log.info("findByUserIdOrAndSinceDate :: END");
     }
@@ -278,7 +277,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         if (pageSize != null) {
             assertThat(users.size()).isEqualTo(Integer.parseInt(pageSize));
             lastUpdateTime = (String) users.get(0).get("lastUpdated");
-            validateRetrievedUsersDetails(testResults);
+            validateRetrievedUsersDetails(testResults, pageSize);
         } else if (searchAfter != null && pageSize == null) {
             assertThat(testResults.get("errorDescription"))
                     .isEqualTo("002 missing/invalid page information");

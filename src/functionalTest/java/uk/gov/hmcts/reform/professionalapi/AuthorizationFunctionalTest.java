@@ -399,12 +399,15 @@ public class AuthorizationFunctionalTest {
         });
     }
 
-    public void validateRetrievedUsersDetails(Map<String, Object> searchResponse) {
+    public void validateRetrievedUsersDetails(Map<String, Object> searchResponse, String pageSize) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
         assertThat(searchResponse.get("lastRecordInPage")).isNotNull();
         assertThat(searchResponse.get("moreAvailable")).isNotNull();
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
 
+        if (pageSize != null) {
+            assertEquals(Integer.parseInt(pageSize), professionalUsersResponses.size());
+        }
         professionalUsersResponses.forEach(user -> {
             assertThat(user.get("userIdentifier")).isNotNull();
             assertThat(user.get("lastUpdated")).isNotNull();
