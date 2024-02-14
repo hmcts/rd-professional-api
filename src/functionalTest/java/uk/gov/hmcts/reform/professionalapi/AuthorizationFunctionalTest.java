@@ -415,6 +415,7 @@ public class AuthorizationFunctionalTest {
             HashMap<String, String> orgInfo = (HashMap<String, String>) user.get("organisationInfo");
             assertThat(orgInfo).isNotNull();
             assertThat(orgInfo.get("organisationIdentifier")).isNotNull();
+            assertThat(orgInfo.get("status")).isEqualTo(IdamStatus.ACTIVE.name());
             assertThat(orgInfo.get("status")).isNotNull();
             assertThat(user.get("lastUpdated")).isNotNull();
 
