@@ -29,7 +29,7 @@ public class NewUserCreationRequest {
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String emailAddress,
             @JsonProperty("roles") List<String> roles,
-            @JsonProperty("resendInvite") boolean resendInvite,
+            @JsonProperty("resendInvite") Boolean resendInvite,
             @JsonProperty("userAccessTypes") Set<UserAccessType> userAccessTypes
     ) {
 
