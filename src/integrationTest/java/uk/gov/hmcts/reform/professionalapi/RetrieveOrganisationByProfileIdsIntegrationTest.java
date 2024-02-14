@@ -154,6 +154,30 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
     }
 
+    @Test
+    void when_search_after_is_given_should_return_matching_organisations_after_search_after_and_status_200() {
+        // arrange
+        OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
+        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
+        Integer pageSize = 1;
+        UUID searchAfter = null;
+
+        // make the first call to get the last record and then use it as searchAfter in the next call
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest,
+                        pageSize, searchAfter);
+        assertSuccessfulResponse(response, 1, "200 OK", true);
+
+        UUID lastRecordInPage = UUID.fromString(response.get("lastRecordInPage").toString());
+
+        // act
+        response = professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest,
+                pageSize, lastRecordInPage);
+
+        // assert
+        assertSuccessfulResponse(response, 1, "200 OK", false);
+    }
+
     @SuppressWarnings("unchecked")
     private void assertSuccessfulResponse(Map<String, Object> response, int expectedOrganisationsCount,
                                           String expectedStatus, boolean expectedHasMoreRecords) {
