@@ -29,14 +29,10 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     @Query(value = "SELECT * FROM dbrefdata.organisation o WHERE "
             + "(COALESCE(:orgTypes) IS NULL OR o.org_type IN (:orgTypes)) "
+            + "AND (COALESCE(:searchAfter) IS NULL OR o.id > :searchAfter) "
             + "ORDER BY o.id ASC", nativeQuery = true)
-    Page<Organisation> findByOrgTypeIn(@Param("orgTypes") List<String> orgTypes, Pageable pageable);
-
-    @Query(value = "SELECT * FROM dbrefdata.organisation o WHERE "
-            + "(COALESCE(:orgTypes) IS NULL OR o.org_type IN (:orgTypes)) "
-            + "AND o.id > :searchAfter ORDER BY o.id ASC", nativeQuery = true)
-    Page<Organisation> findByOrgTypeInAndIdGreaterThan(@Param("orgTypes") List<String> orgTypes,
-                                                       @Param("searchAfter") UUID searchAfter, Pageable pageable);
+    Page<Organisation> findByOrgTypeIn(@Param("orgTypes") List<String> orgTypes,
+                                       @Param("searchAfter") UUID searchAfter, Pageable pageable);
 
     Organisation findByCompanyNumber(String companyNumber);
 
