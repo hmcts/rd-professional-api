@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.repository;
 import feign.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -33,60 +32,15 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
             nativeQuery = true)
     int findByUserCountByOrganisationId(@Param("organisationId") UUID organisationId);
 
-    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier "
-            + "IN :organisationIdentifiers AND pu.deleted IS NULL")
-    List<ProfessionalUser> findByOrganisationIdentifierInAndDeletedNotNull(
-            @Param("organisationIdentifiers") List<String> organisationIdentifiers);
-
-    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier "
-            + "IN :organisationIdentifiers")
-    List<ProfessionalUser> findByOrganisationIdentifierIn(
-            @Param("organisationIdentifiers") List<String> organisationIdentifiers);
-
-    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier "
-            + "IN :organisationIdentifiers")
-    Page<ProfessionalUser> findByOrganisationIdentifierIn(
-            @Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
-
-    @Query("SELECT pu FROM professional_user pu WHERE pu.deleted IS NULL")
-    List<ProfessionalUser> findAllAndDeletedIsNull(Sort sort);
-
-    @Query("SELECT pu FROM professional_user pu WHERE pu.deleted IS NULL")
-    Page<ProfessionalUser> findAllAndDeletedIsNull(Pageable pageable);
-
-    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN "
-            + ":organisationIdentifiers and pu.deleted IS NULL")
-    Page<ProfessionalUser> findByOrganisationIdentifierInAndDeletedIsNull(
-            @Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
-
-
-    @Query("SELECT pu FROM professional_user pu WHERE pu.deleted IS NULL and (CAST(pu.organisation.id AS string) > "
-            + ":organisationId) OR (CAST(pu.organisation.id AS string) = :organisationId AND CAST(pu.id AS string) "
-            + "> :userId) ORDER BY CAST(pu.organisation.id AS string), CAST(pu.id AS string)")
-    Page<ProfessionalUser> findUsersAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
-            @Param("organisationId") String organisationId, @Param("userId") String userId, Pageable pageable);
-
-    @Query("SELECT pu FROM professional_user pu WHERE (CAST(pu.organisation.id AS string) > :organisationId) OR "
-            + "(CAST(pu.organisation.id AS string) = :organisationId AND CAST(pu.id AS string) > :userId) ORDER BY "
-            + "CAST(pu.organisation.id AS string), CAST(pu.id AS string)")
-    Page<ProfessionalUser> findUsersAfterGivenUserAndAfterGivenOrganisation(
-            @Param("organisationId") String organisationId, @Param("userId") String userId, Pageable pageable);
-
-    @Query("SELECT pu FROM professional_user pu WHERE pu.organisation.organisationIdentifier IN "
-            + ":organisationIdentifiers and (CAST(pu.organisation.id AS string) > :organisationId) OR "
-            + "(CAST(pu.organisation.id AS string) = :organisationId AND CAST(pu.id AS string) > :userId) ORDER BY "
-            + "CAST(pu.organisation.id AS string), CAST(pu.id AS string)")
-    Page<ProfessionalUser> findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisation(
-            @Param("organisationIdentifiers") List<String> organisationIdentifiers,
-            @Param("organisationId") String organisationId, @Param("userId") String userId, Pageable pageable);
-
-    @Query("SELECT pu FROM professional_user pu WHERE pu.deleted IS NULL and pu.organisation.organisationIdentifier "
-            + "IN :organisationIdentifiers and (CAST(pu.organisation.id AS string) > :organisationId) OR "
-            + "(CAST(pu.organisation.id AS string) = :organisationId AND CAST(pu.id AS string) > :userId) ORDER BY "
-            + "CAST(pu.organisation.id AS string), CAST(pu.id AS string)")
-    Page<ProfessionalUser> findUsersInOrgByOrgIdentifierAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
-            @Param("organisationIdentifiers") List<String> organisationIdentifiers,
-            @Param("organisationId") String organisationId, @Param("userId") String userId, Pageable pageable);
+    @Query("SELECT pu FROM professional_user pu WHERE "
+        + "(COALESCE(:organisationIdentifiers) IS NULL OR pu.organisation.organisationIdentifier "
+        + "IN :organisationIdentifiers) and "
+        + "((:organisationId IS NULL OR CAST(pu.organisation.id AS string) > :organisationId) OR "
+        + "(:userId IS NULL OR CAST(pu.id AS string) > :userId)) ORDER BY "
+        + "CAST(pu.organisation.id AS string), CAST(pu.id AS string)")
+    Page<ProfessionalUser> findUsersInOrganisations(
+        @Param("organisationIdentifiers") List<String> organisationIdentifiers,
+        @Param("organisationId") String organisationId, @Param("userId") String userId, Pageable pageable);
 
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);
 

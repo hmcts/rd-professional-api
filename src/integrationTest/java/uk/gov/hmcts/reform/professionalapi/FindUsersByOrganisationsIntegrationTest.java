@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+@SuppressWarnings("unchecked")
 public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
@@ -51,7 +52,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     private Organisation organisation3;
 
     // key: organisationIdentifier, value: list of userIdentifiers
-    private Map<String, List<String>> unorderedUsersInOrganisation = new LinkedHashMap<>();
+    private Map<String, List<String>> unorderedUsersInOrganisation;
     // key: organisationId, value: list of professionalUsers
     private LinkedHashMap<UUID, LinkedList<ProfessionalUser>> sortedUsersInOrganisation;
     private ProfessionalUser deletedUser;
@@ -65,6 +66,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     private void createOrganisationsAndUsers() {
+        unorderedUsersInOrganisation = new LinkedHashMap<>();
         String solicitorOrgType = "SOLICITOR-ORG";
 
         // create organisation 1 with 1 superuser, 2 active users and 1 deleted user
@@ -139,11 +141,10 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_all_users_including_deleted_when_no_org_filter_and_no_search_after_is_provided() {
+    void return_all_users_when_no_org_filter_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        boolean showDeleted = true;
         Integer pageSize = null;
         UUID searchAfterUser = null;
         UUID searchAfterOrganisation = null;
@@ -156,7 +157,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+                        pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
@@ -178,37 +179,11 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_all_non_deleted_users_when_no_org_filter_and_no_search_after_is_provided() {
-        // arrange
-        UsersInOrganisationsByOrganisationIdentifiersRequest request =
-                new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        boolean showDeleted = false;
-        Integer pageSize = null;
-        UUID searchAfterUser = null;
-        UUID searchAfterOrganisation = null;
-
-        String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 3;
-        int expectedUsersCount = 9;
-
-        // act
-        Map<String, Object> response =
-                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
-
-        // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
-                expectedHasMoreRecords);
-    }
-
-    @Test
-    void return_all_users_for_given_orgs_including_deleted_when_org_filter_is_provided_and_no_search_after_provided() {
+    void return_all_users_for_given_orgs_when_org_filter_is_provided_and_no_search_after_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
-        boolean showDeleted = true;
         Integer pageSize = null;
         UUID searchAfterUser = null;
         UUID searchAfterOrganisation = null;
@@ -221,7 +196,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+                        pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
@@ -229,37 +204,10 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_all_non_deleted_users_for_given_orgs_when_org_filter_is_provided_and_no_search_after_is_provided() {
+    void return_paged_all_users_when_no_org_filter_and_no_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
-        boolean showDeleted = false;
-        Integer pageSize = null;
-        UUID searchAfterUser = null;
-        UUID searchAfterOrganisation = null;
-
-        String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 2;
-        int expectedUsersCount = 6;
-
-        // act
-        Map<String, Object> response =
-                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
-
-        // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
-                expectedHasMoreRecords, unorderedUsersInOrganisation.get(organisationIdentifier3));
-    }
-
-    @Test
-    void return_paged_all_users_including_deleted_when_no_org_filter_and_no_search_after_is_provided() {
-        // arrange
-        UsersInOrganisationsByOrganisationIdentifiersRequest request =
-                new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        boolean showDeleted = true;
         Integer pageSize = 3;
         UUID searchAfterUser = null;
         UUID searchAfterOrganisation = null;
@@ -272,7 +220,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+                        pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
@@ -280,37 +228,12 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_paged_all_non_deleted_users_when_no_org_filter_and_no_search_after_is_provided() {
-        // arrange
-        UsersInOrganisationsByOrganisationIdentifiersRequest request =
-                new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        boolean showDeleted = false;
-        Integer pageSize = 4;
-        UUID searchAfterUser = null;
-        UUID searchAfterOrganisation = null;
-
-        String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = true;
-        int expectedOrganisationsCount = 2; // no org has 4 active users
-        int expectedUsersCount = 4;
-
-        // act
-        Map<String, Object> response =
-                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
-
-        // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
-                expectedHasMoreRecords);
-    }
-
-    @Test
-    void return_paged_all_users_including_deleted_for_given_orgs_when_org_filter_and_no_search_after_provided() {
+    void return_paged_all_users_for_given_orgs_when_org_filter_and_no_search_after_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
-        boolean showDeleted = true;
+
         Integer pageSize = 5;
         UUID searchAfterUser = null;
         UUID searchAfterOrganisation = null;
@@ -323,7 +246,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+                        pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
@@ -331,37 +254,11 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_paged_all_non_deleted_users_for_given_orgs_when_org_filter_and_no_search_after_is_provided() {
+    void return_paged_all_users_for_given_orgs_when_org_filter_and_search_after_is_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
-        boolean showDeleted = false;
-        Integer pageSize = 4;
-        UUID searchAfterUser = null;
-        UUID searchAfterOrganisation = null;
 
-        String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = true;
-        int expectedOrganisationsCount = 2;
-        int expectedUsersCount = 4;
-
-        // act
-        Map<String, Object> response =
-                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
-
-        // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
-                expectedHasMoreRecords);
-    }
-
-    @Test
-    void return_paged_all_users_including_deleted_for_given_orgs_when_org_filter_and_search_after_is_provided() {
-        // arrange
-        UsersInOrganisationsByOrganisationIdentifiersRequest request =
-                new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        boolean showDeleted = true;
         Integer pageSize = 15;
 
         Map.Entry<UUID, LinkedList<ProfessionalUser>> firstEntry =
@@ -379,7 +276,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+                        pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
@@ -387,40 +284,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_paged_non_deleted_users_for_given_orgs_when_org_filter_and_search_after_is_provided() {
-        // arrange
-        // remove deleted user from list to make setup predictable
-        sortedUsersInOrganisation.get(deletedUser.getOrganisation().getId()).remove(deletedUser);
-        UsersInOrganisationsByOrganisationIdentifiersRequest request =
-                new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        boolean showDeleted = false;
-        Integer pageSize = 3;
-
-        Map.Entry<UUID, LinkedList<ProfessionalUser>> firstEntry =
-                sortedUsersInOrganisation.entrySet().iterator().next();
-        // skip the first 2 users in first org (not necessarily organisation 1)
-        UUID searchAfterUser = firstEntry.getValue().get(0).getId();
-        UUID searchAfterOrganisation = firstEntry.getKey();
-
-        boolean isOrg1First = firstEntry.getKey().equals(organisation1.getId());
-
-        String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = true;
-        int expectedOrganisationsCount = isOrg1First ? 1 : 2; // org 1 has 4 users, org 2 has 3 users
-        int expectedUsersCount = 3;
-
-        // act
-        Map<String, Object> response =
-                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
-
-        // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
-                expectedHasMoreRecords);
-    }
-
-    @Test
-    void return_small_paged_all_users_including_deleted_for_given_orgs_when_org_filter_and_search_after_provided() {
+    void return_small_paged_all_users_for_given_orgs_when_org_filter_and_search_after_provided() {
         // arrange
         // org 1 has a deleted user, so it must be used in the test
         List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
@@ -431,7 +295,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
-        boolean showDeleted = true;
+
         Integer pageSize = 3;
 
         List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
@@ -449,7 +313,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+                        pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
@@ -457,7 +321,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
-    void return_small_paged_non_deleted_users_for_given_orgs_when_org_filter_and_search_after_provided() {
+    void return_small_paged_users_for_given_orgs_when_org_filter_and_search_after_provided() {
         // arrange
 
         // remove deleted user from list to make setup predictable
@@ -465,7 +329,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
-        boolean showDeleted = false;
+
         Integer pageSize = 5;
 
         // get org 1 and org 2 in order
@@ -488,7 +352,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+                        pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
@@ -500,7 +364,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        boolean showDeleted = false;
+
         Integer pageSize = 0;
         UUID searchAfterUser = null;
         UUID searchAfterOrganisation = null;
@@ -510,7 +374,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         // act
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
-                        showDeleted, pageSize, searchAfterUser, searchAfterOrganisation);
+                        pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
         assertThat(response.get("http_status")).isEqualTo(expectedStatus);
