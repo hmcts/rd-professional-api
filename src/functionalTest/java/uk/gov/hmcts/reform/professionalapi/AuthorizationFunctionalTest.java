@@ -492,6 +492,38 @@ public class AuthorizationFunctionalTest {
         });
     }
 
+    public void validateRetrievedUsersDetails(Map<String, Object> searchResponse, String pageSize) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+        assertThat(searchResponse.get("lastRecordInPage")).isNotNull();
+        assertThat(searchResponse.get("moreAvailable")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+
+        if (pageSize != null) {
+            assertEquals(Integer.parseInt(pageSize), professionalUsersResponses.size());
+        }
+        professionalUsersResponses.forEach(user -> {
+            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get("lastUpdated")).isNotNull();
+
+            HashMap<String, String> orgInfo = (HashMap<String, String>) user.get("organisationInfo");
+            assertThat(orgInfo).isNotNull();
+            assertThat(orgInfo.get("organisationIdentifier")).isNotNull();
+            assertThat(orgInfo.get("status")).isEqualTo(IdamStatus.ACTIVE.name());
+            assertThat(orgInfo.get("status")).isNotNull();
+            assertThat(user.get("lastUpdated")).isNotNull();
+
+            List<Object> organisationProfileIdList = new ArrayList<>();
+            for (Map.Entry<String, String> entry : orgInfo.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (key.equals("organisationProfileIds")) {
+                    organisationProfileIdList.add(value);
+                }
+            }
+            assertThat(organisationProfileIdList).hasSizeGreaterThanOrEqualTo(1);
+        });
+    }
+
     private void verifyContactInfoCreatedDateSorting(Object contactInformation) {
         var contactInformationResponse = (List<HashMap>) contactInformation;
         assertEquals("addressLine1", contactInformationResponse.get(0).get("addressLine1"));
