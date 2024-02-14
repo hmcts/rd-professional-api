@@ -5,6 +5,7 @@ import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +48,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -56,7 +56,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @Service
 @Slf4j
@@ -64,6 +65,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public static final String ERROR_USER_CONFIGURED_DELETE = "001 error while deleting user access records";
     public static final String ERROR_USER_CONFIGURED_CREATE = "002 error while creating new user access records";
+
+    @Value("${group-access.organisation-profile-ids}")
+    protected String organisationProfileIds;
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
@@ -143,7 +147,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
                 null, professionalUsers, userConfiguredAccesses
@@ -172,7 +176,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
                 professionalUsersPage, professionalUsers, userConfiguredAccesses
@@ -218,7 +222,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         ResponseEntity<Object> responseEntity
                 = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                organisation.getStatus(),
+                pagedProfessionalUsers.toList());
 
         var headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
                 responseEntity);
@@ -238,13 +244,17 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
         return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                organisation.getStatus(),
+                professionalUsers);
     }
 
     @SuppressWarnings("unchecked")
     private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest,
                                                         String showDeleted, boolean rolesRequired, String status,
-                                                        String organisationIdentifier) {
+                                                        String organisationIdentifier,
+                                                        OrganisationStatus organisationStatus,
+                                                        List<ProfessionalUser> professionalUsers) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
@@ -260,7 +270,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgIdInGetUserResponse(responseEntity, organisationIdentifier);
+                responseEntity = setOrgInfoInGetUserResponseAndSort(responseEntity, organisationIdentifier,
+                        organisationStatus, List.of(organisationProfileIds.split(",")));
+                responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
             }
 
         } catch (FeignException ex) {
@@ -388,8 +400,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (userProfileUpdatedData.getUserAccessTypes() != null) {
             try {
                 List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
-                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .collect(Collectors.toList());
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a)).toList();
                 userConfiguredAccessRepository.saveAll(all);
             } catch (Exception ex) {
                 throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
