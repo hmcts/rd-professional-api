@@ -81,20 +81,16 @@ public class ProfessionalUserInternalControllerV2 extends SuperController {
                     + "organisation identifiers")
             @Valid @NotNull
             @RequestBody UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
-            @RequestParam(value = "showDeleted", required = true, defaultValue = "true") boolean showDeleted,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
             @RequestParam(value = "searchAfterOrg", required = false) UUID searchAfterOrg,
             @RequestParam(value = "searchAfterUser", required = false) UUID searchAfterUser
     ) {
-        usersInOrgByIdentifierValidatorImpl.validate(pageSize, searchAfterOrg,
-                searchAfterUser);
+        usersInOrgByIdentifierValidatorImpl.validate(pageSize, searchAfterOrg, searchAfterUser);
 
-        UsersInOrganisationsByOrganisationIdentifiersResponse response = pageSize == null
-                ? professionalUserService.retrieveUsersByOrganisationIdentifiers(
-                        organisationByProfileIdsRequest.getOrganisationIdentifiers(), showDeleted)
-                : professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(
-                        organisationByProfileIdsRequest.getOrganisationIdentifiers(), showDeleted, pageSize,
-                searchAfterUser, searchAfterOrg);
+        UsersInOrganisationsByOrganisationIdentifiersResponse response =
+                professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(
+                        organisationByProfileIdsRequest.getOrganisationIdentifiers(), pageSize, searchAfterUser,
+                        searchAfterOrg);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -341,116 +341,23 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiers(
-            List<String> organisationIdentifiers, boolean includeDeleted) {
-        List<ProfessionalUser> professionalUsers = new ArrayList<>();
-
-        boolean organisationFilter = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
-        Sort sort = Sort.by(
-                Sort.Order.asc("organisation.id"),
-                Sort.Order.asc("id")
-        );
-        if (!organisationFilter && includeDeleted) {
-            professionalUsers = professionalUserRepository.findAll(sort);
-        }
-
-        if (!organisationFilter && !includeDeleted) {
-            professionalUsers = professionalUserRepository.findAllAndDeletedIsNull(sort);
-        }
-
-        if (organisationFilter && includeDeleted) {
-            professionalUsers = professionalUserRepository.findByOrganisationIdentifierIn(organisationIdentifiers);
-        }
-
-        if (organisationFilter && !includeDeleted) {
-            professionalUsers =
-                    professionalUserRepository.findByOrganisationIdentifierInAndDeletedNotNull(organisationIdentifiers);
-        }
-
-        return new UsersInOrganisationsByOrganisationIdentifiersResponse(professionalUsers, false);
-    }
-
-    @Override
     public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
-            List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser,
+            List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
             UUID searchAfterOrganisation) {
-        boolean organisationFilter = organisationIdentifiers != null && !organisationIdentifiers.isEmpty();
-        boolean searchAfterProvided = searchAfterUser != null && searchAfterOrganisation != null;
 
-        Page<ProfessionalUser> users;
-        Sort sort = Sort.by(
-                Sort.Order.asc("organisation.id"),
-                Sort.Order.asc("id")
-        );
-        if (searchAfterProvided) {
-            Pageable pageableObject = createPageableObject(0, pageSize, sort);
-            pageableObject = PageRequest.of(0, pageSize);
-            users = findUsersWithPageAndWithSearchAfter(organisationIdentifiers, includeDeleted, searchAfterUser,
-                    searchAfterOrganisation, pageableObject, organisationFilter);
-        } else {
-            Pageable pageableObject = createPageableObject(0, pageSize, sort);
-            users = findUsersWithPageAndNoSearchAfter(organisationIdentifiers, includeDeleted, pageableObject,
-                    organisationFilter);
-        }
+        String searchAfterUserId = searchAfterUser != null ? searchAfterUser.toString() : null;
+        String searchAfterOrganisationId = searchAfterOrganisation != null ? searchAfterOrganisation.toString() : null;
+
+        Pageable pageableObject = PageRequest.of(0, pageSize);
+        Page<ProfessionalUser> users = professionalUserRepository
+                .findUsersInOrganisations(
+                        organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId, pageableObject);
 
         if (users == null) {
             return new UsersInOrganisationsByOrganisationIdentifiersResponse(new ArrayList<>(), false);
         }
 
         return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
-    }
-
-    private Page<ProfessionalUser> findUsersWithPageAndWithSearchAfter(List<String> organisationIdentifiers,
-                                                                       boolean includeDeleted, UUID searchAfterUser,
-                                                                       UUID searchAfterOrganisation,
-                                                                       Pageable pageableObject,
-                                                                       boolean organisationFilter) {
-        String searchAfterUserId = searchAfterUser.toString();
-        String searchAfterOrganisationId = searchAfterOrganisation.toString();
-
-        if (!organisationFilter && !includeDeleted) {
-            return professionalUserRepository.findUsersAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
-                    searchAfterOrganisationId, searchAfterUserId, pageableObject);
-        }
-
-        if (!organisationFilter && includeDeleted) {
-            return professionalUserRepository.findUsersAfterGivenUserAndAfterGivenOrganisation(
-                    searchAfterOrganisationId, searchAfterUserId, pageableObject);
-        }
-
-        if (organisationFilter && includeDeleted) {
-            return professionalUserRepository
-                    .findUsersInOrganisationByOrganisationIdentifierAfterGivenUserAndAfterGivenOrganisation(
-                            organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId, pageableObject);
-        }
-
-
-        return professionalUserRepository
-                .findUsersInOrgByOrgIdentifierAfterGivenUserAndAfterGivenOrganisationAndDeletedIsNull(
-                        organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId,
-                        pageableObject);
-
-    }
-
-    private Page<ProfessionalUser> findUsersWithPageAndNoSearchAfter(List<String> organisationIdentifiers,
-                                                                     boolean includeDeleted, Pageable pageableObject,
-                                                                     boolean organisationFilter) {
-
-        if (!organisationFilter && includeDeleted) {
-            return professionalUserRepository.findAll(pageableObject);
-        }
-
-        if (organisationFilter && includeDeleted) {
-            return professionalUserRepository.findByOrganisationIdentifierIn(organisationIdentifiers, pageableObject);
-        }
-
-        if (!organisationFilter && !includeDeleted) {
-            return professionalUserRepository.findAllAndDeletedIsNull(pageableObject);
-        }
-
-        return  professionalUserRepository.findByOrganisationIdentifierInAndDeletedIsNull(organisationIdentifiers,
-                    pageableObject);
-
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {

@@ -50,11 +50,8 @@ public interface ProfessionalUserService {
 
     ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize, UUID searchAfter);
 
-    UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiers(
-            List<String> organisationIdentifiers, boolean includeDeleted);
-
     UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
-            List<String> organisationIdentifiers, boolean includeDeleted, Integer pageSize, UUID searchAfterUser,
+            List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
             UUID searchAfterOrganisation);
 }
 

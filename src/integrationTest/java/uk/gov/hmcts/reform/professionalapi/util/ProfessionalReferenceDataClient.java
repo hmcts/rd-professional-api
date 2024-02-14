@@ -1009,11 +1009,10 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(
-            UsersInOrganisationsByOrganisationIdentifiersRequest request, boolean showDeleted, Integer pageSize,
+            UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
             UUID searchAfterUser, UUID searchAfterOrganisation) {
         StringBuilder sb = new StringBuilder(baseV2IntUrl)
                 .append("/users?");
-        sb.append("&showDeleted=").append(showDeleted);
         if (pageSize != null) {
             sb.append("&pageSize=").append(pageSize);
         }
