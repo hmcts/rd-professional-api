@@ -525,9 +525,9 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (searchAfterProvided) {
             organisations = organisationRepository
-                    .findByOrgTypeInAndIdGreaterThan(orgTypes, searchAfter, pageableObject);
+                    .findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
         } else {
-            organisations = organisationRepository.findByOrgTypeIn(orgTypes, pageableObject);
+            organisations = organisationRepository.findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
         }
 
         if (organisations == null) {

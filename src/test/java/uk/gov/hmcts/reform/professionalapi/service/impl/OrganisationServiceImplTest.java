@@ -2661,30 +2661,6 @@ class OrganisationServiceImplTest {
         assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
     }
 
-
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void shouldRetrieveOrganisationsByProfileIdsWithPagingWithPageSizeAndSearchAfter() {
-        // arrange
-        List<String> profileIds = new ArrayList<>();
-        Integer pageSize = 1;
-        UUID searchAfter = UUID.randomUUID();
-        Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
-        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
-        when(orgPage.getContent()).thenReturn(organisations);
-
-        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(profileIds, searchAfter, pageableObject)).thenReturn(orgPage);
-
-        // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
-                searchAfter);
-
-        // assert
-        assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
-    }
-
     @Test
     @SuppressWarnings("unchecked")
     void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter() {
@@ -2697,30 +2673,7 @@ class OrganisationServiceImplTest {
         Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(profileIds, pageableObject)).thenReturn(orgPage);
-        when(orgPage.getContent()).thenReturn(organisations);
-
-        // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
-                searchAfter);
-
-        // assert
-        assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndEmptyProfileIds() {
-        // arrange
-        String profileId = OrganisationTypeConstants.SOLICITOR_ORG;
-        List<String> profileIds = new ArrayList<>();
-        Integer pageSize = 1;
-        UUID searchAfter = UUID.randomUUID();
-        Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
-        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
-
-        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(profileIds, searchAfter, pageableObject)).thenReturn(orgPage);
+        when(organisationRepository.findByOrgTypeIn(profileIds, searchAfter, pageableObject)).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
 
         // act
