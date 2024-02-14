@@ -2348,72 +2348,7 @@ class OrganisationServiceImplTest {
         assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
     }
 
-    @Test
-    void shouldRetrieveOrganisationsByProfileIds() {
-        // arrange
-        String profileId = OrganisationTypeConstants.SOLICITOR_ORG;
-        List<String> profileIds = new ArrayList<>();
-        profileIds.add(profileId);
 
-        UUID searchAfter = null;
-
-        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(profileIds, searchAfter)).thenReturn(organisations);
-
-        // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIds(profileIds, searchAfter);
-
-        // assert
-        assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
-    }
-
-    @Test
-    void shouldRetrieveOrganisationsByProfileIdsWithNullProfileIds() {
-        // arrange
-        UUID searchAfter = null;
-
-        // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIds(null, searchAfter);
-
-        // assert
-        assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
-    }
-
-    @Test
-    void shouldRetrieveOrganisationsByProfileIdsWithSearchAfter() {
-        // arrange
-        String profileId = OrganisationTypeConstants.SOLICITOR_ORG;
-        List<String> profileIds = new ArrayList<>();
-        profileIds.add(profileId);
-
-        UUID searchAfter = UUID.randomUUID();
-
-        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(profileIds, searchAfter)).thenReturn(organisations);
-
-        // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIds(profileIds, searchAfter);
-
-        // assert
-        assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
-    }
-
-    @Test
-    void shouldRetrieveOrganisationsByProfileIdsWithEmptyProfileIds() {
-        // arrange
-        List<String> profileIds = new ArrayList<>();
-        UUID searchAfter = null;
-
-        when(organisationRepository.findAll()).thenReturn(organisations);
-
-        // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIds(profileIds, searchAfter);
-
-        // assert
-        assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
-    }
 
     @Test
     @SuppressWarnings("unchecked")
@@ -2426,7 +2361,7 @@ class OrganisationServiceImplTest {
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
         when(orgPage.getContent()).thenReturn(organisations);
 
-        when(organisationRepository.findByIdGreaterThan(searchAfter, pageableObject)).thenReturn(orgPage);
+        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(profileIds, searchAfter, pageableObject)).thenReturn(orgPage);
 
         // act
         MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
@@ -2472,7 +2407,7 @@ class OrganisationServiceImplTest {
         Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByIdGreaterThan(searchAfter, pageableObject)).thenReturn(orgPage);
+        when(organisationRepository.findByOrgTypeInAndIdGreaterThan(profileIds, searchAfter, pageableObject)).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
 
         // act
