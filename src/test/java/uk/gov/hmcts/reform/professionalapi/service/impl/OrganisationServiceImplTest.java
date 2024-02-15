@@ -10,6 +10,8 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -79,7 +81,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
@@ -102,6 +104,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -121,7 +124,6 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVI
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -2661,19 +2663,26 @@ class OrganisationServiceImplTest {
         assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {
+        OrganisationProfileIdConstants.SOLICITOR_PROFILE,
+        OrganisationProfileIdConstants.OGD_HO_PROFILE,
+        OrganisationProfileIdConstants.OGD_DWP_PROFILE,
+        OrganisationProfileIdConstants.OGD_HMRC_PROFILE,
+        OrganisationProfileIdConstants.OGD_CICA_PROFILE,
+        OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU,
+        OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND
+    })
     @SuppressWarnings("unchecked")
-    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter() {
+    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter(String profileId) {
         // arrange
-        String profileId = OrganisationTypeConstants.SOLICITOR_ORG;
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
         Integer pageSize = 1;
         UUID searchAfter = null;
-        Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(profileIds, searchAfter, pageableObject)).thenReturn(orgPage);
+        when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), any())).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
 
         // act

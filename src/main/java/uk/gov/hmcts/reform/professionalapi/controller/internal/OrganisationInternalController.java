@@ -71,8 +71,13 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @NoArgsConstructor
 public class OrganisationInternalController extends SuperController {
 
-    @Autowired
     protected OrganisationByProfileIdsRequestValidatorImpl organisationByProfileIdsRequestValidatorImpl;
+
+    @Autowired
+    public OrganisationInternalController(
+            OrganisationByProfileIdsRequestValidatorImpl organisationByProfileIdsRequestValidatorImpl) {
+        this.organisationByProfileIdsRequestValidatorImpl = organisationByProfileIdsRequestValidatorImpl;
+    }
 
     @Value("${loggingComponentName}")
     protected String loggingComponentName;
