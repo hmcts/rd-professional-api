@@ -515,20 +515,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
 
         Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
-        boolean searchAfterProvided = searchAfter != null;
 
-        Page<Organisation> organisations;
+        Page<Organisation> organisations = organisationRepository
+                .findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
 
-        if (searchAfterProvided) {
-            organisations = organisationRepository
-                    .findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
-        } else {
-            organisations = organisationRepository.findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
-        }
-
-        if (organisations == null) {
-            return new MultipleOrganisationsResponse(new ArrayList<>(), false);
-        }
         return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
     }
 
