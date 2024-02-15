@@ -2,14 +2,10 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,24 +37,4 @@ class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledInte
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
     }
-
-    private UserProfileUpdatedData createModifyUserConfiguredAccessData(String email, int numAccessTypes) {
-
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        Set<UserAccessType> userAccessTypes = new HashSet<>();
-        for (int i = 0; i < numAccessTypes; i++) {
-            UserAccessType userAccessType = new UserAccessType("Jurisdiction" + i,
-                    "Organisation" + i,
-                    "AccessType" + i, true);
-            userAccessTypes.add(userAccessType);
-        }
-
-        userProfileUpdatedData.setEmail(email);
-        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
-        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
-        userProfileUpdatedData.setRolesAdd(new HashSet<>());
-        userProfileUpdatedData.setRolesDelete(new HashSet<>());
-        return userProfileUpdatedData;
-    }
-
 }
