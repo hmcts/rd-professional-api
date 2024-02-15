@@ -355,7 +355,8 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         String bearerToken = inviteUser(puiCaseManager, extActiveOrgId, generateRandomEmail(),
                 "firstName2", "lastName2");
 
-        NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList(puiCaseManager));
+        NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList(puiCaseManager),
+                "lastName1", "firstName1");
 
         Map<String, Object> newUserResponse2 = professionalApiClient
                 .addNewUserToAnOrganisation(extActiveOrgId, puiCaseManager,

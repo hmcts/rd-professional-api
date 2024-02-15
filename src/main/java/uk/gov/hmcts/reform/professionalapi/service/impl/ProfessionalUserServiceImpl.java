@@ -409,6 +409,19 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
     }
 
+    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
+        if (userAccessTypes != null) {
+            try {
+                List<UserConfiguredAccess> all = userAccessTypes.stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
+                        .toList();
+                userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
+            }
+        }
+    }
+
     private UserConfiguredAccess mapToUserConfiguredAccess(ProfessionalUser professionalUser,
                                                            UserAccessType userAccessType) {
         UserConfiguredAccess uca = new UserConfiguredAccess();
@@ -422,17 +435,4 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return uca;
     }
 
-
-    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
-        if (userAccessTypes != null) {
-            try {
-                List<UserConfiguredAccess> all = userAccessTypes.stream()
-                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .toList();
-                userConfiguredAccessRepository.saveAll(all);
-            } catch (Exception ex) {
-                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
-            }
-        }
-    }
 }

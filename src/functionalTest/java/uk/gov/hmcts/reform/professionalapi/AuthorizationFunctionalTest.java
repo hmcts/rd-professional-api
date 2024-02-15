@@ -189,6 +189,12 @@ public class AuthorizationFunctionalTest {
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
         String lastName = "someLastName";
         String firstName = "someFirstName";
+        return createUserRequest(userRoles, lastName, firstName);
+    }
+
+    protected NewUserCreationRequest createUserRequest(List<String> userRoles,
+                                                       String lastName,
+                                                       String firstName) {
         Set<UserAccessType> userAccessTypes = new HashSet<>();
         String random = randomAlphabetic(10);
         userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
