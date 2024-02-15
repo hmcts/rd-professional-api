@@ -28,6 +28,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
@@ -43,11 +45,13 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceI
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -165,6 +169,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
+    protected static final String ORG_INFO = "organisationInfo";
+    protected static final String DATE_TIME_DELETED = "dateTimeDeleted";
+    protected static final String LAST_UPDATED = "lastUpdated";
+    protected static final String USER_ACCESS_TYPES = "userAccessTypes";
     public static final String APPLICATION_JSON = "application/json";
 
     @MockBean
@@ -407,6 +415,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
         List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
         return users.get(0).getId().toString();
+    }
+
+    public String retrieveSuperUserIdentifierFromOrganisationId(String orgId) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        return users.get(0).getUserIdentifier();
     }
 
     public String retrieveOrganisationIdFromSuperUserId(String userId) {
@@ -884,5 +898,24 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         organisationUpdateRequest.setStatus(status);
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
+    }
+
+    public UserProfileUpdatedData createModifyUserConfiguredAccessData(String email, int numUserAccessTypes) {
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        for (int i = 0; i < numUserAccessTypes; i++) {
+            UserAccessType userAccessType = new UserAccessType("Jurisdiction" + i,
+                    "Organisation" + i,
+                    "AccessType" + i, true);
+            userAccessTypes.add(userAccessType);
+        }
+
+        userProfileUpdatedData.setEmail(email);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
+        userProfileUpdatedData.setRolesAdd(new HashSet<>());
+        userProfileUpdatedData.setRolesDelete(new HashSet<>());
+        return userProfileUpdatedData;
     }
 }

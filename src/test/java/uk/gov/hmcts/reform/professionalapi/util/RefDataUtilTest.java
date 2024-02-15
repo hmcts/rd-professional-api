@@ -130,6 +130,23 @@ class RefDataUtilTest {
     }
 
 
+    @Test
+    void test_getOrganisationProfileIds() {
+        organisation.setOrgType(null);
+        List<String> organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
+        assertThat(organisationProfileIds).hasSize(1);
+        assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+
+        organisation.setOrgType("Solicitor");
+        organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
+        assertThat(organisationProfileIds).hasSize(1);
+        assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+
+        organisation.setOrgType("Government Organisation-HMRC");
+        organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
+        assertThat(organisationProfileIds).hasSize(1);
+        assertThat(organisationProfileIds.get(0)).isEqualTo("OGD_HMRC_PROFILE");
+    }
 
 
     @Test
