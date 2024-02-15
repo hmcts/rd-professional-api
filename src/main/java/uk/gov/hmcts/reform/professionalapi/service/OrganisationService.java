@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -34,6 +35,10 @@ public interface OrganisationService {
 
     OrganisationEntityResponseV2 retrieveOrganisationForV2Api(String organisationIdentifier,
                                                               boolean isPendingPbaRequired);
+
+    MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationProfileIds,
+                                                                                Integer pageSize,
+                                                                                UUID searchAfter);
 
     OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(String status, Pageable pageable);
 
