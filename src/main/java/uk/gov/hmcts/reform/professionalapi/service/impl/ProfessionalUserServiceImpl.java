@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
@@ -40,18 +42,23 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessReposi
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import javax.transaction.Transactional;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @Service
 @Slf4j
@@ -108,6 +115,92 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
         return professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
+    }
+
+    @Override
+    public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize,
+                                                       UUID searchAfter) {
+        if (since != null) {
+            if (pageSize != null) {
+                Pageable pageable = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
+                return findRefreshUsersPageable(since, pageable, searchAfter);
+            }
+            return findRefreshUsers(since, searchAfter);
+        }
+        return findSingleRefreshUser(userId);
+    }
+
+    public ResponseEntity<Object> findRefreshUsers(String since, UUID searchAfter) {
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        List<ProfessionalUser> professionalUsers;
+
+        if (searchAfter == null) {
+            professionalUsers = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
+                    formattedSince
+            );
+        } else {
+            professionalUsers = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
+                    formattedSince, searchAfter
+            );
+        }
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+                .map(ProfessionalUser::getUserConfiguredAccesses)
+                .flatMap(Collection::stream)
+                .toList();
+
+        GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
+                null, professionalUsers, userConfiguredAccesses
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    public ResponseEntity<Object> findRefreshUsersPageable(String since, Pageable pageable, UUID searchAfter) {
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        Page<ProfessionalUser> professionalUsersPage;
+
+        if (searchAfter == null) {
+            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
+                    formattedSince, pageable
+            );
+        } else {
+            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
+                    formattedSince, searchAfter, pageable
+            );
+        }
+
+        List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+                .map(ProfessionalUser::getUserConfiguredAccesses)
+                .flatMap(Collection::stream)
+                .toList();
+
+        GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
+                professionalUsersPage, professionalUsers, userConfiguredAccesses
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    public ResponseEntity<Object> findSingleRefreshUser(String userId) {
+        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
+        List<UserConfiguredAccess> userConfiguredAccesses;
+
+        if (professionalUser != null) {
+            userConfiguredAccesses = professionalUser.getUserConfiguredAccesses();
+        } else {
+            throw new ResourceNotFoundException("User does not exist");
+        }
+
+        GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
+                null, List.of(professionalUser), userConfiguredAccesses
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @Override
@@ -178,7 +271,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgInfoInGetUserResponse(responseEntity, organisationIdentifier,
+                responseEntity = setOrgInfoInGetUserResponseAndSort(responseEntity, organisationIdentifier,
                         organisationStatus, List.of(organisationProfileIds.split(",")));
                 responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
             }
@@ -308,6 +401,18 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (userProfileUpdatedData.getUserAccessTypes() != null) {
             try {
                 List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a)).toList();
+                userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
+            }
+        }
+    }
+
+    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
+        if (userAccessTypes != null) {
+            try {
+                List<UserConfiguredAccess> all = userAccessTypes.stream()
                         .map(a -> mapToUserConfiguredAccess(professionalUser, a))
                         .toList();
                 userConfiguredAccessRepository.saveAll(all);

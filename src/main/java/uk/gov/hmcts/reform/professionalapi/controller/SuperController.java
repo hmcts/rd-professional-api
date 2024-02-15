@@ -442,11 +442,16 @@ public abstract class SuperController {
         var roles = newUserCreationRequest.getRoles();
         var professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest,
                 removeEmptySpaces(organisationIdentifier), roles);
+        ResponseEntity<Object> inviteResponse;
         if (newUserCreationRequest.isResendInvite() && resendInviteEnabled) {
-            return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles, organisationIdentifier);
+            inviteResponse = reInviteExpiredUser(newUserCreationRequest, professionalUser, roles,
+                    organisationIdentifier);
         } else {
-            return inviteNewUserToOrganisation(newUserCreationRequest, professionalUser, roles);
+            inviteResponse = inviteNewUserToOrganisation(newUserCreationRequest, professionalUser, roles);
         }
+
+        professionalUserService.saveAllUserAccessTypes(professionalUser, newUserCreationRequest.getUserAccessTypes());
+        return inviteResponse;
     }
 
     private ResponseEntity<Object> inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest,

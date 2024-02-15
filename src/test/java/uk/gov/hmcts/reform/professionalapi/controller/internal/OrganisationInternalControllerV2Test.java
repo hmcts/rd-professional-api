@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
@@ -40,6 +41,7 @@ import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -118,8 +120,10 @@ class OrganisationInternalControllerV2Test {
         organisationServiceMock = mock(OrganisationService.class);
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
+        HashSet<UserAccessType> userAccessTypes = new HashSet<>();
+        userAccessTypes.add(new UserAccessType("jurisdictionId", "organisationProfileId", "accessTypeId", false));
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles, false);
+                "some@email.com", userRoles, false, userAccessTypes);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);

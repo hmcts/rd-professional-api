@@ -6,39 +6,32 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
-import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
+import uk.gov.hmcts.reform.professionalapi.controller.internal.ProfessionalUserInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UserProfileUpdateRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
 @Configuration
-public class OrganisationalExternalControllerProviderUsersTestConfiguration extends ProviderTestConfiguration {
+public class ProfessionalUserInternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
     @MockBean
-    protected ProfessionalUserService professionalUserService;
+    protected OrganisationService organisationService;
 
     @MockBean
     protected ClientRegistrationRepository clientRegistrationRepository;
-
-    @MockBean
-    protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
-
-    @MockBean
-    UserConfiguredAccessRepository userConfiguredAccessRepository;
 
     @MockBean
     FeatureToggleService featureToggleService;
@@ -47,47 +40,61 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
     ServiceAuthFilter serviceAuthFilter;
 
     @MockBean
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
+
+    @MockBean
+    UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
+
+    @Primary
+    @Bean
+    protected ProfessionalUserService professionalUserService() {
+        return new ProfessionalUserServiceImpl(organisationRepository,
+                professionalUserRepository,
+                userAttributeRepository,
+                prdEnumRepository,
+                userAttributeService,
+                userProfileFeignClient,
+                userConfiguredAccessRepository,
+                userProfileUpdateRequestValidator);
+    }
+
+    @MockBean
     OrganisationRepository organisationRepository;
 
     @MockBean
-    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
+    UserAttributeRepository userAttributeRepository;
 
     @MockBean
-    PaymentAccountRepository paymentAccountRepository;
-    @MockBean
-    DxAddressRepository dxAddressRepository;
-    @MockBean
-    ContactInformationRepository contactInformationRepository;
-    @MockBean
     PrdEnumRepository prdEnumRepository;
+
     @MockBean
-    UserAttributeService userAttributeService;
+    UserAttributeServiceImpl userAttributeService;
+
     @MockBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
     @MockBean
-    OrgAttributeRepository orgAttributeRepository;
-
-    @Bean
-    @Primary
-    protected OrganisationServiceImpl organisationService() {
-        return new OrganisationServiceImpl();
-    }
+    PaymentAccountRepository paymentAccountRepository;
 
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
         return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
-            emf, professionalUserRepository, organisationService(),
-            userAccountMapService, paymentAccountRepository);
+                emf, professionalUserRepository, organisationService,
+                userAccountMapService, paymentAccountRepository);
     }
 
     @Bean
     @Primary
-    public OrganisationExternalController organisationExternalController() {
-        return new OrganisationExternalController();
+    public ProfessionalUserInternalController professionalUserInternalController() {
+        return new ProfessionalUserInternalController();
     }
 
+    @Bean
+    @Primary
+    protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator() {
+        return new UserProfileUpdateRequestValidatorImpl();
+    }
 
     @Bean
     @Primary

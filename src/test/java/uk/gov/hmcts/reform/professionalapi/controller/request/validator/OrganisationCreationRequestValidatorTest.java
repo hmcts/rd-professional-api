@@ -342,7 +342,7 @@ class OrganisationCreationRequestValidatorTest {
     void test_should_validate_mandatory_user_fields_and_not_throw_exception() {
 
         NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname",
-                "sl@test.com", new ArrayList<String>(), false);
+                "sl@test.com", new ArrayList<String>(), false, null);
 
         assertDoesNotThrow(() ->
                 OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request));
@@ -351,7 +351,7 @@ class OrganisationCreationRequestValidatorTest {
     @Test
     void test_should_validate_mandatory_user_fields_and_throw_exception() {
         NewUserCreationRequest request = new NewUserCreationRequest(null, null,
-                "al@test.com", new ArrayList<String>(), false);
+                "al@test.com", new ArrayList<String>(), false, null);
         assertThrows(InvalidRequest.class, () ->
                 OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request));
     }

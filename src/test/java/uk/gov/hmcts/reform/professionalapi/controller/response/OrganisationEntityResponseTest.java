@@ -26,7 +26,7 @@ class OrganisationEntityResponseTest {
     void test_OrganisationEntityResponseWithProfileId() {
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
-        organisation.setOrgType("SOLICITOR_ORG");
+        organisation.setOrgType("Solicitor");
 
         OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(organisation,
                 false, false, true);

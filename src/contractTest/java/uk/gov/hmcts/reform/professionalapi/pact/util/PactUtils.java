@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccessId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
@@ -146,6 +148,15 @@ public class PactUtils {
     public static List<UserConfiguredAccess> getUserConfiguredAccesses(ProfessionalUser professionalUser) {
         final UserConfiguredAccess userConfiguredAccess1 = getUserConfiguredAccess(professionalUser, 1);
         return List.of(userConfiguredAccess1);
+    }
+
+    public static Set<UserAccessType> getUserAccessTypes() {
+        UserAccessType userAccessType = new UserAccessType(
+                "jurisdictionId1",
+                "organisationProfileId1",
+                "accessTypeId1",
+                true);
+        return Set.of(userAccessType);
     }
 
     public static Organisation setUpOrganisation(String name, String sraId, String companyNumber, String companyUrl) {

@@ -175,6 +175,7 @@ public class ProfessionalApiConstants {
     public static final String INVALID_MANDATORY_PARAMETER = "001 missing/invalid parameter";
     public static final String INVALID_PAGE_INFORMATION = "002 missing/invalid page information";
     public static final String INVALID_SINCE_TIMESTAMP = "003 Field 'since' is in a invalid format. Expected format: ";
+    public static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-ddTHH:mm:ss";
     public static final String LAST_UPDATED_SINCE_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String NESTED_ORG_IDENTIFIER = "organisation.organisationIdentifier";
     public static final String USER_IDENTIFIER = "userIdentifier";
@@ -182,5 +183,4 @@ public class ProfessionalApiConstants {
             .ofPattern(LAST_UPDATED_SINCE_TIMESTAMP_FORMAT);
 
     public static final String PROFESSIONAL_USER_404_MESSAGE = "Professional User not found:";
-
 }

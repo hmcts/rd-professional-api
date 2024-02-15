@@ -296,6 +296,16 @@ public class ProfessionalReferenceDataClient {
                 returnRoles);
     }
 
+    public Map<String, Object> findRefreshUsersWithSince(String since, Integer pageSize) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&pageSize={pageSize}", since,
+                pageSize);
+    }
+
+    public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}",
+                userId);
+    }
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
@@ -336,6 +346,30 @@ public class ProfessionalReferenceDataClient {
         try {
 
             HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Map<String, Object> getRequestWithoutBearerToken(String uriPath, Object... params) {
+
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            HttpEntity<?> request = new HttpEntity<>(getS2sTokenHeaders());
+
             responseEntity = restTemplate
                     .exchange("http://localhost:" + prdApiPort + uriPath,
                             HttpMethod.GET,
