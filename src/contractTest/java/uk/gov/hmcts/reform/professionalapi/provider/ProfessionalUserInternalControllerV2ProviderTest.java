@@ -21,8 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserConfiguredAccesses;
@@ -61,7 +60,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
         ProfessionalUser professionalUser = getProfessionalUser();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        when(professionalUserRepository.findUsersInOrganisations(anyList(), null,null,
+        when(professionalUserRepository.findUsersInOrganisations(anyList(), isNull(),isNull(),
                 any(Pageable.class))).thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
     }
