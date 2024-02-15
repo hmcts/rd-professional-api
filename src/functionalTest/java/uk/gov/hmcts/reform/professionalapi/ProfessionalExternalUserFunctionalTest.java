@@ -118,7 +118,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                     .build();
 
             organisationCreationRequest.setStatus("ACTIVE");
-            extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+            extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
             Map<String, Object> searchResponse = professionalApiClient
                     .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
@@ -259,7 +259,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
                 .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
                 .status("ACTIVE").build();
-        createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+        createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
         NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
 
@@ -338,6 +338,52 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(professionalUsers.size()).isGreaterThan(1);
         validateRetrievedUsers(searchResponse, ACTIVE, false);
         log.info("findUsersBySystemAdminWithoutRolesRequiredShouldBeSuccess :: END");
+    }
+
+    @Test
+    @DisplayName("PRD External Test Scenarios: find org users should sort based on first name")
+    public void findOrganisationUsersSorted() {
+        String superUserEmail = generateRandomEmail();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .superUser(aUserCreationRequest().firstName(firstName)
+                        .lastName(lastName).email(superUserEmail).build())
+                .status("ACTIVE").build();
+
+        String extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+                hmctsAdmin);
+
+        String bearerToken = inviteUser(puiCaseManager, extActiveOrgId, generateRandomEmail(),
+                "firstName2", "lastName2");
+
+        NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList(puiCaseManager));
+
+        Map<String, Object> newUserResponse2 = professionalApiClient
+                .addNewUserToAnOrganisation(extActiveOrgId, puiCaseManager,
+                        newUserCreationRequest2, HttpStatus.CREATED);
+        assertThat(newUserResponse2).isNotNull();
+        assertThat(newUserResponse2.get("userIdentifier")).isNotNull();
+
+        Map<String, Object> response = professionalApiClient
+                .searchOrganisationUsersByReturnRolesParamExternal(OK,
+                        professionalApiClient.getMultipleAuthHeaders(bearerToken), "false");
+
+        assertThat(response.get("users")).asList().isNotEmpty();
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
+        assertThat(professionalUsersResponses.size()).isEqualTo(3);
+
+        HashMap firstUser = professionalUsersResponses.get(0);
+        assertThat(firstUser.get("firstName")).isEqualTo("firstName");
+        assertThat(firstUser.get("lastName")).isEqualTo("lastName");
+
+        HashMap secondUser = professionalUsersResponses.get(1);
+        assertThat(secondUser.get("firstName")).isEqualTo("firstName1");
+        assertThat(secondUser.get("lastName")).isEqualTo("lastName1");
+
+        HashMap thirdUser = professionalUsersResponses.get(2);
+        assertThat(thirdUser.get("firstName")).isEqualTo("firstName2");
+        assertThat(thirdUser.get("lastName")).isEqualTo("lastName2");
+
     }
 
     public void findOrgByPfmShouldBeSuccess() {
@@ -585,6 +631,24 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .addNewUserToAnOrganisation(extActiveOrgId, hmctsAdmin, newUserCreationRequest, CREATED);
         assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
         activeUserId = (String) pumInternalUserResponse.get("userIdentifier");
+        return bearerToken;
+    }
+
+    public String inviteUser(String role,
+                             String orgId,
+                             String email,
+                             String firstName,
+                             String lastName) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(role);
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(userRoles);
+        newUserCreationRequest.setEmail(email);
+        String bearerToken = idamOpenIdClient.getExternalOpenIdToken(puiUserManager,
+                firstName, lastName, email);
+
+        Map<String, Object> pumInternalUserResponse = professionalApiClient
+                .addNewUserToAnOrganisation(orgId, hmctsAdmin, newUserCreationRequest, CREATED);
+        assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
         return bearerToken;
     }
 
