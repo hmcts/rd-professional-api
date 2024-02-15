@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfiles
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -32,14 +33,17 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationInfo;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,6 +55,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.List.of;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -77,6 +82,32 @@ public class RefDataUtil {
     private static int defaultPageSize;
 
     private static String loggingComponentName;
+
+
+    private static final String DEFAULT_ORG_PROFILE_ID = "SOLICITOR_PROFILE";
+    private static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
+            new SimpleEntry<String, List<String>>("Solicitor", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Local Authority", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Probate Practitioner", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Barrister", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Other", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-Other", of("SOLICITOR_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-DWP", of("OGD_DWP_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-Home Office", of("OGD_HO_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-HMRC", of("OGD_HMRC_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-CICA", of("OGD_CICA_PROFILE")),
+            new SimpleEntry<String, List<String>>("Government Organisation-CAFCASS-CYMRU",
+                    of("OGD_CAFCASS_PROFILE_CYMRU")),
+            new SimpleEntry<String, List<String>>("Government Organisation-CAFCASS-ENGLAND",
+                    of("OGD_CAFCASS_PROFILE_ENGLAND"))
+    );
+
+    public static List<String> getOrganisationProfileIds(Organisation organisation) {
+        if (organisation.getOrgType() == null) {
+            return of(DEFAULT_ORG_PROFILE_ID);
+        }
+        return ORG_TYPE_TO_ORG_PROFILE_IDS.get(organisation.getOrgType());
+    }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
         return userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
@@ -487,6 +518,59 @@ public class RefDataUtil {
         return newResponseEntity;
     }
 
+    public static GetRefreshUsersResponse buildGetRefreshUsersResponse(Page<ProfessionalUser> professionalUsersPage,
+                                                                   List<ProfessionalUser> professionalUsers,
+                                                                   List<UserConfiguredAccess> userConfiguredAccesses) {
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse();
+        getRefreshUsersResponse.setMoreAvailable(professionalUsersPage != null && !professionalUsersPage.isLast());
+        List<RefreshUser> refreshUserList = new ArrayList<>();
+
+        for (ProfessionalUser professionalUser : professionalUsers) {
+            List<UserAccessType> userAccessTypes = new ArrayList<>();
+
+            userAccessTypes.addAll(userConfiguredAccesses.stream()
+                    .filter(uca -> uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier()
+                            .equals(professionalUser.getUserIdentifier()))
+                    .map(RefDataUtil::fromUserConfiguredAccess)
+                    .toList());
+
+            OrganisationInfo organisationInfo = new OrganisationInfo(
+                    professionalUser.getOrganisation().getOrganisationIdentifier(),
+                    professionalUser.getOrganisation().getStatus(),
+                    professionalUser.getOrganisation().getLastUpdated(),
+                    getOrganisationProfileIds(professionalUser.getOrganisation())
+            );
+
+            RefreshUser refreshUser = new RefreshUser(
+                    professionalUser.getUserIdentifier(),
+                    professionalUser.getLastUpdated(),
+                    organisationInfo,
+                    userAccessTypes,
+                    professionalUser.getDeleted()
+            );
+
+            refreshUserList.add(refreshUser);
+        }
+
+        getRefreshUsersResponse.setUsers(refreshUserList);
+        if (!refreshUserList.isEmpty()) {
+            getRefreshUsersResponse.setLastRecordInPage(professionalUsers.get(professionalUsers.size() - 1).getId());
+        }
+
+        return getRefreshUsersResponse;
+    }
+
+    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        UserAccessType accessType = new UserAccessType();
+        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
+        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
+                .getOrganisationProfileId());
+        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
+        accessType.setEnabled(userConfiguredAccess.getEnabled());
+
+        return accessType;
+    }
+
     @Value("${loggingComponentName}")
     public void setLoggingComponentName(String loggingComponentName) {
         RefDataUtil.loggingComponentName = loggingComponentName;
@@ -529,17 +613,6 @@ public class RefDataUtil {
             String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
             throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
-    }
-
-    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
-        UserAccessType accessType = new UserAccessType();
-        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
-        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
-                .getOrganisationProfileId());
-        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
-        accessType.setEnabled(userConfiguredAccess.getEnabled());
-
-        return accessType;
     }
 
 }

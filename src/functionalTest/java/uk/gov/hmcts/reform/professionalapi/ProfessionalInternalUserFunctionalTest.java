@@ -66,6 +66,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     String superUserEmail;
     String invitedUserEmail;
     String invitedUserId;
+    List<String> invitedUserIds = new ArrayList<>();
+    String lastUpdateTime;
+    List<String> lastUpdateTimes = new ArrayList<>();
+    String lastRecordIdInPage;
     OrganisationCreationRequest organisationCreationRequest;
 
     @Test
@@ -82,6 +86,48 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         editPbaScenarios();
         deleteOrganisationScenarios();
         updateOrgStatusScenarios();
+    }
+
+    @Test
+    @DisplayName("PRD Internal Test for Group Access Scenarios")
+    void testGroupAccessInternalScenario() {
+        setUpTestData();
+        createOrganisationScenario();
+        inviteMultipleUserScenarios();
+        findUserInternalScenarios();
+    }
+
+    public void inviteMultipleUserScenarios() {
+        inviteUserByAnInternalOrgUser(generateRandomEmail());
+        for (int i = 0; i < 4; i++) {
+            inviteUserByAnInternalOrgUser(generateRandomEmail());
+        }
+    }
+
+    public void findUserInternalScenarios() {
+        findByUserIdOrAndSinceDate(null, invitedUserIds.get(0));
+        findByUserIdOrAndSinceDate(lastUpdateTime, null);
+        findByUserIdOrAndSinceDate(lastUpdateTime, invitedUserId);
+        findByUserIdOrAndSinceDate(null, null);
+
+        findBySinceDatePageSizeOrAndSearchAfter(lastUpdateTimes.get(0), "3", null);
+        findBySinceDatePageSizeOrAndSearchAfter(lastUpdateTimes.get(0), "1", lastRecordIdInPage);
+        findBySinceDatePageSizeOrAndSearchAfter(lastUpdateTimes.get(0), null, lastRecordIdInPage);
+
+        findByUserIdInvalidS2SToken(invitedUserIds.get(0));
+        findByUserIdNotFound("non-existing-id");
+    }
+
+    public void inviteUserByAnInternalOrgUser(String email) {
+        log.info("inviteUserByAnInternalOrgUser :: STARTED");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        invitedUserId = (String) newUserResponse.get("userIdentifier");
+        invitedUserIds.add(invitedUserId);
+        log.info("inviteUserByAnInternalOrgUser :: END");
     }
 
     public void setUpTestData() {
@@ -202,6 +248,53 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .searchUsersByOrganisation(intActiveOrgId, hmctsAdmin, "True",
                         OK, ""), "any", true);
         log.info("findUsersByInternalUserWithRolesShouldReturnSuccess :: END");
+    }
+
+    public void findByUserIdOrAndSinceDate(String sinceDate, String userId) {
+        log.info("findByUserIdOrAndSinceDate :: STARTED");
+        Map<String, Object> testResults = professionalApiClient
+                .retrieveUsersBySinceDateOrAndUserId(sinceDate, userId);
+        if ((userId != null && sinceDate != null) || (userId == null && sinceDate == null)) {
+            assertThat(testResults.get("errorDescription")).isEqualTo("001 missing/invalid parameter");
+        } else {
+            List<HashMap> users = (List<HashMap>) testResults.get("users");
+            lastUpdateTime = (String) users.get(0).get("lastUpdated");
+            lastUpdateTimes.add(lastUpdateTime);
+            lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
+            validateRetrievedUsersDetails(testResults, null);
+        }
+        log.info("findByUserIdOrAndSinceDate :: END");
+    }
+
+    public void findBySinceDatePageSizeOrAndSearchAfter(String sinceDate, String pageSize, String searchAfter) {
+        log.info("findBySinceDatePageSizeOrAndSearchAfter :: STARTED");
+
+        Map<String, Object> testResults = professionalApiClient
+                .retrieveUsersBySinceDatePageSizeOrAndSearchAfter(sinceDate, pageSize, searchAfter);
+        List<HashMap> users = (List<HashMap>) testResults.get("users");
+        lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
+
+        if (pageSize != null) {
+            assertThat(users.size()).isEqualTo(Integer.parseInt(pageSize));
+            lastUpdateTime = (String) users.get(0).get("lastUpdated");
+            validateRetrievedUsersDetails(testResults, pageSize);
+        } else if (searchAfter != null && pageSize == null) {
+            assertThat(testResults.get("errorDescription"))
+                    .isEqualTo("002 missing/invalid page information");
+        }
+        log.info("findBySinceDatePageSizeOrAndSearchAfter :: END");
+    }
+
+    public void findByUserIdInvalidS2SToken(String userId) {
+        log.info("findByUserIdWithInvalidS2SToken :: STARTED");
+        professionalApiClient
+                .retrieveUserByUnAuthorizedS2sToken(userId);
+    }
+
+    public void findByUserIdNotFound(String userId) {
+        log.info("findByUserIdWithInvalidS2SToken :: STARTED");
+        professionalApiClient
+                .retrieveUserByIdNotFound(userId);
     }
 
     public void findUsersByInternalUserWithoutRolesShouldReturnSuccess() {

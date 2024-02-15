@@ -15,16 +15,24 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MANDATORY_PARAMETER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_PAGE_INFORMATION;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_SINCE_TIMESTAMP;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_TWO_ARG_PLACEHOLDER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
 
 @Component
 @Slf4j
@@ -118,5 +126,30 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
         validateOrganisationIsActive(org.get(), BAD_REQUEST);
+    }
+
+    public void validateGetRefreshUsersParams(String since, String userId, Integer pageSize, UUID searchAfter) {
+        if ((since == null && userId == null) || (since != null && userId != null)) {
+            throw new InvalidRequest(INVALID_MANDATORY_PARAMETER);
+        }
+
+        if (since != null) {
+            if (!isSinceInValidFormat(since)) {
+                throw new InvalidRequest(INVALID_SINCE_TIMESTAMP + SINCE_TIMESTAMP_FORMAT);
+            }
+            if (searchAfter != null && (pageSize == null || pageSize <= 0)) {
+                throw new InvalidRequest(INVALID_PAGE_INFORMATION);
+            }
+        }
+    }
+
+    private boolean isSinceInValidFormat(String since) {
+        try {
+            LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+
+        return true;
     }
 }
