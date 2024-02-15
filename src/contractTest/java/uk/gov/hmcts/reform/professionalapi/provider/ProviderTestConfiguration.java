@@ -55,7 +55,7 @@ public class ProviderTestConfiguration {
     @MockBean
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @MockBean
-    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl usersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl;
+    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl usersInOrgValidatorImpl;
     @MockBean
     protected OrganisationByProfileIdsRequestValidatorImpl organisationByProfileIdsRequestValidatorImpl;
     @MockBean
