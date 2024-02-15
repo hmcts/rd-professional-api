@@ -45,8 +45,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -68,7 +70,7 @@ public class ProfessionalApiClient {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String USER_EMAIL_HEADER = "UserEmail";
     private static final String RANDOM_EMAIL = "RANDOM_EMAIL";
-
+    private static final String INTERNAL_BASE_URL = "/refdata/internal/v1/organisations";
     private final String professionalApiUrl;
     private final String s2sToken;
 
@@ -590,6 +592,102 @@ public class ProfessionalApiClient {
         log.info("{}:: Retrieve all orgs with pagination (Internal) response: {}",
             loggingComponentName, response.statusCode());
         return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveUsersBySinceDateOrAndUserId(String since, String userId) {
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL + "/users");
+        boolean isBothParamPresents = since != null && userId != null;
+        boolean isBothParamsNull = since == null && userId == null;
+        if (since != null && userId == null) {
+            baseURL.append("?since=").append(since);
+        } else if (since == null && userId != null) {
+            baseURL.append("?userId=").append(userId);
+        } else if (isBothParamPresents) {
+            baseURL.append("?since=").append(since).append("&userId=").append(userId);
+        }
+        Response response = getS2sTokenHeaders()
+                .body("")
+                .get(baseURL.toString())
+                .andReturn();
+        if (!isBothParamPresents && !isBothParamsNull) {
+            response.then()
+                    .assertThat()
+                    .statusCode(OK.value());
+        } else {
+            response.then()
+                    .assertThat()
+                    .statusCode(BAD_REQUEST.value());
+        }
+
+        log.info("{}:: Retrieve retrieve users  by sinceDate Or/And userId by (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveUsersBySinceDatePageSizeOrAndSearchAfter(String since, String pageSize,
+                                                                                String searchAfter) {
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL + "/users");
+        boolean isPageSizeMissing = since != null && pageSize == null && searchAfter != null;
+        if (since != null && pageSize != null && searchAfter == null) {
+            baseURL.append("?since=").append(since)
+                    .append("&pageSize=").append(pageSize);
+        } else if (since != null && pageSize != null && searchAfter != null) {
+            baseURL.append("?since=").append(since)
+                    .append("&pageSize=").append(pageSize)
+                    .append("&searchAfter=").append(searchAfter);
+        } else if (since != null && pageSize == null && searchAfter != null) {
+            baseURL.append("?since=").append(since)
+                    .append("&searchAfter=").append(searchAfter);
+        }
+        Response response = getS2sTokenHeaders()
+                .body("")
+                .get(baseURL.toString())
+                .andReturn();
+        if (!isPageSizeMissing) {
+            response.then()
+                    .assertThat()
+                    .statusCode(OK.value());
+        } else {
+            response.then()
+                    .assertThat()
+                    .statusCode(BAD_REQUEST.value());
+        }
+
+        log.info("{}::Retrieve retrieve users  by sinceDate, pageSize, searchAfter by (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    public Response retrieveUserByUnAuthorizedS2sToken(String userId) {
+        String baseURL = INTERNAL_BASE_URL + "/users?userId=" + userId;
+        Response response = withUnauthenticatedRequest()
+                .body("")
+                .get(baseURL)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
+
+        log.info("{}:: Retrieve user UNAUTHORIZED (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response;
+    }
+
+    public Response retrieveUserByIdNotFound(String userId) {
+        String baseURL = INTERNAL_BASE_URL + "/users?userId=" + userId;
+        Response response = getS2sTokenHeaders()
+                .body("")
+                .get(baseURL)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(NOT_FOUND.value());
+
+        log.info("{}:: Retrieve user NOT_FOUND (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response;
     }
 
     public Map<String, Object> retrieveAllOrganisationsWithPaginationV2(String role, String page, String size) {
