@@ -29,8 +29,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -258,12 +261,26 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             assertThat(testResults.get("errorDescription")).isEqualTo("001 missing/invalid parameter");
         } else {
             List<HashMap> users = (List<HashMap>) testResults.get("users");
-            lastUpdateTime = (String) users.get(0).get("lastUpdated");
+
+            String updateDateTime = (String) users.get(0).get("lastUpdated");
+            lastUpdateTime = formatDate(updateDateTime);
             lastUpdateTimes.add(lastUpdateTime);
             lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
             validateRetrievedUsersDetails(testResults, null);
         }
         log.info("findByUserIdOrAndSinceDate :: END");
+    }
+
+    public static String formatDate(String dateString) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(dateString);
+        } catch (ParseException e) {
+            log.error("Error occur while paring date");
+            throw new RuntimeException(e);
+        }
+        return sdf.format(date);
     }
 
     public void findBySinceDatePageSizeOrAndSearchAfter(String sinceDate, String pageSize, String searchAfter) {
