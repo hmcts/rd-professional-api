@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class OrganisationByProfileIdsRequestValidatorImplTest {
+class OrganisationByProfileIdsRequestValidatorImplTest {
 
     private final OrganisationByProfileIdsRequestValidatorImpl validator =
             new OrganisationByProfileIdsRequestValidatorImpl();
