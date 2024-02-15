@@ -69,6 +69,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     String extActiveOrgId;
     String activeUserEmail;
     String activeUserId;
+    String newAddedUserId;
     String superUserEmail;
     String superUserId;
     OrganisationCreationRequest organisationCreationRequest;
@@ -98,6 +99,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpUserBearerTokens(List.of(puiUserManager));
         addNewUserAccessTypeScenarios();
         updateAndAddNewUserAccessTypeScenarios();
+        inviteNewUserToOrganisationScenarios();
     }
 
     public void setUpOrgTestData() {
@@ -151,6 +153,16 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         // inviteUserBySuperUserShouldBeSuccess();
     }
 
+    public void inviteNewUserToOrganisationScenarios() {
+        // Adding and verifying user with access type
+        addNewUserToAnOrganisationShouldBeSuccess(true);
+        findUsersByUserIdentifier(true);
+
+        // Adding and verifying user without access type
+        addNewUserToAnOrganisationShouldBeSuccess(false);
+        findUsersByUserIdentifier(false);
+    }
+
     public void findUsersByOrganisationScenarios() {
         findUsersByNonPumAndNoStatusProvidedShouldBeSuccess();
         findUsersByPumAndNoStatusProvidedShouldBeSuccess();
@@ -177,6 +189,10 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void findUsersByUserIdentifierWithUserAccessType() {
         findUserWithAccessTypeShouldBeSuccess();
+    }
+
+    public void findUsersByUserIdentifier(Boolean hasAccessType) {
+        findUserWithIdShouldBeSuccess(hasAccessType);
     }
 
     public void findUsersByUserIdentifierWithUserAccessTypesAndRoles() {
@@ -221,6 +237,16 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                         professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
         log.info("inviteUserByPuiUserManagerShouldBeSuccess :: END");
+    }
+
+    public void addNewUserToAnOrganisationShouldBeSuccess(boolean hasAccessType) {
+        log.info("addNewUserToAnOrganisationShouldBeSuccess :: STARTED");
+        Map<String, Object> newUserResponse = professionalApiClient
+                    .addNewUserToAnOrganisationExternal(createUserRequest(asList(puiCaseManager), hasAccessType),
+                            professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        newAddedUserId = newUserResponse.get("userIdentifier").toString();
+        log.info("addNewUserToAnOrganisationShouldBeSuccess :: END");
     }
 
     public void inviteUserBySuperUserShouldBeSuccess() {
@@ -447,8 +473,18 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findUserWithAccessTypeShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
-        validateAccessTypesInRetrievedUser(response, "ACTIVE", true);
+        validateAccessTypesInRetrievedUser(response, "ACTIVE",
+                true,true, activeUserId);
         log.info("findUserWithAccessTypeShouldBeSuccess :: END");
+    }
+
+    public void findUserWithIdShouldBeSuccess(Boolean hasAccessType) {
+        log.info("findUserWithIdShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), newAddedUserId);
+        validateAccessTypesInRetrievedUser(response, "PENDING",
+                false, hasAccessType, newAddedUserId);
+        log.info("findUserWithIdShouldBeSuccess :: END");
     }
 
     public void findUserWithAccessTypesAndRoleShouldBeSuccess() {
