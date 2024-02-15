@@ -342,12 +342,10 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         UUID searchAfterUser = professionalUsers.get(1).getId();
         UUID searchAfterOrganisation = orgsForTest.get(0).getId();
 
-        boolean isOrg1First = orgsForTest.get(0).getId().equals(organisation1.getId());
-
         String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = false; // only 5 or 4 users left without deleted and skipping the first 2 users
+        boolean expectedHasMoreRecords = false;
         int expectedOrganisationsCount = 2;
-        int expectedUsersCount = isOrg1First ? 5 : 4;
+        int expectedUsersCount = 5;
 
         // act
         Map<String, Object> response =
