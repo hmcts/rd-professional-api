@@ -14,8 +14,6 @@ class RefreshUserTest {
 
     @Test
     void test_should_hold_values_after_creation() {
-        OrganisationInfo orgInfo =
-                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("PROFILE"));
         UserAccessType userAccessType = new UserAccessType();
         userAccessType.setAccessTypeId("ACCESS_TYPE_ID");
         userAccessType.setJurisdictionId("JURISDICTION");
@@ -27,6 +25,8 @@ class RefreshUserTest {
         refreshUser.setUserIdentifier("user-identifier");
         LocalDateTime updated = LocalDateTime.now();
         LocalDateTime deleted = LocalDateTime.now();
+        OrganisationInfo orgInfo =
+                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("PROFILE"));
         refreshUser.setLastUpdated(updated);
         refreshUser.setOrganisationInfo(orgInfo);
         refreshUser.setUserAccessTypes(List.of(userAccessType));

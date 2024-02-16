@@ -19,6 +19,7 @@ class UserConfiguredAccessTest {
         assertThat(userConfiguredAccess.getUserConfiguredAccessId()).isEqualTo(userConfiguredAccessId);
         assertThat(userConfiguredAccess.getEnabled()).isEqualTo(enabled);
     }
+
     @Test
     void test_user_configured_access_no_argsDisabled() {
         UserConfiguredAccessId userConfiguredAccessId = new UserConfiguredAccessId();
