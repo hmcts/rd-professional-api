@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
     @Autowired
     private OrganisationRepository organisationRepository;
+    private String organisationV1Identifier;
 
     @BeforeEach
     public void setup() {
@@ -55,6 +58,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         OrganisationOtherOrgsCreationRequest request4 = this.createUniqueOrganisationRequest("TestOG2", "SRA126",
                 "PBA1234564", "super-email4@gmail.com", ogdHoOrgType);
         professionalReferenceDataClient.createOrganisationV2(request4);
+
+        organisationV1Identifier = createOrganisationRequest();
     }
 
     @Test
@@ -66,7 +71,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 4;
+        int expectedOrganisationsCount = 5; // should be 5 because v1 should be defaulted to solicitor org type
 
         // act
         Map<String, Object> response =
@@ -74,7 +79,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                         pageSize, searchAfter);
 
         // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                true);
     }
 
     @SuppressWarnings("unchecked")
@@ -96,7 +102,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                         pageSize, searchAfter);
 
         // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                null);
 
         List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
 
@@ -124,7 +131,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                         pageSize, searchAfter);
 
         // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                null);
 
         List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
 
@@ -151,7 +159,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                         pageSize, searchAfter);
 
         // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                null);
     }
 
     @Test
@@ -166,7 +175,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest,
                         pageSize, searchAfter);
-        assertSuccessfulResponse(response, 1, "200 OK", true);
+        assertSuccessfulResponse(response, 1, "200 OK", true,
+                null);
 
         UUID lastRecordInPage = UUID.fromString(response.get("lastRecordInPage").toString());
 
@@ -175,31 +185,58 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                 pageSize, lastRecordInPage);
 
         // assert
-        assertSuccessfulResponse(response, 1, "200 OK", false);
+        assertSuccessfulResponse(response, 1, "200 OK", false,
+                null);
     }
 
     @SuppressWarnings("unchecked")
     private void assertSuccessfulResponse(Map<String, Object> response, int expectedOrganisationsCount,
-                                          String expectedStatus, boolean expectedHasMoreRecords) {
+                                          String expectedStatus, boolean expectedHasMoreRecords,
+                                          Boolean checkForV1) {
         String actualStatus = (String) response.get("http_status");
         assertThat(actualStatus).isEqualTo(expectedStatus);
 
-        MultipleOrganisationsResponse typedResponse = new MultipleOrganisationsResponse();
-        boolean actualHasMoreRecords = (boolean) response.get("moreAvailable");
+        String json = convertMapToJson(response);
+        MultipleOrganisationsResponse typedResponse = convertJsonToResponse(json, MultipleOrganisationsResponse.class);
 
-        List<OrganisationByProfileResponse> actualOrganisationInfo =
-                (List<OrganisationByProfileResponse>) response.get("organisationInfo");
-
-        typedResponse.setMoreAvailable(actualHasMoreRecords);
-        typedResponse.setOrganisationInfo(actualOrganisationInfo);
-        if (response.get("lastRecordInPage") != null) {
-            typedResponse.setLastRecordInPage(UUID.fromString((String) response.get("lastRecordInPage")));
-        } else {
-            typedResponse.setLastRecordInPage(null);
-        }
-
-        assertThat(typedResponse.getOrganisationInfo().size()).isEqualTo(expectedOrganisationsCount);
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(expectedOrganisationsCount);
         assertThat(typedResponse.isMoreAvailable()).isEqualTo(expectedHasMoreRecords);
+
+        boolean checkForV1Org = checkForV1 == null ? false : checkForV1;
+
+        if(checkForV1Org) {
+            boolean allMatch =
+                    typedResponse.getOrganisationInfo().stream()
+                            .anyMatch(org -> org.getOrganisationIdentifier().equals(organisationV1Identifier));
+            assertThat(allMatch).isTrue();
+        }
+    }
+
+    public String convertMapToJson(Map<String, Object> map) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = "";
+        try {
+            json = objectMapper.writeValueAsString(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    public <T> T convertJsonToResponse(String json, Class<T> type) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+        T response = null;
+        try {
+            response = objectMapper.readValue(json, type);
+        } catch (Exception e) {
+            // Log the error message and rethrow the exception or handle it appropriately
+            System.err.println("Error processing JSON: " + e.getMessage());
+        }
+        return response;
     }
 
     @Test
