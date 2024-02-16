@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +39,10 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.formatDateString;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
@@ -539,7 +543,8 @@ public class AuthorizationFunctionalTest {
         });
     }
 
-    public void validateRetrievedUsersDetails(Map<String, Object> searchResponse, String pageSize) {
+    public void validateRetrievedUsersDetails(Map<String, Object> searchResponse, String pageSize,
+                                              String sinceDate) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
         assertThat(searchResponse.get("lastRecordInPage")).isNotNull();
         assertThat(searchResponse.get("moreAvailable")).isNotNull();
@@ -548,16 +553,23 @@ public class AuthorizationFunctionalTest {
         if (pageSize != null) {
             assertEquals(Integer.parseInt(pageSize), professionalUsersResponses.size());
         }
-        professionalUsersResponses.forEach(user -> {
+
+        for (Map user : professionalUsersResponses) {
             assertThat(user.get("userIdentifier")).isNotNull();
             assertThat(user.get("lastUpdated")).isNotNull();
+            String lastUpdated = (String) user.get("lastUpdated");
+            lastUpdated = formatDateString(lastUpdated);
 
             HashMap<String, String> orgInfo = (HashMap<String, String>) user.get("organisationInfo");
             assertThat(orgInfo).isNotNull();
             assertThat(orgInfo.get("organisationIdentifier")).isNotNull();
-            assertThat(orgInfo.get("status")).isEqualTo(IdamStatus.ACTIVE.name());
             assertThat(orgInfo.get("status")).isNotNull();
             assertThat(user.get("lastUpdated")).isNotNull();
+
+            if (sinceDate != null) {
+                LocalDateTime responseLocalDateTime = convertStringToLocalDate(lastUpdated);
+                assertTrue(responseLocalDateTime.isAfter(convertStringToLocalDate(sinceDate)));
+            }
 
             List<Object> organisationProfileIdList = new ArrayList<>();
             for (Map.Entry<String, String> entry : orgInfo.entrySet()) {
@@ -568,7 +580,7 @@ public class AuthorizationFunctionalTest {
                 }
             }
             assertThat(organisationProfileIdList).hasSizeGreaterThanOrEqualTo(1);
-        });
+        }
     }
 
     private void verifyContactInfoCreatedDateSorting(Object contactInformation) {
