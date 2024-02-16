@@ -2351,8 +2351,15 @@ class OrganisationServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {OrganisationProfileIdConstants.SOLICITOR_PROFILE,
-            OrganisationProfileIdConstants.OGD_DWP_PROFILE, OrganisationProfileIdConstants.OGD_HO_PROFILE})
+    @ValueSource(strings = {
+        OrganisationProfileIdConstants.SOLICITOR_PROFILE,
+        OrganisationProfileIdConstants.OGD_HO_PROFILE,
+        OrganisationProfileIdConstants.OGD_DWP_PROFILE,
+        OrganisationProfileIdConstants.OGD_HMRC_PROFILE,
+        OrganisationProfileIdConstants.OGD_CICA_PROFILE,
+        OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU,
+        OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND
+    })
     @SuppressWarnings("unchecked")
     void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter(String profileId) {
         // arrange
@@ -2362,10 +2369,8 @@ class OrganisationServiceImplTest {
         UUID searchAfter = null;
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(any(), isNull(), any())).thenReturn(orgPage);
-        List<Organisation> organisations = new ArrayList<>();
+        when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), any())).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
-        when(orgPage.isLast()).thenReturn(true);
 
         // act
         MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
