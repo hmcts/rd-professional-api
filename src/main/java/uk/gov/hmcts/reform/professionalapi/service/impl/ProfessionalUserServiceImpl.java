@@ -219,8 +219,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         var pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
         ResponseEntity<Object> responseEntity
-                = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+                = retrieveUserProfiles(showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
                 organisation.getStatus(),
                 pagedProfessionalUsers.toList(), getOrganisationProfileIds(organisation));
 
@@ -241,15 +240,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (professionalUsers.isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
-        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
-                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
+        return retrieveUserProfiles(showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
                 organisation.getStatus(),
                 professionalUsers, getOrganisationProfileIds(organisation));
     }
 
     @SuppressWarnings("unchecked")
-    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                        String showDeleted, boolean rolesRequired, String status,
+    private ResponseEntity<Object> retrieveUserProfiles(String showDeleted, boolean rolesRequired, String status,
                                                         String organisationIdentifier,
                                                         OrganisationStatus organisationStatus,
                                                         List<ProfessionalUser> professionalUsers,
@@ -257,6 +254,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
+        RetrieveUserProfilesRequest retrieveUserProfilesRequest =
+                generateRetrieveUserProfilesRequest(professionalUsers);
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,
                 Boolean.toString(rolesRequired))) {
 

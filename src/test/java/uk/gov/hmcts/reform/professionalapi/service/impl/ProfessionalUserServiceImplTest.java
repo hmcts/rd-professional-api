@@ -584,7 +584,7 @@ class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
-        verify(professionalUserPage, times(2)).getContent();
+        verify(professionalUserPage, times(1)).getContent();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
 
@@ -629,7 +629,7 @@ class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
-        verify(professionalUserPage, times(2)).getContent();
+        verify(professionalUserPage, times(1)).getContent();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
 
