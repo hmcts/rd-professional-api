@@ -307,20 +307,6 @@ public class ProfessionalReferenceDataClient {
                 userId);
     }
 
-    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, Integer
-            pageSize, UUID searchAfter) {
-        StringBuilder sb = new StringBuilder(baseIntUrl)
-                .append("/getOrganisationsByProfile?");
-        if (pageSize != null) {
-            sb.append("pageSize=").append(pageSize);
-        }
-        if (searchAfter != null) {
-            sb.append("&searchAfter=").append(searchAfter);
-        }
-        String uriPath = sb.toString();
-        return postRequest(uriPath, request, null, null);
-    }
-
     @SuppressWarnings({"rawtypes", "unchecked"})
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
