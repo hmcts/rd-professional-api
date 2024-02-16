@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class OrganisationByProfileResponse {
     private String organisationIdentifier;
     private String status;
