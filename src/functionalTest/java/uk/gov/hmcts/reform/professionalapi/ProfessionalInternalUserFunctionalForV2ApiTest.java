@@ -12,10 +12,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationByProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDateTime;
@@ -23,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,6 +61,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         createOrganisationScenario();
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
+        retrieveOrganisationsByProfileIds();
         deleteOtherOrganisationScenarios();
         findOrganisationWithSinceDateGroupAccessScenarios();
     }
@@ -248,6 +254,56 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         assertThat(organisations).isNotNull().hasSize(2);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
+    }
+
+    public void retrieveOrganisationsByProfileIds() {
+        findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess();
+        findOrganisationWithNonMatchingProfileShouldReturnAllSolicitorOrganisations();
+    }
+
+    public void findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess() {
+        log.info("findOrganisationWithSolicitorProfileShouldBeSuccess :: STARTED");
+
+        OrganisationByProfileIdsRequest request = new OrganisationByProfileIdsRequest();
+        request.getOrganisationProfileIds().add(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
+                1, null);
+
+        verifyOrganisationsByProfileIdResponse(response, OrganisationProfileIdConstants.SOLICITOR_PROFILE, 1);
+        log.info("findOrganisationWithSolicitorProfileShouldBeSuccess :: END");
+    }
+
+    public void findOrganisationWithNonMatchingProfileShouldReturnAllSolicitorOrganisations() {
+        log.info("findOrganisationWithNonMatchingProfileShouldReturnAllSolicitorOrganisations :: STARTED");
+
+        OrganisationByProfileIdsRequest request = new OrganisationByProfileIdsRequest();
+        request.getOrganisationProfileIds().add(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
+                1, null);
+
+        verifyOrganisationsByProfileIdResponse(response, OrganisationProfileIdConstants.SOLICITOR_PROFILE, 1);
+        log.info("findOrganisationWithNonMatchingProfileShouldReturnAllSolicitorOrganisations :: END");
+    }
+
+    private void verifyOrganisationsByProfileIdResponse(Map<String, Object> response, String expectedProfileId,
+                                                        int expectCount) {
+        MultipleOrganisationsResponse typedResponse = new MultipleOrganisationsResponse();
+        boolean actualHasMoreRecords = (boolean) response.get("moreAvailable");
+
+        List<OrganisationByProfileResponse> actualOrganisationInfo =
+                (List<OrganisationByProfileResponse>) response.get("organisationInfo");
+
+        typedResponse.setMoreAvailable(actualHasMoreRecords);
+        typedResponse.setOrganisationInfo(actualOrganisationInfo);
+        if (response.get("lastRecordInPage") != null) {
+            typedResponse.setLastRecordInPage(UUID.fromString((String) response.get("lastRecordInPage")));
+        } else {
+            typedResponse.setLastRecordInPage(null);
+        }
+
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(expectCount);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationProfileIds())
+                .contains(expectedProfileId);
     }
 
     public void deleteOtherOrganisationScenarios() {

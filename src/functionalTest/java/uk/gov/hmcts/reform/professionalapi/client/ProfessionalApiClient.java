@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWith
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -249,7 +252,7 @@ public class ProfessionalApiClient {
                                 .build(),
                         paymentAccounts,
                         contactInfoList,
-                        "Doctor",
+                        OrganisationTypeConstants.SOLICITOR_ORG,
                         orgAttributeRequests);
 
         return  organisationOtherOrgsCreationRequest;
@@ -783,6 +786,34 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, Integer
+            pageSize, UUID searchAfter) {
+        StringBuilder sb = new StringBuilder("/getOrganisationsByProfile?");
+        if (pageSize != null) {
+            sb.append("pageSize=").append(pageSize);
+        }
+        if (searchAfter != null) {
+            sb.append("&searchAfter=").append(searchAfter);
+        }
+        String uriPath = sb.toString();
+
+        Response response = getS2sTokenHeaders()
+                .body(request)
+                .post(uriPath)
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("{}:: Retrieve organisation by profile Ids response: {}", loggingComponentName,
+                    response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
 
         return response.body().as(Map.class);
     }
