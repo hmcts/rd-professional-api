@@ -5,7 +5,6 @@ import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +56,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getOrganisationProfileIds;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
@@ -66,9 +66,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public static final String ERROR_USER_CONFIGURED_DELETE = "001 error while deleting user access records";
     public static final String ERROR_USER_CONFIGURED_CREATE = "002 error while creating new user access records";
-
-    @Value("${group-access.organisation-profile-ids}")
-    protected String organisationProfileIds;
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
@@ -225,7 +222,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
                 showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
                 organisation.getStatus(),
-                pagedProfessionalUsers.toList());
+                pagedProfessionalUsers.toList(), getOrganisationProfileIds(organisation));
 
         var headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
                 responseEntity);
@@ -247,7 +244,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers),
                 showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
                 organisation.getStatus(),
-                professionalUsers);
+                professionalUsers, getOrganisationProfileIds(organisation));
     }
 
     @SuppressWarnings("unchecked")
@@ -255,7 +252,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                                         String showDeleted, boolean rolesRequired, String status,
                                                         String organisationIdentifier,
                                                         OrganisationStatus organisationStatus,
-                                                        List<ProfessionalUser> professionalUsers) {
+                                                        List<ProfessionalUser> professionalUsers,
+                                                        List<String> organsationProfileIds) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
@@ -272,7 +270,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 responseEntity = setOrgInfoInGetUserResponseAndSort(responseEntity, organisationIdentifier,
-                        organisationStatus, List.of(organisationProfileIds.split(",")));
+                        organisationStatus, organsationProfileIds);
                 responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
             }
 
