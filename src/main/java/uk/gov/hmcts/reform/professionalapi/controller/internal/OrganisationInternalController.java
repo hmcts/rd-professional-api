@@ -52,10 +52,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -731,7 +733,18 @@ public class OrganisationInternalController extends SuperController {
         @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
-        return updateOrganisation(organisationCreationRequest, organisationIdentifier);
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+
+        if (isNotBlank(organisationCreationRequest.getSraId())) {
+            organisationCreationRequestValidator.validateOrganisationSraIdInRequest(organisationCreationRequest);
+        }
+        if (isNotBlank(organisationCreationRequest.getName()) ) {
+            organisationCreationRequestValidator.validateOrganisationNameInRequest(organisationCreationRequest);
+        }
+
+        organisationService.updateOrganisationNameOrSra(organisationCreationRequest, orgId);
+        return ResponseEntity.status(200).build();
     }
 
 }
