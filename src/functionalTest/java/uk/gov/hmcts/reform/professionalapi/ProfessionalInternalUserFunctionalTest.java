@@ -94,7 +94,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD Internal Test for Group Access Scenarios")
     void testGroupAccessInternalScenario() {
-        String sinceDateTime = generateRandomDate(null, "10");
+        String sinceDateTime = generateRandomDate(null, "5");
         log.info("sinceDateTime set is : {} ", sinceDateTime);
         setUpTestData();
         createOrganisationScenario();
@@ -111,7 +111,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     public void findUserInternalScenarios() {
-        String sinceDateTime = generateRandomDate(null, "15");
+        String sinceDateTime = generateRandomDate(null, "5");
         log.info("sinceDateTime set is : {} ", sinceDateTime);
         findByUserIdOrAndSinceDate(null, invitedUserIds.get(0));
         findByUserIdOrAndSinceDate(sinceDateTime, null);
@@ -938,7 +938,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void findOrganisationWithSinceDateScenarios(String sinceDate) {
         findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, null, null);
-        findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, "1", "1");
+        findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, "1", "2");
     }
 
     public void findOrganisationBySinceDateInternalShouldBeSuccess(String sinceDate, String page,

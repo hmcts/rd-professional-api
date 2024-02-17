@@ -279,7 +279,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         sinceDateTime = generateRandomDate(null, "10");
         log.info("Since Date is set to : {} ", sinceDateTime);
         findOrganisationBySinceDateInternalV2ShouldBeSuccess(sinceDateTime, null, null);
-        findOrganisationBySinceDateInternalV2ShouldBeSuccess(sinceDateTime, "1", "1");
+        findOrganisationBySinceDateInternalV2ShouldBeSuccess(sinceDateTime, "1", "2");
     }
 
     public void findOrganisationBySinceDateInternalV2ShouldBeSuccess(String sinceDate, String page,
