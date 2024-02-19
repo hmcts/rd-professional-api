@@ -29,4 +29,20 @@ class OrganisationInfoTest {
         assertThat(organisationInfo.getOrganisationProfileIds().get(0)).isEqualTo("orgProfileId1");
         assertThat(organisationInfo.getOrganisationProfileIds().get(1)).isEqualTo("orgProfileId2");
     }
+
+    @Test
+    void test_OrganisationInfoNoArgs() {
+        OrganisationInfo organisationInfo = new OrganisationInfo();
+        organisationInfo.setOrganisationIdentifier(organisationIdentifier);
+        organisationInfo.setStatus(status);
+        organisationInfo.setLastUpdated(lastUpdated);
+        organisationInfo.setOrganisationProfileIds(organisationProfileIds);
+
+        assertThat(organisationInfo.getOrganisationIdentifier()).isEqualTo(organisationIdentifier);
+        assertThat(organisationInfo.getStatus()).isEqualTo(status);
+        assertThat(organisationInfo.getLastUpdated()).isEqualTo(lastUpdated);
+        assertThat(organisationInfo.getOrganisationProfileIds()).hasSize(2);
+        assertThat(organisationInfo.getOrganisationProfileIds().get(0)).isEqualTo("orgProfileId1");
+        assertThat(organisationInfo.getOrganisationProfileIds().get(1)).isEqualTo("orgProfileId2");
+    }
 }

@@ -10,6 +10,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserConfiguredAccessTest {
 
     @Test
+    void test_user_configured_access_nall_args() {
+        UserConfiguredAccessId userConfiguredAccessId = new UserConfiguredAccessId();
+        boolean enabled = true;
+        UserConfiguredAccess userConfiguredAccess = new UserConfiguredAccess(userConfiguredAccessId, enabled);
+        assertThat(userConfiguredAccess.getUserConfiguredAccessId()).isEqualTo(userConfiguredAccessId);
+        assertThat(userConfiguredAccess.getEnabled()).isEqualTo(enabled);
+    }
+
+    @Test
     void test_user_configured_access_no_argsEnabled() {
         UserConfiguredAccessId userConfiguredAccessId = new UserConfiguredAccessId();
         boolean enabled = true;
