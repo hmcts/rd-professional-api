@@ -26,14 +26,13 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +45,7 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -57,6 +57,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
 
 @SerenityTest
 @SpringBootTest
@@ -70,8 +72,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     String invitedUserEmail;
     String invitedUserId;
     List<String> invitedUserIds = new ArrayList<>();
-    String lastUpdateTime;
-    List<String> lastUpdateTimes = new ArrayList<>();
     String lastRecordIdInPage;
     OrganisationCreationRequest organisationCreationRequest;
 
@@ -94,10 +94,13 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD Internal Test for Group Access Scenarios")
     void testGroupAccessInternalScenario() {
+        String sinceDateTime = generateRandomDate(null, "5");
+        log.info("sinceDateTime set is : {} ", sinceDateTime);
         setUpTestData();
         createOrganisationScenario();
         inviteMultipleUserScenarios();
         findUserInternalScenarios();
+        findOrganisationWithSinceDateScenarios(sinceDateTime);
     }
 
     public void inviteMultipleUserScenarios() {
@@ -108,14 +111,16 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     public void findUserInternalScenarios() {
+        String sinceDateTime = generateRandomDate(null, "5");
+        log.info("sinceDateTime set is : {} ", sinceDateTime);
         findByUserIdOrAndSinceDate(null, invitedUserIds.get(0));
-        findByUserIdOrAndSinceDate(lastUpdateTime, null);
-        findByUserIdOrAndSinceDate(lastUpdateTime, invitedUserId);
+        findByUserIdOrAndSinceDate(sinceDateTime, null);
+        findByUserIdOrAndSinceDate(sinceDateTime, invitedUserId);
         findByUserIdOrAndSinceDate(null, null);
 
-        findBySinceDatePageSizeOrAndSearchAfter(lastUpdateTimes.get(0), "3", null);
-        findBySinceDatePageSizeOrAndSearchAfter(lastUpdateTimes.get(0), "1", lastRecordIdInPage);
-        findBySinceDatePageSizeOrAndSearchAfter(lastUpdateTimes.get(0), null, lastRecordIdInPage);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "3", null);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "1", lastRecordIdInPage);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, null, lastRecordIdInPage);
 
         findByUserIdInvalidS2SToken(invitedUserIds.get(0));
         findByUserIdNotFound("non-existing-id");
@@ -260,27 +265,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         if ((userId != null && sinceDate != null) || (userId == null && sinceDate == null)) {
             assertThat(testResults.get("errorDescription")).isEqualTo("001 missing/invalid parameter");
         } else {
-            List<HashMap> users = (List<HashMap>) testResults.get("users");
-
-            String updateDateTime = (String) users.get(0).get("lastUpdated");
-            lastUpdateTime = formatDate(updateDateTime);
-            lastUpdateTimes.add(lastUpdateTime);
             lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
-            validateRetrievedUsersDetails(testResults, null);
+            assertNotNull(lastRecordIdInPage);
+            validateRetrievedUsersDetails(testResults, null, sinceDate);
         }
         log.info("findByUserIdOrAndSinceDate :: END");
-    }
-
-    public static String formatDate(String dateString) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Date date = null;
-        try {
-            date = sdf.parse(dateString);
-        } catch (ParseException e) {
-            log.error("Error occur while paring date");
-            throw new RuntimeException(e);
-        }
-        return sdf.format(date);
     }
 
     public void findBySinceDatePageSizeOrAndSearchAfter(String sinceDate, String pageSize, String searchAfter) {
@@ -293,8 +282,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         if (pageSize != null) {
             assertThat(users.size()).isEqualTo(Integer.parseInt(pageSize));
-            lastUpdateTime = (String) users.get(0).get("lastUpdated");
-            validateRetrievedUsersDetails(testResults, pageSize);
+            validateRetrievedUsersDetails(testResults, pageSize, sinceDate);
         } else if (searchAfter != null && pageSize == null) {
             assertThat(testResults.get("errorDescription"))
                     .isEqualTo("002 missing/invalid page information");
@@ -947,6 +935,108 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         verifyContactInformationDetails(response);
     }
+
+    public void findOrganisationWithSinceDateScenarios(String sinceDate) {
+        findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, null, null);
+        findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, "1", "2");
+    }
+
+    public void findOrganisationBySinceDateInternalShouldBeSuccess(String sinceDate, String page,
+                                                                   String pageSize) {
+        log.info("findOrganisationBySinceDateInternalShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationDetailsBySinceDate(
+                sinceDate, page, pageSize);
+        assertThat(response).isNotNull();
+        verifyOrganisationDetailsBySinceDate(response, pageSize, sinceDate);
+        log.info("findOrganisationBySinceDateInternalShouldBeSuccess :: END");
+    }
+
+    private static void verifyOrganisationDetailsBySinceDate(Map<String, Object> response,
+                                                             String pageSize, String sinceDate) {
+
+        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
+
+        assertThat(organisations)
+                .isNotNull()
+                .isNotEmpty();
+
+        if (pageSize != null) {
+            assertThat(organisations)
+                    .hasSize(Integer.parseInt(pageSize));
+        }
+        assertThat(response.get("moreAvailable"))
+                .isNotNull();
+
+        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
+
+        organisations.forEach(org -> {
+
+            assertThat(org.get("organisationIdentifier"))
+                    .isNotNull();
+
+            assertThat(org.get("lastUpdated"))
+                    .isNotNull();
+
+            String dateString = (String) org.get("lastUpdated");
+            String formattedDateString = DateUtils.formatDateString(dateString);
+            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
+            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
+
+            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
+
+            if (organisationProfileIds != null) {
+
+                assertThat(organisationProfileIds)
+                        .isNotEmpty()
+                        .hasSizeGreaterThan(0);
+
+                assertThat(organisationProfileIds.get(0))
+                        .isEqualTo("SOLICITOR_PROFILE");
+            }
+        });
+    }
+
+    private static void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response,
+                                                               String pageSize, String sinceDate) {
+
+        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
+
+        assertThat(organisations)
+                .isNotNull()
+                .isNotEmpty();
+
+        if (pageSize != null) {
+            assertThat(organisations)
+                    .hasSize(Integer.parseInt(pageSize));
+        }
+        assertThat(response.get("moreAvailable"))
+                .isNotNull();
+
+        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
+
+        organisations.forEach(org -> {
+
+            assertThat(org.get("organisationIdentifier"))
+                    .isNotNull();
+
+            assertThat(org.get("lastUpdated"))
+                    .isNotNull();
+
+            String dateString = (String) org.get("lastUpdated");
+            String formattedDateString = DateUtils.formatDateString(dateString);
+            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
+            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
+
+            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
+            assertThat(organisationProfileIds)
+                    .isNotEmpty()
+                    .hasSizeGreaterThan(0);
+
+            assertThat(organisationProfileIds.get(0))
+                    .isEqualTo("SOLICITOR_PROFILE");
+        });
+    }
+
 
     private static void verifyContactInformationDetails(JsonPath response) {
 
