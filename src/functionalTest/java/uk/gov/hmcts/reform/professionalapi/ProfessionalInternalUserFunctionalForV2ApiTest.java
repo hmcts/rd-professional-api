@@ -63,8 +63,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
         findOrganisationWithSinceDateGroupAccessScenarios();
-        retrieveOrganisationsByProfileIds();
-//        findUserByOrganisationScenarios();
+        retrieveOrganisationsByProfileIds();// findUserByOrganisationScenarios();
         deleteOtherOrganisationScenarios();
     }
 
