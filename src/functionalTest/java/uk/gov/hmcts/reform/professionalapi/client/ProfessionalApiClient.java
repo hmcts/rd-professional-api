@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.path.json.JsonPath;
@@ -26,20 +27,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -849,6 +844,42 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
 
         return response.body().as(Map.class);
+    }
+
+    public UsersInOrganisationsByOrganisationIdentifiersResponse findUsersByOrganisations(
+            UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
+            Integer pageSize, UUID searchAfterOrg, UUID searchAfterUser) {
+        Response response = getS2sTokenHeaders()
+                .body(organisationByProfileIdsRequest)
+                .queryParam("pageSize", pageSize)
+                .queryParam("searchAfterOrg", searchAfterOrg)
+                .queryParam("searchAfterUser", searchAfterUser)
+                .post("refdata/internal/v2/organisations/users")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        log.info("{}:: find users response: {}", loggingComponentName, response.statusCode());
+        return convertMapToResponse(response.body().as(Map.class),
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+    }
+
+    private <T> T convertMapToResponse(Map<String, Object> map, Class<T> type) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+        T response = null;
+        try {
+            String json = objectMapper.writeValueAsString(map);
+            response = objectMapper.readValue(json, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 
     @SuppressWarnings("unchecked")

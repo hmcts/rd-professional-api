@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -61,6 +64,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         retrieveOrganisationPbaScenarios();
         findOrganisationWithSinceDateGroupAccessScenarios();
         retrieveOrganisationsByProfileIds();
+//        findUserByOrganisationScenarios();
         deleteOtherOrganisationScenarios();
     }
 
@@ -106,7 +110,63 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findOrganisationPbaWithoutEmailByInternalUserShouldBeBadRequest();
     }
 
+    public void findUserByOrganisationScenarios() {
+        findUsersInOrganisationWithPageSizeAndNoSearchAfterShouldReturnSuccess();
+        findUsersInOrganisationWithPageSizeAndSearchAfterShouldReturnSuccess();
+    }
 
+    private void findUsersInOrganisationWithPageSizeAndNoSearchAfterShouldReturnSuccess() {
+        log.info("findUsersInOrganisationWithPageSizeAndNoSearchAfterShouldReturnSuccess :: STARTED");
+
+        // arrange
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(List.of(intActiveOrgId));
+
+        // act
+        UsersInOrganisationsByOrganisationIdentifiersResponse response =
+                professionalApiClient.findUsersByOrganisations(request, 1, null, null);
+
+
+        // assert
+        assertThat(response).isNotNull();
+        assertThat(response.isMoreAvailable()).isFalse(); // assuming only one user in the org
+        assertThat(response.getOrganisationInfo()).isNotEmpty();
+        assertThat(response.getOrganisationInfo().get(0).getOrganisationIdentifier()).isEqualTo(intActiveOrgId);
+        assertThat(response.getOrganisationInfo().get(0).getUsers()).isNotEmpty();
+        assertThat(response.getLastOrgInPage()).isNotNull();
+        assertThat(response.getLastUserInPage()).isNotNull();
+
+
+        log.info("findUsersInOrganisationWithPageSizeAndNoSearchAfterShouldReturnSuccess :: END");
+    }
+
+    private void findUsersInOrganisationWithPageSizeAndSearchAfterShouldReturnSuccess() {
+        log.info("findUsersInOrganisationWithPageSizeAndSearchAfterShouldReturnSuccess :: STARTED");
+
+        // arrange
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(List.of(intActiveOrgId));
+
+        UUID searchAfterOrganisationId = null;
+        UUID searchAfterUserId = null;
+
+        // act
+        UsersInOrganisationsByOrganisationIdentifiersResponse response =
+                professionalApiClient.findUsersByOrganisations(request, 1, searchAfterOrganisationId,
+                        searchAfterUserId);
+
+        // assert
+        assertThat(response).isNotNull();
+        assertThat(response.isMoreAvailable()).isFalse(); // assuming only one user in the org
+        assertThat(response.getOrganisationInfo()).isEmpty(); // no users should be returned
+
+        assertThat(response.getLastOrgInPage()).isNull();
+        assertThat(response.getLastUserInPage()).isNull();
+
+        log.info("findUsersInOrganisationWithPageSizeAndSearchAfterShouldReturnSuccess :: END");
+    }
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
         Response response =
