@@ -350,10 +350,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 .findUsersInOrganisations(
                         organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId, pageableObject);
 
-        if (users == null) {
-            return new UsersInOrganisationsByOrganisationIdentifiersResponse(new ArrayList<>(), false);
-        }
-
         return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
     }
 
