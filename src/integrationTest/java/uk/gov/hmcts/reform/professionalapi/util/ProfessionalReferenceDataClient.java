@@ -284,16 +284,6 @@ public class ProfessionalReferenceDataClient {
                 returnRoles);
     }
 
-    public Map<String, Object> findRefreshUsersWithSince(String since, Integer pageSize) {
-        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&pageSize={pageSize}", since,
-                pageSize);
-    }
-
-    public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
-        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}",
-                userId);
-    }
-
     public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, Integer
             pageSize, UUID searchAfter) {
         StringBuilder sb = new StringBuilder(baseIntUrl)
@@ -306,6 +296,16 @@ public class ProfessionalReferenceDataClient {
         }
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
+    }
+
+    public Map<String, Object> findRefreshUsersWithSince(String since, Integer pageSize) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&pageSize={pageSize}", since,
+                pageSize);
+    }
+
+    public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}",
+                userId);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

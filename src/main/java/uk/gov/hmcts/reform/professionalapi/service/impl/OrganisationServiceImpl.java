@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -107,7 +107,6 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 
 @Service
 @Slf4j
@@ -514,26 +513,15 @@ public class OrganisationServiceImpl implements OrganisationService {
             UUID searchAfter) {
         List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
 
-        Pageable pageableObject = createPageableObject(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
-        boolean searchAfterProvided = searchAfter != null;
+        Pageable pageableObject = PageRequest.of(0, pageSize);
+        Page<Organisation> organisations = organisationRepository
+                .findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
 
-        Page<Organisation> organisations;
-
-        if (searchAfterProvided) {
-            organisations = organisationRepository
-                    .findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
-        } else {
-            organisations = organisationRepository.findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
-        }
-
-        if (organisations == null) {
-            return new MultipleOrganisationsResponse(new ArrayList<>(), false);
-        }
         return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
     }
 
     private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
-        List<String> orgTypes = Optional.ofNullable(organisationProfileIds)
+        return Optional.ofNullable(organisationProfileIds)
                 .orElse(Collections.emptyList())
                 .stream()
                 .map(profileId -> {
@@ -546,9 +534,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                         default:
                             return OrganisationTypeConstants.SOLICITOR_ORG;
                     }
-                }).collect(Collectors.toList());
-
-        return orgTypes;
+                }).toList();
     }
 
     @Override

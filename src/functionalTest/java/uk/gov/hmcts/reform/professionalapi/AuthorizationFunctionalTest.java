@@ -152,7 +152,7 @@ public class AuthorizationFunctionalTest {
         return activateOrganisationV2(response, role);
     }
 
-    protected String createAndctivateOrganisationWithGivenRequest(
+    protected String createAndActivateOrganisationWithGivenRequest(
             OrganisationCreationRequest organisationCreationRequest, String role) {
         Map<String, Object> organisationCreationResponse = professionalApiClient
                 .createOrganisation(organisationCreationRequest);
@@ -187,14 +187,19 @@ public class AuthorizationFunctionalTest {
     }
 
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
-
-        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someFirstName";
+        return createUserRequest(userRoles, lastName, firstName);
+    }
+
+    protected NewUserCreationRequest createUserRequest(List<String> userRoles,
+                                                       String lastName,
+                                                       String firstName) {
         Set<UserAccessType> userAccessTypes = new HashSet<>();
         String random = randomAlphabetic(10);
         userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
                 "accessTypeId" + random, false));
+        String userEmail = generateRandomEmail();
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -531,6 +536,38 @@ public class AuthorizationFunctionalTest {
                     assertThat(user.get("roles")).isNull();
                 }
             }
+        });
+    }
+
+    public void validateRetrievedUsersDetails(Map<String, Object> searchResponse, String pageSize) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+        assertThat(searchResponse.get("lastRecordInPage")).isNotNull();
+        assertThat(searchResponse.get("moreAvailable")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+
+        if (pageSize != null) {
+            assertEquals(Integer.parseInt(pageSize), professionalUsersResponses.size());
+        }
+        professionalUsersResponses.forEach(user -> {
+            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get("lastUpdated")).isNotNull();
+
+            HashMap<String, String> orgInfo = (HashMap<String, String>) user.get("organisationInfo");
+            assertThat(orgInfo).isNotNull();
+            assertThat(orgInfo.get("organisationIdentifier")).isNotNull();
+            assertThat(orgInfo.get("status")).isEqualTo(IdamStatus.ACTIVE.name());
+            assertThat(orgInfo.get("status")).isNotNull();
+            assertThat(user.get("lastUpdated")).isNotNull();
+
+            List<Object> organisationProfileIdList = new ArrayList<>();
+            for (Map.Entry<String, String> entry : orgInfo.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (key.equals("organisationProfileIds")) {
+                    organisationProfileIdList.add(value);
+                }
+            }
+            assertThat(organisationProfileIdList).hasSizeGreaterThanOrEqualTo(1);
         });
     }
 

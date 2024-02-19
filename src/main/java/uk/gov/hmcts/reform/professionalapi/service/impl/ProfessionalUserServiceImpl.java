@@ -60,7 +60,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toR
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @Service
 @Slf4j
@@ -273,7 +273,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             responseEntity = toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgInfoInGetUserResponse(responseEntity, organisationIdentifier,
+                responseEntity = setOrgInfoInGetUserResponseAndSort(responseEntity, organisationIdentifier,
                         organisationStatus, List.of(organisationProfileIds.split(",")));
                 responseEntity = setCaseAccessInGetUserResponse(responseEntity, professionalUsers);
             }
@@ -423,6 +423,18 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (userProfileUpdatedData.getUserAccessTypes() != null) {
             try {
                 List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
+                        .map(a -> mapToUserConfiguredAccess(professionalUser, a)).toList();
+                userConfiguredAccessRepository.saveAll(all);
+            } catch (Exception ex) {
+                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
+            }
+        }
+    }
+
+    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
+        if (userAccessTypes != null) {
+            try {
+                List<UserConfiguredAccess> all = userAccessTypes.stream()
                         .map(a -> mapToUserConfiguredAccess(professionalUser, a))
                         .toList();
                 userConfiguredAccessRepository.saveAll(all);
@@ -445,17 +457,4 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return uca;
     }
 
-
-    public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
-        if (userAccessTypes != null) {
-            try {
-                List<UserConfiguredAccess> all = userAccessTypes.stream()
-                        .map(a -> mapToUserConfiguredAccess(professionalUser, a))
-                        .toList();
-                userConfiguredAccessRepository.saveAll(all);
-            } catch (Exception ex) {
-                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
-            }
-        }
-    }
 }

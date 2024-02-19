@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -489,26 +490,33 @@ public class RefDataUtil {
         }
     }
 
-    public static ResponseEntity<Object> setOrgInfoInGetUserResponse(ResponseEntity<Object> responseEntity,
+    public static ResponseEntity<Object> setOrgInfoInGetUserResponseAndSort(ResponseEntity<Object> responseEntity,
                                                                      String organisationIdentifier,
                                                                      OrganisationStatus organisationStatus,
                                                                      List<String> organisationProfileIds) {
         ResponseEntity<Object> newResponseEntity;
-        if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
+        Object response = responseEntity.getBody();
+        if (response instanceof ProfessionalUsersEntityResponse) {
             ProfessionalUsersEntityResponse professionalUsersEntityResponse
                     = (ProfessionalUsersEntityResponse) requireNonNull(responseEntity.getBody());
             professionalUsersEntityResponse.setOrganisationIdentifier(organisationIdentifier);
+            List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUsers();
+            if (userProfiles != null) {
+                userProfiles.sort(Comparator.comparing(ProfessionalUsersResponse::getFirstName,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
+            }
             professionalUsersEntityResponse.setOrganisationStatus(organisationStatus.name());
             professionalUsersEntityResponse.setOrganisationProfileIds(organisationProfileIds);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(),
                     responseEntity.getStatusCode());
         } else {
-            Object response = responseEntity.getBody();
             List<ProfessionalUsersResponseWithoutRoles> userProfiles = response == null
                     ? new ArrayList<>()
                     : ((ProfessionalUsersEntityResponseWithoutRoles) response).getUserProfiles();
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
                     = new ProfessionalUsersEntityResponseWithoutRoles();
+            userProfiles.sort(Comparator.comparing(ProfessionalUsersResponseWithoutRoles::getFirstName,
+                    Comparator.nullsLast(Comparator.naturalOrder())));
             professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
 
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
@@ -562,6 +570,17 @@ public class RefDataUtil {
         return getRefreshUsersResponse;
     }
 
+    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        UserAccessType accessType = new UserAccessType();
+        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
+        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
+                .getOrganisationProfileId());
+        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
+        accessType.setEnabled(userConfiguredAccess.getEnabled());
+
+        return accessType;
+    }
+
     @Value("${loggingComponentName}")
     public void setLoggingComponentName(String loggingComponentName) {
         RefDataUtil.loggingComponentName = loggingComponentName;
@@ -604,17 +623,6 @@ public class RefDataUtil {
             String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
             throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
-    }
-
-    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
-        UserAccessType accessType = new UserAccessType();
-        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
-        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
-                .getOrganisationProfileId());
-        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
-        accessType.setEnabled(userConfiguredAccess.getEnabled());
-
-        return accessType;
     }
 
 }
