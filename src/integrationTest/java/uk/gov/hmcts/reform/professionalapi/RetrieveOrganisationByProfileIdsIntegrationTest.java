@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationByProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
@@ -83,7 +82,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                 true);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     void when_profile_ids_provided_should_return_matching_organisations_and_status_200() {
         // arrange
@@ -112,7 +111,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         assertThat(allMatch).isTrue();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     void when_non_matching_profile_ids_provided_should_return_default_solicitor_organisations_and_status_200() {
         // arrange
@@ -189,7 +188,6 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                 null);
     }
 
-    @SuppressWarnings("unchecked")
     private void assertSuccessfulResponse(Map<String, Object> response, int expectedOrganisationsCount,
                                           String expectedStatus, boolean expectedHasMoreRecords,
                                           Boolean checkForV1) {
@@ -202,9 +200,9 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         assertThat(typedResponse.getOrganisationInfo()).hasSize(expectedOrganisationsCount);
         assertThat(typedResponse.isMoreAvailable()).isEqualTo(expectedHasMoreRecords);
 
-        boolean checkForV1Org = checkForV1 == null ? false : checkForV1;
+        boolean checkForV1Org = checkForV1 != null && checkForV1;
 
-        if(checkForV1Org) {
+        if (checkForV1Org) {
             boolean allMatch =
                     typedResponse.getOrganisationInfo().stream()
                             .anyMatch(org -> org.getOrganisationIdentifier().equals(organisationV1Identifier));
