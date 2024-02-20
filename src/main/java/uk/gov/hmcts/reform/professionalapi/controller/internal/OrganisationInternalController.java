@@ -729,7 +729,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured({"prd-admin"})
     public ResponseEntity<Object> updatesOrganisationName(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-        @Valid @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest,
+        @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
         @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
@@ -737,18 +737,13 @@ public class OrganisationInternalController extends SuperController {
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
 
         if (isNotBlank(organisationCreationRequest.getSraId())) {
-            organisationCreationRequestValidator.validateOrganisationSraIdInRequest(organisationCreationRequest);
+            organisationCreationRequestValidator.validateOrganisationSraIdInRequest(organisationCreationRequest.getSraId());
         }
         if (isNotBlank(organisationCreationRequest.getName()) ) {
-            organisationCreationRequestValidator.validateOrganisationNameInRequest(organisationCreationRequest);
+            organisationCreationRequestValidator.validateOrganisationNameInRequest(organisationCreationRequest.getName());
         }
 
-        var updateOrganisationResponse =
-            organisationService.updateOrganisationNameOrSra(organisationCreationRequest, orgId);
-
-        return ResponseEntity
-            .status(200)
-            .body(updateOrganisationResponse);
+        return organisationService.updateOrganisationNameOrSra(organisationCreationRequest, orgId);
     }
 
 }
