@@ -776,6 +776,35 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
+  //  @ToggleEnable(mapKey = "OrganisationInternalController.updatesOrganisationName", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateOrganisationNameShouldReturnSuccess() {
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        setUpTestData();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+
+        assertNotNull(orgResponse.get("name"));
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().name("Updated Name").build();
+
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin,intActiveOrgId, OK);
+
+        JsonPath orgupdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertThat(response).isNotNull();
+        assertNotNull(orgupdatedNameResponse.get("name"));
+        assertThat(orgupdatedNameResponse.get("name").toString()).contains("Updated Name");
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+    }
+
+    @Test
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisation();
