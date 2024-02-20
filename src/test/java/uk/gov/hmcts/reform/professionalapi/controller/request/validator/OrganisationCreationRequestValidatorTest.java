@@ -583,4 +583,34 @@ class OrganisationCreationRequestValidatorTest {
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
 
+
+
+    @Test
+    void test_validateOrganisationSraIdInRequestNull() {
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateOrganisationSraIdInRequest(null));
+
+    }
+
+    @Test
+    void test_validateOrganisationSraIdInRequestEmpty() {
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateOrganisationSraIdInRequest(" "));
+
+    }
+
+    @Test
+    void test_validateOrganisationNameInRequestNull() {
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateOrganisationNameInRequest(null));
+    }
+
+    @Test
+    void test_validateOrganisationNameInRequestEmpty() {
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateOrganisationNameInRequest(" "));
+    }
+
+
+
 }

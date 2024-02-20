@@ -194,16 +194,12 @@ public class OrganisationCreationRequestValidator {
         requestContactInformation(request.getContactInformation());
     }
 
-    public void validateOrganisationNameInRequest(OrganisationCreationRequest request) {
-        requestValues(request.getName());
-        requestSuperUserValidateAccount(request.getSuperUser());
-
+    public void validateOrganisationNameInRequest(String name) {
+        requestValues(name);
     }
 
-    public void validateOrganisationSraIdInRequest(OrganisationCreationRequest request) {
-        requestValues(request.getSraId());
-        requestSuperUserValidateAccount(request.getSuperUser());
-
+    public void validateOrganisationSraIdInRequest(String sraId) {
+        requestValues(sraId);
     }
 
     private void validateOrgAttributesRequest(List<OrgAttributeRequest> orgAttributes) {
