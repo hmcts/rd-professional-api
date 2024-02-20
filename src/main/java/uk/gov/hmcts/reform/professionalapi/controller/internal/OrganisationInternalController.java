@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -28,17 +27,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
@@ -50,17 +46,18 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
 import java.util.Optional;
-import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -69,16 +66,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @RestController
 @Slf4j
 @NoArgsConstructor
-@SuppressWarnings("checkstyle:Indentation")
 public class OrganisationInternalController extends SuperController {
-
-    protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
-
-    @Autowired
-    public OrganisationInternalController(
-            OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator) {
-        this.organisationByProfileIdsRequestValidator = organisationByProfileIdsRequestValidator;
-    }
 
     @Value("${loggingComponentName}")
     protected String loggingComponentName;
@@ -168,12 +156,11 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<Object> retrieveOrganisations(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @Parameter(name = "id") @RequestParam(value = "id", required = false) String id,
-            @Parameter(name = "since") @RequestParam(value = "since", required = false) String lastUpdatedSince,
             @Parameter(name = "status") @RequestParam(value = "status", required = false) String status,
             @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
 
-        return retrieveAllOrganisationsOrById(id, lastUpdatedSince, status, page, size);
+        return retrieveAllOrganisationOrById(id, status, page, size);
     }
 
 
@@ -697,52 +684,71 @@ public class OrganisationInternalController extends SuperController {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
 
+
     @Operation(
-            summary = "Retrieves Organisations by Organisation Profile IDs",
-            description = "**Bearer token not required to access API. Only a valid s2s token**",
-            security = {
-                @SecurityRequirement(name = "ServiceAuthorization")
-            }
-    )
+        summary = "Updates an Organisation's name",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        })
 
     @ApiResponse(
-            responseCode = "200",
-            description = "List of matching organisations",
-            content = @Content(schema = @Schema(implementation = MultipleOrganisationsResponse.class))
+        responseCode = "200",
+        description = "Organisation name has been updated",
+        content = @Content(schema = @Schema(implementation = String.class))
     )
     @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request (PageSize or searchAfter) provided",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+        responseCode = "400",
+        description = "If Organisation request sent with null/invalid values for mandatory fields",
+        content = @Content
     )
     @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden Error: Access denied",
-            content = @Content
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
     )
     @ApiResponse(
-            responseCode = "500",
-            description = "Internal Server Error",
-            content = @Content
+        responseCode = "404",
+        description = "No Organisation found with the given ID",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
     )
 
-    @PostMapping(
-            path = "/getOrganisationsByProfile",
-            produces = APPLICATION_JSON_VALUE
+    @PutMapping(
+        value = "/name/{orgId}",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Object> retrieveOrganisationsByProfileIds(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-            @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
-            @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
-            @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured({"prd-admin"})
+    public ResponseEntity<Object> updatesOrganisationName(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+        @Valid @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest,
+        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
-        organisationByProfileIdsRequestValidator.validate(pageSize);
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
 
-        MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
-                        organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
+        if (isNotBlank(organisationCreationRequest.getSraId())) {
+            organisationCreationRequestValidator.validateOrganisationSraIdInRequest(organisationCreationRequest);
+        }
+        if (isNotBlank(organisationCreationRequest.getName()) ) {
+            organisationCreationRequestValidator.validateOrganisationNameInRequest(organisationCreationRequest);
+        }
+
+        var updateOrganisationResponse =
+            organisationService.updateOrganisationNameOrSra(organisationCreationRequest, orgId);
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
+            .status(200)
+            .body(updateOrganisationResponse);
     }
+
 }

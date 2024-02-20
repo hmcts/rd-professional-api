@@ -20,6 +20,10 @@ public class ProfessionalApiConstants {
 
     public static final String NO_ORG_FOUND_FOR_GIVEN_ID
             = "No Organisation was found with the given organisationIdentifier ";
+
+    public static final String NO_CONTACT_FOUND_FOR_GIVEN_ORG
+        = "No Contact Information was found with the given organisationIdentifier ";
+
     public static final String ORG_NOT_ACTIVE_NO_USERS_RETURNED
             = "Organisation is not Active hence not returning any users";
     public static final String ERROR_MESSAGE_403_FORBIDDEN = "403 Forbidden";
@@ -69,6 +73,7 @@ public class ProfessionalApiConstants {
     public static final String EMPTY_USER_ID = "User Id cannot be empty";
 
     public static final String ERROR_MSG_NO_ORGANISATION_FOUND = "No organisation belongs to given email";
+    public static final String ERROR_MSG_EMAIL_FOUND = "email address ";
     public static final String ERROR_MSG_NO_PBA_FOUND = "No PBAs associated with given email";
     public static final String PBA_STATUS_MESSAGE_ACCEPTED = "Edited by Admin";
     public static final String PBA_STATUS_MESSAGE_AUTO_ACCEPTED = "Auto approved by Admin";
