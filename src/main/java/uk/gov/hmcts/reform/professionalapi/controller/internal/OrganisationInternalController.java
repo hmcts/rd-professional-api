@@ -697,9 +697,9 @@ public class OrganisationInternalController extends SuperController {
 
     @Operation(
             summary = "Retrieves Organisations by Organisation Profile IDs",
-            description = "**IDAM Roles to access API** : <br> No role restriction",
+            description = "**Bearer token not required to access API. Only a valid s2s token**",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization")
+                @SecurityRequirement(name = "ServiceAuthorization")
             }
     )
 
