@@ -19,7 +19,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -51,7 +50,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
-import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -96,8 +94,6 @@ class ProfessionalUserServiceImplTest {
     private final UserProfileUpdateRequestValidator userProfileUpdateRequestValidator
             = mock(UserProfileUpdateRequestValidator.class);
 
-    private final RefDataUtil refDataUtil = mock(RefDataUtil.class);
-
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
             null, null, null);
     private final String userIdentifier = "1234567";
@@ -133,8 +129,6 @@ class ProfessionalUserServiceImplTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
-        ReflectionTestUtils.setField(professionalUserService, "organisationProfileIds",
-                "organisationProfileId1,organisationProfileId2");
     }
 
     @Test
@@ -175,6 +169,7 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     void test_findUsersByOrganisation_with_userIdentifier() throws Exception {
+        organisation.setOrgType("Solicitor");
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -232,9 +227,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(professionalUsersEntityResponse1.getOrganisationStatus())
                 .isEqualTo(organisation.getStatus().name());
         assertThat(professionalUsersEntityResponse1.getOrganisationProfileIds())
-                .contains("organisationProfileId1");
-        assertThat(professionalUsersEntityResponse1.getOrganisationProfileIds())
-                .contains("organisationProfileId2");
+                .contains("SOLICITOR_PROFILE");
         assertThat(professionalUsersEntityResponse1.getUsers()).hasSize(2);
         professionalUsersEntityResponse1.getUsers().forEach(userProfile -> {
             assertThat(userProfile.getIdamStatus()).isEqualToIgnoringCase("active");
@@ -542,6 +535,8 @@ class ProfessionalUserServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
+        organisation.setOrgType("Government Organisation-DWP");
+
         Pageable pageableMock = mock(Pageable.class);
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
@@ -585,13 +580,11 @@ class ProfessionalUserServiceImplTest {
         assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationStatus())
                 .isEqualTo(organisation.getStatus().name());
         assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationProfileIds())
-                .contains("organisationProfileId1");
-        assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationProfileIds())
-                .contains("organisationProfileId2");
+                .contains("OGD_DWP_PROFILE");
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
-        verify(professionalUserPage, times(2)).getContent();
+        verify(professionalUserPage, times(1)).getContent();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
 
@@ -636,7 +629,7 @@ class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
-        verify(professionalUserPage, times(2)).getContent();
+        verify(professionalUserPage, times(1)).getContent();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
 
