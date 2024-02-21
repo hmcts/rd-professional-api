@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
@@ -116,7 +117,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgType")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo(OrganisationTypeConstants.SOLICITOR_ORG);
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPfmShouldBeSuccess :: END");
         responseValidate(response);
@@ -128,7 +129,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgType")).isEqualTo("Doctor");
+        assertThat(response.get("orgType")).isEqualTo(OrganisationTypeConstants.SOLICITOR_ORG);
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPomShouldBeSuccess :: END");
     }
