@@ -1617,13 +1617,14 @@ class OrganisationServiceImplTest {
     @Test
     void test_updateOrganisationNameAndSra() {
         Organisation organisationMock = mock(Organisation.class);
-        String newName="TestOrgName";
-        String newSraId="TestSraId";
-        String orgIdentifier="9KS20WT";
+        String newName = "TestOrgName";
+        String newSraId = "TestSraId";
+        String orgIdentifier = "9KS20WT";
         organisationCreationRequest.setName(newName);
         organisationCreationRequest.setSraId(newSraId);
 
-        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
+            .thenReturn(organisationMock);
 
         when(organisationCreationRequest.getName()).thenReturn(newName);
         assertNotNull(organisationCreationRequest.getName());
@@ -1635,7 +1636,8 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
 
-        ResponseEntity<Object> updatedOrganisation = sut.updateOrganisationNameOrSra(organisationCreationRequest,orgIdentifier);
+        ResponseEntity<Object> updatedOrganisation = sut.updateOrganisationNameOrSra(
+            organisationCreationRequest,orgIdentifier);
 
         assertThat(updatedOrganisation).isNotNull();
 

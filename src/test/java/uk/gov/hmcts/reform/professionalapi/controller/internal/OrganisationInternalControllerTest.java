@@ -583,13 +583,13 @@ class OrganisationInternalControllerTest {
 
         organisationCreationRequest.setName(updatedName);
         organisationCreationRequest.setSraId(updatedSra);
-       doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
+        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
-        when(organisationServiceMock.updateOrganisationNameOrSra(organisationCreationRequest,organisation.getOrganisationIdentifier()))
-            .thenReturn(updateResponseEntity);
+        when(organisationServiceMock.updateOrganisationNameOrSra(organisationCreationRequest,
+            organisation.getOrganisationIdentifier())).thenReturn(updateResponseEntity);
 
-        ResponseEntity<Object> response = organisationInternalController.updatesOrganisationName(organisationCreationRequest,
-            organisation.getOrganisationIdentifier());
+        ResponseEntity<Object> response = organisationInternalController
+            .updatesOrganisationName(organisationCreationRequest,organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
