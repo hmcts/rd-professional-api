@@ -40,7 +40,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -742,20 +741,22 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, Integer
-            pageSize, UUID searchAfter) {
-        StringBuilder sb = new StringBuilder("/getOrganisationsByProfile?");
-        if (pageSize != null) {
-            sb.append("pageSize=").append(pageSize);
+    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, String
+            pageSize, String searchAfter) {
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL + "/getOrganisationsByProfile");
+
+        if (pageSize != null && searchAfter != null) {
+            baseURL.append("?pageSize=").append(pageSize);
+            baseURL.append("&searchAfter=").append(searchAfter);
+        } else if (pageSize != null && searchAfter == null) {
+            baseURL.append("?pageSize=").append(pageSize);
+        } else if (pageSize == null && searchAfter != null) {
+            baseURL.append("?searchAfter=").append(searchAfter);
         }
-        if (searchAfter != null) {
-            sb.append("&searchAfter=").append(searchAfter);
-        }
-        String uriPath = sb.toString();
 
         Response response = getS2sTokenHeaders()
                 .body(request)
-                .post(uriPath)
+                .post(baseURL.toString())
                 .andReturn();
 
         if (response.statusCode() != OK.value()) {
@@ -765,11 +766,26 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(CREATED.value());
+                .statusCode(OK.value());
 
         return response.body().as(Map.class);
     }
 
+    public Response retrieveOrganisationsByUnAuthorizedS2sToken(String pageSize) {
+        String baseURL = INTERNAL_BASE_URL + "/getOrganisationsByProfile?pageSie=" + pageSize;
+        Response response = withUnauthenticatedRequest()
+                .body("")
+                .get(baseURL)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
+
+        log.info("{}:: Retrieve Org UNAUTHORIZED (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response;
+    }
 
     public Map<String, Object> retrievePaymentAccountsByEmailForExternalV2(HttpStatus status,
                                                                            RequestSpecification requestSpecification,
