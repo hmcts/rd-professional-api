@@ -194,14 +194,6 @@ public class OrganisationCreationRequestValidator {
         requestContactInformation(request.getContactInformation());
     }
 
-    public void validateOrganisationNameInRequest(String name) {
-        requestValues(name);
-    }
-
-    public void validateOrganisationSraIdInRequest(String sraId) {
-        requestValues(sraId);
-    }
-
     private void validateOrgAttributesRequest(List<OrgAttributeRequest> orgAttributes) {
         if (orgAttributes != null) {
             orgAttributes.forEach(orgAttribute -> {
