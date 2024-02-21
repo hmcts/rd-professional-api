@@ -1619,7 +1619,7 @@ class OrganisationServiceImplTest {
         Organisation organisationMock = mock(Organisation.class);
         String newName = "TestOrgName";
         String newSraId = "TestSraId";
-        String orgIdentifier = "9KS20WT";
+        final String orgIdentifier = "9KS20WT";
         organisationCreationRequest.setName(newName);
         organisationCreationRequest.setSraId(newSraId);
 

@@ -579,12 +579,12 @@ class OrganisationInternalControllerTest {
         String updatedSra = "NewSRA";
         organisation.setName(updatedName);
         organisation.setSraId(updatedSra);
-        ResponseEntity<Object> updateResponseEntity = ResponseEntity.status(200).body(organisation);
-
         organisationCreationRequest.setName(updatedName);
         organisationCreationRequest.setSraId(updatedSra);
+
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
+        ResponseEntity<Object> updateResponseEntity = ResponseEntity.status(200).body(organisation);
         when(organisationServiceMock.updateOrganisationNameOrSra(organisationCreationRequest,
             organisation.getOrganisationIdentifier())).thenReturn(updateResponseEntity);
 
