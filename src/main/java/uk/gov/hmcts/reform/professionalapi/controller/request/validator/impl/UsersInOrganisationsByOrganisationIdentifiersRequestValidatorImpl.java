@@ -17,7 +17,7 @@ public class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl {
         }
 
         if (searchAfterOrg != null && searchAfterUser == null) {
-            throw new InvalidRequest("searchAfterOrg cannot be null when searchAfterUser is provided");
+            throw new InvalidRequest("searchAfterUser cannot be null when searchAfterOrg is provided");
         }
 
         if (searchAfterOrg != null && searchAfterUser != null && pageSize == null) {
