@@ -31,6 +31,6 @@ public class OrganisationUserResponse {
         this.email = user.getEmailAddress();
         this.lastUpdated = user.getLastUpdated();
         this.userAccessTypes =
-                user.getUserConfiguredAccesses().stream().map(uca -> fromUserConfiguredAccess(uca)).collect(toList());
+                user.getUserConfiguredAccesses().stream().map(RefDataUtil::fromUserConfiguredAccess).toList();
     }
 }
