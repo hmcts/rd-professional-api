@@ -1948,9 +1948,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
             .thenReturn(organisationMock);
 
-        when(organisationCreationRequest.getName()).thenReturn(newName);
         assertNotNull(organisationCreationRequest.getName());
-        when(organisationCreationRequest.getSraId()).thenReturn(newSraId);
         assertNotNull(organisationCreationRequest.getSraId());
 
         organisationMock.setName(newName);
