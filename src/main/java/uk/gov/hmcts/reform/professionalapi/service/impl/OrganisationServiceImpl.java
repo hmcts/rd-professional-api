@@ -550,10 +550,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        if(isNotBlank(organisationCreationRequest.getName())){
+        if(isNotBlank(organisationCreationRequest.getName())) {
             existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
         }
-        if(isNotBlank(organisationCreationRequest.getSraId())){
+        if(isNotBlank(organisationCreationRequest.getSraId())) {
             existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
         }
 
