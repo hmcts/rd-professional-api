@@ -1613,6 +1613,38 @@ class OrganisationServiceImplTest {
         verify(paymentAccountMock, times(1)).setStatusMessage("statusMessage");
     }
 
+
+    @Test
+    void test_updateOrganisationNameAndSra() {
+        Organisation organisationMock = mock(Organisation.class);
+        String newName="TestOrgName";
+        String newSraId="TestSraId";
+        String orgIdentifier="9KS20WT";
+        organisationCreationRequest.setName(newName);
+        organisationCreationRequest.setSraId(newSraId);
+
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+
+        when(organisationCreationRequest.getName()).thenReturn(newName);
+        assertNotNull(organisationCreationRequest.getName());
+        when(organisationCreationRequest.getSraId()).thenReturn(newSraId);
+        assertNotNull(organisationCreationRequest.getSraId());
+
+        organisationMock.setName(newName);
+        organisationMock.setSraId(newSraId);
+
+        when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
+
+        ResponseEntity<Object> updatedOrganisation = sut.updateOrganisationNameOrSra(organisationCreationRequest,orgIdentifier);
+
+        assertThat(updatedOrganisation).isNotNull();
+
+        verify(organisationRepository, times(1))
+            .findByOrganisationIdentifier(orgIdentifier);
+        verify(organisationRepository, times(1))
+            .save(organisationMock);
+    }
+
     @Test
     void test_AllAttributesAddedToSuperUser() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"),

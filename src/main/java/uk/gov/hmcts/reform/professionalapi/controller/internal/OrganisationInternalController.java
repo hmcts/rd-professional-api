@@ -51,8 +51,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
@@ -720,7 +720,7 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @PutMapping(
-        value = "/name/{orgId}",
+        value = "/nameSra/{orgId}",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -736,11 +736,8 @@ public class OrganisationInternalController extends SuperController {
         var orgId = removeEmptySpaces(organisationIdentifier);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
 
-        if (isNotBlank(organisationCreationRequest.getSraId())) {
-            organisationCreationRequestValidator.validateOrganisationSraIdInRequest(organisationCreationRequest.getSraId());
-        }
-        if (isNotBlank(organisationCreationRequest.getName()) ) {
-            organisationCreationRequestValidator.validateOrganisationNameInRequest(organisationCreationRequest.getName());
+        if(isBlank(organisationCreationRequest.getName()) && isBlank(organisationCreationRequest.getSraId())) {
+            throw new InvalidRequest("Name or SRA Id not found");
         }
 
         return organisationService.updateOrganisationNameOrSra(organisationCreationRequest, orgId);

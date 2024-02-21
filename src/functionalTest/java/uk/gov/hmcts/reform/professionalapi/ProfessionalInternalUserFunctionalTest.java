@@ -778,10 +778,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
   //  @ToggleEnable(mapKey = "OrganisationInternalController.updatesOrganisationName", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void updateOrganisationNameShouldReturnSuccess() {
+    void updateOrganisationNameAndSraShouldReturnSuccess() {
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
         setUpTestData();
-
+        String updatedName = "updatedName";
+        String updatedSra = "updatedSraId";
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
@@ -791,15 +792,17 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         assertNotNull(orgResponse.get("name"));
 
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().name("Updated Name").build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().name(updatedName).sraId(updatedSra).build();
 
         professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin,intActiveOrgId, OK);
 
-        JsonPath orgupdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
+        JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
         assertThat(response).isNotNull();
-        assertNotNull(orgupdatedNameResponse.get("name"));
-        assertThat(orgupdatedNameResponse.get("name").toString()).contains("Updated Name");
+        assertNotNull(orgUpdatedNameResponse.get("name"));
+        assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+        assertNotNull(orgUpdatedNameResponse.get("sraId"));
+        assertThat(orgUpdatedNameResponse.get("sraId").toString()).contains(updatedSra);
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }

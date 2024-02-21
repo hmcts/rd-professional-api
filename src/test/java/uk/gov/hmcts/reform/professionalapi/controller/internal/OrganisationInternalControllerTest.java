@@ -573,24 +573,20 @@ class OrganisationInternalControllerTest {
     }
 
     @Test
-    void testUpdateOrgName() {
+    void testUpdateOrgNameAndSra() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String updatedName = "NewName";
+        String updatedSra = "NewSRA";
         organisation.setName(updatedName);
+        organisation.setSraId(updatedSra);
         ResponseEntity<Object> updateResponseEntity = ResponseEntity.status(200).body(organisation);
 
         organisationCreationRequest.setName(updatedName);
-
+        organisationCreationRequest.setSraId(updatedSra);
        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
-
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationSraIdInRequest(any(String.class));
-
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationNameInRequest(any(String.class));
-
 
         when(organisationServiceMock.updateOrganisationNameOrSra(organisationCreationRequest,organisation.getOrganisationIdentifier()))
             .thenReturn(updateResponseEntity);
-
 
         ResponseEntity<Object> response = organisationInternalController.updatesOrganisationName(organisationCreationRequest,
             organisation.getOrganisationIdentifier());
@@ -598,13 +594,10 @@ class OrganisationInternalControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
         assertThat(((Organisation) response.getBody()).getName()).isEqualTo(organisationCreationRequest.getName());
+        assertThat(((Organisation) response.getBody()).getSraId()).isEqualTo(organisationCreationRequest.getSraId());
 
         verify(organisationCreationRequestValidatorMock, times(1))
             .validateOrganisationIdentifier(any(String.class));
-        verify(organisationCreationRequestValidatorMock, times(1))
-            .validateOrganisationSraIdInRequest(any(String.class));
-        verify(organisationCreationRequestValidatorMock, times(1))
-            .validateOrganisationNameInRequest(any(String.class));
         verify(organisationServiceMock, times(1))
             .updateOrganisationNameOrSra(organisationCreationRequest, organisation.getOrganisationIdentifier());
 
