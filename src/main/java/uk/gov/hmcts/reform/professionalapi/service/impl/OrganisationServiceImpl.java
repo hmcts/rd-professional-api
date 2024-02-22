@@ -535,6 +535,18 @@ public class OrganisationServiceImpl implements OrganisationService {
         profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_HO_PROFILE,
                 Collections.singletonList(OrganisationTypeConstants.OGD_HO_ORG));
 
+        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_HMRC_PROFILE,
+                Collections.singletonList(OrganisationTypeConstants.OGD_HMRC_ORG));
+
+        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CICA_PROFILE,
+                Collections.singletonList(OrganisationTypeConstants.OGD_CICA_ORG));
+
+        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU,
+                Collections.singletonList(OrganisationTypeConstants.OGD_CAFCASS_CYMRU_ORG));
+
+        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND,
+                Collections.singletonList(OrganisationTypeConstants.OGD_CAFCASS_ENGLAND_ORG));
+
         profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.SOLICITOR_PROFILE,
                 Arrays.asList(OrganisationTypeConstants.SOLICITOR_ORG, OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
                         OrganisationTypeConstants.PROBATE_PRACTITIONER, OrganisationTypeConstants.OTHER_ORG,
