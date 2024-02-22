@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 public class OrganisationByProfileIdsRequestValidatorImpl {
     public void validate(Integer pageSize) {
         if (pageSize != null && pageSize < 1) {
-            throw new InvalidRequest("Invalid pageSize");
+            throw new InvalidRequest("001 missing/invalid pageSize");
         }
     }
 }

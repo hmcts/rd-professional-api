@@ -262,7 +262,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         String actualStatus = (String) response.get("http_status");
         assertThat(actualStatus).isEqualTo(expectedStatus);
         String actualResponseBody = (String) response.get("response_body");
-        assertThat(actualResponseBody).contains(expectedErrorMessage);
+        assertThat(actualResponseBody).containsIgnoringCase(expectedErrorMessage);
     }
 
     private OrganisationOtherOrgsCreationRequest createUniqueOrganisationRequest(String companyNumber, String sraId,
