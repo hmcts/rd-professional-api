@@ -5,22 +5,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromUserConfiguredAccess;
-
 @Setter
 @Getter
 @NoArgsConstructor
 public class OrganisationUserResponse {
-    public String userIdentifier;
-    public String firstName;
-    public String lastName;
-    public String email;
+    private String userIdentifier;
+    private String firstName;
+    private String lastName;
+    private String email;
     private LocalDateTime lastUpdated;
     private List<UserAccessType> userAccessTypes = new ArrayList<>();
 
