@@ -84,8 +84,8 @@ public class RefDataUtil {
     private static String loggingComponentName;
 
 
-    private static final String DEFAULT_ORG_PROFILE_ID = "SOLICITOR_PROFILE";
-    private static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
+    public static final String DEFAULT_ORG_PROFILE_ID = "SOLICITOR_PROFILE";
+    public static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
             new SimpleEntry<String, List<String>>("Solicitor", of("SOLICITOR_PROFILE")),
             new SimpleEntry<String, List<String>>("Local Authority", of("SOLICITOR_PROFILE")),
             new SimpleEntry<String, List<String>>("Probate Practitioner", of("SOLICITOR_PROFILE")),

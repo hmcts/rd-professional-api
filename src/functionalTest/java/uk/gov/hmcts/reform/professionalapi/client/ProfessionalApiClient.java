@@ -71,6 +71,7 @@ public class ProfessionalApiClient {
     private static final String USER_EMAIL_HEADER = "UserEmail";
     private static final String RANDOM_EMAIL = "RANDOM_EMAIL";
     private static final String INTERNAL_BASE_URL = "/refdata/internal/v1/organisations";
+    private static final String INTERNAL_BASE_URL_V2 = "/refdata/internal/v2/organisations";
     private final String professionalApiUrl;
     private final String s2sToken;
 
@@ -498,6 +499,53 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
 
         return response.body().jsonPath();
+    }
+
+    public Map<String, Object> retrieveOrganisationDetailsBySinceDate(String sinceDate, String page, String pageSize) {
+        StringBuilder apiURL = new StringBuilder(INTERNAL_BASE_URL);
+
+        if (sinceDate != null && page == null && pageSize == null) {
+            apiURL.append("?since=").append(sinceDate);
+        } else if (sinceDate != null && page != null && pageSize != null) {
+            apiURL.append("?since=").append(sinceDate)
+                    .append("&page=").append(page)
+                    .append("&size=").append(pageSize);
+        }
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get(apiURL.toString())
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
+
+        log.info("{}:: Retrieve all orgs with pagination and since date (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveOrganisationDetailsBySinceDateV2(String sinceDate,
+                                                                        String page, String pageSize) {
+        StringBuilder apiURL = new StringBuilder(INTERNAL_BASE_URL_V2);
+
+        if (sinceDate != null && page == null && pageSize == null) {
+            apiURL.append("?since=").append(sinceDate);
+        } else if (sinceDate != null && page != null && pageSize != null) {
+            apiURL.append("?since=").append(sinceDate)
+                    .append("&page=").append(page)
+                    .append("&size=").append(pageSize);
+        }
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get(apiURL.toString())
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
+
+        log.info("{}:: Retrieve all orgs with pagination and since date ( Internal-V2 ) response: {}",
+                loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
     }
 
     public Map<String, Object> retrieveOrganisationDetailsForV2(String id, String role, HttpStatus status) {
