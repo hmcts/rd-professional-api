@@ -58,7 +58,13 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                 "PBA1234564", "super-email4@gmail.com", ogdHoOrgType);
         professionalReferenceDataClient.createOrganisationV2(request4);
 
+        // this creates an organisation with no org type
         organisationV1Identifier = createOrganisationRequest();
+
+        // create an organisation with Barrister org type, which should map to Solicitor Profile
+        OrganisationOtherOrgsCreationRequest requestBarrister = this.createUniqueOrganisationRequest("TstSO3", "SRA127",
+                "PBA1234565", "super-email5@gmail.com", OrganisationTypeConstants.BARRISTER);
+        professionalReferenceDataClient.createOrganisationV2(requestBarrister);
     }
 
     @Test
@@ -70,7 +76,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 5; // should be 5 because v1 should be defaulted to solicitor org type
+        int expectedOrganisationsCount = 6; // should be 6 because v1 should be defaulted to solicitor org type
 
         // act
         Map<String, Object> response =
@@ -93,7 +99,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 2;
+        int expectedOrganisationsCount = 4; // 2 solicitor orgs and 1 barrister org and 1 v1 org
 
         // act
         Map<String, Object> response =
@@ -122,7 +128,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 2;
+        int expectedOrganisationsCount = 4; // 2 solicitor orgs and 1 barrister org and 1 v1 org
 
         // act
         Map<String, Object> response =
@@ -184,7 +190,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                 pageSize, lastRecordInPage);
 
         // assert
-        assertSuccessfulResponse(response, 1, "200 OK", false,
+        assertSuccessfulResponse(response, 1, "200 OK", true,
                 null);
     }
 

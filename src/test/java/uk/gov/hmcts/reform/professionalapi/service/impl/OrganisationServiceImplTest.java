@@ -2682,7 +2682,7 @@ class OrganisationServiceImplTest {
         UUID searchAfter = null;
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), any())).thenReturn(orgPage);
+        when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), any(), any())).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
 
         // act

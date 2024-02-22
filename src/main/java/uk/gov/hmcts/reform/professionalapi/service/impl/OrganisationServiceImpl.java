@@ -78,9 +78,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -516,29 +518,37 @@ public class OrganisationServiceImpl implements OrganisationService {
             Integer pageSize,
             UUID searchAfter) {
         List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
+        boolean includeV1Orgs = orgTypes.contains(OrganisationTypeConstants.SOLICITOR_ORG);
 
         Pageable pageableObject = PageRequest.of(0, pageSize);
         Page<Organisation> organisations = organisationRepository
-                .findByOrgTypeIn(orgTypes, searchAfter, pageableObject);
+                .findByOrgTypeIn(orgTypes, searchAfter, includeV1Orgs, pageableObject);
 
         return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
     }
 
     private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
-        return Optional.ofNullable(organisationProfileIds)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(profileId -> {
-                    switch (profileId) {
-                        case OrganisationProfileIdConstants.OGD_DWP_PROFILE:
-                            return OrganisationTypeConstants.OGD_DWP_ORG;
-                        case OrganisationProfileIdConstants.OGD_HO_PROFILE:
-                            return OrganisationTypeConstants.OGD_HO_ORG;
-                        case OrganisationProfileIdConstants.SOLICITOR_PROFILE:
-                        default:
-                            return OrganisationTypeConstants.SOLICITOR_ORG;
-                    }
-                }).toList();
+        Map<String, List<String>> profileIdToOrgTypeMap = new HashMap<>();
+        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_DWP_PROFILE,
+                Collections.singletonList(OrganisationTypeConstants.OGD_DWP_ORG));
+
+        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_HO_PROFILE,
+                Collections.singletonList(OrganisationTypeConstants.OGD_HO_ORG));
+
+        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.SOLICITOR_PROFILE,
+                Arrays.asList(OrganisationTypeConstants.SOLICITOR_ORG, OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
+                        OrganisationTypeConstants.PROBATE_PRACTITIONER, OrganisationTypeConstants.OTHER_ORG,
+                        OrganisationTypeConstants.BARRISTER, OrganisationTypeConstants.OGD_OTHER_ORG));
+
+        List<String> orgTypes = new ArrayList<>();
+        for (String profileId : organisationProfileIds) {
+            if (profileIdToOrgTypeMap.containsKey(profileId)) {
+                orgTypes.addAll(profileIdToOrgTypeMap.get(profileId));
+            } else {
+                orgTypes.addAll(profileIdToOrgTypeMap.get(OrganisationProfileIdConstants.SOLICITOR_PROFILE));
+            }
+        }
+        return orgTypes;
     }
 
     @Override

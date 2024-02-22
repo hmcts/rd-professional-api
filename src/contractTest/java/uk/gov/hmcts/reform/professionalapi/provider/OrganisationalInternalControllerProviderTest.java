@@ -311,7 +311,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(anyList(), null, any(Pageable.class))).thenReturn(organisationPage);
+        when(organisationRepository.findByOrgTypeIn(anyList(), null, any(), any(Pageable.class)))
+                .thenReturn(organisationPage);
         when(organisationPage.getContent()).thenReturn(List.of(organisation));
     }
 
@@ -325,7 +326,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(anyList(), any(UUID.class), any(Pageable.class)))
+        when(organisationRepository.findByOrgTypeIn(anyList(), any(UUID.class), any(), any(Pageable.class)))
                 .thenReturn(organisationPage);
         when(organisationPage.getContent()).thenReturn(List.of(organisation));
     }
