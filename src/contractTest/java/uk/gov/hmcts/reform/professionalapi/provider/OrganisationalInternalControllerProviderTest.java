@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -311,7 +312,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(anyList(), null, any(), any(Pageable.class)))
+        when(organisationRepository.findByOrgTypeIn(anyList(), null, anyBoolean(), any(Pageable.class)))
                 .thenReturn(organisationPage);
         when(organisationPage.getContent()).thenReturn(List.of(organisation));
     }
@@ -326,7 +327,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(anyList(), any(UUID.class), any(), any(Pageable.class)))
+        when(organisationRepository.findByOrgTypeIn(anyList(), any(UUID.class), anyBoolean(), any(Pageable.class)))
                 .thenReturn(organisationPage);
         when(organisationPage.getContent()).thenReturn(List.of(organisation));
     }
