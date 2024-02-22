@@ -527,7 +527,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
     }
 
-    private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
+    private static ArrayList<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
         Map<String, List<String>> profileIdToOrgTypeMap = new HashMap<>();
         profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_DWP_PROFILE,
                 Collections.singletonList(OrganisationTypeConstants.OGD_DWP_ORG));
@@ -552,7 +552,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                         OrganisationTypeConstants.PROBATE_PRACTITIONER, OrganisationTypeConstants.OTHER_ORG,
                         OrganisationTypeConstants.BARRISTER, OrganisationTypeConstants.OGD_OTHER_ORG));
 
-        List<String> orgTypes = new ArrayList<>();
+        ArrayList<String> orgTypes = new ArrayList<>();
         for (String profileId : organisationProfileIds) {
             if (profileIdToOrgTypeMap.containsKey(profileId)) {
                 orgTypes.addAll(profileIdToOrgTypeMap.get(profileId));

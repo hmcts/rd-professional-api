@@ -2679,12 +2679,36 @@ class OrganisationServiceImplTest {
         // arrange
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
+        profileIds.add("made up profile id");
         Integer pageSize = 1;
         UUID searchAfter = null;
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
+        when(orgPage.isLast()).thenReturn(true);
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
+                searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void shouldRetrieveOrganisationsWithEmptyProfileIdList() {
+        // arrange
+        List<String> profileIds = new ArrayList<>();
+        Integer pageSize = 1;
+        UUID searchAfter = null;
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
+        when(orgPage.getContent()).thenReturn(organisations);
+        when(orgPage.isLast()).thenReturn(false);
 
         // act
         MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
