@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -172,6 +173,40 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE)))
                 .thenReturn(List.of(organisation));
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+    }
+
+    @State("Active organisations exists for a logged in user using lastUpdatedSince")
+    public void setActiveOrganisationsForLoggedInUserUsingLastUpdatedSince() throws IOException {
+
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
+        addSuperUser(organisation);
+        organisation.setOrganisationIdentifier("M0AEAP0");
+        organisation.setLastUpdated(LocalDateTime.of(2023, 11, 20, 15, 51, 33));
+        organisation.setDateApproved(LocalDateTime.of(2023, 11, 19, 15, 51, 33));
+
+        Page<Organisation> pageable = Mockito.mock(Page.class);
+        when(pageable.getContent()).thenReturn(List.of(organisation));
+        when(pageable.getTotalElements()).thenReturn(1L);
+        when(pageable.isLast()).thenReturn(true);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(any(), any(), any()))
+                .thenReturn(pageable);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();

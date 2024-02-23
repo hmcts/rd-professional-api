@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,6 +54,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 
@@ -62,6 +65,7 @@ class OrganisationInternalControllerV2Test {
     private OrganisationEntityResponseV2 organisationEntityResponse;
     private OrganisationService organisationServiceMock;
     private Organisation organisation;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
 
     private ProfessionalUserService professionalUserServiceMock;
 
@@ -99,6 +103,7 @@ class OrganisationInternalControllerV2Test {
                 "soMeone@somewhere.com", organisation);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
+        organisationIdentifierValidatorImpl = mock(OrganisationIdentifierValidatorImpl.class);
         organisationsDetailResponse =
                 new OrganisationsDetailResponseV2(singletonList(organisation),
                         false, false, true,true);
@@ -142,17 +147,36 @@ class OrganisationInternalControllerV2Test {
     void test_RetrieveOrganisations() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null))
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null, null))
                 .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null,
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null,
                 null, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveAllOrganisationsForV2Api(null);
+                .retrieveAllOrganisationsForV2Api(null, null);
+    }
+
+    @Test
+    void test_RetrieveOrganisationsWithSince() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String since = "2019-08-16T15:00:41";
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(formattedSince, null))
+                .thenReturn(organisationsDetailResponse);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, since,
+                null, null, null);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+                .retrieveAllOrganisationsForV2Api(formattedSince, null);
     }
 
     @Test
@@ -163,7 +187,7 @@ class OrganisationInternalControllerV2Test {
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, 1, null);
+                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, null, 1, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -181,7 +205,7 @@ class OrganisationInternalControllerV2Test {
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
-                .getOrganisationIdentifier(), "PENDING", null, null);
+                .getOrganisationIdentifier(), null, "PENDING", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -194,17 +218,17 @@ class OrganisationInternalControllerV2Test {
     void test_RetrieveOrganisationByStatusWithIdNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.findByOrganisationStatusForV2Api(any(), any()))
+        when(organisationServiceMock.findByOrganisationStatusForV2Api(any(), any(), any()))
                 .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(null, "PENDING", null, null);
+                .retrieveOrganisations(null,  null, "PENDING", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .findByOrganisationStatusForV2Api(OrganisationStatus.PENDING.name(), null);
+                .findByOrganisationStatusForV2Api(null, OrganisationStatus.PENDING.name(), null);
     }
 
     @Test
@@ -213,10 +237,10 @@ class OrganisationInternalControllerV2Test {
         Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
         Pageable pageable = PageRequest.of(0, 1, Sort.by(order));
 
-        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(pageable))
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null, pageable))
             .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, 1);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, null, 1);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -224,7 +248,7 @@ class OrganisationInternalControllerV2Test {
                 .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
-            .retrieveAllOrganisationsForV2Api(pageable);
+            .retrieveAllOrganisationsForV2Api(null, pageable);
     }
 
     @Test
@@ -233,11 +257,11 @@ class OrganisationInternalControllerV2Test {
         Sort.Order order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
         Pageable pageable = PageRequest.of(0, 20, Sort.by(order));
 
-        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(pageable))
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null, pageable))
             .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(null, null, 1, null);
+                .retrieveOrganisations(null, null, null, 1, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -245,7 +269,7 @@ class OrganisationInternalControllerV2Test {
                 .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
-            .retrieveAllOrganisationsForV2Api(pageable);
+            .retrieveAllOrganisationsForV2Api(null, pageable);
     }
 
     @Test
@@ -255,10 +279,10 @@ class OrganisationInternalControllerV2Test {
         Sort.Order name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
         Pageable pageable = PageRequest.of(0, 20, Sort.by(order).and(Sort.by(name)));
 
-        when(organisationServiceMock.findByOrganisationStatusForV2Api(any(), any()))
+        when(organisationServiceMock.findByOrganisationStatusForV2Api(any(), any(), any()))
             .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING", 1, 20);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, "PENDING", 1, 20);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -266,7 +290,7 @@ class OrganisationInternalControllerV2Test {
                 .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
-            .findByOrganisationStatusForV2Api(OrganisationStatus.PENDING.name(), pageable);
+            .findByOrganisationStatusForV2Api(null, OrganisationStatus.PENDING.name(), pageable);
     }
 
     @Test

@@ -14,18 +14,24 @@ import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
 
 @SerenityTest
 @SpringBootTest
@@ -38,6 +44,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String superUserEmail;
     String invitedUserEmail;
     String invitedUserId;
+    String sinceDateTime;
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
     @Test
@@ -50,7 +57,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
         deleteOtherOrganisationScenarios();
-
+        findOrganisationWithSinceDateGroupAccessScenarios();
     }
 
     public void setUpTestData() {
@@ -66,7 +73,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
- 
+
     }
 
     public void createOrganisationScenario() {
@@ -239,7 +246,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> organisations = professionalApiClient
             .retrieveAllOrganisationsWithPaginationV2(hmctsAdmin, "1", "10");
 
-        assertThat(organisations).isNotNull().hasSize(1);
+        assertThat(organisations).isNotNull().hasSize(2);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
 
@@ -267,4 +274,65 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         professionalApiClient.retrieveOrganisationDetailsForV2(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
         log.info("deleteActiveOtherOrganisationShouldReturnSuccess :: END");
     }
+
+    public void findOrganisationWithSinceDateGroupAccessScenarios() {
+        sinceDateTime = generateRandomDate(null, "10");
+        log.info("Since Date is set to : {} ", sinceDateTime);
+        findOrganisationBySinceDateInternalV2ShouldBeSuccess(sinceDateTime, null, null);
+        findOrganisationBySinceDateInternalV2ShouldBeSuccess(sinceDateTime, "1", "2");
+    }
+
+    public void findOrganisationBySinceDateInternalV2ShouldBeSuccess(String sinceDate, String page,
+                                                                     String pageSize) {
+        log.info("findOrganisationBySinceDateInternalV2ShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationDetailsBySinceDateV2(
+                sinceDate, page, pageSize);
+        assertThat(response).isNotNull();
+        verifyOrganisationDetailsBySinceDateV2(response, pageSize, sinceDate);
+        log.info("findOrganisationBySinceDateInternalV2ShouldBeSuccess :: END");
+    }
+
+    private void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response, String pageSize,
+                                                        String sinceDate) {
+        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
+
+        assertThat(organisations)
+                .isNotNull()
+                .isNotEmpty();
+
+        if (pageSize != null) {
+            assertThat(organisations)
+                    .hasSize(Integer.parseInt(pageSize));
+        }
+        assertThat(response.get("moreAvailable"))
+                .isNotNull();
+
+        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
+
+        organisations.forEach(org -> {
+
+            assertThat(org.get("organisationIdentifier"))
+                    .isNotNull();
+
+            assertThat(org.get("lastUpdated"))
+                    .isNotNull();
+
+            String dateString = (String) org.get("lastUpdated");
+            String formattedDateString = DateUtils.formatDateString(dateString);
+            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
+            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
+
+            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
+
+            if (organisationProfileIds != null) {
+                assertThat(organisationProfileIds)
+                        .isNotEmpty()
+                        .hasSizeGreaterThan(0);
+
+                assertThat(organisationProfileIds.get(0))
+                        .isEqualTo("SOLICITOR_PROFILE");
+            }
+        });
+    }
+
 }

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,8 +49,18 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @EntityGraph(value = "Organisation.alljoins")
     Page<Organisation> findByStatusIn(List<OrganisationStatus> statuses, Pageable pageable);
 
+    List<Organisation> findByStatusInAndLastUpdatedGreaterThanEqual(List<OrganisationStatus> statuses,
+                                                                    LocalDateTime since);
+
+    @EntityGraph(value = "Organisation.alljoins")
+    Page<Organisation> findByStatusInAndLastUpdatedGreaterThanEqual(List<OrganisationStatus> statuses,
+                                                                    LocalDateTime since, Pageable pageable);
+
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
+
+    @EntityGraph(value = "Organisation.alljoins")
+    List<Organisation> findByLastUpdatedGreaterThanEqual(LocalDateTime since);
 
     @Query(FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2 + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4)
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);

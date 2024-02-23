@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,8 +45,12 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @DateTimeFormat
     @JsonInclude(ALWAYS)
     protected LocalDateTime dateApproved = null;
-
-
+    @JsonProperty
+    @DateTimeFormat
+    @JsonInclude(ALWAYS)
+    protected LocalDateTime lastUpdated = null;
+    @JsonProperty
+    protected List<String> organisationProfileIds;
 
     public OrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
@@ -105,6 +110,9 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
 
         this.dateReceived = organisation.getCreated();
         this.dateApproved = organisation.getDateApproved();
+        this.lastUpdated = organisation.getLastUpdated();
+        this.organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
 
     }
+
 }

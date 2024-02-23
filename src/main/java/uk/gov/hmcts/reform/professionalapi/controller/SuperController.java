@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -79,6 +80,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
@@ -186,22 +188,25 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-
-
-
-    protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status,
-                                                                   Integer page, Integer size) {
+    protected ResponseEntity<Object> retrieveAllOrganisationsOrById(String organisationIdentifier,
+                                                                    String lastUpdatedSince,
+                                                                    String status, Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
         long totalRecords = 1;
 
+        LocalDateTime formattedSince = null;
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
+        }
+
         Object organisationResponse = null;
         var pageable = createPageable(page, size);
-        var pageableByStatus = createPageableByStatus(page,size);
 
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-            organisationResponse = organisationService.retrieveAllOrganisations(pageable);
+            organisationResponse = organisationService.retrieveAllOrganisations(formattedSince, pageable);
             totalRecords = ((OrganisationsDetailResponse) organisationResponse).getTotalRecords();
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
@@ -214,8 +219,9 @@ public abstract class SuperController {
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
             //Received request to retrieve organisation with status
 
+            var pageableByStatus = createPageableByStatus(page,size);
             organisationResponse = organisationService
-                        .findByOrganisationStatus(orgStatus.toUpperCase(), pageableByStatus);
+                        .findByOrganisationStatus(formattedSince, orgStatus.toUpperCase(), pageableByStatus);
             totalRecords = ((OrganisationsDetailResponse) organisationResponse).getTotalRecords();
         }
 
@@ -229,11 +235,18 @@ public abstract class SuperController {
     }
 
 
-    protected ResponseEntity<Object> retrieveAllOrganisationOrByIdForV2Api(String organisationIdentifier, String status,
-                                                                   Integer page, Integer size) {
+    protected ResponseEntity<Object> retrieveAllOrganisationsOrByIdForV2Api(String organisationIdentifier,
+                                                                            String lastUpdatedSince, String status,
+                                                                            Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
         long totalRecords = 1;
+
+        LocalDateTime formattedSince = null;
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
+        }
 
         Object organisationResponse = null;
         var pageable = createPageable(page, size);
@@ -241,7 +254,7 @@ public abstract class SuperController {
 
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(pageable);
+            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(formattedSince, pageable);
             totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
@@ -255,7 +268,7 @@ public abstract class SuperController {
             //Received request to retrieve organisation with status
 
             organisationResponse = organisationService
-                    .findByOrganisationStatusForV2Api(orgStatus.toUpperCase(), pageableByStatus);
+                    .findByOrganisationStatusForV2Api(formattedSince, orgStatus.toUpperCase(), pageableByStatus);
             totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
         }
 
