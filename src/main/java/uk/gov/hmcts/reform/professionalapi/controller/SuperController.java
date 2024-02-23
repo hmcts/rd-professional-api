@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -46,6 +47,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -69,6 +72,7 @@ import javax.servlet.http.HttpServletRequest;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -343,6 +347,22 @@ public abstract class SuperController {
                         false, true, false,true));
     }
 
+    protected ResponseEntity<Object> updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
+                                                            String organisationIdentifier) {
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+
+        if(isNotBlank(organisationCreationRequest.getSraId())){
+            organisationCreationRequestValidator.validateOrganisationSRAIdInRequest(organisationCreationRequest);
+        }
+        if(isNotBlank(organisationCreationRequest.getName())){
+            organisationCreationRequestValidator.validateOrganisationNameInRequest(organisationCreationRequest);
+        }
+
+        organisationService.updateOrganisationNameOrSRA(organisationCreationRequest, orgId);
+        return ResponseEntity.status(200).build();
+    }
+
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
         Boolean  isOrgApprovalRequest = false;
@@ -582,6 +602,40 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(bulkCustomerDetailResponse);
     }
 
+
+    protected void deleteDxAddressOfGivenOrganisation(DxAddressCreationRequest deletedxRequest,
+                                                      String orgId) {
+
+        if (isBlank(deletedxRequest.getDxNumber())) {
+            throw new InvalidRequest("No dx number  passed in the request");
+        }
+
+        List<ContactInformation>  contactInformationList = organisationService.retrieveContactInformationByOrganisationId(orgId);
+        if (isEmpty(contactInformationList)) {
+            throw new ResourceNotFoundException("No contact information  found");
+        }
+
+             //ANY CONTACT INFORMATION FOR THE ORGANISATION THAT HAS THE GIVEN DX ADDRESS WILL BE DELETED
+        contactInformationList.forEach(contactInfo -> {
+
+            List<DxAddress> dxAddresses = contactInfo.getDxAddresses();
+            dxAddresses.forEach(dxAddress ->{
+                if (ObjectUtils.isEmpty(dxAddresses)) {
+                    throw new InvalidRequest("No dx address found for organisation");
+                }
+                if (dxAddress.getDxNumber().equals(deletedxRequest.getDxNumber())) {
+                    //delete the passed dxaddress  from the organisation
+                    organisationService.deleteDxAddressForOrganisation(dxAddress.getDxNumber(), contactInfo.getId());
+                }
+            });
+        });
+
+
+
+
+
+
+    }
 
     protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
                                                             String orgId, String userId) {

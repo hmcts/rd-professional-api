@@ -20,6 +20,10 @@ public class ProfessionalApiConstants {
 
     public static final String NO_ORG_FOUND_FOR_GIVEN_ID
             = "No Organisation was found with the given organisationIdentifier ";
+
+    public static final String NO_CONTACT_FOUND_FOR_GIVEN_ORG
+        = "No Contact Information was found with the given organisationIdentifier ";
+
     public static final String ORG_NOT_ACTIVE_NO_USERS_RETURNED
             = "Organisation is not Active hence not returning any users";
     public static final String ERROR_MESSAGE_403_FORBIDDEN = "403 Forbidden";

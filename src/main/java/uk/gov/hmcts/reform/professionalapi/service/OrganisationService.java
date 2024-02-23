@@ -7,12 +7,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -41,8 +43,11 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
+    OrganisationResponse updateOrganisationNameOrSRA(
+        OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier);
+
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
-                                            String organisationIdentifier,Boolean isOrgApprovalRequest);
+                                            String organisationIdentifier, Boolean isOrgApprovalRequest);
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
@@ -70,10 +75,16 @@ public interface OrganisationService {
     void addContactInformationsToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest, String organisationIdentifier);
 
+    ResponseEntity<ContactInformationResponse>  updateContactInformationForOrganisation(
+        List<ContactInformationCreationRequest> contactInformationCreationRequest, String organisationIdentifier);
+
     void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet);
 
     void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier);
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
 
+    List<ContactInformation>  retrieveContactInformationByOrganisationId(String orgId);
+
+    void deleteDxAddressForOrganisation(String dxAddresses, UUID id);
 }

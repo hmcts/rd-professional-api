@@ -194,6 +194,18 @@ public class OrganisationCreationRequestValidator {
         requestContactInformation(request.getContactInformation());
     }
 
+    public void validateOrganisationNameInRequest(OrganisationCreationRequest request) {
+        requestValues(request.getName());
+        requestSuperUserValidateAccount(request.getSuperUser());
+
+    }
+
+    public void validateOrganisationSRAIdInRequest(OrganisationCreationRequest request) {
+        requestValues(request.getSraId());
+        requestSuperUserValidateAccount(request.getSuperUser());
+
+    }
+
     private void validateOrgAttributesRequest(List<OrgAttributeRequest> orgAttributes) {
         if (orgAttributes != null) {
             orgAttributes.forEach(orgAttribute -> {
