@@ -30,9 +30,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -63,6 +65,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -85,8 +88,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_EMAIL_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -122,6 +128,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     PrdEnumRepository prdEnumRepository;
     @Autowired
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
+    @Autowired
+    UserAttributeRepository userAttributeRepository;
     @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
@@ -278,6 +286,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
+
     public void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,
             Organisation organisation) {
@@ -352,6 +361,27 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         }
         return updatedOrganisationDetails;
+    }
+
+    public ResponseEntity<Object> updateOrganisationAdmin(UserUpdateRequest userUpdateRequest) {
+        if (isBlank(userUpdateRequest.getExistingAdminEmail() )
+            || isBlank(userUpdateRequest.getNewAdminEmail() ) )
+        {
+            throw new InvalidRequest(ERROR_MSG_EMAIL_FOUND);
+        }
+        // call professional service to fetch prof for existing user email
+        ProfessionalUser existingAdmin = professionalUserService
+            .findProfessionalUserByEmailAddress(userUpdateRequest.getExistingAdminEmail());
+        // call professional service to fetch user for new user email
+        ProfessionalUser newAdmin = professionalUserService
+            .findProfessionalUserByEmailAddress(userUpdateRequest.getNewAdminEmail());
+        //call userattribute service to update professional_id for
+        // userattribute set to new user where id was old user and prd_enum_type = 'ADMIN_ROLE'
+        userAttributeService.updateUser(existingAdmin,newAdmin);
+        //call useraccount map service to set professional id = new id where id = old user
+        userAccountMapService.updateUser(existingAdmin,newAdmin);
+
+        return ResponseEntity.status(200).build();
     }
 
     @Override
@@ -744,6 +774,47 @@ public class OrganisationServiceImpl implements OrganisationService {
                 throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
         }
 
+    }
+
+
+
+    @Override
+    @Transactional
+    public DeleteUserResponse deleteUserForOrganisation(Organisation organisation, List<String> emails) {
+        var deleteOrganisationResponse = new DeleteOrganisationResponse();
+        if(emails.isEmpty()){
+            throw new InvalidRequest("Please provide both email addresses");
+        }
+
+       Set<String> userIds= emails.stream().map(
+           email-> {
+               ProfessionalUser professionalUser = professionalUserRepository
+                   .findByEmailAddress(RefDataUtil.removeAllSpaces(email));
+               if(professionalUser == null){
+                   throw new InvalidRequest("Email address not found");
+               }
+               return  professionalUser.getId().toString();
+           }).collect(Collectors.toSet());
+
+        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
+         deleteOrganisationResponse = RefDataUtil
+            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
+         if(deleteOrganisationResponse == null){
+             throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
+         }
+
+        if(organisation.getStatus().isActive()) {
+            emails.forEach( email -> {
+                ProfessionalUser professionalUser =
+                    professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
+                userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
+                professionalUserRepository.delete(professionalUser);
+            });
+        }else{
+            throw new InvalidRequest("Organisation is not in an Active status cannot delete user");
+        }
+        return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode()
+            ,deleteOrganisationResponse.getMessage());
     }
 
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
