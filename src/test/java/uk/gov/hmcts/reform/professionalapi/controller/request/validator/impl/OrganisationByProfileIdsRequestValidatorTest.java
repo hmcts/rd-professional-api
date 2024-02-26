@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-class OrganisationByProfileIdsRequestValidatorImplTest {
+class OrganisationByProfileIdsRequestValidatorTest {
 
-    private final OrganisationByProfileIdsRequestValidatorImpl validator =
-            new OrganisationByProfileIdsRequestValidatorImpl();
+    private final OrganisationByProfileIdsRequestValidator validator =
+            new OrganisationByProfileIdsRequestValidator();
 
     @Test
     void shouldNotThrowExceptionWhenPageSizeAndSearchAfterAreValid() {
