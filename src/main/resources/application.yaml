@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8090}
+  port: ${PORT:8077}
 
 management:
   endpoints:
@@ -52,7 +52,7 @@ spring:
     caffeine:
       spec: maximumSize=50,expireAfterWrite=1m
 
-### database configuration
+  ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5428}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
@@ -136,7 +136,8 @@ prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 allowedStatus: ACTIVE
 
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
+## userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
+userProfUrl: ${USER_PROFILE_URL:http://localhost:8091}
 
 feign:
   allow:
@@ -158,14 +159,14 @@ loggingComponentName: RD_Professional_API
 
 launchdarkly:
   sdk:
-    key: ${LD_SDK_KEY:}
+    key: sdk-b1310c4a-e522-4512-9e68-d75d23b04c5d
     environment: ${LAUNCH_DARKLY_ENV:local}
     user: rd
 
 
 azure:
   storage:
-    account-name: ${ACCOUNT_NAME:ACCOUNT_NAME}
-    account-key: ${ACCOUNT_KEY:ACCOUNT_KEY}
+    account-name: rdaat
+    account-key: OvJl7NtlengOYaNSVkkMAEAu21bDkcMi5vnm3EyXLv5xtjF426b98TG0DhbHVp71wbEOpgINr29eEVsSSVYO5g==
     container-name: ${CONTAINER_NAME:CONTAINER_NAME}
-    blob-url-suffix: ${BLOB_URL_SUFFIX:BLOB_URL_SUFFIX}
+    blob-url-suffix: core.windows.net

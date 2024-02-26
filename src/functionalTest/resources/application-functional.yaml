@@ -1,4 +1,4 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
+targetInstance: ${TEST_URL:http://localhost:8077}
 
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
@@ -6,10 +6,10 @@ s2s-name: rd_professional_api
 scope-name: openid profile roles manage-user create-user search-user
 
 idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
-oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:}
-idam.auth.clientId: ${OAUTH2_CLIENT_ID:}
+oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:a20c3cf7-1fb4-4bcf-89ec-963c05a13f71}
+idam.auth.clientId: ${OAUTH2_CLIENT_ID:rd-professional-api}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}
-s2s-secret: ${PROFESSIONAL_API_S2S_SECRET:}
+s2s-secret: ${PROFESSIONAL_API_S2S_SECRET:Y2ROIZ3PW4WRHVQZ}
 spring.jpa.properties.hibernate.default_schema: dbrefdata
 spring.flyway.enabled: false
 ## Secure roles configuration 1
@@ -39,6 +39,12 @@ postgres.password: ${FUNC_DATABASE_PASS}
 postgres.port: ${FUNC_DATABASE_PORT}
 #######
 
+launchdarkly:
+  sdk:
+    key: sdk-b1310c4a-e522-4512-9e68-d75d23b04c5d
+    environment: ${LAUNCH_DARKLY_ENV:local}
+    user: rd
 
+LD_SDK_KEY : sdk-b1310c4a-e522-4512-9e68-d75d23b04c5d
 
 
