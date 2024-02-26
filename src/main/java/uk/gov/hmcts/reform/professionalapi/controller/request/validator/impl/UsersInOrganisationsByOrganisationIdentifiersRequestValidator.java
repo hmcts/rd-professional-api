@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import java.util.UUID;
 
 @Component
-public class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl {
+public class UsersInOrganisationsByOrganisationIdentifiersRequestValidator {
     public void validate(Integer pageSize, UUID searchAfterOrg, UUID searchAfterUser) {
         if (pageSize != null && pageSize < 1) {
             throw new InvalidRequest("Invalid pageSize");

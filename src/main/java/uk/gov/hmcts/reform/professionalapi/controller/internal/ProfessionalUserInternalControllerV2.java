@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 
 import java.util.UUID;
@@ -36,7 +36,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 public class ProfessionalUserInternalControllerV2 extends SuperController {
     @Autowired
-    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidatorImpl usersInOrgByIdentifierValidatorImpl;
+    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidator usersInOrgByIdentifierValidator;
 
     @Operation(
             summary = "Retrieves users in organisations by provided organisation identifiers",
@@ -81,7 +81,7 @@ public class ProfessionalUserInternalControllerV2 extends SuperController {
             @RequestParam(value = "searchAfterOrg", required = false) UUID searchAfterOrg,
             @RequestParam(value = "searchAfterUser", required = false) UUID searchAfterUser
     ) {
-        usersInOrgByIdentifierValidatorImpl.validate(pageSize, searchAfterOrg, searchAfterUser);
+        usersInOrgByIdentifierValidator.validate(pageSize, searchAfterOrg, searchAfterUser);
 
         UsersInOrganisationsByOrganisationIdentifiersResponse response =
                 professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(
