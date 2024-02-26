@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -53,6 +54,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -300,6 +302,35 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
     }
 
+    @SuppressWarnings("unchecked")
+    @State("A page size & list of organisation profiles for a PRD internal organisation request")
+    public void setUpOrganisationWithPageSize() {
+        Organisation organisation = getOrganisation();
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
+        organisation.setId(UUID.randomUUID());
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), null, anyBoolean(), any(Pageable.class)))
+                .thenReturn(organisationPage);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+    }
+
+    @SuppressWarnings("unchecked")
+    @State("A page size, search after & list of organisation profiles for a PRD internal organisation request")
+    public void setUpOrganisationWithPageSizeAndSearchAfter() {
+        Organisation organisation = getOrganisation();
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
+        organisation.setId(UUID.randomUUID());
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), any(UUID.class), anyBoolean(), any(Pageable.class)))
+                .thenReturn(organisationPage);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+    }
 
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",

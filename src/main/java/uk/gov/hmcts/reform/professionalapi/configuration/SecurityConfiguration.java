@@ -99,6 +99,8 @@ public class SecurityConfiguration {
            .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations").permitAll()
             .antMatchers(HttpMethod.GET, "/refdata/internal/v1/organisations/users").permitAll()
                 .antMatchers(HttpMethod.POST, "/refdata/external/v2/organisations").permitAll()
+                .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations/getOrganisationsByProfile")
+                .permitAll()
                 .antMatchers(HttpMethod.POST, "/refdata/internal/v2/organisations").permitAll()
            .anyRequest()
            .authenticated()
