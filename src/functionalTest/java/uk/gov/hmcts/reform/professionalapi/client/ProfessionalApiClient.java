@@ -1315,6 +1315,21 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
+    public void updatesOrganisationName(OrganisationCreationRequest organisationCreationRequest, String role,
+                                   String organisationIdentifier, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+            .body(organisationCreationRequest)
+            .put("/refdata/internal/v1/organisations/nameSra/" + organisationIdentifier)
+            .andReturn();
+
+        log.info("{}:: Update organisation Name or SRA id response: {}", loggingComponentName, response.getStatusCode());
+
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
+    }
+
     public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
