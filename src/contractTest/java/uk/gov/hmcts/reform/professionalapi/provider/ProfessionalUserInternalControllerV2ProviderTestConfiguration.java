@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.ProfessionalUserInternalControllerV2;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -23,9 +22,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 
 @Configuration
 public class ProfessionalUserInternalControllerV2ProviderTestConfiguration extends ProviderTestConfiguration {
-    @MockBean
-    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidator usersInOrgValidatorImpl;
-
     @MockBean
     protected ProfessionalUserServiceImpl professionalUserService;
 
