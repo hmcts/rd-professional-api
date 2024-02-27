@@ -798,7 +798,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
             .name(updatedName).sraId(updatedSra).build();
 
-        professionalApiClient.updateOrganisation(organisationCreationRequest,
+        professionalApiClient.updatesOrganisationName(organisationCreationRequest,
             hmctsAdmin,organisationIdentifier, OK);
 
         JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
