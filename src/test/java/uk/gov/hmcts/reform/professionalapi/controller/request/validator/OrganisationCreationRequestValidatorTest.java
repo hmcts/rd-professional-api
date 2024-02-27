@@ -583,6 +583,4 @@ class OrganisationCreationRequestValidatorTest {
                 organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
     }
 
-
-
 }
