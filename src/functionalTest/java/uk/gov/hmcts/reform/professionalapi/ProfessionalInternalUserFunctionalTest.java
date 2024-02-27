@@ -784,7 +784,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @ExtendWith(FeatureToggleConditionExtension.class)
     void updateOrganisationNameAndSraShouldReturnSuccess() {
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
-        setUpTestData();
         String updatedName = "updatedName";
         String updatedSra = "updatedSraId";
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -800,7 +799,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             .name(updatedName).sraId(updatedSra).build();
 
         professionalApiClient.updateOrganisation(organisationCreationRequest,
-            hmctsAdmin,intActiveOrgId, OK);
+            hmctsAdmin,organisationIdentifier, OK);
 
         JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
