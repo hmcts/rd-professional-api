@@ -584,6 +584,8 @@ class OrganisationInternalControllerTest {
         organisationCreationRequest.setSraId(updatedSra);
 
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
+        assertThat(organisationCreationRequest.getName()).isNotEmpty();
+        assertThat(organisationCreationRequest.getSraId()).isNotEmpty();
 
         ResponseEntity<Object> updateResponseEntity = ResponseEntity.status(200).body(organisation);
         when(organisationServiceMock.updateOrganisationNameOrSra(organisationCreationRequest,
