@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -54,6 +55,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
@@ -1231,4 +1233,61 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .sorted(Comparator.comparing(map -> (String) map.get(key)))
                 .collect(Collectors.toList());
     }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateContactInformationForOrganisationShouldReturnSuccess() {
+        log.info("updateContactInformationForOrganisationShouldReturnSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertNotNull(orgResponse);
+        List<HashMap>  existingContactInformationList =  (List) orgResponse.get("contactInformation");
+
+        assertThat(existingContactInformationList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequestList =
+            professionalApiClient.createContactInformationCreationRequests();
+        assertThat(contactInformationCreationRequestList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+        ContactInformationCreationRequest contactInformationCreationRequest =
+            contactInformationCreationRequestList.get(0);
+
+        existingContactInformationList.forEach(existingContactInfo -> {
+
+            assertThat(existingContactInfo.get("addressLine1")).isNotNull();
+            assertThat(existingContactInfo.get("addressLine2")).isNotNull();
+            assertThat(existingContactInfo.get("addressLine3")).isNotNull();
+            assertThat(existingContactInfo.get("uprn")).isNotNull();
+            assertThat(existingContactInfo.get("country")).isNotNull();
+            assertThat(existingContactInfo.get("townCity")).isNotNull();
+            assertThat(existingContactInfo.get("country")).isNotNull();
+            assertThat(existingContactInfo.get("postCode")).isNotNull();
+
+            Response result =
+                professionalApiClient.updateContactInformationsToOrganisation( aContactInformationCreationRequest()
+                    .uprn(contactInformationCreationRequest.getUprn())
+                    .addressLine1(contactInformationCreationRequest.getAddressLine1())
+                    .addressLine2(contactInformationCreationRequest.getAddressLine2())
+                    .addressLine3(contactInformationCreationRequest.getAddressLine3())
+                    .country(contactInformationCreationRequest.getCountry())
+                    .county(contactInformationCreationRequest.getCounty())
+                    .townCity(contactInformationCreationRequest.getTownCity())
+                    .postCode(contactInformationCreationRequest.getPostCode())
+                    .dxAddress(contactInformationCreationRequest.getDxAddress())
+                    .build(),
+                    OK,organisationIdentifier);
+
+            assertNotNull(result);
+            assertThat(result.getBody()).isNotNull();
+            assertThat(result.statusCode()).isEqualTo(200);
+        });
+
+        log.info("updateContactInformationForOrganisationShouldReturnSuccess :: END");
+    }
+
 }

@@ -1661,4 +1661,28 @@ public class ProfessionalApiClient {
         log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
     }
+
+    @SuppressWarnings("unchecked")
+    public Response updateContactInformationsToOrganisation(
+
+        ContactInformationCreationRequest
+            contactInformationCreationRequest,
+        HttpStatus expectedStatus,
+        String organisationId) {
+
+        Response response = getMultipleAuthHeadersInternal()
+            .body(contactInformationCreationRequest)
+            .put("/refdata/internal/v1/organisations/contactInformation/" + organisationId )
+            .andReturn();
+
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
+
+        log.info("{}:: Update organisation contact information response: {}",
+            loggingComponentName, response.getStatusCode());
+
+        return response;
+
+    }
 }

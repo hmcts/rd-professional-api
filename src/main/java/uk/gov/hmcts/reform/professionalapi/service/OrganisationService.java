@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -32,6 +33,8 @@ public interface OrganisationService {
     BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                        String idamId);
 
+    ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        ContactInformationCreationRequest contactInfo, String organisationIdentifier);
     OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
 
     OrganisationEntityResponseV2 retrieveOrganisationForV2Api(String organisationIdentifier,
