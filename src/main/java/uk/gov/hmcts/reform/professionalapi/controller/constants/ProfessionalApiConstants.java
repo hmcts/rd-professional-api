@@ -132,18 +132,18 @@ public class ProfessionalApiConstants {
     public static final String DEL_ORG_PBA_NOTES_2 = "- Organisation is not ACTIVE.<br>";
     public static final String DEL_ORG_PBA_NOTES_3 = "- No payment accounts passed to be deleted in the request body.";
     public static final String DEL_ORG_PBA_NOTES_4 =
-                                    "<br>- Passed payment account numbers are in an invalid format.<br>";
+            "<br>- Passed payment account numbers are in an invalid format.<br>";
     public static final String DEL_ORG_PBA_NOTES_5 = "-The payment accounts are not associated with users organisation";
 
     public static final String GET_PBA_EMAIL_NOTES_1 =
-                                    "**IDAM Roles to access API** : <br> pui-finance-manager,<br>pui-";
+            "**IDAM Roles to access API** : <br> pui-finance-manager,<br>pui-";
     public static final String GET_PBA_EMAIL_NOTES_2 =
-                                    "user-manager,<br> pui-organisation-manager,<br> pui-case-manager";
+            "user-manager,<br> pui-organisation-manager,<br> pui-case-manager";
 
     public static final String GET_ORG_BY_STATUS_NOTES_1 =
-                                    "**IDAM Roles to access API** : <br> pui-organisation-manager";
+            "**IDAM Roles to access API** : <br> pui-organisation-manager";
     public static final String GET_ORG_BY_STATUS_NOTES_2 =
-                                    ",<br>pui-finance-manager,<br> pui-case-manager,pui-caa,<br>";
+            ",<br>pui-finance-manager,<br> pui-case-manager,pui-caa,<br>";
     public static final String GET_ORG_BY_STATUS_NOTES_3 = "pui-user-manager,citizen,caseworker";
 
     public static final String DELETE_ORG_ADD_400_MESSAGE_1 = "Bad Request Error: One of the below reasons: <br>";
@@ -181,6 +181,11 @@ public class ProfessionalApiConstants {
     public static final String INVALID_PAGE_INFORMATION = "002 missing/invalid page information";
     public static final String INVALID_SINCE_TIMESTAMP = "003 Field 'since' is in a invalid format. Expected format: ";
     public static final String SINCE_TIMESTAMP_FORMAT = "yyyy-MM-ddTHH:mm:ss";
-    public static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+    public static final String LAST_UPDATED_SINCE_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String NESTED_ORG_IDENTIFIER = "organisation.organisationIdentifier";
+    public static final String USER_IDENTIFIER = "userIdentifier";
+    public static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = DateTimeFormatter
+            .ofPattern(LAST_UPDATED_SINCE_TIMESTAMP_FORMAT);
+
     public static final String PROFESSIONAL_USER_404_MESSAGE = "Professional User not found:";
 }

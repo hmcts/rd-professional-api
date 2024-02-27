@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -149,6 +150,11 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsWithPaginationSince(String page, String size, String role,
+                                                                           String since) {
+        return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}&since={since}", role, page, size, since);
+    }
+
     public Map<String, Object> retrieveAllOrganisationsWithPaginationForV2Api(String page, String size, String role) {
         return getRequest(APP_INT_V2_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
@@ -172,6 +178,10 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationsSince(String role, String since) {
+        return getRequest(APP_INT_BASE_PATH + "?since={since}", role, since);
     }
 
     public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
@@ -224,6 +234,11 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationDetailsByStatusSinceTest(String status, String role,
+                                                                               String since) {
+        return getRequest(APP_INT_BASE_PATH + "?status={status}&&since={since}", role, status, since);
     }
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusForV2ApiTest(String status, String role) {
@@ -290,6 +305,20 @@ public class ProfessionalReferenceDataClient {
     public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
         return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}",
                 userId);
+    }
+
+    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, Integer
+            pageSize, UUID searchAfter) {
+        StringBuilder sb = new StringBuilder(baseIntUrl)
+                .append("/getOrganisationsByProfile?");
+        if (pageSize != null) {
+            sb.append("pageSize=").append(pageSize);
+        }
+        if (searchAfter != null) {
+            sb.append("&searchAfter=").append(searchAfter);
+        }
+        String uriPath = sb.toString();
+        return postRequest(uriPath, request, null, null);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

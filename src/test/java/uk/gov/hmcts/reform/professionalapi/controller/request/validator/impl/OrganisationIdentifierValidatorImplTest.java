@@ -167,4 +167,12 @@ class OrganisationIdentifierValidatorImplTest {
         assertDoesNotThrow(() -> organisationIdentifierValidatorImpl
                 .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, 1, null));
     }
+
+    @Test
+    void test_validateSince() {
+        assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl.validateSince("bad format"));
+        organisationIdentifierValidatorImpl.validateSince(null);
+        organisationIdentifierValidatorImpl.validateSince("2023-12-05T14:49:53");
+    }
+
 }

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWith
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,6 +73,7 @@ public class ProfessionalApiClient {
     private static final String USER_EMAIL_HEADER = "UserEmail";
     private static final String RANDOM_EMAIL = "RANDOM_EMAIL";
     private static final String INTERNAL_BASE_URL = "/refdata/internal/v1/organisations";
+    private static final String INTERNAL_BASE_URL_V2 = "/refdata/internal/v2/organisations";
     private final String professionalApiUrl;
     private final String s2sToken;
 
@@ -248,7 +251,7 @@ public class ProfessionalApiClient {
                                 .build(),
                         paymentAccounts,
                         contactInfoList,
-                        "Doctor",
+                        OrganisationTypeConstants.SOLICITOR_ORG,
                         orgAttributeRequests);
 
         return  organisationOtherOrgsCreationRequest;
@@ -500,6 +503,53 @@ public class ProfessionalApiClient {
         return response.body().jsonPath();
     }
 
+    public Map<String, Object> retrieveOrganisationDetailsBySinceDate(String sinceDate, String page, String pageSize) {
+        StringBuilder apiURL = new StringBuilder(INTERNAL_BASE_URL);
+
+        if (sinceDate != null && page == null && pageSize == null) {
+            apiURL.append("?since=").append(sinceDate);
+        } else if (sinceDate != null && page != null && pageSize != null) {
+            apiURL.append("?since=").append(sinceDate)
+                    .append("&page=").append(page)
+                    .append("&size=").append(pageSize);
+        }
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get(apiURL.toString())
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
+
+        log.info("{}:: Retrieve all orgs with pagination and since date (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveOrganisationDetailsBySinceDateV2(String sinceDate,
+                                                                        String page, String pageSize) {
+        StringBuilder apiURL = new StringBuilder(INTERNAL_BASE_URL_V2);
+
+        if (sinceDate != null && page == null && pageSize == null) {
+            apiURL.append("?since=").append(sinceDate);
+        } else if (sinceDate != null && page != null && pageSize != null) {
+            apiURL.append("?since=").append(sinceDate)
+                    .append("&page=").append(page)
+                    .append("&size=").append(pageSize);
+        }
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get(apiURL.toString())
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
+
+        log.info("{}:: Retrieve all orgs with pagination and since date ( Internal-V2 ) response: {}",
+                loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> retrieveOrganisationDetailsForV2(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
@@ -739,6 +789,51 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, String
+            pageSize, String searchAfter) {
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL + "/getOrganisationsByProfile");
+
+        if (pageSize != null && searchAfter != null) {
+            baseURL.append("?pageSize=").append(pageSize);
+            baseURL.append("&searchAfter=").append(searchAfter);
+        } else if (pageSize != null && searchAfter == null) {
+            baseURL.append("?pageSize=").append(pageSize);
+        } else if (pageSize == null && searchAfter != null) {
+            baseURL.append("?searchAfter=").append(searchAfter);
+        }
+
+        Response response = getS2sTokenHeaders()
+                .body(request)
+                .post(baseURL.toString())
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("{}:: Retrieve organisation by profile Ids response: {}", loggingComponentName,
+                    response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Response retrieveOrganisationsByUnAuthorizedS2sToken(String pageSize) {
+        String baseURL = INTERNAL_BASE_URL + "/getOrganisationsByProfile?pageSie=" + pageSize;
+        Response response = withUnauthenticatedRequest()
+                .body("")
+                .get(baseURL)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
+
+        log.info("{}:: Retrieve Org UNAUTHORIZED (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response;
+    }
 
     public Map<String, Object> retrievePaymentAccountsByEmailForExternalV2(HttpStatus status,
                                                                            RequestSpecification requestSpecification,
