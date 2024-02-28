@@ -19,16 +19,16 @@ public class OrganisationInfoWithUsersResponse {
     private List<String> organisationProfileIds;
     private List<OrganisationUserResponse> users;
 
-    public OrganisationInfoWithUsersResponse(Organisation organisation) {
+    public OrganisationInfoWithUsersResponse(Organisation organisation, List<ProfessionalUser> professionalUsers) {
         this.users = new ArrayList<>();
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
         this.status = organisation.getStatus().name();
         this.organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
-    }
 
-    public void addUser(ProfessionalUser professionalUser) {
-        OrganisationUserResponse userResponse = new OrganisationUserResponse(professionalUser);
-        this.users.add(userResponse);
+        professionalUsers.forEach(user -> {
+            OrganisationUserResponse userResponse = new OrganisationUserResponse(user);
+            users.add(userResponse);
+        });
     }
 }
 

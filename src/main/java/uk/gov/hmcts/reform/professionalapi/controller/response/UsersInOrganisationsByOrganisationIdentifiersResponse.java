@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Setter
@@ -24,27 +24,34 @@ public class UsersInOrganisationsByOrganisationIdentifiersResponse {
                                                                  boolean moreAvailable) {
         this.moreAvailable = moreAvailable;
         this.organisationInfo = mapToOrganisationInfo(professionalUsers);
+        if (!this.organisationInfo.isEmpty()) {
+            this.lastOrgInPage = professionalUsers.get(professionalUsers.size() - 1).getOrganisation().getId();
+            this.lastUserInPage = professionalUsers.get(professionalUsers.size() - 1).getId();
+        }
     }
 
     private List<OrganisationInfoWithUsersResponse> mapToOrganisationInfo(List<ProfessionalUser> professionalUsers) {
-        Map<String, OrganisationInfoWithUsersResponse> organisationInfoMap = new HashMap<>();
+        // get all distinct organisations from the list of professionalUsers and sort them
+        List<Organisation> organisations = new ArrayList<>(professionalUsers.stream()
+                .map(ProfessionalUser::getOrganisation)
+                .distinct().toList());
 
-        for (ProfessionalUser professionalUser : professionalUsers) {
-            // if the organisationInfoMap does not contain the organisationIdentifier as a key, then add it
-            String organisationIdentifier = professionalUser.getOrganisation().getOrganisationIdentifier();
-            OrganisationInfoWithUsersResponse organisationInfo = organisationInfoMap.get(organisationIdentifier);
-            if (organisationInfo == null) {
-                organisationInfo = new OrganisationInfoWithUsersResponse(professionalUser.getOrganisation());
-                organisationInfoMap.put(organisationIdentifier, organisationInfo);
+        organisations.sort(Comparator.comparing(org -> org.getId().toString()));
+        List<OrganisationInfoWithUsersResponse> sortedOrganisationInfo = new ArrayList<>();
+
+        for (Organisation organisation : organisations) {
+            // find the professionalUsers that belong to the organisation and sort them
+            List<ProfessionalUser> users = new ArrayList<>();
+            for (ProfessionalUser professionalUser : professionalUsers) {
+                if (professionalUser.getOrganisation().getId().equals(organisation.getId())) {
+                    users.add(professionalUser);
+                }
             }
-
-            organisationInfo.addUser(professionalUser);
-
-            lastOrgInPage = professionalUser.getOrganisation().getId();
-            lastUserInPage = professionalUser.getId();
+            users.sort(Comparator.comparing(user -> user.getId().toString()));
+            sortedOrganisationInfo.add(new OrganisationInfoWithUsersResponse(organisation, users));
         }
 
-        return new ArrayList<>(organisationInfoMap.values());
+        return sortedOrganisationInfo;
     }
 }
 

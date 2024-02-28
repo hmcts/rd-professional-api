@@ -37,7 +37,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
         + "IN :organisationIdentifiers) and "
         + "((:searchAfterOrgId IS NULL OR CAST(pu.organisation.id AS string) > :searchAfterOrgId) OR "
         + "(:searchAfterUserId IS NULL OR CAST(pu.id AS string) > :searchAfterUserId)) ORDER BY "
-        + "CAST(pu.organisation.id AS string), CAST(pu.id AS string)")
+        + "CAST(pu.organisation.id AS string) asc, CAST(pu.id AS string) asc")
     Page<ProfessionalUser> findUsersInOrganisations(
         @Param("organisationIdentifiers") List<String> organisationIdentifiers,
         @Param("searchAfterOrgId") String searchAfterOrgId, @Param("searchAfterUserId") String searchAfterUserId,
