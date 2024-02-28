@@ -43,7 +43,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -855,15 +854,39 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public UsersInOrganisationsByOrganisationIdentifiersResponse findUsersByOrganisations(
+    public Response retrieveUsersInOrgByUnAuthorizedS2sToken(String pageSize) {
+        String baseURL = INTERNAL_BASE_URL + "?pageSize=" + pageSize;
+        Response response = withUnauthenticatedRequest()
+                .body("")
+                .get(baseURL)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
+
+        log.info("{}:: Retrieve user UNAUTHORIZED (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response;
+    }
+
+    public UsersInOrganisationsByOrganisationIdentifiersResponse findUsersInOrganisationShouldBeSuccess(
             UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
-            Integer pageSize, UUID searchAfterOrg, UUID searchAfterUser) {
+            String pageSize, String searchAfterOrg, String searchAfterUser) {
+
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL_V2 + "/users");
+
+        if (pageSize != null && searchAfterOrg == null && searchAfterUser == null) {
+            baseURL.append("?pageSize=").append(pageSize);
+        } else if (pageSize != null && searchAfterOrg != null && searchAfterUser != null) {
+            baseURL.append("?pageSize=").append(pageSize)
+                    .append("&searchAfterOrg=").append(searchAfterOrg)
+                    .append("&searchAfterUser=").append(searchAfterUser);
+        }
+
         Response response = getS2sTokenHeaders()
                 .body(organisationByProfileIdsRequest)
-                .queryParam("pageSize", pageSize)
-                .queryParam("searchAfterOrg", searchAfterOrg)
-                .queryParam("searchAfterUser", searchAfterUser)
-                .post("refdata/internal/v2/organisations/users")
+                .post(baseURL.toString())
                 .andReturn();
 
         response.then()
@@ -873,6 +896,34 @@ public class ProfessionalApiClient {
         log.info("{}:: find users response: {}", loggingComponentName, response.statusCode());
         return convertMapToResponse(response.body().as(Map.class),
                 UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+    }
+
+    public Map<String, Object> findUsersInOrgShouldHaveBadRequest(
+            UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
+            String pageSize, String searchAfterOrg, String searchAfterUser) {
+
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL_V2 + "/users");
+
+        if (pageSize != null && searchAfterOrg != null && searchAfterUser == null) {
+            baseURL.append("?pageSize=").append(pageSize)
+                    .append("&searchAfterOrg=").append(searchAfterOrg);
+
+        } else if (pageSize != null && searchAfterOrg == null && searchAfterUser != null) {
+            baseURL.append("?pageSize=").append(pageSize)
+                    .append("&searchAfterUser=").append(searchAfterUser);
+        }
+
+        Response response = getS2sTokenHeaders()
+                .body(organisationByProfileIdsRequest)
+                .post(baseURL.toString())
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value());
+
+        log.info("{}:: find users response: {}", loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
     }
 
     private <T> T convertMapToResponse(Map<String, Object> map, Class<T> type) {
