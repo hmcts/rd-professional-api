@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
@@ -52,6 +53,8 @@ public class ProviderTestConfiguration {
     protected UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     @MockBean
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    @MockBean
+    protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
     @MockBean
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @MockBean

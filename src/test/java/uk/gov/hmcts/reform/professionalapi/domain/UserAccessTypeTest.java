@@ -15,7 +15,7 @@ class UserAccessTypeTest {
     private static final Boolean ENABLED = true;
 
     @Test
-    void test_should_hold_values_after_creation() {
+    void test_should_hold_values_after_creationEnabled() {
         UserAccessType userAccessType = new UserAccessType();
         userAccessType.setAccessTypeId(ACCESS_TYPE_ID);
         userAccessType.setJurisdictionId(JURISDICTION);
@@ -26,5 +26,19 @@ class UserAccessTypeTest {
         assertThat(userAccessType.getJurisdictionId()).isEqualTo(JURISDICTION);
         assertThat(userAccessType.getOrganisationProfileId()).isEqualTo(ORG_PROFILE_ID);
         assertThat(userAccessType.getEnabled()).isEqualTo(ENABLED);
+    }
+
+    @Test
+    void test_should_hold_values_after_creationDisabled() {
+        UserAccessType userAccessType = new UserAccessType();
+        userAccessType.setAccessTypeId(ACCESS_TYPE_ID);
+        userAccessType.setJurisdictionId(JURISDICTION);
+        userAccessType.setOrganisationProfileId(ORG_PROFILE_ID);
+        userAccessType.setEnabled(false);
+
+        assertThat(userAccessType.getAccessTypeId()).isEqualTo(ACCESS_TYPE_ID);
+        assertThat(userAccessType.getJurisdictionId()).isEqualTo(JURISDICTION);
+        assertThat(userAccessType.getOrganisationProfileId()).isEqualTo(ORG_PROFILE_ID);
+        assertThat(userAccessType.getEnabled()).isEqualTo(false);
     }
 }

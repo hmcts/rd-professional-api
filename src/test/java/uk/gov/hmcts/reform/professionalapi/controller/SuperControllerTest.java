@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
@@ -45,7 +47,9 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +67,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -82,6 +87,7 @@ class SuperControllerTest {
     private PrdEnumServiceImpl prdEnumServiceMock;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
     private ProfessionalUserRepository professionalUserRepository;
     private PrdEnumRepository prdEnumRepository;
     private Organisation organisation;
@@ -111,6 +117,7 @@ class SuperControllerTest {
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         professionalUserRepository = mock(ProfessionalUserRepository.class);
+        organisationIdentifierValidatorImplMock = mock(OrganisationIdentifierValidatorImpl.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -129,8 +136,10 @@ class SuperControllerTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
+        HashSet<UserAccessType> userAccessTypes = new HashSet<>();
+        userAccessTypes.add(new UserAccessType("jurisdictionId", "organisationProfileId", "accessTypeId", false));
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles, false);
+                "some@email.com", userRoles, false, userAccessTypes);
         UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
@@ -157,20 +166,59 @@ class SuperControllerTest {
     void test_retrieveAllOrganisationOrById() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveAllOrganisations(null)).thenReturn(organisationsDetailResponse);
+        when(organisationServiceMock.retrieveAllOrganisations(null, null)).thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = superController.retrieveAllOrganisationOrById(null, null, null, null);
+        ResponseEntity<?> actual = superController.retrieveAllOrganisationsOrById(null, null, null, null, null);
 
         assertThat(actual.getBody()).isEqualTo(organisationsDetailResponse);
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null);
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null, null);
+    }
+
+    @Test
+    void test_retrieveAllOrganisationsOrByIdWithSince() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        when(organisationServiceMock.retrieveAllOrganisations(any(LocalDateTime.class), any()))
+                .thenReturn(organisationsDetailResponse);
+
+        String since = "2019-08-16T15:00:41";
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<?> actual = superController.retrieveAllOrganisationsOrById(null, since,
+                null, null, null);
+
+        assertThat(actual.getBody()).isEqualTo(organisationsDetailResponse);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisations(formattedSince, null);
+    }
+
+    @Test
+    void test_retrieveAllOrganisationsOrByIdWithSinceAndStatus() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        OrganisationsDetailResponse response = new OrganisationsDetailResponse(singletonList(organisation),
+                false, false, true);
+        response.setTotalRecords(100L);
+        response.setMoreAvailable(true);
+        when(organisationServiceMock.findByOrganisationStatus(any(), any(), any())).thenReturn(response);
+
+        String since = "2019-08-16T15:00:41";
+        String status = "ACTIVE";
+        ResponseEntity<?> actual = superController.retrieveAllOrganisationsOrById(null, since,
+                status, 1, 200);
+
+        assertThat(actual.getBody()).isEqualTo(response);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(1);
     }
 
     @Test
     void test_retrieveAllOrganisationWithPagination0_shouldThrowException() {
         assertThrows(InvalidRequest.class, () ->
-            superController.retrieveAllOrganisationOrById(null, null, 0, null));
+            superController.retrieveAllOrganisationsOrById(null, null, null, 0, null));
     }
 
 
@@ -178,23 +226,41 @@ class SuperControllerTest {
     void test_retrieveAllOrganisationOrByIdForV2Api() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null))
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(null, null))
                 .thenReturn(organisationsDetailResponseV2);
 
         ResponseEntity<?> actual = superController
-                .retrieveAllOrganisationOrByIdForV2Api(null, null, null, null);
+                .retrieveAllOrganisationsOrByIdForV2Api(null, null, null, null, null);
 
         assertThat(actual.getBody()).isEqualTo(organisationsDetailResponseV2);
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveAllOrganisationsForV2Api(null);
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisationsForV2Api(null, null);
+    }
+
+    @Test
+    void test_retrieveAllOrganisationOrByIdForV2ApiWithSince() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String since = "2019-08-16T15:00:41";
+        LocalDateTime formattedSince = LocalDateTime.parse(since, ISO_DATE_TIME_FORMATTER);
+
+        when(organisationServiceMock.retrieveAllOrganisationsForV2Api(formattedSince, null))
+                .thenReturn(organisationsDetailResponseV2);
+
+        ResponseEntity<?> actual = superController
+                .retrieveAllOrganisationsOrByIdForV2Api(null, since, null, null, null);
+
+        assertThat(actual.getBody()).isEqualTo(organisationsDetailResponseV2);
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisationsForV2Api(formattedSince, null);
     }
 
     @Test
     void test_retrieveAllOrganisationForV2ApiWithPagination0_shouldThrowException() {
         assertThrows(InvalidRequest.class, () ->
                 superController
-                        .retrieveAllOrganisationOrByIdForV2Api(null, null, 0, null));
+                        .retrieveAllOrganisationsOrByIdForV2Api(null, null, null, 0, null));
     }
 
     @Test

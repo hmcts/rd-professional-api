@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -52,6 +54,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -189,6 +192,40 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
     }
 
+    @State("Active organisations exists for a logged in user using lastUpdatedSince")
+    public void setActiveOrganisationsForLoggedInUserUsingLastUpdatedSince() throws IOException {
+
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
+        addSuperUser(organisation);
+        organisation.setOrganisationIdentifier("M0AEAP0");
+        organisation.setLastUpdated(LocalDateTime.of(2023, 11, 20, 15, 51, 33));
+        organisation.setDateApproved(LocalDateTime.of(2023, 11, 19, 15, 51, 33));
+
+        Page<Organisation> pageable = Mockito.mock(Page.class);
+        when(pageable.getContent()).thenReturn(List.of(organisation));
+        when(pageable.getTotalElements()).thenReturn(1L);
+        when(pageable.isLast()).thenReturn(true);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(any(), any(), any()))
+                .thenReturn(pageable);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+    }
+
     @State("User invited to Organisation")
     public void setUpUserForInviteToOrganisation() throws IOException {
 
@@ -265,6 +302,35 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
     }
 
+    @SuppressWarnings("unchecked")
+    @State("A page size & list of organisation profiles for a PRD internal organisation request")
+    public void setUpOrganisationWithPageSize() {
+        Organisation organisation = getOrganisation();
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
+        organisation.setId(UUID.randomUUID());
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), null, anyBoolean(), any(Pageable.class)))
+                .thenReturn(organisationPage);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+    }
+
+    @SuppressWarnings("unchecked")
+    @State("A page size, search after & list of organisation profiles for a PRD internal organisation request")
+    public void setUpOrganisationWithPageSizeAndSearchAfter() {
+        Organisation organisation = getOrganisation();
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
+        organisation.setId(UUID.randomUUID());
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), any(UUID.class), anyBoolean(), any(Pageable.class)))
+                .thenReturn(organisationPage);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+    }
 
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
