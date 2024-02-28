@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserConfiguredAccesses;
@@ -51,7 +50,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
         when(professionalUserRepository
-                .findUsersInOrganisations(anyList(),
+                .findUsersInOrganisationsSearchAfter(anyList(),
                         any(String.class), any(String.class), any(Pageable.class))).thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
     }
@@ -62,7 +61,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
         ProfessionalUser professionalUser = getProfessionalUser();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        when(professionalUserRepository.findUsersInOrganisations(anyList(), isNull(),isNull(),
+        when(professionalUserRepository.findUsersInOrganisations(anyList(),
                 any(Pageable.class))).thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
     }

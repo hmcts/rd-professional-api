@@ -32,14 +32,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 @SuppressWarnings("unchecked")
-public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
     private OrganisationRepository organisationRepository;
@@ -358,6 +361,250 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
     }
 
     @Test
+    void search_without_searchAfter_and_then_search_with_after_until_no_more_is_available() {
+        // arrange
+
+        // use 2 organisations with same number of users for simplicity
+        List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier2),
+                getMatchingOrganisationKeyByIdentifier(organisationIdentifier3));
+        orgsForTest.sort(Comparator.comparing(org -> org.getId().toString()));
+
+        List<ProfessionalUser> professionUsersForTest =
+                new ArrayList<>(sortedUsersInOrganisation.get(orgsForTest.get(0).getId()));
+        professionUsersForTest.addAll(sortedUsersInOrganisation.get(orgsForTest.get(1).getId()));
+
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier2, organisationIdentifier3));
+
+        // act & assert, until no more records are available
+        Integer pageSize = 2;
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                        pageSize, null, null);
+
+        String json = convertMapToJson(response);
+        UsersInOrganisationsByOrganisationIdentifiersResponse typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        // first request / page will only return 2 users from the first organisation
+        assertTrue(typedResponse.isMoreAvailable());
+        assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(2);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
+                .isEqualTo(orgsForTest.get(0).getOrganisationIdentifier());
+
+        List<OrganisationUserResponse> usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
+
+        assertThat(usersInResponse.get(0).getUserIdentifier())
+                .isEqualTo(professionUsersForTest.get(0).getUserIdentifier());
+        assertThat(usersInResponse.get(1).getUserIdentifier())
+                .isEqualTo(professionUsersForTest.get(1).getUserIdentifier());
+
+        UUID lastUserInPage = typedResponse.getLastUserInPage();
+        UUID lastOrgInPage = typedResponse.getLastOrgInPage();
+
+        assertThat(lastUserInPage).isEqualTo(professionUsersForTest.get(1).getId());
+        assertThat(lastOrgInPage).isEqualTo(orgsForTest.get(0).getId());
+
+        // second request / page will return 1 user from first organisation and 1 organisation from the second
+        response = professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                pageSize, lastUserInPage, lastOrgInPage);
+
+        json = convertMapToJson(response);
+        typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        assertTrue(typedResponse.isMoreAvailable());
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(2);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(1).getUsers()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
+                .isEqualTo(orgsForTest.get(0).getOrganisationIdentifier());
+        assertThat(typedResponse.getOrganisationInfo().get(1).getOrganisationIdentifier())
+                .isEqualTo(orgsForTest.get(1).getOrganisationIdentifier());
+
+        usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
+
+        assertThat(usersInResponse.get(0).getUserIdentifier())
+                .isEqualTo(professionUsersForTest.get(2).getUserIdentifier());
+        assertThat(usersInResponse.get(1).getUserIdentifier())
+                .isEqualTo(professionUsersForTest.get(3).getUserIdentifier());
+
+        lastUserInPage = typedResponse.getLastUserInPage();
+        lastOrgInPage = typedResponse.getLastOrgInPage();
+
+        assertThat(lastUserInPage).isEqualTo(professionUsersForTest.get(3).getId());
+        assertThat(lastOrgInPage).isEqualTo(orgsForTest.get(1).getId());
+
+        // third request / page will return 2 users from the second organisation
+        response = professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                pageSize, lastUserInPage, lastOrgInPage);
+
+        json = convertMapToJson(response);
+        typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        assertThat(typedResponse.isMoreAvailable()).isFalse();
+        assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(2);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
+                .isEqualTo(orgsForTest.get(1).getOrganisationIdentifier());
+
+        usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
+
+        assertThat(usersInResponse.get(0).getUserIdentifier())
+                .isEqualTo(professionUsersForTest.get(4).getUserIdentifier());
+        assertThat(usersInResponse.get(1).getUserIdentifier())
+                .isEqualTo(professionUsersForTest.get(5).getUserIdentifier());
+
+        lastUserInPage = typedResponse.getLastUserInPage();
+        lastOrgInPage = typedResponse.getLastOrgInPage();
+
+        assertThat(lastUserInPage).isEqualTo(professionUsersForTest.get(5).getId());
+        assertThat(lastOrgInPage).isEqualTo(orgsForTest.get(1).getId());
+    }
+
+    @Test
+    void search_single_organisation_until_no_more_available() {
+        // there are 3 users in organisation 2
+        Integer pageSize = 1;
+
+        // first request has no search after and page size 1
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(Collections.singletonList(organisationIdentifier2));
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                        pageSize, null, null);
+
+        String json = convertMapToJson(response);
+        UsersInOrganisationsByOrganisationIdentifiersResponse typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        // first request / page will only return 1 user from the first organisation
+        Organisation organisationForTest = getMatchingOrganisationKeyByIdentifier(organisationIdentifier2);
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
+                .isEqualTo(organisationForTest.getOrganisationIdentifier());
+
+        assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(1);
+        assertTrue(typedResponse.isMoreAvailable());
+
+
+        List<OrganisationUserResponse> usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
+        List<ProfessionalUser> professionalUsersForTest =
+                new ArrayList<>(sortedUsersInOrganisation.get(organisationForTest.getId()));
+        assertThat(usersInResponse.get(0).getUserIdentifier())
+                .isEqualTo(professionalUsersForTest.get(0).getUserIdentifier());
+
+        UUID lastUserInPage = typedResponse.getLastUserInPage();
+        UUID lastOrgInPage = typedResponse.getLastOrgInPage();
+
+
+        // second request / page will return 1 user from the first organisation
+        response = professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                pageSize, lastUserInPage, lastOrgInPage);
+
+        json = convertMapToJson(response);
+        typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        assertTrue(typedResponse.isMoreAvailable());
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
+                .isEqualTo(organisationForTest.getOrganisationIdentifier());
+
+        usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
+        assertThat(usersInResponse.get(0).getUserIdentifier())
+                .isEqualTo(professionalUsersForTest.get(1).getUserIdentifier());
+
+        lastUserInPage = typedResponse.getLastUserInPage();
+        lastOrgInPage = typedResponse.getLastOrgInPage();
+
+        // third request / page will return 1 user from the first organisation
+        response = professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                pageSize, lastUserInPage, lastOrgInPage);
+
+        json = convertMapToJson(response);
+        typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        assertFalse(typedResponse.isMoreAvailable());
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
+                .isEqualTo(organisationForTest.getOrganisationIdentifier());
+
+        usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
+        assertThat(usersInResponse.get(0).getUserIdentifier())
+                .isEqualTo(professionalUsersForTest.get(2).getUserIdentifier());
+    }
+
+    @Test
+    void search_single_organisation_with_page_size_greater_than_number_of_users() {
+        // there are 3 users in organisation 2
+        Integer pageSize = 2;
+
+        // first request has no search after and page size 1
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(Collections.singletonList(organisationIdentifier2));
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                        pageSize, null, null);
+
+        String json = convertMapToJson(response);
+        UsersInOrganisationsByOrganisationIdentifiersResponse typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        // first request / page will only return 1 user from the first organisation
+        Organisation organisationForTest = getMatchingOrganisationKeyByIdentifier(organisationIdentifier2);
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
+                .isEqualTo(organisationForTest.getOrganisationIdentifier());
+        assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(2);
+        assertTrue(typedResponse.isMoreAvailable());
+
+        List<ProfessionalUser> professionalUsersForTest =
+                new ArrayList<>(sortedUsersInOrganisation.get(organisationForTest.getId()));
+        List<OrganisationUserResponse> usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
+        assertThat(usersInResponse.get(0).getUserIdentifier())
+                .isEqualTo(professionalUsersForTest.get(0).getUserIdentifier());
+        assertThat(usersInResponse.get(1).getUserIdentifier())
+                .isEqualTo(professionalUsersForTest.get(1).getUserIdentifier());
+
+        UUID lastUserInPage = typedResponse.getLastUserInPage();
+        UUID lastOrgInPage = typedResponse.getLastOrgInPage();
+
+        // second request / page will return remaining 1 user from the first organisation
+        response = professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                pageSize, lastUserInPage, lastOrgInPage);
+
+        json = convertMapToJson(response);
+        typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        assertFalse(typedResponse.isMoreAvailable());
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(1);
+        assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
+                .isEqualTo(organisationForTest.getOrganisationIdentifier());
+
+        usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
+        assertThat(usersInResponse.get(0).getUserIdentifier())
+                .isEqualTo(professionalUsersForTest.get(2).getUserIdentifier());
+    }
+
+    private List<OrganisationUserResponse> getAllUsersInOrganisationResponse(
+            UsersInOrganisationsByOrganisationIdentifiersResponse response) {
+        return response.getOrganisationInfo().stream()
+                .flatMap(organisationInfo -> organisationInfo.getUsers().stream()).collect(Collectors.toList());
+    }
+
+    @Test
     void return_bad_request_with_invalid_params() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
@@ -375,7 +622,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
                         pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
-        assertThat(response.get("http_status")).isEqualTo(expectedStatus);
+        assertThat(response).containsEntry("http_status", "response_body");
 
         String actualResponseBody = (String) response.get("response_body");
         ErrorResponse typedResponse = convertJsonToResponse(actualResponseBody, ErrorResponse.class);
@@ -394,7 +641,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         UsersInOrganisationsByOrganisationIdentifiersResponse typedResponse = convertJsonToResponse(json,
                 UsersInOrganisationsByOrganisationIdentifiersResponse.class);
 
-        assertThat(typedResponse.getOrganisationInfo().size()).isEqualTo(expectedOrganisationsCount);
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(expectedOrganisationsCount);
 
         List<OrganisationUserResponse> allUsers = new ArrayList<>();
         for (OrganisationInfoWithUsersResponse organisationInfo : typedResponse.getOrganisationInfo()) {
@@ -410,7 +657,7 @@ public class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnable
         }
 
 
-        assertThat(allUsers.size()).isEqualTo(expectedUsersCount);
+        assertThat(allUsers).hasSize(expectedUsersCount);
         assertThat(typedResponse.isMoreAvailable()).isEqualTo(expectedHasMoreRecords);
         assertThat(typedResponse.getLastOrgInPage()).isNotNull();
         assertThat(typedResponse.getLastUserInPage()).isNotNull();

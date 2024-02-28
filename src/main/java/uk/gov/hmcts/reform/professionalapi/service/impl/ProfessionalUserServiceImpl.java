@@ -346,9 +346,16 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         String searchAfterOrganisationId = searchAfterOrganisation != null ? searchAfterOrganisation.toString() : null;
 
         Pageable pageableObject = PageRequest.of(0, pageSize);
-        Page<ProfessionalUser> users = professionalUserRepository
-                .findUsersInOrganisations(
-                        organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId, pageableObject);
+        Page<ProfessionalUser> users;
+        if (searchAfterOrganisationId == null && searchAfterUserId == null) {
+            users = professionalUserRepository
+                    .findUsersInOrganisations(
+                            organisationIdentifiers, pageableObject);
+        } else {
+            users = professionalUserRepository
+                    .findUsersInOrganisationsSearchAfter(
+                            organisationIdentifiers, searchAfterOrganisationId, searchAfterUserId, pageableObject);
+        }
 
         return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
     }
