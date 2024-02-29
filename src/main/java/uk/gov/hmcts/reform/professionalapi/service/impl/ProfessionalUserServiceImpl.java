@@ -342,9 +342,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
             UUID searchAfterOrganisation) {
 
-//        String searchAfterUserId = searchAfterUser != null ? searchAfterUser.toString() : null;
-//        String searchAfterOrganisationId = searchAfterOrganisation != null ? searchAfterOrganisation.toString() : null;
-
         Pageable pageableObject = PageRequest.of(0, pageSize);
         Page<ProfessionalUser> users;
         if (searchAfterOrganisation == null && searchAfterUser == null) {
