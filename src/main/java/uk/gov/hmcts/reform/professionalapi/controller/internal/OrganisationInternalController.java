@@ -753,7 +753,8 @@ public class OrganisationInternalController extends SuperController {
             throw new InvalidRequest("Name or SRA Id not found");
         }
 
-        OrganisationResponse organisationResponse = organisationService.updateOrganisationNameOrSra(organisationCreationRequest, orgId);
+        OrganisationResponse organisationResponse = organisationService
+            .updateOrganisationNameOrSra(organisationCreationRequest, orgId);
 
         ResponseEntity<OrganisationResponse> resp =  ResponseEntity.status(200).body(organisationResponse);
         return resp;
