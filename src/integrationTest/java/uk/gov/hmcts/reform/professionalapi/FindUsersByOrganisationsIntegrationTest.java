@@ -133,11 +133,11 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         organisation3 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier3);
 
         List<Organisation> organisations = Arrays.asList(organisation1, organisation2, organisation3);
-        organisations.sort(Comparator.comparing(org -> org.getId().toString()));
+        organisations.sort(Comparator.comparing(Organisation::getId));
 
         for (Organisation organisation : organisations) {
             List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-            users.sort(Comparator.comparing(user -> user.getId().toString()));
+            users.sort(Comparator.comparing(ProfessionalUser::getId));
             LinkedList<ProfessionalUser> usersLinkedList = new LinkedList<>(users);
             sortedUsersInOrganisation.put(organisation.getId(), usersLinkedList);
         }
@@ -293,7 +293,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
                 getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
         // cannot assume org 1 is first
-        orgsForTest.sort(Comparator.comparing(org -> org.getId().toString()));
+        orgsForTest.sort(Comparator.comparing(Organisation::getId));
 
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
@@ -338,7 +338,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         // get org 1 and org 2 in order
         List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
                 getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
-        orgsForTest.sort(Comparator.comparing(org -> org.getId().toString()));
+        orgsForTest.sort(Comparator.comparing(Organisation::getId));
 
         List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
         // skip the first user in first org (not necessarily organisation 1)
@@ -367,7 +367,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         // use 2 organisations with same number of users for simplicity
         List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier2),
                 getMatchingOrganisationKeyByIdentifier(organisationIdentifier3));
-        orgsForTest.sort(Comparator.comparing(org -> org.getId().toString()));
+        orgsForTest.sort(Comparator.comparing(Organisation::getId));
 
         List<ProfessionalUser> professionUsersForTest =
                 new ArrayList<>(sortedUsersInOrganisation.get(orgsForTest.get(0).getId()));
@@ -622,7 +622,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
                         pageSize, searchAfterUser, searchAfterOrganisation);
 
         // assert
-        assertThat(response).containsEntry("http_status", "response_body");
+        assertThat(response).containsEntry("http_status", expectedStatus);
 
         String actualResponseBody = (String) response.get("response_body");
         ErrorResponse typedResponse = convertJsonToResponse(actualResponseBody, ErrorResponse.class);
