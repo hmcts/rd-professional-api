@@ -20,7 +20,8 @@ public class UsersInOrganisationsByOrganisationIdentifiersRequestValidator {
             throw new InvalidRequest("searchAfterUser cannot be null when searchAfterOrg is provided");
         }
 
-        if (searchAfterOrg != null && searchAfterUser != null && pageSize == null) {
+        // searchAfterUser will not be null by this point
+        if (searchAfterOrg != null && pageSize == null) {
             throw new InvalidRequest("pageSize cannot be null when searchAfterOrg and searchAfterUser are provided");
         }
     }

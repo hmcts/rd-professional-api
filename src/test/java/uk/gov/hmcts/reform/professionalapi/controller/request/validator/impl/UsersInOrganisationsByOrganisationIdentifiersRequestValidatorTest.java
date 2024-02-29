@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorTest {
+class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorTest {
 
     private final UsersInOrganisationsByOrganisationIdentifiersRequestValidator validator =
             new UsersInOrganisationsByOrganisationIdentifiersRequestValidator();
