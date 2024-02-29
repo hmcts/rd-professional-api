@@ -587,17 +587,17 @@ class OrganisationInternalControllerTest {
         assertThat(organisationCreationRequest.getName()).isNotEmpty();
         assertThat(organisationCreationRequest.getSraId()).isNotEmpty();
 
-        ResponseEntity<Object> updateResponseEntity = ResponseEntity.status(200).body(organisation);
-        when(organisationServiceMock.updateOrganisationNameOrSra(organisationCreationRequest,
-            organisation.getOrganisationIdentifier())).thenReturn(updateResponseEntity);
 
-        ResponseEntity<Object> response = organisationInternalController
-            .updatesOrganisationName(organisationCreationRequest,organisation.getOrganisationIdentifier());
+        when(organisationServiceMock.updateOrganisationNameOrSra(organisationCreationRequest,
+            organisation.getOrganisationIdentifier())).thenReturn(new OrganisationResponse(organisation));
+
+        ResponseEntity<OrganisationResponse> response = organisationInternalController
+            .updateOrganisationNameOrSra(organisationCreationRequest,organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
-        assertThat(((Organisation) response.getBody()).getName()).isEqualTo(organisationCreationRequest.getName());
-        assertThat(((Organisation) response.getBody()).getSraId()).isEqualTo(organisationCreationRequest.getSraId());
+        assertThat(response.getBody().getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
+
 
         verify(organisationCreationRequestValidatorMock, times(1))
             .validateOrganisationIdentifier(any(String.class));

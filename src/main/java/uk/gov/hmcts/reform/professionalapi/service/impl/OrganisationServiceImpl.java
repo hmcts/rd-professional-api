@@ -612,7 +612,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public ResponseEntity<Object> updateOrganisationNameOrSra(
+    public OrganisationResponse updateOrganisationNameOrSra(
         OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
@@ -625,7 +625,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         var savedOrganisation = organisationRepository.save(existingOrganisation);
 
-        return ResponseEntity.status(200).body(savedOrganisation);
+        return new OrganisationResponse(savedOrganisation);
     }
 
     @Override

@@ -740,7 +740,7 @@ public class OrganisationInternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured({"prd-admin"})
-    public ResponseEntity<Object> updatesOrganisationName(
+    public ResponseEntity<OrganisationResponse> updateOrganisationNameOrSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
         @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
         @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
@@ -753,7 +753,10 @@ public class OrganisationInternalController extends SuperController {
             throw new InvalidRequest("Name or SRA Id not found");
         }
 
-        return organisationService.updateOrganisationNameOrSra(organisationCreationRequest, orgId);
+        OrganisationResponse organisationResponse = organisationService.updateOrganisationNameOrSra(organisationCreationRequest, orgId);
+
+        ResponseEntity<OrganisationResponse> resp =  ResponseEntity.status(200).body(organisationResponse);
+        return resp;
     }
 
 
