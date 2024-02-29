@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -1022,21 +1021,25 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(
-            UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
-            UUID searchAfterUser, UUID searchAfterOrganisation) {
-        StringBuilder sb = new StringBuilder(baseV2IntUrl)
-                .append("/users?");
-        if (pageSize != null) {
-            sb.append("&pageSize=").append(pageSize);
+
+    public Map<String, Object> updateOrgNameSraIdStatus(
+        OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/nameSra/" + organisationIdentifier;
+        try {
+            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
+                getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
         }
-        if (searchAfterUser != null) {
-            sb.append("&searchAfterUser=").append(searchAfterUser);
-        }
-        if (searchAfterOrganisation != null) {
-            sb.append("&searchAfterOrg=").append(searchAfterOrganisation);
-        }
-        String uriPath = sb.toString();
-        return postRequest(uriPath, request, null, null);
+
+        Map<String, Object> organisationResponse = new HashMap<>();
+        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return organisationResponse;
     }
 }

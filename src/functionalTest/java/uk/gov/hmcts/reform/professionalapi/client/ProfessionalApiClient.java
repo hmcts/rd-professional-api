@@ -1323,7 +1323,8 @@ public class ProfessionalApiClient {
             .put("/refdata/internal/v1/organisations/nameSra/" + organisationIdentifier)
             .andReturn();
 
-        log.info("{}:: Update organisation Name or SRA id response: {}", loggingComponentName, response.getStatusCode());
+        log.info("{}:: Update organisation Name or SRA id response: {}",
+            loggingComponentName, response.getStatusCode());
 
         response.then()
             .assertThat()
