@@ -36,10 +36,10 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
     @Autowired
     ProfessionalUserRepository professionalUserRepository;
 
-    public static final String ORG_NAME = "Org-Name";
-    public static final String SRA_ID = "sra-id";
-    public static final String COMPANY_NUMBER = "companyN";
-    public static final String COMPANY_URL = "www.org.com";
+    private static final String ORG_NAME = "Org-Name";
+    private static final String SRA_ID = "sra-id";
+    private static final String COMPANY_NUMBER = "companyN";
+    private static final String COMPANY_URL = "www.org.com";
 
     public static final String PBA_NUMBER = "PBA1234567";
 
