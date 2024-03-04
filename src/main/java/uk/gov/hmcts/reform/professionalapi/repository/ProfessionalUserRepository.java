@@ -32,6 +32,31 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
             nativeQuery = true)
     int findByUserCountByOrganisationId(@Param("organisationId") UUID organisationId);
 
+    @Query(value = """
+            SELECT pu FROM professional_user pu
+            WHERE (COALESCE(:organisationIdentifiers, '') = ''
+            OR pu.organisation.organisationIdentifier IN :organisationIdentifiers)
+            ORDER BY pu.organisation.id ,pu.id
+            """)
+    Page<ProfessionalUser> findUsersInOrganisations(
+            @Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
+
+    @Query(value = """
+       SELECT pu.* FROM dbrefdata.professional_user pu
+       INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
+       WHERE (COALESCE(:organisationIdentifiers, '') = ''
+       OR organisation.organisation_identifier in :organisationIdentifiers)
+       AND (
+           (organisation.Id = :searchAfterOrgId AND pu.Id > :searchAfterUserId)
+           OR (organisation.Id > :searchAfterOrgId)
+       )
+       ORDER BY pu.organisation_id, pu.id
+        """, nativeQuery = true)
+    Page<ProfessionalUser> findUsersInOrganisationsSearchAfter(
+            @Param("organisationIdentifiers") List<String> organisationIdentifiers,
+            @Param("searchAfterOrgId") UUID searchAfterOrgId, @Param("searchAfterUserId") UUID searchAfterUserId,
+            Pageable pageable);
+
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);
 
     Page<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated, Pageable pageable);
@@ -42,4 +67,5 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
                                                                                   UUID searchAfter,
                                                                                   Pageable pageable);
+
 }
