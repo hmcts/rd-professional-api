@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -71,12 +71,12 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @NoArgsConstructor
 public class OrganisationInternalController extends SuperController {
 
-    protected OrganisationByProfileIdsRequestValidatorImpl organisationByProfileIdsRequestValidatorImpl;
+    protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
 
     @Autowired
     public OrganisationInternalController(
-            OrganisationByProfileIdsRequestValidatorImpl organisationByProfileIdsRequestValidatorImpl) {
-        this.organisationByProfileIdsRequestValidatorImpl = organisationByProfileIdsRequestValidatorImpl;
+            OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator) {
+        this.organisationByProfileIdsRequestValidator = organisationByProfileIdsRequestValidator;
     }
 
     @Value("${loggingComponentName}")
@@ -698,9 +698,9 @@ public class OrganisationInternalController extends SuperController {
 
     @Operation(
             summary = "Retrieves Organisations by Organisation Profile IDs",
-            description = "**IDAM Roles to access API** : <br> No role restriction",
+            description = "**Bearer token not required to access API. Only a valid s2s token**",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization")
+                @SecurityRequirement(name = "ServiceAuthorization")
             }
     )
 
@@ -735,7 +735,7 @@ public class OrganisationInternalController extends SuperController {
             @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
             @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
 
-        organisationByProfileIdsRequestValidatorImpl.validate(pageSize);
+        organisationByProfileIdsRequestValidator.validate(pageSize);
 
         MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
                         organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);

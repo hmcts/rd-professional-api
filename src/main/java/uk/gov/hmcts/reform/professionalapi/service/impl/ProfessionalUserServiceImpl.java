@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -333,6 +335,26 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         modifyUserConfiguredAccess(userProfileUpdatedData, userId);
 
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+    }
+
+    @Override
+    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
+            List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
+            UUID searchAfterOrganisation) {
+
+        Pageable pageableObject = PageRequest.of(0, pageSize);
+        Page<ProfessionalUser> users;
+        if (searchAfterOrganisation == null && searchAfterUser == null) {
+            users = professionalUserRepository
+                    .findUsersInOrganisations(
+                            organisationIdentifiers, pageableObject);
+        } else {
+            users = professionalUserRepository
+                    .findUsersInOrganisationsSearchAfter(
+                            organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+        }
+
+        return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {

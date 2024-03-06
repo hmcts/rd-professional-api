@@ -12,10 +12,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDateTime;
@@ -44,7 +48,11 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String superUserEmail;
     String invitedUserEmail;
     String invitedUserId;
+    String searchAfter;
     String sinceDateTime;
+    String lastOrgIdInPage;
+    String lastUserInPage;
+    List<String> orgIdentifiersList = new ArrayList<>();
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
     @Test
@@ -56,8 +64,10 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         createOrganisationScenario();
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
-        deleteOtherOrganisationScenarios();
         findOrganisationWithSinceDateGroupAccessScenarios();
+        retrieveOrganisationsByProfileIds();
+        retrieveOrganisationsUsersBySearchAfterGA();
+        deleteOtherOrganisationScenarios();
     }
 
     public void setUpTestData() {
@@ -67,13 +77,13 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationOtherOrgsCreationRequest.getSuperUser().setEmail(superUserEmail);
 
         intActiveOrgId = createAndUpdateOrganisationToActiveForV2(hmctsAdmin, organisationOtherOrgsCreationRequest);
+        orgIdentifiersList.add(intActiveOrgId);
 
         List<String> roles = new ArrayList<>();
         roles.add(puiCaseManager);
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
-
     }
 
     public void createOrganisationScenario() {
@@ -100,6 +110,127 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findOrganisationPbaWithEmailByInternalUserShouldBeSuccess();
         findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess();
         findOrganisationPbaWithoutEmailByInternalUserShouldBeBadRequest();
+    }
+
+    public void retrieveOrganisationsUsersBySearchAfterGA() {
+        inviteMultipleUserScenarios();
+        setUpTestData();
+        createOrganisationScenario();
+        inviteMultipleUserScenarios();
+
+        findUsersInOrgWithPageSizeAndOrSearchAfter("1", null, null);
+        findUsersInOrgWithPageSizeAndOrSearchAfter("2", lastOrgIdInPage, lastUserInPage);
+        findUsersInOrgWithPageSizeAndOrSearchAfter("3", lastOrgIdInPage, lastUserInPage);
+        findUsersInOrgShouldHaveBaqRequest("1", lastOrgIdInPage, null);
+        findUsersInOrgShouldHaveBaqRequest("1", null, lastUserInPage);
+        findUsersInOrgShouldHaveBaqRequest("1", null, "123");
+        findUsersInOrgShouldHaveBaqRequest("1", "123", null);
+
+        findUsersInOrganisationUnAuthorized("1");
+        findUsersInOrgWithPageSizeAndOrSearchAfter(null, null, null);
+    }
+
+    public void inviteMultipleUserScenarios() {
+        for (int i = 0; i < 2; i++) {
+            inviteUserByAnInternalOrgUser(generateRandomEmail());
+        }
+    }
+
+    public void inviteUserByAnInternalOrgUser(String email) {
+        log.info("inviteUserByAnInternalOrgUser :: STARTED");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        invitedUserId = (String) newUserResponse.get("userIdentifier");
+        log.info("inviteUserByAnInternalOrgUser :: END");
+    }
+
+    public void findUsersInOrgShouldHaveBaqRequest(String pageSize,
+                                                   String searchAfterOrg, String searchAfterUser) {
+
+        log.info("findUsersInOrgShouldHaveBaqRequest :: STARTED");
+
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+
+        request.setOrganisationIdentifiers(orgIdentifiersList);
+
+        Map<String, Object> response = professionalApiClient
+                .findUsersInOrgShouldHaveBadRequest(request, pageSize, searchAfterOrg, searchAfterUser);
+
+        assertThat(response).isNotNull();
+
+        if (searchAfterOrg != null && !searchAfterOrg.equals("123") && searchAfterUser == null) {
+            assertThat(response.get("errorDescription"))
+                    .isEqualTo("searchAfterUser cannot be null when searchAfterOrg is provided");
+        } else if (searchAfterUser != null && !searchAfterUser.equals("123") && searchAfterOrg == null) {
+            assertThat(response.get("errorDescription"))
+                    .isEqualTo("searchAfterOrg cannot be null when searchAfterUser is provided");
+        } else if (searchAfterUser != null && searchAfterUser.equals("123") && searchAfterOrg == null) {
+            assertThat(response.get("errorDescription"))
+                    .isEqualTo("Invalid UUID string: 123");
+        } else if (searchAfterOrg != null && searchAfterUser == null && searchAfterOrg.equals("123")) {
+            assertThat(response.get("errorDescription"))
+                    .isEqualTo("Invalid UUID string: 123");
+        }
+        log.info("findUsersInOrgShouldHaveBaqRequest :: END");
+    }
+
+    public void findUsersInOrganisationUnAuthorized(String pageSize) {
+
+        log.info("findUsersInOrganisationUnAuthorized :: STARTED");
+        professionalApiClient
+                .retrieveUsersInOrgByUnAuthorizedS2sToken(pageSize);
+        log.info("findUsersInOrganisationUnAuthorized :: END");
+
+    }
+
+    public void findUsersInOrgWithPageSizeAndOrSearchAfter(String pageSize,
+                                                           String searchAfterOrg, String searchAfterUser) {
+
+        log.info("findUsersInOrgWithPageSizeAndOrSearchAfter :: STARTED");
+
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+
+        request.setOrganisationIdentifiers(orgIdentifiersList);
+
+        UsersInOrganisationsByOrganisationIdentifiersResponse response =
+                professionalApiClient.findUsersInOrganisationShouldBeSuccess(request,
+                        pageSize, searchAfterOrg, searchAfterUser);
+
+        assertThat(response).isNotNull();
+
+
+        assertThat(response.getLastOrgInPage()).isNotNull();
+        assertThat(response.getLastUserInPage()).isNotNull();
+        lastOrgIdInPage = response.getLastOrgInPage().toString();
+        lastUserInPage = response.getLastUserInPage().toString();
+
+        assertThat(response.getOrganisationInfo().get(0).getUsers()).isNotEmpty();
+
+        if (pageSize != null && pageSize.equals("2")) {
+            assertThat(response.getOrganisationInfo().get(0).getUsers()).hasSize(Integer.parseInt(pageSize));
+            assertThat(response.isMoreAvailable()).isTrue();
+        } else if (pageSize != null && pageSize.equals("3")) {
+            assertThat(response.getOrganisationInfo().get(0).getUsers()).hasSize(3);
+            assertThat(response.isMoreAvailable()).isFalse();
+        } else if (pageSize == null && searchAfterOrg == null && searchAfterUser == null) {
+            assertThat(response.getOrganisationInfo()).isNotEmpty();
+            assertThat(response.getOrganisationInfo()).hasSize(2);
+            assertThat(response.getOrganisationInfo().get(0).getUsers()).isNotEmpty();
+            assertThat(response.getOrganisationInfo().get(0).getUsers()).hasSize(3);
+            assertThat(response.getOrganisationInfo().get(1).getUsers()).hasSize(3);
+            assertThat(response.isMoreAvailable()).isFalse();
+        }
+
+        assertThat(response.getOrganisationInfo().get(0).getOrganisationIdentifier()).isNotNull();
+        System.out.println("lastOrgIdInPage" + lastOrgIdInPage);
+        System.out.println("lastUserInPage" + lastUserInPage);
+
+        log.info("findUsersInOrgWithPageSizeAndOrSearchAfter :: END");
     }
 
 
@@ -250,6 +381,69 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
 
+    public void retrieveOrganisationsByProfileIds() {
+        findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess("2");
+        findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess("1");
+        findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter(null, searchAfter);
+        findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter(null, null);
+        findByOrganisationsByInvalidS2SToken("1");
+    }
+
+    public void findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess(String pageSize) {
+        log.info("findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess :: STARTED");
+
+        OrganisationByProfileIdsRequest request = new OrganisationByProfileIdsRequest();
+        request.getOrganisationProfileIds().add(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
+                pageSize, null);
+
+        verifyOrganisationsByProfileIdResponse(response, OrganisationProfileIdConstants.SOLICITOR_PROFILE, pageSize);
+        log.info("findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess :: END");
+    }
+
+    public void findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter(String pageSize, String searchAfter) {
+        log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: STARTED");
+
+        OrganisationByProfileIdsRequest request = new OrganisationByProfileIdsRequest();
+        request.getOrganisationProfileIds().add("UNKNOWN");
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
+                pageSize, searchAfter);
+
+        verifyOrganisationsByProfileIdResponse(response, OrganisationProfileIdConstants.SOLICITOR_PROFILE, pageSize);
+        log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: END");
+    }
+
+    public void findByOrganisationsByInvalidS2SToken(String pageSize) {
+        log.info("findByOrganisationsByInvalidS2SToken :: STARTED");
+        professionalApiClient
+                .retrieveOrganisationsByUnAuthorizedS2sToken(pageSize);
+    }
+
+    private void verifyOrganisationsByProfileIdResponse(Map<String, Object> response, String expectedProfileId,
+                                                        String expectCount) {
+
+        assertThat(response.get("moreAvailable")).isNotNull();
+        assertThat(response.get("lastRecordInPage")).isNotNull();
+        searchAfter = (String) response.get("lastRecordInPage");
+        List<HashMap> orgInfo = (List<HashMap>) response.get("organisationInfo");
+        assertThat(orgInfo).isNotEmpty();
+        if (expectCount != null) {
+            assertThat((orgInfo)).hasSize(Integer.parseInt(expectCount));
+        }
+
+        orgInfo.forEach(org -> {
+            assertThat(org.get("organisationIdentifier")).isNotNull();
+            assertThat(org.get("status")).isNotNull();
+            assertThat(org.get("lastUpdated")).isNotNull();
+
+            List<String> organisationProfileIdList = (List<String>) org.get("organisationProfileIds");
+            assertThat(organisationProfileIdList).isNotEmpty();
+            assertThat((organisationProfileIdList)).hasSize(1);
+            assertThat(organisationProfileIdList.get(0).equals(expectedProfileId));
+        });
+
+    }
+
     public void deleteOtherOrganisationScenarios() {
         deletePendingOtherOrganisationShouldReturnSuccess();
         deleteActiveOtherOrganisationShouldReturnSuccess();
@@ -276,7 +470,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
     public void findOrganisationWithSinceDateGroupAccessScenarios() {
-        sinceDateTime = generateRandomDate(null, "10");
+        sinceDateTime = generateRandomDate(null, "30");
         log.info("Since Date is set to : {} ", sinceDateTime);
         findOrganisationBySinceDateInternalV2ShouldBeSuccess(sinceDateTime, null, null);
         findOrganisationBySinceDateInternalV2ShouldBeSuccess(sinceDateTime, "1", "2");

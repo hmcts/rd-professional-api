@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +9,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationByProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
@@ -35,6 +36,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
     @Autowired
     private OrganisationRepository organisationRepository;
+    private String organisationV1Identifier;
 
     @BeforeEach
     public void setup() {
@@ -55,6 +57,14 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         OrganisationOtherOrgsCreationRequest request4 = this.createUniqueOrganisationRequest("TestOG2", "SRA126",
                 "PBA1234564", "super-email4@gmail.com", ogdHoOrgType);
         professionalReferenceDataClient.createOrganisationV2(request4);
+
+        // this creates an organisation with no org type
+        organisationV1Identifier = createOrganisationRequest();
+
+        // create an organisation with Barrister org type, which should map to Solicitor Profile
+        OrganisationOtherOrgsCreationRequest requestBarrister = this.createUniqueOrganisationRequest("TstSO3", "SRA127",
+                "PBA1234565", "super-email5@gmail.com", OrganisationTypeConstants.BARRISTER);
+        professionalReferenceDataClient.createOrganisationV2(requestBarrister);
     }
 
     @Test
@@ -66,7 +76,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 4;
+        int expectedOrganisationsCount = 6; // should be 6 because v1 should be defaulted to solicitor org type
 
         // act
         Map<String, Object> response =
@@ -74,10 +84,11 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                         pageSize, searchAfter);
 
         // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                true);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     void when_profile_ids_provided_should_return_matching_organisations_and_status_200() {
         // arrange
@@ -88,7 +99,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 2;
+        int expectedOrganisationsCount = 4; // 2 solicitor orgs and 1 barrister org and 1 v1 org
 
         // act
         Map<String, Object> response =
@@ -96,7 +107,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                         pageSize, searchAfter);
 
         // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                null);
 
         List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
 
@@ -105,7 +117,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         assertThat(allMatch).isTrue();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     void when_non_matching_profile_ids_provided_should_return_default_solicitor_organisations_and_status_200() {
         // arrange
@@ -116,7 +128,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 2;
+        int expectedOrganisationsCount = 4; // 2 solicitor orgs and 1 barrister org and 1 v1 org
 
         // act
         Map<String, Object> response =
@@ -124,7 +136,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                         pageSize, searchAfter);
 
         // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                null);
 
         List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
 
@@ -151,7 +164,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                         pageSize, searchAfter);
 
         // assert
-        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords);
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                null);
     }
 
     @Test
@@ -166,7 +180,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         Map<String, Object> response =
                 professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest,
                         pageSize, searchAfter);
-        assertSuccessfulResponse(response, 1, "200 OK", true);
+        assertSuccessfulResponse(response, 1, "200 OK", true,
+                null);
 
         UUID lastRecordInPage = UUID.fromString(response.get("lastRecordInPage").toString());
 
@@ -175,31 +190,57 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                 pageSize, lastRecordInPage);
 
         // assert
-        assertSuccessfulResponse(response, 1, "200 OK", false);
+        assertSuccessfulResponse(response, 1, "200 OK", true,
+                null);
     }
 
-    @SuppressWarnings("unchecked")
     private void assertSuccessfulResponse(Map<String, Object> response, int expectedOrganisationsCount,
-                                          String expectedStatus, boolean expectedHasMoreRecords) {
+                                          String expectedStatus, boolean expectedHasMoreRecords,
+                                          Boolean checkForV1) {
         String actualStatus = (String) response.get("http_status");
         assertThat(actualStatus).isEqualTo(expectedStatus);
 
-        MultipleOrganisationsResponse typedResponse = new MultipleOrganisationsResponse();
-        boolean actualHasMoreRecords = (boolean) response.get("moreAvailable");
+        String json = convertMapToJson(response);
+        MultipleOrganisationsResponse typedResponse = convertJsonToResponse(json, MultipleOrganisationsResponse.class);
 
-        List<OrganisationByProfileResponse> actualOrganisationInfo =
-                (List<OrganisationByProfileResponse>) response.get("organisationInfo");
-
-        typedResponse.setMoreAvailable(actualHasMoreRecords);
-        typedResponse.setOrganisationInfo(actualOrganisationInfo);
-        if (response.get("lastRecordInPage") != null) {
-            typedResponse.setLastRecordInPage(UUID.fromString((String) response.get("lastRecordInPage")));
-        } else {
-            typedResponse.setLastRecordInPage(null);
-        }
-
-        assertThat(typedResponse.getOrganisationInfo().size()).isEqualTo(expectedOrganisationsCount);
+        assertThat(typedResponse.getOrganisationInfo()).hasSize(expectedOrganisationsCount);
         assertThat(typedResponse.isMoreAvailable()).isEqualTo(expectedHasMoreRecords);
+
+        boolean checkForV1Org = checkForV1 != null && checkForV1;
+
+        if (checkForV1Org) {
+            boolean allMatch =
+                    typedResponse.getOrganisationInfo().stream()
+                            .anyMatch(org -> org.getOrganisationIdentifier().equals(organisationV1Identifier));
+            assertThat(allMatch).isTrue();
+        }
+    }
+
+    public String convertMapToJson(Map<String, Object> map) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = "";
+        try {
+            json = objectMapper.writeValueAsString(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    public <T> T convertJsonToResponse(String json, Class<T> type) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+        T response = null;
+        try {
+            response = objectMapper.readValue(json, type);
+        } catch (Exception e) {
+            // Log the error message and rethrow the exception or handle it appropriately
+            System.err.println("Error processing JSON: " + e.getMessage());
+        }
+        return response;
     }
 
     @Test
@@ -221,7 +262,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         String actualStatus = (String) response.get("http_status");
         assertThat(actualStatus).isEqualTo(expectedStatus);
         String actualResponseBody = (String) response.get("response_body");
-        assertThat(actualResponseBody).contains(expectedErrorMessage);
+        assertThat(actualResponseBody).containsIgnoringCase(expectedErrorMessage);
     }
 
     private OrganisationOtherOrgsCreationRequest createUniqueOrganisationRequest(String companyNumber, String sraId,

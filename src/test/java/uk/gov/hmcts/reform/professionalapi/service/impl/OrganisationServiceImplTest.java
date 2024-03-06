@@ -102,6 +102,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -2678,12 +2679,36 @@ class OrganisationServiceImplTest {
         // arrange
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
+        profileIds.add("made up profile id");
         Integer pageSize = 1;
         UUID searchAfter = null;
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
-        when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), any())).thenReturn(orgPage);
+        when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
+        when(orgPage.isLast()).thenReturn(true);
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
+                searchAfter);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void shouldRetrieveOrganisationsWithEmptyProfileIdList() {
+        // arrange
+        List<String> profileIds = new ArrayList<>();
+        Integer pageSize = 1;
+        UUID searchAfter = null;
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
+        when(orgPage.getContent()).thenReturn(organisations);
+        when(orgPage.isLast()).thenReturn(false);
 
         // act
         MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
