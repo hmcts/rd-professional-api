@@ -84,6 +84,24 @@ variable "jenkins_AAD_objectId" {
   description = "(Required) The Azure AD object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
 }
 
+variable "enable_schema_ownership" {
+  type        = bool
+  default     = false
+  description = "Enables the schema ownership script. Change this to true if you want to use the script. Defaults to false"
+}
+
+variable "force_schema_ownership_trigger" {
+  default     = ""
+  type        = string
+  description = "Update this to a new value to force the schema ownership script to run again."
+}
+
+variable "kv_subscription" {
+  default     = "DCD-CNP-DEV"
+  type        = string
+  description = "Update this with the name of the subscription where the single server key vault is. Defaults to DCD-CNP-DEV."
+}
+
 variable "pgsql_server_configuration" {
   description = "Postgres server configuration"
   type        = list(object({ name : string, value : string }))

@@ -109,6 +109,14 @@ module "db-professional-ref-data-v16" {
   # Setup Access Reader db user
   force_user_permissions_trigger = "1"
 
+  # Sets correct DB owner after migration to fix permissions
+  enable_schema_ownership = var.enable_schema_ownership
+  force_schema_ownership_trigger = "1"
+  kv_subscription = var.kv_subscription
+  kv_name = data.azurerm_key_vault.rd_key_vault.name
+  user_secret_name = azurerm_key_vault_secret.POSTGRES-USER.name
+  pass_secret_name = azurerm_key_vault_secret.POSTGRES-PASS.name
+
   subnet_suffix        = "expanded"
   pgsql_version        = "16"
   product              = var.product-v16
