@@ -736,7 +736,7 @@ public class OrganisationInternalController extends SuperController {
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
 
         if (isBlank(organisationCreationRequest.getName()) && isBlank(organisationCreationRequest.getSraId())) {
-            throw new InvalidRequest("Name or SRA Id not found");
+            throw new InvalidRequest("Name or SRA Id is required");
         }
 
         OrganisationResponse organisationResponse = organisationService

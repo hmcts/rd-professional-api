@@ -43,6 +43,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         assertThat(updateResponse.get("response_body").toString()).contains("Name or SRA Id not found");
     }
 
+    @Test
     void update_name_or_sra_with_invalid_name_and_valid_sra_should_return_200() {
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
             .name(null)
@@ -53,6 +54,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         assertThat(updateResponse).containsEntry("http_status", 200);
     }
 
+    @Test
     void update_name_or_sra_with_invalid_sra_and_valid_name_should_return_200() {
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
             .sraId(null)

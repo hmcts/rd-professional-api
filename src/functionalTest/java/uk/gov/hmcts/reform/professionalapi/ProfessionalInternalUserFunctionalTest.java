@@ -781,6 +781,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void updateOrganisationNameAndSraShouldReturnSuccess() {
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");

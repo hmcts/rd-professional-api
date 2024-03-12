@@ -148,6 +148,11 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+    private static final String ATTRIBUTE_KEY = "regulators-0";
+
+    private static final String ATTRIBUTE_VALUE = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\",\"organisationRegistrationNumber\":\"3456789100\"}";
+
+
     @Override
     @Transactional
     public OrganisationResponse createOrganisationFrom(
@@ -180,7 +185,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
         }
-
         return new OrganisationResponse(organisation);
     }
 
@@ -612,12 +616,27 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        if (isNotBlank(organisationCreationRequest.getName())) {
-            existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
+        if (existingOrganisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+        } else {
+            if (isNotBlank(organisationCreationRequest.getName())) {
+                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
+            }
+            if (isNotBlank(organisationCreationRequest.getSraId())) {
+                existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
+            }
         }
-        if (isNotBlank(organisationCreationRequest.getSraId())) {
-            existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
-        }
+
+        OrgAttribute attribute = new OrgAttribute();
+        attribute.setKey(RefDataUtil.removeEmptySpaces(ATTRIBUTE_KEY));
+        attribute.setValue(RefDataUtil
+            .removeEmptySpaces(ATTRIBUTE_VALUE));
+        attribute.setOrganisation(existingOrganisation);
+        orgAttributeRepository.save(attribute);
+
+        List<OrgAttribute> attributes = new ArrayList<>();
+        attributes.add(attribute);
+        existingOrganisation.setOrgAttributes(attributes);
 
         var savedOrganisation = organisationRepository.save(existingOrganisation);
 

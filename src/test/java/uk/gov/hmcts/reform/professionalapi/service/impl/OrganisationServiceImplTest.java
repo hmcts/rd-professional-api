@@ -1938,13 +1938,20 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_updateOrganisationNameAndSra() {
-        Organisation organisationMock = mock(Organisation.class);
         String newName = "TestOrgName";
         String newSraId = "TestSraId";
         final String orgIdentifier = "9KS20WT";
         organisationCreationRequest.setName(newName);
         organisationCreationRequest.setSraId(newSraId);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
 
+        when(organisationRepository.findByOrganisationIdentifier(orgId)).thenReturn(null);
+        assertThrows(EmptyResultDataAccessException.class, () ->
+            sut.retrieveOrganisation(orgId, false));
+        verify(organisationRepository, times(1))
+            .findByOrganisationIdentifier(any(String.class));
+
+        Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
             .thenReturn(organisationMock);
 
@@ -1953,6 +1960,10 @@ class OrganisationServiceImplTest {
 
         organisationMock.setName(newName);
         organisationMock.setSraId(newSraId);
+
+        OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
+
+        when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
 
         when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
 
@@ -1965,7 +1976,11 @@ class OrganisationServiceImplTest {
             .findByOrganisationIdentifier(orgIdentifier);
         verify(organisationRepository, times(1))
             .save(organisationMock);
+        verify(orgAttributeRepository, times(1))
+            .save(any(OrgAttribute.class));
     }
+
+
 
     @Test
     void test_AllAttributesAddedToSuperUser() {
