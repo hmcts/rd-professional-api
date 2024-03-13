@@ -149,11 +149,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
-    private static final String ATTRIBUTE_KEY = "regulators-0";
 
-    private static final String ATTRIBUTE_VALUE =
-        "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
-            + "\"organisationRegistrationNumber\":\"3456789100\"}";
 
 
     @Override
@@ -617,7 +613,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationResponse updateOrganisationNameOrSra(
         OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
-
+        final String ATTRIBUTE_KEY = "regulators-0";
+        final String ATTRIBUTE_VALUE = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+                + "\"organisationRegistrationNumber\":\""+organisationCreationRequest.getSraId()+"\"}";
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (existingOrganisation == null) {
             throw new EmptyResultDataAccessException(ONE);
