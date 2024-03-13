@@ -613,9 +613,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationResponse updateOrganisationNameOrSra(
         OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
-        final String ATTRIBUTE_KEY = "regulators-0";
-        final String ATTRIBUTE_VALUE = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
-                + "\"organisationRegistrationNumber\":\""+organisationCreationRequest.getSraId()+"\"}";
+        final String attributeKey = "regulators-0";
+        final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+                + "\"organisationRegistrationNumber\":\"" + organisationCreationRequest.getSraId() + "\"}";
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (existingOrganisation == null) {
             throw new EmptyResultDataAccessException(ONE);
@@ -629,9 +629,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         OrgAttribute attribute = new OrgAttribute();
-        attribute.setKey(RefDataUtil.removeEmptySpaces(ATTRIBUTE_KEY));
+        attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
         attribute.setValue(RefDataUtil
-            .removeEmptySpaces(ATTRIBUTE_VALUE));
+            .removeEmptySpaces(attributeValue));
         attribute.setOrganisation(existingOrganisation);
         orgAttributeRepository.save(attribute);
 
