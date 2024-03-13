@@ -151,7 +151,9 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private static final String ATTRIBUTE_KEY = "regulators-0";
 
-    private static final String ATTRIBUTE_VALUE = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\",\"organisationRegistrationNumber\":\"3456789100\"}";
+    private static final String ATTRIBUTE_VALUE =
+        "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+            + "\"organisationRegistrationNumber\":\"3456789100\"}";
 
 
     @Override
