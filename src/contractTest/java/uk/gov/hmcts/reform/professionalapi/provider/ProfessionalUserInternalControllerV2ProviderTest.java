@@ -74,7 +74,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
         professionalUser.setLastName("last name");
         professionalUser.setEmailAddress("test@email.com");
         professionalUser.setLastUpdated(LocalDateTime.now());
-
+        professionalUser.setDeleted(null);
         professionalUser.setOrganisation(getOrganisation());
 
         professionalUser.setUserConfiguredAccesses(getUserConfiguredAccesses(professionalUser));
