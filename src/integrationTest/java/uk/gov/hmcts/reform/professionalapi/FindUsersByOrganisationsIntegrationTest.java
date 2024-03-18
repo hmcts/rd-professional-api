@@ -220,7 +220,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
             assertThat(userResponse.getFirstName()).isEqualTo(expectedUser.getFirstName());
             assertThat(userResponse.getLastName()).isEqualTo(expectedUser.getLastName());
             assertThat(userResponse.getEmail()).isEqualTo(expectedUser.getEmailAddress());
-            assertThat(userResponse.getLastUpdated()).isEqualTo(expectedUser.getLastUpdated());
+            assertThat(userResponse.getLastUpdated()).isEqualToIgnoringNanos(expectedUser.getLastUpdated());
             assertThat(userResponse.getDeleted()).isEqualTo(expectedUser.getDeleted());
         }
 
@@ -228,7 +228,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
                 .filter(professionalUser -> professionalUser.getUserIdentifier()
                         .equals(deletedUser.getUserIdentifier())).findFirst().orElse(null);
         assertThat(deletedUserResponse).isNotNull();
-        assertThat(deletedUser.getDeleted()).isEqualTo(deletedUserResponse.getDeleted());
+        assertThat(deletedUser.getDeleted()).isEqualToIgnoringNanos(deletedUserResponse.getDeleted());
     }
 
     @Test
