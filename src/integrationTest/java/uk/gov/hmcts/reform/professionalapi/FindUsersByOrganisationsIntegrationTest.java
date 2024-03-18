@@ -182,6 +182,55 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     }
 
     @Test
+    void return_all_users_for_single_organisation_with_deleted_users() {
+        // arrange
+        LinkedList<ProfessionalUser> expectedUsers = sortedUsersInOrganisation.get(organisation1.getId());
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+                new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1));
+        Integer pageSize = null;
+
+        String expectedStatus = "200 OK";
+        boolean expectedHasMoreRecords = false;
+        int expectedOrganisationsCount = 1;
+        int expectedUsersCount = 4;
+
+        // act
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveUsersInOrganisationsByOrganisationIdentifiers(request,
+                        pageSize, null, null);
+
+        String json = convertMapToJson(response);
+        UsersInOrganisationsByOrganisationIdentifiersResponse typedResponse = convertJsonToResponse(json,
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+
+        // assert
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedUsersCount, expectedStatus,
+                expectedHasMoreRecords);
+
+        List<OrganisationUserResponse> userResponses = typedResponse.getOrganisationInfo().get(0).getUsers();
+        for (OrganisationUserResponse userResponse : userResponses) {
+            // get matching user from the expected list
+            ProfessionalUser expectedUser = expectedUsers.stream()
+                    .filter(professionalUser -> professionalUser.getUserIdentifier()
+                            .equals(userResponse.getUserIdentifier())).findFirst().orElse(null);
+
+            assertThat(expectedUser).isNotNull();
+            assertThat(userResponse.getFirstName()).isEqualTo(expectedUser.getFirstName());
+            assertThat(userResponse.getLastName()).isEqualTo(expectedUser.getLastName());
+            assertThat(userResponse.getEmail()).isEqualTo(expectedUser.getEmailAddress());
+            assertThat(userResponse.getLastUpdated()).isEqualTo(expectedUser.getLastUpdated());
+            assertThat(userResponse.getDeleted()).isEqualTo(expectedUser.getDeleted());
+        }
+
+        ProfessionalUser expectedDeletedUser = expectedUsers.stream()
+                .filter(professionalUser -> professionalUser.getUserIdentifier()
+                        .equals(deletedUser.getUserIdentifier())).findFirst().orElse(null);
+        assertThat(expectedDeletedUser).isNotNull();
+        assertThat(deletedUser.getDeleted()).isEqualTo(expectedDeletedUser.getDeleted());
+    }
+
+    @Test
     void return_all_users_for_given_orgs_when_org_filter_is_provided_and_no_search_after_provided() {
         // arrange
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
