@@ -183,7 +183,6 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    @Ignore("Checking if this is causing the build to fail")
     void return_all_users_for_single_organisation_with_deleted_users() {
         // arrange
         LinkedList<ProfessionalUser> expectedUsers = sortedUsersInOrganisation.get(organisation1.getId());
@@ -225,11 +224,11 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
             assertThat(userResponse.getDeleted()).isEqualTo(expectedUser.getDeleted());
         }
 
-        ProfessionalUser expectedDeletedUser = expectedUsers.stream()
+        OrganisationUserResponse deletedUserResponse = userResponses.stream()
                 .filter(professionalUser -> professionalUser.getUserIdentifier()
                         .equals(deletedUser.getUserIdentifier())).findFirst().orElse(null);
-        assertThat(expectedDeletedUser).isNotNull();
-        assertThat(deletedUser.getDeleted()).isEqualTo(expectedDeletedUser.getDeleted());
+        assertThat(deletedUserResponse).isNotNull();
+        assertThat(deletedUser.getDeleted()).isEqualTo(deletedUserResponse.getDeleted());
     }
 
     @Test
