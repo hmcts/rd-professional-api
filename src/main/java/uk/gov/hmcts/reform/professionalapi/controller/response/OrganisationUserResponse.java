@@ -20,6 +20,7 @@ public class OrganisationUserResponse {
     private String lastName;
     private String email;
     private LocalDateTime lastUpdated;
+    private LocalDateTime deleted;
     private List<UserAccessType> userAccessTypes = new ArrayList<>();
 
     public OrganisationUserResponse(ProfessionalUser user) {
@@ -28,6 +29,7 @@ public class OrganisationUserResponse {
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
         this.lastUpdated = user.getLastUpdated();
+        this.deleted = user.getDeleted();
         this.userAccessTypes =
                 user.getUserConfiguredAccesses().stream().map(RefDataUtil::fromUserConfiguredAccess).toList();
     }
