@@ -32,35 +32,50 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
     @Test
     void update_name_or_sra_with_invalid_name_and_sra_should_return_400() {
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
+
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
             .name("")
-            .sraId(null)
+            .sraId("")
             .build();
+
         Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgNameSraIdStatus(organisationUpdateRequest,  hmctsAdmin,getOrganisationId());
+                .updateOrgNameSraIdStatus(organisationUpdateRequest,
+                    hmctsAdmin,(String) responseForOrganisationCreation.get(ORG_IDENTIFIER));
 
         assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString()).contains("Name or SRA Id not found");
+        assertThat(updateResponse.get("response_body").toString()).contains("Name or SRA Id is required");
     }
 
     @Test
     void update_name_or_sra_with_invalid_name_and_valid_sra_should_return_200() {
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
+
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-            .name(null)
+            .name("")
             .build();
+
         Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgNameSraIdStatus(organisationUpdateRequest,  hmctsAdmin,getOrganisationId());
+            .updateOrgNameSraIdStatus(organisationUpdateRequest,
+                hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER));
 
         assertThat(updateResponse).containsEntry("http_status", 200);
     }
 
     @Test
     void update_name_or_sra_with_invalid_sra_and_valid_name_should_return_200() {
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
+
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-            .sraId(null)
+            .sraId(" ")
             .build();
+
         Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgNameSraIdStatus(organisationUpdateRequest,  hmctsAdmin,getOrganisationId());
+            .updateOrgNameSraIdStatus(organisationUpdateRequest,
+                hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER));
 
         assertThat(updateResponse).containsEntry("http_status", 200);
     }
