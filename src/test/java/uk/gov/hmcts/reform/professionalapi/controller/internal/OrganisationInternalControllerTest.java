@@ -70,6 +70,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -570,6 +571,39 @@ class OrganisationInternalControllerTest {
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
+    }
+
+    @Test
+    void testUpdateOrgNameAndSra() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String updatedName = "NewName";
+        String updatedSra = "NewSRA";
+        organisation.setName(updatedName);
+        organisation.setSraId(updatedSra);
+        organisationCreationRequest.setName(updatedName);
+        organisationCreationRequest.setSraId(updatedSra);
+
+        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
+        assertThat(organisationCreationRequest.getName()).isNotEmpty();
+        assertThat(organisationCreationRequest.getSraId()).isNotEmpty();
+
+
+        when(organisationServiceMock.updateOrganisationNameOrSra(organisationCreationRequest,
+            organisation.getOrganisationIdentifier())).thenReturn(new OrganisationResponse(organisation));
+
+        ResponseEntity<OrganisationResponse> response = organisationInternalController
+            .updateOrganisationNameOrSra(organisationCreationRequest,organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(response.getBody().getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
+
+
+        verify(organisationCreationRequestValidatorMock, times(1))
+            .validateOrganisationIdentifier(any(String.class));
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationNameOrSra(organisationCreationRequest, organisation.getOrganisationIdentifier());
+
     }
 
 }
