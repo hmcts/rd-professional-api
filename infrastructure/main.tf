@@ -107,7 +107,7 @@ module "db-professional-ref-data-v16" {
   ]
 
   # Setup Access Reader db user
-  force_user_permissions_trigger = "1"
+  force_user_permissions_trigger = "2"
 
   # Sets correct DB owner after migration to fix permissions
   enable_schema_ownership = var.enable_schema_ownership
