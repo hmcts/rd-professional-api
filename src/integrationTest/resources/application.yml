@@ -1,6 +1,6 @@
 spring:
   flyway:
-    schemas: DBREFDATA
+    schemas: dbrefdata
     locations: classpath:db/migration
 
   jpa:

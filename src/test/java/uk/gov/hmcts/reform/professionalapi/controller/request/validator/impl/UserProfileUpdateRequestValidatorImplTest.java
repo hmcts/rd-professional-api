@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,7 +52,7 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     @Test
     void test_ValidateRequestIfBothStatusAndRoleArePresent() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),email, firstName, lastName,
                 IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
@@ -66,7 +67,7 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     @Test
     void test_ValidateRequestForStatus() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),email, firstName, lastName,
                 IdamStatus.ACTIVE.name(), null, null, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
@@ -80,7 +81,7 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     @Test
     void test_ValidateRequestForRoles() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),email, firstName, lastName,
                 null, rolesData, rolesToDeleteData, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
@@ -94,7 +95,7 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     @Test
     void test_ValidateRequestForAccessTypes() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),email, firstName, lastName,
                 IdamStatus.ACTIVE.name(), null, null, userAccessTypes);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
@@ -109,7 +110,7 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     @Test
     void test_ValidateRequestForAccessTypesEmpty() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),email, firstName, lastName,
                 IdamStatus.ACTIVE.name(), null, null, new HashSet<>());
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
@@ -124,7 +125,7 @@ class UserProfileUpdateRequestValidatorImplTest {
 
     @Test
     void test_ThrowErrorIfValidateRequestIsEmpty() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),email, firstName, lastName,
                 null, null, null, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
