@@ -7,7 +7,7 @@ Professional Reference Data API
 Provides professional reference data to client applications. Implemented as a Java/SpringBoot application.
 
 Please refer to the confluence for more information. 
-https://tools.hmcts.net/confluence/display/RTRD/Professional+Reference+Data
+https://tools.hmcts.net/confluence/display/RTRD/Professional+Reference+Data 
 
 
 ### Prerequisites
