@@ -17,6 +17,8 @@ java:
     LAUNCH_DARKLY_ENV: "{{ .Values.global.environment }}"
     SCHEDULER_ENABLED: false
     CRON_EXPRESSION: "* */10 * * * *"
+  spotInstances:
+    enabled: true
   image: 'hmctspublic.azurecr.io/rd/professional-api:latest'
   keyVaults:
     rd:
