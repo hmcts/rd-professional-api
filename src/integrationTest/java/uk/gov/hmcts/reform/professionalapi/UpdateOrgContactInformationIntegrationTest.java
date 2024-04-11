@@ -104,7 +104,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
                 null,null,null,null,null,
                 null,null), hmctsAdmin,createOrganisationRequest());
 
-        assertThat(updateResponse).containsEntry("http_status", "404");
+        assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
             .contains("validation on an argument failed");
 
