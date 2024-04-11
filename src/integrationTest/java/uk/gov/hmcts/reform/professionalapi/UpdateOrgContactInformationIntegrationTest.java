@@ -44,7 +44,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString()).contains(
-        "[Field error in object 'contactInformationCreationRequest' on field 'addressLine1'");
+            "[Field error in object 'contactInformationCreationRequest' on field 'addressLine1'");
     }
 
     @Test
