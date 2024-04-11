@@ -1235,12 +1235,12 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updateContactInformationForOrganisationShouldReturnSuccess() {
         log.info("updateContactInformationForOrganisationShouldReturnSuccess :: STARTED");
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
+
         assertThat(organisationIdentifier).isNotEmpty();
         JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
@@ -1269,7 +1269,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             assertThat(existingContactInfo.get("postCode")).isNotNull();
 
             Response result =
-                professionalApiClient.updateContactInformationsToOrganisation( aContactInformationCreationRequest()
+                professionalApiClient.updateContactInformationsToOrganisation(aContactInformationCreationRequest()
                     .uprn(contactInformationCreationRequest.getUprn())
                     .addressLine1(contactInformationCreationRequest.getAddressLine1())
                     .addressLine2(contactInformationCreationRequest.getAddressLine2())

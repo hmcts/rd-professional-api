@@ -324,8 +324,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
-    private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
-                                                  ContactInformation contactInformation) {
+    public void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
+                                                 ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {

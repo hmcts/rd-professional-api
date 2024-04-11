@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
@@ -136,6 +138,10 @@ class OrganisationServiceImplTest {
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final OrgAttributeRepository orgAttributeRepository = mock(OrgAttributeRepository.class);
 
+    private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
+
+    private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
+
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
@@ -205,6 +211,9 @@ class OrganisationServiceImplTest {
 
     private final ProfessionalUserService professionalUserServiceMock
             = mock(ProfessionalUserService.class);
+
+    @Mock
+    private ArrayList<ContactInformation> existingContactInformationList;
 
     @BeforeEach
     void setUp() {
@@ -2718,4 +2727,40 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_updateOrganisationContactInformation() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+
+        when(organisationMock.getContactInformation()).thenReturn(existingContactInformationList);
+        assertNotNull(contactInformationCreationRequest);
+
+        ContactInformation existingContactInformation = new ContactInformation();
+
+        existingContactInformation.setAddressLine1(contactInformationCreationRequest.getAddressLine1());
+        existingContactInformation.setTownCity(contactInformationCreationRequest.getTownCity());
+
+        when(contactInformationRepository.save(existingContactInformation)).thenReturn(existingContactInformation);
+        assertNotNull(existingContactInformation);
+        assertThat(existingContactInformation.getAddressLine1())
+            .isEqualTo(contactInformationCreationRequest.getAddressLine1());
+
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+
+        ResponseEntity<ContactInformationResponse> updatedOrganisationContact =
+            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,orgId);
+
+        assertThat(updatedOrganisationContact).isNotNull();
+        assertThat(updatedOrganisationContact.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+
+
+
+    }
+
 }

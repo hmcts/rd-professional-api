@@ -315,6 +315,25 @@ public class OrganisationFixtures {
         return contactInfoList;
     }
 
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder createContactInformationRequest() {
+
+        return aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("country")
+                .county("county")
+                .townCity("town-city")
+                .uprn("uprn")
+                .postCode("some-post-code")
+                .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                    .dxNumber("DX 1234567890")
+                    .dxExchange("dxExchange").build()));
+
+    }
+
+
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder
         organisationRequestWithMultipleAddressAllFields() {
         Set<String> paymentAccounts = new HashSet<>();

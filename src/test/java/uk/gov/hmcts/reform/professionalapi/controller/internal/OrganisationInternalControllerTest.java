@@ -20,6 +20,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -57,6 +59,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -74,11 +77,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 
+@SuppressWarnings({"unchecked", "checkstyle:AbbreviationAsWordInName"})
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationInternalControllerTest {
     private OrganisationResponse organisationResponse;
     private OrganisationsDetailResponse organisationsDetailResponse;
@@ -87,6 +92,9 @@ class OrganisationInternalControllerTest {
     private PaymentAccountService paymentAccountServiceMock;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
+
+    private ContactInformationCreationRequest contactInformationCreationRequest;
+
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
@@ -161,7 +169,10 @@ class OrganisationInternalControllerTest {
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null,"Doctor",null);
-
+        contactInformationCreationRequest = new ContactInformationCreationRequest("uprn1","addressLine1",
+            "addressLine2","addressLine3", "some-country1","some-county1","som1-town-city",
+            "som1-post-code",Arrays.asList(dxAddressCreationRequest()
+            .dxNumber("DX 1234567890").dxExchange("dxExchange").build()));
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -572,4 +583,44 @@ class OrganisationInternalControllerTest {
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
 
+    @Test
+    void testUpdateOrgContactInformation() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        doNothing().when(organisationCreationRequestValidatorMock)
+        .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
+            .thenReturn(organisation);
+
+        assertThat(organisation).isNotNull();
+
+        when(organisationServiceMock.updateContactInformationForOrganisation(contactInformationCreationRequest,
+            organisation.getOrganisationIdentifier())).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
+
+        ResponseEntity<ContactInformationResponse> response = organisationInternalController
+            .updateContactInformationForOrganisation(contactInformationCreationRequest,
+                organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationCreationRequestValidatorMock, times(1))
+            .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
+        verify(organisationServiceMock, times(1))
+            .updateContactInformationForOrganisation(contactInformationCreationRequest,
+                organisation.getOrganisationIdentifier());
+
+    }
+
+    @Test
+    void testUpdateOrgContactInformationWithEmptyOrgIdentifier() {
+
+        doNothing().when(organisationCreationRequestValidatorMock)
+            .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(null)).thenReturn(null);
+        assertThrows(ResourceNotFoundException.class, () ->
+            organisationInternalController.updateContactInformationForOrganisation(contactInformationCreationRequest,
+                null));
+    }
 }

@@ -1763,7 +1763,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(contactInformationCreationRequest)
-            .put("/refdata/internal/v1/organisations/contactInformation/" + organisationId )
+            .put("/refdata/internal/v1/organisations/contactInformation/" + organisationId)
             .andReturn();
 
         response.then()

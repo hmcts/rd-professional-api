@@ -802,12 +802,12 @@ public class OrganisationInternalController extends SuperController {
         @Valid @NotNull @RequestBody ContactInformationCreationRequest contactInformationCreationRequest,
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
-        organisationCreationRequestValidator.validateContactInformations(Arrays.asList(contactInformationCreationRequest));
+        organisationCreationRequestValidator.validateContactInformations(Arrays
+            .asList(contactInformationCreationRequest));
 
-        var organisation = Optional.ofNullable(organisationService
-            .getOrganisationByOrgIdentifier(organisationIdentifier));
+        var organisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
 
-        if (organisation.isEmpty()) {
+        if (organisation == null) {
             throw new ResourceNotFoundException("Organisation does not exist");
         }
 

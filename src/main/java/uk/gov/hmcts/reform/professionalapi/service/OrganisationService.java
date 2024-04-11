@@ -35,6 +35,7 @@ public interface OrganisationService {
 
     ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
         ContactInformationCreationRequest contactInfo, String organisationIdentifier);
+
     OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
 
     OrganisationEntityResponseV2 retrieveOrganisationForV2Api(String organisationIdentifier,
