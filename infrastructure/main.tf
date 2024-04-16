@@ -111,7 +111,7 @@ module "db-professional-ref-data-v16" {
 
   # Sets correct DB owner after migration to fix permissions
   enable_schema_ownership = var.enable_schema_ownership
-  force_schema_ownership_trigger = "1"
+  force_schema_ownership_trigger = "2"
   kv_subscription = var.kv_subscription
   kv_name = data.azurerm_key_vault.rd_key_vault.name
   user_secret_name = azurerm_key_vault_secret.POSTGRES-USER.name
