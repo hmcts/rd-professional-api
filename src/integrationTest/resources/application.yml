@@ -3,6 +3,7 @@ spring:
     schemas: dbrefdata
     locations: classpath:db/migration
 
+
   jpa:
     show-sql: true
     properties:
