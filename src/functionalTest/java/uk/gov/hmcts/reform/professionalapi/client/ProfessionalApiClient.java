@@ -1265,6 +1265,21 @@ public class ProfessionalApiClient {
         return response;
     }
 
+    public Response deleteDXAddress(DxAddressCreationRequest dxAddressCreationRequest,String organisationId, String role, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body(dxAddressCreationRequest)
+                .delete("/refdata/internal/v1/organisations/dxAddress/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("{}:: Delete DX Address response: {}", loggingComponentName, response.asString());
+        }
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response;
+    }
+
     public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
             .body("")
@@ -1466,6 +1481,22 @@ public class ProfessionalApiClient {
                 .statusCode(expectedStatus.value());
 
         log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
+                loggingComponentName, response.getStatusCode());
+    }
+
+    public void deleteDXAddressesOfOrganisation(List<DeleteMultipleAddressRequest> deleteRequest,
+                                                      RequestSpecification requestSpecification,
+                                                      HttpStatus expectedStatus) {
+        Response response = requestSpecification
+                .body(deleteRequest)
+                .delete("/refdata/internal/v1/organisations/dxAddress/")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: Delete DX Addresses of an organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
     }
 }

@@ -13,12 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
@@ -154,6 +149,17 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void deleteOrganisationScenarios() {
         deletePendingOrganisationShouldReturnSuccess();
         deleteActiveOrganisationShouldReturnSuccess();
+        deleteDXAddressShouldReturnSuccess();
+    }
+
+    public void deleteDXAddressShouldReturnSuccess() {
+        log.info("deleteDXAddressShouldReturnSuccess :: STARTED");
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+        JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+        String dxNumber = jsonPath.get("contactInformation[0].dxAddress[0].dxNumber");
+        String dxExchange = jsonPath.get("contactInformation[0].dxAddress[0].dxExchange");
+        professionalApiClient.deleteDXAddress(new DxAddressCreationRequest(dxNumber, dxExchange),orgIdentifier, hmctsAdmin, NO_CONTENT);
+        log.info("deleteDXAddressShouldReturnSuccess :: END");
     }
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
