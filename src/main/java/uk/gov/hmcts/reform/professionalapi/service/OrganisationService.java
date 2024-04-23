@@ -59,7 +59,7 @@ public interface OrganisationService {
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
 
     @Transactional
-    DeleteUserResponse deleteUserForOrganisation( List<String> emails);
+    DeleteUserResponse deleteUserForOrganisation(List<String> emails);
 
     List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable);
 

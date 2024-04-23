@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
@@ -37,12 +36,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
-
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -70,7 +67,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 
 @RequestMapping(
-    path = "refdata/internal/v1/organisations"
+        path = "refdata/internal/v1/organisations"
 )
 @Validated
 @RestController
@@ -82,7 +79,7 @@ public class OrganisationInternalController extends SuperController {
 
     @Autowired
     public OrganisationInternalController(
-        OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator) {
+            OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator) {
         this.organisationByProfileIdsRequestValidator = organisationByProfileIdsRequestValidator;
     }
 
@@ -90,138 +87,138 @@ public class OrganisationInternalController extends SuperController {
     protected String loggingComponentName;
 
     @Operation(
-        summary = "Creates an Organisation",
-        description = "**IDAM Roles to access API** : <br> No role restriction",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization")
-        }
+            summary = "Creates an Organisation",
+            description = "**IDAM Roles to access API** : <br> No role restriction",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "201",
-        description = "The Organisation Identifier of the created Organisation",
-        content = @Content(schema = @Schema(implementation = OrganisationResponse.class))
+            responseCode = "201",
+            description = "The Organisation Identifier of the created Organisation",
+            content = @Content(schema = @Schema(implementation = OrganisationResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "An invalid request has been provided",
-        content = @Content
+            responseCode = "400",
+            description = "An invalid request has been provided",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @PostMapping(
-        consumes = APPLICATION_JSON_VALUE,
-        produces = APPLICATION_JSON_VALUE
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisation(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-        @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+            @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for internal users
         return createOrganisationFrom(organisationCreationRequest);
     }
 
     @Operation(
-        summary = "Retrieves all Organisations filtered by given Status or one Organisation if ID is given",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
+            summary = "Retrieves all Organisations filtered by given Status or one Organisation if ID is given",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
 
 
     @ApiResponse(
-        responseCode = "200",
-        description = "Details of one or more Organisations",
-        content = @Content(schema = @Schema(implementation = OrganisationsDetailResponse.class))
+            responseCode = "200",
+            description = "Details of one or more Organisations",
+            content = @Content(schema = @Schema(implementation = OrganisationsDetailResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "Invalid request (Status or ID) provided",
-        content = @Content
+            responseCode = "400",
+            description = "Invalid request (Status or ID) provided",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "No Organisation(s) found with the given ID",
-        content = @Content
+            responseCode = "404",
+            description = "No Organisation(s) found with the given ID",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
 
     @Secured("prd-admin")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> retrieveOrganisations(
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @Parameter(name = "id") @RequestParam(value = "id", required = false) String id,
-        @Parameter(name = "since") @RequestParam(value = "since", required = false) String lastUpdatedSince,
-        @Parameter(name = "status") @RequestParam(value = "status", required = false) String status,
-        @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
-        @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @Parameter(name = "id") @RequestParam(value = "id", required = false) String id,
+            @Parameter(name = "since") @RequestParam(value = "since", required = false) String lastUpdatedSince,
+            @Parameter(name = "status") @RequestParam(value = "status", required = false) String status,
+            @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
+            @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
 
         return retrieveAllOrganisationsOrById(id, lastUpdatedSince, status, page, size);
     }
 
 
     @Operation(
-        summary = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization"),
-            @SecurityRequirement(name = "UserEmail")
-        }
+            summary = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization"),
+                    @SecurityRequirement(name = "UserEmail")
+            }
     )
 
     @ApiResponse(
-        responseCode = "200",
-        description = "The Organisation's associated Payment Accounts",
-        content = @Content(schema = @Schema(implementation = OrganisationPbaResponse.class))
+            responseCode = "200",
+            description = "The Organisation's associated Payment Accounts",
+            content = @Content(schema = @Schema(implementation = OrganisationPbaResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "An invalid Email Address was provided",
-        content = @Content
+            responseCode = "400",
+            description = "An invalid Email Address was provided",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "No Payment Accounts found with the given Email Address",
-        content = @Content
+            responseCode = "404",
+            description = "No Payment Accounts found with the given Email Address",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @GetMapping(
-        path = "/pbas",
-        produces = APPLICATION_JSON_VALUE
+            path = "/pbas",
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity<Object> retrievePaymentAccountBySuperUserEmail() {
@@ -232,180 +229,180 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @Operation(
-        summary = "Edit the PBAs of an Organisation by Organisation ID",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
+            summary = "Edit the PBAs of an Organisation by Organisation ID",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "200",
-        description = "The Payment Account's have been updated",
-        content = @Content(schema = @Schema(implementation = PbaResponse.class))
+            responseCode = "200",
+            description = "The Payment Account's have been updated",
+            content = @Content(schema = @Schema(implementation = PbaResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "An invalid request was provided",
-        content = @Content
+            responseCode = "400",
+            description = "An invalid request was provided",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "No Organisation found with the given ID",
-        content = @Content
+            responseCode = "404",
+            description = "No Organisation found with the given ID",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @PutMapping(
-        path = "/{orgId}/pbas",
-        produces = APPLICATION_JSON_VALUE
+            path = "/{orgId}/pbas",
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity<Object> editPaymentAccountsByOrgId(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "pbaEditRequest")
-        @Valid @NotNull @RequestBody PbaRequest pbaEditRequest,
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
-            message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "pbaEditRequest")
+            @Valid @NotNull @RequestBody PbaRequest pbaEditRequest,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+                    message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("{}:: Received request to edit payment accounts by organisation Id...", loggingComponentName);
 
         Optional<Organisation> organisation = Optional.ofNullable(organisationService
-            .getOrganisationByOrgIdentifier(organisationIdentifier));
+                .getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (organisation.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
         paymentAccountValidator.validatePaymentAccounts(
-            pbaEditRequest.getPaymentAccounts(), organisation.get(), false);
+                pbaEditRequest.getPaymentAccounts(), organisation.get(), false);
 
         var response = paymentAccountService
-            .editPaymentAccountsByOrganisation(organisation.get(), pbaEditRequest);
+                .editPaymentAccountsByOrganisation(organisation.get(), pbaEditRequest);
 
         return ResponseEntity
-            .status(200)
-            .body(response);
+                .status(200)
+                .body(response);
     }
 
     @Operation(
-        summary = "Updates an Organisation",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        })
+            summary = "Updates an Organisation",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            })
 
     @ApiResponse(
-        responseCode = "200",
-        description = "Organisation has been updated",
-        content = @Content(schema = @Schema(implementation = String.class))
+            responseCode = "200",
+            description = "Organisation has been updated",
+            content = @Content(schema = @Schema(implementation = String.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "If Organisation request sent with null/invalid values for mandatory fields",
-        content = @Content
+            responseCode = "400",
+            description = "If Organisation request sent with null/invalid values for mandatory fields",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "No Organisation found with the given ID",
-        content = @Content
+            responseCode = "404",
+            description = "No Organisation found with the given ID",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @PutMapping(
-        value = "/{orgId}",
-        produces = APPLICATION_JSON_VALUE
+            value = "/{orgId}",
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     @Secured("prd-admin")
     public ResponseEntity<Object> updatesOrganisation(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-        @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @PathVariable("orgId") @NotBlank String organisationIdentifier,
-        @Parameter(hidden = true) @UserId String userId) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+            @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @Parameter(hidden = true) @UserId String userId) {
 
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }
 
     @Operation(
-        summary = "Add a new User to an Organisation",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
+            summary = "Add a new User to an Organisation",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "201",
-        description = "The new User has been added to the Organisation",
-        content = @Content(schema = @Schema(implementation = NewUserResponse.class))
+            responseCode = "201",
+            description = "The new User has been added to the Organisation",
+            content = @Content(schema = @Schema(implementation = NewUserResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "An invalid request was provided",
-        content = @Content
+            responseCode = "400",
+            description = "An invalid request was provided",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "No Organisation found with the given ID to add new User to",
-        content = @Content
+            responseCode = "404",
+            description = "No Organisation found with the given ID to add new User to",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "409",
-        description = "A User already exists with the given "
-            + "Email Address or is already active in SIDAM during resend invite",
-        content = @Content
+            responseCode = "409",
+            description = "A User already exists with the given "
+                    + "Email Address or is already active in SIDAM during resend invite",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "429",
-        description = "Too many requests for resend invite",
-        content = @Content
+            responseCode = "429",
+            description = "Too many requests for resend invite",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @PostMapping(
-        path = "/{orgId}/users/",
-        produces = APPLICATION_JSON_VALUE
+            path = "/{orgId}/users/",
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured("prd-admin")
     public ResponseEntity<Object> addUserToOrganisation(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "newUserCreationRequest")
-        @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @PathVariable("orgId") @NotBlank String organisationIdentifier,
-        @Parameter(hidden = true) @UserId String userId) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "newUserCreationRequest")
+            @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @Parameter(hidden = true) @UserId String userId) {
 
         //Received request to add a internal new user to an organisation
 
@@ -413,127 +410,127 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @Operation(
-        summary = "Delete an Organisation",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
+            summary = "Delete an Organisation",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "204",
-        description = "A representation of the Deleted organisation",
-        content = @Content(schema = @Schema(implementation = DeleteOrganisationResponse.class))
+            responseCode = "204",
+            description = "A representation of the Deleted organisation",
+            content = @Content(schema = @Schema(implementation = DeleteOrganisationResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "The orgId provided for an organisation is not valid or organisation admin is not in "
-            + "Pending state ",
-        content = @Content
+            responseCode = "400",
+            description = "The orgId provided for an organisation is not valid or organisation admin is not in "
+                    + "Pending state ",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized Error : "
-            + "The requested resource is restricted and requires authentication",
-        content = @Content
+            responseCode = "401",
+            description = "Unauthorized Error : "
+                    + "The requested resource is restricted and requires authentication",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "Not Found",
-        content = @Content
+            responseCode = "404",
+            description = "Not Found",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
 
     @DeleteMapping(
-        value = "/{orgId}",
-        produces = APPLICATION_JSON_VALUE
+            value = "/{orgId}",
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @ResponseBody
     @Secured("prd-admin")
     public ResponseEntity<DeleteOrganisationResponse> deleteOrganisation(
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @PathVariable("orgId") @NotBlank String organisationIdentifier,
-        @Parameter(hidden = true) @UserId String userId) {
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @Parameter(hidden = true) @UserId String userId) {
 
         Optional<Organisation> organisation = Optional.ofNullable(organisationService
-            .getOrganisationByOrgIdentifier(organisationIdentifier));
+                .getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (organisation.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
 
         var deleteOrganisationResponse =
-            organisationService.deleteOrganisation(organisation.get(), userId);
+                organisationService.deleteOrganisation(organisation.get(), userId);
 
         return ResponseEntity
-            .status(deleteOrganisationResponse.getStatusCode())
-            .body(deleteOrganisationResponse);
+                .status(deleteOrganisationResponse.getStatusCode())
+                .body(deleteOrganisationResponse);
     }
 
     @Operation(
-        summary = "Updates the MFA preference of an Organisation",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
+            summary = "Updates the MFA preference of an Organisation",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "200",
-        description = "The MFA preference of the organisation has been successfully updated",
-        content = @Content
+            responseCode = "200",
+            description = "The MFA preference of the organisation has been successfully updated",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "An invalid request was provided",
-        content = @Content
+            responseCode = "400",
+            description = "An invalid request was provided",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized Error : "
-            + "The requested resource is restricted and requires authentication",
-        content = @Content
+            responseCode = "401",
+            description = "Unauthorized Error : "
+                    + "The requested resource is restricted and requires authentication",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "No Organisation was found with the given organisationIdentifier",
-        content = @Content
+            responseCode = "404",
+            description = "No Organisation was found with the given organisationIdentifier",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @PutMapping(
-        path = "/{orgId}/mfa",
-        produces = APPLICATION_JSON_VALUE
+            path = "/{orgId}/mfa",
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity<Object> updateOrgMfaStatus(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "mfaUpdateRequest")
-        @Valid @NotNull @RequestBody MfaUpdateRequest mfaUpdateRequest,
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
-            message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "mfaUpdateRequest")
+            @Valid @NotNull @RequestBody MfaUpdateRequest mfaUpdateRequest,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+                    message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("{}:: Received request to update organisation mfa preference::", loggingComponentName);
 
@@ -549,43 +546,43 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @Operation(
-        summary = "Retrieves the list of organisations with particular PBA status",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
+            summary = "Retrieves the list of organisations with particular PBA status",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "200",
-        description = "",
-        content = @Content(schema = @Schema(implementation = OrganisationsWithPbaStatusResponse.class))
+            responseCode = "200",
+            description = "",
+            content = @Content(schema = @Schema(implementation = OrganisationsWithPbaStatusResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "PBA status is not valid",
-        content = @Content
+            responseCode = "400",
+            description = "PBA status is not valid",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "401",
-        description = "",
-        content = @Content
+            responseCode = "401",
+            description = "",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "",
-        content = @Content
+            responseCode = "403",
+            description = "",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @GetMapping(
-        path = "/pba/{status}",
-        produces = APPLICATION_JSON_VALUE
+            path = "/pba/{status}",
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity<Object> retrieveOrgByPbaStatus(@PathVariable("status") @NotBlank String pbaStatus) {
@@ -595,58 +592,58 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @Operation(
-        summary = "Review (Accept or Reject) an Organisation's registered PBAs ",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
+            summary = "Review (Accept or Reject) an Organisation's registered PBAs ",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "200",
-        description = "Success: The requested PBAs have been successfully Updated - OR - "
-            + "Partial Success: Some of the requested PBAs have been successfully Updated"
-            + " and the invalid ones returned with individual error message",
-        content = @Content(schema = @Schema(implementation = UpdatePbaStatusResponse.class))
+            responseCode = "200",
+            description = "Success: The requested PBAs have been successfully Updated - OR - "
+                    + "Partial Success: Some of the requested PBAs have been successfully Updated"
+                    + " and the invalid ones returned with individual error message",
+            content = @Content(schema = @Schema(implementation = UpdatePbaStatusResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "An invalid request was provided",
-        content = @Content
+            responseCode = "400",
+            description = "An invalid request was provided",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "No Organisation found with the given ID",
-        content = @Content
+            responseCode = "404",
+            description = "No Organisation found with the given ID",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "422",
-        description = "All requested PBAs failed to update",
-        content = @Content
+            responseCode = "422",
+            description = "All requested PBAs failed to update",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @PutMapping(
-        path = "/{orgId}/pba/status",
-        produces = APPLICATION_JSON_VALUE
+            path = "/{orgId}/pba/status",
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     @ResponseBody
     @Secured("prd-admin")
     public ResponseEntity<Object> updateAnOrganisationsRegisteredPbas(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "updatePbaRequest")
-        @Valid @NotNull @RequestBody UpdatePbaRequest updatePbaRequest,
-        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "updatePbaRequest")
+            @Valid @NotNull @RequestBody UpdatePbaRequest updatePbaRequest,
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         //Received request to update an Organisation's PBAs
 
@@ -655,51 +652,51 @@ public class OrganisationInternalController extends SuperController {
         organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
 
         var updatePbaStatusResponse =
-            updateAnOrganisationsPbas(updatePbaRequest.getPbaRequestList(), organisationIdentifier);
+                updateAnOrganisationsPbas(updatePbaRequest.getPbaRequestList(), organisationIdentifier);
 
         return ResponseEntity
-            .status(updatePbaStatusResponse.getStatusCode())
-            .body(updatePbaStatusResponse);
+                .status(updatePbaStatusResponse.getStatusCode())
+                .body(updatePbaStatusResponse);
     }
 
     @Operation(
-        summary = "Retrieves the organisation details of a user",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
+            summary = "Retrieves the organisation details of a user",
+            description = "**IDAM Roles to access API** : <br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "200",
-        description = "",
-        content = @Content(schema = @Schema(implementation = OrganisationEntityResponse.class))
+            responseCode = "200",
+            description = "",
+            content = @Content(schema = @Schema(implementation = OrganisationEntityResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "User id null"
+            responseCode = "400",
+            description = "User id null"
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied"
+            responseCode = "403",
+            description = "Forbidden Error: Access denied"
     )
     @ApiResponse(
-        responseCode = "404",
-        description = "Professional User not found"
+            responseCode = "404",
+            description = "Professional User not found"
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error"
+            responseCode = "500",
+            description = "Internal Server Error"
     )
 
     @GetMapping(
-        path = "/orgDetails/{userId}",
-        produces = APPLICATION_JSON_VALUE
+            path = "/orgDetails/{userId}",
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(
-        @PathVariable("userId") String userId) {
+            @PathVariable("userId") String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
 
@@ -765,51 +762,51 @@ public class OrganisationInternalController extends SuperController {
 
 
     @Operation(
-        summary = "Retrieves Organisations by Organisation Profile IDs",
-        description = "**Bearer token not required to access API. Only a valid s2s token**",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization")
-        }
+            summary = "Retrieves Organisations by Organisation Profile IDs",
+            description = "**Bearer token not required to access API. Only a valid s2s token**",
+            security = {
+                @SecurityRequirement(name = "ServiceAuthorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "200",
-        description = "List of matching organisations",
-        content = @Content(schema = @Schema(implementation = MultipleOrganisationsResponse.class))
+            responseCode = "200",
+            description = "List of matching organisations",
+            content = @Content(schema = @Schema(implementation = MultipleOrganisationsResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "Invalid request (PageSize or searchAfter) provided",
-        content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            responseCode = "400",
+            description = "Invalid request (PageSize or searchAfter) provided",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @PostMapping(
-        path = "/getOrganisationsByProfile",
-        produces = APPLICATION_JSON_VALUE
+            path = "/getOrganisationsByProfile",
+            produces = APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Object> retrieveOrganisationsByProfileIds(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-        @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
-        @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
-        @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+            @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
+            @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
+            @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
 
         organisationByProfileIdsRequestValidator.validate(pageSize);
 
         MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
-            organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
+                        organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(response);
+                .status(HttpStatus.OK)
+                .body(response);
     }
 }
