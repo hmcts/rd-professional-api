@@ -122,7 +122,6 @@ public class ProfessionalApiConstants {
     public static final String GET_ORG_BY_ID_NOTES_1 = "**IDAM Roles to access API**";
     public static final String GET_ORG_BY_ID_NOTES_2 = ":<br> pui-organisation-manager,<br> pui-finance-manager,";
     public static final String GET_ORG_BY_ID_NOTES_3 = "<br> pui-case-manager,<br> pui-caa,<br> pui-user-manager";
-
     public static final String DEL_ORG_PBA_NOTES_1 = "Bad Request Error: One of the below reasons: <br>";
     public static final String DEL_ORG_PBA_NOTES_2 = "- Organisation is not ACTIVE.<br>";
     public static final String DEL_ORG_PBA_NOTES_3 = "- No payment accounts passed to be deleted in the request body.";
