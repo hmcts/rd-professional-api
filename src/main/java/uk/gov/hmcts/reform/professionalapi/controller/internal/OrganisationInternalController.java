@@ -36,8 +36,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -49,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusRe
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -58,6 +61,7 @@ import javax.validation.constraints.Pattern;
 
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_1;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
@@ -743,5 +747,64 @@ public class OrganisationInternalController extends SuperController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
+    }
+
+    @Operation(
+        summary = "Deletes the provided list of user accounts from the organisation.",
+        description = "**IDAM Roles to access API** : <br> - pui-finance-manager",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Successfully deleted the list of user accounts from the organisation.",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = DEL_ORG_PBA_NOTES_1,
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized Error : "
+            + "The requested resource is restricted and requires authentication",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: "
+            + "Access denied for either invalid permissions or user is pending",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Resource Not Found Error: The user does not exist",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @DeleteMapping(path = "/users")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Secured({"prd-admin"})
+    public ResponseEntity<DeleteUserResponse> deleteUserFromOrganisation(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
+        @Valid @NotNull @RequestBody UserDeletionRequest userDeletionRequest) {
+
+        List<String> emails = userDeletionRequest.getEmails();
+
+        DeleteUserResponse deleteUserResponse =
+            organisationService.deleteUserForOrganisation( emails);
+
+        return ResponseEntity
+            .status(deleteUserResponse.getStatusCode())
+            .body(deleteUserResponse);
+
     }
 }
