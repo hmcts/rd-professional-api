@@ -12,10 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDateTime;
@@ -44,6 +46,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String superUserEmail;
     String invitedUserEmail;
     String invitedUserId;
+    String searchAfter;
     String sinceDateTime;
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
@@ -56,8 +59,9 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         createOrganisationScenario();
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
-        deleteOtherOrganisationScenarios();
         findOrganisationWithSinceDateGroupAccessScenarios();
+        retrieveOrganisationsByProfileIds();
+        deleteOtherOrganisationScenarios();
     }
 
     public void setUpTestData() {
@@ -248,6 +252,69 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         assertThat(organisations).isNotNull().hasSize(2);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
+    }
+
+    public void retrieveOrganisationsByProfileIds() {
+        findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess("2");
+        findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess("1");
+        findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter(null, searchAfter);
+        findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter(null, null);
+        findByOrganisationsByInvalidS2SToken("1");
+    }
+
+    public void findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess(String pageSize) {
+        log.info("findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess :: STARTED");
+
+        OrganisationByProfileIdsRequest request = new OrganisationByProfileIdsRequest();
+        request.getOrganisationProfileIds().add(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
+                pageSize, null);
+
+        verifyOrganisationsByProfileIdResponse(response, OrganisationProfileIdConstants.SOLICITOR_PROFILE, pageSize);
+        log.info("findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess :: END");
+    }
+
+    public void findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter(String pageSize, String searchAfter) {
+        log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: STARTED");
+
+        OrganisationByProfileIdsRequest request = new OrganisationByProfileIdsRequest();
+        request.getOrganisationProfileIds().add("UNKNOWN");
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
+                pageSize, searchAfter);
+
+        verifyOrganisationsByProfileIdResponse(response, OrganisationProfileIdConstants.SOLICITOR_PROFILE, pageSize);
+        log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: END");
+    }
+
+    public void findByOrganisationsByInvalidS2SToken(String pageSize) {
+        log.info("findByOrganisationsByInvalidS2SToken :: STARTED");
+        professionalApiClient
+                .retrieveOrganisationsByUnAuthorizedS2sToken(pageSize);
+    }
+
+    private void verifyOrganisationsByProfileIdResponse(Map<String, Object> response, String expectedProfileId,
+                                                        String expectCount) {
+
+        assertThat(response.get("moreAvailable")).isNotNull();
+        assertThat(response.get("lastRecordInPage")).isNotNull();
+        searchAfter = (String) response.get("lastRecordInPage");
+        List<HashMap> orgInfo = (List<HashMap>) response.get("organisationInfo");
+        assertThat(orgInfo).isNotEmpty();
+        if (expectCount != null) {
+            assertThat((orgInfo)).hasSize(Integer.parseInt(expectCount));
+        }
+
+        orgInfo.forEach(org -> {
+            assertThat(org.get("organisationIdentifier")).isNotNull();
+            assertThat(org.get("status")).isNotNull();
+            assertThat(org.get("lastUpdated")).isNotNull();
+
+            List<String> organisationProfileIdList = (List<String>) org.get("organisationProfileIds");
+            assertThat(organisationProfileIdList).isNotEmpty();
+            assertThat((organisationProfileIdList)).hasSize(1);
+            assertThat(organisationProfileIdList.get(0).equals(expectedProfileId));
+        });
+
     }
 
     public void deleteOtherOrganisationScenarios() {

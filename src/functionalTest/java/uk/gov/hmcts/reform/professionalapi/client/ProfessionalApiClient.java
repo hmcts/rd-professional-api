@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWith
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -249,7 +251,7 @@ public class ProfessionalApiClient {
                                 .build(),
                         paymentAccounts,
                         contactInfoList,
-                        "Doctor",
+                        OrganisationTypeConstants.SOLICITOR_ORG,
                         orgAttributeRequests);
 
         return  organisationOtherOrgsCreationRequest;
@@ -787,6 +789,51 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, String
+            pageSize, String searchAfter) {
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL + "/getOrganisationsByProfile");
+
+        if (pageSize != null && searchAfter != null) {
+            baseURL.append("?pageSize=").append(pageSize);
+            baseURL.append("&searchAfter=").append(searchAfter);
+        } else if (pageSize != null && searchAfter == null) {
+            baseURL.append("?pageSize=").append(pageSize);
+        } else if (pageSize == null && searchAfter != null) {
+            baseURL.append("?searchAfter=").append(searchAfter);
+        }
+
+        Response response = getS2sTokenHeaders()
+                .body(request)
+                .post(baseURL.toString())
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("{}:: Retrieve organisation by profile Ids response: {}", loggingComponentName,
+                    response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Response retrieveOrganisationsByUnAuthorizedS2sToken(String pageSize) {
+        String baseURL = INTERNAL_BASE_URL + "/getOrganisationsByProfile?pageSie=" + pageSize;
+        Response response = withUnauthenticatedRequest()
+                .body("")
+                .get(baseURL)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
+
+        log.info("{}:: Retrieve Org UNAUTHORIZED (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response;
+    }
 
     public Map<String, Object> retrievePaymentAccountsByEmailForExternalV2(HttpStatus status,
                                                                            RequestSpecification requestSpecification,
