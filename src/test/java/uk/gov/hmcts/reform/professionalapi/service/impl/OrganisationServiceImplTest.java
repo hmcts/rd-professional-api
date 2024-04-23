@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -77,6 +78,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
@@ -95,7 +97,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -112,12 +117,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.BLOCKED;
@@ -139,6 +147,7 @@ class OrganisationServiceImplTest {
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
+    private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock
             = mock(ContactInformationRepository.class);
     private final BulkCustomerDetailsRepository bulkCustomerDetailsRepositoryMock =
@@ -2718,4 +2727,39 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_deleteUserForOrganisation() throws JsonProcessingException {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        DeleteUserResponse deleteUserResponse = new DeleteUserResponse
+            (204, "The organisation has deleted successfully");
+
+        String deleteBody = new ObjectMapper().writeValueAsString(new NewUserResponse());
+        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
+
+        when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
+        doNothing().when(userAttributeRepositoryMock).deleteByProfessionalUserId(professionalUser.getId());
+        doNothing().when(professionalUserRepositoryMock).delete(professionalUser);
+
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder().status(STATUS_CODE_204).reason("OK").body(deleteBody, UTF_8)
+            .request(mock(Request.class)).build());
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
+
+        deleteUserResponse = sut.deleteUserForOrganisation(emails);
+        assertThat(deleteUserResponse).isNotNull();
+        assertThat(deleteUserResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+
+    }
+
+    @Test
+    void test_deleteUserForOrganisationWithEmptyEmails() {
+        assertThrows(InvalidRequest.class, () ->
+            sut.deleteUserForOrganisation(new ArrayList<>()));
+    }
+
 }
