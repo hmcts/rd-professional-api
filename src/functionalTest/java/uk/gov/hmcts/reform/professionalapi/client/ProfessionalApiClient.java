@@ -1483,20 +1483,4 @@ public class ProfessionalApiClient {
         log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
     }
-
-    public void deleteDXAddressesOfOrganisation(List<DeleteMultipleAddressRequest> deleteRequest,
-                                                      RequestSpecification requestSpecification,
-                                                      HttpStatus expectedStatus) {
-        Response response = requestSpecification
-                .body(deleteRequest)
-                .delete("/refdata/internal/v1/organisations/dxAddress/")
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(expectedStatus.value());
-
-        log.info("{}:: Delete DX Addresses of an organisation status response: {}",
-                loggingComponentName, response.getStatusCode());
-    }
 }
