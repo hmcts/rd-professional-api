@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.client;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Headers;
+import feign.RequestLine;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
@@ -12,6 +14,8 @@ import net.serenitybdd.rest.SerenityRest;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
@@ -25,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -488,6 +493,20 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public JsonPath deleteUserFromOrganisation(UserDeletionRequest userDeletionRequest, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+            .body(userDeletionRequest)
+            .delete("/refdata/internal/v1/organisations/users/")
+            .andReturn();
+
+        response.then()
+            .assertThat()
+            .statusCode(status.value());
+
+        return response.body().jsonPath();
+    }
+
+
     @SuppressWarnings("unchecked")
     public JsonPath retrieveOrganisationDetails(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
@@ -504,6 +523,8 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
 
         return response.body().jsonPath();
+
+
     }
 
     public Map<String, Object> retrieveOrganisationDetailsBySinceDate(String sinceDate, String page, String pageSize) {

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -863,6 +865,27 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         professionalApiClient
                 .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
+    }
+
+
+    @Test
+  //  @ToggleEnable(mapKey = "OrganisationInternalController.deleteUserFromOrganisation", withFeature = false)
+    void deletUserFromProfessionalAndUserProfileShouldReturnSuccess() {
+
+        log.info("deletUserFromProfessionalAndUserProfileShouldReturnSuccess :: STARTED");
+
+        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
+        UserDeletionRequest userDeletionRequest = new UserDeletionRequest(emails);
+
+        JsonPath response = professionalApiClient.deleteUserFromOrganisation(userDeletionRequest,OK);
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+     //   assertThat(organisationIdentifier).isNotEmpty();
+     //  assertThat(response).isNotNull();
+      //  assertNotNull(orgUpdatedNameResponse.get("name"));
+     //   assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+
+        log.info("deletUserFromProfessionalAndUserProfileShouldReturnSuccess :: END");
+
     }
 
     private static void verifyOrganisationDetails(JsonPath response) {

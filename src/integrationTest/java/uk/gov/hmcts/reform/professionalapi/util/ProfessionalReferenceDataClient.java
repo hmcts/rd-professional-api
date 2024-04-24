@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -1038,5 +1039,27 @@ public class ProfessionalReferenceDataClient {
         }
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
+    }
+
+
+    public Map<String, Object> deleteUser(UserDeletionRequest userDeletionRequest,
+                                          String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        var urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/users";
+
+        try {
+            HttpEntity<UserDeletionRequest> requestEntity = new HttpEntity<>(userDeletionRequest,
+                getMultipleAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            var statusAndBody = new HashMap<String, Object>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+        Map<String, Object> deleteUserResponse = new HashMap<>();
+        deleteUserResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return deleteUserResponse;
     }
 }

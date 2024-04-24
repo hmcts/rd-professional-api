@@ -800,7 +800,7 @@ public class OrganisationInternalController extends SuperController {
         List<String> emails = userDeletionRequest.getEmails();
 
         DeleteUserResponse deleteUserResponse =
-            organisationService.deleteUserForOrganisation( emails);
+            organisationService.deleteUserForOrganisation(emails);
 
         return ResponseEntity
             .status(deleteUserResponse.getStatusCode())
