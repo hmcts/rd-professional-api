@@ -4,19 +4,30 @@ import groovy.util.logging.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.getContactInformationList;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 @Slf4j
@@ -37,7 +48,7 @@ class DeleteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         setUpUsersToBeDeleted();
 
-        List<String> emails =  Arrays.asList("james.invite@gmaiil.co.uk","vegxjyrwd9f@mailinator.com");
+        List<String> emails =  Arrays.asList("somenewuse3@email.com");
         UserDeletionRequest userDeletionRequest =
             new UserDeletionRequest(emails);
 
@@ -71,34 +82,46 @@ class DeleteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
         assertThat(updateResponse.get("response_body").toString())
             .contains("Please provide both email addresses");
 
-
     }
 
 
-    private void setUpUsersToBeDeleted(){
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
-        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgId = (String) response.get(ORG_IDENTIFIER);
+    private void setUpUsersToBeDeleted() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
 
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
+
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE")
+            .build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin,
+            orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);
         List userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgId);
+        Map<String, Object> newUserResponse = professionalReferenceDataClient
+            .addUserToOrganisationWithUserId(orgIdentifierResponse,
+                inviteUserCreationRequest("somenewuse3@email.com", userRoles), hmctsAdmin,
+                userIdentifier);
+    }
 
-        Map<String, Object> newUserResponse =
-            professionalReferenceDataClient.addUserToOrganisationWithUserId(orgId,
-                inviteUserCreationRequest("james.invite@gmaiil.co.uk", userRoles),
-                hmctsAdmin, userIdentifier);
+@Test
+    public void setUpOrganisationData() {
 
-        assertThat(newUserResponse.get("http_status")).isNotNull();
-        assertThat(newUserResponse.get("http_status")).isEqualTo("200 OK");
-        Map<String, Object> newUserResponse1 =
-            professionalReferenceDataClient.addUserToOrganisationWithUserId(orgId,
-                inviteUserCreationRequest("vegxjyrwd9f@mailinator.com", userRoles),
-                hmctsAdmin, userIdentifier);
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+            .build();
+        Map<String, Object> orgResponse = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(newUserResponse1.get("http_status")).isNotNull();
-        assertThat(newUserResponse1.get("http_status")).isEqualTo("200 OK");
+        String orgId = (String) orgResponse.get(ORG_IDENTIFIER);
+
+        String userId = updateOrgAndInviteUser(orgId, puiOrgManager);
+
+        assertNotNull(userId);
     }
 
 }
