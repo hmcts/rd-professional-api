@@ -832,16 +832,13 @@ public class OrganisationServiceImpl implements OrganisationService {
                 deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
                 deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
 
-            } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
-                // If user is not active in the up will send the request to delete
+            } else {
+                // user will be deleted even if he is in active state
                 var userIds = new HashSet<String>();
                 userIds.add(user.getUserIdentifier());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
                         .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-            } else {
-                deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
-                deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
             }
         } else {
             deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
