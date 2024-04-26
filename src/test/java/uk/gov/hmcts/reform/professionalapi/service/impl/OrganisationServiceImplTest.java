@@ -97,8 +97,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -117,8 +115,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -189,8 +185,6 @@ class OrganisationServiceImplTest {
     private DxAddressCreationRequest dxAddressRequest;
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
-
-    private OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest;
 
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
@@ -286,8 +280,6 @@ class OrganisationServiceImplTest {
                 "number02", "company-url", superUserCreationRequest, paymentAccountList,
                 contactInformationCreationRequests, "Doctor", orgAttributeRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
-
-        organisationNameSraUpdateRequest = new OrganisationNameSraUpdateRequest("name","sraId");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);

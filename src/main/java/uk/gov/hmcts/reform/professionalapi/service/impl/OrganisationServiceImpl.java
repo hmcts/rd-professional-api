@@ -154,9 +154,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
-
-
-
     @Override
     @Transactional
     public OrganisationResponse createOrganisationFrom(
@@ -824,22 +821,24 @@ public class OrganisationServiceImpl implements OrganisationService {
                 + "::organisation deleted by::prdadmin::" + prdAdminUserId);
         return deleteOrganisationResponse;
     }
+
     @Override
     @Transactional
     public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
         var deleteOrganisationResponse = new DeleteOrganisationResponse();
-        if(emails.isEmpty()){
+        if (emails.isEmpty()) {
             throw new InvalidRequest("Please provide both email addresses");
         }
 
-        Set<String> userIdsToBeDeleted= emails.stream().map(
-            email-> {
+        Set<String> userIdsToBeDeleted = emails.stream().map(
+            email -> {
                 Set<String> userIds = new HashSet<>();
                 Optional.ofNullable(professionalUserRepository
-                    .findByEmailAddress(RefDataUtil.removeAllSpaces(email))).ifPresent(professionalUser -> {
-                    userIds.add(professionalUser.getUserIdentifier());
-                    userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
-                    professionalUserRepository.delete(professionalUser);
+                    .findByEmailAddress(RefDataUtil.removeAllSpaces(email)))
+                    .ifPresent(professionalUser -> {
+                        userIds.add(professionalUser.getUserIdentifier());
+                        userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
+                        professionalUserRepository.delete(professionalUser);
                 });
                 return userIds.stream().iterator().next();
             }).collect(Collectors.toSet());;
@@ -847,12 +846,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
         deleteOrganisationResponse = RefDataUtil
             .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-        if(deleteOrganisationResponse == null){
+        if (deleteOrganisationResponse == null) {
             throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
         }
 
-        return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode()
-            ,deleteOrganisationResponse.getMessage());
+        return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode(),
+            deleteOrganisationResponse.getMessage());
     }
 
 
