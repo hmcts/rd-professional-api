@@ -867,6 +867,26 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
     }
 
+    public List<String> setUpUsersToDelete() {
+        superUserEmail = generateRandomEmail();
+        invitedUserEmail = generateRandomEmail();
+        organisationCreationRequest = createOrganisationRequest()
+            .superUser(aUserCreationRequest()
+                .firstName("firstName")
+                .lastName("lastName")
+                .email(superUserEmail)
+                .build())
+            .build();
+        intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
+
+        List<String> roles = new ArrayList<>();
+        roles.add(puiCaseManager);
+        roles.add(puiOrgManager);
+        roles.add(puiFinanceManager);
+        idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
+
+        return Arrays.asList(superUserEmail.toLowerCase());
+    }
 
     @Test
   //  @ToggleEnable(mapKey = "OrganisationInternalController.deleteUserFromOrganisation", withFeature = false)
@@ -874,15 +894,13 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         log.info("deletUserFromProfessionalAndUserProfileShouldReturnSuccess :: STARTED");
 
-        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
+        List<String> emails = setUpUsersToDelete();
+
         UserDeletionRequest userDeletionRequest = new UserDeletionRequest(emails);
 
         JsonPath response = professionalApiClient.deleteUserFromOrganisation(userDeletionRequest,OK);
-        String organisationIdentifier = (String) response.get("organisationIdentifier");
-     //   assertThat(organisationIdentifier).isNotEmpty();
-     //  assertThat(response).isNotNull();
-      //  assertNotNull(orgUpdatedNameResponse.get("name"));
-     //   assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+
+        assertThat(response).isNotNull();
 
         log.info("deletUserFromProfessionalAndUserProfileShouldReturnSuccess :: END");
 

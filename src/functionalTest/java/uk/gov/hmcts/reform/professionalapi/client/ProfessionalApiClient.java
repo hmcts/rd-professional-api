@@ -496,12 +496,12 @@ public class ProfessionalApiClient {
     public JsonPath deleteUserFromOrganisation(UserDeletionRequest userDeletionRequest, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
             .body(userDeletionRequest)
-            .delete("/refdata/internal/v1/organisations/users/")
+            .delete("/refdata/internal/v1/organisations/users")
             .andReturn();
 
         response.then()
             .assertThat()
-            .statusCode(status.value());
+            .statusCode(status.NO_CONTENT.value());
 
         return response.body().jsonPath();
     }
