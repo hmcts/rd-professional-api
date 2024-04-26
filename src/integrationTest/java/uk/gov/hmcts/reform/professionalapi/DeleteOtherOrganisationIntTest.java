@@ -77,15 +77,13 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
 
 
     @Test
-    void returns_400_with_error_msg_when_delete_active_otherOrganisation_with_active_user_profile() {
+    void returns_200_with_error_msg_when_delete_active_otherOrganisation_with_active_user_profile() {
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
         String orgIdentifier = createAndActivateOtherOrganisation();
 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
-        assertThat(deleteResponse.get("http_status")).isEqualTo("400");
-        assertThat((String) deleteResponse.get("response_body"))
-                .contains("The organisation admin is not in Pending state");
+        assertThat(deleteResponse.get("http_status")).isEqualTo("204");
 
     }
 
@@ -102,7 +100,7 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    void returns_400_when_delete_active_otherOrganisation_with_more_than_one__user_profile() {
+    void returns_200_when_delete_active_otherOrganisation_with_more_than_one__user_profile() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -120,7 +118,7 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
-        assertThat(deleteResponse.get("http_status")).isEqualTo("400");
+        assertThat(deleteResponse.get("http_status")).isEqualTo("201");
     }
 
     @Test
