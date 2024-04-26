@@ -2106,7 +2106,7 @@ class OrganisationServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(400).build());
+                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(200).build());
         Organisation organisation = getDeleteOrganisation(ACTIVE);
 
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
@@ -2743,8 +2743,8 @@ class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
         verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
 
-        DeleteUserResponse deleteUserResponse = new DeleteUserResponse
-            (204, "The organisation has deleted successfully");
+        DeleteUserResponse deleteUserResponse = new DeleteUserResponse(
+            204, "The organisation has deleted successfully");
         List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
 
         deleteUserResponse = sut.deleteUserForOrganisation(emails);

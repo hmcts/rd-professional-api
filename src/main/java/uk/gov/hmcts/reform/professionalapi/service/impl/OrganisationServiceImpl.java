@@ -837,7 +837,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                         userIds.add(professionalUser.getUserIdentifier());
                         userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
                         professionalUserRepository.delete(professionalUser);
-                });
+                    });
                 return userIds.stream().iterator().next();
             }).collect(Collectors.toSet());;
 
