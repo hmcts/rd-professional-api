@@ -597,8 +597,8 @@ class OrganisationInternalControllerTest {
 
     @Test
     void testDeleteProfessionalUserFromOrganisation() {
-        DeleteUserResponse deleteUserResponse = new DeleteUserResponse
-            (STATUS_CODE_204, "The organisation has deleted successfully");
+        DeleteUserResponse deleteUserResponse = new DeleteUserResponse(
+            STATUS_CODE_204, "The organisation has deleted successfully");
         List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
         UserDeletionRequest userDeletionRequest = new UserDeletionRequest("fname","lname",emails);
 
