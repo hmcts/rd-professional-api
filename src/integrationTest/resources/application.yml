@@ -9,6 +9,7 @@ spring:
       hibernate:
         default_schema: dbrefdata
         enable_lazy_load_no_trans: true
+
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
