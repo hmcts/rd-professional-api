@@ -493,6 +493,25 @@ class OrganisationInternalControllerTest {
     }
 
     @Test
+    void testDeleteOrganisationWithStatusActive() {
+
+        final HttpStatus expectedHttpStatus = HttpStatus.NO_CONTENT;
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(organisation, "123456789"))
+            .thenReturn(deleteOrganisationResponse);
+        ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId, "123456789");
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(organisationServiceMock, times(1))
+            .deleteOrganisation(organisation, "123456789");
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
     void testDeleteOrganisationThrows404WhenNoOrgFound() {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
