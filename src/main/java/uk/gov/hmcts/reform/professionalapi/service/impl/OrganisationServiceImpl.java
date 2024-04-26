@@ -841,12 +841,17 @@ public class OrganisationServiceImpl implements OrganisationService {
                     }, () -> {
                             throw new InvalidRequest("Email addresses provided do not exist"); });
                 return userIds.stream().iterator().next();
-            }).collect(Collectors.toSet());;
+            }).collect(Collectors.toSet());
 
-        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted.stream().collect(
+        if (userIdsToBeDeleted.isEmpty()) {
+            throw new InvalidRequest("Could not find users to delete");
+        }
+
+        DeleteUserProfilesRequest deleteUserProfileRequest =
+            new DeleteUserProfilesRequest(userIdsToBeDeleted.stream().collect(
             Collectors.toSet()));
         deleteOrganisationResponse = RefDataUtil
-            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
+            .deleteUserProfilesFromUp(deleteUserProfileRequest, userProfileFeignClient);
         if (deleteOrganisationResponse == null) {
             throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
         }

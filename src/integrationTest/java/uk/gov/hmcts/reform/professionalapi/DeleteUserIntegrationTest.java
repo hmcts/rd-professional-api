@@ -3,30 +3,17 @@ package uk.gov.hmcts.reform.professionalapi;
 import groovy.util.logging.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.getContactInformationList;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -43,6 +30,7 @@ class DeleteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
         assertThat(updateResponse.get("response_body").toString()).contains("Email addresses provided do not exist");
 
     }
+
     @Test
     void delete_user_should_return_200() {
 
@@ -110,12 +98,13 @@ class DeleteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
                 userIdentifier);
     }
 
-@Test
+    @Test
     public void setUpOrganisationData() {
 
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
             .build();
-        Map<String, Object> orgResponse = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> orgResponse =
+            professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         String orgId = (String) orgResponse.get(ORG_IDENTIFIER);
 

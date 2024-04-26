@@ -889,7 +889,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-  //  @ToggleEnable(mapKey = "OrganisationInternalController.deleteUserFromOrganisation", withFeature = false)
+    @DisplayName("PRD Internal Delete User for Professional and User Profile")
     void deletUserFromProfessionalAndUserProfileShouldReturnSuccess() {
 
         log.info("deletUserFromProfessionalAndUserProfileShouldReturnSuccess :: STARTED");
