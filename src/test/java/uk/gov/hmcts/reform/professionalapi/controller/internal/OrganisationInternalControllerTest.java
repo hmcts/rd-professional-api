@@ -168,7 +168,7 @@ class OrganisationInternalControllerTest {
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null,"Doctor",null);
-        organisationNameSraUpdateRequest = new OrganisationNameSraUpdateRequest("name","sraId");
+
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);

@@ -2778,4 +2778,39 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_deleteUserForOrganisation() throws JsonProcessingException {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        DeleteUserResponse deleteUserResponse = new DeleteUserResponse
+            (204, "The organisation has deleted successfully");
+
+        String deleteBody = new ObjectMapper().writeValueAsString(new NewUserResponse());
+        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
+
+        when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
+        doNothing().when(userAttributeRepositoryMock).deleteByProfessionalUserId(professionalUser.getId());
+        doNothing().when(professionalUserRepositoryMock).delete(professionalUser);
+
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder().status(STATUS_CODE_204).reason("OK").body(deleteBody, UTF_8)
+            .request(mock(Request.class)).build());
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
+
+        deleteUserResponse = sut.deleteUserForOrganisation(emails);
+        assertThat(deleteUserResponse).isNotNull();
+        assertThat(deleteUserResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+
+    }
+
+    @Test
+    void test_deleteUserForOrganisationWithEmptyEmails() {
+        assertThrows(InvalidRequest.class, () ->
+            sut.deleteUserForOrganisation(new ArrayList<>()));
+    }
+
 }
