@@ -1,13 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import groovy.util.logging.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
@@ -16,10 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+
 
 @Slf4j
 class DeleteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
