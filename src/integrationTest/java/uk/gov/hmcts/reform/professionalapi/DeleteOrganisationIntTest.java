@@ -132,7 +132,7 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
-        assertThat(deleteResponse.get("http_status")).isEqualTo(200);
+        assertThat(deleteResponse.get("http_status")).isEqualTo(204);
     }
 
     @Test
