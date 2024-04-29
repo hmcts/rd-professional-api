@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepos
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -67,6 +69,9 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
 
     @MockBean
     OrgAttributeRepository orgAttributeRepository;
+
+    @MockBean
+    UserAttributeRepository userAttributeRepository;
 
     @Bean
     @Primary
