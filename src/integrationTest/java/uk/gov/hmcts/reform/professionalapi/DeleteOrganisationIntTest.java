@@ -113,13 +113,14 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void returns_400_when_delete_active_organisation_with_more_than_one__user_profile() {
+    void returns_200_when_delete_active_organisation_with_more_than_one_user_profile() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
         String orgIdentifier = createAndActivateOrganisation();
-
+        getUserProfileByEmailWireMock(HttpStatus.resolve(200));
+        deleteUserProfileMock(HttpStatus.resolve(204));
         Map<String, Object> newUserResponse = professionalReferenceDataClient
                 .addUserToOrganisation(orgIdentifier,
                         inviteUserCreationRequest("somenewuser@email.com", userRoles), hmctsAdmin);
@@ -131,7 +132,7 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
-        assertThat(deleteResponse.get("http_status")).isEqualTo("400");
+        assertThat(deleteResponse.get("http_status")).isEqualTo(400);
     }
 
     @Test
