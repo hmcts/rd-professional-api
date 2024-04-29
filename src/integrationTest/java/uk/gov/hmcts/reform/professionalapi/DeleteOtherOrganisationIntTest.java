@@ -84,7 +84,7 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
         deleteUserProfileMock(HttpStatus.resolve(204));
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
-        assertThat(deleteResponse.get("http_status")).isEqualTo("204");
+        assertThat(deleteResponse.get("http_status")).isEqualTo(204);
 
     }
 
