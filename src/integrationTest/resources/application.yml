@@ -76,7 +76,7 @@ prd:
     defaultLockAtMostFor: ${Default_Lock_At_Most_For:PT3M}
 
 ## user profile feign connection
-user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8093}
+user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
