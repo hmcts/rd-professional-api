@@ -101,7 +101,7 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    void returns_200_when_delete_active_otherOrganisation_with_more_than_one__user_profile() {
+    void returns_400_when_delete_active_otherOrganisation_with_more_than_one__user_profile() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
