@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsReposit
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
@@ -85,6 +86,9 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+
+    @Autowired
+    UserAttributeRepository userAttributeRepository;
 
     @Autowired
     IdamRepository idamRepositoryMock;
