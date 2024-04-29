@@ -80,7 +80,8 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
     void returns_200_with_error_msg_when_delete_active_otherOrganisation_with_active_user_profile() {
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
         String orgIdentifier = createAndActivateOtherOrganisation();
-
+        getUserProfileByEmailWireMock(HttpStatus.resolve(200));
+        deleteUserProfileMock(HttpStatus.resolve(204));
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
         assertThat(deleteResponse.get("http_status")).isEqualTo("204");
@@ -118,7 +119,7 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
-        assertThat(deleteResponse.get("http_status")).isEqualTo("201");
+        assertThat(deleteResponse.get("http_status")).isEqualTo("400");
     }
 
     @Test
