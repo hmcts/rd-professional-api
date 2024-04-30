@@ -1074,7 +1074,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public ResponseEntity<Object>  updateIdamId(String existingUserIdentifier, String newUserIdentifier){
 
         try (Response response = userProfileFeignClient.getUserProfileById(existingUserIdentifier)) {
-
+            ResponseEntity<Object> modifiedUserResponse;
             Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity<Object> responseResponseEntity = toResponseEntity(response, clazz);
 
@@ -1102,8 +1102,13 @@ public class OrganisationServiceImpl implements OrganisationService {
             }else{
                 throw new EmptyResultDataAccessException(PROFESSIONAL_USER_404_MESSAGE, 1);
             }
-            return toResponseEntity(
-                userResponse, userResponse.status() > 300 ? ErrorResponse.class : ModifyUserRolesResponse.class);
+
+            if(userResponse != null && userResponse.status() > 300){
+                modifiedUserResponse = toResponseEntity(userResponse, ModifyUserRolesResponse.class);
+            }else {
+                modifiedUserResponse = toResponseEntity(userResponse, ErrorResponse.class);
+            }
+            return modifiedUserResponse;
         } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
         }

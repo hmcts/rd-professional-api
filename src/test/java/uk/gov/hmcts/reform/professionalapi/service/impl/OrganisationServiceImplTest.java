@@ -81,6 +81,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -198,6 +199,8 @@ class OrganisationServiceImplTest {
     private DeleteOrganisationResponse deleteOrganisationResponse;
 
     private List<PaymentAccount> emptypaymentAccounts;
+
+
     Set<String> emptypaymentAccountList;
 
     @InjectMocks
@@ -290,7 +293,6 @@ class OrganisationServiceImplTest {
         when(organisationRepositoryImplNullReturnedMock.findByOrganisationIdentifier(any())).thenReturn(null);
         when(organisationMfaStatusRepositoryMock.save(any(OrganisationMfaStatus.class)))
                 .thenReturn(organisationMfaStatus);
-
         when(bulkCustomerDetailsRepositoryMock.save(any(BulkCustomerDetails.class))).thenReturn(bulkCustomerDetails);
     }
 
@@ -2635,6 +2637,7 @@ class OrganisationServiceImplTest {
         List<Organisation> result = sut.getOrganisationByStatus(OrganisationStatus.ACTIVE, null);
 
         assertThat(result).isNotEmpty();
+
     }
 
     @Test
@@ -2717,5 +2720,116 @@ class OrganisationServiceImplTest {
         // assert
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    void test_modifyOrganisationSetNewIdamIdForUser() throws JsonProcessingException {
+        String existUserId  = UUID.randomUUID().toString();
+        String newUserId = UUID.randomUUID().toString();
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(newUserId);
+        newUserResponse.setIdamStatus("ACTIVE");
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        Response userResponse = Response.builder()
+            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+
+        when(userProfileFeignClient.getUserProfileById(existUserId)).thenReturn(userResponse);
+
+        Response response = mock(Response.class);
+        when(response.status()).thenReturn(200);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any()))
+            .thenReturn(professionalUserMock);
+
+        assertThat(userResponse).isNotNull();
+        ResponseEntity<Object > result = sut.updateIdamId(existUserId, newUserId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepositoryMock, times(1)).save(any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(),any(),any());
+    }
+
+
+    @Test
+    void test_modifyOrganisationSetNewIdamIdForNonExistingUserProfileGivesError() throws JsonProcessingException {
+        String existUserId  = UUID.randomUUID().toString();
+        String newUserId = UUID.randomUUID().toString();
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(newUserId);
+        newUserResponse.setIdamStatus("ACTIVE");
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        Response userResponse = Response.builder()
+            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build();
+
+        when(userProfileFeignClient.getUserProfileById(existUserId)).thenReturn(userResponse);
+
+        assertThrows(ExternalApiException.class, () -> sut.updateIdamId(existUserId, newUserId));
+
+    }
+
+    @Test
+    void test_modifyOrganisationSetNewIdamIdForNonExistingProfessionalUserGivesError() throws JsonProcessingException {
+        String existUserId  = UUID.randomUUID().toString();
+        String newUserId = UUID.randomUUID().toString();
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(newUserId);
+        newUserResponse.setIdamStatus("ACTIVE");
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        Response userResponse = Response.builder()
+            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+
+        when(userProfileFeignClient.getUserProfileById(existUserId)).thenReturn(userResponse);
+        Response response = mock(Response.class);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any()))
+            .thenReturn(null);
+        assertThrows(EmptyResultDataAccessException.class, () -> sut.updateIdamId(existUserId, newUserId));
+    }
+
+    @Test
+    void test_modifyOrganisationSetNewIdamIdForUserGivesError() throws JsonProcessingException {
+        String existUserId  = UUID.randomUUID().toString();
+        String newUserId = UUID.randomUUID().toString();
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(newUserId);
+        newUserResponse.setIdamStatus("ACTIVE");
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        Response userResponse = Response.builder()
+            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+
+        when(userProfileFeignClient.getUserProfileById(existUserId)).thenReturn(userResponse);
+        assertThat(userResponse).isNotNull();
+
+        Response response = mock(Response.class);
+        when(response.status()).thenReturn(400);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any()))
+            .thenReturn(professionalUserMock);
+
+        ResponseEntity<Object > result = sut.updateIdamId(existUserId, newUserId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
     }
 }
