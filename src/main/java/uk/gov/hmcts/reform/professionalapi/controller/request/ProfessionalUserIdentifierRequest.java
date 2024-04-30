@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
 
 
 @Getter

@@ -81,7 +81,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -2748,7 +2747,7 @@ class OrganisationServiceImplTest {
             .thenReturn(professionalUserMock);
 
         assertThat(userResponse).isNotNull();
-        ResponseEntity<Object > result = sut.updateIdamId(existUserId, newUserId);
+        ResponseEntity<Object> result = sut.updateIdamId(existUserId, newUserId);
 
         assertThat(result).isNotNull();
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -2826,7 +2825,7 @@ class OrganisationServiceImplTest {
         when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any()))
             .thenReturn(professionalUserMock);
 
-        ResponseEntity<Object > result = sut.updateIdamId(existUserId, newUserId);
+        ResponseEntity<Object> result = sut.updateIdamId(existUserId, newUserId);
 
         assertThat(result).isNotNull();
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

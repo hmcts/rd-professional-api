@@ -60,7 +60,6 @@ import javax.validation.constraints.Pattern;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
@@ -752,8 +751,8 @@ public class OrganisationInternalController extends SuperController {
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
         @Valid @NotNull @RequestBody ProfessionalUserIdentifierRequest professionalUserIdentifierRequest) {
 
-        log.info("{}:: Received request to update idam id for an user in an " +
-            "organisation ::", loggingComponentName);
+        log.info("{}:: Received request to update idam id for an user in an "
+            + "organisation ::", loggingComponentName);
 
         if (!Optional.ofNullable(professionalUserIdentifierRequest).isPresent()) {
             throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);
@@ -762,8 +761,8 @@ public class OrganisationInternalController extends SuperController {
         ) {
             throw new InvalidRequest("Please enter existing and New Idam ids / User identifiers");
         }
-        return organisationService.updateIdamId(professionalUserIdentifierRequest.getExistingIdamId()
-            ,professionalUserIdentifierRequest.getNewIdamId());
+        return organisationService.updateIdamId(professionalUserIdentifierRequest.getExistingIdamId(),
+            professionalUserIdentifierRequest.getNewIdamId());
     }
 
 

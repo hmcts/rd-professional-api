@@ -38,11 +38,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
-
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
-
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
-
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -1071,8 +1068,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Transactional
-    public ResponseEntity<Object>  updateIdamId(String existingUserIdentifier, String newUserIdentifier){
-
+    public ResponseEntity<Object>  updateIdamId(String existingUserIdentifier, String newUserIdentifier) {
         try (Response response = userProfileFeignClient.getUserProfileById(existingUserIdentifier)) {
             ResponseEntity<Object> modifiedUserResponse;
             Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
@@ -1092,20 +1088,21 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .idamStatus(existingUserProfile.getIdamStatus().name())
                 .build();
 
-            Response userResponse = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, existingUserIdentifier,
-                " ");
+            Response userResponse = userProfileFeignClient
+                .modifyUserRoles(userProfileUpdatedData, existingUserIdentifier," ");
 
-            Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserService.findProfessionalUserByUserIdentifier(existingUserIdentifier));
-            if(professionalUser.isPresent()){
+            Optional<ProfessionalUser> professionalUser = Optional
+                .ofNullable(professionalUserService.findProfessionalUserByUserIdentifier(existingUserIdentifier));
+            if (professionalUser.isPresent()) {
                 professionalUser.get().setUserIdentifier(newUserIdentifier);
                 professionalUserRepository.save(professionalUser.get());
-            }else{
+            } else {
                 throw new EmptyResultDataAccessException(PROFESSIONAL_USER_404_MESSAGE, 1);
             }
 
-            if(userResponse != null && userResponse.status() > 300){
+            if (userResponse != null && userResponse.status() > 300) {
                 modifiedUserResponse = toResponseEntity(userResponse, ModifyUserRolesResponse.class);
-            }else {
+            } else {
                 modifiedUserResponse = toResponseEntity(userResponse, ErrorResponse.class);
             }
             return modifiedUserResponse;

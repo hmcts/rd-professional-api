@@ -371,7 +371,8 @@ class ProfessionalExternalUserControllerTest {
     @Test
     void test_modifyRolesForExistingUserOfExternalOrganisation() {
         ResponseEntity<Object> newResponse = ResponseEntity.status(200).body("");
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(UUID.randomUUID().toString(),"test@email.com", "firstName",
+        UserProfileUpdatedData userProfileUpdatedData =
+            new UserProfileUpdatedData(UUID.randomUUID().toString(),"test@email.com", "firstName",
                 "lastName", IdamStatus.ACTIVE.name(), null, null, null);
         String orgId = "org123";
         String userId = "1234567890";

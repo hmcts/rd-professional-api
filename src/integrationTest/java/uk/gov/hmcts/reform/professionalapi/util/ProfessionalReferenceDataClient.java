@@ -665,12 +665,13 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> updateUserIdamForOrganisation(
-        ProfessionalUserIdentifierRequest professionalUserIdentifierRequest , String hmctsAdmin) {
+        ProfessionalUserIdentifierRequest professionalUserIdentifierRequest, String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/userIdam/";
 
         try {
-            HttpEntity<ProfessionalUserIdentifierRequest> requestEntity = new HttpEntity<>(professionalUserIdentifierRequest,
+            HttpEntity<ProfessionalUserIdentifierRequest> requestEntity =
+                new HttpEntity<>(professionalUserIdentifierRequest,
                 getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
