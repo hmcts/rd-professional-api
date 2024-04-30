@@ -741,7 +741,7 @@ public class OrganisationInternalController extends SuperController {
 
 
     @PutMapping(
-        path = "/userIdam/{orgId}",
+        path = "/userIdam",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -750,8 +750,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured({"prd-admin"})
     public ResponseEntity<Object> updateUserIdamForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
-        @Valid @NotNull @RequestBody ProfessionalUserIdentifierRequest professionalUserIdentifierRequest,
-        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
+        @Valid @NotNull @RequestBody ProfessionalUserIdentifierRequest professionalUserIdentifierRequest) {
 
         log.info("{}:: Received request to update idam id for an user in an " +
             "organisation ::", loggingComponentName);
