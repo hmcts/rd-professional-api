@@ -2348,4 +2348,12 @@ class OrganisationServiceImplTest {
         when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(null);
         assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
     }
+
+    @Test
+    void test_deleteDxAddressForOrganisation() {
+        String dxAddress = "dxAddress";
+        UUID randomUUID = UUID.randomUUID();
+        sut.deleteDxAddressForOrganisation(dxAddress, randomUUID);
+        verify(dxAddressRepositoryMock, times(1)).deleteByContactInfoId(dxAddress, randomUUID);
+    }
 }
