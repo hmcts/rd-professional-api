@@ -16,7 +16,7 @@ plugins {
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.36.0'
-    id "info.solidsoft.pitest" version '1.7.0'
+    id "info.solidsoft.pitest" version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.sonarqube' version '3.3'
     id 'org.springframework.boot' version '2.7.18'
@@ -32,7 +32,7 @@ apply plugin: 'idea'
 
 def versions = [
         lombok          : '1.18.22',
-        pitest          : '1.7.4',
+        pitest          : '1.16.0',
         reformLogging   : '6.0.1',
         serenity        : '2.0.76',
         springBoot      : '2.7.18',
@@ -262,7 +262,7 @@ jacocoTestReport {
 }
 
 pitest {
-    junit5PluginVersion = '0.15'
+    junit5PluginVersion = '1.0.0'
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
@@ -485,7 +485,7 @@ dependencies {
 
 
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-    testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
+    testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.15.0'
     testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '0.16'
 
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5', {
