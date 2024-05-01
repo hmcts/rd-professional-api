@@ -529,7 +529,7 @@ dependencies {
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
     contractTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
-    contractTestImplementation('org.scala-lang:scala-library:2.13.8')
+    contractTestImplementation('org.scala-lang:scala-library:2.13.14')
 
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
