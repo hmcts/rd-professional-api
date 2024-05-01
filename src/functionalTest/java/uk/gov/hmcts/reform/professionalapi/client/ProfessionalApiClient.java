@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.path.json.JsonPath;
@@ -25,8 +26,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserIdentifierRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
@@ -865,6 +868,94 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
 
         return response.body().as(Map.class);
+    }
+
+    public Response retrieveUsersInOrgByUnAuthorizedS2sToken(String pageSize) {
+        String baseURL = INTERNAL_BASE_URL + "?pageSize=" + pageSize;
+        Response response = withUnauthenticatedRequest()
+                .body("")
+                .get(baseURL)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
+
+        log.info("{}:: Retrieve user UNAUTHORIZED (Internal) response: {}",
+                loggingComponentName, response.statusCode());
+        return response;
+    }
+
+    public UsersInOrganisationsByOrganisationIdentifiersResponse findUsersInOrganisationShouldBeSuccess(
+            UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
+            String pageSize, String searchAfterOrg, String searchAfterUser) {
+
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL_V2 + "/users");
+
+        if (pageSize != null && searchAfterOrg == null && searchAfterUser == null) {
+            baseURL.append("?pageSize=").append(pageSize);
+        } else if (pageSize != null && searchAfterOrg != null && searchAfterUser != null) {
+            baseURL.append("?pageSize=").append(pageSize)
+                    .append("&searchAfterOrg=").append(searchAfterOrg)
+                    .append("&searchAfterUser=").append(searchAfterUser);
+        }
+
+        Response response = getS2sTokenHeaders()
+                .body(organisationByProfileIdsRequest)
+                .post(baseURL.toString())
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        log.info("{}:: find users response: {}", loggingComponentName, response.statusCode());
+        return convertMapToResponse(response.body().as(Map.class),
+                UsersInOrganisationsByOrganisationIdentifiersResponse.class);
+    }
+
+    public Map<String, Object> findUsersInOrgShouldHaveBadRequest(
+            UsersInOrganisationsByOrganisationIdentifiersRequest organisationByProfileIdsRequest,
+            String pageSize, String searchAfterOrg, String searchAfterUser) {
+
+        StringBuilder baseURL = new StringBuilder(INTERNAL_BASE_URL_V2 + "/users");
+
+        if (pageSize != null && searchAfterOrg != null && searchAfterUser == null) {
+            baseURL.append("?pageSize=").append(pageSize)
+                    .append("&searchAfterOrg=").append(searchAfterOrg);
+
+        } else if (pageSize != null && searchAfterOrg == null && searchAfterUser != null) {
+            baseURL.append("?pageSize=").append(pageSize)
+                    .append("&searchAfterUser=").append(searchAfterUser);
+        }
+
+        Response response = getS2sTokenHeaders()
+                .body(organisationByProfileIdsRequest)
+                .post(baseURL.toString())
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value());
+
+        log.info("{}:: find users response: {}", loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    private <T> T convertMapToResponse(Map<String, Object> map, Class<T> type) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+        T response = null;
+        try {
+            String json = objectMapper.writeValueAsString(map);
+            response = objectMapper.readValue(json, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 
     @SuppressWarnings("unchecked")
