@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserIdentifierRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -38,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -687,6 +689,46 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: END");
 
+    }
+
+    @Test
+    @DisplayName("Update Organisation's Idam id should return 200 when toggled off")
+    void updateUserIdamForOrganisationShouldReturnSuccess() {
+        log.info("updateUserIdamForOrganisationShouldReturnSuccess :: STARTED");
+        OrganisationCreationRequest orgReq = createOrganisationRequest().build();
+        Map<String, Object> response = professionalApiClient.createOrganisation(orgReq);
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        orgReq.setStatus("ACTIVE");
+        professionalApiClient.updateOrganisation(orgReq, hmctsAdmin,
+            orgIdentifier, OK);
+
+        NewUserCreationRequest newUserCreationRequest =
+            professionalApiClient.createNewUserRequest("testEmail@hmcts.com");
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier,
+            hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        String existingUserId = (String) newUserResponse.get("userIdentifier");
+
+        ProfessionalUserIdentifierRequest professionalUserIdentifierRequest =  ProfessionalUserIdentifierRequest
+            .aUserIdentifierRequest().existingIdamId(existingUserId).newIdamId(UUID.randomUUID().toString())
+            .build();
+
+        Map<String, Object> updatedIdamResponse = professionalApiClient.updateUserIdamForOrganisation(
+            professionalUserIdentifierRequest, OK);
+
+        Map<String, Object> searchResponse = professionalApiClient
+            .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, OK);
+
+        List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
+        Map professionalUsersResponse = getUserById(professionalUsersResponses, existingUserId);
+
+        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, NO_CONTENT);
+
+        assertThat(updatedIdamResponse).isNotNull();
+        assertThat(professionalUsersResponse).isNotNull();
+
+        log.info("updateUserIdamForOrganisationShouldReturnSuccess :: END");
     }
 
     @Test

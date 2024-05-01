@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserIdentifierRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -773,6 +774,21 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> updateUserIdamForOrganisation(
+        ProfessionalUserIdentifierRequest professionalUserIdentifierRequest, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+            .body(professionalUserIdentifierRequest)
+            .put("/refdata/internal/v1/organisations/userIdam")
+            .andReturn();
+
+        response.then()
+            .assertThat()
+            .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+
     public Map<String, Object> retrievePaymentAccountsByEmailV2(String email, String role) {
         Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient
                 .getcwdAdminOpenIdToken("prd-admin"), email)
@@ -1196,8 +1212,8 @@ public class ProfessionalApiClient {
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
-
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE")
+            .statusMessage("Activate organisation").build();
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
     }
 
