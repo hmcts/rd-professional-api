@@ -12,8 +12,8 @@ import java.util.UUID;
 public interface DxAddressRepository extends JpaRepository<DxAddress, UUID> {
 
     @Modifying
-    @Query(value = "delete from dbrefdata.dx_address da " +
-        "where da.dx_number=:dxNumber and da.contact_information_id =:id",
+    @Query(value = "delete from dbrefdata.dx_address da "
+        + "where da.dx_number=:dxNumber and da.contact_information_id =:id",
         nativeQuery = true)
     void deleteByContactInfoId(String dxNumber, UUID id);
 

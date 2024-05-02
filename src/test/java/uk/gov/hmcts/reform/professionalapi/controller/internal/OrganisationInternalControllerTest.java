@@ -20,7 +20,15 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.*;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
@@ -31,7 +39,17 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -41,7 +59,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,7 +71,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 
@@ -552,16 +572,19 @@ class OrganisationInternalControllerTest {
     @Test
     void testDeleteDxAddressOfOrganisationNullDxNumberThrowsInvalidRequest() {
         Exception expectedEx = assertThrows(InvalidRequest.class, () ->
-                organisationInternalController.deleteDxAddressOfOrganisation(DxAddressCreationRequest.dxAddressCreationRequest().build(), "1234"));
+                organisationInternalController.deleteDxAddressOfOrganisation(DxAddressCreationRequest
+                        .dxAddressCreationRequest().build(), "1234"));
         assertThat(expectedEx.getMessage()).isEqualTo("No dx number  passed in the request");
     }
 
     @Test
     void testDeleteDxAddressOfOrganisationEmptyContactListThrowsResourceNotFoundException() {
         List<ContactInformation> emptyContactInformationList = List.of();
-        when(organisationServiceMock.retrieveContactInformationByOrganisationId(anyString())).thenReturn(emptyContactInformationList);
+        when(organisationServiceMock.retrieveContactInformationByOrganisationId(anyString()))
+                .thenReturn(emptyContactInformationList);
         Exception expectedEx = assertThrows(ResourceNotFoundException.class, () ->
-                organisationInternalController.deleteDxAddressOfOrganisation(new DxAddressCreationRequest("dxNumber", "dxExchange"), "1234"));
+                organisationInternalController.deleteDxAddressOfOrganisation(new DxAddressCreationRequest("dxNumber",
+                        "dxExchange"), "1234"));
         assertThat(expectedEx.getMessage()).isEqualTo("No contact information  found");
     }
 
@@ -574,9 +597,11 @@ class OrganisationInternalControllerTest {
         contactInformation.addDxAddress(new DxAddress(dxNumber,"dxExchange",contactInformation));
         contactInformation.setId(contactInformationId);
         contactInformationList.add(contactInformation);
-        when(organisationServiceMock.retrieveContactInformationByOrganisationId(anyString())).thenReturn(contactInformationList);
+        when(organisationServiceMock.retrieveContactInformationByOrganisationId(anyString()))
+                .thenReturn(contactInformationList);
 
-        organisationInternalController.deleteDxAddressOfOrganisation(new DxAddressCreationRequest(dxNumber, "dxExchange"), "1234");
+        organisationInternalController.deleteDxAddressOfOrganisation(new DxAddressCreationRequest(dxNumber,
+                "dxExchange"), "1234");
         verify(organisationServiceMock, times(1))
                 .deleteDxAddressForOrganisation(dxNumber, contactInformationId);
     }
