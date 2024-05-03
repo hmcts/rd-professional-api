@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -39,7 +41,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -502,7 +503,7 @@ public class ProfessionalReferenceDataClient {
     public String getAndReturnBearerToken(String userId, String role) {
         String bearerToken;
         if (bearerTokenMap.get(role) == null && userId != null) {
-            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+            bearerToken = "Bearer ".concat(getBearerToken(isNull(userId) ? UUID.randomUUID().toString()
                     : userId, role));
             bearerTokenMap.put(role, bearerToken);
         } else if (bearerTokenMap.get(role + userId) == null) {
@@ -839,6 +840,25 @@ public class ProfessionalReferenceDataClient {
         return deleteOrganisationResponse;
     }
 
+    public Map<String, Object> deleteDxAddress(
+            String role, String organisationIdentifier, DxAddressCreationRequest dxRequest) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/dxAddress/" + organisationIdentifier;
+        try {
+            HttpEntity<?> requestEntity = new HttpEntity<>(dxRequest, getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", ex.getRawStatusCode());
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+        Map<String, Object> deleteDxResponse = new HashMap<>();
+        deleteDxResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return deleteDxResponse;
+    }
+
     public Object findOrganisationsByPbaStatus(String pbaStatus, String role, boolean isUnauthorised)
             throws JsonProcessingException {
 
@@ -862,7 +882,7 @@ public class ProfessionalReferenceDataClient {
             throws JsonProcessingException {
         Map<String, Object> errorResponseMap = new HashMap<>();
         String body = (String) responseEntity.getBody();
-        if (org.apache.commons.lang.StringUtils.isNotEmpty(body)) {
+        if (StringUtils.isNotEmpty(body)) {
             errorResponseMap.put("response_body", objectMapper.readValue(
                     body, ErrorResponse.class));
         } else {
