@@ -82,8 +82,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 
-@SuppressWarnings({"unchecked", "checkstyle:AbbreviationAsWordInName"})
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationInternalControllerTest {
     private OrganisationResponse organisationResponse;
     private OrganisationsDetailResponse organisationsDetailResponse;
