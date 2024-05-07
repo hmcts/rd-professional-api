@@ -35,8 +35,6 @@ public interface OrganisationService {
     @Transactional
     void deleteDxAddressForOrganisation(String dxAddresses, UUID id);
 
-    OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable);
-
     OrganisationsDetailResponse retrieveAllOrganisations(LocalDateTime formattedSince, Pageable pageable);
 
 

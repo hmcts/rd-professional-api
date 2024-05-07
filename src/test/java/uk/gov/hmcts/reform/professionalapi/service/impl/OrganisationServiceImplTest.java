@@ -2671,7 +2671,6 @@ class OrganisationServiceImplTest {
         sut.deleteDxAddressForOrganisation(dxAddress, randomUUID);
         verify(dxAddressRepositoryMock, times(1)).deleteByContactInfoId(dxAddress, randomUUID);
     }
-}
 
     @ParameterizedTest
     @ValueSource(strings = {
