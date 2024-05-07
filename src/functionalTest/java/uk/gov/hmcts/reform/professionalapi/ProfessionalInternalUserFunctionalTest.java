@@ -692,7 +692,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
     @DisplayName("Update Organisation's Idam id should return 200 when toggled off")
+    @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = false)
     void updateUserIdamForOrganisationShouldReturnSuccess() {
         log.info("updateUserIdamForOrganisationShouldReturnSuccess :: STARTED");
         OrganisationCreationRequest orgReq = createOrganisationRequest().build();
