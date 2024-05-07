@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -27,6 +29,7 @@ public interface OrganisationService {
 
     OrganisationResponse createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest);
 
+
     List<ContactInformation>  retrieveContactInformationByOrganisationId(String organisationIdentifier);
 
     @Transactional
@@ -34,15 +37,23 @@ public interface OrganisationService {
 
     OrganisationsDetailResponse retrieveAllOrganisations(Pageable pageable);
 
+    OrganisationsDetailResponse retrieveAllOrganisations(LocalDateTime formattedSince, Pageable pageable);
+
+
     BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                        String idamId);
 
-    OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(Pageable pageable);
+    OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
 
     OrganisationEntityResponseV2 retrieveOrganisationForV2Api(String organisationIdentifier,
                                                               boolean isPendingPbaRequired);
 
-    OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(String status, Pageable pageable);
+    MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationProfileIds,
+                                                                                Integer pageSize,
+                                                                                UUID searchAfter);
+
+    OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(LocalDateTime formattedSince, String status,
+                                                                   Pageable pageable);
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
@@ -51,7 +62,8 @@ public interface OrganisationService {
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
-    OrganisationsDetailResponse findByOrganisationStatus(String status, Pageable pageable);
+    OrganisationsDetailResponse findByOrganisationStatus(LocalDateTime formattedSince, String status,
+                                                         Pageable pageable);
 
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
 

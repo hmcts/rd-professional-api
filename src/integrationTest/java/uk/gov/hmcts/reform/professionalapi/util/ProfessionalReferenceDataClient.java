@@ -25,10 +25,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddr
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -150,6 +152,11 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsWithPaginationSince(String page, String size, String role,
+                                                                           String since) {
+        return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}&since={since}", role, page, size, since);
+    }
+
     public Map<String, Object> retrieveAllOrganisationsWithPaginationForV2Api(String page, String size, String role) {
         return getRequest(APP_INT_V2_BASE_PATH + "?page={page}&size={size}", role, page, size);
     }
@@ -173,6 +180,10 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationsSince(String role, String since) {
+        return getRequest(APP_INT_BASE_PATH + "?since={since}", role, since);
     }
 
     public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
@@ -225,6 +236,11 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationDetailsByStatusSinceTest(String status, String role,
+                                                                               String since) {
+        return getRequest(APP_INT_BASE_PATH + "?status={status}&&since={since}", role, status, since);
     }
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusForV2ApiTest(String status, String role) {
@@ -283,6 +299,30 @@ public class ProfessionalReferenceDataClient {
                 returnRoles);
     }
 
+    public Map<String, Object> findRefreshUsersWithSince(String since, Integer pageSize) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&pageSize={pageSize}", since,
+                pageSize);
+    }
+
+    public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}",
+                userId);
+    }
+
+    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, Integer
+            pageSize, UUID searchAfter) {
+        StringBuilder sb = new StringBuilder(baseIntUrl)
+                .append("/getOrganisationsByProfile?");
+        if (pageSize != null) {
+            sb.append("pageSize=").append(pageSize);
+        }
+        if (searchAfter != null) {
+            sb.append("&searchAfter=").append(searchAfter);
+        }
+        String uriPath = sb.toString();
+        return postRequest(uriPath, request, null, null);
+    }
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
@@ -323,6 +363,30 @@ public class ProfessionalReferenceDataClient {
         try {
 
             HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Map<String, Object> getRequestWithoutBearerToken(String uriPath, Object... params) {
+
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            HttpEntity<?> request = new HttpEntity<>(getS2sTokenHeaders());
+
             responseEntity = restTemplate
                     .exchange("http://localhost:" + prdApiPort + uriPath,
                             HttpMethod.GET,
@@ -978,4 +1042,21 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(
+            UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
+            UUID searchAfterUser, UUID searchAfterOrganisation) {
+        StringBuilder sb = new StringBuilder(baseV2IntUrl)
+                .append("/users?");
+        if (pageSize != null) {
+            sb.append("&pageSize=").append(pageSize);
+        }
+        if (searchAfterUser != null) {
+            sb.append("&searchAfterUser=").append(searchAfterUser);
+        }
+        if (searchAfterOrganisation != null) {
+            sb.append("&searchAfterOrg=").append(searchAfterOrganisation);
+        }
+        String uriPath = sb.toString();
+        return postRequest(uriPath, request, null, null);
+    }
 }

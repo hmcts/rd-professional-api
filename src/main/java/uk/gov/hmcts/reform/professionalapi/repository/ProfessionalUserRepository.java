@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,5 +31,41 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     @Query(value = "SELECT count(*) FROM dbrefdata.professional_user pu WHERE pu.organisation_id = :organisationId",
             nativeQuery = true)
     int findByUserCountByOrganisationId(@Param("organisationId") UUID organisationId);
+
+    @Query(value = """
+            SELECT pu FROM professional_user pu
+            WHERE (COALESCE(:organisationIdentifiers, '') = ''
+            OR pu.organisation.organisationIdentifier IN :organisationIdentifiers)
+            ORDER BY pu.organisation.id ,pu.id
+            """)
+    Page<ProfessionalUser> findUsersInOrganisations(
+            @Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
+
+    @Query(value = """
+       SELECT pu.* FROM dbrefdata.professional_user pu
+       INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
+       WHERE (COALESCE(:organisationIdentifiers, '') = ''
+       OR organisation.organisation_identifier in :organisationIdentifiers)
+       AND (
+           (organisation.Id = :searchAfterOrgId AND pu.Id > :searchAfterUserId)
+           OR (organisation.Id > :searchAfterOrgId)
+       )
+       ORDER BY pu.organisation_id, pu.id
+        """, nativeQuery = true)
+    Page<ProfessionalUser> findUsersInOrganisationsSearchAfter(
+            @Param("organisationIdentifiers") List<String> organisationIdentifiers,
+            @Param("searchAfterOrgId") UUID searchAfterOrgId, @Param("searchAfterUserId") UUID searchAfterUserId,
+            Pageable pageable);
+
+    List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);
+
+    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated, Pageable pageable);
+
+    List<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
+                                                                                  UUID searchAfter);
+
+    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
+                                                                                  UUID searchAfter,
+                                                                                  Pageable pageable);
 
 }
