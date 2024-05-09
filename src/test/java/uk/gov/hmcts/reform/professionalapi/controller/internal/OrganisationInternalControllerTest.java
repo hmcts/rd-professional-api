@@ -76,6 +76,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 
+
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationInternalControllerTest {
@@ -108,8 +109,14 @@ class OrganisationInternalControllerTest {
     private List<PrdEnum> prdEnumList;
 
     private ProfessionalUser professionalUser;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
+
+
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
+
+
+
     private DeleteOrganisationResponse deleteOrganisationResponse;
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
@@ -118,6 +125,8 @@ class OrganisationInternalControllerTest {
 
     @InjectMocks
     private OrganisationInternalControllerV2 organisationInternalControllerV2;
+
+
 
     @BeforeEach
     void setUp() throws Exception {
@@ -136,6 +145,7 @@ class OrganisationInternalControllerTest {
                 new OrganisationEntityResponse(organisation, false, true, true);
 
         organisationServiceMock = mock(OrganisationService.class);
+        //organisationIdentifierValidatorImplMock = mock(OrganisationIdentifierValidatorImpl.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
@@ -566,4 +576,47 @@ class OrganisationInternalControllerTest {
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
 
+
+
+
+    @Test
+    void testDeletePaymentAccounts() {
+        PbaRequest deletePbaRequest = new PbaRequest();
+        var accountsToDelete = new HashSet<String>();
+        accountsToDelete.add("PBA1234567");
+        deletePbaRequest.setPaymentAccounts(accountsToDelete);
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(new PaymentAccount());
+        organisation.setPaymentAccounts(paymentAccounts);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisationInternalController
+                .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId);
+
+        verify(professionalUserServiceMock, times(1))
+                .checkUserStatusIsActiveByUserId(anyString());
+        verify(orgIdValidatorMock, times(1))
+                .validateOrganisationIsActive(any(Organisation.class), any(HttpStatus.class));
+        verify(paymentAccountServiceMock, times(1))
+                .deletePaymentsOfOrganisation(any(PbaRequest.class), any(Organisation.class));
+
+    }
+
+
+
+
+    @Test
+    void test_deletePaymentAccounts_NoPaymentAccountsPassed() {
+        PbaRequest deletePbaRequest = new PbaRequest();
+        var accountsToDelete = new HashSet<String>();
+        deletePbaRequest.setPaymentAccounts(accountsToDelete);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(InvalidRequest.class,() ->
+                organisationInternalController
+                        .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId));
+
+    }
 }
