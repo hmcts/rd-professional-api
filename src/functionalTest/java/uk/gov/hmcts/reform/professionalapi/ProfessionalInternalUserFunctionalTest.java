@@ -212,6 +212,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         deleteDxAddressShouldReturnSuccess();
     }
 
+
     public void deleteDxAddressShouldReturnSuccess() {
         log.info("deleteDxAddressShouldReturnSuccess :: STARTED");
         String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
