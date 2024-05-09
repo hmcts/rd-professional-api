@@ -77,7 +77,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 
-
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationInternalControllerTest {
@@ -115,9 +114,6 @@ class OrganisationInternalControllerTest {
 
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
-
-
-
     private DeleteOrganisationResponse deleteOrganisationResponse;
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
@@ -126,8 +122,6 @@ class OrganisationInternalControllerTest {
 
     @InjectMocks
     private OrganisationInternalControllerV2 organisationInternalControllerV2;
-
-
 
     @BeforeEach
     void setUp() throws Exception {
@@ -146,7 +140,6 @@ class OrganisationInternalControllerTest {
                 new OrganisationEntityResponse(organisation, false, true, true);
 
         organisationServiceMock = mock(OrganisationService.class);
-        //organisationIdentifierValidatorImplMock = mock(OrganisationIdentifierValidatorImpl.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
