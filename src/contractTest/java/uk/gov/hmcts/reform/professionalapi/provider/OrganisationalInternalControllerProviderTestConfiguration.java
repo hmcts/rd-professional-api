@@ -36,6 +36,9 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
     OrganisationRepository organisationRepository;
 
     @MockBean
+    UserAttributeRepository userAttributeRepository;
+
+    @MockBean
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
     @MockBean

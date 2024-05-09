@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -72,6 +73,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
+
+    @Autowired
+    UserAttributeRepository userAttributeRepository;
 
     @Autowired
     PaymentAccountRepository paymentAccountRepository;
