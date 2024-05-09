@@ -32,9 +32,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -73,6 +76,13 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @Autowired
     PaymentAccountRepository paymentAccountRepository;
 
+
+    @Autowired
+    ProfessionalUserRepository professionalUserRepository;
+
+    @Autowired
+    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
+
     @Autowired
     ProfessionalUserService professionalUserService;
 
@@ -87,6 +97,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     PaymentAccountService paymentAccountService;
+
+    @Autowired
+    MfaStatusService mfaStatusService;
 
     @Autowired
     MappingJackson2HttpMessageConverter httpMessageConverter;
