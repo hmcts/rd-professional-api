@@ -2,25 +2,35 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
+import feign.Response;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalControllerV2;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +39,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalInternalV2")
@@ -47,6 +58,9 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
 
     @Autowired
     OrganisationInternalControllerV2 organisationInternalControllerV2;
+
+    @Autowired
+    UserProfileFeignClient userProfileFeignClient;
 
     @MockBean
     PaymentAccountService paymentAccountService;
@@ -113,11 +127,70 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
 
     }
 
+    @State("Active organisationsV2 exists for a logged in user using lastUpdatedSince")
+    public void setActiveOrganisationsForLoggedInUserUsingLastUpdatedSince() throws IOException {
+
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
+        addSuperUser(organisation);
+        organisation.setOrganisationIdentifier("M0AEAP0");
+        organisation.setLastUpdated(LocalDateTime.of(2023, 11, 20, 15, 51, 33));
+        organisation.setDateApproved(LocalDateTime.of(2023, 11, 19, 15, 51, 33));
+
+        when(organisationRepository.findByLastUpdatedGreaterThanEqual(any()))
+                .thenReturn(List.of(organisation));
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+    }
+
+    @State("Active organisations V2 exists for a logged in user using lastUpdatedSince")
+    public void setActiveOrganisationsV2ForLoggedInUserUsingLastUpdatedSince() throws IOException {
+
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
+        addSuperUser(organisation);
+        organisation.setOrganisationIdentifier("M0AEAP0");
+        organisation.setLastUpdated(LocalDateTime.of(2023, 11, 20, 15, 51, 33));
+        organisation.setDateApproved(LocalDateTime.of(2023, 11, 19, 15, 51, 33));
+
+        when(organisationRepository.findByLastUpdatedGreaterThanEqual(any()))
+                .thenReturn(List.of(organisation));
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+    }
 
     private void mockOrgDetails(Organisation organisation) {
         List<Organisation> organisationList = new ArrayList<>();
         organisationList.add(organisation);
-        when(organisationService.retrieveAllOrganisationsForV2Api(null))
+        when(organisationService.retrieveAllOrganisationsForV2Api(null, null))
             .thenReturn(new OrganisationsDetailResponseV2(
                 organisationList, true, true,
                 false,true));

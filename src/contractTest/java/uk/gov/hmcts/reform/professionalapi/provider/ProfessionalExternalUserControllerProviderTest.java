@@ -236,7 +236,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         organisation.setSraRegulated(true);
         organisation.setCompanyUrl("companyUrl");
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
-        organisation.setOrgType("SOLICITOR_ORG");
+        organisation.setOrgType("Solicitor");
 
         ProfessionalUser profile1 = PactUtils.getProfessionalUser(organisation, 1);
         profile1.setUserConfiguredAccesses(List.of(PactUtils.getUserConfiguredAccess(profile1, 1),

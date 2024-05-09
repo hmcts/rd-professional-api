@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfiles
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -32,16 +33,20 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationInfo;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +55,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.List.of;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -76,6 +82,42 @@ public class RefDataUtil {
     private static int defaultPageSize;
 
     private static String loggingComponentName;
+
+
+    public static final String DEFAULT_ORG_PROFILE_ID = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+    public static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
+            new SimpleEntry<>(OrganisationTypeConstants.SOLICITOR_ORG,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.PROBATE_PRACTITIONER,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OTHER_ORG,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.BARRISTER,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_DWP_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_DWP_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_HO_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_HO_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_OTHER_ORG, List.of(
+                    OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_HMRC_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_HMRC_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_CICA_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_CICA_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_CYMRU_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_ENGLAND_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND))
+    );
+
+    public static List<String> getOrganisationProfileIds(Organisation organisation) {
+        if (organisation.getOrgType() == null) {
+            return of(DEFAULT_ORG_PROFILE_ID);
+        }
+        return ORG_TYPE_TO_ORG_PROFILE_IDS.get(organisation.getOrgType());
+    }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
         return userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
@@ -448,26 +490,33 @@ public class RefDataUtil {
         }
     }
 
-    public static ResponseEntity<Object> setOrgInfoInGetUserResponse(ResponseEntity<Object> responseEntity,
+    public static ResponseEntity<Object> setOrgInfoInGetUserResponseAndSort(ResponseEntity<Object> responseEntity,
                                                                    String organisationIdentifier,
                                                                    OrganisationStatus organisationStatus,
                                                                    List<String> organisationProfileIds) {
         ResponseEntity<Object> newResponseEntity;
-        if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
+        Object response = responseEntity.getBody();
+        if (response instanceof ProfessionalUsersEntityResponse) {
             ProfessionalUsersEntityResponse professionalUsersEntityResponse
                     = (ProfessionalUsersEntityResponse) requireNonNull(responseEntity.getBody());
             professionalUsersEntityResponse.setOrganisationIdentifier(organisationIdentifier);
+            List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUsers();
+            if (userProfiles != null) {
+                userProfiles.sort(Comparator.comparing(ProfessionalUsersResponse::getFirstName,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
+            }
             professionalUsersEntityResponse.setOrganisationStatus(organisationStatus.name());
             professionalUsersEntityResponse.setOrganisationProfileIds(organisationProfileIds);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(),
                     responseEntity.getStatusCode());
         } else {
-            Object response = responseEntity.getBody();
             List<ProfessionalUsersResponseWithoutRoles> userProfiles = response == null
                     ? new ArrayList<>()
                     : ((ProfessionalUsersEntityResponseWithoutRoles) response).getUserProfiles();
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
                     = new ProfessionalUsersEntityResponseWithoutRoles();
+            userProfiles.sort(Comparator.comparing(ProfessionalUsersResponseWithoutRoles::getFirstName,
+                    Comparator.nullsLast(Comparator.naturalOrder())));
             professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
 
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
@@ -477,6 +526,59 @@ public class RefDataUtil {
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
         return newResponseEntity;
+    }
+
+    public static GetRefreshUsersResponse buildGetRefreshUsersResponse(Page<ProfessionalUser> professionalUsersPage,
+                                                                   List<ProfessionalUser> professionalUsers,
+                                                                   List<UserConfiguredAccess> userConfiguredAccesses) {
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse();
+        getRefreshUsersResponse.setMoreAvailable(professionalUsersPage != null && !professionalUsersPage.isLast());
+        List<RefreshUser> refreshUserList = new ArrayList<>();
+
+        for (ProfessionalUser professionalUser : professionalUsers) {
+            List<UserAccessType> userAccessTypes = new ArrayList<>();
+
+            userAccessTypes.addAll(userConfiguredAccesses.stream()
+                    .filter(uca -> uca.getUserConfiguredAccessId().getProfessionalUser().getUserIdentifier()
+                            .equals(professionalUser.getUserIdentifier()))
+                    .map(RefDataUtil::fromUserConfiguredAccess)
+                    .toList());
+
+            OrganisationInfo organisationInfo = new OrganisationInfo(
+                    professionalUser.getOrganisation().getOrganisationIdentifier(),
+                    professionalUser.getOrganisation().getStatus(),
+                    professionalUser.getOrganisation().getLastUpdated(),
+                    getOrganisationProfileIds(professionalUser.getOrganisation())
+            );
+
+            RefreshUser refreshUser = new RefreshUser(
+                    professionalUser.getUserIdentifier(),
+                    professionalUser.getLastUpdated(),
+                    organisationInfo,
+                    userAccessTypes,
+                    professionalUser.getDeleted()
+            );
+
+            refreshUserList.add(refreshUser);
+        }
+
+        getRefreshUsersResponse.setUsers(refreshUserList);
+        if (!refreshUserList.isEmpty()) {
+            getRefreshUsersResponse.setLastRecordInPage(professionalUsers.get(professionalUsers.size() - 1).getId());
+        }
+
+        return getRefreshUsersResponse;
+    }
+
+    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
+        UserAccessType accessType = new UserAccessType();
+        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
+        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
+                .getOrganisationProfileId());
+        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
+        accessType.setEnabled(userConfiguredAccess.getEnabled());
+
+        return accessType;
     }
 
     @Value("${loggingComponentName}")
@@ -521,17 +623,6 @@ public class RefDataUtil {
             String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
             throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
-    }
-
-    public static UserAccessType fromUserConfiguredAccess(UserConfiguredAccess userConfiguredAccess) {
-        UserAccessType accessType = new UserAccessType();
-        accessType.setAccessTypeId(userConfiguredAccess.getUserConfiguredAccessId().getAccessTypeId());
-        accessType.setOrganisationProfileId(userConfiguredAccess.getUserConfiguredAccessId()
-                .getOrganisationProfileId());
-        accessType.setJurisdictionId(userConfiguredAccess.getUserConfiguredAccessId().getJurisdictionId());
-        accessType.setEnabled(userConfiguredAccess.getEnabled());
-
-        return accessType;
     }
 
 }

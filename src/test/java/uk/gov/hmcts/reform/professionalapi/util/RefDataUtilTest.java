@@ -83,7 +83,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -130,6 +130,23 @@ class RefDataUtilTest {
     }
 
 
+    @Test
+    void test_getOrganisationProfileIds() {
+        organisation.setOrgType(null);
+        List<String> organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
+        assertThat(organisationProfileIds).hasSize(1);
+        assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+
+        organisation.setOrgType("Solicitor");
+        organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
+        assertThat(organisationProfileIds).hasSize(1);
+        assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+
+        organisation.setOrgType("Government Organisation-HMRC");
+        organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
+        assertThat(organisationProfileIds).hasSize(1);
+        assertThat(organisationProfileIds.get(0)).isEqualTo("OGD_HMRC_PROFILE");
+    }
 
 
     @Test
@@ -1143,7 +1160,7 @@ class RefDataUtilTest {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
-        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity, "ABCD123",
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponseAndSort(responseEntity, "ABCD123",
                 OrganisationStatus.ACTIVE, List.of("organisationProfileId1,organisationProfileId2".split(",")));
         assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse) responseEntityOutput.getBody();
@@ -1151,6 +1168,26 @@ class RefDataUtilTest {
         assertThat(output.getOrganisationStatus()).isEqualTo(OrganisationStatus.ACTIVE.name());
         assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId1");
         assertThat(output.getOrganisationProfileIds()).contains("organisationProfileId2");
+    }
+
+    @Test
+    void test_setOrgIdInGetUserResponse_with_roles_response_sort_first_name() {
+        List<ProfessionalUsersResponse> professionalUsersResponses = new ArrayList<>();
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
+        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(
+                new ProfessionalUser("first-name", "last-name", "soMeone@somewhere.com", organisation));
+        professionalUsersResponses.add(professionalUsersResponse);
+        professionalUsersResponses.add(professionalUsersResponse2);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponseAndSort(responseEntity, "ABCD123",
+                OrganisationStatus.ACTIVE, List.of("organisationProfileId1,organisationProfileId2".split(",")));
+        assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
+        ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse) responseEntityOutput.getBody();
+        assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+        assertEquals(2, output.getUsers().size());
+        assertThat(output.getUsers().get(0).getFirstName()).hasToString("first-name");
     }
 
     @Test
@@ -1164,7 +1201,7 @@ class RefDataUtilTest {
         professionalUsersEntityResponseWithoutRoles.setUserProfiles(professionalUsersEntityResponsesWithoutRoles);
         ResponseEntity<Object> responseEntity
                 = ResponseEntity.status(200).body(professionalUsersEntityResponseWithoutRoles);
-        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponse(responseEntity, "ABCD123",
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponseAndSort(responseEntity, "ABCD123",
                 OrganisationStatus.ACTIVE, List.of("organisationProfileId1,organisationProfileId2".split(",")));
         assertThat(responseEntityOutput.getBody())
                 .isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
@@ -1180,6 +1217,30 @@ class RefDataUtilTest {
         assertThat(output.getUserProfiles().get(0).getFirstName()).isEqualTo("some-fname");
         assertThat(output.getUserProfiles().get(0).getLastUpdated().toString())
                 .isEqualTo("2023-12-31T23:59:59.987654321");
+    }
+
+    @Test
+    void test_setOrgIdInGetUserResponse_without_roles_response_sort_first_name() {
+        List<ProfessionalUsersResponseWithoutRoles> professionalUsersEntityResponsesWithoutRoles = new ArrayList<>();
+        ProfessionalUsersResponseWithoutRoles puwrUser1 = new ProfessionalUsersResponseWithoutRoles(professionalUser);
+        ProfessionalUsersResponseWithoutRoles puwrUser2 = new ProfessionalUsersResponseWithoutRoles(
+                new ProfessionalUser("first-name", "last-name", "firstlast@somewhere.com", organisation));
+        professionalUsersEntityResponsesWithoutRoles.add(puwrUser1);
+        professionalUsersEntityResponsesWithoutRoles.add(puwrUser2);
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                = new ProfessionalUsersEntityResponseWithoutRoles();
+        professionalUsersEntityResponseWithoutRoles.setUserProfiles(professionalUsersEntityResponsesWithoutRoles);
+        ResponseEntity<Object> responseEntity
+                = ResponseEntity.status(200).body(professionalUsersEntityResponseWithoutRoles);
+        ResponseEntity<Object> responseEntityOutput = setOrgInfoInGetUserResponseAndSort(responseEntity, "ABCD123",
+                OrganisationStatus.ACTIVE, List.of("organisationProfileId1,organisationProfileId2".split(",")));
+        assertThat(responseEntityOutput.getBody())
+                .isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
+        ProfessionalUsersEntityResponseWithoutRoles output
+                = (ProfessionalUsersEntityResponseWithoutRoles) responseEntityOutput.getBody();
+        assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+        assertEquals(2, output.getUserProfiles().size());
+        assertThat(output.getUserProfiles().get(0).getFirstName()).hasToString("first-name");
     }
 
     @Test
