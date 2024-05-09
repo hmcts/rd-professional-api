@@ -17,7 +17,7 @@ plugins {
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.36.0'
     id "info.solidsoft.pitest" version '1.15.0'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'io.spring.dependency-management' version '1.1.4'
     id 'org.sonarqube' version '3.3'
     id 'org.springframework.boot' version '2.7.18'
     id "org.flywaydb.flyway" version "8.5.4"
@@ -42,7 +42,7 @@ def versions = [
         junit           : '5.9.2',
         junitPlatform   : '1.9.2',
         log4j           : '2.17.1',
-        springVersion   : '5.3.27',
+        springVersion   : '5.3.34',
         bouncycastle    : '1.77',
         logback         : '1.2.13'
 ]
@@ -404,7 +404,7 @@ dependencies {
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.7'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.8'
 
     implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter', version:versions.camel
     implementation group: 'org.apache.camel', name: 'camel-csv', version: versions.camel
@@ -496,7 +496,7 @@ dependencies {
     testImplementation 'io.github.openfeign:feign-jackson:12.1'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.1'
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.10'
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
@@ -554,7 +554,7 @@ dependencyManagement {
         // CVE-2021-25122
         // CVE-2021-42340
         // CVE-2023-28709
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.83') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.88') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -572,7 +572,7 @@ dependencyManagement {
             entry 'commons-fileupload'
         }
         //CVE-2021-22044
-        dependencySet(group: 'org.springframework.cloud', version: '3.1.5') {
+        dependencySet(group: 'org.springframework.cloud', version: '3.1.9') {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
         }
