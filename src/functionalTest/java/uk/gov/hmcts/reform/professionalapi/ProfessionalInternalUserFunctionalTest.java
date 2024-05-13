@@ -213,14 +213,18 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
 
+    @Test
     public void deleteDxAddressShouldReturnSuccess() {
         log.info("deleteDxAddressShouldReturnSuccess :: STARTED");
         String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
         JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
         String dxNumber = jsonPath.get("contactInformation[0].dxAddress[0].dxNumber");
         String dxExchange = jsonPath.get("contactInformation[0].dxAddress[0].dxExchange");
-        professionalApiClient.deleteDXAddress(new DxAddressCreationRequest(dxNumber, dxExchange),
-                orgIdentifier, hmctsAdmin, NO_CONTENT);
+        Response deleteDxAddressResponse = professionalApiClient
+                .deleteDxAddress(new DxAddressCreationRequest(dxNumber, dxExchange),
+                orgIdentifier, NO_CONTENT);
+        assertThat(deleteDxAddressResponse).isNotNull();
+        assertThat(deleteDxAddressResponse.getStatusCode()).isEqualTo(204);
         log.info("deleteDxAddressShouldReturnSuccess :: END");
     }
 

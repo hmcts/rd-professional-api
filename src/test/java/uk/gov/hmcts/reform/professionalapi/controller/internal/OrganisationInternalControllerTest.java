@@ -576,20 +576,20 @@ class OrganisationInternalControllerTest {
 
     @Test
     void testDeleteDxAddressOfOrganisationNullDxNumberThrowsInvalidRequest() {
+        DxAddressCreationRequest dxAddressRequest = DxAddressCreationRequest.dxAddressCreationRequest().build();
         Exception expectedEx = assertThrows(InvalidRequest.class, () ->
-                organisationInternalController.deleteDxAddressOfOrganisation(DxAddressCreationRequest
-                        .dxAddressCreationRequest().build(), "1234"));
+                organisationInternalController.deleteDxAddressOfOrganisation(dxAddressRequest, "1234"));
         assertThat(expectedEx.getMessage()).isEqualTo("No dx number  passed in the request");
     }
 
     @Test
     void testDeleteDxAddressOfOrganisationEmptyContactListThrowsResourceNotFoundException() {
         List<ContactInformation> emptyContactInformationList = List.of();
+        DxAddressCreationRequest dxAddressRequest = new DxAddressCreationRequest("dxNumber","dxExchange");
         when(organisationServiceMock.retrieveContactInformationByOrganisationId(anyString()))
                 .thenReturn(emptyContactInformationList);
         Exception expectedEx = assertThrows(ResourceNotFoundException.class, () ->
-                organisationInternalController.deleteDxAddressOfOrganisation(new DxAddressCreationRequest("dxNumber",
-                        "dxExchange"), "1234"));
+                organisationInternalController.deleteDxAddressOfOrganisation(dxAddressRequest, "1234"));
         assertThat(expectedEx.getMessage()).isEqualTo("No contact information  found");
     }
 

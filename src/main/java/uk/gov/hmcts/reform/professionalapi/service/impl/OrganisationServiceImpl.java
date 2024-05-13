@@ -291,9 +291,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public List<ContactInformation>  retrieveContactInformationByOrganisationId(String organisationIdentifier) {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
-
-        return existingContactInformationList;
+        return organisation.getContactInformation();
 
     }
 

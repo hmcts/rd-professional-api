@@ -1549,8 +1549,8 @@ public class ProfessionalApiClient {
         return response;
     }
 
-    public Response deleteDXAddress(DxAddressCreationRequest dxAddressCreationRequest,String organisationId,
-                                    String role, HttpStatus status) {
+    public Response deleteDxAddress(DxAddressCreationRequest dxAddressCreationRequest,String organisationId,
+                                    HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(dxAddressCreationRequest)
                 .delete("/refdata/internal/v1/organisations/dxAddress/" + organisationId)
