@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -2774,8 +2773,6 @@ class OrganisationServiceImplTest {
     @Test
     void testUpdateOrgContactInformationWithMultipleRequestsButEmptyUPRN() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
-
         var contactInformation = new ContactInformation();
         contactInformation.setCountry("TestCountry");
         contactInformation.setCreated(LocalDateTime.now());
@@ -2783,7 +2780,7 @@ class OrganisationServiceImplTest {
         var contactInformation1 = new ContactInformation();
         contactInformation1.setCountry("TestAnotherCountry");
         contactInformation1.setCreated(LocalDateTime.now());
-
+        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
         existingContactInformationList.addAll(List.of(contactInformation1, contactInformation));
 
         Organisation organisationMock = mock(Organisation.class);
