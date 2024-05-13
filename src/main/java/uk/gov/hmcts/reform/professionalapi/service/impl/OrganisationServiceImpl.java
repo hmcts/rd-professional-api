@@ -1082,10 +1082,10 @@ public class OrganisationServiceImpl implements OrganisationService {
                 } else {// If UPRN not set in db for the contact or nto sent in request then throw error
                     throw new ResourceNotFoundException("No UPRN value found in existing contact information ");
                 }
-            } else {
+            } else {// If contact information does not exist in db for the organisation
                 throw new ResourceNotFoundException("No contact information found in request");
             }
-        } else {
+        } else {// If request is made without contact information details
             throw new ResourceNotFoundException("No contact information existing for given organisation");
         }
         return ResponseEntity.status(200).build();
