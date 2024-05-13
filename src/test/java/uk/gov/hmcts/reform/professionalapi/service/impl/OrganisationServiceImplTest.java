@@ -267,7 +267,7 @@ class OrganisationServiceImplTest {
         contactInformationCreationRequest = new ContactInformationCreationRequest("uprn",
                 "addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
-                "country", "postCode", dxAddressRequests,true);
+                "country", "postCode", dxAddressRequests);
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
@@ -2001,7 +2001,7 @@ class OrganisationServiceImplTest {
                 = new ContactInformationCreationRequest("uprn", "addressLine-1",
                 "addressLine-2",
                 "addressLine-3", "townCity", "county", "country",
-                "postCode", dxAddressRequests,true);
+                "postCode", dxAddressRequests);
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
         sut.addContactInformationToOrganisation(contactInformationCreationRequests, this.organisation);
@@ -2462,7 +2462,7 @@ class OrganisationServiceImplTest {
         contactInformationCreationRequest = new ContactInformationCreationRequest("uprn",
                 "addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
-                "country", "postCode", dxAddressRequests,true);
+                "country", "postCode", dxAddressRequests);
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
@@ -2486,7 +2486,7 @@ class OrganisationServiceImplTest {
         contactInformationCreationRequest = new ContactInformationCreationRequest("uprn",
                 "addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
-                "country", "postCode", dxAddressRequests,true);
+                "country", "postCode", dxAddressRequests);
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
@@ -2753,7 +2753,7 @@ class OrganisationServiceImplTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
 
         ResponseEntity<ContactInformationResponse> updatedOrganisationContact =
-            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,orgId);
+            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,orgId,true);
 
         assertThat(updatedOrganisationContact).isNotNull();
         assertThat(updatedOrganisationContact.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -2767,7 +2767,7 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
         assertThrows(ResourceNotFoundException.class, () ->
             sut.updateContactInformationForOrganisation(contactInformationCreationRequest,
-                null));
+                null,true));
     }
 
     @Test
@@ -2798,7 +2798,7 @@ class OrganisationServiceImplTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         assertThrows(ResourceNotFoundException.class, () ->
             sut.updateContactInformationForOrganisation(contactInformationCreationRequest,
-                orgId));
+                orgId,true));
     }
 
 }

@@ -172,7 +172,7 @@ class OrganisationInternalControllerTest {
         contactInformationCreationRequest = new ContactInformationCreationRequest("uprn1","addressLine1",
             "addressLine2","addressLine3", "some-country1","some-county1","som1-town-city",
             "som1-post-code",Arrays.asList(dxAddressCreationRequest()
-            .dxNumber("DX 1234567890").dxExchange("dxExchange").build()),true);
+            .dxNumber("DX 1234567890").dxExchange("dxExchange").build()));
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -591,11 +591,11 @@ class OrganisationInternalControllerTest {
         .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
 
         when(organisationServiceMock.updateContactInformationForOrganisation(contactInformationCreationRequest,
-            organisation.getOrganisationIdentifier())).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
+            organisation.getOrganisationIdentifier(),true)).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
 
         ResponseEntity<ContactInformationResponse> response = organisationInternalController
             .updateContactInformationForOrganisation(contactInformationCreationRequest,
-                organisation.getOrganisationIdentifier());
+                organisation.getOrganisationIdentifier(),true);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -604,7 +604,7 @@ class OrganisationInternalControllerTest {
             .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
         verify(organisationServiceMock, times(1))
             .updateContactInformationForOrganisation(contactInformationCreationRequest,
-                organisation.getOrganisationIdentifier());
+                organisation.getOrganisationIdentifier(),true);
 
     }
 

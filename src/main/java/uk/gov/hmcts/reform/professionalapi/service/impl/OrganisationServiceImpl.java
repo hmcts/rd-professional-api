@@ -1059,7 +1059,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
-        ContactInformationCreationRequest contactInformationRequest, String organisationIdentifier) {
+        ContactInformationCreationRequest contactInformationRequest, String organisationIdentifier,
+        Boolean dxAddressRequired) {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
@@ -1073,12 +1074,14 @@ public class OrganisationServiceImpl implements OrganisationService {
             if (contactInformationRequest != null) {
                 if (existingContactInformationList.size() == 1) {
                     //If single address is present then update address details
-                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
+                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation,
+                        dxAddressRequired);
                 } else if (!contactInformationRequest.getUprn().isEmpty()
                     && (contactInformationRequest.getUprn()
                     .equalsIgnoreCase(existingContactInformationList.get(0).getUprn()))) {
                     // If multiple addresses present then update address details for provided UPRN
-                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
+                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation,
+                        dxAddressRequired);
                 } else { // If UPRN not set in db for the contact or nto sent in request then throw error
                     throw new ResourceNotFoundException("No UPRN value found in existing contact information ");
                 }
@@ -1093,7 +1096,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
     private void updateContactInformation(List<ContactInformation> existingContactInformationList,
-                                       ContactInformationCreationRequest contactInfoRequest,Organisation organisation) {
+                                       ContactInformationCreationRequest contactInfoRequest,Organisation organisation,
+                                          Boolean dxAddressRequired) {
         existingContactInformationList.forEach(existingInfo -> {
             existingInfo.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
             existingInfo.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
@@ -1105,7 +1109,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             existingInfo.setOrganisation(organisation);
             existingInfo.setLastUpdated(LocalDateTime.now());
             ContactInformation savedContactInformation = contactInformationRepository.save(existingInfo);
-            if (contactInfoRequest.isDxAddressUpdateRequired() && contactInfoRequest.getDxAddress().isEmpty()) {
+            if (dxAddressRequired && contactInfoRequest.getDxAddress().isEmpty()) {
                 throw new ResourceNotFoundException("No Dx Address Information provided in request");
             } else {
                 addDxAddressToContactInformation(contactInfoRequest.getDxAddress(), savedContactInformation);

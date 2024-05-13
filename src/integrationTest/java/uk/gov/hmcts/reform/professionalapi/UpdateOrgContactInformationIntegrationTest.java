@@ -101,7 +101,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgContactInformation(new ContactInformationCreationRequest(null,null,
                 null,null,null,null,null,
-                null,null, true), hmctsAdmin,createOrganisationRequest());
+                null,null), hmctsAdmin,createOrganisationRequest());
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())

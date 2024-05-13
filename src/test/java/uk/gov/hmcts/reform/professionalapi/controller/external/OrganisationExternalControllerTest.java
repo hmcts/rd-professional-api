@@ -451,7 +451,7 @@ class OrganisationExternalControllerTest {
         ContactInformationCreationRequest contactInformationCreationRequest =
                 new ContactInformationCreationRequest("uprn", "addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
-                "country", "postCode", dxAddressRequests,true);
+                "country", "postCode", dxAddressRequests);
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
         List<ContactInformationResponseWithDxAddress> result = new ArrayList<>();

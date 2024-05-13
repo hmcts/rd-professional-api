@@ -34,7 +34,7 @@ public interface OrganisationService {
                                                                                        String idamId);
 
     ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
-        ContactInformationCreationRequest contactInfo, String organisationIdentifier);
+        ContactInformationCreationRequest contactInfo, String organisationIdentifier,Boolean dxAddressRequired);
 
     OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
 
