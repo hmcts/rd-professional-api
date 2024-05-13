@@ -1074,8 +1074,9 @@ public class OrganisationServiceImpl implements OrganisationService {
                 if (existingContactInformationList.size() == 1) {
                     //If single address is present then update address details
                     updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
-                } else if (contactInformationRequest.getUprn()
-                    .equalsIgnoreCase(existingContactInformationList.get(0).getUprn())) {
+                } else if (!contactInformationRequest.getUprn().isEmpty() &&
+                    (contactInformationRequest.getUprn()
+                    .equalsIgnoreCase(existingContactInformationList.get(0).getUprn()))) {
                     // If multiple addresses present then update address details for provided UPRN
                     updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
                 } else {
