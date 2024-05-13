@@ -1074,18 +1074,18 @@ public class OrganisationServiceImpl implements OrganisationService {
                 if (existingContactInformationList.size() == 1) {
                     //If single address is present then update address details
                     updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
-                } else if (!contactInformationRequest.getUprn().isEmpty() &&
-                    (contactInformationRequest.getUprn()
+                } else if (!contactInformationRequest.getUprn().isEmpty()
+                    && (contactInformationRequest.getUprn()
                     .equalsIgnoreCase(existingContactInformationList.get(0).getUprn()))) {
                     // If multiple addresses present then update address details for provided UPRN
                     updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
-                } else {// If UPRN not set in db for the contact or nto sent in request then throw error
+                } else { // If UPRN not set in db for the contact or nto sent in request then throw error
                     throw new ResourceNotFoundException("No UPRN value found in existing contact information ");
                 }
-            } else {// If contact information does not exist in db for the organisation
+            } else { // If contact information does not exist in db for the organisation
                 throw new ResourceNotFoundException("No contact information found in request");
             }
-        } else {// If request is made without contact information details
+        } else { // If request is made without contact information details
             throw new ResourceNotFoundException("No contact information existing for given organisation");
         }
         return ResponseEntity.status(200).build();
