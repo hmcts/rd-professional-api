@@ -1078,7 +1078,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     .equalsIgnoreCase(existingContactInformationList.get(0).getUprn())) {
                     // If multiple addresses present then update address details for provided UPRN
                     updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
-                } else{
+                } else {
                     throw new ResourceNotFoundException("No UPRN value found in existing contact information ");
                 }
             } else {
