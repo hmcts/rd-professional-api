@@ -325,7 +325,7 @@ public class OrganisationFixtures {
                 .country("country")
                 .county("county")
                 .townCity("town-city")
-                .uprn("uprn")
+                .uprn("uprn1")
                 .postCode("some-post-code")
                 .dxAddress(Arrays.asList(dxAddressCreationRequest()
                     .dxNumber("DX 1234567890")

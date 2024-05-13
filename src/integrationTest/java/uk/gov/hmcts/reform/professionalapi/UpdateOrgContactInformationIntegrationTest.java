@@ -56,7 +56,6 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
             .createOrganisation(organisationRequestWithMultipleAddressAllFields().build());
 
-
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgContactInformation(contactInformationCreationRequest,
                 hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER));
