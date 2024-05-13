@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.launchdarkly.shaded.kotlin.collections.EmptyList;
 import feign.Request;
 import feign.Response;
 import org.assertj.core.api.Assertions;
@@ -2754,8 +2755,8 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_deleteUserForOrganisationWithEmptyEmails() {
-        assertThrows(InvalidRequest.class, () ->
-            sut.deleteUserForOrganisation(new ArrayList<>()));
+        List<String> emptyEmailList = new ArrayList();
+        assertThrows(InvalidRequest.class, () -> sut.deleteUserForOrganisation(emptyEmailList));
     }
 
 }

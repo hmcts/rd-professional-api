@@ -823,7 +823,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
-        var deleteOrganisationResponse = new DeleteOrganisationResponse();
         if (emails.isEmpty()) {
             throw new InvalidRequest("Please provide both email addresses");
         }
@@ -837,6 +836,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 professionalUserRepository.delete(professionalUser);
             }
         });
+        var deleteOrganisationResponse = new DeleteOrganisationResponse();
         DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
         deleteOrganisationResponse = RefDataUtil
             .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);

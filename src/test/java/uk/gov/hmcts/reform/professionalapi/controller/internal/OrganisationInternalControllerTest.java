@@ -600,7 +600,7 @@ class OrganisationInternalControllerTest {
         DeleteUserResponse deleteUserResponse = new DeleteUserResponse(
             STATUS_CODE_204, "The organisation has deleted successfully");
         List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
-        UserDeletionRequest userDeletionRequest = new UserDeletionRequest("fname","lname",emails);
+        UserDeletionRequest userDeletionRequest = new UserDeletionRequest(emails);
 
         when(organisationServiceMock.deleteUserForOrganisation(emails)).thenReturn(deleteUserResponse);
 
