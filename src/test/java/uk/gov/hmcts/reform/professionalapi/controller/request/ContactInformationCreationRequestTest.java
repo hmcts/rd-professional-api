@@ -26,7 +26,7 @@ class ContactInformationCreationRequestTest {
     void test_has_mandatory_fields_specified_not_null() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 null, null, null, null, null, null,
-                null, null,null);
+                null, null,null, true);
 
         Set<ConstraintViolation<ContactInformationCreationRequest>> violations = validator
                 .validate(contactInformationCreationRequest);
@@ -43,7 +43,7 @@ class ContactInformationCreationRequestTest {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 "some-uprn","some-address1", "some-address2", "some-address3",
                 "some-town-city", "some-county", "some-country",
-                "some-post-code", dxAddresses);
+                "some-post-code", dxAddresses, true);
 
         assertThat(contactInformationCreationRequest.getUprn()).isEqualTo("some-uprn");
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
@@ -65,7 +65,7 @@ class ContactInformationCreationRequestTest {
 
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 null,"some-address1", null, null, null, null,
-                null, null, null);
+                null, null, null, true);
 
         assertThat(contactInformationCreationRequest.getUprn()).isNull();
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
@@ -83,7 +83,7 @@ class ContactInformationCreationRequestTest {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 "some-uprn","some-address1", "some-address2", "some-address3",
                 "some-town-city", "some-county", "some-country",
-                "some-post-code", null);
+                "some-post-code", null, true);
 
         assertThat(contactInformationCreationRequest.getUprn()).isEqualTo("some-uprn");
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");

@@ -212,8 +212,6 @@ class OrganisationServiceImplTest {
     private final ProfessionalUserService professionalUserServiceMock
             = mock(ProfessionalUserService.class);
 
-    @Mock
-    private ArrayList<ContactInformation> existingContactInformationList;
 
     @BeforeEach
     void setUp() {
@@ -270,7 +268,7 @@ class OrganisationServiceImplTest {
         contactInformationCreationRequest = new ContactInformationCreationRequest("uprn",
                 "addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
-                "country", "postCode", dxAddressRequests);
+                "country", "postCode", dxAddressRequests,true);
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
@@ -2004,7 +2002,7 @@ class OrganisationServiceImplTest {
                 = new ContactInformationCreationRequest("uprn", "addressLine-1",
                 "addressLine-2",
                 "addressLine-3", "townCity", "county", "country",
-                "postCode", dxAddressRequests);
+                "postCode", dxAddressRequests,true);
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
         sut.addContactInformationToOrganisation(contactInformationCreationRequests, this.organisation);
@@ -2465,7 +2463,7 @@ class OrganisationServiceImplTest {
         contactInformationCreationRequest = new ContactInformationCreationRequest("uprn",
                 "addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
-                "country", "postCode", dxAddressRequests);
+                "country", "postCode", dxAddressRequests,true);
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
@@ -2489,7 +2487,7 @@ class OrganisationServiceImplTest {
         contactInformationCreationRequest = new ContactInformationCreationRequest("uprn",
                 "addressLine-1",
                 "addressLine-2", "addressLine-3", "townCity", "county",
-                "country", "postCode", dxAddressRequests);
+                "country", "postCode", dxAddressRequests,true);
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
@@ -2731,6 +2729,11 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_updateOrganisationContactInformation() {
+        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+        existingContactInformationList.add(contactInformation);
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
@@ -2740,7 +2743,6 @@ class OrganisationServiceImplTest {
         assertNotNull(contactInformationCreationRequest);
 
         ContactInformation existingContactInformation = new ContactInformation();
-
         existingContactInformation.setAddressLine1(contactInformationCreationRequest.getAddressLine1());
         existingContactInformation.setTownCity(contactInformationCreationRequest.getTownCity());
 
@@ -2748,7 +2750,6 @@ class OrganisationServiceImplTest {
         assertNotNull(existingContactInformation);
         assertThat(existingContactInformation.getAddressLine1())
             .isEqualTo(contactInformationCreationRequest.getAddressLine1());
-
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
 
@@ -2758,9 +2759,49 @@ class OrganisationServiceImplTest {
         assertThat(updatedOrganisationContact).isNotNull();
         assertThat(updatedOrganisationContact.getStatusCode()).isEqualTo(expectedHttpStatus);
 
+    }
 
+    @Test
+    void testUpdateOrgContactInformationWithEmptyOrgIdentifier() {
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(null)).thenReturn(null);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+        assertThrows(ResourceNotFoundException.class, () ->
+            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,
+                null));
+    }
 
+    @Test
+    void testUpdateOrgContactInformationWithMultipleRequestsButEmptyUPRN() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
 
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+
+        var contactInformation1 = new ContactInformation();
+        contactInformation1.setCountry("TestAnotherCountry");
+        contactInformation1.setCreated(LocalDateTime.now());
+
+        existingContactInformationList.addAll(List.of(contactInformation1, contactInformation));
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+
+        when(organisationMock.getContactInformation()).thenReturn(existingContactInformationList);
+        assertNotNull(existingContactInformationList);
+        assertNotNull(contactInformationCreationRequest);
+
+        ContactInformation existingContactInformation = new ContactInformation();
+
+        existingContactInformation.setAddressLine1(contactInformationCreationRequest.getAddressLine1());
+        existingContactInformation.setTownCity(contactInformationCreationRequest.getTownCity());
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        assertThrows(ResourceNotFoundException.class, () ->
+            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,
+                orgId));
     }
 
 }

@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
@@ -804,12 +803,6 @@ public class OrganisationInternalController extends SuperController {
 
         organisationCreationRequestValidator.validateContactInformations(Arrays
             .asList(contactInformationCreationRequest));
-
-        var organisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-
-        if (organisation == null) {
-            throw new ResourceNotFoundException("Organisation does not exist");
-        }
 
         return organisationService.updateContactInformationForOrganisation(
             contactInformationCreationRequest,organisationIdentifier);

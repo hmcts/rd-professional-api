@@ -32,6 +32,7 @@ public class ContactInformationCreationRequest {
 
     private final List<DxAddressCreationRequest> dxAddress;
 
+    private boolean dxAddressUpdateRequired;
 
     @JsonCreator
     public ContactInformationCreationRequest(
@@ -43,7 +44,8 @@ public class ContactInformationCreationRequest {
             @JsonProperty("county") String county,
             @JsonProperty("country") String country,
             @JsonProperty("postCode") String postCode,
-            @JsonProperty("dxAddress") List<DxAddressCreationRequest> dxAddress) {
+            @JsonProperty("dxAddress") List<DxAddressCreationRequest> dxAddress,
+            @JsonProperty("dxAddressUpdateRequired") Boolean dxAddressUpdateRequired) {
 
         this.uprn = uprn;
         this.addressLine1 = addressLine1;
@@ -54,5 +56,6 @@ public class ContactInformationCreationRequest {
         this.country = country;
         this.postCode = postCode;
         this.dxAddress = dxAddress;
+        this.dxAddressUpdateRequired = dxAddressUpdateRequired;
     }
 }

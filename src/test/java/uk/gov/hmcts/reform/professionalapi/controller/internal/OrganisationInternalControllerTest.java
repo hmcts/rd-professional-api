@@ -172,7 +172,7 @@ class OrganisationInternalControllerTest {
         contactInformationCreationRequest = new ContactInformationCreationRequest("uprn1","addressLine1",
             "addressLine2","addressLine3", "some-country1","some-county1","som1-town-city",
             "som1-post-code",Arrays.asList(dxAddressCreationRequest()
-            .dxNumber("DX 1234567890").dxExchange("dxExchange").build()));
+            .dxNumber("DX 1234567890").dxExchange("dxExchange").build()),true);
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -590,11 +590,6 @@ class OrganisationInternalControllerTest {
         doNothing().when(organisationCreationRequestValidatorMock)
         .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
 
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
-            .thenReturn(organisation);
-
-        assertThat(organisation).isNotNull();
-
         when(organisationServiceMock.updateContactInformationForOrganisation(contactInformationCreationRequest,
             organisation.getOrganisationIdentifier())).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
 
@@ -613,14 +608,5 @@ class OrganisationInternalControllerTest {
 
     }
 
-    @Test
-    void testUpdateOrgContactInformationWithEmptyOrgIdentifier() {
 
-        doNothing().when(organisationCreationRequestValidatorMock)
-            .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(null)).thenReturn(null);
-        assertThrows(ResourceNotFoundException.class, () ->
-            organisationInternalController.updateContactInformationForOrganisation(contactInformationCreationRequest,
-                null));
-    }
 }

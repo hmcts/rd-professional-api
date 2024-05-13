@@ -1059,28 +1059,57 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
-        ContactInformationCreationRequest contactInfo, String organisationIdentifier) {
+        ContactInformationCreationRequest contactInformationRequest, String organisationIdentifier) {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
-        //if multiple contact informations are found they will all be updated
-        if (contactInfo != null) {
-            existingContactInformationList.forEach(existingInfo -> {
-                existingInfo.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
-                existingInfo.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
-                existingInfo.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
-                existingInfo.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
-                existingInfo.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
-                existingInfo.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
-                existingInfo.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
-                existingInfo.setOrganisation(organisation);
-                existingInfo.setLastUpdated(LocalDateTime.now());
-                ContactInformation savedContactInformation = contactInformationRepository.save(existingInfo);
-                addDxAddressToContactInformation(contactInfo.getDxAddress(), savedContactInformation);
-            });
 
+        if (organisation == null) {
+            throw new ResourceNotFoundException("Organisation does not exist");
+        }
+
+        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
+
+        if (!existingContactInformationList.isEmpty()) {
+            if (contactInformationRequest != null) {
+                if (existingContactInformationList.size() == 1) {
+                    //If single address is present then update address details
+                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
+                } else if (contactInformationRequest.getUprn()
+                    .equalsIgnoreCase(existingContactInformationList.get(0).getUprn())) {
+                    // If multiple addresses present then update address details for provided UPRN
+                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation);
+                } else{
+                    throw new ResourceNotFoundException("No UPRN value found in existing contact information ");
+                }
+            } else {
+                throw new ResourceNotFoundException("No contact information found in request");
+            }
+        } else {
+            throw new ResourceNotFoundException("No contact information existing for given organisation");
         }
         return ResponseEntity.status(200).build();
+    }
+
+
+    private void updateContactInformation(List<ContactInformation> existingContactInformationList,
+                                       ContactInformationCreationRequest contactInfoRequest,Organisation organisation) {
+        existingContactInformationList.forEach(existingInfo -> {
+            existingInfo.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
+            existingInfo.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
+            existingInfo.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine3()));
+            existingInfo.setTownCity(RefDataUtil.removeEmptySpaces(contactInfoRequest.getTownCity()));
+            existingInfo.setCounty(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCounty()));
+            existingInfo.setCountry(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCountry()));
+            existingInfo.setPostCode(RefDataUtil.removeEmptySpaces(contactInfoRequest.getPostCode()));
+            existingInfo.setOrganisation(organisation);
+            existingInfo.setLastUpdated(LocalDateTime.now());
+            ContactInformation savedContactInformation = contactInformationRepository.save(existingInfo);
+            if (contactInfoRequest.isDxAddressUpdateRequired() && contactInfoRequest.getDxAddress().isEmpty()) {
+                throw new ResourceNotFoundException("No Dx Address Information provided in request");
+            } else {
+                addDxAddressToContactInformation(contactInfoRequest.getDxAddress(), savedContactInformation);
+            }
+        });
     }
 
 }
