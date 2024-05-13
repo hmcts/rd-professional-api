@@ -794,7 +794,6 @@ public class OrganisationInternalController extends SuperController {
         produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.CREATED)
-    @ResponseBody
     @Secured({"prd-admin"})
     public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
