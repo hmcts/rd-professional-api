@@ -827,20 +827,16 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (emails.isEmpty()) {
             throw new InvalidRequest("Please provide both email addresses");
         }
-
-        Set<String> userIdsToBeDeleted = emails.stream().map(
-            email -> {
-                Set<String> userIds = new HashSet<>();
-                Optional.ofNullable(professionalUserRepository
-                    .findByEmailAddress(RefDataUtil.removeAllSpaces(email)))
-                    .ifPresent(professionalUser -> {
-                        userIds.add(professionalUser.getUserIdentifier());
-                        userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
-                        professionalUserRepository.delete(professionalUser);
-                    });
-                return userIds.stream().iterator().next();
-            }).collect(Collectors.toSet());;
-
+        Set<String> userIdsToBeDeleted = new HashSet<>();
+        emails.forEach(email -> {
+            ProfessionalUser professionalUser = professionalUserRepository
+                .findByEmailAddress(RefDataUtil.removeAllSpaces(email));
+            if (professionalUser != null) {
+                userIdsToBeDeleted.add(professionalUser.getUserIdentifier());
+                userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
+                professionalUserRepository.delete(professionalUser);
+            }
+        });
         DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
         deleteOrganisationResponse = RefDataUtil
             .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
