@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
@@ -27,13 +26,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -93,9 +92,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -821,6 +820,35 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
+    @Override
+    @Transactional
+    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
+        if (emails.isEmpty()) {
+            throw new InvalidRequest("Please provide both email addresses");
+        }
+        Set<String> userIdsToBeDeleted = new HashSet<>();
+        emails.forEach(email -> {
+            Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
+                .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
+            if (!professionalUser.isEmpty()) {
+                userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
+                professionalUserRepository.delete(professionalUser.get());
+            }
+
+        });
+        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
+        Optional<DeleteOrganisationResponse> deleteOrganisationResponse = Optional.ofNullable(RefDataUtil
+            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient));
+        if (deleteOrganisationResponse.isEmpty()) {
+            throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
+        }
+        return new DeleteUserResponse(deleteOrganisationResponse.get().getStatusCode(),
+            deleteOrganisationResponse.get().getMessage());
+    }
+
+
+
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {
 
@@ -837,16 +865,13 @@ public class OrganisationServiceImpl implements OrganisationService {
                 deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
                 deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
 
-            } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
-                // If user is not active in the up will send the request to delete
+            } else {
+                // user will be deleted even if he is in active state
                 var userIds = new HashSet<String>();
                 userIds.add(user.getUserIdentifier());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
                         .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-            } else {
-                deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
-                deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
             }
         } else {
             deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
@@ -1060,54 +1085,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
     }
-
-    public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
-                                                   OrganisationSraUpdateRequest organisationNameSraUpdateRequest) {
-        final String attributeKey = "regulators-0";
-        final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
-            + "\"organisationRegistrationNumber\":\"" + organisationNameSraUpdateRequest.getSraId() + "\"}";
-
-        existingOrganisation.setSraId(
-            RefDataUtil.removeEmptySpaces(organisationNameSraUpdateRequest.getSraId()));
-        OrgAttribute attribute = new OrgAttribute();
-        attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
-        attribute.setValue(RefDataUtil
-            .removeEmptySpaces(attributeValue));
-        attribute.setOrganisation(existingOrganisation);
-        OrgAttribute savedAttribute = orgAttributeRepository.save(attribute);
-        List<OrgAttribute> attributes = new ArrayList<>();
-        attributes.add(attribute);
-        existingOrganisation.setOrgAttributes(attributes);
-
-        return savedAttribute;
-    }
-
-    @Override
-    @Transactional
-    public OrganisationsDetailResponse updateOrganisationSra(
-        OrganisationSraUpdateRequest organisationSraUpdateRequest, String organisationIdentifier) {
-
-        var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        Organisation savedOrganisation = null;
-        if (existingOrganisation == null) {
-            throw new EmptyResultDataAccessException(ONE);
-        } else {
-            if (isNotBlank(organisationSraUpdateRequest.getSraId())) {
-                OrgAttribute savedAttribute = saveOrganisationAttributes(
-                    existingOrganisation,organisationSraUpdateRequest);
-                if (savedAttribute == null) {
-                    log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
-                    throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
-                }
-            }
-            savedOrganisation = organisationRepository.save(existingOrganisation);
-        }
-
-        return new OrganisationsDetailResponse(List.of(savedOrganisation),false,
-            false,false);
-    }
-
-
 
 }
 
