@@ -20,7 +20,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgContactInformation(contactInformationCreationRequest,
-                hmctsAdmin,createOrganisationRequest());
+                hmctsAdmin,createOrganisationRequest(),true);
 
         assertThat(updateResponse).containsEntry("http_status", 200);
     }
@@ -28,7 +28,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
     @Test
     void update_contact_with_bad_request_should_return_400() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgContactInformation(null,  hmctsAdmin,createOrganisationRequest());
+            .updateOrgContactInformation(null,  hmctsAdmin,createOrganisationRequest(),true);
 
         assertThat(updateResponse).containsEntry("http_status", "400");
     }
@@ -40,7 +40,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgContactInformation(contactInformationCreationRequest,
-                hmctsAdmin,createOrganisationRequest());
+                hmctsAdmin,createOrganisationRequest(),true);
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString()).contains(
@@ -58,7 +58,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgContactInformation(contactInformationCreationRequest,
-                hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER));
+                hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER),true);
 
         assertThat(updateResponse).containsEntry("http_status", 200);
     }
@@ -76,7 +76,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgContactInformation(contactInformationCreationRequest,
-                hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER));
+                hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER),true);
 
         assertThat(updateResponse).containsEntry("http_status", 200);
     }
@@ -87,7 +87,8 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
             createContactInformationRequest().build();
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgContactInformation(contactInformationCreationRequest,  hmctsAdmin,"ABCDEF7");
+            .updateOrgContactInformation(contactInformationCreationRequest,  hmctsAdmin,
+                "ABCDEF7",true);
 
         assertThat(updateResponse).containsEntry("http_status", "404");
         assertThat(updateResponse.get("response_body").toString())
@@ -101,7 +102,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgContactInformation(new ContactInformationCreationRequest(null,null,
                 null,null,null,null,null,
-                null,null), hmctsAdmin,createOrganisationRequest());
+                null,null), hmctsAdmin,createOrganisationRequest(),true);
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
