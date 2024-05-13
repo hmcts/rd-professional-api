@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.launchdarkly.shaded.kotlin.collections.EmptyList;
 import feign.Request;
 import feign.Response;
 import org.assertj.core.api.Assertions;
@@ -116,6 +115,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_400;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -2097,7 +2097,7 @@ class OrganisationServiceImplTest {
 
 
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
+        deleteOrganisationResponse.setStatusCode(ERROR_CODE_400);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
         ObjectMapper mapperOne = new ObjectMapper();
         String deleteBody = mapperOne.writeValueAsString(newUserResponse);
@@ -2131,7 +2131,7 @@ class OrganisationServiceImplTest {
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ERROR_CODE_400);
         assertThat(deleteOrganisationResponse.getMessage())
                 .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
         verify(organisationRepository, times(0)).deleteById(any());
@@ -2754,9 +2754,11 @@ class OrganisationServiceImplTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void test_deleteUserForOrganisationWithEmptyEmails() {
         List<String> emptyEmailList = new ArrayList();
         assertThrows(InvalidRequest.class, () -> sut.deleteUserForOrganisation(emptyEmailList));
     }
+
 
 }

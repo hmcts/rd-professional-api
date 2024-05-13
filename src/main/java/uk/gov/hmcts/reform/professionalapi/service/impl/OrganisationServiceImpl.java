@@ -828,24 +828,23 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
         Set<String> userIdsToBeDeleted = new HashSet<>();
         emails.forEach(email -> {
-            ProfessionalUser professionalUser = professionalUserRepository
-                .findByEmailAddress(RefDataUtil.removeAllSpaces(email));
-            if (professionalUser != null) {
-                userIdsToBeDeleted.add(professionalUser.getUserIdentifier());
-                userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
-                professionalUserRepository.delete(professionalUser);
+            Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
+                .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
+            if (!professionalUser.isEmpty()) {
+                userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
+                professionalUserRepository.delete(professionalUser.get());
             }
+
         });
-        var deleteOrganisationResponse = new DeleteOrganisationResponse();
         DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
-        deleteOrganisationResponse = RefDataUtil
-            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-        if (deleteOrganisationResponse == null) {
+        Optional<DeleteOrganisationResponse> deleteOrganisationResponse = Optional.ofNullable(RefDataUtil
+            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient));
+        if (deleteOrganisationResponse.isEmpty()) {
             throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
         }
-
-        return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode(),
-            deleteOrganisationResponse.getMessage());
+        return new DeleteUserResponse(deleteOrganisationResponse.get().getStatusCode(),
+            deleteOrganisationResponse.get().getMessage());
     }
 
 
