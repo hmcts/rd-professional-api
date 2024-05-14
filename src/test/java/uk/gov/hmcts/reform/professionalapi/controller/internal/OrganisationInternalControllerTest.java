@@ -594,8 +594,8 @@ class OrganisationInternalControllerTest {
             organisation.getOrganisationIdentifier(),true)).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
 
         ResponseEntity<ContactInformationResponse> response = organisationInternalController
-            .updateContactInformationForOrganisation(contactInformationCreationRequest,
-                organisation.getOrganisationIdentifier(),true);
+            .updateContactInformationForOrganisation(contactInformationCreationRequest,true,
+                organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);

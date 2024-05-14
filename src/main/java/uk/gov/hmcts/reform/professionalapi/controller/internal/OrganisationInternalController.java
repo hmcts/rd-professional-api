@@ -798,8 +798,8 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
         @Valid @NotNull @RequestBody ContactInformationCreationRequest contactInformationCreationRequest,
-        @PathVariable("orgId") @NotBlank  String organisationIdentifier,
-        @PathVariable("dxAddressRequired") @NotBlank  boolean dxAddressRequired) {
+        @PathVariable("dxAddressRequired") boolean dxAddressRequired,
+        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
         organisationCreationRequestValidator.validateContactInformations(Arrays
             .asList(contactInformationCreationRequest));

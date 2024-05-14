@@ -1755,7 +1755,6 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Response updateContactInformationsToOrganisation(
-
         ContactInformationCreationRequest
             contactInformationCreationRequest,
         HttpStatus expectedStatus,
