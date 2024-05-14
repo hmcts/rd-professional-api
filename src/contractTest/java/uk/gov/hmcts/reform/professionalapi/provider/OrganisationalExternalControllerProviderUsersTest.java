@@ -24,30 +24,33 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 
@@ -70,6 +73,9 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @Autowired
     OrganisationRepository organisationRepository;
+
+    @Autowired
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
 
     @Autowired
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
@@ -124,6 +130,37 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
                 .thenReturn(organisation);
 
+
+        setUpUserProfileClientInteraction();
+    }
+
+    @State({"Organisation exists that can invite new users with AccessTypes"})
+    public void toInviteNewUsersWithAccessTypes() throws IOException {
+        mockSecurityContext();
+        ProfessionalUser professionalUser = setUpProfessionalUser();
+
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+                "firstName", "lastName", IdamStatus.ACTIVE);
+
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+        String body = objectMapper.writeValueAsString(userProfileResponse);
+
+        when(userProfileFeignClientMock.getUserProfileById("someUserIdentifier"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(200).build());
+
+
+        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
+                .thenReturn(professionalUser);
+
+        when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
+                .thenReturn(organisation);
+
+
+        Set<UserAccessType> userAccessTypes = PactUtils.getUserAccessTypes();
+        verify(professionalUserServiceMock).saveAllUserAccessTypes(professionalUser, userAccessTypes);
 
         setUpUserProfileClientInteraction();
     }
@@ -192,7 +229,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
 
     private ProfessionalUser setUpProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
-        setUpOrganisation(name, sraId, companyNumber, companyUrl);
+        organisation = PactUtils.setUpOrganisation(name, sraId, companyNumber, companyUrl);
 
         SuperUser su = new SuperUser();
         su.setEmailAddress("superUser@email.com");
@@ -220,24 +257,6 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         String companyUrl = "companyUrl";
 
         return setUpProfessionalUser(name, sraId, companyNumber, companyUrl);
-    }
-
-    private void setUpOrganisation(String name, String sraId, String companyNumber, String companyUrl) {
-        organisation = new Organisation();
-        organisation.setName(name);
-        organisation.setCompanyNumber(companyNumber);
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisation.setSraId(sraId);
-        organisation.setSraRegulated(true);
-        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
-        organisation.setCompanyUrl(companyUrl);
-        ContactInformation contactInformation = new ContactInformation();
-        contactInformation.setUprn("uprn");
-        contactInformation.setAddressLine1("addressLine1");
-        contactInformation.setAddressLine2("addressLine2");
-        contactInformation.setCountry("country");
-        contactInformation.setPostCode("HA5 1BJ");
-        organisation.setContactInformations(asList(contactInformation));
     }
 
 }

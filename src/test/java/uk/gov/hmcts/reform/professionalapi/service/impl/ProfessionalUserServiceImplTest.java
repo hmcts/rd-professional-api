@@ -25,9 +25,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -39,15 +41,18 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleDeletionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
+import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
-import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -62,12 +67,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
@@ -82,8 +89,10 @@ class ProfessionalUserServiceImplTest {
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
     private final FeignException feignExceptionMock = mock(FeignException.class);
-
-    private final RefDataUtil refDataUtil = mock(RefDataUtil.class);
+    private final UserConfiguredAccessRepository userConfiguredAccessRepository
+            = mock(UserConfiguredAccessRepository.class);
+    private final UserProfileUpdateRequestValidator userProfileUpdateRequestValidator
+            = mock(UserProfileUpdateRequestValidator.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
             null, null, null);
@@ -95,7 +104,8 @@ class ProfessionalUserServiceImplTest {
 
     private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
             organisationRepository, professionalUserRepository, userAttributeRepository,
-            prdEnumRepository, userAttributeService, userProfileFeignClient);
+            prdEnumRepository, userAttributeService, userProfileFeignClient, userConfiguredAccessRepository,
+            userProfileUpdateRequestValidator);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname", "some-email", organisation);
@@ -116,6 +126,7 @@ class ProfessionalUserServiceImplTest {
         prdEnums.add(anEnum);
 
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
     }
@@ -158,6 +169,7 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     void test_findUsersByOrganisation_with_userIdentifier() throws Exception {
+        organisation.setOrgType("Solicitor");
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -212,6 +224,10 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         assertThat(professionalUsersEntityResponse1.getOrganisationIdentifier())
                 .isEqualTo(organisation.getOrganisationIdentifier());
+        assertThat(professionalUsersEntityResponse1.getOrganisationStatus())
+                .isEqualTo(organisation.getStatus().name());
+        assertThat(professionalUsersEntityResponse1.getOrganisationProfileIds())
+                .contains("SOLICITOR_PROFILE");
         assertThat(professionalUsersEntityResponse1.getUsers()).hasSize(2);
         professionalUsersEntityResponse1.getUsers().forEach(userProfile -> {
             assertThat(userProfile.getIdamStatus()).isEqualToIgnoringCase("active");
@@ -519,6 +535,8 @@ class ProfessionalUserServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
+        organisation.setOrgType("Government Organisation-DWP");
+
         Pageable pageableMock = mock(Pageable.class);
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
@@ -554,13 +572,19 @@ class ProfessionalUserServiceImplTest {
         ResponseEntity responseEntity = professionalUserService
                 .findProfessionalUsersByOrganisationWithPageable(organisation, "false", false,
                         "Active", pageableMock);
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                = ((ProfessionalUsersEntityResponseWithoutRoles)responseEntity.getBody());
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
+        assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationStatus())
+                .isEqualTo(organisation.getStatus().name());
+        assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationProfileIds())
+                .contains("OGD_DWP_PROFILE");
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
-        verify(professionalUserPage, times(2)).getContent();
+        verify(professionalUserPage, times(1)).getContent();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
 
@@ -605,7 +629,7 @@ class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
-        verify(professionalUserPage, times(2)).getContent();
+        verify(professionalUserPage, times(1)).getContent();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
 
@@ -705,12 +729,11 @@ class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress()))
                 .thenReturn(professionalUser);
 
-        NewUserResponse newUserResponse = new NewUserResponse();
-        newUserResponse.setUserIdentifier("a123dfgr46");
-        newUserResponse.setIdamStatus("ACTIVE");
+        NewUserResponse getUserResponse = new NewUserResponse();
+        getUserResponse.setUserIdentifier("a123dfgr46");
+        getUserResponse.setIdamStatus("ACTIVE");
         ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(newUserResponse);
-
+        String body = mapper.writeValueAsString(getUserResponse);
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
@@ -898,18 +921,406 @@ class ProfessionalUserServiceImplTest {
         verify(professionalUser, times(1)).getUserIdentifier();
     }
 
+    @Test
+    void testModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
+        String userId = UUID.randomUUID().toString();
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(userId);
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        Response response = mock(Response.class);
+        when(response.status()).thenReturn(200);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
+
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData))
+                .thenReturn(userProfileUpdatedData);
+
+        ResponseEntity<Object> actualData = professionalUserService.modifyRolesForUser(userProfileUpdatedData,
+                userId, Optional.of("EXUI"));
+
+        assertThat(actualData).isNotNull();
+        assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(userProfileUpdateRequestValidator, times(1)).validateRequest(userProfileUpdatedData);
+    }
+
+    @Test
+    void test_modifyRolesAndUserConfiguredAccessForAddedAccessType() throws JsonProcessingException {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(uuidStr);
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        Response response = mock(Response.class);
+        when(response.status()).thenReturn(200);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData))
+                .thenReturn(userProfileUpdatedData);
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
+
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        String origin = "EXUI";
+        Optional<String> originOpt = Optional.of(origin);
+        professionalUserService.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData,
+                uuidStr, originOpt);
+
+
+        verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
+        verify(userConfiguredAccessRepository, times(1)).saveAll(any());
+    }
+
+    @Test
+    void test_failModifyRolesAndUserConfiguredAccessForRoleUpdateException() throws JsonProcessingException {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(uuidStr);
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData))
+                .thenReturn(userProfileUpdatedData);
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
+
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        String origin = "EXUI";
+        Optional<String> originOpt = Optional.of(origin);
+
+        try {
+            professionalUserService.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData,
+                    uuidStr, originOpt);
+        } catch (ExternalApiException externalApiException) {
+            assertThat(externalApiException.getHttpStatus().value()).isEqualTo(500);
+        }
+
+        verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
+        verify(userConfiguredAccessRepository, times(1)).saveAll(any());
+    }
+
+    @Test
+    void test_modifyUserRolesAndUserConfiguredAccessForNullAccessType() throws JsonProcessingException {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(uuidStr);
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        Response response = mock(Response.class);
+        when(response.status()).thenReturn(200);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
+
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
+
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        String origin = "EXUI";
+        Optional<String> originOpt = Optional.of(origin);
+        professionalUserService.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData,
+                uuidStr, originOpt);
+
+
+        verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
+        verify(userConfiguredAccessRepository, times(0)).saveAll(any());
+    }
+
+    @Test
+    void test_modifyUserConfiguredAccessForDeleteFail() throws JsonProcessingException {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        NewUserResponse getUserResponse = new NewUserResponse();
+        getUserResponse.setUserIdentifier(uuidStr);
+        getUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(getUserResponse);
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
+
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        doThrow(new IllegalArgumentException()).when(userConfiguredAccessRepository).deleteAll(optUca);
+
+        try {
+            professionalUserService.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData,
+                    uuidStr, Optional.of("EXUI"));
+        } catch (ExternalApiException eae) {
+            assertThat(eae.getHttpStatus().value()).isEqualTo(500);
+            assertThat(eae.getMessage()).contains("001");
+        }
+
+        verify(userConfiguredAccessRepository, times(0)).saveAll(any());
+    }
+
+    @Test
+    void test_modifyUserConfiguredAccessForSaveFail() throws JsonProcessingException {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserMock);
+        when(professionalUserMock.getId()).thenReturn(uuid);
+
+        NewUserResponse getUserResponse = new NewUserResponse();
+        getUserResponse.setUserIdentifier(uuidStr);
+        getUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(getUserResponse);
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+        UserConfiguredAccess userConfiguredAccess1 = new UserConfiguredAccess();
+        UserConfiguredAccess userConfiguredAccess2 = new UserConfiguredAccess();
+        List<UserConfiguredAccess> optUca = List.of(userConfiguredAccess1, userConfiguredAccess2);
+
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(optUca);
+
+        doThrow(new IllegalArgumentException()).when(userConfiguredAccessRepository).saveAll(any());
+
+        try {
+            professionalUserService.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData,
+                    uuidStr, Optional.of("EXUI"));
+        } catch (ExternalApiException eae) {
+            assertThat(eae.getHttpStatus().value()).isEqualTo(500);
+            assertThat(eae.getMessage()).contains("002");
+        }
+
+        verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
+    }
+
+
+    @Test
+    void test_ErrorOnsaveAllUserAccessTypes() {
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        UserAccessType userAccessType2 = new UserAccessType();
+        userAccessTypes.add(userAccessType2);
+
+        doThrow(new IllegalArgumentException()).when(userConfiguredAccessRepository).saveAll(any());
+
+        try {
+            professionalUserService.saveAllUserAccessTypes(professionalUser,
+                    userAccessTypes);
+        } catch (ExternalApiException eae) {
+            assertThat(eae.getHttpStatus().value()).isEqualTo(500);
+            assertThat(eae.getMessage()).contains("002");
+        }
+
+        verify(userConfiguredAccessRepository, times(1)).saveAll(any());
+    }
+
+    @Test
+    void test_saveAllUserAccessTypes() {
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        UserAccessType userAccessType1 = new UserAccessType();
+        userAccessTypes.add(userAccessType1);
+        UserAccessType userAccessType2 = new UserAccessType();
+        userAccessTypes.add(userAccessType2);
+
+        professionalUserService.saveAllUserAccessTypes(professionalUser,
+                userAccessTypes);
+
+        verify(userConfiguredAccessRepository, times(1)).saveAll(any());
+    }
+
     void callModifyRolesForUser(HttpStatus status) {
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
 
         String uuid = UUID.randomUUID().toString();
 
         Throwable thrown
-                = catchThrowable(() ->  professionalUserService.modifyRolesForUser(new UserProfileUpdatedData(),
-                uuid, Optional.of("")));
+                = catchThrowable(() ->  professionalUserService
+                .modifyRolesForUser(new UserProfileUpdatedData(), uuid, Optional.of("")));
         assertThat(thrown)
                 .isInstanceOf(ExternalApiException.class)
                 .hasMessageContaining(ERROR_MESSAGE_UP_FAILED);
         assertThat(((ExternalApiException) thrown).getHttpStatus()).isEqualTo(status);
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_fetchUsersForRefresh() {
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUserList.add(professionalUser);
+
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any()))
+                .thenReturn(professionalUserList);
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<Object> responseEntity = professionalUserService.fetchUsersForRefresh(since, null, null, null);
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepository, times(1))
+                .findByLastUpdatedGreaterThanEqual(any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_fetchUsersForRefreshPageable() {
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+        Page<ProfessionalUser> professionalUserPage = mock(Page.class);
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUserList.add(professionalUser);
+
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any(), any()))
+                .thenReturn(professionalUserPage);
+
+        when(professionalUserPage.getContent()).thenReturn(professionalUserList);
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<Object> responseEntity =
+                professionalUserService.fetchUsersForRefresh(since, null, 10, null);
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepository, times(1))
+                .findByLastUpdatedGreaterThanEqual(any(), any());
+    }
+
+    @Test
+    void test_fetchUsersForRefreshWithSearchAfter() {
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUserList.add(professionalUser);
+
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(any(), any()))
+                .thenReturn(professionalUserList);
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<Object> responseEntity = professionalUserService
+                .fetchUsersForRefresh(since, null, null, UUID.randomUUID());
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepository, times(1))
+                .findByLastUpdatedGreaterThanEqualAndIdGreaterThan(any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_findSingleRefreshUser() {
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        professionalUser.setId(UUID.randomUUID());
+        professionalUser.setCreated(LocalDateTime.now());
+
+        when(professionalUserRepository.findByUserIdentifier(any()))
+                .thenReturn(professionalUser);
+
+        ResponseEntity<Object> responseEntity = professionalUserService
+                .fetchUsersForRefresh(null, userIdentifier, null, null);
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserRepository, times(1))
+                .findByUserIdentifier(any());
     }
 }

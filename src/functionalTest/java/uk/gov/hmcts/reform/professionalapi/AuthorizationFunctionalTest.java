@@ -19,9 +19,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,10 +35,14 @@ import javax.annotation.PostConstruct;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.formatDateString;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
@@ -150,7 +156,7 @@ public class AuthorizationFunctionalTest {
         return activateOrganisationV2(response, role);
     }
 
-    protected String createAndctivateOrganisationWithGivenRequest(
+    protected String createAndActivateOrganisationWithGivenRequest(
             OrganisationCreationRequest organisationCreationRequest, String role) {
         Map<String, Object> organisationCreationResponse = professionalApiClient
                 .createOrganisation(organisationCreationRequest);
@@ -185,16 +191,59 @@ public class AuthorizationFunctionalTest {
     }
 
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
-
-        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someFirstName";
+        return createUserRequest(userRoles, lastName, firstName);
+    }
+
+    protected NewUserCreationRequest createUserRequest(List<String> userRoles,
+                                                       String lastName,
+                                                       String firstName) {
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        String random = randomAlphabetic(10);
+        userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
+                "accessTypeId" + random, false));
+        String userEmail = generateRandomEmail();
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
+                .userAccessTypes(userAccessTypes)
                 .build();
+        return userCreationRequest;
+    }
+
+    protected NewUserCreationRequest createUserRequest(List<String> userRoles, boolean hasAccessTypes) {
+
+        String userEmail = generateRandomEmail();
+        String lastName = "someLastName";
+        String firstName = "someFirstName";
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        NewUserCreationRequest userCreationRequest;
+
+        if (hasAccessTypes) {
+            userAccessTypes
+                    .add(new UserAccessType("testJurisdictionId",
+                            "testOrganisationProfileId",
+                            "testAccessTypeId", true));
+            userCreationRequest = aNewUserCreationRequest()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(userEmail)
+                    .roles(userRoles)
+                    .userAccessTypes(userAccessTypes)
+                    .build();
+        } else {
+            userCreationRequest = aNewUserCreationRequest()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(userEmail)
+                    .roles(userRoles)
+                    .userAccessTypes(null)
+                    .build();
+        }
+
         return userCreationRequest;
     }
 
@@ -332,6 +381,77 @@ public class AuthorizationFunctionalTest {
 
     }
 
+    public void validateAccessTypesInRetrievedUser(Map<String, Object> searchResponse, String expectedStatus,
+                                                   Boolean rolesReturned, Boolean hasAccessType,
+                                                   String expectedUserIdentifier) {
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsersResponses).isNotEmpty();
+        assertThat(professionalUsersResponses).hasSize(1);
+        assertThat(professionalUsersResponses.get(0).get("idamStatus")).isEqualTo(expectedStatus);
+        assertThat(professionalUsersResponses.get(0).get("userIdentifier")).isEqualTo(expectedUserIdentifier);
+
+        if (hasAccessType) {
+            List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses
+                    .get(0).get("userAccessTypes");
+
+            assertThat(userAccessTypeList).isNotEmpty();
+            assertThat(userAccessTypeList).isNotNull();
+            assertThat(userAccessTypeList).hasSize(1);
+            assertEquals("testJurisdictionId", userAccessTypeList.get(0).get("jurisdictionId"));
+            assertEquals("testOrganisationProfileId",
+                    userAccessTypeList.get(0).get("organisationProfileId"));
+            assertEquals("testAccessTypeId", userAccessTypeList.get(0).get("accessTypeId"));
+            assertEquals(true, userAccessTypeList.get(0).get("enabled"));
+        }
+
+        HashMap userMap = professionalUsersResponses.get(0);
+        assertThat(userMap).isNotEmpty();
+        validateUserResponse(userMap, searchResponse);
+
+        if (rolesReturned) {
+            assertThat(userMap.get("roles")).isNotNull();
+            assertThat(userMap.get("roles")).asList().hasSize(1);
+        } else {
+            assertThat(userMap.get("roles")).isNull();
+        }
+    }
+
+    public void validateAccessTypesAndRolesInRetrievedUser(Map<String, Object> searchResponse,
+                                                           Boolean rolesReturned) {
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsersResponses).isNotEmpty();
+        assertThat(professionalUsersResponses).hasSize(1);
+
+        List<HashMap> userAccessTypeList = (List<HashMap>) professionalUsersResponses.get(0).get("userAccessTypes");
+        assertThat(userAccessTypeList).isNotEmpty();
+        assertThat(userAccessTypeList).isNotNull();
+
+        HashMap userMap = professionalUsersResponses.get(0);
+        assertThat(userMap).isNotEmpty();
+        validateUserResponse(userMap, searchResponse);
+        assertThat(userAccessTypeList).hasSize(2);
+
+        if (rolesReturned) {
+            assertThat(userMap.get("roles")).isNotNull();
+            assertThat(userMap.get("roles")).asList().hasSize(2);
+        } else {
+            assertThat(userMap.get("roles")).isNull();
+        }
+    }
+
+    public void validateUserResponse(HashMap userMap, Map<String, Object> searchResponse) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
+        assertThat(searchResponse.get("organisationProfileIds")).isNotNull();
+        assertThat(userMap.get("idamStatus")).isNotNull();
+        assertThat(userMap.get("userIdentifier")).isNotNull();
+        assertThat(userMap.get("firstName")).isNotNull();
+        assertThat(userMap.get("lastName")).isNotNull();
+        assertThat(userMap.get("email")).isNotNull();
+        assertThat(userMap.get("lastUpdated")).isNotNull();
+        assertThat(userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name()));
+    }
+
     public UserProfileUpdatedData deleteRoleRequest(String role) {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName = new RoleName(role);
@@ -347,6 +467,30 @@ public class AuthorizationFunctionalTest {
         Set<RoleName> roles = new HashSet<>();
         roles.add(roleName);
         userProfileUpdatedData.setRolesAdd(roles);
+        return userProfileUpdatedData;
+    }
+
+    public UserProfileUpdatedData addOrUpdateUserAccessType(UserAccessType userAccessType) {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        userAccessTypes.add(userAccessType);
+        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+        return userProfileUpdatedData;
+    }
+
+    public UserProfileUpdatedData addOrUpdateUserAccessTypeAndRole(String role, Set<UserAccessType> userAccessTypeSet) {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+
+        //adding new role
+        RoleName roleName = new RoleName(role);
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName);
+        userProfileUpdatedData.setRolesAdd(roles);
+
+        //adding new user access type
+        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypeSet);
         return userProfileUpdatedData;
     }
 
@@ -397,6 +541,49 @@ public class AuthorizationFunctionalTest {
                 }
             }
         });
+    }
+
+    public void validateRetrievedUsersDetails(Map<String, Object> searchResponse, String pageSize,
+                                              String sinceDate) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+        assertThat(searchResponse.get("lastRecordInPage")).isNotNull();
+        assertThat(searchResponse.get("moreAvailable")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+
+        if (pageSize != null) {
+            assertEquals(Integer.parseInt(pageSize), professionalUsersResponses.size());
+        }
+
+        for (Map user : professionalUsersResponses) {
+            HashMap<String, String> orgInfo = (HashMap<String, String>) user.get("organisationInfo");
+            assertThat(orgInfo).isNotNull();
+            String userStatus = orgInfo.get("status");
+            assertThat(userStatus).isNotNull();
+            if (userStatus.equalsIgnoreCase(IdamStatus.ACTIVE.name())) {
+                assertThat(user.get("userIdentifier")).isNotNull();
+            }
+            assertThat(user.get("lastUpdated")).isNotNull();
+            String lastUpdated = (String) user.get("lastUpdated");
+            lastUpdated = formatDateString(lastUpdated);
+            assertThat(orgInfo.get("organisationIdentifier")).isNotNull();
+            assertThat(orgInfo.get("status")).isNotNull();
+            assertThat(user.get("lastUpdated")).isNotNull();
+
+            if (sinceDate != null) {
+                LocalDateTime responseLocalDateTime = convertStringToLocalDate(lastUpdated);
+                assertTrue(responseLocalDateTime.isAfter(convertStringToLocalDate(sinceDate)));
+            }
+
+            List<Object> organisationProfileIdList = new ArrayList<>();
+            for (Map.Entry<String, String> entry : orgInfo.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (key.equals("organisationProfileIds")) {
+                    organisationProfileIdList.add(value);
+                }
+            }
+            assertThat(organisationProfileIdList).hasSizeGreaterThanOrEqualTo(1);
+        }
     }
 
     private void verifyContactInfoCreatedDateSorting(Object contactInformation) {
