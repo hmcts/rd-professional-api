@@ -1046,7 +1046,7 @@ public class ProfessionalReferenceDataClient {
 
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH
-            + "/contactInformation/"+dxAddressRequired+ "/"+organisationIdentifier;
+            + "/contactInformation/" + dxAddressRequired + "/" + organisationIdentifier;
         try {
             HttpEntity<ContactInformationCreationRequest> requestEntity =
                 new HttpEntity<>(contactInformationCreationRequest,
