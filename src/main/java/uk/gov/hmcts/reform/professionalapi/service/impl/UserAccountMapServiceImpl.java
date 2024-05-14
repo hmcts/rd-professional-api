@@ -40,7 +40,7 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
         }
     }
 
-    public void updateUser(ProfessionalUser existingAdmin,ProfessionalUser newAdmin){
+    public void updateUser(ProfessionalUser existingAdmin,ProfessionalUser newAdmin) {
 
         List<UserAccountMap> userAccountMaps = userAccountMapRepository
             .fetchByProfessionalUserId(existingAdmin.getId());
@@ -48,7 +48,8 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
         if (!userAccountMaps.isEmpty()) {
             userAccountMaps.forEach(userAccountMap -> {
                 UserAccountMapId userAccountMapId = userAccountMap.getUserAccountMapId();
-                UserAccountMap accMap = new UserAccountMap(new UserAccountMapId(newAdmin, userAccountMapId.getPaymentAccount()));
+                UserAccountMap accMap = new UserAccountMap(
+                    new UserAccountMapId(newAdmin, userAccountMapId.getPaymentAccount()));
                 userAccountMapRepository.save(accMap);
                 userAccountMapRepository.delete(userAccountMap);
             });
