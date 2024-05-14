@@ -51,9 +51,6 @@ public interface OrganisationService {
 
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
 
-    @Transactional
-    DeleteUserResponse deleteUserForOrganisation(Organisation organisation, List<String> emails);
-
     List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable);
 
     List<Organisation> getOrganisationByStatus(OrganisationStatus status);
