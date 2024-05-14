@@ -84,8 +84,8 @@ public class RefDataUtil {
     private static String loggingComponentName;
 
 
-    public static final String DEFAULT_ORG_PROFILE_ID = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
-    public static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
+    private static final String DEFAULT_ORG_PROFILE_ID = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+    private static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
             new SimpleEntry<>(OrganisationTypeConstants.SOLICITOR_ORG,
                     List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
             new SimpleEntry<>(OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
@@ -403,7 +403,7 @@ public class RefDataUtil {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
                 if (errorResponse != null) {
                     log.error("{}:: Response from UserProfileByEmail service call {}",
-                        loggingComponentName, errorResponse.getErrorDescription());
+                            loggingComponentName, errorResponse.getErrorDescription());
                 }
                 newUserResponse = new NewUserResponse();
             }
@@ -464,7 +464,7 @@ public class RefDataUtil {
     }
 
     private static void addAllAccessTypes(ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponse,
-                                   List<ProfessionalUser> professionalUsers) {
+                                          List<ProfessionalUser> professionalUsers) {
         for (ProfessionalUsersResponseWithoutRoles professionalUsersResponse : professionalUsersEntityResponse
                 .getUserProfiles()) {
             for (ProfessionalUser pu : professionalUsers) {
@@ -491,9 +491,9 @@ public class RefDataUtil {
     }
 
     public static ResponseEntity<Object> setOrgInfoInGetUserResponseAndSort(ResponseEntity<Object> responseEntity,
-                                                                   String organisationIdentifier,
-                                                                   OrganisationStatus organisationStatus,
-                                                                   List<String> organisationProfileIds) {
+                                                                     String organisationIdentifier,
+                                                                     OrganisationStatus organisationStatus,
+                                                                     List<String> organisationProfileIds) {
         ResponseEntity<Object> newResponseEntity;
         Object response = responseEntity.getBody();
         if (response instanceof ProfessionalUsersEntityResponse) {

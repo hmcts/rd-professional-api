@@ -454,5 +454,4 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return uca;
     }
 
-
 }
