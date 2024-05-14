@@ -696,10 +696,6 @@ public abstract class SuperController {
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }
 
-
-
-
-
     public String getUserToken() {
         var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return jwt.getTokenValue();
