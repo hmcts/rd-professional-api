@@ -611,6 +611,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    @Transactional
     public OrganisationResponse updateOrganisationNameOrSra(
         OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
         final String attributeKey = "regulators-0";
