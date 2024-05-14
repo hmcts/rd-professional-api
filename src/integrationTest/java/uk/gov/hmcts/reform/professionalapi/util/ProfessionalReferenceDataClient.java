@@ -1042,11 +1042,11 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> updateOrgContactInformation(
         ContactInformationCreationRequest contactInformationCreationRequest,
-        String role, String organisationIdentifier, Boolean dxAddressREquired) {
+        String role, String organisationIdentifier, Boolean dxAddressRequired) {
 
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH
-            + "/contactInformation/" + organisationIdentifier + dxAddressREquired;
+            + "/contactInformation/"+dxAddressRequired+ "/"+organisationIdentifier;
         try {
             HttpEntity<ContactInformationCreationRequest> requestEntity =
                 new HttpEntity<>(contactInformationCreationRequest,

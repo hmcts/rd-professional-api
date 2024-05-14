@@ -1759,11 +1759,11 @@ public class ProfessionalApiClient {
         ContactInformationCreationRequest
             contactInformationCreationRequest,
         HttpStatus expectedStatus,
-        String organisationId) {
+        String organisationId,Boolean dxAddressRequired) {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(contactInformationCreationRequest)
-            .put("/refdata/internal/v1/organisations/contactInformation/" + organisationId)
+            .put("/refdata/internal/v1/organisations/contactInformation/" +dxAddressRequired+ "/"+organisationId)
             .andReturn();
 
         response.then()

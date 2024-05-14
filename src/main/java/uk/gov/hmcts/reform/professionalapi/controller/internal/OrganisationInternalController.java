@@ -789,7 +789,7 @@ public class OrganisationInternalController extends SuperController {
 
 
     @PutMapping(
-        path = "/contactInformation/{orgId}",
+        path = "/contactInformation/{dxAddressRequired}/{orgId}",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )

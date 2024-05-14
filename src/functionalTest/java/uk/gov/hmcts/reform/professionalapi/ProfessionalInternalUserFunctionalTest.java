@@ -1280,7 +1280,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                     .postCode(contactInformationCreationRequest.getPostCode())
                     .dxAddress(contactInformationCreationRequest.getDxAddress())
                     .build(),
-                    OK,organisationIdentifier);
+                    OK,organisationIdentifier,true);
 
             assertNotNull(result);
             assertThat(result.getBody()).isNotNull();
