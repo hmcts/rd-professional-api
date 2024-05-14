@@ -602,10 +602,10 @@ public abstract class SuperController {
         contactInformationList.forEach(contactInfo -> {
 
             List<DxAddress> dxAddresses = contactInfo.getDxAddresses();
+            if (ObjectUtils.isEmpty(dxAddresses)) {
+                throw new InvalidRequest("No dx address found for organisation");
+            }
             dxAddresses.forEach(dxAddress -> {
-                if (ObjectUtils.isEmpty(dxAddresses)) {
-                    throw new InvalidRequest("No dx address found for organisation");
-                }
                 if (dxAddress.getDxNumber().equals(deletedxRequest.getDxNumber())) {
                     //delete the passed dxaddress  from the organisation
                     organisationService.deleteDxAddressForOrganisation(dxAddress.getDxNumber(), contactInfo.getId());
