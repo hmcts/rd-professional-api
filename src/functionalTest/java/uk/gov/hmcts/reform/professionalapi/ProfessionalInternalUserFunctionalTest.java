@@ -808,7 +808,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
         assertNotNull(orgUpdatedNameResponse.get("sraId"));
         assertThat(orgUpdatedNameResponse.get("sraId").toString()).contains(updatedSra);
-
+        assertThat(orgUpdatedNameResponse.get("orgAttributes").toString()).contains("regulators-0");    
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
 
