@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
@@ -98,8 +97,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -118,8 +115,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -2734,24 +2729,23 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_deleteUserForOrganisation() throws JsonProcessingException {
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        DeleteUserResponse deleteUserResponse = new DeleteUserResponse
-            (STATUS_CODE_204, "The organisation has deleted successfully");
-
         String deleteBody = new ObjectMapper().writeValueAsString(new NewUserResponse());
-        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
 
         when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
         doNothing().when(userAttributeRepositoryMock).deleteByProfessionalUserId(professionalUser.getId());
         doNothing().when(professionalUserRepositoryMock).delete(professionalUser);
 
-        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder().status(STATUS_CODE_204).reason("OK").body(deleteBody, UTF_8)
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
+            .status(STATUS_CODE_204).reason("OK").body(deleteBody, UTF_8)
             .request(mock(Request.class)).build());
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
         verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
 
+        DeleteUserResponse deleteUserResponse = new DeleteUserResponse(
+            STATUS_CODE_204, "The organisation has deleted successfully");
+        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
         deleteUserResponse = sut.deleteUserForOrganisation(emails);
         assertThat(deleteUserResponse).isNotNull();
         assertThat(deleteUserResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);

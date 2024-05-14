@@ -752,7 +752,7 @@ public class OrganisationInternalController extends SuperController {
         List<String> emails = userDeletionRequest.getEmails();
 
         var deleteUserResponse =
-            organisationService.deleteUserForOrganisation( emails);
+            organisationService.deleteUserForOrganisation(emails);
 
         return ResponseEntity
             .status(deleteUserResponse.getStatusCode())
