@@ -1235,6 +1235,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void updateContactInformationForOrganisationShouldReturnSuccess() {
         log.info("updateContactInformationForOrganisationShouldReturnSuccess :: STARTED");
 
