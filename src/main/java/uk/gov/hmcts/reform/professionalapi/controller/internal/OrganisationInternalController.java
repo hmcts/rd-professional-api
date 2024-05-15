@@ -36,10 +36,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -657,7 +655,6 @@ public class OrganisationInternalController extends SuperController {
                 .body(updatePbaStatusResponse);
     }
 
-
     @Operation(
             summary = "Retrieves the organisation details of a user",
             description = "**IDAM Roles to access API** : <br> prd-admin",
@@ -698,8 +695,6 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("userId") String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
-
-
 
     @Operation(
         summary = "Updates the  admin user of an Organisation",
