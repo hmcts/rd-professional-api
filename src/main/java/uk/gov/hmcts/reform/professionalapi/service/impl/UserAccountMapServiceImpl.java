@@ -39,28 +39,4 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
             }
         }
     }
-
-    public void updateUser(ProfessionalUser existingAdmin,ProfessionalUser newAdmin) {
-
-        List<UserAccountMap> userAccountMaps = userAccountMapRepository
-            .fetchByProfessionalUserId(existingAdmin.getId());
-        //Unable to update embeded key UserAccountMap hence creating new and deleting old
-        if (!userAccountMaps.isEmpty()) {
-            userAccountMaps.forEach(userAccountMap -> {
-                UserAccountMapId userAccountMapId = userAccountMap.getUserAccountMapId();
-                UserAccountMap accMap = new UserAccountMap(
-                    new UserAccountMapId(newAdmin, userAccountMapId.getPaymentAccount()));
-                userAccountMapRepository.save(accMap);
-                userAccountMapRepository.delete(userAccountMap);
-            });
-        }
-
-
-
-
-
-
-    }
-
-
 }

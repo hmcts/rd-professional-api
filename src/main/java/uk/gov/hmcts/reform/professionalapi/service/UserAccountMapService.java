@@ -8,6 +8,4 @@ import java.util.List;
 public interface UserAccountMapService {
 
     void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts);
-
-    void updateUser(ProfessionalUser existingAdmin, ProfessionalUser newAdmin);
 }

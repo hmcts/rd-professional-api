@@ -30,10 +30,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -93,10 +93,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_EMAIL_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -133,8 +132,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Autowired
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
     @Autowired
-    UserAttributeRepository userAttributeRepository;
-    @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
@@ -150,6 +147,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     ProfessionalUserService professionalUserService;
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
+    @Autowired
+    UserAttributeRepository userAttributeRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -290,7 +289,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
-
     public void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,
             Organisation organisation) {
@@ -365,26 +363,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         }
         return updatedOrganisationDetails;
-    }
-
-    public ResponseEntity<Object> updateOrganisationAdmin(UserUpdateRequest userUpdateRequest) {
-        if (isBlank(userUpdateRequest.getExistingAdminEmail())
-            || isBlank(userUpdateRequest.getNewAdminEmail())) {
-            throw new InvalidRequest(ERROR_MSG_EMAIL_FOUND);
-        }
-        // call professional service to fetch prof for existing user email
-        ProfessionalUser existingAdmin = professionalUserService
-            .findProfessionalUserByEmailAddress(userUpdateRequest.getExistingAdminEmail());
-        // call professional service to fetch user for new user email
-        ProfessionalUser newAdmin = professionalUserService
-            .findProfessionalUserByEmailAddress(userUpdateRequest.getNewAdminEmail());
-        //call userattribute service to update professional_id for
-        // userattribute set to new user where id was old user and prd_enum_type = 'ADMIN_ROLE'
-        userAttributeService.updateUser(existingAdmin,newAdmin);
-        //call useraccount map service to set professional id = new id where id = old user
-        userAccountMapService.updateUser(existingAdmin,newAdmin);
-
-        return ResponseEntity.status(200).build();
     }
 
     @Override
@@ -830,7 +808,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
-
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
                                                                 DeleteOrganisationResponse deleteOrganisationResponse,
                                                                 String prdAdminUserId) {
@@ -843,6 +820,38 @@ public class OrganisationServiceImpl implements OrganisationService {
                 + "::organisation deleted by::prdadmin::" + prdAdminUserId);
         return deleteOrganisationResponse;
     }
+    @Override
+    @Transactional
+    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
+        var deleteOrganisationResponse = new DeleteOrganisationResponse();
+        if(emails.isEmpty()){
+            throw new InvalidRequest("Please provide both email addresses");
+        }
+
+        Set<String> userIdsToBeDeleted= emails.stream().map(
+            email-> {
+                Set<String> userIds = new HashSet<>();
+                Optional.ofNullable(professionalUserRepository
+                    .findByEmailAddress(RefDataUtil.removeAllSpaces(email))).ifPresent(professionalUser -> {
+                    userIds.add(professionalUser.getUserIdentifier());
+                    userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
+                    professionalUserRepository.delete(professionalUser);
+                });
+                return userIds.stream().iterator().next();
+            }).collect(Collectors.toSet());;
+
+        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
+        deleteOrganisationResponse = RefDataUtil
+            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
+        if(deleteOrganisationResponse == null){
+            throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
+        }
+
+        return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode()
+            ,deleteOrganisationResponse.getMessage());
+    }
+
+
 
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {

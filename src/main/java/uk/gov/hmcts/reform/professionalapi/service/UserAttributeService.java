@@ -11,6 +11,4 @@ public interface UserAttributeService {
 
     List<UserAttribute> addUserAttributesToSuperUser(ProfessionalUser user,
                                                                       List<UserAttribute> attributes);
-
-    void updateUser(ProfessionalUser existingAdmin,ProfessionalUser newAdmin);
 }

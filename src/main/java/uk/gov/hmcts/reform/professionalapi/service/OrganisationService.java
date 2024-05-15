@@ -2,14 +2,13 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -83,7 +82,5 @@ public interface OrganisationService {
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
 
-    @Transactional
-    ResponseEntity<Object> updateOrganisationAdmin(UserUpdateRequest userUpdateRequest);
-
+    DeleteUserResponse deleteUserForOrganisation(List<String> emails);
 }
