@@ -710,8 +710,8 @@ public class OrganisationInternalController extends SuperController {
     )
     @ApiResponse(
         responseCode = "400",
-        description = "An invalid request was provided",
-        content = @Content
+        description = "Invalid request (PageSize or searchAfter) provided",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     @ApiResponse(
         responseCode = "401",
