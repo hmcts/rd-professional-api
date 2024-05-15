@@ -12,5 +12,4 @@ import java.util.UUID;
 public interface UserAccountMapRepository extends JpaRepository<UserAccountMap,UUID> {
 
     Optional<UserAccountMap> findByUserAccountMapId(UserAccountMapId userAccountMapId);
-
 }
