@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -27,14 +28,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
@@ -46,6 +52,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
 import java.util.Optional;
+import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -65,6 +72,14 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @Slf4j
 @NoArgsConstructor
 public class OrganisationInternalController extends SuperController {
+
+    protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
+
+    @Autowired
+    public OrganisationInternalController(
+            OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator) {
+        this.organisationByProfileIdsRequestValidator = organisationByProfileIdsRequestValidator;
+    }
 
     @Value("${loggingComponentName}")
     protected String loggingComponentName;
@@ -154,11 +169,12 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<Object> retrieveOrganisations(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @Parameter(name = "id") @RequestParam(value = "id", required = false) String id,
+            @Parameter(name = "since") @RequestParam(value = "since", required = false) String lastUpdatedSince,
             @Parameter(name = "status") @RequestParam(value = "status", required = false) String status,
             @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
 
-        return retrieveAllOrganisationOrById(id, status, page, size);
+        return retrieveAllOrganisationsOrById(id, lastUpdatedSince, status, page, size);
     }
 
 
@@ -693,7 +709,6 @@ public class OrganisationInternalController extends SuperController {
             @SecurityRequirement(name = "Authorization")
         }
     )
-
     @ApiResponse(
         responseCode = "200",
         description = "The admin user of the organisation has been successfully updated",
@@ -726,17 +741,21 @@ public class OrganisationInternalController extends SuperController {
         content = @Content
     )
 
-    @PutMapping(
-        path = "/updateadmin",
-        produces = APPLICATION_JSON_VALUE
-    )
-    @Secured("prd-admin")
-    public ResponseEntity<Object> updateOrgAdmin(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "adminUpdateRequest")
-        @Valid @NotNull @RequestBody UserUpdateRequest userUpdateRequest) {
+    @DeleteMapping(path = "/users")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Secured({"prd-admin"})
+    public ResponseEntity<DeleteUserResponse> deleteUserFromOrganisation(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
+        @Valid @NotNull @RequestBody UserDeletionRequest userDeletionRequest) {
 
-        return organisationService.updateOrganisationAdmin(userUpdateRequest);
+        List<String> emails = userDeletionRequest.getEmails();
+
+        DeleteUserResponse deleteUserResponse =
+            organisationService.deleteUserForOrganisation( emails);
+
+        return ResponseEntity
+            .status(deleteUserResponse.getStatusCode())
+            .body(deleteUserResponse);
 
     }
-
 }
