@@ -726,22 +726,22 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @PostMapping(
-        path = "/getOrganisationsByProfile",
-        produces = APPLICATION_JSON_VALUE
+          path = "/getOrganisationsByProfile",
+          produces = APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Object> retrieveOrganisationsByProfileIds(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-        @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
-        @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
-        @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+          @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
+          @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
+          @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
 
         organisationByProfileIdsRequestValidator.validate(pageSize);
 
         MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
-            organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
+                organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(response);
+             .status(HttpStatus.OK)
+             .body(response);
     }
 }
