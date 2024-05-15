@@ -735,21 +735,23 @@ public class OrganisationInternalController extends SuperController {
         content = @Content
     )
 
-    @DeleteMapping(path = "/users")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Secured({"prd-admin"})
-    public ResponseEntity<DeleteUserResponse> deleteUserFromOrganisation(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
-        @Valid @NotNull @RequestBody UserDeletionRequest userDeletionRequest) {
+    @PostMapping(
+        path = "/getOrganisationsByProfile",
+        produces = APPLICATION_JSON_VALUE
+    public ResponseEntity<Object> retrieveOrganisationsByProfileIds(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+        @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
+        @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
+        @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
 
-        List<String> emails = userDeletionRequest.getEmails();
+        organisationByProfileIdsRequestValidator.validate(pageSize);
 
-        DeleteUserResponse deleteUserResponse =
-            organisationService.deleteUserForOrganisation( emails);
+        MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
+            organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
 
         return ResponseEntity
-            .status(deleteUserResponse.getStatusCode())
-            .body(deleteUserResponse);
+            .status(HttpStatus.OK)
+            .body(response);
 
     }
 }
