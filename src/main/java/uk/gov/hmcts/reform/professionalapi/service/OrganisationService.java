@@ -81,5 +81,4 @@ public interface OrganisationService {
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
 
-
 }
