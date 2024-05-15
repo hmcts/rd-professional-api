@@ -17,12 +17,12 @@ public class UserAccountMapId implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "PROFESSIONAL_USER_ID",insertable = false,
-         updatable = false, nullable = false)
+        updatable = false, nullable = false)
     private ProfessionalUser professionalUser;
 
     @ManyToOne
     @JoinColumn(name = "PAYMENT_ACCOUNT_ID", insertable = false,
-         updatable = false, nullable = false)
+        updatable = false, nullable = false)
     private PaymentAccount paymentAccount;
 
 }
