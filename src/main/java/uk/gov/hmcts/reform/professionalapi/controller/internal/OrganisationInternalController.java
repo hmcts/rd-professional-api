@@ -703,6 +703,7 @@ public class OrganisationInternalController extends SuperController {
             @SecurityRequirement(name = "ServiceAuthorization")
         }
     )
+
     @ApiResponse(
         responseCode = "200",
         description = "List of matching organisations",
@@ -714,19 +715,8 @@ public class OrganisationInternalController extends SuperController {
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     @ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized Error : "
-            + "The requested resource is restricted and requires authentication",
-        content = @Content
-    )
-    @ApiResponse(
         responseCode = "403",
         description = "Forbidden Error: Access denied",
-        content = @Content
-    )
-    @ApiResponse(
-        responseCode = "404",
-        description = "No Organisation was found with the given organisationIdentifier",
         content = @Content
     )
     @ApiResponse(
@@ -738,6 +728,7 @@ public class OrganisationInternalController extends SuperController {
     @PostMapping(
         path = "/getOrganisationsByProfile",
         produces = APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<Object> retrieveOrganisationsByProfileIds(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
         @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
@@ -752,6 +743,5 @@ public class OrganisationInternalController extends SuperController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(response);
-
     }
 }
