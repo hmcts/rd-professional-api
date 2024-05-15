@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -65,7 +64,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -95,7 +93,6 @@ import java.util.stream.Stream;
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -147,8 +144,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     ProfessionalUserService professionalUserService;
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
-    @Autowired
-    UserAttributeRepository userAttributeRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -820,38 +815,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                 + "::organisation deleted by::prdadmin::" + prdAdminUserId);
         return deleteOrganisationResponse;
     }
-    @Override
-    @Transactional
-    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
-        var deleteOrganisationResponse = new DeleteOrganisationResponse();
-        if(emails.isEmpty()){
-            throw new InvalidRequest("Please provide both email addresses");
-        }
-
-        Set<String> userIdsToBeDeleted= emails.stream().map(
-            email-> {
-                Set<String> userIds = new HashSet<>();
-                Optional.ofNullable(professionalUserRepository
-                    .findByEmailAddress(RefDataUtil.removeAllSpaces(email))).ifPresent(professionalUser -> {
-                    userIds.add(professionalUser.getUserIdentifier());
-                    userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
-                    professionalUserRepository.delete(professionalUser);
-                });
-                return userIds.stream().iterator().next();
-            }).collect(Collectors.toSet());;
-
-        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
-        deleteOrganisationResponse = RefDataUtil
-            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-        if(deleteOrganisationResponse == null){
-            throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
-        }
-
-        return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode()
-            ,deleteOrganisationResponse.getMessage());
-    }
-
-
 
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {
