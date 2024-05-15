@@ -697,17 +697,16 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @Operation(
-        summary = "Updates the  admin user of an Organisation",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
+        summary = "Retrieves Organisations by Organisation Profile IDs",
+        description = "**Bearer token not required to access API. Only a valid s2s token**",
         security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
+            @SecurityRequirement(name = "ServiceAuthorization")
         }
     )
     @ApiResponse(
         responseCode = "200",
-        description = "The admin user of the organisation has been successfully updated",
-        content = @Content
+        description = "List of matching organisations",
+        content = @Content(schema = @Schema(implementation = MultipleOrganisationsResponse.class))
     )
     @ApiResponse(
         responseCode = "400",
