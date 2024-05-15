@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusRe
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -58,6 +59,7 @@ import javax.validation.constraints.Pattern;
 
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_1;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
@@ -697,51 +699,52 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @Operation(
-        summary = "Retrieves Organisations by Organisation Profile IDs",
-        description = "**Bearer token not required to access API. Only a valid s2s token**",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization")
-        }
+            summary = "Retrieves Organisations by Organisation Profile IDs",
+            description = "**Bearer token not required to access API. Only a valid s2s token**",
+            security = {
+                @SecurityRequirement(name = "ServiceAuthorization")
+            }
     )
 
     @ApiResponse(
-        responseCode = "200",
-        description = "List of matching organisations",
-        content = @Content(schema = @Schema(implementation = MultipleOrganisationsResponse.class))
+            responseCode = "200",
+            description = "List of matching organisations",
+            content = @Content(schema = @Schema(implementation = MultipleOrganisationsResponse.class))
     )
     @ApiResponse(
-        responseCode = "400",
-        description = "Invalid request (PageSize or searchAfter) provided",
-        content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            responseCode = "400",
+            description = "Invalid request (PageSize or searchAfter) provided",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
     )
     @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
     )
 
     @PostMapping(
-          path = "/getOrganisationsByProfile",
-          produces = APPLICATION_JSON_VALUE
+            path = "/getOrganisationsByProfile",
+            produces = APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Object> retrieveOrganisationsByProfileIds(
-          @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-          @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
-          @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
-          @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+            @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
+            @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
+            @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
 
         organisationByProfileIdsRequestValidator.validate(pageSize);
 
         MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
-                organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
+                        organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
 
         return ResponseEntity
-             .status(HttpStatus.OK)
-             .body(response);
+                .status(HttpStatus.OK)
+                .body(response);
     }
+
 }
