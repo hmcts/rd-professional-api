@@ -4,7 +4,7 @@ java:
   aadIdentityName: rd
   environment:
     POSTGRES_HOST: rd-professional-api-postgres-db-v16-{{ .Values.global.environment }}.postgres.database.azure.com
-    POSTGRES_USERNAME: DTS JIT Access rd DB Reader SC
+    POSTGRES_USERNAME: pgadmin
     POSTGRES_PORT: 5432
     CONTAINER_NAME: rd-prd-data
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
