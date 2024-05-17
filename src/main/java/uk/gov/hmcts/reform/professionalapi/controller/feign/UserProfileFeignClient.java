@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @FeignClient(name = "UserProfileClient", url = "${userProfUrl}", configuration = FeignInterceptorConfiguration.class)
+@SuppressWarnings("checkstyle:Indentation")
 public interface UserProfileFeignClient {
 
     @PostMapping(value = "/v1/userprofile")
