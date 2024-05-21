@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -32,9 +33,11 @@ import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +57,8 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
@@ -208,6 +213,75 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void deleteOrganisationScenarios() {
         deletePendingOrganisationShouldReturnSuccess();
         deleteActiveOrganisationShouldReturnSuccess();
+        deleteDxAddressShouldReturnSuccess();
+        deleteEmptyContactListShouldReturnError();
+        deleteEmptyDxAddressShouldReturnError();
+    }
+
+    @Test
+    public void deleteDxAddressShouldReturnSuccess() {
+        log.info("deleteDxAddressShouldReturnSuccess :: STARTED");
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+        JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+        String dxNumber = jsonPath.get("contactInformation[0].dxAddress[0].dxNumber");
+        String dxExchange = jsonPath.get("contactInformation[0].dxAddress[0].dxExchange");
+        Response deleteDxAddressResponse = professionalApiClient
+                .deleteDxAddress(new DxAddressCreationRequest(dxNumber, dxExchange),
+                orgIdentifier, NO_CONTENT);
+        assertThat(deleteDxAddressResponse).isNotNull();
+        assertThat(deleteDxAddressResponse.getStatusCode()).isEqualTo(204);
+        log.info("deleteDxAddressShouldReturnSuccess :: END");
+    }
+
+    @Test
+    public void deleteEmptyContactListShouldReturnError() {
+        log.info("deleteEmptyContactListShouldReturnError :: STARTED");
+        OrganisationCreationRequest orgCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .status("ACTIVE")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(generateRandomEmail().toLowerCase())
+                        .build()).contactInformation(new LinkedList<>()).build();
+
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin, orgCreationRequest);
+
+        Map<String, Object> deleteDxAddressResponse = professionalApiClient.deleteDxAddressWithResponse(
+                new DxAddressCreationRequest("DX 1234567890", "dxExchange"),orgIdentifier);
+        assertThat((String) deleteDxAddressResponse.get("errorDescription")).contains("No contact information  found");
+        log.info("deleteEmptyContactListShouldReturnError :: END");
+    }
+
+    @Test
+    public void deleteEmptyDxAddressShouldReturnError() {
+        log.info("deleteEmptyDxAddressShouldReturnError :: STARTED");
+        OrganisationCreationRequest orgCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .status("ACTIVE")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(generateRandomEmail().toLowerCase())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("address1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin, orgCreationRequest);
+
+        professionalApiClient.deleteDxAddress(new DxAddressCreationRequest("DX 1234567890", "dxExchange"),
+                        orgIdentifier, HttpStatus.NO_CONTENT);
+        Map<String, Object> deleteDxAddressResponse = professionalApiClient.deleteDxAddressWithResponse(
+                new DxAddressCreationRequest("DX 1234567890", "dxExchange"),orgIdentifier);
+
+        assertThat((String) deleteDxAddressResponse.get("errorDescription"))
+                .contains("No dx address found for organisation");
+
+        log.info("deleteEmptyDxAddressShouldReturnError :: END");
     }
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {

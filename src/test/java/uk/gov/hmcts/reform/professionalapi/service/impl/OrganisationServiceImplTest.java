@@ -2664,6 +2664,14 @@ class OrganisationServiceImplTest {
         assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
     }
 
+    @Test
+    void test_deleteDxAddressForOrganisation() {
+        String dxAddress = "dxAddress";
+        UUID randomUUID = UUID.randomUUID();
+        sut.deleteDxAddressForOrganisation(dxAddress, randomUUID);
+        verify(dxAddressRepositoryMock, times(1)).deleteByContactInfoId(dxAddress, randomUUID);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
         OrganisationProfileIdConstants.SOLICITOR_PROFILE,

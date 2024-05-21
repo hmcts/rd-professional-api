@@ -1549,6 +1549,31 @@ public class ProfessionalApiClient {
         return response;
     }
 
+    public Response deleteDxAddress(DxAddressCreationRequest dxAddressCreationRequest,String organisationId,
+                                    HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body(dxAddressCreationRequest)
+                .delete("/refdata/internal/v1/organisations/dxAddress/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("{}:: Delete DX Address response: {}", loggingComponentName, response.asString());
+        }
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response;
+    }
+
+    public Map<String, Object> deleteDxAddressWithResponse(DxAddressCreationRequest dxAddressCreationRequest,
+                                                           String organisationId) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body(dxAddressCreationRequest)
+                .delete("/refdata/internal/v1/organisations/dxAddress/" + organisationId)
+                .andReturn();
+        return response.body().as(Map.class);
+    }
+
     public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
             .body("")
