@@ -74,6 +74,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @RestController
 @Slf4j
 @NoArgsConstructor
+@SuppressWarnings("checkstyle:Indentation")
 public class OrganisationInternalController extends SuperController {
 
     protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;

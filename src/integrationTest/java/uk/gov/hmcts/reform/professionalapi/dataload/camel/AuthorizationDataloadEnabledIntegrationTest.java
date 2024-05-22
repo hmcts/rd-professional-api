@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.util.SpringBootIntegrationTest;
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
         "USER_PROFILE_URL:http://127.0.0.1:8091"})
 @DirtiesContext
+@SuppressWarnings("checkstyle:Indentation")
 public abstract class AuthorizationDataloadEnabledIntegrationTest extends SpringBootIntegrationTest implements
     IntegrationTestSupport {
 
