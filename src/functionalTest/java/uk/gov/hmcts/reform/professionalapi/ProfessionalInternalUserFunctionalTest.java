@@ -622,7 +622,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("updateOrgMFAShouldReturn403 :: END");
     }
 
-    public void  updateOrgStatusScenarios() {
+    public void updateOrgStatusScenarios() {
         updateOrgStatusShouldBeSuccess();
     }
 
@@ -785,7 +785,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisation();
         Map<String, Object> organisations = professionalApiClient
-            .retrieveAllOrganisationsWithPagination(hmctsAdmin, "1", "2");
+                .retrieveAllOrganisationsWithPagination(hmctsAdmin, "1", "2");
 
         assertThat(organisations).isNotNull().hasSize(2);
 
@@ -1231,4 +1231,59 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .sorted(Comparator.comparing(map -> (String) map.get(key)))
                 .collect(Collectors.toList());
     }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+    void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
+        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA0000021");
+        paymentAccounts.add("PBA0000022");
+        paymentAccounts.add("PBA0000023");
+
+        setUpTestData();
+        setUpUserBearerTokens(List.of(puiFinanceManager));
+
+        PbaRequest deletePbaRequest = new PbaRequest();
+        deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
+
+        String pfmBearerTokens = null;
+        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
+                professionalApiClient.getMultipleAuthHeaders(null), FORBIDDEN);
+
+        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
+    }
+
+    private void setUpUserBearerTokens(List<String> puiFinanceManager) {
+    }
+
+    @Test
+    //@ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    //@ExtendWith(FeatureToggleConditionExtension.class)
+    void deletePbaOfExistingOrganisationShouldBeSuccess() {
+        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
+
+
+
+        setUpTestData();
+        setUpUserBearerTokens(List.of(puiFinanceManager));
+
+        PbaRequest deletePbaRequest = new PbaRequest();
+        deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
+
+        String pfmBearerToken = null;
+        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
+                professionalApiClient.getMultipleAuthHeaders(null), NO_CONTENT);
+
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(null));
+
+        var paymentAccounts = (List<String>) response.get("paymentAccount");
+        assertThat(paymentAccounts).isEmpty();
+        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: END");
+    }
 }
+
