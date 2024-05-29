@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
@@ -285,8 +286,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public void addContactInformationToOrganisation(
-            List<ContactInformationCreationRequest> contactInformationCreationRequest,
-            Organisation organisation) {
+        List<ContactInformationCreationRequest> contactInformationCreationRequest,
+        Organisation organisation) {
 
         if (contactInformationCreationRequest != null) {
             contactInformationCreationRequest.forEach(contactInfo -> {
@@ -321,8 +322,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
-    private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
-                                                  ContactInformation contactInformation) {
+    public void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
+                                                 ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {
@@ -1054,6 +1055,66 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
+    }
+
+    @Override
+    public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        ContactInformationCreationRequest contactInformationRequest, String organisationIdentifier,
+        Boolean dxAddressRequired) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        if (organisation == null) {
+            throw new ResourceNotFoundException("Organisation does not exist");
+        }
+
+        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
+
+        if (!existingContactInformationList.isEmpty()) {
+            if (contactInformationRequest != null) {
+                if (existingContactInformationList.size() == 1) {
+                    //If single address is present then update address details
+                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation,
+                        dxAddressRequired);
+                } else if (!contactInformationRequest.getUprn().isEmpty()
+                    && (contactInformationRequest.getUprn()
+                    .equalsIgnoreCase(existingContactInformationList.get(0).getUprn()))) {
+                    // If multiple addresses present then update address details for provided UPRN
+                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation,
+                        dxAddressRequired);
+                } else { // If UPRN not set in db for the contact or nto sent in request then throw error
+                    throw new ResourceNotFoundException("No UPRN value found in existing contact information ");
+                }
+            } else { // If contact information does not exist in db for the organisation
+                throw new ResourceNotFoundException("No contact information found in request");
+            }
+        } else { // If request is made without contact information details
+            throw new ResourceNotFoundException("No contact information existing for given organisation");
+        }
+        return ResponseEntity.status(200).build();
+    }
+
+
+    private void updateContactInformation(List<ContactInformation> existingContactInformationList,
+                                       ContactInformationCreationRequest contactInfoRequest,Organisation organisation,
+                                          Boolean dxAddressRequired) {
+        existingContactInformationList.forEach(existingInfo -> {
+            existingInfo.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
+            existingInfo.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
+            existingInfo.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine3()));
+            existingInfo.setTownCity(RefDataUtil.removeEmptySpaces(contactInfoRequest.getTownCity()));
+            existingInfo.setCounty(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCounty()));
+            existingInfo.setCountry(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCountry()));
+            existingInfo.setPostCode(RefDataUtil.removeEmptySpaces(contactInfoRequest.getPostCode()));
+            existingInfo.setOrganisation(organisation);
+            existingInfo.setLastUpdated(LocalDateTime.now());
+            ContactInformation savedContactInformation = contactInformationRepository.save(existingInfo);
+            if (dxAddressRequired && contactInfoRequest.getDxAddress().isEmpty()) {
+                throw new ResourceNotFoundException("No Dx Address Information provided in request");
+            } else {
+                addDxAddressToContactInformation(contactInfoRequest.getDxAddress(), savedContactInformation);
+            }
+        });
     }
 
 }

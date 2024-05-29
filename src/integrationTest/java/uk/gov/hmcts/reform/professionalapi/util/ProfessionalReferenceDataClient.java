@@ -1039,4 +1039,30 @@ public class ProfessionalReferenceDataClient {
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
     }
+
+    public Map<String, Object> updateOrgContactInformation(
+        ContactInformationCreationRequest contactInformationCreationRequest,
+        String role, String organisationIdentifier, Boolean dxAddressRequired) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH
+            + "/contactInformation/" + dxAddressRequired + "/" + organisationIdentifier;
+        try {
+            HttpEntity<ContactInformationCreationRequest> requestEntity =
+                new HttpEntity<>(contactInformationCreationRequest,
+                getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> contactInformationResponse = new HashMap<>();
+        contactInformationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return contactInformationResponse;
+    }
+
+
 }
