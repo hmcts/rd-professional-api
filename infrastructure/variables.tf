@@ -120,3 +120,8 @@ variable "pgsql_server_configuration" {
     }
   ]
 }
+
+variable "pgsql_sku" {
+  description = "The PGSql flexible server instance sku"
+  default     = "GP_Standard_D2s_v3"
+}
