@@ -72,7 +72,7 @@ module "db-professional-ref-data-v16" {
 
   subnet_suffix        = "expanded"
   pgsql_version        = "16"
-  pgsql_sku          = var.pgsql_sku
+  pgsql_sku            = var.pgsql_sku
   product              = "rd"
   name               = join("-", [var.product-v16, var.component-v16])
 
