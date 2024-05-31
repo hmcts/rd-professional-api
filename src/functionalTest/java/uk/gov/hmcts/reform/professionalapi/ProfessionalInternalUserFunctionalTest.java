@@ -1246,10 +1246,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 "firstName2", "lastName2");
 
         PbaRequest deletePbaRequest = new PbaRequest();
-        deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
+        deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
         professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(bearerToken), FORBIDDEN);
+                professionalApiClient.getMultipleAuthHeaders(bearerToken), BAD_REQUEST);
 
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
     }
