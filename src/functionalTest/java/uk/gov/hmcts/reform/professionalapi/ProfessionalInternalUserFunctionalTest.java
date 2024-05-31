@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,12 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+import static org.springframework.http.HttpStatus.*;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -1233,31 +1229,41 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    //@ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    //@ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
-        Set<String> paymentAccounts = new HashSet<>();
-        paymentAccounts.add("PBA0000021");
-        paymentAccounts.add("PBA0000022");
-        paymentAccounts.add("PBA0000023");
-
         setUpTestData();
-        setUpUserBearerTokens(List.of(puiFinanceManager));
+        String bearerToken = inviteUser(puiFinanceManager, intActiveOrgId, generateRandomEmail(),
+                "firstName2", "lastName2");
 
         PbaRequest deletePbaRequest = new PbaRequest();
-        deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
+        deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
 
-        String pfmBearerTokens = null;
         professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(null), FORBIDDEN);
+                professionalApiClient.getMultipleAuthHeaders(bearerToken), FORBIDDEN);
 
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
     }
 
-    private void setUpUserBearerTokens(List<String> puiFinanceManager) {
+    public String inviteUser(String role,
+                             String orgId,
+                             String email,
+                             String firstName,
+                             String lastName) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(role);
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(userRoles);
+        newUserCreationRequest.setEmail(email);
+        String bearerToken = idamOpenIdClient.getExternalOpenIdToken(puiUserManager,
+                firstName, lastName, email);
+
+        Map<String, Object> pumInternalUserResponse = professionalApiClient
+                .addNewUserToAnOrganisation(orgId, hmctsAdmin, newUserCreationRequest, CREATED);
+        assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
+        return bearerToken;
     }
 
     @Test
@@ -1266,20 +1272,31 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
 
+        organisationCreationRequest = createOrganisationRequest()
+                .superUser(aUserCreationRequest()
+                        .firstName("firstName")
+                        .lastName("lastName")
+                        .email(generateRandomEmail())
+                        .build())
+                .paymentAccount(Set.of("PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
+                        "PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
+                        "PBA".concat(RandomStringUtils.randomAlphanumeric(7))))
+                .status("ACTIVE")
+                .build();
+        String intActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+                hmctsAdmin);
 
-
-        setUpTestData();
-        setUpUserBearerTokens(List.of(puiFinanceManager));
+        String bearerToken = inviteUser(puiFinanceManager, intActiveOrgId, generateRandomEmail(),
+                "firstName2", "lastName2");
 
         PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
 
-        String pfmBearerToken = null;
         professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(null), NO_CONTENT);
+                professionalApiClient.getMultipleAuthHeaders(bearerToken), NO_CONTENT);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
-                professionalApiClient.getMultipleAuthHeaders(null));
+                professionalApiClient.getMultipleAuthHeaders(bearerToken));
 
         var paymentAccounts = (List<String>) response.get("paymentAccount");
         assertThat(paymentAccounts).isEmpty();
