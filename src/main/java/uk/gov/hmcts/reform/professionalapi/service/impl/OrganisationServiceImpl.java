@@ -1111,7 +1111,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             ContactInformation savedContactInformation = contactInformationRepository.save(existingInfo);
             if (dxAddressRequired && contactInfoRequest.getDxAddress().isEmpty()) {
                 throw new ResourceNotFoundException("No Dx Address Information provided in request");
-            } else {
+            } else if (dxAddressRequired) {
                 addDxAddressToContactInformation(contactInfoRequest.getDxAddress(), savedContactInformation);
             }
         });
