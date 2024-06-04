@@ -11,9 +11,4 @@ import java.util.UUID;
 @Repository
 public interface UserAttributeRepository extends JpaRepository<UserAttribute, UUID> {
 
-    @Modifying
-    @Query(value = "delete from dbrefdata.user_attribute ua where ua.professional_user_id = :profUserId ",
-        nativeQuery = true)
-    void deleteByProfessionalUserId(UUID profUserId);
-
 }

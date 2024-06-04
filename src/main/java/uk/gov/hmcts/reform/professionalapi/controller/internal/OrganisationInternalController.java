@@ -36,10 +36,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -749,62 +747,4 @@ public class OrganisationInternalController extends SuperController {
                 .body(response);
     }
 
-    @Operation(
-        summary = "Deletes the provided list of user accounts from the organisation.",
-        description = "**IDAM Roles to access API** : <br> - pui-finance-manager",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        }
-    )
-    @ApiResponse(
-        responseCode = "204",
-        description = "Successfully deleted the list of user accounts from the organisation.",
-        content = @Content
-    )
-    @ApiResponse(
-        responseCode = "400",
-        description = DEL_ORG_PBA_NOTES_1,
-        content = @Content
-    )
-    @ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized Error : "
-            + "The requested resource is restricted and requires authentication",
-        content = @Content
-    )
-    @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: "
-            + "Access denied for either invalid permissions or user is pending",
-        content = @Content
-    )
-    @ApiResponse(
-        responseCode = "404",
-        description = "Resource Not Found Error: The user does not exist",
-        content = @Content
-    )
-    @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
-    )
-
-    @DeleteMapping(path = "/users")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Secured({"prd-admin"})
-    public ResponseEntity<DeleteUserResponse> deleteUserFromOrganisation(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
-        @Valid @NotNull @RequestBody UserDeletionRequest userDeletionRequest) {
-
-        List<String> emails = userDeletionRequest.getEmails();
-
-        DeleteUserResponse deleteUserResponse =
-            organisationService.deleteUserForOrganisation(emails);
-
-        return ResponseEntity
-            .status(deleteUserResponse.getStatusCode())
-            .body(deleteUserResponse);
-
-    }
 }
