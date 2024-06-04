@@ -59,6 +59,7 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
     @MockBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
+
     @Bean
     @Primary
     protected OrganisationInternalController organisationInternalController() {
