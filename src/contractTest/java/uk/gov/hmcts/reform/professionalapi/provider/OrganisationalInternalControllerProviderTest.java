@@ -107,7 +107,6 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @Autowired
     OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
 
-
     public static final String ORG_NAME = "Org-Name";
     public static final String SRA_ID = "sra-id";
     public static final String COMPANY_NUMBER = "companyN";
