@@ -57,7 +57,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -77,7 +76,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
