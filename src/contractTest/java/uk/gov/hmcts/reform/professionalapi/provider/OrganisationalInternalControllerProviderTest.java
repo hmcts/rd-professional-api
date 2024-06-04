@@ -33,10 +33,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -71,6 +71,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     OrganisationRepository organisationRepository;
 
     @Autowired
+    OrgAttributeRepository orgAttributeRepository;
+
+    @Autowired
     PaymentAccountRepository paymentAccountRepository;
 
 
@@ -103,9 +106,6 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
-
-    @Autowired
-    UserAttributeRepository userAttributeRepository;
 
 
     public static final String ORG_NAME = "Org-Name";
