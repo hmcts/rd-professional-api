@@ -100,7 +100,6 @@ import java.util.stream.Stream;
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -841,29 +840,31 @@ public class OrganisationServiceImpl implements OrganisationService {
             Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
                 .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
             if (!professionalUser.isEmpty()) {
-               if (!professionalUser.get().getRoles().contains(PrdEnumType.ADMIN_ROLE.name()) &&
-                   !professionalUser.get().getRoles().contains(PrdEnumType.SIDAM_ROLE.name())) {
-                   //Users to be deleted from usre profile database
-                   userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
-                   //Delete usres from User Account Map
-                   List<PaymentAccount> paymentAccountsList = professionalUser.get().getOrganisation().getPaymentAccounts();
-                   if (!paymentAccountsList.isEmpty()) {
-                       List<UserAccountMap> userAccountMaps = new ArrayList<>();
-                       paymentAccountsList.forEach(paymentAccount ->
-                           userAccountMaps.add(new UserAccountMap(new UserAccountMapId(professionalUser.get(), paymentAccount))));
-                       if (!CollectionUtils.isEmpty(userAccountMaps)) {
-                           userAccountMapRepository.deleteAll(userAccountMaps);
-                       }
-                   }
-                   //Delete usres from User attribute table
-                   userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
-                   //Delete usres from professional user table
-                   professionalUserRepository.delete(professionalUser.get());
-               }
+                if (!professionalUser.get().getRoles().contains(PrdEnumType.ADMIN_ROLE.name())
+                    && !professionalUser.get().getRoles().contains(PrdEnumType.SIDAM_ROLE.name())) {
+                    //Users to be deleted from usre profile database
+                    userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                    //Delete usres from User Account Map
+                    List<PaymentAccount> paymentAccountsList = professionalUser.get().getOrganisation()
+                        .getPaymentAccounts();
+                    if (!paymentAccountsList.isEmpty()) {
+                        List<UserAccountMap> userAccountMaps = new ArrayList<>();
+                        paymentAccountsList.forEach(paymentAccount ->
+                            userAccountMaps.add(new UserAccountMap(
+                               new UserAccountMapId(professionalUser.get(), paymentAccount))));
+                        if (!CollectionUtils.isEmpty(userAccountMaps)) {
+                            userAccountMapRepository.deleteAll(userAccountMaps);
+                        }
+                    }
+                    //Delete usres from User attribute table
+                    userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
+                    //Delete usres from professional user table
+                    professionalUserRepository.delete(professionalUser.get());
+                }
             }
         });
         Optional<DeleteOrganisationResponse> deleteOrganisationResponse = null;
-        if(!userIdsToBeDeleted.isEmpty()) {
+        if (!userIdsToBeDeleted.isEmpty()) {
             DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
             deleteOrganisationResponse = Optional.ofNullable(RefDataUtil
                 .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient));

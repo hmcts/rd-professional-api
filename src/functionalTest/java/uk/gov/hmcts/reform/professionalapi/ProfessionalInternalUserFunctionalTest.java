@@ -899,7 +899,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         UserDeletionRequest userDeletionRequest = new UserDeletionRequest(emails);
 
         JsonPath response = professionalApiClient.deleteUserFromOrganisation(userDeletionRequest,OK);
-
+        Response getUserResponse = professionalApiClient.retrieveUserByIdNotFound(intActiveOrgId);
+        assertThat(getUserResponse).isNull();
         assertThat(response).isNotNull();
 
         log.info("deletUserFromProfessionalAndUserProfileShouldReturnSuccess :: END");
