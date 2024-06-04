@@ -834,16 +834,18 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (emails.isEmpty()) {
             throw new InvalidRequest("Please provide both email addresses");
         }
-
-        Set<String> userIdsToBeDeleted = new HashSet<>();
+        StringBuilder failedIds = new StringBuilder();
+        //DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         emails.forEach(email -> {
             Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
                 .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
             if (!professionalUser.isEmpty()) {
-                if (!professionalUser.get().getRoles().contains(PrdEnumType.ADMIN_ROLE.name())
-                    && !professionalUser.get().getRoles().contains(PrdEnumType.SIDAM_ROLE.name())) {
-                    //Users to be deleted from usre profile database
-                    userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                UserAttribute userAttribute = userAttributeRepository
+                    .findByProfessionalUserId(professionalUser.get().getId());
+                if (userAttribute != null && !userAttribute.getPrdEnum().getPrdEnumId().getEnumType()
+                        .contains(PrdEnumType.ADMIN_ROLE.name())
+                    && !userAttribute.getPrdEnum().getPrdEnumId().getEnumType()
+                    .contains(PrdEnumType.SIDAM_ROLE.name())) {
                     //Delete usres from User Account Map
                     List<PaymentAccount> paymentAccountsList = professionalUser.get().getOrganisation()
                         .getPaymentAccounts();
@@ -853,27 +855,55 @@ public class OrganisationServiceImpl implements OrganisationService {
                             userAccountMaps.add(new UserAccountMap(
                                new UserAccountMapId(professionalUser.get(), paymentAccount))));
                         if (!CollectionUtils.isEmpty(userAccountMaps)) {
-                            userAccountMapRepository.deleteAll(userAccountMaps);
+                            deleteUserAccountMap(userAccountMaps);
                         }
                     }
-                    //Delete usres from User attribute table
-                    userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
+                    //Delete users from User attribute table
+                    deleteUserAttribute(professionalUser.get());
                     //Delete usres from professional user table
-                    professionalUserRepository.delete(professionalUser.get());
+                    deleteProfessionalUser(professionalUser.get());
+                    //Users to be deleted from usre profile database
+                    Set<String> userIdsToBeDeleted = new HashSet<>();
+                    userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                    DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
+                    DeleteOrganisationResponse deleteOrganisationResponse = deleteUserProfile(deleteUserRequest);
+                    if (deleteOrganisationResponse == null) {
+                        failedIds.append(professionalUser.get().getUserIdentifier());
+                    }
                 }
             }
         });
-        Optional<DeleteOrganisationResponse> deleteOrganisationResponse = null;
-        if (!userIdsToBeDeleted.isEmpty()) {
-            DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
-            deleteOrganisationResponse = Optional.ofNullable(RefDataUtil
-                .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient));
+        DeleteUserResponse response = null;
+        if (failedIds.isEmpty()) {
+            response =  new DeleteUserResponse(ProfessionalApiConstants.ERROR_CODE_400,
+                ProfessionalApiConstants.ERROR_USER_DELETED_UP  + " " + failedIds);
+        } else {
+            response = new DeleteUserResponse(ProfessionalApiConstants.STATUS_CODE_204,
+                ProfessionalApiConstants.DEL_USER_UP);
         }
-        return new DeleteUserResponse(deleteOrganisationResponse.get().getStatusCode(),
-            deleteOrganisationResponse.get().getMessage());
+        return response;
     }
 
 
+    @Transactional
+    private void deleteUserAccountMap(List<UserAccountMap> userAccountMaps) {
+        userAccountMapRepository.deleteAll(userAccountMaps);
+    }
+
+    @Transactional
+    private void deleteProfessionalUser(ProfessionalUser professionalUser) {
+        professionalUserRepository.delete(professionalUser);
+    }
+
+    @Transactional
+    private void deleteUserAttribute(ProfessionalUser professionalUser) {
+        userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
+    }
+
+    @Transactional
+    private DeleteOrganisationResponse deleteUserProfile(DeleteUserProfilesRequest deleteUserRequest) {
+        return RefDataUtil.deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
+    }
 
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {

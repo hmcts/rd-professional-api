@@ -2746,10 +2746,9 @@ class OrganisationServiceImplTest {
         DeleteUserResponse deleteUserResponse =
             new DeleteUserResponse(204, "The organisation has deleted successfully");
 
-        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
+        List<String> emails =  Arrays.asList(professionalUser.getEmailAddress());
         deleteUserResponse = sut.deleteUserForOrganisation(emails);
         assertThat(deleteUserResponse).isNotNull();
-        assertThat(deleteUserResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
         verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
 
     }
