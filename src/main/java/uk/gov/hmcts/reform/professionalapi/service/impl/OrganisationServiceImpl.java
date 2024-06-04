@@ -15,9 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.PrdEnumType;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
@@ -55,6 +57,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -65,6 +69,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -149,6 +154,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     OrgAttributeRepository orgAttributeRepository;
     @Autowired
     UserAttributeRepository userAttributeRepository;
+    @Autowired
+    UserAccountMapRepository userAccountMapRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -821,42 +828,48 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
+
     @Override
     @Transactional
     public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
-        var deleteOrganisationResponse = new DeleteOrganisationResponse();
         if (emails.isEmpty()) {
             throw new InvalidRequest("Please provide both email addresses");
         }
 
-        Set<String> userIdsToBeDeleted = emails.stream().map(
-            email -> {
-                Set<String> userIds = new HashSet<>();
-                Optional.ofNullable(professionalUserRepository
-                        .findByEmailAddress(RefDataUtil.removeAllSpaces(email)))
-                    .ifPresentOrElse(professionalUser -> {
-                        userIds.add(professionalUser.getUserIdentifier());
-                        userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
-                        professionalUserRepository.delete(professionalUser);
-                    }, () -> {
-                            throw new InvalidRequest("Email addresses provided do not exist"); });
-                return userIds.stream().iterator().next();
-            }).collect(Collectors.toSet());
-
-        if (userIdsToBeDeleted.isEmpty()) {
-            throw new InvalidRequest("Could not find users to delete");
+        Set<String> userIdsToBeDeleted = new HashSet<>();
+        emails.forEach(email -> {
+            Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
+                .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
+            if (!professionalUser.isEmpty()) {
+               if (!professionalUser.get().getRoles().contains(PrdEnumType.ADMIN_ROLE.name()) &&
+                   !professionalUser.get().getRoles().contains(PrdEnumType.SIDAM_ROLE.name())) {
+                   //Users to be deleted from usre profile database
+                   userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                   //Delete usres from User Account Map
+                   List<PaymentAccount> paymentAccountsList = professionalUser.get().getOrganisation().getPaymentAccounts();
+                   if (!paymentAccountsList.isEmpty()) {
+                       List<UserAccountMap> userAccountMaps = new ArrayList<>();
+                       paymentAccountsList.forEach(paymentAccount ->
+                           userAccountMaps.add(new UserAccountMap(new UserAccountMapId(professionalUser.get(), paymentAccount))));
+                       if (!CollectionUtils.isEmpty(userAccountMaps)) {
+                           userAccountMapRepository.deleteAll(userAccountMaps);
+                       }
+                   }
+                   //Delete usres from User attribute table
+                   userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
+                   //Delete usres from professional user table
+                   professionalUserRepository.delete(professionalUser.get());
+               }
+            }
+        });
+        Optional<DeleteOrganisationResponse> deleteOrganisationResponse = null;
+        if(!userIdsToBeDeleted.isEmpty()) {
+            DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
+            deleteOrganisationResponse = Optional.ofNullable(RefDataUtil
+                .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient));
         }
-
-        DeleteUserProfilesRequest deleteUserProfileRequest =
-            new DeleteUserProfilesRequest(userIdsToBeDeleted.stream().collect(
-            Collectors.toSet()));
-        deleteOrganisationResponse = RefDataUtil
-            .deleteUserProfilesFromUp(deleteUserProfileRequest, userProfileFeignClient);
-        if (deleteOrganisationResponse == null) {
-            throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
-        }
-        return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode(),
-            deleteOrganisationResponse.getMessage());
+        return new DeleteUserResponse(deleteOrganisationResponse.get().getStatusCode(),
+            deleteOrganisationResponse.get().getMessage());
     }
 
 
