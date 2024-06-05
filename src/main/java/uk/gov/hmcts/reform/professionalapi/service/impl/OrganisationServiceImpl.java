@@ -367,6 +367,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         return updatedOrganisationDetails;
     }
 
+    @Transactional
     public ResponseEntity<Object> updateOrganisationAdmin(UserUpdateRequest userUpdateRequest) {
         if (isBlank(userUpdateRequest.getExistingAdminEmail())
             || isBlank(userUpdateRequest.getNewAdminEmail())) {
