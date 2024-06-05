@@ -27,9 +27,9 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     @Autowired
     public UserAttributeServiceImpl(
-            UserAttributeRepository userAttributeRepository,
-            PrdEnumRepository prdEnumRepository,
-            PrdEnumServiceImpl prdEnumService) {
+        UserAttributeRepository userAttributeRepository,
+        PrdEnumRepository prdEnumRepository,
+        PrdEnumServiceImpl prdEnumService) {
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
         this.prdEnumService = prdEnumService;
@@ -37,15 +37,15 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     @Override
     public void addUserAttributesToUser(ProfessionalUser newUser, List<String> userRoles, List<PrdEnum> prdEnums) {
-        List<UserAttribute> userAttributes =  new ArrayList<>();
+        List<UserAttribute> userAttributes = new ArrayList<>();
 
         userRoles.forEach(role -> {
             for (PrdEnum prdEnum : prdEnums) {
                 if (prdEnum.getEnumName().equals(role)) {
                     PrdEnum newPrdEnum = new PrdEnum(
-                            prdEnum.getPrdEnumId(),
-                            RefDataUtil.removeEmptySpaces(prdEnum.getEnumName()),
-                            RefDataUtil.removeEmptySpaces(prdEnum.getEnumDescription()));
+                        prdEnum.getPrdEnumId(),
+                        RefDataUtil.removeEmptySpaces(prdEnum.getEnumName()),
+                        RefDataUtil.removeEmptySpaces(prdEnum.getEnumDescription()));
 
                     UserAttribute userAttribute = new UserAttribute(newUser, newPrdEnum);
                     userAttributes.add(userAttribute);
@@ -61,14 +61,14 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     @Override
     public List<UserAttribute> addUserAttributesToSuperUser(ProfessionalUser user,
-                                                                             List<UserAttribute> attributes) {
+                                                            List<UserAttribute> attributes) {
         prdEnumService.findAllPrdEnums().stream()
-                .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType()))
-                .map(prdEnum -> {
-                    PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(),
-                            prdEnum.getEnumDescription());
-                    return new UserAttribute(user, e);
-                }).forEach(attributes::add);
+            .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType()))
+            .map(prdEnum -> {
+                PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(),
+                    prdEnum.getEnumDescription());
+                return new UserAttribute(user, e);
+            }).forEach(attributes::add);
 
         if (!CollectionUtils.isEmpty(attributes)) {
             userAttributeRepository.saveAll(attributes);
@@ -80,21 +80,19 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     public boolean isValidEnumType(String enumType) {
         return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
-                || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name());
+            || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name());
     }
 
-    public void updateUser(ProfessionalUser existingAdmin,ProfessionalUser newAdmin) {
+    public void updateUser(ProfessionalUser existingAdmin, ProfessionalUser newAdmin) {
         List<UserAttribute> userAttributes = userAttributeRepository
             .fetchByProfessionalUserIdAndPrdEnumType(existingAdmin.getId());
-        userAttributes.forEach(userAttribute -> {
-            if (userAttribute.getPrdEnum().getPrdEnumId().getEnumType().equalsIgnoreCase(
-                PrdEnumType.ADMIN_ROLE.name())) {
+        if (userAttributes.size() > 0) {
+            userAttributes.forEach(userAttribute -> {
                 userAttribute.setProfessionalUser(newAdmin);
                 userAttributeRepository.save(userAttribute);
-            } else {
-                throw new InvalidRequest("The requested user is not an admin "
-                    + userAttribute.getProfessionalUser().getId());
-            }
-        });
+            });
+        } else {
+            throw new InvalidRequest("The requested user's attributes not found or is not an admin");
+        }
     }
 }

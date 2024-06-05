@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
@@ -329,6 +330,15 @@ public abstract class SuperController {
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false, true, false));
     }
+
+    protected ResponseEntity<Object> updateAdminForOrganisation(UserUpdateRequest userUpdateRequest) {
+
+        validateEmail(userUpdateRequest.getExistingAdminEmail());
+        validateEmail(userUpdateRequest.getNewAdminEmail());
+        return organisationService.updateOrganisationAdmin(userUpdateRequest);
+    }
+
+
 
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmailForV2Api(String email) {
 
