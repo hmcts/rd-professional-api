@@ -419,7 +419,6 @@ public class RefDataUtil {
 
     public static DeleteOrganisationResponse deleteUserProfilesFromUp(DeleteUserProfilesRequest deleteUserRequest,
                                                                       UserProfileFeignClient userProfileFeignClient) {
-
         DeleteOrganisationResponse deleteOrganisationResponse = null;
         try (Response response = userProfileFeignClient.deleteUserProfile(deleteUserRequest)) {
 

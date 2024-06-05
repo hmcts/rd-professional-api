@@ -15,8 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -64,6 +67,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -93,6 +97,7 @@ import java.util.stream.Stream;
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -128,6 +133,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     PrdEnumRepository prdEnumRepository;
     @Autowired
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
+    @Autowired
+    UserAttributeRepository userAttributeRepository;
     @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
@@ -421,7 +428,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(
                 resultingOrganisations, true, true, false);
         organisationsDetailResponse.setTotalRecords(totalRecords);
-        organisationsDetailResponse.setMoreAvailable(moreAvailable);
         return organisationsDetailResponse;
     }
 
@@ -803,6 +809,33 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
+    @Override
+    @Transactional
+    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
+        if (emails.isEmpty()) {
+            throw new InvalidRequest("Please provide both email addresses");
+        }
+        Set<String> userIdsToBeDeleted = new HashSet<>();
+        emails.forEach(email -> {
+            Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
+                .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
+            if (!professionalUser.isEmpty()) {
+                userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
+                professionalUserRepository.delete(professionalUser.get());
+            }
+
+        });
+        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
+        Optional<DeleteOrganisationResponse> deleteOrganisationResponse = Optional.ofNullable(RefDataUtil
+            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient));
+        if (deleteOrganisationResponse.isEmpty()) {
+            throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
+        }
+        return new DeleteUserResponse(deleteOrganisationResponse.get().getStatusCode(),
+            deleteOrganisationResponse.get().getMessage());
+    }
+
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
                                                                 DeleteOrganisationResponse deleteOrganisationResponse,
                                                                 String prdAdminUserId) {
@@ -815,8 +848,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                 + "::organisation deleted by::prdadmin::" + prdAdminUserId);
         return deleteOrganisationResponse;
     }
-
-
 
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {
