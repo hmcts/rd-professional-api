@@ -2103,7 +2103,7 @@ class OrganisationServiceImplTest {
 
 
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
+        deleteOrganisationResponse.setStatusCode(ERROR_CODE_400);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
         ObjectMapper mapperOne = new ObjectMapper();
         String deleteBody = mapperOne.writeValueAsString(newUserResponse);
@@ -2113,21 +2113,19 @@ class OrganisationServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(400).build());
+                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
         Organisation organisation = getDeleteOrganisation(ACTIVE);
 
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
-        assertThat(deleteOrganisationResponse.getMessage())
-                .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
-        verify(organisationRepository, times(0)).deleteById(any());
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(organisationRepository, times(1)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
-        verify(orgAttributeRepository, times(0)).deleteByOrganistion(any());
-        verify(bulkCustomerDetailsRepositoryMock, times(0)).deleteByOrganistion(any());
+        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
+        verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
 
@@ -2139,7 +2137,7 @@ class OrganisationServiceImplTest {
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ERROR_CODE_400);
         assertThat(deleteOrganisationResponse.getMessage())
                 .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
         verify(organisationRepository, times(0)).deleteById(any());
@@ -2496,7 +2494,7 @@ class OrganisationServiceImplTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
-        assertThrows(ResourceNotFoundException.class,() ->
+        assertThrows(ResourceNotFoundException.class, () ->
                 sut.addContactInformationsToOrganisation(contactInformationCreationRequests, orgUUId));
     }
 
@@ -2588,9 +2586,9 @@ class OrganisationServiceImplTest {
         Organisation organisationMock = mock(Organisation.class);
 
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-        sut.deleteOrgAttribute(orgAttributeRequests,any());
+        sut.deleteOrgAttribute(orgAttributeRequests, any());
 
-        verify(orgAttributeRepository,times(1)).deleteByOrganistion(any());
+        verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
 
     }
 

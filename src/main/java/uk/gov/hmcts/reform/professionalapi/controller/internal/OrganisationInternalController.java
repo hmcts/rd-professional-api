@@ -38,8 +38,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
@@ -703,6 +703,7 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("userId") String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
+
     @Operation(
         summary = "Deletes the provided list of user accounts from the organisation.",
         description = "**IDAM Roles to access API** : <br> - pui-finance-manager",
