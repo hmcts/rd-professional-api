@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -40,8 +41,8 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
         }
     }
 
+    @Transactional
     public void updateUser(ProfessionalUser existingAdmin,ProfessionalUser newAdmin) {
-
         List<UserAccountMap> userAccountMaps = userAccountMapRepository
             .fetchByProfessionalUserId(existingAdmin.getId());
         //Unable to update embeded key UserAccountMap hence creating new and deleting old
@@ -54,13 +55,5 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
                 userAccountMapRepository.delete(userAccountMap);
             });
         }
-
-
-
-
-
-
     }
-
-
 }

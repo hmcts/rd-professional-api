@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -51,6 +52,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
@@ -59,10 +61,13 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -79,6 +84,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEFAULT_PAGE_SIZE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_EMAIL_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
@@ -115,6 +121,10 @@ public abstract class SuperController {
     @Autowired
     protected PaymentAccountService paymentAccountService;
     @Autowired
+    protected UserAttributeService userAttributeService;
+    @Autowired
+    protected UserAccountMapService userAccountMapService;
+    @Autowired
     protected PrdEnumService prdEnumService;
     @Autowired
     protected UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
@@ -128,6 +138,8 @@ public abstract class SuperController {
     protected PaymentAccountValidator paymentAccountValidator;
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
+    @Autowired
+    protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
     @Autowired
     protected MfaStatusService mfaStatusService;
     @Autowired
@@ -352,6 +364,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponseV2(organisation,
                         false, true, false,true));
     }
+
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
@@ -624,6 +637,14 @@ public abstract class SuperController {
         paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
     }
 
+    protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
+                                                                      String userId, Optional<String> origin) {
+
+        userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
+
+        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
+    }
+
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {
 
         return paymentAccountService.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, orgId);
@@ -711,6 +732,29 @@ public abstract class SuperController {
                 .collect(Collectors.toSet());
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }
+
+    protected ResponseEntity<Object> updateOrganisationAdmin(UserUpdateRequest userUpdateRequest) {
+        if (isBlank(userUpdateRequest.getExistingAdminEmail() )
+            || isBlank(userUpdateRequest.getNewAdminEmail() ) )
+        {
+            throw new InvalidRequest(ERROR_MSG_EMAIL_FOUND);
+        }
+        // call professional service to fetch prof for existing user email
+        ProfessionalUser existingAdmin = professionalUserService
+            .findProfessionalUserByEmailAddress(userUpdateRequest.getExistingAdminEmail());
+        // call professional service to fetch user for new user email
+        ProfessionalUser newAdmin = professionalUserService
+             .findProfessionalUserByEmailAddress(userUpdateRequest.getNewAdminEmail());
+        //call userattribute service to update professional_id for
+        // userattribute set to new user where id was old user and prd_enum_type = 'ADMIN_ROLE'
+        userAttributeService.updateUser(existingAdmin,newAdmin);
+        //call useraccount map service to set professional id = new id where id = old user
+        userAccountMapService.updateUser(existingAdmin,newAdmin);
+
+        return ResponseEntity.status(200).build();
+    }
+
+
 
     public String getUserToken() {
         var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
