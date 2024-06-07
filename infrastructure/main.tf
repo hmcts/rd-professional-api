@@ -73,6 +73,7 @@ module "db-professional-ref-data-v16" {
   subnet_suffix        = "expanded"
   pgsql_version        = "16"
   product              = "rd"
+  pgsql_sku            = var.pgsql_sku
   name               = join("-", [var.product-v16, var.component-v16])
 
   pgsql_server_configuration = var.pgsql_server_configuration
