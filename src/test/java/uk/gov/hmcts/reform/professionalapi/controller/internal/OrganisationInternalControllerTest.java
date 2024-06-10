@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
@@ -123,18 +124,18 @@ class OrganisationInternalControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-                "companyN", false, "www.org.com");
+            "companyN", false, "www.org.com");
         organisationResponse = new OrganisationResponse(organisation);
         organisationsDetailResponse =
-                new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
+            new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
         organisationEntityResponse =
-                new OrganisationEntityResponse(organisation, false, true, true);
-        deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
+            new OrganisationEntityResponse(organisation, false, true, true);
+        deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
         organisationResponse = new OrganisationResponse(organisation);
         organisationsDetailResponse =
-                new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
+            new OrganisationsDetailResponse(singletonList(organisation), false, false, true);
         organisationEntityResponse =
-                new OrganisationEntityResponse(organisation, false, true, true);
+            new OrganisationEntityResponse(organisation, false, true, true);
 
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
@@ -154,19 +155,19 @@ class OrganisationInternalControllerTest {
         prdEnumList.add(anEnum3);
 
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
-                "some@email.com");
+            "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
-                "sra-id", "false", "number02", "company-url",
-                userCreationRequest, null, null);
+            "sra-id", "false", "number02", "company-url",
+            userCreationRequest, null, null);
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
-                "sra-id", "false", "number02", "company-url",
-                userCreationRequest, null, null,"Doctor",null);
+            "sra-id", "false", "number02", "company-url",
+            userCreationRequest, null, null, "Doctor", null);
 
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
-                "soMeone@somewhere.com", organisation);
+            "soMeone@somewhere.com", organisation);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false, false, true);
 
         List<String> userRoles = new ArrayList<>();
@@ -176,7 +177,7 @@ class OrganisationInternalControllerTest {
         userAccessTypes.add(new UserAccessType("jurisdictionId", "organisationProfileId", "accessTypeId", false));
 
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles, false, userAccessTypes);
+            "some@email.com", userRoles, false, userAccessTypes);
 
         MockitoAnnotations.openMocks(this);
     }
@@ -186,14 +187,14 @@ class OrganisationInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.CREATED;
 
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
-                .thenReturn(organisationResponse);
+            .thenReturn(organisationResponse);
 
         ResponseEntity<?> actual = organisationInternalController.createOrganisation(organisationCreationRequest);
 
         verify(organisationCreationRequestValidatorMock, times(1))
-                .validate(any(OrganisationCreationRequest.class));
+            .validate(any(OrganisationCreationRequest.class));
         verify(organisationServiceMock, times(1))
-                .createOrganisationFrom(any(OrganisationCreationRequest.class));
+            .createOrganisationFrom(any(OrganisationCreationRequest.class));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -204,15 +205,15 @@ class OrganisationInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.CREATED;
 
         when(organisationServiceMock.createOrganisationFrom(organisationOtherOrgsCreationRequest))
-                .thenReturn(organisationResponse);
+            .thenReturn(organisationResponse);
 
         ResponseEntity<?> actual = organisationInternalControllerV2
-                .createOrganisation(organisationOtherOrgsCreationRequest);
+            .createOrganisation(organisationOtherOrgsCreationRequest);
 
         verify(organisationCreationRequestValidatorMock, times(1))
-                .validate(any(OrganisationOtherOrgsCreationRequest.class));
+            .validate(any(OrganisationOtherOrgsCreationRequest.class));
         verify(organisationServiceMock, times(1))
-                .createOrganisationFrom(any(OrganisationOtherOrgsCreationRequest.class));
+            .createOrganisationFrom(any(OrganisationOtherOrgsCreationRequest.class));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -237,17 +238,17 @@ class OrganisationInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         when(organisationServiceMock.retrieveOrganisation(any(String.class), any(boolean.class)))
-                .thenReturn(organisationEntityResponse);
+            .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, null, 1, null);
+            .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, null, 1, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(1);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
+            .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
     }
 
     @Test
@@ -255,16 +256,16 @@ class OrganisationInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         when(organisationServiceMock.retrieveOrganisation(any(String.class), any(boolean.class)))
-                .thenReturn(organisationEntityResponse);
+            .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
-                .getOrganisationIdentifier(), null, "PENDING", null, null);
+            .getOrganisationIdentifier(), null, "PENDING", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
+            .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
     }
 
     @Test
@@ -272,16 +273,16 @@ class OrganisationInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         when(organisationServiceMock.findByOrganisationStatus(any(), any(), any()))
-                .thenReturn(organisationsDetailResponse);
+            .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null,
-                "PENDING", null, null);
+            "PENDING", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .findByOrganisationStatus(null, OrganisationStatus.PENDING.name(), null);
+            .findByOrganisationStatus(null, OrganisationStatus.PENDING.name(), null);
     }
 
     @Test
@@ -298,7 +299,7 @@ class OrganisationInternalControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
-                .getOrganisations().size());
+            .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
             .retrieveAllOrganisations(null, pageable);
@@ -318,7 +319,7 @@ class OrganisationInternalControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
-                .getOrganisations().size());
+            .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
             .retrieveAllOrganisations(null, pageable);
@@ -339,7 +340,7 @@ class OrganisationInternalControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(organisationsDetailResponse
-                .getOrganisations().size());
+            .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
             .findByOrganisationStatus(null, OrganisationStatus.PENDING.name(), pageable);
@@ -373,7 +374,7 @@ class OrganisationInternalControllerTest {
         when(httpRequest.getHeader(anyString())).thenReturn(email);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
         assertThrows(ResourceNotFoundException.class, () ->
-                organisationInternalController.retrievePaymentAccountBySuperUserEmail());
+            organisationInternalController.retrievePaymentAccountBySuperUserEmail());
     }
 
     @Test
@@ -382,7 +383,7 @@ class OrganisationInternalControllerTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(email);
         assertThrows(InvalidRequest.class, () ->
-                organisationInternalController.retrievePaymentAccountBySuperUserEmail());
+            organisationInternalController.retrievePaymentAccountBySuperUserEmail());
     }
 
     @Test
@@ -390,7 +391,7 @@ class OrganisationInternalControllerTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(null);
         assertThrows(InvalidRequest.class, () ->
-                organisationInternalController.retrievePaymentAccountBySuperUserEmail());
+            organisationInternalController.retrievePaymentAccountBySuperUserEmail());
 
         verify(httpRequest, times(1)).getHeader("UserEmail");
     }
@@ -405,16 +406,16 @@ class OrganisationInternalControllerTest {
         pbaEditRequest.setPaymentAccounts(pbas);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
-                .thenReturn(organisation);
+            .thenReturn(organisation);
 
         ResponseEntity<Object> response = organisationInternalController.editPaymentAccountsByOrgId(pbaEditRequest,
-                organisation.getOrganisationIdentifier());
+            organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(paymentAccountServiceMock, times(1))
-                .editPaymentAccountsByOrganisation(organisation, pbaEditRequest);
+            .editPaymentAccountsByOrganisation(organisation, pbaEditRequest);
     }
 
     @Test
@@ -436,18 +437,18 @@ class OrganisationInternalControllerTest {
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
-                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
-                        .status(200).build());
+            .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                .status(200).build());
 
         ResponseEntity<?> actual = organisationInternalController.addUserToOrganisation(newUserCreationRequest,
-                orgId, userId);
+            orgId, userId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUserByEmailAddress("some@email.com");
+            .findProfessionalUserByEmailAddress("some@email.com");
     }
 
     @Test
@@ -458,12 +459,12 @@ class OrganisationInternalControllerTest {
         organisation.setStatus(OrganisationStatus.PENDING);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(organisationServiceMock.deleteOrganisation(organisation, "123456789"))
-                .thenReturn(deleteOrganisationResponse);
+            .thenReturn(deleteOrganisationResponse);
         ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId, "123456789");
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(organisationServiceMock, times(1))
-                .deleteOrganisation(organisation, "123456789");
+            .deleteOrganisation(organisation, "123456789");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -477,12 +478,12 @@ class OrganisationInternalControllerTest {
         organisation.setStatus(OrganisationStatus.REVIEW);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(organisationServiceMock.deleteOrganisation(organisation, "123456789"))
-                .thenReturn(deleteOrganisationResponse);
+            .thenReturn(deleteOrganisationResponse);
         ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId, "123456789");
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(organisationServiceMock, times(1))
-                .deleteOrganisation(organisation, "123456789");
+            .deleteOrganisation(organisation, "123456789");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -493,7 +494,7 @@ class OrganisationInternalControllerTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
         assertThrows(EmptyResultDataAccessException.class, () ->
-                organisationInternalController.deleteOrganisation(orgId, "123456789"));
+            organisationInternalController.deleteOrganisation(orgId, "123456789"));
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
     }
 
@@ -505,19 +506,19 @@ class OrganisationInternalControllerTest {
         MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(MFAStatus.NONE);
         organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
-                .thenReturn(organisation);
+            .thenReturn(organisation);
         when(mfaStatusServiceMock.updateOrgMfaStatus(mfaUpdateRequest, organisation)).thenReturn(updateResponseEntity);
 
         ResponseEntity<Object> response = organisationInternalController.updateOrgMfaStatus(mfaUpdateRequest,
-                organisation.getOrganisationIdentifier());
+            organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(mfaStatusServiceMock, times(1))
-                .updateOrgMfaStatus(mfaUpdateRequest, organisation);
+            .updateOrgMfaStatus(mfaUpdateRequest, organisation);
         verify(organisationServiceMock, times(1))
-                .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
+            .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
     }
 
     @Test
@@ -528,7 +529,7 @@ class OrganisationInternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
 
         assertThrows(InvalidRequest.class, () ->
-                organisationInternalController.updateOrgMfaStatus(mfaUpdateRequest, orgId));
+            organisationInternalController.updateOrgMfaStatus(mfaUpdateRequest, orgId));
 
         verify(orgIdValidatorMock, times(1)).validateOrganisationExistsWithGivenOrgId(orgId);
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
@@ -543,11 +544,11 @@ class OrganisationInternalControllerTest {
         String orgId = "AK57L4T";
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
-                .thenReturn(organisation);
+            .thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserById(any())).thenReturn(professionalUser);
 
         ResponseEntity<Object> response = organisationInternalController
-                .updatesOrganisation(organisationCreationRequest, orgId, null);
+            .updatesOrganisation(organisationCreationRequest, orgId, null);
 
         assertNotNull(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -569,7 +570,33 @@ class OrganisationInternalControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .getOrganisationsByPbaStatus(pbaStatus.toString());
+            .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
 
+    @Test
+    void testUpdateAdminForOrganisation() {
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
+            "test@hmcts.com", "newTest@hmcts.com");
+        when(organisationServiceMock.updateOrganisationAdmin(userUpdateRequest)).thenReturn(ResponseEntity
+            .status(200).build());
+        ResponseEntity<Object> response = organisationInternalController.updateOrgAdmin(userUpdateRequest);
+
+        assertNotNull(response);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(organisationServiceMock, times(1)).updateOrganisationAdmin(userUpdateRequest);
+    }
+
+    @Test
+    void testUpdateAdminForOrganisationInvalid() {
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest("",
+            "");
+        when(organisationServiceMock.updateOrganisationAdmin(userUpdateRequest))
+            .thenThrow(new InvalidRequest("email address not found"));
+
+        assertThrows(InvalidRequest.class, () ->
+            organisationInternalController.updateOrgAdmin(userUpdateRequest));
+
+    }
 }
+
+
