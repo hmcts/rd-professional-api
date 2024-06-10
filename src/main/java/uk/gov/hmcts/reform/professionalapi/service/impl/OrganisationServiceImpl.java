@@ -376,14 +376,14 @@ public class OrganisationServiceImpl implements OrganisationService {
         // call professional service to fetch prof for existing user email
         ProfessionalUser existingAdmin = professionalUserService
             .findProfessionalUserByEmailAddress(userUpdateRequest.getExistingAdminEmail());
-        if(existingAdmin == null){
-            throw new InvalidRequest("No user found for email "+userUpdateRequest.getExistingAdminEmail());
+        if (existingAdmin == null) {
+            throw new InvalidRequest("No user found for email " + userUpdateRequest.getExistingAdminEmail());
         }
         // call professional service to fetch user for new user email
         ProfessionalUser newAdmin = professionalUserService
             .findProfessionalUserByEmailAddress(userUpdateRequest.getNewAdminEmail());
-        if(existingAdmin == null){
-            throw new InvalidRequest("No user found for email "+userUpdateRequest.getNewAdminEmail());
+        if (existingAdmin == null) {
+            throw new InvalidRequest("No user found for email " + userUpdateRequest.getNewAdminEmail());
         }
         //call userattribute service to update professional_id for
         // userattribute set to new user where id was old user and prd_enum_type = 'ADMIN_ROLE'
