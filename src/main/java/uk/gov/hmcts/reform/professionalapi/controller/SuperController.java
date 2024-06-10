@@ -734,9 +734,8 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<Object> updateOrganisationAdmin(UserUpdateRequest userUpdateRequest) {
-        if (isBlank(userUpdateRequest.getExistingAdminEmail() )
-            || isBlank(userUpdateRequest.getNewAdminEmail() ) )
-        {
+        if (isBlank(userUpdateRequest.getExistingAdminEmail())
+            || isBlank(userUpdateRequest.getNewAdminEmail())) {
             throw new InvalidRequest(ERROR_MSG_EMAIL_FOUND);
         }
         // call professional service to fetch prof for existing user email

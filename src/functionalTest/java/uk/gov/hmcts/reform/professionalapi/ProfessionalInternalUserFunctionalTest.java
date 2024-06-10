@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,12 +20,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
@@ -40,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +58,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
@@ -1230,5 +1235,64 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .stream()
                 .sorted(Comparator.comparing(map -> (String) map.get(key)))
                 .collect(Collectors.toList());
+    }
+
+    protected NewUserCreationRequest createNewUserRequest() {
+
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        String random = RandomStringUtils.randomAlphabetic(10);
+        userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
+            "accessTypeId" + random, false));
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+            .firstName("testFirstName")
+            .lastName("testLastName")
+            .email("test@hmcts.net")
+            .roles(asList("prd-admin"))
+            .userAccessTypes(userAccessTypes)
+            .build();
+        return userCreationRequest;
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgAdmin", withFeature = false)
+    void updateOrganisationAdminReturnSuccess() {
+
+        log.info("updateOrganisationAdminReturnSuccess :: STARTED");
+        String updatedName = "updatedName";
+        String updatedSra = "updatedSraId";
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+
+        assertNotNull(orgResponse.get("name"));
+
+        //creatign a test admin user in organisation
+        Map<String, Object> newUserResponse = professionalApiClient.addUserToOrganisation(
+            createNewUserRequest(),organisationIdentifier,HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        String userId = (String) newUserResponse.get("userIdentifier");
+
+        //updating the user with new email
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
+            "test@hmcts.net","updatedTest@hmcts.net");
+        professionalApiClient.updatesOrganisationAdmin(userUpdateRequest, OK);
+
+        //fetching updated user to verify
+        Map<String, Object> orgUpdatedResponse = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+            professionalApiClient.getMultipleAuthHeadersInternal(), userId);
+        List<HashMap> professionalUsersResponses = (List<HashMap>) orgUpdatedResponse.get("users");
+
+        assertThat(professionalUsersResponses).isNotEmpty();
+        assertThat(professionalUsersResponses).hasSize(1);
+        assertThat(professionalUsersResponses.get(0).get("emailAddress")).isEqualTo("updatedTest@hmcts.net");
+
+        professionalApiClient.deleteOrganisation(organisationIdentifier, hmctsAdmin, NO_CONTENT);
+
+        log.info("updateOrganisationAdminReturnSuccess :: END");
+
     }
 }

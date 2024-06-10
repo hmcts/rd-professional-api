@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
@@ -453,6 +454,7 @@ class OrganisationServiceImplTest {
 
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
+
         when(userAttributeServiceMock.addUserAttributesToSuperUser(professionalUser,
                 professionalUserMock.getUserAttributes())).thenReturn(attributes);
 
@@ -2717,5 +2719,27 @@ class OrganisationServiceImplTest {
         // assert
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    void test_modifyAdminUserForAnOrganisation() throws JsonProcessingException {
+        UserUpdateRequest userUpdateRequest =
+            new UserUpdateRequest("newtest@hmcts.net","updatedTest@hmcts.net");
+        ProfessionalUser existingProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "test@test.com", organisation);
+
+        ProfessionalUser newProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "newtest@test.com", organisation);
+
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(
+            userUpdateRequest.getExistingAdminEmail())).thenReturn(existingProfessionalUser);
+
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(
+            userUpdateRequest.getNewAdminEmail())).thenReturn(newProfessionalUser);
+
+        ResponseEntity<Object> result = sut.updateOrganisationAdmin(userUpdateRequest);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 }

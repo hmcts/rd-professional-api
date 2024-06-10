@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -504,6 +505,38 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
 
         return response.body().jsonPath();
+    }
+
+    public Map<String, Object> addUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
+                                                     String orgId, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+            .body(newUserCreationRequest)
+            .put("/refdata/internal/v1/organisations/" + orgId + "/users/")
+            .andReturn();
+
+        log.info("{}:: Update organisation Admin response: {}",
+            loggingComponentName, response.getStatusCode());
+
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
+        return response.body().as(Map.class);
+    }
+
+    public void updatesOrganisationAdmin(UserUpdateRequest userUpdateRequest, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+            .body(userUpdateRequest)
+            .put("/refdata/internal/v1/organisations/updateadmin/")
+            .andReturn();
+
+        log.info("{}:: Update organisation Admin response: {}",
+            loggingComponentName, response.getStatusCode());
+
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
     }
 
     public Map<String, Object> retrieveOrganisationDetailsBySinceDate(String sinceDate, String page, String pageSize) {
@@ -1497,6 +1530,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+
+
     public Map<String, Object> searchOrganisationUsersByUserIdExternal(HttpStatus status,
                                                                        RequestSpecification requestSpecification,
                                                                        String userIdentifier) {
@@ -1579,7 +1614,7 @@ public class ProfessionalApiClient {
             .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
 
-    private RequestSpecification getMultipleAuthHeadersInternal() {
+    public RequestSpecification getMultipleAuthHeadersInternal() {
         return getMultipleAuthHeaders(idamOpenIdClient.getcwdAdminOpenIdToken("prd-admin"));
     }
 
