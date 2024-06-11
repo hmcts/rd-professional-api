@@ -1258,8 +1258,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void updateOrganisationAdminReturnSuccess() {
 
         log.info("updateOrganisationAdminReturnSuccess :: STARTED");
-        String updatedName = "updatedName";
-        String updatedSra = "updatedSraId";
+
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
@@ -1289,6 +1288,42 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(professionalUsersResponses).isNotEmpty();
         assertThat(professionalUsersResponses).hasSize(1);
         assertThat(professionalUsersResponses.get(0).get("emailAddress")).isEqualTo("updatedTest@hmcts.net");
+
+        professionalApiClient.deleteOrganisation(organisationIdentifier, hmctsAdmin, NO_CONTENT);
+
+        log.info("updateOrganisationAdminReturnSuccess :: END");
+
+    }
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgAdmin", withFeature = false)
+    void updateOrganisationAdminReturnFailure() {
+
+        log.info("updateOrganisationAdminReturnSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+
+        assertNotNull(orgResponse.get("name"));
+
+        //creatign a test admin user in organisation
+        Map<String, Object> newUserResponse = professionalApiClient.addUserToOrganisation(
+            createNewUserRequest(),organisationIdentifier,HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        String userId = (String) newUserResponse.get("userIdentifier");
+
+        //updating the user with new email
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
+            "","updatedTest@hmcts.net");
+        Map<String, Object> orgUpdatedResponse = professionalApiClient.updatesOrganisationAdmin(userUpdateRequest, OK);
+
+        assertThat(orgUpdatedResponse).isNotEmpty();
+        assertThat(orgUpdatedResponse).hasSize(1);
+       // assertThat(orgUpdatedResponse.get(0).get("emailAddress")).isEqualTo("updatedTest@hmcts.net");
 
         professionalApiClient.deleteOrganisation(organisationIdentifier, hmctsAdmin, NO_CONTENT);
 
