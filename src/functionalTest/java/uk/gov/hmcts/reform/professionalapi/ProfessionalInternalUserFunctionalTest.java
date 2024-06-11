@@ -1294,6 +1294,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("updateOrganisationAdminReturnSuccess :: END");
 
     }
+
+
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgAdmin", withFeature = false)
     void updateOrganisationAdminReturnFailure() {
@@ -1317,9 +1319,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String userId = (String) newUserResponse.get("userIdentifier");
 
         //updating the user with new email
-        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
-            "","updatedTest@hmcts.net");
-        Map<String, Object> orgUpdatedResponse = professionalApiClient.updatesOrganisationAdmin(userUpdateRequest, NOT_FOUND);
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest("",
+            "updatedTest@hmcts.net");
+        Map<String, Object> orgUpdatedResponse = professionalApiClient.updatesOrganisationAdmin(
+            userUpdateRequest, NOT_FOUND);
 
         assertThat(orgUpdatedResponse).isNotEmpty();
         assertThat(orgUpdatedResponse).hasSize(1);

@@ -524,7 +524,9 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> updatesOrganisationAdmin(UserUpdateRequest userUpdateRequest, HttpStatus expectedStatus) {
+
+    public Map<String, Object> updatesOrganisationAdmin(UserUpdateRequest userUpdateRequest,
+                                                        HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(userUpdateRequest)
