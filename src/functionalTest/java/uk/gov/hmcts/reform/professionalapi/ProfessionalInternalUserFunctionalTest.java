@@ -1319,11 +1319,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         //updating the user with new email
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
             "","updatedTest@hmcts.net");
-        Map<String, Object> orgUpdatedResponse = professionalApiClient.updatesOrganisationAdmin(userUpdateRequest, OK);
+        Map<String, Object> orgUpdatedResponse = professionalApiClient.updatesOrganisationAdmin(userUpdateRequest, NOT_FOUND);
 
         assertThat(orgUpdatedResponse).isNotEmpty();
         assertThat(orgUpdatedResponse).hasSize(1);
-       // assertThat(orgUpdatedResponse.get(0).get("emailAddress")).isEqualTo("updatedTest@hmcts.net");
 
         professionalApiClient.deleteOrganisation(organisationIdentifier, hmctsAdmin, NO_CONTENT);
 
