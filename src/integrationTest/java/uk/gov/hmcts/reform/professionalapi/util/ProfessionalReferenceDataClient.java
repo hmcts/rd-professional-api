@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -1039,4 +1040,26 @@ public class ProfessionalReferenceDataClient {
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
     }
+
+
+    public Map<String, Object> modifyUserAdminForOrganisation(UserUpdateRequest userUpdateRequest,
+                                                               String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/updateadmin";
+
+        try {
+            HttpEntity<UserUpdateRequest> requestEntity = new HttpEntity<>(userUpdateRequest,
+                getMultipleAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+
+        return getResponse(responseEntity);
+    }
+
 }
