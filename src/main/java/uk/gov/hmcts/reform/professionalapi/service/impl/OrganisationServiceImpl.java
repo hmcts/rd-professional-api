@@ -1074,7 +1074,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity<Object> responseResponseEntity = toResponseEntity(response, clazz);
 
-            if (response.status() > 300) {
+            if (response.status() > 300 && responseResponseEntity.getBody() != null) {
                 String errorMessage = nonNull(responseResponseEntity.getBody())
                     ? ((ErrorResponse)responseResponseEntity.getBody()).getErrorMessage() : ERROR_MESSAGE_UP_FAILED;
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(), errorMessage);
