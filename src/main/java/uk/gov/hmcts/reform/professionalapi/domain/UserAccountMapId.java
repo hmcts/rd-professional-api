@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 import javax.persistence.Embeddable;
