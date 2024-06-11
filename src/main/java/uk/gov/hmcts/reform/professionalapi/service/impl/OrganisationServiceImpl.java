@@ -1080,6 +1080,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(), errorMessage);
 
             }
+
             GetUserProfileResponse existingUserProfile =
                 (GetUserProfileResponse) requireNonNull(responseResponseEntity.getBody());
 
