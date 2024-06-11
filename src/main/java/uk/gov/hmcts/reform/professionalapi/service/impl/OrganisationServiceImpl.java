@@ -626,19 +626,17 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
             if (isNotBlank(organisationCreationRequest.getSraId())) {
                 existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
+                OrgAttribute attribute = new OrgAttribute();
+                attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
+                attribute.setValue(RefDataUtil
+                    .removeEmptySpaces(attributeValue));
+                attribute.setOrganisation(existingOrganisation);
+                orgAttributeRepository.save(attribute);
+                List<OrgAttribute> attributes = new ArrayList<>();
+                attributes.add(attribute);
+                existingOrganisation.setOrgAttributes(attributes);
             }
         }
-
-        OrgAttribute attribute = new OrgAttribute();
-        attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
-        attribute.setValue(RefDataUtil
-            .removeEmptySpaces(attributeValue));
-        attribute.setOrganisation(existingOrganisation);
-        orgAttributeRepository.save(attribute);
-
-        List<OrgAttribute> attributes = new ArrayList<>();
-        attributes.add(attribute);
-        existingOrganisation.setOrgAttributes(attributes);
 
         var savedOrganisation = organisationRepository.save(existingOrganisation);
 
