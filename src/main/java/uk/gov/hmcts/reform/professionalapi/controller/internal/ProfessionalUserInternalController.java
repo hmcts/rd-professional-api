@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleU
 @Validated
 @RestController
 @Slf4j
+@SuppressWarnings("checkstyle:Indentation")
 public class ProfessionalUserInternalController extends SuperController {
 
     @Operation(
