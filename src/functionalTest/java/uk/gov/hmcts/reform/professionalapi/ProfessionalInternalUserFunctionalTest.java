@@ -1300,36 +1300,38 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgAdmin", withFeature = false)
     void updateOrganisationAdminReturnFailure() {
 
-        log.info("updateOrganisationAdminReturnSuccess :: STARTED");
-
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String organisationIdentifier = (String) response.get("organisationIdentifier");
-        assertThat(organisationIdentifier).isNotEmpty();
-
-        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
-            organisationIdentifier, hmctsAdmin,OK);
-
-        assertNotNull(orgResponse.get("name"));
-
-        //creatign a test admin user in organisation
-        Map<String, Object> newUserResponse = professionalApiClient.addUserToOrganisation(
-            createNewUserRequest(),organisationIdentifier,HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
-        String userId = (String) newUserResponse.get("userIdentifier");
+        log.info("updateOrganisationAdminReturnFailure :: STARTED");
 
         //updating the user with new email
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest("",
             "updatedTest@hmcts.net");
         Map<String, Object> orgUpdatedResponse = professionalApiClient.updatesOrganisationAdmin(
-            userUpdateRequest, NOT_FOUND);
+            userUpdateRequest, BAD_REQUEST);
 
         assertThat(orgUpdatedResponse).isNotEmpty();
-        assertThat(orgUpdatedResponse).hasSize(1);
+        assertThat((String) orgUpdatedResponse.get("errorDescription")).contains("email address not found");
 
-        professionalApiClient.deleteOrganisation(organisationIdentifier, hmctsAdmin, NO_CONTENT);
+        log.info("updateOrganisationAdminReturnFailure :: END");
 
-        log.info("updateOrganisationAdminReturnSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgAdmin", withFeature = false)
+    void updateOrgAdminReturnFailure() {
+
+        log.info("updateOrgAdminReturnFailure :: STARTED");
+
+        //updating the user with new email
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest("test@hmcts.net",
+            "");
+        Map<String, Object> orgUpdatedResponse = professionalApiClient.updatesOrganisationAdmin(
+            userUpdateRequest, BAD_REQUEST);
+
+        assertThat(orgUpdatedResponse).isNotEmpty();
+        assertThat((String) orgUpdatedResponse.get("errorDescription")).contains("email address not found");
+
+
+        log.info("updateOrgAdminReturnFailure :: END");
 
     }
 }

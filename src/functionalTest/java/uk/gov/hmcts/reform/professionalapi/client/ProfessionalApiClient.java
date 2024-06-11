@@ -521,6 +521,7 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(expectedStatus.value());
+
         return response.body().as(Map.class);
     }
 
