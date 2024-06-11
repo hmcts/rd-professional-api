@@ -12,7 +12,6 @@ import javax.persistence.ManyToOne;
 
 @Embeddable
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserAccountMapId implements Serializable {

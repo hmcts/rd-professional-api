@@ -15,7 +15,6 @@ import javax.persistence.EntityListeners;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@Setter
 public class UserAccountMap implements Serializable {
 
     @EmbeddedId
