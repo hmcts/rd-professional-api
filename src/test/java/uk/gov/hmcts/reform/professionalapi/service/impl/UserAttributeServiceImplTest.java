@@ -3,10 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -177,9 +174,6 @@ class UserAttributeServiceImplTest {
         ProfessionalUser existingProfessionalUser = new ProfessionalUser("some-fname",
             "some-lname", "test@test.com", organisation);
 
-        ProfessionalUser newProfessionalUser = new ProfessionalUser("some-fname",
-            "some-lname", "newtest@test.com", organisation);
-
         List<UserAttribute> userAttributes = new ArrayList<>();
         UserAttribute user = new UserAttribute();
         user.setProfessionalUser(existingProfessionalUser);
@@ -188,6 +182,8 @@ class UserAttributeServiceImplTest {
         when(userAttributeRepositoryMock.fetchByProfessionalUserIdAndPrdEnumType(
             existingProfessionalUser.getId())).thenReturn(userAttributes);
 
+        ProfessionalUser newProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "newtest@test.com", organisation);
         sut.updateUser(existingProfessionalUser,newProfessionalUser);
 
         verify(userAttributeRepositoryMock, times(1)).save(any());
