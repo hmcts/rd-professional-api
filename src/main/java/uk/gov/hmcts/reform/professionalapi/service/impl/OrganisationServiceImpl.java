@@ -40,7 +40,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisatio
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -77,7 +76,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
@@ -1078,7 +1076,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             ResponseEntity<Object> responseResponseEntity = toResponseEntity(response, clazz);
             if (response.status() > 300) {
                 String errorMessage = nonNull(responseResponseEntity.getBody())
-                    ? ((ErrorResponse)requireNonNull(responseResponseEntity.getBody())).getErrorMessage() : ERROR_MESSAGE_UP_FAILED;
+                    ? ((ErrorResponse)requireNonNull(responseResponseEntity.getBody())).getErrorMessage()
+                    : ERROR_MESSAGE_UP_FAILED;
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(), errorMessage);
             }
 
