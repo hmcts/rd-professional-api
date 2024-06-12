@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisatio
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -76,6 +77,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
@@ -98,6 +100,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -1069,16 +1072,13 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Transactional
     public ResponseEntity<Object>  updateIdamId(String existingUserIdentifier, String newUserIdentifier) {
         try (Response response = userProfileFeignClient.getUserProfileById(existingUserIdentifier)) {
+
             ResponseEntity<Object> modifiedUserResponse;
             Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity<Object> responseResponseEntity = toResponseEntity(response, clazz);
-            String errorMessage;
             if (response.status() > 300) {
-                if (responseResponseEntity != null && responseResponseEntity.getBody() != null) {
-                    errorMessage = ((ErrorResponse)responseResponseEntity.getBody()).getErrorMessage();
-                } else {
-                    errorMessage = ERROR_MESSAGE_UP_FAILED;
-                }
+                String errorMessage = nonNull(responseResponseEntity.getBody())
+                    ? ((ErrorResponse)requireNonNull(responseResponseEntity.getBody())).getErrorMessage() : ERROR_MESSAGE_UP_FAILED;
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(), errorMessage);
             }
 
