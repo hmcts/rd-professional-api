@@ -98,7 +98,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -1073,11 +1072,11 @@ public class OrganisationServiceImpl implements OrganisationService {
             ResponseEntity<Object> modifiedUserResponse;
             Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity<Object> responseResponseEntity = toResponseEntity(response, clazz);
-            String errorMessage ;
+            String errorMessage;
             if (response.status() > 300) {
-                if(responseResponseEntity != null && responseResponseEntity.getBody() != null){
+                if (responseResponseEntity != null && responseResponseEntity.getBody() != null) {
                     errorMessage = ((ErrorResponse)responseResponseEntity.getBody()).getErrorMessage();
-                } else{
+                } else {
                     errorMessage = ERROR_MESSAGE_UP_FAILED;
                 }
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(), errorMessage);
