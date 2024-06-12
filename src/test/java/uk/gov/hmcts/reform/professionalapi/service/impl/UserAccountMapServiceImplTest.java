@@ -60,4 +60,24 @@ class UserAccountMapServiceImplTest {
         verify(userAccountMapRepositoryMock, Mockito.times(1)).delete(any());
 
     }
+
+    @Test
+    void test_updateUserNotExisting() {
+        PaymentAccount pba = new PaymentAccount("PBA1234567");
+        ProfessionalUser existingProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "test@test.com", new Organisation());
+
+        List<UserAccountMap> userAccountMaps = new ArrayList<>();
+
+        when(userAccountMapRepositoryMock.fetchByProfessionalUserId(
+            existingProfessionalUser.getId())).thenReturn(userAccountMaps);
+
+        ProfessionalUser newProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "newtest@test.com", new Organisation());
+        sut.updateUser(existingProfessionalUser,newProfessionalUser);
+
+        verify(userAccountMapRepositoryMock, Mockito.times(0)).save(any());
+        verify(userAccountMapRepositoryMock, Mockito.times(0)).delete(any());
+
+    }
 }
