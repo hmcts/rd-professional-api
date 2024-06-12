@@ -343,12 +343,6 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false, true, false));
     }
 
-    protected ResponseEntity<Object> updateAdminForOrganisation(UserUpdateRequest userUpdateRequest) {
-
-        validateEmail(userUpdateRequest.getExistingAdminEmail());
-        validateEmail(userUpdateRequest.getNewAdminEmail());
-        return organisationService.updateOrganisationAdmin(userUpdateRequest);
-    }
 
 
 
@@ -637,14 +631,6 @@ public abstract class SuperController {
         paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
     }
 
-    protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
-                                                                      String userId, Optional<String> origin) {
-
-        userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
-
-        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
-    }
-
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {
 
         return paymentAccountService.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, orgId);
@@ -733,26 +719,12 @@ public abstract class SuperController {
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }
 
-    protected ResponseEntity<Object> updateOrganisationAdmin(UserUpdateRequest userUpdateRequest) {
-        if (isBlank(userUpdateRequest.getExistingAdminEmail())
-            || isBlank(userUpdateRequest.getNewAdminEmail())) {
-            throw new InvalidRequest(ERROR_MSG_EMAIL_FOUND);
-        }
-        // call professional service to fetch prof for existing user email
-        ProfessionalUser existingAdmin = professionalUserService
-            .findProfessionalUserByEmailAddress(userUpdateRequest.getExistingAdminEmail());
-        // call professional service to fetch user for new user email
-        ProfessionalUser newAdmin = professionalUserService
-             .findProfessionalUserByEmailAddress(userUpdateRequest.getNewAdminEmail());
-        //call userattribute service to update professional_id for
-        // userattribute set to new user where id was old user and prd_enum_type = 'ADMIN_ROLE'
-        userAttributeService.updateUser(existingAdmin,newAdmin);
-        //call useraccount map service to set professional id = new id where id = old user
-        userAccountMapService.updateUser(existingAdmin,newAdmin);
+    protected ResponseEntity<Object> updateAdminForOrganisation(UserUpdateRequest userUpdateRequest) {
 
-        return ResponseEntity.status(200).build();
+        validateEmail(userUpdateRequest.getExistingAdminEmail());
+        validateEmail(userUpdateRequest.getNewAdminEmail());
+        return organisationService.updateOrganisationAdmin(userUpdateRequest);
     }
-
 
 
     public String getUserToken() {
