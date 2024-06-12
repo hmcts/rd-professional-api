@@ -2782,4 +2782,44 @@ class OrganisationServiceImplTest {
         assertThrows(InvalidRequest.class, () ->
             sut.updateOrganisationAdmin(userUpdateRequest));
     }
+
+    @Test
+    void test_modifyAdminUserForAnOrganisationBlabkExistingId() throws JsonProcessingException {
+        UserUpdateRequest userUpdateRequest =
+            new UserUpdateRequest(" ","updatedTest@hmcts.net");
+        ProfessionalUser existingProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "test@test.com", organisation);
+
+        ProfessionalUser newProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "newtest@test.com", organisation);
+
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(
+            userUpdateRequest.getExistingAdminEmail())).thenReturn(existingProfessionalUser);
+
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(
+            userUpdateRequest.getNewAdminEmail())).thenReturn(newProfessionalUser);
+
+        assertThrows(InvalidRequest.class, () ->
+            sut.updateOrganisationAdmin(userUpdateRequest));
+    }
+
+    @Test
+    void test_modifyAdminUserForAnOrganisationBlabkNewId() throws JsonProcessingException {
+        UserUpdateRequest userUpdateRequest =
+            new UserUpdateRequest("newtest@hmcts.net"," ");
+        ProfessionalUser existingProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "test@test.com", organisation);
+
+        ProfessionalUser newProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "newtest@test.com", organisation);
+
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(
+            userUpdateRequest.getExistingAdminEmail())).thenReturn(existingProfessionalUser);
+
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(
+            userUpdateRequest.getNewAdminEmail())).thenReturn(newProfessionalUser);
+
+        assertThrows(InvalidRequest.class, () ->
+            sut.updateOrganisationAdmin(userUpdateRequest));
+    }
 }
