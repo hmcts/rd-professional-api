@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -15,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -162,5 +168,46 @@ class UserAttributeServiceImplTest {
         assertThat(response3).isFalse();
 
 
+    }
+
+    @Test
+    void test_modifyAdminUserForAnOrganisation() throws JsonProcessingException {
+
+
+        ProfessionalUser existingProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "test@test.com", organisation);
+
+        ProfessionalUser newProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "newtest@test.com", organisation);
+
+        List<UserAttribute> userAttributes = new ArrayList<>();
+        UserAttribute user = new UserAttribute();
+        user.setProfessionalUser(existingProfessionalUser);
+        userAttributes.add(user);
+
+        when(userAttributeRepositoryMock.fetchByProfessionalUserIdAndPrdEnumType(
+            existingProfessionalUser.getId())).thenReturn(userAttributes);
+
+        sut.updateUser(existingProfessionalUser,newProfessionalUser);
+
+        verify(userAttributeRepositoryMock, times(1)).save(any());
+    }
+
+    @Test
+    void test_modifyAdminUserForAnOrganisationFails() throws JsonProcessingException {
+
+        List<UserAttribute> userAttributes = new ArrayList<>();
+            
+        ProfessionalUser existingProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "test@test.com", organisation);
+
+        ProfessionalUser newProfessionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "newtest@test.com", organisation);
+
+        when(userAttributeRepositoryMock.fetchByProfessionalUserIdAndPrdEnumType(
+            existingProfessionalUser.getId())).thenReturn(userAttributes);
+
+        assertThrows(InvalidRequest.class, () ->
+            sut.updateUser(existingProfessionalUser,newProfessionalUser));
     }
 }
