@@ -9,5 +9,3 @@ pgsql_server_configuration = [
     name  = "backslash_quote"
     value = "ON"
   }]
-
-pgsql_sku = "GP_Standard_D4s_v3"
