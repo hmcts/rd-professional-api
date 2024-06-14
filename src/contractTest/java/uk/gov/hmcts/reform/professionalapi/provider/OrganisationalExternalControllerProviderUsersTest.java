@@ -99,7 +99,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     @Mock
     SecurityContext securityContext;
 
-    @MockBean
+    @Autowired
     UserAttributeService userAttributeService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
