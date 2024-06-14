@@ -65,7 +65,6 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
     UserAttributeService userAttributeService;
     @MockBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
-
     @MockBean
     OrgAttributeRepository orgAttributeRepository;
 
