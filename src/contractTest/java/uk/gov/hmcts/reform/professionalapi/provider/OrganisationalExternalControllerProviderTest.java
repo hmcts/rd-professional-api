@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -107,6 +108,9 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
+
+    @Autowired
+    UserAttributeService userAttributeService;
 
     @Override
     void setController() {
