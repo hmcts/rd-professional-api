@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -97,6 +98,9 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     Authentication authentication;
     @Mock
     SecurityContext securityContext;
+
+    @Autowired
+    UserAttributeService userAttributeService;
 
     @Autowired
     UserAttributeRepository userAttributeRepository;

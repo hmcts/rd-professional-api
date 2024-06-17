@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessReposi
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
@@ -68,6 +69,9 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
 
     @MockBean
     UserAttributeRepository userAttributeRepository;
+
+    @MockBean
+    UserAttributeService userAttributeService;
 
     @Bean
     @Primary
