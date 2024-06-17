@@ -1254,7 +1254,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgAdmin", withFeature = false)
+    @DisplayName("PRD Internal Update Organisation Admin retuens Successfully")
     void updateOrganisationAdminReturnSuccess() {
 
         log.info("updateOrganisationAdminReturnSuccess :: STARTED");
