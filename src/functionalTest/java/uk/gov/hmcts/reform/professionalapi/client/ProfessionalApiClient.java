@@ -512,7 +512,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(newUserCreationRequest)
-            .put("/refdata/internal/v1/organisations/" + orgId + "/users/")
+            .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
             .andReturn();
 
         log.info("{}:: Update organisation Admin response: {}",

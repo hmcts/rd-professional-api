@@ -1263,6 +1263,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
 
+        activateOrganisation(response, "prd-admin");
+
         JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
 
