@@ -507,25 +507,6 @@ public class ProfessionalApiClient {
         return response.body().jsonPath();
     }
 
-    public Map<String, Object> addUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
-                                                     String orgId, HttpStatus expectedStatus) {
-
-        Response response = getMultipleAuthHeadersInternal()
-            .body(newUserCreationRequest)
-            .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
-            .andReturn();
-
-        log.info("{}:: Update organisation Admin response: {}",
-            loggingComponentName, response.getStatusCode());
-
-        response.then()
-            .assertThat()
-            .statusCode(expectedStatus.value());
-
-        return response.body().as(Map.class);
-    }
-
-
     public Map<String, Object> updatesOrganisationAdmin(UserUpdateRequest userUpdateRequest,
                                                         HttpStatus expectedStatus) {
 
