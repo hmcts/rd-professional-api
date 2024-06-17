@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProf
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -33,7 +34,7 @@ public class OrganisationalExternalControllerV2ProviderTestConfiguration extends
     protected OrganisationServiceImpl organisationService;
 
     @MockBean
-    UserAttributeService userAttributeService;
+    UserAttributeRepository userAttributeRepository;
 
     @Bean
     @Primary

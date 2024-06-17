@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
@@ -82,7 +83,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
     IdamRepository idamRepositoryMock;
 
     @Autowired
-    UserAttributeService userAttributeService;
+    UserAttributeRepository userAttributeRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisationMock;
