@@ -1271,7 +1271,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertNotNull(orgResponse.get("name"));
 
         //creatign a test admin user in organisation
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest("test6@hmcts.net");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest("test8@hmcts.net");
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
             hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
@@ -1280,7 +1280,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         //updating the user with new email
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
-            "test6@hmcts.net","updatedTests@hmcts.net");
+            "test8@hmcts.net","updatedTests@hmcts.net");
         professionalApiClient.updatesOrganisationAdmin(userUpdateRequest, HttpStatus.CREATED);
 
         //fetching updated user to verify
