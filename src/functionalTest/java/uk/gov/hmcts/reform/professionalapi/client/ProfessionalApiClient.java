@@ -507,22 +507,20 @@ public class ProfessionalApiClient {
         return response.body().jsonPath();
     }
 
-    public Map<String, Object> updatesOrganisationAdmin(UserUpdateRequest userUpdateRequest,
-                                                        HttpStatus expectedStatus) {
 
+    public Map<String, Object> updatesOrganisationAdmin(UserUpdateRequest userUpdateRequest,
+                                                         HttpStatus expectedStatus) {
         Response response = getMultipleAuthHeadersInternal()
             .body(userUpdateRequest)
-            .put("/refdata/internal/v1/organisations/updateadmin/")
+            .put("/refdata/internal/v1/organisations/updateadmin")
             .andReturn();
-
-        log.info("{}:: Update organisation Admin response: {}",
-            loggingComponentName, response.getStatusCode());
-
         response.then()
             .assertThat()
             .statusCode(expectedStatus.value());
+        log.info("{}:: Updating admin user (Internal) response: {}", loggingComponentName, response.statusCode());
         return response.body().as(Map.class);
     }
+
 
     public Map<String, Object> retrieveOrganisationDetailsBySinceDate(String sinceDate, String page, String pageSize) {
         StringBuilder apiURL = new StringBuilder(INTERNAL_BASE_URL);

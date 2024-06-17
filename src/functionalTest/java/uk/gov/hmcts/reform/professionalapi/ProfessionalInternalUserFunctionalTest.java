@@ -1254,7 +1254,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @DisplayName("PRD Internal Update Organisation Admin retuens Successfully")
+    @DisplayName("PRD Internal Update Organisation Admin returns Successfully")
     void updateOrganisationAdminReturnSuccess() {
 
         log.info("updateOrganisationAdminReturnSuccess :: STARTED");
@@ -1271,7 +1271,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertNotNull(orgResponse.get("name"));
 
         //creatign a test admin user in organisation
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest("testEmail@hmcts.net");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest("test6@hmcts.net");
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
             hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
@@ -1280,8 +1280,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         //updating the user with new email
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
-            "testEmail@hmcts.net","updatedTest@hmcts.net");
-        professionalApiClient.updatesOrganisationAdmin(userUpdateRequest, OK);
+            "test6@hmcts.net","updatedTests@hmcts.net");
+        professionalApiClient.updatesOrganisationAdmin(userUpdateRequest, HttpStatus.CREATED);
 
         //fetching updated user to verify
         Map<String, Object> orgUpdatedResponse = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
@@ -1290,7 +1290,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         assertThat(professionalUsersResponses).isNotEmpty();
         assertThat(professionalUsersResponses).hasSize(1);
-        assertThat(professionalUsersResponses.get(0).get("emailAddress")).isEqualTo("updatedTest@hmcts.net");
+        assertThat(professionalUsersResponses.get(0).get("emailAddress")).isEqualTo("updatedTests@hmcts.net");
 
         professionalApiClient.deleteOrganisation(organisationIdentifier, hmctsAdmin, NO_CONTENT);
 
