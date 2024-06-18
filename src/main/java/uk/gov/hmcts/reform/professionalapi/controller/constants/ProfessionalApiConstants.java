@@ -130,6 +130,10 @@ public class ProfessionalApiConstants {
             "<br>- Passed payment account numbers are in an invalid format.<br>";
     public static final String DEL_ORG_PBA_NOTES_5 = "-The payment accounts are not associated with users organisation";
 
+    public static final String DEL_USER_UP = "- Users  deleted successfully.";
+
+    public static final String ERROR_USER_DELETED_UP = "- Error in deleting users.";
+
     public static final String GET_PBA_EMAIL_NOTES_1 =
             "**IDAM Roles to access API** : <br> pui-finance-manager,<br>pui-";
     public static final String GET_PBA_EMAIL_NOTES_2 =
