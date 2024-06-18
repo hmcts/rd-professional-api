@@ -13,9 +13,11 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
@@ -33,6 +35,12 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
 
     @MockBean
     OrgAttributeRepository orgAttributeRepository;
+
+    @MockBean
+    UserAttributeService userAttributeService;
+
+    @MockBean
+    UserAttributeRepository userAttributeRepository;
 
     @Bean
     @Primary

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
@@ -19,6 +20,7 @@ import static javax.persistence.GenerationType.AUTO;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@Setter
 public class UserAttribute implements Serializable {
 
     @Id
