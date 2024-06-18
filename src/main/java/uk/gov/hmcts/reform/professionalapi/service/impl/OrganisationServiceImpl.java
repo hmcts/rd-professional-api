@@ -91,6 +91,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -148,6 +149,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+
+
+
     @Override
     @Transactional
     public OrganisationResponse createOrganisationFrom(
@@ -180,7 +184,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
         }
-
         return new OrganisationResponse(organisation);
     }
 
@@ -605,6 +608,39 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisationsDetailResponse.setMoreAvailable(moreAvailable);
 
         return organisationsDetailResponse;
+    }
+
+    @Override
+    @Transactional
+    public OrganisationResponse updateOrganisationNameOrSra(
+        OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
+        final String attributeKey = "regulators-0";
+        final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+                + "\"organisationRegistrationNumber\":\"" + organisationCreationRequest.getSraId() + "\"}";
+        var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        if (existingOrganisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+        } else {
+            if (isNotBlank(organisationCreationRequest.getName())) {
+                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
+            }
+            if (isNotBlank(organisationCreationRequest.getSraId())) {
+                existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
+                OrgAttribute attribute = new OrgAttribute();
+                attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
+                attribute.setValue(RefDataUtil
+                    .removeEmptySpaces(attributeValue));
+                attribute.setOrganisation(existingOrganisation);
+                orgAttributeRepository.save(attribute);
+                List<OrgAttribute> attributes = new ArrayList<>();
+                attributes.add(attribute);
+                existingOrganisation.setOrgAttributes(attributes);
+            }
+        }
+
+        var savedOrganisation = organisationRepository.save(existingOrganisation);
+
+        return new OrganisationResponse(savedOrganisation);
     }
 
     @Override
