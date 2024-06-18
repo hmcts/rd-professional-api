@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
@@ -32,7 +31,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -64,6 +65,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -93,6 +95,7 @@ import java.util.stream.Stream;
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -128,6 +131,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     PrdEnumRepository prdEnumRepository;
     @Autowired
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
+    @Autowired
+    UserAttributeRepository userAttributeRepository;
     @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
@@ -285,8 +290,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public void addContactInformationToOrganisation(
-            List<ContactInformationCreationRequest> contactInformationCreationRequest,
-            Organisation organisation) {
+        List<ContactInformationCreationRequest> contactInformationCreationRequest,
+        Organisation organisation) {
 
         if (contactInformationCreationRequest != null) {
             contactInformationCreationRequest.forEach(contactInfo -> {
@@ -321,8 +326,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
-    private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
-                                                  ContactInformation contactInformation) {
+    public void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
+                                                 ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {
@@ -421,7 +426,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(
                 resultingOrganisations, true, true, false);
         organisationsDetailResponse.setTotalRecords(totalRecords);
-        organisationsDetailResponse.setMoreAvailable(moreAvailable);
         return organisationsDetailResponse;
     }
 
@@ -803,6 +807,33 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
+    @Override
+    @Transactional
+    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
+        if (emails.isEmpty()) {
+            throw new InvalidRequest("Please provide both email addresses");
+        }
+        Set<String> userIdsToBeDeleted = new HashSet<>();
+        emails.forEach(email -> {
+            Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
+                .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
+            if (!professionalUser.isEmpty()) {
+                userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
+                professionalUserRepository.delete(professionalUser.get());
+            }
+
+        });
+        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
+        Optional<DeleteOrganisationResponse> deleteOrganisationResponse = Optional.ofNullable(RefDataUtil
+            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient));
+        if (deleteOrganisationResponse.isEmpty()) {
+            throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
+        }
+        return new DeleteUserResponse(deleteOrganisationResponse.get().getStatusCode(),
+            deleteOrganisationResponse.get().getMessage());
+    }
+
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
                                                                 DeleteOrganisationResponse deleteOrganisationResponse,
                                                                 String prdAdminUserId) {
@@ -832,16 +863,13 @@ public class OrganisationServiceImpl implements OrganisationService {
                 deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
                 deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
 
-            } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
-                // If user is not active in the up will send the request to delete
+            } else {
+                // user will be deleted even if he is in active state
                 var userIds = new HashSet<String>();
                 userIds.add(user.getUserIdentifier());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
                         .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-            } else {
-                deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
-                deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
             }
         } else {
             deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
@@ -1054,6 +1082,66 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
+    }
+
+    @Override
+    public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        ContactInformationCreationRequest contactInformationRequest, String organisationIdentifier,
+        Boolean dxAddressRequired) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        if (organisation == null) {
+            throw new ResourceNotFoundException("Organisation does not exist");
+        }
+
+        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
+
+        if (!existingContactInformationList.isEmpty()) {
+            if (contactInformationRequest != null) {
+                if (existingContactInformationList.size() == 1) {
+                    //If single address is present then update address details
+                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation,
+                        dxAddressRequired);
+                } else if (!contactInformationRequest.getUprn().isEmpty()
+                    && (contactInformationRequest.getUprn()
+                    .equalsIgnoreCase(existingContactInformationList.get(0).getUprn()))) {
+                    // If multiple addresses present then update address details for provided UPRN
+                    updateContactInformation(existingContactInformationList,contactInformationRequest,organisation,
+                        dxAddressRequired);
+                } else { // If UPRN not set in db for the contact or nto sent in request then throw error
+                    throw new ResourceNotFoundException("No UPRN value found in existing contact information ");
+                }
+            } else { // If contact information does not exist in db for the organisation
+                throw new ResourceNotFoundException("No contact information found in request");
+            }
+        } else { // If request is made without contact information details
+            throw new ResourceNotFoundException("No contact information existing for given organisation");
+        }
+        return ResponseEntity.status(200).build();
+    }
+
+
+    private void updateContactInformation(List<ContactInformation> existingContactInformationList,
+                                       ContactInformationCreationRequest contactInfoRequest,Organisation organisation,
+                                          Boolean dxAddressRequired) {
+        existingContactInformationList.forEach(existingInfo -> {
+            existingInfo.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
+            existingInfo.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
+            existingInfo.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine3()));
+            existingInfo.setTownCity(RefDataUtil.removeEmptySpaces(contactInfoRequest.getTownCity()));
+            existingInfo.setCounty(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCounty()));
+            existingInfo.setCountry(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCountry()));
+            existingInfo.setPostCode(RefDataUtil.removeEmptySpaces(contactInfoRequest.getPostCode()));
+            existingInfo.setOrganisation(organisation);
+            existingInfo.setLastUpdated(LocalDateTime.now());
+            ContactInformation savedContactInformation = contactInformationRepository.save(existingInfo);
+            if (dxAddressRequired && contactInfoRequest.getDxAddress().isEmpty()) {
+                throw new ResourceNotFoundException("No Dx Address Information provided in request");
+            } else {
+                addDxAddressToContactInformation(contactInfoRequest.getDxAddress(), savedContactInformation);
+            }
+        });
     }
 
 }
