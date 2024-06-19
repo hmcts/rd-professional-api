@@ -1242,34 +1242,14 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
         setUpTestData();
-        String bearerToken = inviteUser(puiFinanceManager, intActiveOrgId, generateRandomEmail(),
-                "firstName2", "lastName2");
 
         PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
-        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(bearerToken), BAD_REQUEST);
+        professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,intActiveOrgId,
+                professionalApiClient.getMultipleAuthHeadersInternal(), FORBIDDEN);
 
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
-    }
-
-    public String inviteUser(String role,
-                             String orgId,
-                             String email,
-                             String firstName,
-                             String lastName) {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(role);
-        NewUserCreationRequest newUserCreationRequest = createUserRequest(userRoles);
-        newUserCreationRequest.setEmail(email);
-        String bearerToken = idamOpenIdClient.getExternalOpenIdToken(puiUserManager,
-                firstName, lastName, email);
-
-        Map<String, Object> pumInternalUserResponse = professionalApiClient
-                .addNewUserToAnOrganisation(orgId, hmctsAdmin, newUserCreationRequest, CREATED);
-        assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
-        return bearerToken;
     }
 
     @Test
@@ -1292,17 +1272,14 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String intActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
                 hmctsAdmin);
 
-        String bearerToken = inviteUser(puiFinanceManager, intActiveOrgId, generateRandomEmail(),
-                "firstName2", "lastName2");
-
         PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
 
-        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
-                professionalApiClient.getMultipleAuthHeaders(bearerToken), NO_CONTENT);
+        professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,intActiveOrgId
+            professionalApiClient.getMultipleAuthHeadersInternal(), NO_CONTENT);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
-                professionalApiClient.getMultipleAuthHeaders(bearerToken));
+            professionalApiClient.getMultipleAuthHeadersInternal());
 
         var paymentAccounts = (List<String>) response.get("paymentAccount");
         assertThat(paymentAccounts).isEmpty();

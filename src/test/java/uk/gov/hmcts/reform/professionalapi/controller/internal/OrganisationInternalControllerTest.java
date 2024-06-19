@@ -576,9 +576,6 @@ class OrganisationInternalControllerTest {
     }
 
 
-
-
-
     @Test
     void testDeletePaymentAccounts() {
         PbaRequest deletePbaRequest = new PbaRequest();
