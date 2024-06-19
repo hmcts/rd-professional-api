@@ -1275,7 +1275,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
 
-        professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,intActiveOrgId
+        professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,intActiveOrgId,
             professionalApiClient.getMultipleAuthHeadersInternal(), NO_CONTENT);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
