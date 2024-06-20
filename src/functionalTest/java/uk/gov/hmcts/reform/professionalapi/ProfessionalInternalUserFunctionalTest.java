@@ -47,6 +47,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -93,6 +94,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         reinviteUserScenarios();
         editPbaScenarios();
         deleteOrganisationScenarios();
+        deleteDxAddressScenarios();
         updateOrgStatusScenarios();
     }
 
@@ -213,9 +215,12 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void deleteOrganisationScenarios() {
         deletePendingOrganisationShouldReturnSuccess();
         deleteActiveOrganisationShouldReturnSuccess();
+    }
+
+    public void deleteDxAddressScenarios(){
         deleteDxAddressShouldReturnSuccess();
         deleteEmptyContactListShouldReturnError();
-        deleteEmptyDxAddressShouldReturnError();
+        deleteNonExistDxAddressShouldReturnError();
     }
 
     @Test
@@ -230,6 +235,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 orgIdentifier, NO_CONTENT);
         assertThat(deleteDxAddressResponse).isNotNull();
         assertThat(deleteDxAddressResponse.getStatusCode()).isEqualTo(204);
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+        assertNotEquals(dxNumber, orgResponse.get("contactInformation[0].dxAddress[0].dxNumber"));
         log.info("deleteDxAddressShouldReturnSuccess :: END");
     }
 
@@ -254,8 +262,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    public void deleteEmptyDxAddressShouldReturnError() {
-        log.info("deleteEmptyDxAddressShouldReturnError :: STARTED");
+    public void deleteNonExistDxAddressShouldReturnError() {
+        log.info("deleteNonExistDxAddressShouldReturnError :: STARTED");
         OrganisationCreationRequest orgCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .status("ACTIVE")
@@ -281,7 +289,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat((String) deleteDxAddressResponse.get("errorDescription"))
                 .contains("No dx address found for organisation");
 
-        log.info("deleteEmptyDxAddressShouldReturnError :: END");
+        log.info("deleteNonExistDxAddressShouldReturnError :: END");
     }
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
