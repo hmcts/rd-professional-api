@@ -686,6 +686,9 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLdOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
@@ -702,6 +705,8 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
 
@@ -723,8 +728,8 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    //@ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
-    //@ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");

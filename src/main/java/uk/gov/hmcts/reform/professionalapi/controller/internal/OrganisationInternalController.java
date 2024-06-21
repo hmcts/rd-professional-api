@@ -704,7 +704,7 @@ public class OrganisationInternalController extends SuperController {
 
     @Operation(
         summary = "Deletes the provided list of dx addresses from the organisation.",
-        description = "**IDAM Roles to access API** : <br> - pui-finance-manager",
+        description = "**IDAM Roles to access API** : <br> - prd-admin",
         security = {
             @SecurityRequirement(name = "ServiceAuthorization"),
             @SecurityRequirement(name = "Authorization")
