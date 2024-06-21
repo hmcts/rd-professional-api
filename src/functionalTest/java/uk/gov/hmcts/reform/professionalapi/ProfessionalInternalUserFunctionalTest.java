@@ -1240,13 +1240,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
-        setUpTestData();
-
         PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
         professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,intActiveOrgId,
-                professionalApiClient.getMultipleAuthHeadersInternal(), FORBIDDEN);
+                professionalApiClient.getMultipleAuthHeadersWithGivenRole("pui-user-manager"), FORBIDDEN);
 
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
     }
