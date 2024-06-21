@@ -43,8 +43,8 @@ public class OrganisationFixtures {
                         .build()));
     }
 
-    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder
-    minimalOrganisationEmptyContactListRequest() {
+    public static OrganisationCreationRequest
+            .OrganisationCreationRequestBuilder minimalOrganisationEmptyContactListRequest() {
 
         return anOrganisationCreationRequest()
                 .name("some-org-name")
