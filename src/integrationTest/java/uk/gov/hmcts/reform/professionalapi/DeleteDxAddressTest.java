@@ -1,17 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.lib.idam.IdamOpenId.generateRandomEmail;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-
-import static uk.gov.hmcts.reform.lib.idam.IdamOpenId.generateRandomEmail;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -49,8 +44,8 @@ class DeleteDxAddressTest extends AuthorizationEnabledIntegrationTest {
 
         String orgIdentifier = createAndActivateOrganisationWithGivenRequest(orgCreationRequest);
 
-        Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteDxAddress(hmctsAdmin, orgIdentifier
-                , new DxAddressCreationRequest("DX 1234567890","dxExchange"));
+        Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteDxAddress(hmctsAdmin, orgIdentifier,
+                 new DxAddressCreationRequest("DX 1234567890","dxExchange"));
 
         assertThat(deleteResponse.get("http_status")).isEqualTo(404);
         assertThat((String) deleteResponse.get("response_body")).contains("No contact information  found");
@@ -61,8 +56,8 @@ class DeleteDxAddressTest extends AuthorizationEnabledIntegrationTest {
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
         String orgIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest);
 
-        Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteDxAddress(hmctsAdmin, orgIdentifier
-                , new DxAddressCreationRequest("DX 1234567890","dxExchange"));
+        Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteDxAddress(hmctsAdmin, orgIdentifier,
+                 new DxAddressCreationRequest("DX 1234567890","dxExchange"));
 
         assertThat(deleteResponse.get("http_status")).isEqualTo(400);
         assertThat((String) deleteResponse.get("response_body")).contains("No dx address found for organisation");

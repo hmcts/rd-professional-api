@@ -217,7 +217,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         deleteActiveOrganisationShouldReturnSuccess();
     }
 
-    public void deleteDxAddressScenarios(){
+    public void deleteDxAddressScenarios() {
         deleteDxAddressShouldReturnSuccess();
         deleteEmptyContactListShouldReturnError();
         deleteNonExistDxAddressShouldReturnError();
