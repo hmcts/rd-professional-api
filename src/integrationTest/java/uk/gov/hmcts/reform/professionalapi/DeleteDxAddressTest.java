@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.lib.idam.IdamOpenId.generateRandomEmail;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import java.util.LinkedList;
+
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.minimalOrganisationEmptyContactListRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -33,15 +31,8 @@ class DeleteDxAddressTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void returns_404_when_deleting_empty_contact_list() {
-        OrganisationCreationRequest orgCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .status("ACTIVE")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email(generateRandomEmail().toLowerCase())
-                        .build()).contactInformation(new LinkedList<>()).build();
 
+        OrganisationCreationRequest orgCreationRequest = minimalOrganisationEmptyContactListRequest().build();
         String orgIdentifier = createAndActivateOrganisationWithGivenRequest(orgCreationRequest);
 
         Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteDxAddress(hmctsAdmin, orgIdentifier,
