@@ -5,7 +5,6 @@ import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -1243,42 +1242,30 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
-        professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,intActiveOrgId,
+        professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,
                 professionalApiClient.getMultipleAuthHeadersWithGivenRole("pui-user-manager"), FORBIDDEN);
 
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    //@ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    //@ExtendWith(FeatureToggleConditionExtension.class)
     void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
 
-        organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest()
-                        .firstName("firstName")
-                        .lastName("lastName")
-                        .email(generateRandomEmail())
-                        .build())
-                .paymentAccount(Set.of("PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
-                        "PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
-                        "PBA".concat(RandomStringUtils.randomAlphanumeric(7))))
-                .status("ACTIVE")
-                .build();
-        String intActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
-                hmctsAdmin);
+        setUpTestData();
 
         PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
 
-        professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,intActiveOrgId,
+        professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,
             professionalApiClient.getMultipleAuthHeadersInternal(), NO_CONTENT);
 
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
-            professionalApiClient.getMultipleAuthHeadersInternal());
+        JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
+        assertThat(jsonPath).isNotNull();
+        var paymentAccounts = (List<String>) jsonPath.get("paymentAccount");
 
-        var paymentAccounts = (List<String>) response.get("paymentAccount");
         assertThat(paymentAccounts).isEmpty();
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: END");
     }

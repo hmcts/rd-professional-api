@@ -1702,7 +1702,7 @@ public class ProfessionalApiClient {
                 loggingComponentName, response.getStatusCode());
     }
 
-    public void deletePaymentAccountsOfOrganisationInternal(PbaRequest deletePbaRequest,String organisationId,
+    public void deletePaymentAccountsOfOrganisationInternal(PbaRequest deletePbaRequest,
                                                     RequestSpecification requestSpecification,
                                                     HttpStatus expectedStatus) {
         Response response = requestSpecification

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -747,13 +748,13 @@ public class OrganisationInternalController extends SuperController {
         content = @Content
     )
 
-    @DeleteMapping(path = "/pba/{orgId}")
+    @DeleteMapping(path = "/pba")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"prd-admin"})
     public void deletePaymentAccountsOfOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
         @Valid @NotNull @RequestBody PbaRequest deletePbaRequest,
-        @PathVariable("orgId") @NotBlank String organisationIdentifier,
+        @Parameter(hidden = true) @OrgId String organisationIdentifier,
         @Parameter(hidden = true) @UserId String userId) {
 
         deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, organisationIdentifier, userId);
