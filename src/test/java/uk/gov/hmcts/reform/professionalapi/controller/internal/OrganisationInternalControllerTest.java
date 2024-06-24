@@ -590,7 +590,7 @@ class OrganisationInternalControllerTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
         organisationInternalController
-                .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId);
+                .deletePaymentAccountsForOrganisation(deletePbaRequest, orgId, userId);
 
         verify(professionalUserServiceMock, times(1))
                 .checkUserStatusIsActiveByUserId(anyString());
@@ -611,7 +611,7 @@ class OrganisationInternalControllerTest {
         String userId = UUID.randomUUID().toString();
         assertThrows(InvalidRequest.class,() ->
                 organisationInternalController
-                        .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId));
+                        .deletePaymentAccountsForOrganisation(deletePbaRequest, orgId, userId));
 
     }
 }

@@ -706,8 +706,8 @@ public class OrganisationInternalController extends SuperController {
 
 
     @Operation(
-        summary = "Deletes the provided list of payment accounts from the organisation.",
-        description = "**IDAM Roles to access API** : <br> - prd-admin",
+        summary = "Deletes the provided list of payment accounts from the organisation (internal api).",
+        description = "IDAM Roles to access API : <br> - prd-admin",
         security = {
             @SecurityRequirement(name = "ServiceAuthorization"),
             @SecurityRequirement(name = "Authorization")
@@ -715,7 +715,7 @@ public class OrganisationInternalController extends SuperController {
     )
     @ApiResponse(
         responseCode = "204",
-        description = "Successfully deleted the list of provided payment accounts from the organisation.",
+        description = "Successfully deleted the list of payment accounts from the provided organisation.",
         content = @Content
     )
     @ApiResponse(
@@ -751,13 +751,13 @@ public class OrganisationInternalController extends SuperController {
     @DeleteMapping(path = "/pba")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"prd-admin"})
-    public void deletePaymentAccountsOfOrganisation(
+    public void deletePaymentAccountsForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
         @Valid @NotNull @RequestBody PbaRequest deletePbaRequest,
-        @Parameter(hidden = true) @OrgId String organisationIdentifier,
+        @Parameter(hidden = true) @OrgId String orgIdentifier,
         @Parameter(hidden = true) @UserId String userId) {
 
-        deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, organisationIdentifier, userId);
+        deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, orgIdentifier, userId);
 
     }
 
