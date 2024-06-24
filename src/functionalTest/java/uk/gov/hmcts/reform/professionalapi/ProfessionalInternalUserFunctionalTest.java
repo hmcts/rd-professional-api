@@ -1249,8 +1249,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    //@ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
-    //@ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
 
