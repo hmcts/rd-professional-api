@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -748,16 +747,19 @@ public class OrganisationInternalController extends SuperController {
         content = @Content
     )
 
-    @DeleteMapping(path = "/pba")
+    @DeleteMapping(
+        value = "/pba/{orgId}"
+    )
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Secured({"prd-admin"})
+    @ResponseBody
+    @Secured("prd-admin")
     public void deletePaymentAccountsForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
         @Valid @NotNull @RequestBody PbaRequest deletePbaRequest,
-        @Parameter(hidden = true) @OrgId String orgIdentifier,
+        @PathVariable("orgId") @NotBlank String organisationIdentifier,
         @Parameter(hidden = true) @UserId String userId) {
 
-        deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, orgIdentifier, userId);
+        deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, organisationIdentifier, userId);
 
     }
 
@@ -769,7 +771,6 @@ public class OrganisationInternalController extends SuperController {
                 @SecurityRequirement(name = "ServiceAuthorization")
             }
     )
-
     @ApiResponse(
             responseCode = "200",
             description = "List of matching organisations",

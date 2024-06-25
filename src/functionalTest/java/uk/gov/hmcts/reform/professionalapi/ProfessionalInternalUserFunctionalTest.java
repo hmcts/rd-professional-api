@@ -154,6 +154,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         roles.add(puiCaseManager);
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
+        roles.add(hmctsAdmin);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
 
     }
@@ -1243,24 +1244,52 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
         professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,
-                professionalApiClient.getMultipleAuthHeadersWithGivenRole("pui-user-manager"), FORBIDDEN);
+                professionalApiClient.getMultipleAuthHeadersWithGivenRole("pui-user-manager"),
+            intActiveOrgId,FORBIDDEN);
 
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
     }
 
+
     @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationInternalController.deletePaymentAccountsForOrganisation", withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
+        superUserEmail = generateRandomEmail();
+        invitedUserEmail = generateRandomEmail();
+        organisationCreationRequest = createOrganisationRequest()
+            .superUser(aUserCreationRequest()
+                .firstName("firstName")
+                .lastName("lastName")
+                .email(superUserEmail)
+                .build())
+            .build();
+        intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
 
-        setUpTestData();
+        List<String> roles = new ArrayList<>();
+        roles.add(puiCaseManager);
+        roles.add(puiOrgManager);
+        roles.add(puiFinanceManager);
+        roles.add(hmctsAdmin);
+        Map<String, String> userResponse = idamOpenIdClient.createUser(roles, invitedUserEmail,
+            "firstName", "lastName");
+        String activeUserId = (String) userResponse.get("userIdentifier");
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setIdamStatus("ACTIVE");
+        userProfileUpdatedData.setEmail(invitedUserEmail);
+        userProfileUpdatedData.setFirstName("firstName");
+        userProfileUpdatedData.setLastName("lastName");
+        Map<String, Object> modifiedUserResponse = professionalApiClient
+            .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, intActiveOrgId,
+                activeUserId);
 
         PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
 
         professionalApiClient.deletePaymentAccountsOfOrganisationInternal(deletePbaRequest,
-            professionalApiClient.getMultipleAuthHeadersInternal(), NO_CONTENT);
+            professionalApiClient.getMultipleAuthHeadersInternal(),intActiveOrgId, NO_CONTENT);
 
         JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
         assertThat(jsonPath).isNotNull();

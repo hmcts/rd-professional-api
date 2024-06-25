@@ -1704,10 +1704,11 @@ public class ProfessionalApiClient {
 
     public void deletePaymentAccountsOfOrganisationInternal(PbaRequest deletePbaRequest,
                                                     RequestSpecification requestSpecification,
+                                                    String organisationIdentifier,
                                                     HttpStatus expectedStatus) {
         Response response = requestSpecification
             .body(deletePbaRequest)
-            .delete("/refdata/internal/v1/organisations/pba")
+            .delete("/refdata/internal/v1/organisations/pba/" + organisationIdentifier)
             .andReturn();
 
         response.then()
