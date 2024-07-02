@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
+import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepos
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -35,6 +37,9 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
 
     @MockBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
+
+    @MockBean
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
 
     @MockBean
     FeatureToggleService featureToggleService;
@@ -84,6 +89,11 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
         return new OrganisationExternalController();
     }
 
+    @Bean
+    @Primary
+    public ProfessionalExternalUserController professionalExternalUserController() {
+        return new ProfessionalExternalUserController();
+    }
 
     @Bean
     @Primary

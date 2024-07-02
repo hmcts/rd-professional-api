@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -33,12 +34,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -365,5 +368,24 @@ class ProfessionalExternalUserControllerTest {
                 professionalExternalUserController.findUserStatusByEmail(email));
     }
 
+    @Test
+    void test_modifyRolesForExistingUserOfExternalOrganisation() {
+        ResponseEntity<Object> newResponse = ResponseEntity.status(200).body("");
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
+                "lastName", IdamStatus.ACTIVE.name(), null, null, null);
+        String orgId = "org123";
+        String userId = "1234567890";
+        String origin = "EXUI";
+        Optional<String> originOpt = Optional.of(origin);
+        when(professionalUserServiceMock.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData,
+                userId, originOpt)).thenReturn(newResponse);
+
+        ResponseEntity<Object> response = professionalExternalUserController
+                .modifyUserConfiguredAccessAndRolesForExistingUserOfExternalOrganisation(userProfileUpdatedData,
+                        orgId, userId, origin);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isNotNull();
+    }
 
 }

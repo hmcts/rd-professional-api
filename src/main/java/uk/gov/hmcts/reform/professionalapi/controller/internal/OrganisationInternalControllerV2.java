@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @RestController
 @Slf4j
 @NoArgsConstructor
+@SuppressWarnings("checkstyle:Indentation")
 public class OrganisationInternalControllerV2 extends SuperController {
     @Value("${loggingComponentName}")
     protected String loggingComponentName;
@@ -133,11 +134,12 @@ public class OrganisationInternalControllerV2 extends SuperController {
     public ResponseEntity<Object> retrieveOrganisations(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @Parameter(name = "id") @RequestParam(value = "id", required = false) String id,
+            @Parameter(name = "since") @RequestParam(value = "since", required = false) String lastUpdatedSince,
             @Parameter(name = "status") @RequestParam(value = "status", required = false) String status,
             @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
 
-        return retrieveAllOrganisationOrByIdForV2Api(id, status, page, size);
+        return retrieveAllOrganisationsOrByIdForV2Api(id, lastUpdatedSince, status, page, size);
     }
 
     @Operation(

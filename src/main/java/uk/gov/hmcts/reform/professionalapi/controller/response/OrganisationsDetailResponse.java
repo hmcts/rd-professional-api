@@ -19,6 +19,10 @@ public class OrganisationsDetailResponse {
     @Setter
     long totalRecords;
 
+    @Getter
+    @Setter
+    boolean moreAvailable;
+
     public OrganisationsDetailResponse(
             List<Organisation> organisations, Boolean isRequiredContactInfo,
             Boolean isRequiredPendingPbas, Boolean isRequiredAllPbas) {

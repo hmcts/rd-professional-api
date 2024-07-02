@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
@@ -68,6 +69,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     String extActiveOrgId;
     String activeUserEmail;
     String activeUserId;
+    String newAddedUserId;
     String superUserEmail;
     String superUserId;
     OrganisationCreationRequest organisationCreationRequest;
@@ -90,6 +92,16 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         suspendUserScenarios();
     }
 
+    @Test
+    @DisplayName("PRD Group Access External Test Scenarios")
+    void testExternalUserGroupAccessScenario() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager));
+        addNewUserAccessTypeScenarios();
+        updateAndAddNewUserAccessTypeScenarios();
+        inviteNewUserToOrganisationScenarios();
+    }
+
     public void setUpOrgTestData() {
         if (isEmpty(extActiveOrgId)) {
             log.info("Setting up organization...");
@@ -106,7 +118,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                     .build();
 
             organisationCreationRequest.setStatus("ACTIVE");
-            extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+            extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
             Map<String, Object> searchResponse = professionalApiClient
                     .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
@@ -141,6 +153,16 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         // inviteUserBySuperUserShouldBeSuccess();
     }
 
+    public void inviteNewUserToOrganisationScenarios() {
+        // Adding and verifying user with access type
+        addNewUserToAnOrganisationShouldBeSuccess(true);
+        findUsersByUserIdentifier(true);
+
+        // Adding and verifying user without access type
+        addNewUserToAnOrganisationShouldBeSuccess(false);
+        findUsersByUserIdentifier(false);
+    }
+
     public void findUsersByOrganisationScenarios() {
         findUsersByNonPumAndNoStatusProvidedShouldBeSuccess();
         findUsersByPumAndNoStatusProvidedShouldBeSuccess();
@@ -165,6 +187,18 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess();
     }
 
+    public void findUsersByUserIdentifierWithUserAccessType() {
+        findUserWithAccessTypeShouldBeSuccess();
+    }
+
+    public void findUsersByUserIdentifier(Boolean hasAccessType) {
+        findUserWithIdShouldBeSuccess(hasAccessType);
+    }
+
+    public void findUsersByUserIdentifierWithUserAccessTypesAndRoles() {
+        findUserWithAccessTypesAndRoleShouldBeSuccess();
+    }
+
     public void findUserStatusByEmailScenarios() {
         findUserStatusByEmailByPumShouldBeSuccess();
         findUserStatusByEmailInHeaderByPumShouldBeSuccess();
@@ -182,6 +216,16 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         addRolesByPendingExtUserShouldReturnForbidden();
     }
 
+    public void addNewUserAccessTypeScenarios() {
+        addUserAccessTypeShouldBeSuccess();
+        findUsersByUserIdentifierWithUserAccessType();;
+    }
+
+    public void updateAndAddNewUserAccessTypeScenarios() {
+        addOrUpdateUserAccessTypeShouldBeSuccess();
+        findUsersByUserIdentifierWithUserAccessTypesAndRoles();;
+    }
+
     public void suspendUserScenarios() {
         suspendUserByPumShouldBeSuccess();
     }
@@ -195,6 +239,16 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("inviteUserByPuiUserManagerShouldBeSuccess :: END");
     }
 
+    public void addNewUserToAnOrganisationShouldBeSuccess(boolean hasAccessType) {
+        log.info("addNewUserToAnOrganisationShouldBeSuccess :: STARTED");
+        Map<String, Object> newUserResponse = professionalApiClient
+                    .addNewUserToAnOrganisationExternal(createUserRequest(asList(puiCaseManager), hasAccessType),
+                            professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        newAddedUserId = newUserResponse.get("userIdentifier").toString();
+        log.info("addNewUserToAnOrganisationShouldBeSuccess :: END");
+    }
+
     public void inviteUserBySuperUserShouldBeSuccess() {
         log.info("inviteUserBySuperUserShouldBeSuccess :: STARTED");
         String email = generateRandomEmail();
@@ -205,7 +259,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
                 .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
                 .status("ACTIVE").build();
-        createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+        createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
         NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
 
@@ -284,6 +338,53 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(professionalUsers.size()).isGreaterThan(1);
         validateRetrievedUsers(searchResponse, ACTIVE, false);
         log.info("findUsersBySystemAdminWithoutRolesRequiredShouldBeSuccess :: END");
+    }
+
+    @Test
+    @DisplayName("PRD External Test Scenarios: find org users should sort based on first name")
+    public void findOrganisationUsersSorted() {
+        String superUserEmail = generateRandomEmail();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .superUser(aUserCreationRequest().firstName(firstName)
+                        .lastName(lastName).email(superUserEmail).build())
+                .status("ACTIVE").build();
+
+        String extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+                hmctsAdmin);
+
+        String bearerToken = inviteUser(puiCaseManager, extActiveOrgId, generateRandomEmail(),
+                "firstName2", "lastName2");
+
+        NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList(puiCaseManager),
+                "lastName1", "firstName1");
+
+        Map<String, Object> newUserResponse2 = professionalApiClient
+                .addNewUserToAnOrganisation(extActiveOrgId, puiCaseManager,
+                        newUserCreationRequest2, HttpStatus.CREATED);
+        assertThat(newUserResponse2).isNotNull();
+        assertThat(newUserResponse2.get("userIdentifier")).isNotNull();
+
+        Map<String, Object> response = professionalApiClient
+                .searchOrganisationUsersByReturnRolesParamExternal(OK,
+                        professionalApiClient.getMultipleAuthHeaders(bearerToken), "false");
+
+        assertThat(response.get("users")).asList().isNotEmpty();
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
+        assertThat(professionalUsersResponses.size()).isEqualTo(3);
+
+        HashMap firstUser = professionalUsersResponses.get(0);
+        assertThat(firstUser.get("firstName")).isEqualTo("firstName");
+        assertThat(firstUser.get("lastName")).isEqualTo("lastName");
+
+        HashMap secondUser = professionalUsersResponses.get(1);
+        assertThat(secondUser.get("firstName")).isEqualTo("firstName1");
+        assertThat(secondUser.get("lastName")).isEqualTo("lastName1");
+
+        HashMap thirdUser = professionalUsersResponses.get(2);
+        assertThat(thirdUser.get("firstName")).isEqualTo("firstName2");
+        assertThat(thirdUser.get("lastName")).isEqualTo("lastName2");
+
     }
 
     public void findOrgByPfmShouldBeSuccess() {
@@ -368,6 +469,32 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findActiveOrganisationByPumShouldBeSuccess :: END");
     }
 
+    public void findUserWithAccessTypeShouldBeSuccess() {
+        log.info("findUserWithAccessTypeShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        validateAccessTypesInRetrievedUser(response, "ACTIVE",
+                true,true, activeUserId);
+        log.info("findUserWithAccessTypeShouldBeSuccess :: END");
+    }
+
+    public void findUserWithIdShouldBeSuccess(Boolean hasAccessType) {
+        log.info("findUserWithIdShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), newAddedUserId);
+        validateAccessTypesInRetrievedUser(response, "PENDING",
+                false, hasAccessType, newAddedUserId);
+        log.info("findUserWithIdShouldBeSuccess :: END");
+    }
+
+    public void findUserWithAccessTypesAndRoleShouldBeSuccess() {
+        log.info("findUserWithAccessTypesAndRoleShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        validateAccessTypesAndRolesInRetrievedUser(response,  true);
+        log.info("findUserWithAccessTypesAndRoleShouldBeSuccess :: END");
+    }
+
     public void findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess() {
         log.info("findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess :: STARTED");
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
@@ -422,6 +549,40 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("addRolesByPumShouldBeSuccess :: END");
     }
 
+    public void addUserAccessTypeShouldBeSuccess() {
+        log.info("addUserAccessTypeShouldBeSuccess :: STARTED");
+        UserAccessType userAccessType = new UserAccessType();
+        userAccessType.setAccessTypeId("testAccessTypeId");
+        userAccessType.setJurisdictionId("testJurisdictionId");
+        userAccessType.setOrganisationProfileId("testOrganisationProfileId");
+        userAccessType.setEnabled(true);
+        professionalApiClient.modifyUserToExistingUserForExternal(OK, addOrUpdateUserAccessType(userAccessType),
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        log.info("addUserAccessTypeShouldBeSuccess :: END");
+    }
+
+    public void addOrUpdateUserAccessTypeShouldBeSuccess() {
+        log.info("addOrUpdateUserAccessTypeShouldBeSuccess :: STARTED");
+        UserAccessType userAccessType2 = new UserAccessType();
+        userAccessType2.setAccessTypeId("testAccessTypeId2");
+        userAccessType2.setJurisdictionId("testJurisdictionId2");
+        userAccessType2.setOrganisationProfileId("testOrganisationProfileId2");
+        userAccessType2.setEnabled(false);
+
+        UserAccessType userAccessType3 = new UserAccessType();
+        userAccessType3.setAccessTypeId("testAccessTypeId3");
+        userAccessType3.setJurisdictionId("testJurisdictionId3");
+        userAccessType3.setOrganisationProfileId("testOrganisationProfileId3");
+        userAccessType3.setEnabled(true);
+
+        Set<UserAccessType> userAccessTypeSet = new HashSet<>();
+        userAccessTypeSet.add(userAccessType2);
+        userAccessTypeSet.add(userAccessType3);
+        professionalApiClient.modifyUserToExistingUserForExternal(OK, addOrUpdateUserAccessTypeAndRole(puiOrgManager,
+                        userAccessTypeSet),professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        log.info("addOrUpdateUserAccessTypeShouldBeSuccess :: END");
+    }
+
     public void deleteRolesByPumShouldBeSuccess() {
         log.info("deleteRolesByPumShouldBeSuccess :: STARTED");
         professionalApiClient.modifyUserToExistingUserForExternal(OK, deleteRoleRequest(puiOrgManager),
@@ -471,6 +632,24 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .addNewUserToAnOrganisation(extActiveOrgId, hmctsAdmin, newUserCreationRequest, CREATED);
         assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
         activeUserId = (String) pumInternalUserResponse.get("userIdentifier");
+        return bearerToken;
+    }
+
+    public String inviteUser(String role,
+                             String orgId,
+                             String email,
+                             String firstName,
+                             String lastName) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(role);
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(userRoles);
+        newUserCreationRequest.setEmail(email);
+        String bearerToken = idamOpenIdClient.getExternalOpenIdToken(puiUserManager,
+                firstName, lastName, email);
+
+        Map<String, Object> pumInternalUserResponse = professionalApiClient
+                .addNewUserToAnOrganisation(orgId, hmctsAdmin, newUserCreationRequest, CREATED);
+        assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
         return bearerToken;
     }
 

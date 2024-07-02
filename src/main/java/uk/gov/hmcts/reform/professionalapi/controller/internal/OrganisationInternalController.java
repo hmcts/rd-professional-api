@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -30,13 +31,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
@@ -62,7 +67,16 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @RestController
 @Slf4j
 @NoArgsConstructor
+@SuppressWarnings("checkstyle:Indentation")
 public class OrganisationInternalController extends SuperController {
+
+    protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
+
+    @Autowired
+    public OrganisationInternalController(
+            OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator) {
+        this.organisationByProfileIdsRequestValidator = organisationByProfileIdsRequestValidator;
+    }
 
     @Value("${loggingComponentName}")
     protected String loggingComponentName;
@@ -152,11 +166,12 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<Object> retrieveOrganisations(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @Parameter(name = "id") @RequestParam(value = "id", required = false) String id,
+            @Parameter(name = "since") @RequestParam(value = "since", required = false) String lastUpdatedSince,
             @Parameter(name = "status") @RequestParam(value = "status", required = false) String status,
             @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
 
-        return retrieveAllOrganisationOrById(id, status, page, size);
+        return retrieveAllOrganisationsOrById(id, lastUpdatedSince, status, page, size);
     }
 
 
@@ -678,5 +693,54 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(
             @PathVariable("userId") String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
+    }
+
+    @Operation(
+            summary = "Retrieves Organisations by Organisation Profile IDs",
+            description = "**Bearer token not required to access API. Only a valid s2s token**",
+            security = {
+                @SecurityRequirement(name = "ServiceAuthorization")
+            }
+    )
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "List of matching organisations",
+            content = @Content(schema = @Schema(implementation = MultipleOrganisationsResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request (PageSize or searchAfter) provided",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
+    @PostMapping(
+            path = "/getOrganisationsByProfile",
+            produces = APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Object> retrieveOrganisationsByProfileIds(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+            @Valid @NotNull @RequestBody OrganisationByProfileIdsRequest organisationByProfileIdsRequest,
+            @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
+            @RequestParam(value = "searchAfter", required = false) UUID searchAfter) {
+
+        organisationByProfileIdsRequestValidator.validate(pageSize);
+
+        MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
+                        organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 }

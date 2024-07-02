@@ -28,6 +28,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
@@ -42,11 +45,13 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceI
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -76,6 +81,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwks
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
         "USER_PROFILE_URL:http://127.0.0.1:8091"})
 @DirtiesContext
+@SuppressWarnings("checkstyle:Indentation")
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -98,6 +104,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Autowired
     protected OrgAttributeRepository orgAttributeRepository;
+
+    @Autowired
+    protected BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
     @Autowired
     protected UserAttributeRepository userAttributeRepository;
@@ -161,6 +170,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access Denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
+    protected static final String ORG_INFO = "organisationInfo";
+    protected static final String DATE_TIME_DELETED = "dateTimeDeleted";
+    protected static final String LAST_UPDATED = "lastUpdated";
+    protected static final String USER_ACCESS_TYPES = "userAccessTypes";
     public static final String APPLICATION_JSON = "application/json";
 
     @MockBean
@@ -277,6 +290,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
         orgAttributeRepository.deleteAll();
+        bulkCustomerDetailsRepository.deleteAll();
         organisationRepository.deleteAll();
     }
 
@@ -365,19 +379,27 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return orgIdentifier;
     }
 
-    public NewUserCreationRequest inviteUserCreationRequest(String userEmail, List<String> userRoles) {
-
-        String lastName = "someLastName";
-        String firstName = "1Aaron";
+    public NewUserCreationRequest inviteUserCreationRequest(String userEmail,
+                                                            String lastName,
+                                                            String firstName,
+                                                            List<String> userRoles) {
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        String random = randomAlphabetic(10);
+        userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
+                "accessTypeId" + random, false));
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
+                .userAccessTypes(userAccessTypes)
                 .build();
 
         return userCreationRequest;
+    }
 
+    public NewUserCreationRequest inviteUserCreationRequest(String userEmail, List<String> userRoles) {
+        return inviteUserCreationRequest(userEmail, "someLastName", "1Aaron", userRoles);
     }
 
     public NewUserCreationRequest reInviteUserCreationRequest(String userEmail, List<String> userRoles) {
@@ -400,11 +422,27 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return users.get(0).getId().toString();
     }
 
+    public String retrieveSuperUserIdentifierFromOrganisationId(String orgId) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        return users.get(0).getUserIdentifier();
+    }
+
     public String retrieveOrganisationIdFromSuperUserId(String userId) {
         return professionalUserRepository.findByUserIdentifier(userId).getOrganisation().getOrganisationIdentifier();
     }
 
     public void userProfileCreateUserWireMock(HttpStatus status)  {
+        userProfileCreateUserWireMock("testFn", "R", "dummy@email.com", "testFn", "L", "dummy@email.com", status);
+    }
+
+    public void userProfileCreateUserWireMock(String firstName,
+                                              String lastName,
+                                              String email,
+                                              String firstName2,
+                                              String lastName2,
+                                              String email2,
+                                              HttpStatus status)  {
         String body = null;
         int returnHttpStaus = status.value();
         if (status.is2xxSuccessful()) {
@@ -426,9 +464,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"testFn\","
-                + "  \"lastName\": \"R\","
-                + "  \"email\": \"dummy@email.com\","
+                + "  \"firstName\": \"" + firstName + "\","
+                + "  \"lastName\": \"" + lastName + "\","
+                + "  \"email\": \"" + email + "\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-organisation-manager\""
@@ -438,9 +476,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + "  {"
                 + "  \"userIdentifier\":\" %s" + "\","
-                + "  \"firstName\": \"testFn\","
-                + "  \"lastName\": \"L\","
-                + "  \"email\": \"dummy@email.com\","
+                + "  \"firstName\": \"" + firstName2 + "\","
+                + "  \"lastName\": \"" + lastName2 + "\","
+                + "  \"email\": \"" + email2 + "\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-case-manager\""
@@ -476,9 +514,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"testFN\","
-                + "  \"lastName\": \"R\","
-                + "  \"email\": \"dummy@email.com\","
+                + "  \"firstName\": \"" + firstName + "\","
+                + "  \"lastName\": \"" + lastName + "\","
+                + "  \"email\": \"" + email + "\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
@@ -486,9 +524,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"testFn\","
-                + "  \"lastName\": \"L\","
-                + "  \"email\": \"dummy@email.com\","
+                + "  \"firstName\": \"" + firstName2 + "\","
+                + "  \"lastName\": \"" + lastName2 + "\","
+                + "  \"email\": \"" + email2 + "\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
@@ -865,5 +903,24 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         organisationUpdateRequest.setStatus(status);
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
+    }
+
+    public UserProfileUpdatedData createModifyUserConfiguredAccessData(String email, int numUserAccessTypes) {
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        for (int i = 0; i < numUserAccessTypes; i++) {
+            UserAccessType userAccessType = new UserAccessType("Jurisdiction" + i,
+                    "Organisation" + i,
+                    "AccessType" + i, true);
+            userAccessTypes.add(userAccessType);
+        }
+
+        userProfileUpdatedData.setEmail(email);
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+        userProfileUpdatedData.setIdamStatus(IdamStatus.ACTIVE.name());
+        userProfileUpdatedData.setRolesAdd(new HashSet<>());
+        userProfileUpdatedData.setRolesDelete(new HashSet<>());
+        return userProfileUpdatedData;
     }
 }

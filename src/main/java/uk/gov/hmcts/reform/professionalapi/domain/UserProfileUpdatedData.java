@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @NoArgsConstructor
 @Getter
@@ -25,13 +28,17 @@ public class UserProfileUpdatedData {
 
     private Set<RoleName> rolesDelete;
 
+    @JsonInclude(NON_NULL)
+    private Set<UserAccessType> userAccessTypes;
+
     @JsonCreator
     public UserProfileUpdatedData(@JsonProperty(value = "email") String email,
                                   @JsonProperty(value = "firstName") String firstName,
                                   @JsonProperty(value = "lastName") String lastName,
                                   @JsonProperty(value = "idamStatus") String idamStatus,
                                   @JsonProperty(value = "rolesAdd") Set<RoleName> rolesAdd,
-                                  @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete
+                                  @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete,
+                                  @JsonProperty(value = "userAccessTypes") Set<UserAccessType> userAccessTypes
     ) {
         this.email = email;
         this.firstName = firstName;
@@ -39,6 +46,7 @@ public class UserProfileUpdatedData {
         this.idamStatus = idamStatus;
         this.rolesAdd = rolesAdd;
         this.rolesDelete = rolesDelete;
+        this.userAccessTypes = userAccessTypes;
     }
 
 }

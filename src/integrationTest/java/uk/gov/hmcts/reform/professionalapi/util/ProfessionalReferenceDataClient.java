@@ -19,14 +19,17 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -56,6 +59,8 @@ public class ProfessionalReferenceDataClient {
 
     private static final String APP_EXT_BASE_PATH = "/refdata/external/v1/organisations";
 
+    private static final String APP_INT_BULK = "/refdata/internal/v1/bulkCustomer";
+
     private static final String APP_EXT_V2_BASE_PATH = "/refdata/external/v2/organisations";
     private static final String APP_INT_V2_BASE_PATH = "/refdata/internal/v2/organisations";
     private static final String APP_INT_BASE_PATH = "/refdata/internal/v1/organisations";
@@ -69,6 +74,9 @@ public class ProfessionalReferenceDataClient {
     private String baseIntUrl;
 
     private String baseV2Url;
+
+
+    private String baseBulkIntUrl;
 
     private String baseV2IntUrl;
 
@@ -87,6 +95,7 @@ public class ProfessionalReferenceDataClient {
         this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
         this.baseV2Url = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH;
         this.baseV2IntUrl = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH;
+        this.baseBulkIntUrl = "http://localhost:" + prdApiPort + APP_INT_BULK;
         this.issuer = issuer;
         this.expiration = tokenExpirationInterval;
     }
@@ -114,6 +123,17 @@ public class ProfessionalReferenceDataClient {
                 role, userId, email);
     }
 
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeader(String email, String role) {
+        return getRequestToGetEmailFromHeader("/refdata/internal/v2/organisations" + "/pbas",
+                role, "", email);
+    }
+
+    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers(String email, String role,
+                                                                                         String userId) {
+        return getRequestToGetEmailFromHeader("/refdata/external/v2/organisations" + "/pbas",
+                role, userId, email);
+    }
+
     public Map<String, Object> findMFAByUserID(String professionalUserID) {
         return getRequestWithoutAuthHeaders(APP_EXT_BASE_PATH + "/mfa?user_id={userIdentifier}", professionalUserID);
     }
@@ -122,12 +142,23 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?id={id}", role, id);
     }
 
+    public Map<String, Object> retrieveBulkOrganisation(BulkCustomerRequest request, String role) {
+        return postRequest(baseBulkIntUrl, request, role, null);
+    }
+
+
+
     public Map<String, Object> retrieveSingleOrganisationForV2Api(String id, String role) {
         return getRequest(APP_INT_V2_BASE_PATH + "?id={id}", role, id);
     }
 
     public Map<String, Object> retrieveAllOrganisationsWithPagination(String page, String size, String role) {
         return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}", role, page, size);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationsWithPaginationSince(String page, String size, String role,
+                                                                           String since) {
+        return getRequest(APP_INT_BASE_PATH + "?page={page}&size={size}&since={since}", role, page, size, since);
     }
 
     public Map<String, Object> retrieveAllOrganisationsWithPaginationForV2Api(String page, String size, String role) {
@@ -155,19 +186,12 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH, role);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsSince(String role, String since) {
+        return getRequest(APP_INT_BASE_PATH + "?since={since}", role, since);
+    }
+
     public Map<String, Object> createOrganisationIntV2(OrganisationOtherOrgsCreationRequest request) {
         return postRequest(baseV2IntUrl, request, null, null);
-    }
-
-    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeader(String email, String role) {
-        return getRequestToGetEmailFromHeader("/refdata/internal/v2/organisations" + "/pbas",
-            role, "", email);
-    }
-
-    public Map<String, Object> findPaymentAccountsForV2ByEmailFromHeaderForExternalUsers(String email, String role,
-                                                                                         String userId) {
-        return getRequestToGetEmailFromHeader("/refdata/external/v2/organisations" + "/pbas",
-            role, userId, email);
     }
 
     public Map<String, Object> retrieveAllOrganisationsForV2Api(String role) {
@@ -216,6 +240,11 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
+    }
+
+    public Map<String, Object> retrieveAllOrganisationDetailsByStatusSinceTest(String status, String role,
+                                                                               String since) {
+        return getRequest(APP_INT_BASE_PATH + "?status={status}&&since={since}", role, status, since);
     }
 
     public Map<String, Object> retrieveAllOrganisationDetailsByStatusForV2ApiTest(String status, String role) {
@@ -274,6 +303,30 @@ public class ProfessionalReferenceDataClient {
                 returnRoles);
     }
 
+    public Map<String, Object> findRefreshUsersWithSince(String since, Integer pageSize) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?since={since}&pageSize={pageSize}", since,
+                pageSize);
+    }
+
+    public Map<String, Object> findRefreshUsersWithUserIdentifier(String userId) {
+        return getRequestWithoutBearerToken(APP_INT_BASE_PATH + "/users?userId={userId}",
+                userId);
+    }
+
+    public Map<String, Object> retrieveOrganisationsByProfileIds(OrganisationByProfileIdsRequest request, Integer
+            pageSize, UUID searchAfter) {
+        StringBuilder sb = new StringBuilder(baseIntUrl)
+                .append("/getOrganisationsByProfile?");
+        if (pageSize != null) {
+            sb.append("pageSize=").append(pageSize);
+        }
+        if (searchAfter != null) {
+            sb.append("&searchAfter=").append(searchAfter);
+        }
+        String uriPath = sb.toString();
+        return postRequest(uriPath, request, null, null);
+    }
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
@@ -314,6 +367,30 @@ public class ProfessionalReferenceDataClient {
         try {
 
             HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Map<String, Object> getRequestWithoutBearerToken(String uriPath, Object... params) {
+
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            HttpEntity<?> request = new HttpEntity<>(getS2sTokenHeaders());
+
             responseEntity = restTemplate
                     .exchange("http://localhost:" + prdApiPort + uriPath,
                             HttpMethod.GET,
@@ -600,6 +677,27 @@ public class ProfessionalReferenceDataClient {
         try {
             HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,
                     getMultipleAuthHeaders(externalRole, userIdentifier));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> modifyUserConfiguredAcessOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
+                                                             String orgId, String userIdentifier, String role) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/users/"
+                + userIdentifier;
+
+        try {
+            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,
+                    getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -929,4 +1027,21 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(
+            UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
+            UUID searchAfterUser, UUID searchAfterOrganisation) {
+        StringBuilder sb = new StringBuilder(baseV2IntUrl)
+                .append("/users?");
+        if (pageSize != null) {
+            sb.append("&pageSize=").append(pageSize);
+        }
+        if (searchAfterUser != null) {
+            sb.append("&searchAfterUser=").append(searchAfterUser);
+        }
+        if (searchAfterOrganisation != null) {
+            sb.append("&searchAfterOrg=").append(searchAfterOrganisation);
+        }
+        String uriPath = sb.toString();
+        return postRequest(uriPath, request, null, null);
+    }
 }

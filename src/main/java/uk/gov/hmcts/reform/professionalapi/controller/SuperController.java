@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -52,7 +51,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
@@ -63,8 +61,8 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -82,6 +80,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
@@ -128,8 +127,6 @@ public abstract class SuperController {
     protected PaymentAccountValidator paymentAccountValidator;
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
-    @Autowired
-    protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
     @Autowired
     protected MfaStatusService mfaStatusService;
     @Autowired
@@ -191,22 +188,25 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-
-
-
-    protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status,
-                                                                   Integer page, Integer size) {
+    protected ResponseEntity<Object> retrieveAllOrganisationsOrById(String organisationIdentifier,
+                                                                    String lastUpdatedSince,
+                                                                    String status, Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
         long totalRecords = 1;
 
+        LocalDateTime formattedSince = null;
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
+        }
+
         Object organisationResponse = null;
         var pageable = createPageable(page, size);
-        var pageableByStatus = createPageableByStatus(page,size);
 
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-            organisationResponse = organisationService.retrieveAllOrganisations(pageable);
+            organisationResponse = organisationService.retrieveAllOrganisations(formattedSince, pageable);
             totalRecords = ((OrganisationsDetailResponse) organisationResponse).getTotalRecords();
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
@@ -219,8 +219,9 @@ public abstract class SuperController {
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
             //Received request to retrieve organisation with status
 
+            var pageableByStatus = createPageableByStatus(page,size);
             organisationResponse = organisationService
-                        .findByOrganisationStatus(orgStatus.toUpperCase(), pageableByStatus);
+                        .findByOrganisationStatus(formattedSince, orgStatus.toUpperCase(), pageableByStatus);
             totalRecords = ((OrganisationsDetailResponse) organisationResponse).getTotalRecords();
         }
 
@@ -234,11 +235,18 @@ public abstract class SuperController {
     }
 
 
-    protected ResponseEntity<Object> retrieveAllOrganisationOrByIdForV2Api(String organisationIdentifier, String status,
-                                                                   Integer page, Integer size) {
+    protected ResponseEntity<Object> retrieveAllOrganisationsOrByIdForV2Api(String organisationIdentifier,
+                                                                            String lastUpdatedSince, String status,
+                                                                            Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
         long totalRecords = 1;
+
+        LocalDateTime formattedSince = null;
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
+        }
 
         Object organisationResponse = null;
         var pageable = createPageable(page, size);
@@ -246,7 +254,7 @@ public abstract class SuperController {
 
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(pageable);
+            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(formattedSince, pageable);
             totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
@@ -260,7 +268,7 @@ public abstract class SuperController {
             //Received request to retrieve organisation with status
 
             organisationResponse = organisationService
-                    .findByOrganisationStatusForV2Api(orgStatus.toUpperCase(), pageableByStatus);
+                    .findByOrganisationStatusForV2Api(formattedSince, orgStatus.toUpperCase(), pageableByStatus);
             totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
         }
 
@@ -422,7 +430,8 @@ public abstract class SuperController {
 
         var organisationMinimalInfoResponses =
                 organisations.stream()
-                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address)).toList();
+                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address))
+                        .collect(Collectors.toList());
 
         return ResponseEntity.status(200).body(organisationMinimalInfoResponses);
     }
@@ -433,11 +442,16 @@ public abstract class SuperController {
         var roles = newUserCreationRequest.getRoles();
         var professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest,
                 removeEmptySpaces(organisationIdentifier), roles);
+        ResponseEntity<Object> inviteResponse;
         if (newUserCreationRequest.isResendInvite() && resendInviteEnabled) {
-            return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles, organisationIdentifier);
+            inviteResponse = reInviteExpiredUser(newUserCreationRequest, professionalUser, roles,
+                    organisationIdentifier);
         } else {
-            return inviteNewUserToOrganisation(newUserCreationRequest, professionalUser, roles);
+            inviteResponse = inviteNewUserToOrganisation(newUserCreationRequest, professionalUser, roles);
         }
+
+        professionalUserService.saveAllUserAccessTypes(professionalUser, newUserCreationRequest.getUserAccessTypes());
+        return inviteResponse;
     }
 
     private ResponseEntity<Object> inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
@@ -598,14 +612,6 @@ public abstract class SuperController {
 
         //delete the passed pba account numbers from the organisation
         paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
-    }
-
-    protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
-                                                                      String userId, Optional<String> origin) {
-
-        userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
-
-        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
     }
 
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {
