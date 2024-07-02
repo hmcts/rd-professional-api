@@ -572,6 +572,11 @@ dependencyManagement {
         dependencySet(group: 'commons-fileupload', version: '1.5') {
             entry 'commons-fileupload'
         }
+        //CVE-2021-22044
+        dependencySet(group: 'org.springframework.cloud', version: '3.1.9') {
+            entry 'spring-cloud-starter-openfeign'
+            entry 'spring-cloud-openfeign-core'
+        }
 
 //        Resolves CVE-2023-4586
         dependencySet(group: 'io.netty', version: '4.1.109.Final') {
@@ -627,8 +632,6 @@ bootJar {
 }
 
 configurations.all {
-    exclude group: 'com.vaadin.external.google', module: 'android-json'
-
     resolutionStrategy.eachDependency { details ->
         // Remedy for CVE-2020-8908, ensures launchdarkly uses correct version
         if (details.requested.group == 'com.google.guava'
@@ -636,7 +639,17 @@ configurations.all {
             details.useVersion "32.1.1-jre"
         }
     }
+
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.bouncycastle'
+                && (details.requested.name == 'bcpkix-jdk18on'
+                || details.requested.name == 'bcprov-jdk18on')
+        ){
+            details.useVersion versions.bouncycastle
+        }
+    }
 }
+
 dependencies {
     modules {
         module("org.bouncycastle:bcpkix-jdk15on") {
@@ -662,14 +675,5 @@ rootProject.tasks.named("processIntegrationTestResources") {
 }
 
 rootProject.tasks.named("processContractTestResources") {
-    duplicatesStrategy = 'include'
-}
-rootProject.tasks.named("bootJar") {
-    duplicatesStrategy = 'include'
-}
-rootProject.tasks.named("distTar") {
-    duplicatesStrategy = 'include'
-}
-rootProject.tasks.named("distZip") {
     duplicatesStrategy = 'include'
 }

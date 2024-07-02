@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.launchdarkly.sdk.server.LDClient;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;

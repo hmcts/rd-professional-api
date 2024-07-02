@@ -97,7 +97,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/refdata/external/v1/organisations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations/users").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations/getOrganisationsByProfile").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/refdata/internal/v1/organisations/getOrganisationsByProfile").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refdata/external/v2/organisations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refdata/internal/v2/organisations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refdata/internal/v2/organisations/users").permitAll()
