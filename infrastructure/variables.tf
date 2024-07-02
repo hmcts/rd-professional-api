@@ -33,21 +33,21 @@ variable "team_name" {
   default = "RD"
 }
 
-variable sku_name {
+variable "sku_name" {
   default = "GP_Gen5_2"
 }
 
-variable sku_capacity {
+variable "sku_capacity" {
   default = "2"
 }
 
 variable "product-v16" {
-  type = string
-  default="rd-professional-api"
+  type    = string
+  default = "rd-professional-api"
 }
 variable "component-v16" {
-  type = string
-  default="postgres-db-v16"
+  type    = string
+  default = "postgres-db-v16"
 }
 
 variable "aks_subscription_id" {
