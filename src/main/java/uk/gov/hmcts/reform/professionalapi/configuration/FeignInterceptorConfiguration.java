@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.configuration;
 
 import feign.RequestInterceptor;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.Enumeration;
-import javax.servlet.http.HttpServletRequest;
 
 import static uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter.AUTHORISATION;
 
