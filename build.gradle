@@ -460,7 +460,7 @@ dependencies {
         exclude group: "net.bytebuddy", module: "byte-buddy"
         exclude group: "net.bytebuddy", module: "byte-buddy-agent"
     }
-    testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.13'){
+    testImplementation ('com.github.hmcts:rd-commons-lib:0.0.18'){
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
     }
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.7'
