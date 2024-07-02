@@ -69,23 +69,6 @@ resource "azurerm_resource_group" "rg" {
   }
 }
 
-module "db-professional-ref-data-v11" {
-  source             = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product            = var.product
-  component          = var.component
-  name               = join("-", [var.product, var.component, "postgres-db", "v11"])
-  location           = var.location
-  subscription       = var.subscription
-  env                = var.env
-  postgresql_user    = "dbrefdata"
-  database_name      = "dbrefdata"
-  common_tags        = var.common_tags
-  postgresql_version = "11"
-  sku_name           = var.sku_name
-  sku_capacity       = var.sku_capacity
-  sku_tier           = "GeneralPurpose"
-}
-
 # Create the database server v16
 # Name and resource group name will be defaults (<product>-<component>-<env> and <product>-<component>-data-<env> respectively)
 module "db-professional-ref-data-v16" {
