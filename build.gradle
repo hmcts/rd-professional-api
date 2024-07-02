@@ -677,3 +677,12 @@ rootProject.tasks.named("processIntegrationTestResources") {
 rootProject.tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
+rootProject.tasks.named("bootJar") {
+    duplicatesStrategy = 'include'
+}
+rootProject.tasks.named("distTar") {
+    duplicatesStrategy = 'include'
+}
+rootProject.tasks.named("distZip") {
+    duplicatesStrategy = 'include'
+}
