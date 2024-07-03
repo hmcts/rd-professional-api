@@ -67,8 +67,8 @@ module "db-professional-ref-data-v16" {
   force_schema_ownership_trigger = "3"
   kv_subscription                = var.kv_subscription
   kv_name                        = data.azurerm_key_vault.rd_key_vault.name
-  user_secret_name               = azurerm_key_vault_secret.POSTGRES-USER-v16.name
-  pass_secret_name               = azurerm_key_vault_secret.POSTGRES-PASS-v16.name
+  user_secret_name               = azurerm_key_vault_secret.POSTGRES-USER.name
+  pass_secret_name               = azurerm_key_vault_secret.POSTGRES-PASS.name
 
   subnet_suffix = "expanded"
   pgsql_version = "16"
