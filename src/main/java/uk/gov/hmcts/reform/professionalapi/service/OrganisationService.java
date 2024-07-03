@@ -37,7 +37,6 @@ public interface OrganisationService {
 
     OrganisationsDetailResponse retrieveAllOrganisations(LocalDateTime formattedSince, Pageable pageable);
 
-
     BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                        String idamId);
 

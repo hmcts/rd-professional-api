@@ -43,19 +43,6 @@ public class OrganisationFixtures {
                         .build()));
     }
 
-    public static OrganisationCreationRequest
-            .OrganisationCreationRequestBuilder minimalOrganisationEmptyContactListRequest() {
-
-        return anOrganisationCreationRequest()
-                .name("some-org-name")
-                .status("ACTIVE")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email(randomAlphanumeric(7).concat("@test.com"))
-                        .build()).contactInformation(new LinkedList<>());
-    }
-
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder whiteSpaceTrimOrganisationRequest() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");

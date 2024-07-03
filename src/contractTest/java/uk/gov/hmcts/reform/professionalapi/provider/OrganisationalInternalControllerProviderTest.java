@@ -73,7 +73,6 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
 
-
     @Autowired
     PaymentAccountRepository paymentAccountRepository;
 

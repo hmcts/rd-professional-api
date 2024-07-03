@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.minimalOrganisationEmptyContactListRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -32,7 +31,7 @@ class DeleteDxAddressTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void returns_404_when_deleting_empty_contact_list() {
 
-        OrganisationCreationRequest orgCreationRequest = minimalOrganisationEmptyContactListRequest().build();
+        OrganisationCreationRequest orgCreationRequest = someMinimalOrganisationRequest().build();
         String orgIdentifier = createAndActivateOrganisationWithGivenRequest(orgCreationRequest);
 
         Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteDxAddress(hmctsAdmin, orgIdentifier,
