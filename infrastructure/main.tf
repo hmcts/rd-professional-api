@@ -24,9 +24,9 @@ data "azurerm_key_vault_secret" "s2s_secret" {
 }
 
 resource "azurerm_key_vault_secret" "professional_s2s_secret" {
-  name          = "professional-api-s2s-secret"
-  value         = data.azurerm_key_vault_secret.s2s_secret.value
-  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+  name         = "professional-api-s2s-secret"
+  value        = data.azurerm_key_vault_secret.s2s_secret.value
+  key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -70,11 +70,11 @@ module "db-professional-ref-data-v16" {
   user_secret_name               = azurerm_key_vault_secret.POSTGRES-USER-v16.name
   pass_secret_name               = azurerm_key_vault_secret.POSTGRES-PASS-v16.name
 
-  subnet_suffix        = "expanded"
-  pgsql_version        = "16"
-  pgsql_sku            = var.pgsql_sku
-  product              = "rd"
-  name               = join("-", [var.product-v16, var.component-v16])
+  subnet_suffix = "expanded"
+  pgsql_version = "16"
+  pgsql_sku     = var.pgsql_sku
+  product       = "rd"
+  name          = join("-", [var.product-v16, var.component-v16])
 
   pgsql_server_configuration = var.pgsql_server_configuration
 
@@ -82,32 +82,32 @@ module "db-professional-ref-data-v16" {
 
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
-  name          = join("-", [var.component, "POSTGRES-USER"])
-  value         = module.db-professional-ref-data-v16.username
-  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+  name         = join("-", [var.component, "POSTGRES-USER"])
+  value        = module.db-professional-ref-data-v16.username
+  key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
-  name          = join("-", [var.component, "POSTGRES-HOST"])
-  value         = module.db-professional-ref-data-v16.fqdn
-  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+  name         = join("-", [var.component, "POSTGRES-HOST"])
+  value        = module.db-professional-ref-data-v16.fqdn
+  key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
-  name          = join("-", [var.component, "POSTGRES-PASS"])
-  value         = module.db-professional-ref-data-v16.password
-  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+  name         = join("-", [var.component, "POSTGRES-PASS"])
+  value        = module.db-professional-ref-data-v16.password
+  key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
-  name          = join("-", [var.component, "POSTGRES-DATABASE"])
-  value         = "dbrefdata"
-  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+  name         = join("-", [var.component, "POSTGRES-DATABASE"])
+  value        = "dbrefdata"
+  key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
-  name          = join("-", [var.component, "POSTGRES-PORT"])
-  value         = "5432"
-  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+  name         = join("-", [var.component, "POSTGRES-PORT"])
+  value        = "5432"
+  key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 
 }
