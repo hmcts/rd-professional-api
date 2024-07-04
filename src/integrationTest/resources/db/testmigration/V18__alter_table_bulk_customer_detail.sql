@@ -9,8 +9,6 @@ ALTER TABLE bulk_customer_details ADD COLUMN organisation_id VARCHAR(7);
 ALTER TABLE bulk_customer_details ADD CONSTRAINT organisation_fk7 foreign key (organisation_id)
 references organisation (organisation_identifier);
 
-ALTER TABLE ORGANISATION ADD COLUMN STATUS_MESSAGE VARCHAR(256);
-
 ALTER TABLE ORGANISATION ADD COLUMN date_approved TIMESTAMP;
 
 
