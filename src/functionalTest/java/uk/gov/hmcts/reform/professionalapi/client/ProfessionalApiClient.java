@@ -1287,8 +1287,8 @@ public class ProfessionalApiClient {
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
-
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE")
+            .statusMessage("Activate organisation").build();
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
     }
 

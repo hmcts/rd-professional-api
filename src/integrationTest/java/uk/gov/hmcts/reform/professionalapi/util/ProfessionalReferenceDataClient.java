@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -567,7 +568,7 @@ public class ProfessionalReferenceDataClient {
     public String getAndReturnBearerToken(String userId, String role) {
         String bearerToken;
         if (bearerTokenMap.get(role) == null && userId != null) {
-            bearerToken = "Bearer ".concat(getBearerToken(isNull(userId) ? UUID.randomUUID().toString()
+            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
                     : userId, role));
             bearerTokenMap.put(role, bearerToken);
         } else if (bearerTokenMap.get(role + userId) == null) {

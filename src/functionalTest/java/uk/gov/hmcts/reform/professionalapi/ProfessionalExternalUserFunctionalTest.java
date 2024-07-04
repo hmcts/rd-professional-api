@@ -689,7 +689,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-    void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLdOff() {
+    void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
         setUpOrgTestData();

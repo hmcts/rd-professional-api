@@ -290,7 +290,6 @@ class OrganisationServiceImplTest {
         when(organisationRepositoryImplNullReturnedMock.findByOrganisationIdentifier(any())).thenReturn(null);
         when(organisationMfaStatusRepositoryMock.save(any(OrganisationMfaStatus.class)))
                 .thenReturn(organisationMfaStatus);
-
         when(bulkCustomerDetailsRepositoryMock.save(any(BulkCustomerDetails.class))).thenReturn(bulkCustomerDetails);
     }
 
