@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
-import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
-import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,12 +64,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
 
 @Provider("referenceData_organisationalInternal")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-        host = "${PACT_BROKER_URL:localhost}",
-        port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-            @VersionSelector(tag = "Dev")},
-        providerTags = "${pactbroker.providerTags:master}",
-        enablePendingPacts = "${pactbroker.enablePending:true}")
 @Import(OrganisationalInternalControllerProviderTestConfiguration.class)
 public class OrganisationalInternalControllerProviderTest extends MockMvcProviderTest {
 
