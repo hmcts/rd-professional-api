@@ -106,4 +106,20 @@ class ModifyUserIdamIdIntegrationTest extends AuthorizationEnabledIntegrationTes
         assertThat(modifiedUserResponse.get("http_status")).isNotNull();
         assertThat(modifiedUserResponse).containsEntry("http_status","400");
     }
+
+    void ac2_modify_idam_empty_Request_should_return_400() {
+
+        ProfessionalUserIdentifierRequest professionalUserIdentifierRequest =  ProfessionalUserIdentifierRequest
+            .aUserIdentifierRequest().existingIdamId(null).newIdamId(UUID.randomUUID().toString())
+            .build();
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
+
+        Map<String, Object> modifiedUserResponse =
+            professionalReferenceDataClient.updateUserIdamForOrganisation(null,hmctsAdmin);
+
+        assertThat(modifiedUserResponse.get("http_status")).isNotNull();
+        assertThat(modifiedUserResponse).containsEntry("http_status","400");
+    }
 }

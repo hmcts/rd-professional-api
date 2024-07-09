@@ -703,7 +703,7 @@ public class OrganisationInternalController extends SuperController {
 
     @Operation(
         summary = "Updates idam id for a user in an organisation",
-        description = "**IDAM Roles to access API** :<br> pui-organisation-manager",
+        description = "**IDAM Roles to access API** :<br> prd-admin ",
         security = {
             @SecurityRequirement(name = "ServiceAuthorization"),
             @SecurityRequirement(name = "Authorization")
