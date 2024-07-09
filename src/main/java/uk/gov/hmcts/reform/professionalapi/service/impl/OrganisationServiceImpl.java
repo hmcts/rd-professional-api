@@ -1092,19 +1092,18 @@ public class OrganisationServiceImpl implements OrganisationService {
             Response userResponse = userProfileFeignClient
                 .modifyUserRoles(userProfileUpdatedData, existingUserIdentifier," ");
 
-            Optional<ProfessionalUser> professionalUser = Optional
-                .ofNullable(professionalUserService.findProfessionalUserByUserIdentifier(existingUserIdentifier));
-            if (professionalUser.isPresent()) {
-                professionalUser.get().setUserIdentifier(newUserIdentifier);
-                professionalUserRepository.save(professionalUser.get());
-            } else {
-                throw new EmptyResultDataAccessException(PROFESSIONAL_USER_404_MESSAGE, 1);
-            }
-
             if (userResponse != null && userResponse.status() > 300) {
-                modifiedUserResponse = toResponseEntity(userResponse, ModifyUserRolesResponse.class);
-            } else {
                 modifiedUserResponse = toResponseEntity(userResponse, ErrorResponse.class);
+            } else {
+                Optional<ProfessionalUser> professionalUser = Optional
+                    .ofNullable(professionalUserService.findProfessionalUserByUserIdentifier(existingUserIdentifier));
+                if (professionalUser.isPresent()) {
+                    professionalUser.get().setUserIdentifier(newUserIdentifier);
+                    professionalUserRepository.save(professionalUser.get());
+                } else {
+                    throw new EmptyResultDataAccessException(PROFESSIONAL_USER_404_MESSAGE, 1);
+                }
+                modifiedUserResponse = toResponseEntity(userResponse, ModifyUserRolesResponse.class);
             }
             return modifiedUserResponse;
         } catch (FeignException ex) {
