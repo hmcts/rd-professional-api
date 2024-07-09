@@ -122,4 +122,39 @@ class ModifyUserIdamIdIntegrationTest extends AuthorizationEnabledIntegrationTes
         assertThat(modifiedUserResponse.get("http_status")).isNotNull();
         assertThat(modifiedUserResponse).containsEntry("http_status","400");
     }
+
+    @Test
+    void ac1_modify_idamId_userProfileFeignClient_getUserProfileById_Bad_Request_error() {
+        //create and update organisation
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
+
+        //create new user
+        List<String> userRoles = new ArrayList<>();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userRoles.add(puiCaseManager);
+
+        Map<String, Object> newUserResponse =
+            professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+                inviteUserCreationRequest(randomAlphabetic(5) + "@email.com",
+                    userRoles), hmctsAdmin);
+        String existingUserIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
+
+        ProfessionalUserIdentifierRequest professionalUserIdentifierRequest =  ProfessionalUserIdentifierRequest
+            .aUserIdentifierRequest().existingIdamId(existingUserIdentifier).newIdamId(UUID.randomUUID().toString())
+            .build();
+
+        //modify Idam  details in user Profile
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
+
+        Map<String, Object> modifiedUserResponse =
+            professionalReferenceDataClient.updateUserIdamForOrganisation(professionalUserIdentifierRequest,hmctsAdmin);
+
+        //validate overall response should be 200 always
+        assertThat(modifiedUserResponse.get("http_status")).isNotNull();
+        assertThat(modifiedUserResponse).containsEntry("http_status","400");
+
+    }
 }
