@@ -711,9 +711,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
         String existingUserId = (String) newUserResponse.get("userIdentifier");
-
+        String newId = UUID.randomUUID().toString();
         ProfessionalUserIdentifierRequest professionalUserIdentifierRequest =  ProfessionalUserIdentifierRequest
-            .aUserIdentifierRequest().existingIdamId(existingUserId).newIdamId(UUID.randomUUID().toString())
+            .aUserIdentifierRequest().existingIdamId(existingUserId).newIdamId(newId)
             .build();
 
         Map<String, Object> updatedIdamResponse = professionalApiClient.updateUserIdamForOrganisation(
@@ -725,10 +725,12 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
         Map professionalUsersResponse = getUserById(professionalUsersResponses, existingUserId);
 
-        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, NO_CONTENT);
-
         assertThat(updatedIdamResponse).isNotNull();
         assertThat(professionalUsersResponse).isNotNull();
+        assertThat(professionalUsersResponse.get("userIdentifier").toString())
+            .contains(newId);
+
+        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, NO_CONTENT);
 
         log.info("updateUserIdamForOrganisationShouldReturnSuccess :: END");
     }
