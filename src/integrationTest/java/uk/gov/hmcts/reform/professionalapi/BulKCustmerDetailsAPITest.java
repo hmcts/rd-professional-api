@@ -120,7 +120,7 @@ class BulKCustmerDetailsAPITest extends AuthorizationEnabledIntegrationTest {
                         "pui-user-manager");
         assertThat(bulkOrganisationResponse).containsEntry("http_status", "403");
         assertThat(bulkOrganisationResponse.get("response_body").toString())
-                .contains("Access is denied");
+                .contains("Access Denied");
 
 
     }
