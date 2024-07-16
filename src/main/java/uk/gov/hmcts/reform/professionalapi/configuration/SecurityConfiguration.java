@@ -96,7 +96,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(a -> a.requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refdata/external/v1/organisations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/refdata/internal/v1/organisations/users").permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/refdata/internal/v1/organisations/getOrganisationsByProfile").permitAll()
                         .requestMatchers(HttpMethod.POST, "/refdata/external/v2/organisations").permitAll()
