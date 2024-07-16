@@ -66,6 +66,9 @@ withNightlyPipeline(type, product, component) {
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.Rules = params.SecurityRules
 
+    // Var for testcontainers.org
+    env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
+
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
