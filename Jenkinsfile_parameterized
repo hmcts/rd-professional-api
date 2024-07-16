@@ -60,6 +60,9 @@ withParameterizedPipeline(type, product, component, 'sandbox', 'sandbox') {
     env.OAUTH2_REDIRECT_URI = params.OAUTH2_REDIRECT_URI_TO_TEST
     env.PROFESSIONAL_API_S2S_SECRET = params.S2S_SECRET_TO_TEST
 
+    // Var for testcontainers.org
+    env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
+
     after('integrationTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
