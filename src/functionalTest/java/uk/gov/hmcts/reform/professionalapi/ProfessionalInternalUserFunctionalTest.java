@@ -1298,5 +1298,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(paymentAccounts).isEmpty();
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: END");
     }
+
 }
 
