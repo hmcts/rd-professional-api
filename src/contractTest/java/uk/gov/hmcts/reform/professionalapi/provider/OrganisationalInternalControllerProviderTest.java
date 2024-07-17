@@ -358,7 +358,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         organisation.setContactInformations(List.of(contactInformation));
 
         SuperUser superUser = new SuperUser("firstName", "lastName",
-            "email", organisation);
+                "email", organisation);
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
