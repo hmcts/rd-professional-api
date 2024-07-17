@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.binder;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.dataload.domain.CommonCsvField;
 
 import java.io.Serializable;
-import javax.validation.constraints.NotEmpty;
+
 
 // TODO validation frameworks needs to be implemented
 

@@ -6,10 +6,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,9 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -83,7 +82,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-            @Valid @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
+            @Validated @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for external user
         return createOrganisationFrom(organisationCreationRequest);

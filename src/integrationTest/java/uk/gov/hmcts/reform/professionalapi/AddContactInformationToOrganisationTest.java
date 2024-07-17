@@ -173,7 +173,7 @@ public class AddContactInformationToOrganisationTest extends AuthorizationEnable
         assertThat(addContactsToOrgresponse).isNotNull();
         ErrorResponse errorResponse = get404ErrorResponse(addContactsToOrgresponse.get("response_body").toString());
 
-        assertThat(errorResponse.getErrorDescription()).contains("Access is denied");
+        assertThat(errorResponse.getErrorDescription()).contains("Access Denied");
         assertThat(addContactsToOrgresponse.get("http_status")).isEqualTo("403");
     }
 

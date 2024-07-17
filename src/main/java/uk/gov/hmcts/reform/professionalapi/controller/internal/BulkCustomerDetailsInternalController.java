@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.constraints.NotNull;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -82,7 +80,7 @@ public class BulkCustomerDetailsInternalController extends SuperController {
     public ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomer(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description =
                                                                     "retrieveOrganisationDetailsForBulkCustomer")
-            @Valid @NotNull @RequestBody BulkCustomerRequest bulkCustomerRequest) {
+            @Validated @NotNull @RequestBody BulkCustomerRequest bulkCustomerRequest) {
 
         log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomer", loggingComponentName);
 

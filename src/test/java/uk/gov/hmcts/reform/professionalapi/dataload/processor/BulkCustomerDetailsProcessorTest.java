@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.processor;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -26,9 +29,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
