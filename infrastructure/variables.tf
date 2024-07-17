@@ -33,11 +33,11 @@ variable "team_name" {
   default = "RD"
 }
 
-variable sku_name {
+variable "sku_name" {
   default = "GP_Gen5_2"
 }
 
-variable sku_capacity {
+variable "sku_capacity" {
   default = "2"
 }
 
