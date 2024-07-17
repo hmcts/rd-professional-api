@@ -1234,8 +1234,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    @DisplayName("Delete PBA for existing Organisation Forbidden")
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
@@ -1252,8 +1251,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationInternalController.deletePaymentAccountsForOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    @DisplayName("Delete PBA for existing Organisation")
     void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
         superUserEmail = generateRandomEmail();
