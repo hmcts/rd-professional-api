@@ -19,7 +19,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.sonarqube' version '5.0.0.4638'
-    id 'org.springframework.boot' version '3.2.1'
+    id 'org.springframework.boot' version '3.3.1'
     id "org.flywaydb.flyway" version '9.22.3'
     id 'au.com.dius.pact' version '4.1.7'// do not change, otherwise serenity report fails
 }
@@ -323,7 +323,6 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '8.0.1.Final'
     implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa')
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -554,7 +553,7 @@ dependencyManagement {
         // CVE-2021-25122
         // CVE-2021-42340
         // CVE-2023-28709
-        dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.14') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.16') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -565,8 +564,6 @@ dependencyManagement {
             entry 'jackson-core'
             entry 'jackson-annotations'
         }
-        // CVE-2021-22060, CVE-2022-22965, CVE-2022-22950, CVE-2022-22971, CVE-2022-22968, CVE-2022-22970, CVE-2022-31690, CVE-2022-31692
-        dependency(group: 'org.springframework', name: 'spring-corespring-core', version: '5.3.22') //remove this line after spring boot upgrade to 2.7.7 and spring frame work to 6.0
 
         //CVE-2023-24998
         dependencySet(group: 'commons-fileupload', version: '1.5') {
