@@ -362,9 +362,9 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
 
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.0-rc1'
-    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.3', ext: 'pom'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.17.2', ext: 'pom'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation 'com.github.hmcts:idam-java-client:2.0.1'
@@ -494,6 +494,8 @@ dependencies {
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.5.3'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.5.3'
 
 
     contractTestImplementation (group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version)
@@ -550,10 +552,6 @@ dependencies {
 dependencyManagement {
 
     dependencies {
-        dependencySet(group: 'com.fasterxml.jackson.core', version: '2.14.0-rc1') {
-            entry 'jackson-core'
-            entry 'jackson-annotations'
-        }
 
         //CVE-2023-24998
         dependencySet(group: 'commons-fileupload', version: '1.5') {
