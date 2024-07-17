@@ -31,7 +31,7 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 ext {
-    springCloudVersion = '2023.0.0'
+    springCloudVersion = '2023.0.3'
 }
 
 def versions = [
