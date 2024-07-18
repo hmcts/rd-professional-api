@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.PrdEnumType;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
@@ -82,7 +83,16 @@ public class UserAttributeServiceImpl implements UserAttributeService {
                 || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name());
     }
 
-
-
-
+    public void updateUser(ProfessionalUser existingAdmin, ProfessionalUser newAdmin) {
+        List<UserAttribute> userAttributes = userAttributeRepository
+            .fetchByProfessionalUserIdAndPrdEnumType(existingAdmin.getId());
+        if (userAttributes.size() > 0) {
+            userAttributes.forEach(userAttribute -> {
+                userAttribute.setProfessionalUser(newAdmin);
+                userAttributeRepository.save(userAttribute);
+            });
+        } else {
+            throw new InvalidRequest("The requested user's attributes not found or is not an admin");
+        }
+    }
 }
