@@ -29,7 +29,7 @@ class DeleteDxAddressTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void returns_404_when_deleting_empty_contact_list() {
+    void returns_invalid_request_when_deleting_empty_contact_list() {
 
         OrganisationCreationRequest orgCreationRequest = someMinimalOrganisationRequest().build();
         String orgIdentifier = createAndActivateOrganisationWithGivenRequest(orgCreationRequest);
@@ -37,7 +37,7 @@ class DeleteDxAddressTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteDxAddress(hmctsAdmin, orgIdentifier,
                  new DxAddressCreationRequest("DX 1234567890","dxExchange"));
 
-        assertThat(deleteResponse.get("http_status")).isEqualTo(404);
+        assertThat(deleteResponse.get("http_status")).isEqualTo(400);
         assertThat((String) deleteResponse.get("response_body")).contains("No contact information  found");
     }
 
