@@ -31,7 +31,7 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 def versions = [
-        lombok          : '1.18.34',
+        lombok          : '1.18.32',
         pitest          : '1.16.1',
         reformLogging   : '6.0.1',
         serenity        : '2.0.76',
