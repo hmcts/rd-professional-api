@@ -719,7 +719,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (StringUtils.isBlank(userId) || userId.equalsIgnoreCase("null")) {
             throw new InvalidRequest("Bad Request: User Id is null");
         }
-        ProfessionalUser  professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
+        ProfessionalUser  professionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userId.trim()));
         if (professionalUser == null) {
             log.error("{}:: ProfessionalUserUser info null::", loggingComponentName);
             throw new EmptyResultDataAccessException(PROFESSIONAL_USER_404_MESSAGE, 1);

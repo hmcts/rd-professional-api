@@ -142,7 +142,7 @@ class ProfessionalUserTest {
         userAttributes.add(userAttribute);
 
         UUID id = UUID.randomUUID();
-        professionalUser.setUserIdentifier(id.toString());
+        professionalUser.setUserIdentifier(id);
         professionalUser.setId(id);
         professionalUser.setCreated(LocalDateTime.now());
         professionalUser.setLastUpdated(LocalDateTime.now());

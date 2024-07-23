@@ -114,7 +114,7 @@ class RefDataUtilTest {
                 "soMeone@somewhere.com", organisation);
         professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
         professionalUser.setOrganisation(organisation);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
         professionalUser.setLastUpdated(LocalDateTime.of(2023, 12, 31, 23, 59, 59, 987654321));
         userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         userAccountMap = new UserAccountMap(userAccountMapId);

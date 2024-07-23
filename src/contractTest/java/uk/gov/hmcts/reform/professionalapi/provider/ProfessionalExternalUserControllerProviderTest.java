@@ -61,12 +61,16 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATI
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID2;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID2_STR;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID_STR;
 
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {ProfessionalExternalUserControllerProviderTestConfiguration.class, WebConfig.class})
 public class ProfessionalExternalUserControllerProviderTest extends WebMvcProviderTest {
+
+    private static final UUID USER_ID = UUID.fromString("someUid");
 
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
@@ -102,18 +106,18 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
     private static final String USER_JWT = "Bearer some-access-token";
 
-    @State({"Professional User exists for identifier " + PROFESSIONAL_USER_ID})
+    @State({"Professional User exists for identifier " + PROFESSIONAL_USER_ID_STR})
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
         setupInteractionsForProfessionalUser();
     }
 
-    @State({"Professional User exists for modification with identifier " + PROFESSIONAL_USER_ID})
+    @State({"Professional User exists for modification with identifier " + PROFESSIONAL_USER_ID_STR})
     public void toUpdateUserRolesForIdentifier() throws IOException {
 
         setupInteractionsForProfessionalUser();
     }
 
-    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID2})
+    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID2_STR})
     public void toUpdateUserRolesAndAccessTypesForIdentifier() throws IOException {
 
         setupInteractionsForProfessionalUserWithUserAccessTypes();
@@ -144,7 +148,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(PROFESSIONAL_USER_ID);
+        userProfileResponse.setUserIdentifier(PROFESSIONAL_USER_ID_STR);
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.setUserProfiles(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -194,7 +198,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
                 .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
 
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(USER_ID)).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
 
@@ -247,7 +251,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         List<ProfessionalUser> professionalUsers = List.of(profile1, profile2);
         when(professionalUserRepositoryMock.findByOrganisation(any())).thenReturn(professionalUsers);
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(profile1);
+        when(professionalUserRepositoryMock.findByUserIdentifier(USER_ID)).thenReturn(profile1);
         when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(profile1);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any())).thenReturn(organisation);
         List<UserConfiguredAccess> allUserConfiguredAccess1 = PactUtils.getUserConfiguredAccesses(profile1);
@@ -316,7 +320,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
                 .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
 
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(USER_ID)).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByUserIdentifier(any())).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID2)).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);

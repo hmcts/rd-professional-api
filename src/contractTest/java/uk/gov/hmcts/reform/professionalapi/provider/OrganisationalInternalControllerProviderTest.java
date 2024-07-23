@@ -335,7 +335,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
                 "some-email-address", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -359,7 +359,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         SuperUser superUser = new SuperUser("firstName", "lastName",
                 "email", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setUsers(users);

@@ -1,20 +1,30 @@
 spring:
   flyway:
-    schemas: DBREFDATA
+    out-of-order: true
+    enabled: true
     locations: classpath:db/testmigration
-
+    schemas:
+      - dbrefdata
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     properties:
       hibernate:
+        order_updates: true
+        order_inserts: true
         default_schema: dbrefdata
         enable_lazy_load_no_trans: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+          batch_size: 10
+          time_zone: UTC
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:dbrefdata
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: ${DB_URL:jdbc:tc:postgresql:11.1:///dbrefdata}
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
   security:

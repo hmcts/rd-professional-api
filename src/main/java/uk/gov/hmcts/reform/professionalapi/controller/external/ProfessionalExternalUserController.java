@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -126,7 +127,7 @@ public class ProfessionalExternalUserController extends SuperController {
         if (userIdentifier != null) {
             profExtUsrReqValidator.validateUuid(userIdentifier);
             ProfessionalUser fetchingUser = professionalUserService.findProfessionalUserByUserIdentifier(
-                    userIdentifier);
+                    UUID.fromString(userIdentifier));
             profExtUsrReqValidator.validateOrganisationMatch(organisationIdentifier, fetchingUser);
         }
 

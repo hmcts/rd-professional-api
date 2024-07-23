@@ -29,8 +29,10 @@ public class PactUtils {
     private PactUtils() {
     }
 
-    public static final String PROFESSIONAL_USER_ID = "123456";
-    public static final String PROFESSIONAL_USER_ID2 = "234567";
+    public static final String PROFESSIONAL_USER_ID_STR = "123456";
+    public static final UUID PROFESSIONAL_USER_ID = UUID.fromString(PROFESSIONAL_USER_ID_STR);
+    public static final String PROFESSIONAL_USER_ID2_STR = "234567";
+    public static final UUID PROFESSIONAL_USER_ID2 =  UUID.fromString(PROFESSIONAL_USER_ID2_STR);
     public static final String ORGANISATION_IDENTIFIER = "HM2OHHS";
     public static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 

@@ -429,7 +429,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     public String retrieveOrganisationIdFromSuperUserId(String userId) {
-        return professionalUserRepository.findByUserIdentifier(userId).getOrganisation().getOrganisationIdentifier();
+        return professionalUserRepository.findByUserIdentifier(UUID.fromString(userId)).getOrganisation().getOrganisationIdentifier();
     }
 
     public void userProfileCreateUserWireMock(HttpStatus status)  {

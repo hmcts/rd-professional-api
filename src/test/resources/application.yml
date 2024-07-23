@@ -15,8 +15,8 @@ spring:
     show-sql: true
 
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:dbrefdata
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: ${DB_URL:jdbc:tc:postgresql:11.1:///dbrefdata}
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
 defaultPageSize: ${DEFAULTPAGESIZE:10}

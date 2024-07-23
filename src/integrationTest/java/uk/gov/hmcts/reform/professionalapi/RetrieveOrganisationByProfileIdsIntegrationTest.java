@@ -42,19 +42,19 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     public void setup() {
         organisationRepository.deleteAll();
 
-        OrganisationOtherOrgsCreationRequest request1 = this.createUniqueOrganisationRequest("TstSO1", "SRA123",
+        OrganisationOtherOrgsCreationRequest request1 = this.createUniqueOrganisationRequest("TstSO11", "SRA123",
                 "PBA1234561", "super-email1@gmail.com", solicitorOrgType);
         professionalReferenceDataClient.createOrganisationV2(request1);
 
-        OrganisationOtherOrgsCreationRequest request2 = this.createUniqueOrganisationRequest("TstSO2", "SRA124",
+        OrganisationOtherOrgsCreationRequest request2 = this.createUniqueOrganisationRequest("TstSO21", "SRA124",
                 "PBA1234562", "super-email2@gmail.com", solicitorOrgType);
         professionalReferenceDataClient.createOrganisationV2(request2);
 
-        OrganisationOtherOrgsCreationRequest request3 = this.createUniqueOrganisationRequest("TestOG1", "SRA125",
+        OrganisationOtherOrgsCreationRequest request3 = this.createUniqueOrganisationRequest("TestOG11", "SRA125",
                 "PBA1234563", "super-email3@gmail.com", ogdHoOrgType);
         professionalReferenceDataClient.createOrganisationV2(request3);
 
-        OrganisationOtherOrgsCreationRequest request4 = this.createUniqueOrganisationRequest("TestOG2", "SRA126",
+        OrganisationOtherOrgsCreationRequest request4 = this.createUniqueOrganisationRequest("TestOG21", "SRA126",
                 "PBA1234564", "super-email4@gmail.com", ogdHoOrgType);
         professionalReferenceDataClient.createOrganisationV2(request4);
 
@@ -62,7 +62,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         organisationV1Identifier = createOrganisationRequest();
 
         // create an organisation with Barrister org type, which should map to Solicitor Profile
-        OrganisationOtherOrgsCreationRequest requestBarrister = this.createUniqueOrganisationRequest("TstSO3", "SRA127",
+        OrganisationOtherOrgsCreationRequest requestBarrister = this.createUniqueOrganisationRequest("TstSO31", "SRA127",
                 "PBA1234565", "super-email5@gmail.com", OrganisationTypeConstants.BARRISTER);
         professionalReferenceDataClient.createOrganisationV2(requestBarrister);
     }

@@ -65,6 +65,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
     private static final String USER_JWT = "Bearer some-access-token";
+    private static final UUID USER_ID = UUID.fromString("someUid");
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
 
@@ -126,7 +127,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .body(body, Charset.defaultCharset()).status(200).build());
 
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(USER_ID)).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
 
@@ -154,7 +155,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .body(body, Charset.defaultCharset()).status(200).build());
 
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(USER_ID)).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
 
@@ -182,7 +183,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .request(mock(Request.class))
                         .body(body, Charset.defaultCharset()).status(200).build());
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(
+        when(professionalUserRepositoryMock.findByUserIdentifier(USER_ID)).thenReturn(
                 setUpProfessionalUser());
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
@@ -209,7 +210,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     public void toRetrieveActiveOrganisations() throws IOException {
 
         ProfessionalUser professionalUser = setUpProfessionalUser();
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(USER_ID)).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
         when(organisationRepository.findByStatus(ACTIVE)).thenReturn(asList(organisation));

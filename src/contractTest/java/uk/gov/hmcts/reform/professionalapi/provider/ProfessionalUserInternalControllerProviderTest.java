@@ -38,7 +38,7 @@ public class ProfessionalUserInternalControllerProviderTest extends WebMvcProvid
     public void toRetrieveRefreshUserUsingUserIdentifier() {
         ProfessionalUser professionalUser = setupProfessionalUserWithOrganisation();
 
-        when(professionalUserRepositoryMock.findByUserIdentifier(any(String.class)))
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class)))
                 .thenReturn(professionalUser);
     }
 
