@@ -12,7 +12,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.61'
+    id 'uk.gov.hmcts.java' version '0.12.63'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.36.0'
@@ -31,7 +31,7 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 def versions = [
-        lombok          : '1.18.34',
+        lombok          : '1.18.32',
         pitest          : '1.16.1',
         reformLogging   : '6.0.1',
         serenity        : '2.0.76',
@@ -555,7 +555,7 @@ dependencyManagement {
         // CVE-2021-25122
         // CVE-2021-42340
         // CVE-2023-28709
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.88') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.91') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -579,7 +579,7 @@ dependencyManagement {
         }
 
 //        Resolves CVE-2023-4586
-        dependencySet(group: 'io.netty', version: '4.1.109.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.112.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
