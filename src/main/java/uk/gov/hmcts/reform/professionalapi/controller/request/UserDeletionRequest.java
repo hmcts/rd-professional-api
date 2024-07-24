@@ -13,19 +13,12 @@ import java.util.List;
 @Builder(builderMethodName = "userDeletionRequest")
 public class UserDeletionRequest {
 
-    private String firstName;
-    private String lastName;
     private List<String> emails;
 
     @JsonCreator
     public UserDeletionRequest(
-            @JsonProperty("firstName") String firstName,
-            @JsonProperty("lastName") String lastName,
             @JsonProperty("emails") List<String> emails
     ) {
-
-        this.firstName = firstName;
-        this.lastName = lastName;
         this.emails = emails;
     }
 }
