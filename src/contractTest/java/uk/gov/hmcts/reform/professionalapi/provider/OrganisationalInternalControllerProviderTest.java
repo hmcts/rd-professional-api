@@ -360,6 +360,13 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         contactInformation.setCreated(LocalDateTime.now());
         contactInformation.setId(UUID.randomUUID());
         organisation.setContactInformations(List.of(contactInformation));
+
+        SuperUser superUser = new SuperUser("firstName", "lastName",
+                "email", organisation);
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+        organisation.setUsers(users);
         return organisation;
     }
 
