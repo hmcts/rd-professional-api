@@ -401,7 +401,7 @@ dependencies {
     testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-rc-1'
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
