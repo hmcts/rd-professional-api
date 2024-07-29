@@ -370,7 +370,7 @@ dependencies {
     implementation 'com.github.hmcts:idam-java-client:2.1.1'
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.25'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.40'
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     //Fix for CVE-2021-29425
