@@ -404,7 +404,7 @@ dependencies {
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.8'
 
     implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter', version:versions.camel
