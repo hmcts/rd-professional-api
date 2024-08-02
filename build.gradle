@@ -169,7 +169,7 @@ check.dependsOn jacocoTestCoverageVerification
 
 
 pmd {
-    toolVersion = '6.53.0'
+    toolVersion = '6.55.0'
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.functionalTest, sourceSets.smokeTest]
     reportsDir = file("$project.buildDir/reports/pmd")
