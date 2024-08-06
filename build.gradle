@@ -36,7 +36,7 @@ def versions = [
         reformLogging   : '6.1.5',
         serenity        : '2.0.76',
         springBoot      : '2.7.18',
-        camel           : '3.8.0',
+        camel           : '3.22.2',
         pact_version    : '4.1.7',
         launchDarklySdk : '5.10.9',
         junit           : '5.9.2',
@@ -420,7 +420,7 @@ dependencies {
     implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter', version: versions.camel
 
     implementation group: 'org.apache.camel', name: 'camel-core', version: versions.camel
-    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
+    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.22.2'
 
     //Added below dependencies for shedlock
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.2.0'
