@@ -411,7 +411,7 @@ dependencies {
     implementation group: 'org.apache.camel', name: 'camel-csv', version: versions.camel
     implementation group: 'org.apache.camel', name: 'camel-sql', version: versions.camel
     implementation group: 'org.apache.camel', name: 'camel-spring-batch', version: versions.camel
-    implementation group: 'com.opencsv', name: 'opencsv', version: '3.7'
+    implementation group: 'com.opencsv', name: 'opencsv', version: '3.10'
 
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter', version:versions.camel
     implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version:versions.camel
