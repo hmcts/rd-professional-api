@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -488,6 +489,20 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public JsonPath deleteUserFromOrganisation(UserDeletionRequest userDeletionRequest, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+            .body(userDeletionRequest)
+            .delete("/refdata/internal/v1/organisations/users")
+            .andReturn();
+
+        response.then()
+            .assertThat()
+            .statusCode(status.NO_CONTENT.value());
+
+        return response.body().jsonPath();
+    }
+
+
     @SuppressWarnings("unchecked")
     public JsonPath retrieveOrganisationDetails(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
@@ -504,6 +519,8 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
 
         return response.body().jsonPath();
+
+
     }
 
     public Map<String, Object> retrieveOrganisationDetailsBySinceDate(String sinceDate, String page, String pageSize) {
