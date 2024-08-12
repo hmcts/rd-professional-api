@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.repository;
 
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageabl
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProfessionalUserRepositoryTest extends BaseRepository {
 
     @Test
