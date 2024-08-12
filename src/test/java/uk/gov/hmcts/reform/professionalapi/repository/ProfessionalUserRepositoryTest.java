@@ -58,7 +58,7 @@ class ProfessionalUserRepositoryTest extends BaseRepository {
     @Test
     void test_findByUserIdentifier() {
         ProfessionalUser profUser = professionalUserRepository.findByUserIdentifier(professionalUser
-                .getUserIdentifierUUID());
+                .getUserIdentifier());
 
         assertThat(profUser).isEqualTo(professionalUser);
         assertThat(profUser.getId()).isEqualTo(professionalUser.getId());
@@ -67,7 +67,7 @@ class ProfessionalUserRepositoryTest extends BaseRepository {
     @Test
     void test_findByOrganisationAndUserIdentifier() {
         List<ProfessionalUser> profUser = professionalUserRepository.findByOrganisationAndUserIdentifier(
-                professionalUser.getOrganisation(), professionalUser.getUserIdentifierUUID());
+                professionalUser.getOrganisation(), professionalUser.getUserIdentifier());
 
         assertThat(profUser.get(0)).isEqualTo(professionalUser);
         assertThat(profUser.get(0).getId()).isEqualTo(professionalUser.getId());

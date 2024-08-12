@@ -51,7 +51,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
 
         when(professionalUserRepository
                 .findUsersInOrganisationsSearchAfter(anyList(),
-                        any(UUID.class), any(UUID.class), any(Pageable.class))).thenReturn(professionalUserPage);
+                        any(String.class), any(String.class), any(Pageable.class))).thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
     }
 

@@ -157,7 +157,7 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
         SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(persistedSuperUser
-                .getUserIdentifierUUID());
+                .getUserIdentifier());
 
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isNotNull();
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);

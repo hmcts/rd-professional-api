@@ -71,7 +71,7 @@ public class ProfessionalUser implements Serializable {
     private LocalDateTime created;
 
     @Column(name = "USER_IDENTIFIER")
-    private UUID userIdentifier;
+    private String userIdentifier;
 
     @Transient
     private List<String> roles;
@@ -95,24 +95,6 @@ public class ProfessionalUser implements Serializable {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.organisation = organisation;
-    }
-
-    public void setUserIdentifier(UUID userIdentifier) {
-        this.userIdentifier = userIdentifier;
-    }
-
-    public void setUserIdentifier(String userIdentifier) {
-        if (userIdentifier != null) {
-            this.userIdentifier = UUID.fromString(userIdentifier);
-        }
-    }
-
-    public String getUserIdentifier() {
-        return userIdentifier == null ? null : userIdentifier.toString();
-    }
-
-    public UUID getUserIdentifierUUID() {
-        return userIdentifier;
     }
 
     public SuperUser toSuperUser() {

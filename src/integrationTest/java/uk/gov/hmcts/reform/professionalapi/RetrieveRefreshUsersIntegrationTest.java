@@ -83,8 +83,9 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
     void retrieve_refresh_users_using_invalid_user_identifier_should_return_status_404() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
+        String UUID_STR = "b615435d-2899-4f31-807e-29dd9b11ed8e";
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier("123");
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier(UUID_STR);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 

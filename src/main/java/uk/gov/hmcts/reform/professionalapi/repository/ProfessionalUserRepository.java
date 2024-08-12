@@ -24,9 +24,9 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     List<ProfessionalUser> findByOrganisation(Organisation organisation);
 
-    List<ProfessionalUser> findByOrganisationAndUserIdentifier(Organisation organisation, UUID userIdentifier);
+    List<ProfessionalUser> findByOrganisationAndUserIdentifier(Organisation organisation, String userIdentifier);
 
-    ProfessionalUser findByUserIdentifier(UUID userIdentifier);
+    ProfessionalUser findByUserIdentifier(String userIdentifier);
 
     @Query(value = "SELECT count(*) FROM dbrefdata.professional_user pu WHERE pu.organisation_id = :organisationId",
             nativeQuery = true)
@@ -34,7 +34,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     @Query(value = """
             SELECT pu FROM professional_user pu
-            WHERE (COALESCE(:organisationIdentifiers, '') = ''
+            WHERE (COALESCE(:organisationIdentifiers) is NULL
             OR pu.organisation.organisationIdentifier IN :organisationIdentifiers)
             ORDER BY pu.organisation.id ,pu.id
             """)
@@ -44,17 +44,17 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     @Query(value = """
        SELECT pu.* FROM dbrefdata.professional_user pu
        INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
-       WHERE (COALESCE(:organisationIdentifiers, '') = ''
+       WHERE (COALESCE(:organisationIdentifiers) is NULL
        OR organisation.organisation_identifier in :organisationIdentifiers)
        AND (
-           (organisation.Id = :searchAfterOrgId AND pu.Id > :searchAfterUserId)
-           OR (organisation.Id > :searchAfterOrgId)
+           (organisation.Id::text = :searchAfterOrgId AND pu.Id::text > :searchAfterUserId)
+           OR (organisation.Id::text > :searchAfterOrgId)
        )
        ORDER BY pu.organisation_id, pu.id
         """, nativeQuery = true)
     Page<ProfessionalUser> findUsersInOrganisationsSearchAfter(
             @Param("organisationIdentifiers") List<String> organisationIdentifiers,
-            @Param("searchAfterOrgId") UUID searchAfterOrgId, @Param("searchAfterUserId") UUID searchAfterUserId,
+            @Param("searchAfterOrgId") String searchAfterOrgId, @Param("searchAfterUserId") String searchAfterUserId,
             Pageable pageable);
 
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);

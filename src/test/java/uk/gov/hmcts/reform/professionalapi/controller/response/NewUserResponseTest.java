@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 class NewUserResponseTest {
 
-    private final UUID userIdentifier = UUID.randomUUID();
+    private final String userIdentifier = UUID.randomUUID().toString();
     private ProfessionalUser professionalUser;
     private Organisation organisation;
     private NewUserResponse newUserResponse;
@@ -35,15 +35,15 @@ class NewUserResponseTest {
 
     @Test
     void test_getUserIdentifier() {
-        assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier.toString());
+        assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier);
     }
 
     @Test
     void test_userIdentifier_with_setter() {
-        newUserResponse.setUserIdentifier(userIdentifier.toString());
+        newUserResponse.setUserIdentifier(userIdentifier);
         newUserResponse.setIdamStatus("ACTIVE");
 
-        assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier.toString());
+        assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier);
         assertThat(newUserResponse.getIdamStatus()).isEqualTo("ACTIVE");
     }
 

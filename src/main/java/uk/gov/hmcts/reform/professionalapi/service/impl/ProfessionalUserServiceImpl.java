@@ -186,7 +186,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
-        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userId));
+        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
         List<UserConfiguredAccess> userConfiguredAccesses;
 
         if (professionalUser != null) {
@@ -209,7 +209,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ProfessionalUser findProfessionalUserByUserIdentifier(UUID id) {
+    public ProfessionalUser findProfessionalUserByUserIdentifier(String id) {
         return professionalUserRepository.findByUserIdentifier(id);
     }
 
@@ -236,8 +236,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                                                       String showDeleted, boolean rolesRequired,
                                                                       String status) {
         var professionalUsers = userIdentifier != null
-                ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation,
-                UUID.fromString(userIdentifier)) : professionalUserRepository.findByOrganisation(organisation);
+                ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userIdentifier)
+                : professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
@@ -345,13 +345,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         Pageable pageableObject = PageRequest.of(0, pageSize);
         Page<ProfessionalUser> users;
         if (searchAfterOrganisation == null && searchAfterUser == null) {
-            users = professionalUserRepository
-                    .findUsersInOrganisations(
-                            organisationIdentifiers, pageableObject);
+            users = professionalUserRepository.findUsersInOrganisations(organisationIdentifiers, pageableObject);
         } else {
-            users = professionalUserRepository
-                    .findUsersInOrganisationsSearchAfter(
-                            organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+            users = professionalUserRepository.findUsersInOrganisationsSearchAfter(organisationIdentifiers,
+                    searchAfterOrganisation.toString(),
+                    searchAfterUser.toString(),
+                    pageableObject);
         }
 
         return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
@@ -384,7 +383,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public void checkUserStatusIsActiveByUserId(String userId) {
         NewUserResponse newUserResponse = null;
-        var user = professionalUserRepository.findByUserIdentifier(UUID.fromString(userId));
+        var user = professionalUserRepository.findByUserIdentifier(userId);
 
         if (null != user) {
             newUserResponse = RefDataUtil.findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
@@ -406,7 +405,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     private void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
                                             String userId) {
 
-        ProfessionalUser professionalUser = findProfessionalUserByUserIdentifier(UUID.fromString(userId));
+        ProfessionalUser professionalUser = findProfessionalUserByUserIdentifier(userId);
         try {
             List<UserConfiguredAccess> foundAccess = userConfiguredAccessRepository
                     .findByUserConfiguredAccessId_ProfessionalUser_Id(professionalUser.getId());

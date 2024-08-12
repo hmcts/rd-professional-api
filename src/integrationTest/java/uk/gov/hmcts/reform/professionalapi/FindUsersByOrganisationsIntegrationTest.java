@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +57,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     // key: organisationIdentifier, value: list of userIdentifiers
     private Map<String, List<String>> unorderedUsersInOrganisation;
     // key: organisationId, value: list of professionalUsers
-    private LinkedHashMap<UUID, List<ProfessionalUser>> sortedUsersInOrganisation;
+    private LinkedHashMap<UUID, LinkedList<ProfessionalUser>> sortedUsersInOrganisation;
     private ProfessionalUser deletedUser;
 
     @BeforeEach
@@ -72,7 +73,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         String solicitorOrgType = "SOLICITOR-ORG";
 
         // create organisation 1 with 1 superuser, 2 active users and 1 deleted user
-        OrganisationOtherOrgsCreationRequest newOrgRequest1 = createUniqueOrganisationRequest("TstSO11", "SRA123",
+        OrganisationOtherOrgsCreationRequest newOrgRequest1 = createUniqueOrganisationRequest("TstSO1", "SRA123",
                 "PBA1234561", "super-email1@gmail.com", solicitorOrgType);
         organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(newOrgRequest1);
 
@@ -88,7 +89,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         unorderedUsersInOrganisation.put(organisationIdentifier1, Arrays.asList(userIdentifier1Org1,
                 userIdentifier2Org1, userIdentifier3Org1));
 
-        deletedUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userIdentifier3Org1));
+        deletedUser = professionalUserRepository.findByUserIdentifier(userIdentifier3Org1);
         deletedUser.setDeleted(LocalDateTime.now());
         deletedUser.setIdamStatus(IdamStatus.SUSPENDED);
         professionalUserRepository.save(deletedUser);
@@ -136,8 +137,9 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
 
         for (Organisation organisation : organisations) {
             List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-            users.sort(Comparator.comparing(ProfessionalUser::getUserIdentifier));
-            sortedUsersInOrganisation.put(organisation.getId(), users);
+            users.sort(Comparator.comparing(ProfessionalUser::getId));
+            LinkedList<ProfessionalUser> usersLinkedList = new LinkedList<>(users);
+            sortedUsersInOrganisation.put(organisation.getId(), usersLinkedList);
         }
     }
 
@@ -182,7 +184,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     @Test
     void return_all_users_for_single_organisation_with_deleted_users() {
         // arrange
-        List<ProfessionalUser> expectedUsers = sortedUsersInOrganisation.get(organisation1.getId());
+        LinkedList<ProfessionalUser> expectedUsers = sortedUsersInOrganisation.get(organisation1.getId());
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1));
@@ -311,7 +313,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
 
         Integer pageSize = 15;
 
-        Map.Entry<UUID, List<ProfessionalUser>> firstEntry =
+        Map.Entry<UUID, LinkedList<ProfessionalUser>> firstEntry =
                 sortedUsersInOrganisation.entrySet().iterator().next();
         // skip the first user in first org (not necessarily organisation 1)
         UUID searchAfterUser = firstEntry.getValue().get(0).getId();
@@ -798,7 +800,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     }
 
     private void setUserToActive(String userIdentifier, String organisationIdentifier) {
-        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(UUID.fromString(userIdentifier));
+        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(userIdentifier);
         user.setIdamStatus(IdamStatus.ACTIVE);
         professionalUserRepository.saveAndFlush(user);
     }

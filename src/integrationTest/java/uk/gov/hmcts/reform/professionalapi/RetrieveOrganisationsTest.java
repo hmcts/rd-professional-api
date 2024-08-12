@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,6 +54,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
             .ofPattern(LAST_UPDATED_SINCE_TIMESTAMP_FORMAT);
     static final int SINCE_PAUSE_SECONDS = 2;
+    public static final String UUID_STR = "b615435d-2899-4f31-807e-29dd9b11ed8e";
 
     @SuppressWarnings("unchecked")
     @Test
@@ -468,11 +470,11 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void persists_and_returns_all_organisations() {
 
-        Set<String> paymentAccounts2ndOrg = new HashSet<>();
+        Set<String> paymentAccounts2ndOrg = new LinkedHashSet<>();
         paymentAccounts2ndOrg.add("PBA1000000");
         paymentAccounts2ndOrg.add("PBA1200000");
         paymentAccounts2ndOrg.add("PBA1230000");
-        Set<String> paymentAccounts3rdOrg = new HashSet<>();
+        Set<String> paymentAccounts3rdOrg = new LinkedHashSet<>();
         paymentAccounts3rdOrg.add("PBA1234567");
         paymentAccounts3rdOrg.add("PBA1234568");
         paymentAccounts3rdOrg.add("PBA1234569");
@@ -596,21 +598,21 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void forbidden_if_pui_case_manager_user_try_access_organisation_id_without_role_access() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(UUID_STR,
                 puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
     void forbidden_if_pui_user_manager_try_access_organisation_id_without_role_access() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(UUID_STR,
                 puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
     void forbidden_if_user_does_not_exist_in_org_pui_finance_manager_try_access_organisation_id() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(UUID_STR,
                 puiFinanceManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
@@ -1202,28 +1204,28 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void forbidden_status_when_user_try_access_organisation_id_without_role_access_for_v2() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisationForV2Api("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisationForV2Api(UUID_STR,
             "dummyrole");
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
     void forbidden_for_v2_if_pui_case_manager_user_try_access_organisation_id_without_role_access() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(UUID_STR,
             puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
     void forbidden_for_v2_if_pui_user_manager_try_access_organisation_id_without_role_access() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(UUID_STR,
             puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
     void forbidden_for_v2_if_user_does_not_exist_in_org_pui_finance_manager_try_access_organisation_id() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api("11AA116",
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(UUID_STR,
             puiFinanceManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
@@ -1252,7 +1254,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void should_throw_not_found_exception_when_professional_user_not_found() {
-        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId("123", hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.findOrganisationsByUserId(UUID_STR, hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 

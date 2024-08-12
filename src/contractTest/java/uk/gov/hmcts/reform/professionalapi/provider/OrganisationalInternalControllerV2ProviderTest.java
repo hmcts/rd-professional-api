@@ -199,7 +199,7 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser(FIRST_NAME, LAST_NAME,
                 ORGANISATION_EMAIL, organisation);
-        superUser.setUserIdentifier(UUID.randomUUID());
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);

@@ -86,12 +86,14 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
             this.paymentAccount = organisation.getPaymentAccounts()
                     .stream()
                     .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
+                    .sorted()
                     .toList();
         } else {
             this.paymentAccount = organisation.getPaymentAccounts()
                     .stream()
                     .filter(pba -> pba.getPbaStatus().equals(ACCEPTED))
                     .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
+                    .sorted()
                     .toList();
         }
 
@@ -100,6 +102,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
                     .stream()
                     .filter(pba -> pba.getPbaStatus().equals(PENDING))
                     .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
+                    .sorted()
                     .toList();
         }
 
