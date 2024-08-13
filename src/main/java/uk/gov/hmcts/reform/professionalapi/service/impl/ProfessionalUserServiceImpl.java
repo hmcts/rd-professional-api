@@ -58,6 +58,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getOrganisationProfileIds;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setCaseAccessInGetUserResponse;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
@@ -117,7 +118,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize,
+    public ResponseEntity<Object> fetchUsersForRefresh(String since, UUID userId, Integer pageSize,
                                                        UUID searchAfter) {
         if (since != null) {
             if (pageSize != null) {
@@ -185,7 +186,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
-    public ResponseEntity<Object> findSingleRefreshUser(String userId) {
+    public ResponseEntity<Object> findSingleRefreshUser(UUID userId) {
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
         List<UserConfiguredAccess> userConfiguredAccesses;
 
@@ -209,7 +210,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ProfessionalUser findProfessionalUserByUserIdentifier(String id) {
+    public ProfessionalUser findProfessionalUserByUserIdentifier(UUID id) {
         return professionalUserRepository.findByUserIdentifier(id);
     }
 
@@ -235,8 +236,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String userIdentifier,
                                                                       String showDeleted, boolean rolesRequired,
                                                                       String status) {
-        var professionalUsers = userIdentifier != null
-                ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userIdentifier)
+        UUID userId = fromString(userIdentifier);
+        var professionalUsers = userId != null
+                ? professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userId)
                 : professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
@@ -304,7 +306,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(List<ProfessionalUser> professionalUsers) {
         var usersId = new ArrayList<String>();
 
-        professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
+        professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier().toString()));
 
         return new RetrieveUserProfilesRequest(usersId);
     }
@@ -316,8 +318,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     private ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
-                                                     String userId, Optional<String> origin) {
-        try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId,
+                                                     UUID userId, Optional<String> origin) {
+        try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId.toString(),
                 origin.orElse(""))) {
             return toResponseEntity(
                     response, response.status() > 300 ? ErrorResponse.class : ModifyUserRolesResponse.class);
@@ -330,7 +332,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Transactional
     @Override
     public ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
-                                                                     String userId, Optional<String> origin) {
+                                                                     UUID userId, Optional<String> origin) {
         checkUserStatusIsActiveByUserId(userId);
         modifyUserConfiguredAccess(userProfileUpdatedData, userId);
 
@@ -381,7 +383,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 .body(newUserResponse);
     }
 
-    public void checkUserStatusIsActiveByUserId(String userId) {
+    public void checkUserStatusIsActiveByUserId(UUID userId) {
         NewUserResponse newUserResponse = null;
         var user = professionalUserRepository.findByUserIdentifier(userId);
 
@@ -395,7 +397,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     public ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData,
-                                                                    String userId, Optional<String> origin) {
+                                                                    UUID userId, Optional<String> origin) {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
@@ -403,7 +405,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     private void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
-                                            String userId) {
+                                            UUID userId) {
 
         ProfessionalUser professionalUser = findProfessionalUserByUserIdentifier(userId);
         try {

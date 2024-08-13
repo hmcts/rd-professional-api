@@ -61,6 +61,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -694,7 +695,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(
             @PathVariable("userId") String userId) {
-        return organisationService.retrieveOrganisationByUserId(userId);
+        return organisationService.retrieveOrganisationByUserId(fromString(userId));
     }
 
     @Operation(

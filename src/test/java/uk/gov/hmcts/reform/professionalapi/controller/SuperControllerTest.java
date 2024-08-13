@@ -558,7 +558,7 @@ class SuperControllerTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         lenient().when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
         professionalUser.setUserIdentifier(userId);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
@@ -578,7 +578,7 @@ class SuperControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
-        assertThat(professionalUser.getUserIdentifier()).isEqualTo(userProfileCreationResponse.getIdamId());
+        assertThat(professionalUser.getUserIdentifier().toString()).isEqualTo(userProfileCreationResponse.getIdamId());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());

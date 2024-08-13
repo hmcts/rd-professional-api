@@ -17,8 +17,7 @@ public class NewUserResponse {
     private String  idamStatus;
 
     public NewUserResponse(ProfessionalUser user) {
-
-        this.userIdentifier = user.getUserIdentifier();
+        this.userIdentifier = user.getUserIdentifier() == null ? null : user.getUserIdentifier().toString();
     }
 
     public NewUserResponse(UserProfileCreationResponse userProfileCreationResponse) {

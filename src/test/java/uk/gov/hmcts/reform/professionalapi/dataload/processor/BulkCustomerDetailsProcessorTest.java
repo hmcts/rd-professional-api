@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -36,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ROUTE_DETAILS;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @ExtendWith(MockitoExtension.class)
 public class BulkCustomerDetailsProcessorTest {
@@ -105,7 +105,7 @@ public class BulkCustomerDetailsProcessorTest {
         exchange.getIn().setBody(bulkCustomerDetails);
 
         Organisation organisationOne = new Organisation();
-        organisationOne.setId(UUID.fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee44"));
+        organisationOne.setId(fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee44"));
         organisationOne.setOrganisationIdentifier("ASDEFF");
         organisationOne.setCompanyNumber("325");
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisationOne);
@@ -132,7 +132,7 @@ public class BulkCustomerDetailsProcessorTest {
         exchange.getIn().setBody(bulkCustomerDetails);
 
         Organisation organisationOne = new Organisation();
-        organisationOne.setId(UUID.fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee44"));
+        organisationOne.setId(fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee44"));
         organisationOne.setCompanyNumber("325");
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
         when(((ConfigurableApplicationContext)

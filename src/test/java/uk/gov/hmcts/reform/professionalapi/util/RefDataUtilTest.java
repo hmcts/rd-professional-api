@@ -114,7 +114,7 @@ class RefDataUtilTest {
                 "soMeone@somewhere.com", organisation);
         professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
         professionalUser.setOrganisation(organisation);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
         professionalUser.setLastUpdated(LocalDateTime.of(2023, 12, 31, 23, 59, 59, 987654321));
         userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         userAccountMap = new UserAccountMap(userAccountMapId);
@@ -243,7 +243,7 @@ class RefDataUtilTest {
         assertThat(responseUser.getFirstName()).isEqualTo(profile.getFirstName());
         assertThat(responseUser.getLastName()).isEqualTo(profile.getLastName());
         assertThat(responseUser.getIdamStatus()).isEqualTo(profile.getIdamStatus());
-        assertThat(responseUser.getUserIdentifier()).isEqualTo(profile.getIdamId());
+        assertThat(responseUser.getUserIdentifier().toString()).isEqualTo(profile.getIdamId());
         assertThat(responseUser.getRoles()).contains(professionalUser.getRoles().get(0));
         assertThat(getUserProfileResponse.getIdamStatusCode()).isEqualTo(getUserProfileResponse.getIdamStatusCode());
         assertThat(getUserProfileResponse.getIdamMessage()).isEqualTo(getUserProfileResponse.getIdamMessage());
@@ -563,9 +563,12 @@ class RefDataUtilTest {
         ProfessionalUsersResponse professionalUsersResponse2
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
-        professionalUsersResponse.setUserIdentifier("1");
-        professionalUsersResponse1.setUserIdentifier("2");
-        professionalUsersResponse2.setUserIdentifier("3");
+        String userId1 = UUID.randomUUID().toString();
+        professionalUsersResponse.setUserIdentifier(userId1);
+        String userId2 = UUID.randomUUID().toString();
+        professionalUsersResponse1.setUserIdentifier(userId2);
+        String userId3 = UUID.randomUUID().toString();
+        professionalUsersResponse2.setUserIdentifier(userId3);
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
@@ -581,15 +584,15 @@ class RefDataUtilTest {
         users.add(professionalUser.toSuperUser());
         organisation.setUsers(users);
         Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
-        activeOrganisationDtls.put("1", organisation);
-        activeOrganisationDtls.put("2", organisation);
-        activeOrganisationDtls.put("3", organisation);
+        activeOrganisationDtls.put(userId1, organisation);
+        activeOrganisationDtls.put(userId2, organisation);
+        activeOrganisationDtls.put(userId3, organisation);
         ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header,
                 HttpStatus.OK);
         Map<String, Organisation> response
                 = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
 
-        Organisation organisationRes = response.get("1");
+        Organisation organisationRes = response.get(userId1);
         assertEquals(organisation, organisationRes);
 
         SuperUser item = users.get(0);
@@ -732,9 +735,12 @@ class RefDataUtilTest {
         ProfessionalUsersResponse professionalUsersResponse2
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
-        professionalUsersResponse.setUserIdentifier("1");
-        professionalUsersResponse1.setUserIdentifier("2");
-        professionalUsersResponse2.setUserIdentifier("3");
+        String userId1 = UUID.randomUUID().toString();
+        professionalUsersResponse.setUserIdentifier(userId1);
+        String userId2 = UUID.randomUUID().toString();
+        professionalUsersResponse1.setUserIdentifier(userId2);
+        String userId3 = UUID.randomUUID().toString();
+        professionalUsersResponse2.setUserIdentifier(userId3);
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
@@ -748,9 +754,9 @@ class RefDataUtilTest {
         users.add(professionalUser.toSuperUser());
         organisation.setUsers(users);
         Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
-        activeOrganisationDtls.put("1", organisation);
-        activeOrganisationDtls.put("2", organisation);
-        activeOrganisationDtls.put("3", organisation);
+        activeOrganisationDtls.put(userId1.toString(), organisation);
+        activeOrganisationDtls.put(userId2.toString(), organisation);
+        activeOrganisationDtls.put(userId3.toString(), organisation);
 
 
 

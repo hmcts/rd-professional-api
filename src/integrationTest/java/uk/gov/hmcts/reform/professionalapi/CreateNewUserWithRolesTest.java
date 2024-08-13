@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
@@ -89,7 +90,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
         assertThat(updatedUsers.size()).isEqualTo(2);
 
         ProfessionalUser persistedProfessionalUser = professionalUserRepository
-                .findByUserIdentifier(userIdentifierResponse);
+                .findByUserIdentifier(fromString(userIdentifierResponse));
         assertThat(persistedProfessionalUser).isNotNull();
     }
 
@@ -125,7 +126,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
         assertThat(updatedUsers.size()).isEqualTo(2);
 
         ProfessionalUser persistedProfessionalUser = professionalUserRepository
-                .findByUserIdentifier(userIdentifierResponse);
+                .findByUserIdentifier(fromString(userIdentifierResponse));
         assertThat(persistedProfessionalUser).isNotNull();
     }
 

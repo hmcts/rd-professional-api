@@ -206,6 +206,8 @@ class OrganisationServiceImplTest {
     private final ProfessionalUserService professionalUserServiceMock
             = mock(ProfessionalUserService.class);
 
+    private String userIdentifier = UUID.randomUUID().toString();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -784,7 +786,7 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAnOrganisationsByOrgIdentifier() throws Exception {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
@@ -800,7 +802,7 @@ class OrganisationServiceImplTest {
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
 
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
@@ -828,7 +830,7 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_retrieveAnOrganisationsByOrgIdentifier_for_contact_information_less_than_one() throws Exception {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
@@ -841,7 +843,7 @@ class OrganisationServiceImplTest {
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
 
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
@@ -869,7 +871,7 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAnOrganisationsByOrgIdentifier_for_v2_api() throws Exception {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
@@ -884,7 +886,7 @@ class OrganisationServiceImplTest {
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
 
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
@@ -910,13 +912,13 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAnOrganisationsByWhenStatusActive() throws Exception {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
@@ -929,7 +931,7 @@ class OrganisationServiceImplTest {
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(userIdentifier);
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -949,13 +951,13 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAnOrganisationsByWhenStatusActiveWithSince() throws Exception {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
@@ -969,7 +971,7 @@ class OrganisationServiceImplTest {
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(userIdentifier);
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -987,13 +989,13 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAnOrganisationsByWhenStatusActive_for_v2_api() throws Exception {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
@@ -1006,7 +1008,7 @@ class OrganisationServiceImplTest {
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(userIdentifier);
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -1154,7 +1156,7 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_retrieveAllActiveOrganisationsWithSince() {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         Organisation organisation1 = new Organisation("pending-org-name", null,
@@ -1180,7 +1182,7 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_retrieveAllOrganisationsWithPaginationAndSince() {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         Organisation organisation1 = new Organisation("someother-org-name", null,
@@ -1250,7 +1252,7 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_retrieveAllOrganisationsWithPagination() {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         Organisation organisation1 = new Organisation("someother-org-name", null,
@@ -1294,7 +1296,7 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_retrieveAllOrganisationsForV2ApiWithPagination() {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
@@ -1337,7 +1339,7 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_retrieveAllOrganisationsForV2ApiWithPaginationSince() {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
@@ -1382,13 +1384,13 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_RetrieveAnOrganisationsByStatusAndPagination() throws JsonProcessingException {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
@@ -1398,7 +1400,7 @@ class OrganisationServiceImplTest {
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(userIdentifier);
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -1437,13 +1439,13 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_RetrieveAnOrganisationsByStatusAndPaginationWithSince() throws JsonProcessingException {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
@@ -1453,7 +1455,7 @@ class OrganisationServiceImplTest {
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(userIdentifier);
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -1493,13 +1495,13 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_RetrieveAnOrganisationsByStatusAndPaginationWithSinceAndMoreAvailable() throws JsonProcessingException {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
@@ -1509,7 +1511,7 @@ class OrganisationServiceImplTest {
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(userIdentifier);
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -1548,13 +1550,13 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_RetrieveAnOrganisationsByStatusAndPagination_for_v2_api() throws JsonProcessingException {
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
         organisation.setStatus(ACTIVE);
         organisation.setUsers(users);
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
@@ -1564,7 +1566,7 @@ class OrganisationServiceImplTest {
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(userIdentifier);
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -2232,7 +2234,7 @@ class OrganisationServiceImplTest {
 
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
                 "email@org.com", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
 
@@ -2340,7 +2342,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
         ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
@@ -2357,7 +2359,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
         assertThrows(InvalidRequest.class, () ->
                 sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
     }
@@ -2374,10 +2376,9 @@ class OrganisationServiceImplTest {
                 .body(addPbaResponse);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
         organisation.setStatus(ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
-
+        UUID userId = UUID.randomUUID();
         responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
@@ -2399,7 +2400,7 @@ class OrganisationServiceImplTest {
         when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(Optional.of(paymentAccount));
 
         ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest,
-                UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID().toString());
+                UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID());
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
 
@@ -2412,7 +2413,7 @@ class OrganisationServiceImplTest {
         pbaRequest.setPaymentAccounts(pbas);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
 
         assertThrows(ResourceNotFoundException.class, () ->
@@ -2433,7 +2434,7 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
         ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         AddPbaResponse response = (AddPbaResponse) responseEntity.getBody();
 
@@ -2639,10 +2640,10 @@ class OrganisationServiceImplTest {
 
     @Test
     void shouldReturnOrganisationByUserId() {
-        String userId = "userId123";
+        UUID userId = UUID.randomUUID();
         professionalUser.setUserIdentifier(userId);
         professionalUser.setOrganisation(organisation);
-        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class))).thenReturn(professionalUser);
 
         ResponseEntity<OrganisationEntityResponse> result = sut.retrieveOrganisationByUserId(userId);
         assertNotNull(result.getBody());
@@ -2652,15 +2653,15 @@ class OrganisationServiceImplTest {
 
     @Test
     void shouldThrowEmptyResultsExceptionWhenProfessionalUserNotFound() {
-        String userId = "userId123";
-        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(null);
+        UUID userId = UUID.randomUUID();
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class))).thenReturn(null);
         assertThrows(EmptyResultDataAccessException.class, () -> sut.retrieveOrganisationByUserId(userId));
     }
 
     @Test
     void shouldThrowInvalidRequestExceptionWhenUserIdIsEmpty() {
-        String userId = "";
-        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(null);
+        UUID userId = null;
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class))).thenReturn(null);
         assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
     }
 

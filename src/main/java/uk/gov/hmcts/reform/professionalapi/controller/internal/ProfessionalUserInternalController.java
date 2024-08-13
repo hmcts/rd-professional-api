@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 
 
@@ -171,7 +172,8 @@ public class ProfessionalUserInternalController extends SuperController {
         organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(orgId);
 
         //Received request to update user roles of an organisation
-        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, Optional.of(origin));
+        return professionalUserService.modifyRolesForUser(userProfileUpdatedData,
+                fromString(userId), Optional.of(origin));
 
     }
 
@@ -221,7 +223,7 @@ public class ProfessionalUserInternalController extends SuperController {
             @RequestParam(value = "searchAfter", required = false) UUID searchAfter
     ) {
         organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId, pageSize, searchAfter);
-
-        return professionalUserService.fetchUsersForRefresh(since, userId, pageSize, searchAfter);
+        UUID userIdentifier = fromString(userId);
+        return professionalUserService.fetchUsersForRefresh(since, userIdentifier, pageSize, searchAfter);
     }
 }

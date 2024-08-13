@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @SuppressWarnings("unchecked")
 class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -55,7 +56,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     private Organisation organisation3;
 
     // key: organisationIdentifier, value: list of userIdentifiers
-    private Map<String, List<String>> unorderedUsersInOrganisation;
+    private Map<String, List<UUID>> unorderedUsersInOrganisation;
     // key: organisationId, value: list of professionalUsers
     private LinkedHashMap<UUID, LinkedList<ProfessionalUser>> sortedUsersInOrganisation;
     private ProfessionalUser deletedUser;
@@ -78,13 +79,13 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(newOrgRequest1);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String userIdentifier1Org1 = addAUserToOrganisation("user1.org1@test.com", organisationIdentifier1);
+        UUID userIdentifier1Org1 = addAUserToOrganisation("user1.org1@test.com", organisationIdentifier1);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String userIdentifier2Org1 = addAUserToOrganisation("user2.org1@test.com", organisationIdentifier1);
+        UUID userIdentifier2Org1 = addAUserToOrganisation("user2.org1@test.com", organisationIdentifier1);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String userIdentifier3Org1 = addAUserToOrganisation("user3.org1@test.com", organisationIdentifier1);
+        UUID userIdentifier3Org1 = addAUserToOrganisation("user3.org1@test.com", organisationIdentifier1);
 
         unorderedUsersInOrganisation.put(organisationIdentifier1, Arrays.asList(userIdentifier1Org1,
                 userIdentifier2Org1, userIdentifier3Org1));
@@ -100,10 +101,10 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         organisationIdentifier2 = createAndActivateOrganisationWithGivenRequest(newOrgRequest2);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String userIdentifier1Org2 = addAUserToOrganisation("user1.org2@test.com", organisationIdentifier2);
+        UUID userIdentifier1Org2 = addAUserToOrganisation("user1.org2@test.com", organisationIdentifier2);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String userIdentifier2Org2 = addAUserToOrganisation("user2.org2@test.com", organisationIdentifier2);
+        UUID userIdentifier2Org2 = addAUserToOrganisation("user2.org2@test.com", organisationIdentifier2);
 
         unorderedUsersInOrganisation.put(organisationIdentifier2, Arrays.asList(userIdentifier1Org2,
                 userIdentifier2Org2));
@@ -114,10 +115,10 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         organisationIdentifier3 = createAndActivateOrganisationWithGivenRequest(newOrgRequest3);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String userIdentifier1Org3 = addAUserToOrganisation("user1.org3@test.com", organisationIdentifier3);
+        UUID userIdentifier1Org3 = addAUserToOrganisation("user1.org3@test.com", organisationIdentifier3);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String userIdentifier2Org3 = addAUserToOrganisation("user2.org3@test.com", organisationIdentifier3);
+        UUID userIdentifier2Org3 = addAUserToOrganisation("user2.org3@test.com", organisationIdentifier3);
 
         unorderedUsersInOrganisation.put(organisationIdentifier3, Arrays.asList(userIdentifier1Org3,
                 userIdentifier2Org3));
@@ -681,7 +682,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     @SuppressWarnings("unchecked")
     private void assertSuccessfulResponse(Map<String, Object> response, int expectedOrganisationsCount,
                                           int expectedUsersCount, String expectedStatus,
-                                          boolean expectedHasMoreRecords, List<String>... unexpectedUserIdentifiers) {
+                                          boolean expectedHasMoreRecords, List<UUID>... unexpectedUserIdentifiers) {
 
         String actualStatus = (String) response.get("http_status");
         assertThat(actualStatus).isEqualTo(expectedStatus);
@@ -698,8 +699,8 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         }
 
 
-        for (List<String> unexpectedUserIdsInOrg : unexpectedUserIdentifiers) {
-            for (String unexpectedUserIdentifier : unexpectedUserIdsInOrg) {
+        for (List<UUID> unexpectedUserIdsInOrg : unexpectedUserIdentifiers) {
+            for (UUID unexpectedUserIdentifier : unexpectedUserIdsInOrg) {
                 assertThat(allUsers.stream()
                         .anyMatch(user -> user.getUserIdentifier().equals(unexpectedUserIdentifier))).isFalse();
             }
@@ -788,18 +789,19 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
                         orgAttributeRequests);
     }
 
-    private String addAUserToOrganisation(String email, String orgId) {
+    private UUID addAUserToOrganisation(String email, String orgId) {
         List<String> userRoles = Collections.singletonList("pui-user-manager");
         NewUserCreationRequest userCreationRequest = inviteUserCreationRequest(email, userRoles);
 
         Map<String, Object> addUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgId, userCreationRequest, hmctsAdmin);
         String id = (String) addUserResponse.get(USER_IDENTIFIER);
-        setUserToActive(id,orgId);
-        return id;
+        UUID userIdentifier = fromString(id);
+        setUserToActive(userIdentifier,orgId);
+        return userIdentifier;
     }
 
-    private void setUserToActive(String userIdentifier, String organisationIdentifier) {
+    private void setUserToActive(UUID userIdentifier, String organisationIdentifier) {
         ProfessionalUser user = professionalUserRepository.findByUserIdentifier(userIdentifier);
         user.setIdamStatus(IdamStatus.ACTIVE);
         professionalUserRepository.saveAndFlush(user);

@@ -28,6 +28,7 @@ import java.util.UUID;
 import static java.util.Objects.nonNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 
 @Provider("referenceData_bulkCustomerDetails")
@@ -101,7 +102,7 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
                 COMPANY_NUMBER, false, COMPANY_URL);
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
-        organisation.setId(UUID.fromString("c5e5c75d-cced-4e57-97c8-e359ce33a855"));
+        organisation.setId(fromString("c5e5c75d-cced-4e57-97c8-e359ce33a855"));
 
 
         BulkCustomerDetails bulkCustomerDetails = new BulkCustomerDetails();

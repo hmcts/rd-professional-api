@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -183,7 +184,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         assertSuccessfulResponse(response, 1, "200 OK", true,
                 null);
 
-        UUID lastRecordInPage = UUID.fromString(response.get("lastRecordInPage").toString());
+        UUID lastRecordInPage = fromString(response.get("lastRecordInPage").toString());
 
         // act
         response = professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest,

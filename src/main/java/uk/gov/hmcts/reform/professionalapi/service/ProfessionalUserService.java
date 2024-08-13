@@ -22,7 +22,7 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserById(UUID userIdentifier);
 
-    ProfessionalUser findProfessionalUserByUserIdentifier(String userIdentifier);
+    ProfessionalUser findProfessionalUserByUserIdentifier(UUID userIdentifier);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String userIdentifier,
                                                                String showDeleted, boolean rolesRequired,
@@ -34,21 +34,21 @@ public interface ProfessionalUserService {
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 
-    ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId,
+    ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, UUID userId,
                                               Optional<String> origin);
 
     void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes);
 
     ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String email);
 
-    void checkUserStatusIsActiveByUserId(String userId);
+    void checkUserStatusIsActiveByUserId(UUID userId);
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
 
     ResponseEntity<Object> modifyUserConfiguredAccessAndRoles(UserProfileUpdatedData userProfileUpdatedData,
-                                                              String userId, Optional<String> origin);
+                                                              UUID userId, Optional<String> origin);
 
-    ResponseEntity<Object> fetchUsersForRefresh(String since, String userId, Integer pageSize, UUID searchAfter);
+    ResponseEntity<Object> fetchUsersForRefresh(String since, UUID userId, Integer pageSize, UUID searchAfter);
 
     UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
             List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,

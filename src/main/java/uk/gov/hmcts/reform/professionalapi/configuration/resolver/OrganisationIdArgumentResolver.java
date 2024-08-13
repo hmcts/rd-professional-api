@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 
 @Component
@@ -63,7 +64,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
         if (null != userInfo && StringUtils.isNotEmpty(userInfo.getUid())) {
             userId = userInfo.getUid();
-            professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
+            professionalUser = professionalUserRepository.findByUserIdentifier(fromString(userId.trim()));
             if (null != professionalUser && null != professionalUser.getOrganisation()) {
 
                 organisation = professionalUser.getOrganisation();

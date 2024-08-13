@@ -56,6 +56,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @Provider("referenceData_organisationalExternalUsers")
 @WebMvcTest({OrganisationExternalController.class})
@@ -126,7 +127,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .body(body, Charset.defaultCharset()).status(200).build());
 
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class))).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
 
@@ -154,7 +155,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .body(body, Charset.defaultCharset()).status(200).build());
 
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class))).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
 
@@ -182,9 +183,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .request(mock(Request.class))
                         .body(body, Charset.defaultCharset()).status(200).build());
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(
-                setUpProfessionalUser());
-
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class))).thenReturn(setUpProfessionalUser());
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
                 .thenReturn(organisation);
 
@@ -201,7 +200,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
         when(idamRepositoryMock.getUserInfo(anyString()))
-                .thenReturn(UserInfo.builder().uid("someUid")
+                .thenReturn(UserInfo.builder().uid(UUID.randomUUID().toString())
                         .roles(Arrays.asList("pui-case-manager")).build());
     }
 
@@ -209,7 +208,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     public void toRetrieveActiveOrganisations() throws IOException {
 
         ProfessionalUser professionalUser = setUpProfessionalUser();
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class))).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
         when(organisationRepository.findByStatus(ACTIVE)).thenReturn(asList(organisation));
@@ -219,7 +218,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     @State({"User exists"})
     public void toRetrieveUser() {
         ProfessionalUser professionalUser = setUpProfessionalUser();
-        professionalUser.setUserIdentifier("someUserIdentifier");
+        professionalUser.setUserIdentifier(fromString("someUserIdentifier"));
         ResponseEntity<NewUserResponse> response = ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new NewUserResponse(professionalUser));
@@ -249,7 +248,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         su.setEmailAddress("superUser@email.com");
         su.setFirstName("some-fname");
         su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        su.setUserIdentifier(fromString("someUserIdentifier"));
 
         PaymentAccount pa = new PaymentAccount();
         pa.setPbaNumber("pbaNumber");

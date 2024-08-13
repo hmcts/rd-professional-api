@@ -20,6 +20,7 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY_USER_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_USER_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @Service
 @Slf4j
@@ -37,7 +38,7 @@ public class MfaStatusServiceImpl implements MfaStatusService {
             throw new InvalidRequest(EMPTY_USER_ID);
         }
 
-        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(id);
+        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(fromString(id));
         if (Objects.isNull(user)) {
             throw new ResourceNotFoundException(NO_USER_FOUND);
         }

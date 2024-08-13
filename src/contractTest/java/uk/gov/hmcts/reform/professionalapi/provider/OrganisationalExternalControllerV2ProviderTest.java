@@ -46,6 +46,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @Provider("referenceData_organisationalExternalPbasV2")
 @Import(OrganisationalExternalControllerV2ProviderTestConfiguration.class)
@@ -59,7 +60,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
     public static final String COMPANY_URL = "www.org.com";
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
     private static final String USER_JWT = "Bearer 8gf364fg367f67";
-    private static final String SOME_USER_IDENTIFIER = "someUserIdentifier";
+    private static final UUID SOME_USER_IDENTIFIER = fromString("someUserIdentifier");
     @Autowired
     OrganisationExternalControllerV2 organisationExternalControllerV2;
 
@@ -112,7 +113,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
 
-        when(userProfileFeignClientMock.getUserProfileById(SOME_USER_IDENTIFIER))
+        when(userProfileFeignClientMock.getUserProfileById(SOME_USER_IDENTIFIER.toString()))
             .thenReturn(Response.builder()
                 .request(mock(Request.class))
                 .body(body, Charset.defaultCharset()).status(200).build());

@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -94,6 +95,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valu
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
@@ -377,8 +379,9 @@ public abstract class SuperController {
                 UserProfileCreationResponse userProfileCreationResponse
                         = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
                 //Idam registration success
-                professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-                superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                UUID uuid = fromString(userProfileCreationResponse.getIdamId());
+                professionalUser.setUserIdentifier(uuid);
+                superUser.setUserIdentifier(uuid);
                 professionalUserService.persistUser(professionalUser);
             } else {
                 log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()),
@@ -465,7 +468,8 @@ public abstract class SuperController {
             UserProfileCreationResponse userProfileCreationResponse
                     = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
             //Idam registration success
-            professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+            UUID uuid = fromString(userProfileCreationResponse.getIdamId());
+            professionalUser.setUserIdentifier(uuid);
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles,
                     prdEnumService.findAllPrdEnums());
         } else {
@@ -505,7 +509,8 @@ public abstract class SuperController {
             //then check if existing user and idam user id are same
             if (!userProfileResponse.getUserIdentifier().equals(existingUser.getUserIdentifier())) {
                 //we need to then update user info
-                existingUser.setUserIdentifier(userProfileResponse.getUserIdentifier());
+                UUID uuid = fromString(userProfileResponse.getUserIdentifier());
+                existingUser.setUserIdentifier(uuid);
                 professionalUserRepository.save(existingUser);
             }
             responseBody = userProfileResponse;
@@ -595,7 +600,7 @@ public abstract class SuperController {
         }
 
         //check if user status is 'ACTIVE'
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+        professionalUserService.checkUserStatusIsActiveByUserId(fromString(userId));
 
         var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
 
@@ -697,7 +702,7 @@ public abstract class SuperController {
 
         //delete the passed address id numbers from the request
         var idsSet = addressIds.stream()
-                .map(UUID::fromString)
+                .map(RefDataUtil::fromString)
                 .collect(Collectors.toSet());
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }

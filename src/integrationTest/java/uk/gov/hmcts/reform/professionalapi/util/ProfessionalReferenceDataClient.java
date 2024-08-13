@@ -594,7 +594,7 @@ public class ProfessionalReferenceDataClient {
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
         String bearerToken = getAndReturnBearerToken(userId, role);
-        mockJwtToken(role, userId, bearerToken);
+        mockJwtToken(bearerToken);
         headers.add("Authorization", bearerToken);
 
         return headers;
@@ -783,7 +783,7 @@ public class ProfessionalReferenceDataClient {
         return createJwt(token, jwt);
     }
 
-    public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
+    public synchronized void mockJwtToken(String bearerToken) {
         String[] bearerTokenArray = bearerToken.split(" ");
         when(jwtDecode.decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
     }

@@ -72,7 +72,7 @@ class ProfessionalExternalUserControllerTest {
     private IdamRepository idamRepositoryMock;
     private SecurityContext securityContext;
     private UserInfo userInfoMock;
-    private final String userIdentifier = UUID.randomUUID().toString();
+    private final UUID userIdentifier = UUID.randomUUID();
     private static final String USER_JWT = "Bearer 8gf364fg367f67";
 
 
@@ -130,7 +130,7 @@ class ProfessionalExternalUserControllerTest {
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities,
                 TestConstants.PUI_USER_MANAGER)).thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(String.class)))
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(UUID.class)))
                 .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
@@ -141,7 +141,7 @@ class ProfessionalExternalUserControllerTest {
 
         ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation
                         .getOrganisationIdentifier(), "true", "", true, null,
-                null, userIdentifier, null);
+                null, userIdentifier.toString(), null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
@@ -149,7 +149,7 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true, "");
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier.toString(), "true", true, "");
     }
 
     @Test
@@ -178,7 +178,7 @@ class ProfessionalExternalUserControllerTest {
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER))
                 .thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(String.class)))
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(UUID.class)))
                 .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
@@ -188,14 +188,14 @@ class ProfessionalExternalUserControllerTest {
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
-                        true, null, null, userIdentifier,null);
+                        true, null, null, userIdentifier.toString(),null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true,
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier.toString(), "true", true,
                         "");
     }
 
@@ -229,7 +229,7 @@ class ProfessionalExternalUserControllerTest {
                 anyString(), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(professionalUsersEntityResponse);
-        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(anyString()))
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(any(UUID.class)))
                 .thenReturn(professionalUser);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
@@ -240,7 +240,7 @@ class ProfessionalExternalUserControllerTest {
 
         ResponseEntity<?> actual = professionalExternalUserController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "",
-                        false, null, null, userIdentifier, null);
+                        false, null, null, userIdentifier.toString(), null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -251,7 +251,7 @@ class ProfessionalExternalUserControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true",
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier.toString(), "true",
                         false, "Active");
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUsersByOrganisation(any(Organisation.class), anyString(), any(String.class),
@@ -374,7 +374,8 @@ class ProfessionalExternalUserControllerTest {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
                 "lastName", IdamStatus.ACTIVE.name(), null, null, null);
         String orgId = "org123";
-        String userId = "1234567890";
+        UUID userId = UUID.randomUUID();
+        String userIdStr = userId.toString();
         String origin = "EXUI";
         Optional<String> originOpt = Optional.of(origin);
         when(professionalUserServiceMock.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData,
@@ -382,7 +383,7 @@ class ProfessionalExternalUserControllerTest {
 
         ResponseEntity<Object> response = professionalExternalUserController
                 .modifyUserConfiguredAccessAndRolesForExistingUserOfExternalOrganisation(userProfileUpdatedData,
-                        orgId, userId, origin);
+                        orgId, userIdStr, origin);
 
         assertThat(response).isNotNull();
         assertThat(response.getBody()).isNotNull();

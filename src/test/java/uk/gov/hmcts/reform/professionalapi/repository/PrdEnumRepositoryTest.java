@@ -8,6 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,15 +20,14 @@ class PrdEnumRepositoryTest extends BaseRepository {
 
     @Test
     void test_findAll() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
-
+        List<PrdEnum> prdEnums = findAll();
         assertThat(prdEnums).hasSize(47);
         assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isZero();
     }
 
     @Test
     void test_findAll_containsCaaRoles_and_unspec_ccd_roles() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
+        List<PrdEnum> prdEnums = findAll();
 
         assertThat(prdEnums.get(37).getEnumName()).isEqualTo("pui-caa");
         assertThat(prdEnums.get(38).getEnumName()).isEqualTo("caseworker-caa");
@@ -37,9 +37,17 @@ class PrdEnumRepositoryTest extends BaseRepository {
 
     @Test
     void test_findAll_manageOrg_roles() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
+        List<PrdEnum> prdEnums = findAll();
 
         assertThat(prdEnums.get(45).getEnumName()).isEqualTo("caseworker-employment");
         assertThat(prdEnums.get(46).getEnumName()).isEqualTo("caseworker-employment-legalrep-solicitor");
+    }
+
+    private List<PrdEnum>  findAll() {
+        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
+        Collections.sort(prdEnums,
+                (prdEnum1, prdEnum2) -> prdEnum1.getPrdEnumId().getEnumCode() - prdEnum2.getPrdEnumId().getEnumCode());
+
+        return prdEnums;
     }
 }

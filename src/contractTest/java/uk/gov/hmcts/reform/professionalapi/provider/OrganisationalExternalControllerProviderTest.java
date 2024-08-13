@@ -51,6 +51,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @Provider("referenceData_organisationalExternalPbas")
 @Import(OrganisationalExternalControllerProviderTestConfiguration.class)
@@ -180,7 +181,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         su.setEmailAddress("superUser@email.com");
         su.setFirstName("some-fname");
         su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        su.setUserIdentifier(fromString("someUserIdentifier"));
 
         PaymentAccount pa = new PaymentAccount();
         pa.setPbaNumber("pbaNumber");

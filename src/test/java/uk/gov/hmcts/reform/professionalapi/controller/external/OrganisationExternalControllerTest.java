@@ -389,7 +389,7 @@ class OrganisationExternalControllerTest {
                 .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId);
 
         verify(professionalUserServiceMock, times(1))
-                .checkUserStatusIsActiveByUserId(anyString());
+                .checkUserStatusIsActiveByUserId(any(UUID.class));
         verify(organisationIdentifierValidatorImplMock, times(1))
                 .validateOrganisationIsActive(any(Organisation.class), any(HttpStatus.class));
         verify(paymentAccountServiceMock, times(1))
@@ -423,12 +423,14 @@ class OrganisationExternalControllerTest {
                 .body(addPbaResponse);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
+        String userIdStr = userId.toString();
+
         when(organisationServiceMock.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId))
                 .thenReturn(responseEntity);
 
         ResponseEntity<?> actual = organisationExternalController
-                .addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
+                .addPaymentAccountsToOrganisation(pbaRequest, orgId, userIdStr);
 
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         assertThat(actual).isNotNull();

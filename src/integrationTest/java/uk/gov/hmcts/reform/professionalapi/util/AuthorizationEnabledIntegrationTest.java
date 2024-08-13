@@ -74,6 +74,7 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.decodeJwtToken;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
 import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwksResponse;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @Configuration
 @SerenityTest
@@ -422,14 +423,15 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return users.get(0).getId().toString();
     }
 
-    public String retrieveSuperUserIdentifierFromOrganisationId(String orgId) {
+    public UUID retrieveSuperUserIdentifierFromOrganisationId(String orgId) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
         List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
         return users.get(0).getUserIdentifier();
     }
 
     public String retrieveOrganisationIdFromSuperUserId(String userId) {
-        return professionalUserRepository.findByUserIdentifier(userId).getOrganisation().getOrganisationIdentifier();
+        return professionalUserRepository.findByUserIdentifier(fromString(userId))
+                .getOrganisation().getOrganisationIdentifier();
     }
 
     public void userProfileCreateUserWireMock(HttpStatus status)  {
@@ -447,7 +449,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         int returnHttpStaus = status.value();
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                    + "  \"idamId\":\"" + UUID.randomUUID() + "\","
                     + "  \"idamRegistrationResponse\":\"201\""
                     + "}";
             returnHttpStaus = 201;
@@ -505,7 +507,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 aResponse()
                                         .withHeader("Content-Type", APPLICATION_JSON)
                                         .withBody(usersBody)
-                                        .withTransformers("transformer-multi-user-response")
+                                        .withTransformers("external_user-token-response")
                                         .withStatus(200)
                         )
         );
@@ -552,7 +554,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 aResponse()
                                         .withHeader("Content-Type", APPLICATION_JSON)
                                         .withBody(usersBodyWithoutRoles)
-                                        .withTransformers("transformer-multi-user-response")
+                                        .withTransformers("external_user-token-response")
                                         .withStatus(200)
                         )
         );
@@ -597,7 +599,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 aResponse()
                                         .withHeader("Content-Type", APPLICATION_JSON)
                                         .withBody(usersBody)
-                                        .withTransformers("transformer-multi-user-response")
+                                        .withTransformers("external_user-token-response")
                                         .withStatus(200)
                         )
         );

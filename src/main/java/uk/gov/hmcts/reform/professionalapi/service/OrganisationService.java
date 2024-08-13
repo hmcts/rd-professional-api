@@ -70,7 +70,7 @@ public interface OrganisationService {
     ResponseEntity<Object> getOrganisationsByPbaStatus(String pbaStatus);
 
     ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaRequest pbaRequest,
-                                                            String organisationIdentifier, String userId);
+                                                            String organisationIdentifier, UUID userId);
 
     void addContactInformationsToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest, String organisationIdentifier);
@@ -79,6 +79,6 @@ public interface OrganisationService {
 
     void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier);
 
-    ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
+    ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(UUID userId);
 
 }

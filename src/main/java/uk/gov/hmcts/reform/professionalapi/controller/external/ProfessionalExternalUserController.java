@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_3;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -126,7 +127,7 @@ public class ProfessionalExternalUserController extends SuperController {
         if (userIdentifier != null) {
             profExtUsrReqValidator.validateUuid(userIdentifier);
             ProfessionalUser fetchingUser = professionalUserService.findProfessionalUserByUserIdentifier(
-                    userIdentifier);
+                    fromString(userIdentifier));
             profExtUsrReqValidator.validateOrganisationMatch(organisationIdentifier, fetchingUser);
         }
 
@@ -184,8 +185,8 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") String origin
     ) {
 
-        return professionalUserService
-                .modifyUserConfiguredAccessAndRoles(userProfileUpdatedData, userId, Optional.of(origin));
+        return professionalUserService.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData,
+                fromString(userId), Optional.of(origin));
     }
 
     @Operation(

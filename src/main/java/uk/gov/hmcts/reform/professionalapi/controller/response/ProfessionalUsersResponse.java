@@ -22,14 +22,9 @@ public class ProfessionalUsersResponse extends ProfessionalUsersResponseWithoutR
     private String idamMessage;
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
-        this.userIdentifier = user.getUserIdentifier();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
-        this.email = user.getEmailAddress();
+        super(user);
         this.roles = user.getRoles();
-        this.idamStatus = user.getIdamStatus() ==  null ? "" :  user.getIdamStatus().toString();
         this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();
         this.idamMessage = StringUtils.isBlank(user.getIdamMessage()) ? "" : user.getIdamMessage();
-        this.lastUpdated = user.getLastUpdated();
     }
 }

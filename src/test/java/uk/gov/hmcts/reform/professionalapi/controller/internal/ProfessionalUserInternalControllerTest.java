@@ -63,7 +63,7 @@ class ProfessionalUserInternalControllerTest {
     private UserProfileUpdatedData userProfileUpdatedData;
     List<String> prdAdminRoles;
     List<String> systemUserRoles;
-    private final String userIdentifier = "1234567";
+    private final UUID userIdentifier = UUID.randomUUID();
     @InjectMocks
     private ProfessionalUserInternalController professionalUserInternalController;
     @Mock
@@ -129,7 +129,7 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actual = professionalUserInternalController
                 .findUsersByOrganisation(organisation
-                        .getOrganisationIdentifier(), userIdentifier,"true", true, null, null);
+                        .getOrganisationIdentifier(), userIdentifier.toString(),"true", true, null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -167,7 +167,7 @@ class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier, "true",
+                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier.toString(), "true",
                         true, null, null);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
@@ -175,7 +175,7 @@ class ProfessionalUserInternalControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true,
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier.toString(), "true", true,
                         "");
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
@@ -205,7 +205,7 @@ class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier,"true",
+                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier.toString(),"true",
                         true, null, null);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
@@ -213,7 +213,7 @@ class ProfessionalUserInternalControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, userIdentifier,"true", true,
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier.toString(),"true", true,
                         "");
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
@@ -232,9 +232,10 @@ class ProfessionalUserInternalControllerTest {
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(body);
         when(professionalUserServiceMock.modifyRolesForUser(any(), any(), any())).thenReturn(responseEntity);
 
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
         ResponseEntity<Object> actualData = professionalUserInternalController
-                .modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId, "EXUI");
+                .modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A",
+                        userId.toString(), "EXUI");
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -293,12 +294,12 @@ class ProfessionalUserInternalControllerTest {
                 .thenReturn(responseEntity);
 
         ResponseEntity<Object> actualData = professionalUserInternalController
-                .getRefreshUsers(null, "uid", null, null);
+                .getRefreshUsers(null, UUID.randomUUID().toString(), null, null);
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(professionalUserServiceMock, times(1))
-                .fetchUsersForRefresh(null, "uid", null, null);
+                .fetchUsersForRefresh(any(), any(), any(), any());
     }
 }

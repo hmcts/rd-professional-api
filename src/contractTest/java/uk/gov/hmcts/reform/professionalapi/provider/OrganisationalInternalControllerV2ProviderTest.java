@@ -41,6 +41,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @Provider("referenceData_organisationalInternalV2")
 @Import(OrganisationalInternalControllerV2ProviderTestConfiguration.class)
@@ -199,7 +200,7 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser(FIRST_NAME, LAST_NAME,
                 ORGANISATION_EMAIL, organisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -285,7 +286,7 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
         su.setEmailAddress(ORGANISATION_EMAIL);
         su.setFirstName("some-fname");
         su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        su.setUserIdentifier(fromString("someUserIdentifier"));
         return su;
     }
 }

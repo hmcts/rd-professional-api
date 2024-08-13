@@ -343,7 +343,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
                     .getUserIdentifier()) {
-                activeOrganisationDtls.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(), organisation);
+                String userIdentifier = organisation.getUsers().get(ZERO_INDEX).getUserIdentifier().toString();
+                activeOrganisationDtls.put(userIdentifier, organisation);
             }
         });
 
@@ -391,8 +392,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 activeOrganisations.add(organisation);
                 if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
                         .getUserIdentifier()) {
-                    activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(),
-                            organisation);
+                    String userIdentifier = organisation.getUsers().get(ZERO_INDEX).getUserIdentifier().toString();
+                    activeOrganisationDetails.put(userIdentifier, organisation);
                 }
             } else if (organisation.getStatus() == PENDING) {
                 pendingOrganisations.add(organisation);
@@ -458,8 +459,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 activeOrganisations.add(organisation);
                 if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
                         .getUserIdentifier()) {
-                    activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(),
-                            organisation);
+                    String userIdentifier = organisation.getUsers().get(ZERO_INDEX).getUserIdentifier().toString();
+                    activeOrganisationDetails.put(userIdentifier, organisation);
                 }
             } else if (organisation.getStatus() == PENDING) {
                 pendingOrganisations.add(organisation);
@@ -715,11 +716,11 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId) {
-        if (StringUtils.isBlank(userId) || userId.equalsIgnoreCase("null")) {
+    public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(UUID userId) {
+        if (userId == null) {
             throw new InvalidRequest("Bad Request: User Id is null");
         }
-        ProfessionalUser  professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
+        ProfessionalUser  professionalUser = professionalUserRepository.findByUserIdentifier(userId);
         if (professionalUser == null) {
             log.error("{}:: ProfessionalUserUser info null::", loggingComponentName);
             throw new EmptyResultDataAccessException(PROFESSIONAL_USER_404_MESSAGE, 1);
@@ -835,7 +836,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
                 // If user is not active in the up will send the request to delete
                 var userIds = new HashSet<String>();
-                userIds.add(user.getUserIdentifier());
+                userIds.add(user.getUserIdentifier().toString());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
                         .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
@@ -900,7 +901,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaRequest pbaRequest,
-                                                                   String organisationIdentifier, String userId) {
+                                                                   String organisationIdentifier, UUID userId) {
         Optional<Organisation> organisation = Optional.ofNullable(
                 getOrganisationByOrgIdentifier(organisationIdentifier));
 

@@ -23,14 +23,17 @@ import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 public class PactUtils {
 
     private PactUtils() {
     }
 
-    public static final String PROFESSIONAL_USER_ID = "123456";
-    public static final String PROFESSIONAL_USER_ID2 = "234567";
+    public static final UUID PROFESSIONAL_USER_ID = UUID.randomUUID();
+    public static final UUID PROFESSIONAL_USER_ID2 = UUID.randomUUID();
+    public static final String PROFESSIONAL_USER_ID_STR = "123456";
+    public static final String PROFESSIONAL_USER_ID2_STR = "234567";
     public static final String ORGANISATION_IDENTIFIER = "HM2OHHS";
     public static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
@@ -42,7 +45,7 @@ public class PactUtils {
     public static void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
                 "some-email-address", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        superUser.setUserIdentifier(UUID.randomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -111,7 +114,7 @@ public class PactUtils {
         ProfessionalUser professionalUser = new ProfessionalUser("firstName" + i, "lastName" + i,
                 "email" + 1 + "@org.com", organisation);
         professionalUser.setId(UUID.randomUUID());
-        professionalUser.setUserIdentifier("someUid" +  i);
+        professionalUser.setUserIdentifier(UUID.randomUUID());
         professionalUser.setIdamStatus(IdamStatus.ACTIVE);
         professionalUser.setIdamStatusCode("200");
         professionalUser.setLastUpdated(LocalDateTime.now());
@@ -132,7 +135,7 @@ public class PactUtils {
         su.setEmailAddress("superUser@email.com");
         su.setFirstName("some-fname");
         su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        su.setUserIdentifier(fromString("someUserIdentifier"));
         return su;
     }
 

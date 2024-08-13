@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import feign.FeignException;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
@@ -163,7 +165,8 @@ public class RefDataUtil {
     public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user,
                                                                   UserProfileFeignClient userProfileFeignClient,
                                                                   Boolean isRequiredRoles) {
-        try (Response response = userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
+        String userIdentifier = user.getUserIdentifier() == null ? null : user.getUserIdentifier().toString();
+        try (Response response = userProfileFeignClient.getUserProfileById(userIdentifier)) {
 
             Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
@@ -220,15 +223,16 @@ public class RefDataUtil {
             List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUsers();
             userProfiles.forEach(userProfile -> {
 
-                if (null != activeOrganisationDtls.get(userProfile.getUserIdentifier())) {
+                String userIdentifier = userProfile.getUserIdentifier();
+                if (null != activeOrganisationDtls.get(userIdentifier)) {
 
-                    Organisation organisation = activeOrganisationDtls.get(userProfile.getUserIdentifier());
+                    Organisation organisation = activeOrganisationDtls.get(userIdentifier);
 
                     organisation.getUsers().get(0).setFirstName(userProfile.getFirstName());
                     organisation.getUsers().get(0).setLastName(userProfile.getLastName());
                     organisation.getUsers().get(0).setEmailAddress(userProfile.getEmail());
 
-                    activeOrganisationDtls.put(userProfile.getUserIdentifier(), organisation);
+                    activeOrganisationDtls.put(userIdentifier, organisation);
 
                 }
 
@@ -248,7 +252,7 @@ public class RefDataUtil {
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
             if (TRUE.equals(isRequiredRoles)) {
-                user.setUserIdentifier(userProfileResponse.getIdamId());
+                user.setUserIdentifier(fromString(userProfileResponse.getIdamId()));
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());
                 user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());
@@ -468,7 +472,7 @@ public class RefDataUtil {
         for (ProfessionalUsersResponseWithoutRoles professionalUsersResponse : professionalUsersEntityResponse
                 .getUserProfiles()) {
             for (ProfessionalUser pu : professionalUsers) {
-                if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
+                if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifierUuid())) {
                     professionalUsersResponse.getUserAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
                             .map(uca -> fromUserConfiguredAccess(uca)).collect(toList()));
                     professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
@@ -481,7 +485,7 @@ public class RefDataUtil {
                                           List<ProfessionalUser> professionalUsers) {
         for (ProfessionalUsersResponse professionalUsersResponse : professionalUsersEntityResponse.getUsers()) {
             for (ProfessionalUser pu : professionalUsers) {
-                if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifier())) {
+                if (pu.getUserIdentifier().equals(professionalUsersResponse.getUserIdentifierUuid())) {
                     professionalUsersResponse.getUserAccessTypes().addAll(pu.getUserConfiguredAccesses().stream()
                             .map(uca -> fromUserConfiguredAccess(uca)).collect(toList()));
                     professionalUsersResponse.setLastUpdated(pu.getLastUpdated());
@@ -551,8 +555,11 @@ public class RefDataUtil {
                     getOrganisationProfileIds(professionalUser.getOrganisation())
             );
 
+            String userIdentifier = professionalUser.getUserIdentifier() == null
+                    ? null
+                    : professionalUser.getUserIdentifier().toString();
             RefreshUser refreshUser = new RefreshUser(
-                    professionalUser.getUserIdentifier(),
+                    userIdentifier,
                     professionalUser.getLastUpdated(),
                     organisationInfo,
                     userAccessTypes,
@@ -623,6 +630,13 @@ public class RefDataUtil {
             String invalidAddId = invalidAddIdsSet.stream().collect(Collectors.joining(", "));
             throw new ResourceNotFoundException(ERROR_MSG_ORG_IDS_DOES_NOT_MATCH + " : " + invalidAddId);
         }
+    }
+
+    public static final UUID fromString(String userIdentifier) {
+        if (StringUtils.isEmpty(userIdentifier)) {
+            return null;
+        }
+        return UUID.fromString(userIdentifier);
     }
 
 }

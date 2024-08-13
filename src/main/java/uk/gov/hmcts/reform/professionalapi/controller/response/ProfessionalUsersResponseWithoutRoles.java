@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -30,9 +31,11 @@ public class ProfessionalUsersResponseWithoutRoles {
     public LocalDateTime lastUpdated;
     @JsonProperty
     public List<UserAccessType> userAccessTypes = new ArrayList<>();
+    public UUID userUuid;
 
     public ProfessionalUsersResponseWithoutRoles(ProfessionalUser user) {
-        this.userIdentifier = user.getUserIdentifier();
+        this.userIdentifier = user.getUserIdentifier() == null ? null : user.getUserIdentifier().toString();
+        this.userUuid = user.getUserIdentifier();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
@@ -40,4 +43,7 @@ public class ProfessionalUsersResponseWithoutRoles {
         this.lastUpdated = user.getLastUpdated();
     }
 
+    public UUID getUserIdentifierUuid() {
+        return userUuid;
+    }
 }

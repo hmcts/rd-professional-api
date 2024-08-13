@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -37,15 +38,16 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         updateUserProfileRolesMock(HttpStatus.OK);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-        String userIdentifier = retrieveSuperUserIdentifierFromOrganisationId(organisationIdentifier);
+        UUID userIdentifier = retrieveSuperUserIdentifierFromOrganisationId(organisationIdentifier);
 
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserConfiguredAccessData("test@mail.com", 1);
 
-        professionalReferenceDataClient
-                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
+        professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData,
+                userIdentifier.toString(),
+                puiUserManager);
 
         Map<String, Object> response = professionalReferenceDataClient
-                .findRefreshUsersWithUserIdentifier(userIdentifier);
+                .findRefreshUsersWithUserIdentifier(userIdentifier.toString());
         validateResponse(response, 1, 1);
     }
 
@@ -54,15 +56,16 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
         updateUserProfileRolesMock(HttpStatus.OK);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-        String userIdentifier = retrieveSuperUserIdentifierFromOrganisationId(organisationIdentifier);
+        UUID userIdentifier = retrieveSuperUserIdentifierFromOrganisationId(organisationIdentifier);
 
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserConfiguredAccessData("test@mail.com", 2);
 
-        professionalReferenceDataClient
-                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
+        professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData,
+                userIdentifier.toString(),
+                puiUserManager);
 
         Map<String, Object> response = professionalReferenceDataClient
-                .findRefreshUsersWithUserIdentifier(userIdentifier);
+                .findRefreshUsersWithUserIdentifier(userIdentifier.toString());
         validateResponse(response, 1, 2);
     }
 
@@ -83,9 +86,9 @@ class RetrieveRefreshUsersIntegrationTest extends AuthorizationEnabledIntegratio
     void retrieve_refresh_users_using_invalid_user_identifier_should_return_status_404() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-        String UUID_STR = "b615435d-2899-4f31-807e-29dd9b11ed8e";
+        String uuidStr = "b615435d-2899-4f31-807e-29dd9b11ed8e";
 
-        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier(UUID_STR);
+        Map<String, Object> response = professionalReferenceDataClient.findRefreshUsersWithUserIdentifier(uuidStr);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 

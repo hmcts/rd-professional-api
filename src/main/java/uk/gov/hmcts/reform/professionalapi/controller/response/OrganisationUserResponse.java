@@ -10,12 +10,13 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Setter
 @Getter
 @NoArgsConstructor
 public class OrganisationUserResponse {
-    private String userIdentifier;
+    private UUID userIdentifier;
     private String firstName;
     private String lastName;
     private String email;

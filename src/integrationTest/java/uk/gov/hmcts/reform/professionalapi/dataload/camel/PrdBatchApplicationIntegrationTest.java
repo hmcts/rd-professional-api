@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.dataload.support.IntegrationTestSupport.setSourcePath;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 
 @ContextConfiguration(classes = {DataloadConfig.class,BlobStorageCredentials.class,AzureBlobConfig.class},
@@ -101,7 +101,7 @@ class PrdBatchApplicationIntegrationTest extends AuthorizationDataloadEnabledInt
     @AfterEach
     public void cleanupTestData() {
         jdbcTemplate.execute(bulkCustomerSqlDelete);
-        organisationRepository.deleteById(UUID.fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee91"));
+        organisationRepository.deleteById(fromString("046b6c7f-0b8a-43b9-b35d-6489e6daee91"));
     }
 
 }

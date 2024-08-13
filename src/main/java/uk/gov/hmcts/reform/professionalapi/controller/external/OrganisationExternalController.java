@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -284,7 +285,7 @@ public class OrganisationExternalController extends SuperController {
             @Parameter(hidden = true) @UserId String userId) {
 
         //Received request to add a new user to an organisation for external
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+        professionalUserService.checkUserStatusIsActiveByUserId(fromString(userId));
 
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
 
@@ -478,7 +479,9 @@ public class OrganisationExternalController extends SuperController {
 
         log.info("Received request to add payment accounts to organisation Id");
 
-        return organisationService.addPaymentAccountsToOrganisation(pbaRequest, organisationIdentifier, userId);
+        return organisationService.addPaymentAccountsToOrganisation(pbaRequest,
+                organisationIdentifier,
+                fromString(userId));
 
     }
 
