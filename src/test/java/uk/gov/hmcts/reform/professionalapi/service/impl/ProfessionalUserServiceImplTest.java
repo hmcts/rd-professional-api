@@ -77,6 +77,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserServiceImplTest {
@@ -97,7 +98,7 @@ class ProfessionalUserServiceImplTest {
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
             null, null, null);
     private final UUID userIdentifier = UUID.randomUUID();
-    private final UserProfile userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com",
+    private final UserProfile userProfile = new UserProfile(randomUUID(), "test@email.com",
             "fName", "lName", IdamStatus.PENDING);
     private final GetUserProfileResponse getUserProfileResponseMock = new GetUserProfileResponse(userProfile,
             false);

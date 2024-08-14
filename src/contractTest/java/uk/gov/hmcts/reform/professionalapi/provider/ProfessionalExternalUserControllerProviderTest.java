@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -64,6 +63,7 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSION
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID2_STR;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID_STR;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
@@ -116,7 +116,8 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         setupInteractionsForProfessionalUser();
     }
 
-    @State({"Professional User exists for modification of user access types with identifier " + PROFESSIONAL_USER_ID2_STR})
+    @State({"Professional User exists for modification of user access types with identifier "
+            + PROFESSIONAL_USER_ID2_STR})
     public void toUpdateUserRolesAndAccessTypesForIdentifier() throws IOException {
 
         setupInteractionsForProfessionalUserWithUserAccessTypes();
@@ -168,7 +169,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
         when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                .uid(UUID.randomUUID().toString())
+                .uid(randomUUID())
                 .roles(Arrays.asList("pui-case-manager")).build());
 
         String name = "name";
@@ -228,7 +229,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
         when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                .uid(UUID.randomUUID().toString())
+                .uid(randomUUID())
                 .roles(Arrays.asList("pui-case-manager")).build());
 
         organisation = new Organisation();
@@ -260,10 +261,10 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
                 .thenReturn(allUserConfiguredAccess2);
 
         ProfessionalUsersResponse userProfileResponse1 = new ProfessionalUsersResponse(profile1);
-        userProfileResponse1.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse1.setUserIdentifier(randomUUID());
         userProfileResponse1.setLastUpdated(LocalDateTime.of(2020, 12, 31, 1, 23));
         ProfessionalUsersResponse userProfileResponse2 = new ProfessionalUsersResponse(profile2);
-        userProfileResponse2.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse2.setUserIdentifier(randomUUID());
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         userProfiles.add(userProfileResponse1);
@@ -289,7 +290,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
         when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                .uid(UUID.randomUUID().toString())
+                .uid(randomUUID())
                 .roles(Arrays.asList("pui-case-manager")).build());
 
         String name = "name";
@@ -345,7 +346,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
     }
 
     private UserProfile getUserProfile() {
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         return profile;
     }

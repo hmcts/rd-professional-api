@@ -62,7 +62,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,6 +75,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -420,7 +420,7 @@ class OrganisationInternalControllerTest {
     @Test
     void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
@@ -428,9 +428,9 @@ class OrganisationInternalControllerTest {
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
-        String userId = UUID.randomUUID().toString();
+        String userId = randomUUID();
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
@@ -454,7 +454,7 @@ class OrganisationInternalControllerTest {
     void testDeleteOrganisation() {
 
         final HttpStatus expectedHttpStatus = HttpStatus.NO_CONTENT;
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         organisation.setStatus(OrganisationStatus.PENDING);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(organisationServiceMock.deleteOrganisation(organisation, "123456789"))
@@ -473,7 +473,7 @@ class OrganisationInternalControllerTest {
     void testDeleteOrganisationWithStatusReview() {
 
         final HttpStatus expectedHttpStatus = HttpStatus.NO_CONTENT;
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         organisation.setStatus(OrganisationStatus.REVIEW);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(organisationServiceMock.deleteOrganisation(organisation, "123456789"))
@@ -490,7 +490,7 @@ class OrganisationInternalControllerTest {
 
     @Test
     void testDeleteOrganisationThrows404WhenNoOrgFound() {
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationInternalController.deleteOrganisation(orgId, "123456789"));

@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -31,6 +30,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
@@ -290,7 +290,7 @@ class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
     @Test
     void return_400_invalid_organisation_with_invalid_email() {
-        String prefix = UUID.randomUUID().toString();
+        String prefix = randomUUID();
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()

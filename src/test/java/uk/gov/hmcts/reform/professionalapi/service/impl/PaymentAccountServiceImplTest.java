@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_INVALID;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -266,7 +267,7 @@ class PaymentAccountServiceImplTest {
 
     @Test
     void testUpdatePaymentAccountsForAnOrganisation_422_failure_scenario() {
-        String orgId = UUID.randomUUID().toString();
+        String orgId = randomUUID();
         List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
 
         pbaRequestList.add(new PbaUpdateRequest("PBA1234567", "REJUCTED", ""));

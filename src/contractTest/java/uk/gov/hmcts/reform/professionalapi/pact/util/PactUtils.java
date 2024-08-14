@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 public class PactUtils {
 
@@ -68,13 +69,13 @@ public class PactUtils {
 
     public static UserProfileCreationResponse getUserProfileCreationResponse() {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
         return userProfileCreationResponse;
     }
 
     public static UserProfile getUserProfile() {
-        return new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        return new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
     }
 

@@ -68,6 +68,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -284,7 +285,7 @@ class SuperControllerTest {
     @Test
     void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
@@ -294,9 +295,9 @@ class SuperControllerTest {
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
-        String userId = UUID.randomUUID().toString();
+        String userId = randomUUID();
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
@@ -361,14 +362,14 @@ class SuperControllerTest {
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         lenient().when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
-        String userId = UUID.randomUUID().toString();
+        String userId = randomUUID();
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
@@ -398,13 +399,13 @@ class SuperControllerTest {
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         lenient().when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
         ErrorResponse errorDetails = new ErrorResponse("errorMessage", "errorDescription",
                 "23:13");
-        String userId = UUID.randomUUID().toString();
+        String userId = randomUUID();
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(errorDetails);
@@ -433,7 +434,7 @@ class SuperControllerTest {
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(null);
 
@@ -455,15 +456,15 @@ class SuperControllerTest {
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         lenient().when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
                 .thenReturn(professionalUser);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
-        String userId = UUID.randomUUID().toString();
+        String userId = randomUUID();
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
@@ -490,7 +491,7 @@ class SuperControllerTest {
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
@@ -556,14 +557,14 @@ class SuperControllerTest {
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         lenient().when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         UUID userId = UUID.randomUUID();
         professionalUser.setUserIdentifier(userId);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
 
         ObjectMapper mapper = new ObjectMapper();

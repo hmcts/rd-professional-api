@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_USER_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Slf4j
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -38,7 +39,7 @@ class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void returns_404_when_user_identifier_not_found() {
-        Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(UUID.randomUUID().toString());
+        Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(randomUUID());
         assertThat(response).containsEntry("http_status", "404");
         assertThat(response.get("response_body").toString()).contains(NO_USER_FOUND);
     }

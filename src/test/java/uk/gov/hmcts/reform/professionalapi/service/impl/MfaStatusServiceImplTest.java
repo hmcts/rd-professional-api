@@ -18,8 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -68,7 +67,7 @@ class MfaStatusServiceImplTest {
     void test_findMfaStatusByUserId() {
         when(organisation.getOrganisationMfaStatus()).thenReturn(orgMfaStatus);
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity = mfaStatusService
                 .findMfaStatusByUserId(uuid);
@@ -92,7 +91,7 @@ class MfaStatusServiceImplTest {
     void test_findMfaStatusByUserId_shouldReturn404_whenUserNotFound() {
         when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(null);
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         assertThrows(ResourceNotFoundException.class, () ->
                 mfaStatusService.findMfaStatusByUserId(uuid));
@@ -102,7 +101,7 @@ class MfaStatusServiceImplTest {
     void test_findMfaStatusByUserId_shouldReturn400_whenInactiveOrg() {
         when(organisation.isOrganisationStatusActive()).thenReturn(false);
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         assertThrows(InvalidRequest.class, () ->
                 mfaStatusService.findMfaStatusByUserId(uuid));

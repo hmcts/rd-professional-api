@@ -69,7 +69,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
     private ProfessionalUser getProfessionalUser() {
         ProfessionalUser professionalUser = new ProfessionalUser();
         professionalUser.setId(UUID.randomUUID());
-        professionalUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUser.setUserIdentifier(UUID.randomUUID());
         professionalUser.setFirstName("some name");
         professionalUser.setLastName("last name");
         professionalUser.setEmailAddress("test@email.com");

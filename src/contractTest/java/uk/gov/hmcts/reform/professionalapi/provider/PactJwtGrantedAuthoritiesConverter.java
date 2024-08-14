@@ -6,9 +6,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 
-import java.util.UUID;
-
 import static java.util.Arrays.asList;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Component
 @Primary
@@ -20,7 +19,6 @@ public class PactJwtGrantedAuthoritiesConverter extends JwtGrantedAuthoritiesCon
 
 
     public UserInfo getUserInfo() {
-        return UserInfo.builder().roles(asList("pui-finance-manager")).
-                uid(UUID.randomUUID().toString()).build();
+        return UserInfo.builder().roles(asList("pui-finance-manager")).uid(randomUUID()).build();
     }
 }

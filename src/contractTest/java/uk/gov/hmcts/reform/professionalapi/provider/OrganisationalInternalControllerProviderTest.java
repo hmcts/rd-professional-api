@@ -62,6 +62,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_organisationalInternal")
 @Import(OrganisationalInternalControllerProviderTestConfiguration.class)
@@ -181,7 +182,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(randomUUID());
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -215,7 +216,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(randomUUID());
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -368,7 +369,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     private UserProfileCreationResponse getUserProfileCreationResponse() {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
         return userProfileCreationResponse;
     }

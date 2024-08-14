@@ -125,6 +125,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVI
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -206,7 +207,7 @@ class OrganisationServiceImplTest {
     private final ProfessionalUserService professionalUserServiceMock
             = mock(ProfessionalUserService.class);
 
-    private String userIdentifier = UUID.randomUUID().toString();
+    private String userIdentifier = randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -750,7 +751,7 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAllOrganisationsThrowExceptionWhenOrganisationEmpty() throws JsonProcessingException {
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
@@ -768,7 +769,7 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_RetrieveAllOrganisationsForV2ApiThrowExceptionWhenOrganisationEmpty() throws JsonProcessingException {
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
@@ -806,7 +807,7 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -847,7 +848,7 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -890,7 +891,7 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -2341,7 +2342,7 @@ class OrganisationServiceImplTest {
         organisation.setUsers(asList(superUser));
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         UUID userId = UUID.randomUUID();
         ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNull();
@@ -2358,7 +2359,7 @@ class OrganisationServiceImplTest {
         organisation.setUsers(asList(superUser));
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         UUID userId = UUID.randomUUID();
         assertThrows(InvalidRequest.class, () ->
                 sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId));
@@ -2375,7 +2376,7 @@ class OrganisationServiceImplTest {
                 .status(200)
                 .body(addPbaResponse);
 
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         organisation.setStatus(ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
         UUID userId = UUID.randomUUID();
@@ -2400,7 +2401,7 @@ class OrganisationServiceImplTest {
         when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(Optional.of(paymentAccount));
 
         ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest,
-                UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID());
+                randomUUID().substring(0, 7), UUID.randomUUID());
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
 
@@ -2412,7 +2413,7 @@ class OrganisationServiceImplTest {
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(pbas);
 
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         UUID userId = UUID.randomUUID();
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
 
@@ -2433,7 +2434,7 @@ class OrganisationServiceImplTest {
         organisation.setUsers(asList(superUser));
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         UUID userId = UUID.randomUUID();
         ResponseEntity<Object> responseEntity = sut.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId);
         AddPbaResponse response = (AddPbaResponse) responseEntity.getBody();

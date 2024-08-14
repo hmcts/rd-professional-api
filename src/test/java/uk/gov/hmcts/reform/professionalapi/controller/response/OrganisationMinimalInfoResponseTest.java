@@ -9,17 +9,17 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationMinimalInfoResponseTest {
 
     String name = "Organisation Name";
-    String organisationIdentifier = UUID.randomUUID().toString();
+    String organisationIdentifier = randomUUID();
     ContactInformation contactInformation = new ContactInformation();
     List<ContactInformation> contactInformations = Arrays.asList(contactInformation);
     Organisation organisationMock = mock(Organisation.class);

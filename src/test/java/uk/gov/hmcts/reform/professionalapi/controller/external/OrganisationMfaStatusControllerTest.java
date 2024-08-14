@@ -10,12 +10,11 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -32,7 +31,7 @@ class OrganisationMfaStatusControllerTest {
     void test_retrieveMfaStatusByUserId() {
         mfaStatusResponseEntity = ResponseEntity.status(HttpStatus.OK).body(new MfaStatusResponse());
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String id = UUID.randomUUID().toString();
+        String id = randomUUID();
 
         when(mfaStatusServiceMock.findMfaStatusByUserId(id)).thenReturn(mfaStatusResponseEntity);
 

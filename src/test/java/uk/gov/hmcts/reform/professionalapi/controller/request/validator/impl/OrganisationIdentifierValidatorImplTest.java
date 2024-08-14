@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationIdentifierValidatorImplTest {
@@ -37,7 +38,7 @@ class OrganisationIdentifierValidatorImplTest {
     void setUp() {
         organisation = new Organisation("Company", OrganisationStatus.PENDING, "SraId",
                 "12345678", false, "www.company.com");
-        organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
+        organisation.setOrganisationIdentifier(randomUUID());
         paymentAccount = new PaymentAccount("PBA1234567");
     }
 
@@ -63,7 +64,7 @@ class OrganisationIdentifierValidatorImplTest {
     void test_shouldThrowAEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
         organisation.setPaymentAccounts(new ArrayList<>());
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
@@ -74,7 +75,7 @@ class OrganisationIdentifierValidatorImplTest {
     void test_shouldThrowAAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
         organisation.setPaymentAccounts(singletonList(paymentAccount));
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         assertThrows(AccessDeniedException.class, () ->
                 organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
@@ -83,7 +84,7 @@ class OrganisationIdentifierValidatorImplTest {
 
     @Test
     void test_shouldThrowEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(
@@ -92,7 +93,7 @@ class OrganisationIdentifierValidatorImplTest {
 
     @Test
     void shouldThrowEmptyResultDataAccessExceptionWhenOrganisationIsNull() {
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(

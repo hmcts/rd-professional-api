@@ -9,9 +9,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class MultipleUserProfilesResponseTest {
@@ -23,7 +23,7 @@ class MultipleUserProfilesResponseTest {
 
     @BeforeEach
     void setUp() {
-        userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com", "fName",
+        userProfile = new UserProfile(randomUUID(), "test@email.com", "fName",
                 "lName", IdamStatus.PENDING);
         getUserProfileResponse = new GetUserProfileResponse();
         userProfiles.add(userProfile);

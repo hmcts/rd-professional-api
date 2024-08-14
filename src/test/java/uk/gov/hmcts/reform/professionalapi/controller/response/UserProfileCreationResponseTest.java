@@ -5,16 +5,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class UserProfileCreationResponseTest {
 
     private final UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-    private final String testUuid = UUID.randomUUID().toString();
+    private final String testUuid = randomUUID();
 
     @Test
     void test_has_mandatory_fields_specified_not_null() {

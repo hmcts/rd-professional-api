@@ -57,6 +57,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_organisationalExternalUsers")
 @WebMvcTest({OrganisationExternalController.class})
@@ -115,7 +116,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         mockSecurityContext();
         ProfessionalUser professionalUser = setUpProfessionalUser();
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
@@ -143,7 +144,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         mockSecurityContext();
         ProfessionalUser professionalUser = setUpProfessionalUser();
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
@@ -173,7 +174,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
         mockSecurityContext();
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
@@ -200,7 +201,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
         when(idamRepositoryMock.getUserInfo(anyString()))
-                .thenReturn(UserInfo.builder().uid(UUID.randomUUID().toString())
+                .thenReturn(UserInfo.builder().uid(randomUUID())
                         .roles(Arrays.asList("pui-case-manager")).build());
     }
 
@@ -229,7 +230,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     private void setUpUserProfileClientInteraction() throws JsonProcessingException {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
 
         ObjectMapper mapper = new ObjectMapper();

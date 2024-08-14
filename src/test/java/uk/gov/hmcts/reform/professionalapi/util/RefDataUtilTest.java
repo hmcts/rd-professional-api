@@ -83,6 +83,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @ExtendWith(MockitoExtension.class)
@@ -118,7 +119,7 @@ class RefDataUtilTest {
         professionalUser.setLastUpdated(LocalDateTime.of(2023, 12, 31, 23, 59, 59, 987654321));
         userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         userAccountMap = new UserAccountMap(userAccountMapId);
-        profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName",
+        profile = new UserProfile(randomUUID(), "email@org.com", "firstName",
                 "lastName", IdamStatus.ACTIVE);
         getUserProfileResponse = new GetUserProfileResponse(profile, true);
         getUserProfileResponse.setRoles(singletonList("pui-case-manager"));
@@ -223,8 +224,8 @@ class RefDataUtilTest {
 
     @Test
     void test_shouldReturnTrueValidateOrgIdentifier() {
-        String uuid = UUID.randomUUID().toString();
-        String uuid2 = UUID.randomUUID().toString();
+        String uuid = randomUUID();
+        String uuid2 = randomUUID();
         assertThrows(AccessDeniedException.class,() ->
                 RefDataUtil.validateOrgIdentifier(uuid, uuid2));
     }
@@ -563,11 +564,11 @@ class RefDataUtilTest {
         ProfessionalUsersResponse professionalUsersResponse2
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
-        String userId1 = UUID.randomUUID().toString();
+        String userId1 = randomUUID();
         professionalUsersResponse.setUserIdentifier(userId1);
-        String userId2 = UUID.randomUUID().toString();
+        String userId2 = randomUUID();
         professionalUsersResponse1.setUserIdentifier(userId2);
-        String userId3 = UUID.randomUUID().toString();
+        String userId3 = randomUUID();
         professionalUsersResponse2.setUserIdentifier(userId3);
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
@@ -609,7 +610,7 @@ class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "some@email.com",
+        UserProfile profile = new UserProfile(randomUUID(), "some@email.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -679,7 +680,7 @@ class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "some@email.com",
+        UserProfile profile = new UserProfile(randomUUID(), "some@email.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -705,7 +706,7 @@ class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "some@email.com",
+        UserProfile profile = new UserProfile(randomUUID(), "some@email.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -735,11 +736,11 @@ class RefDataUtilTest {
         ProfessionalUsersResponse professionalUsersResponse2
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
-        String userId1 = UUID.randomUUID().toString();
+        String userId1 = randomUUID();
         professionalUsersResponse.setUserIdentifier(userId1);
-        String userId2 = UUID.randomUUID().toString();
+        String userId2 = randomUUID();
         professionalUsersResponse1.setUserIdentifier(userId2);
-        String userId3 = UUID.randomUUID().toString();
+        String userId3 = randomUUID();
         professionalUsersResponse2.setUserIdentifier(userId3);
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
@@ -763,7 +764,7 @@ class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "some@email.com",
+        UserProfile profile = new UserProfile(randomUUID(), "some@email.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
@@ -821,7 +822,7 @@ class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "some@email.com",
+        UserProfile profile = new UserProfile(randomUUID(), "some@email.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
@@ -1138,7 +1139,7 @@ class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "some@email.com",
+        UserProfile profile = new UserProfile(randomUUID(), "some@email.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 

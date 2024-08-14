@@ -6,9 +6,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class DeleteUserProfilesRequestTest {
@@ -17,13 +17,13 @@ class DeleteUserProfilesRequestTest {
     void test_DeleteUserProfilesRequest() {
 
         Set<String> userIds = new HashSet<>();
-        userIds.add(UUID.randomUUID().toString());
+        userIds.add(randomUUID());
         DeleteUserProfilesRequest delUserProfileRequest = new DeleteUserProfilesRequest(userIds);
         assertThat(delUserProfileRequest.getUserIds()).containsAll(userIds);
         assertThat(delUserProfileRequest.getUserIds()).hasSize(1);
 
         Set<String> userIds1 = new HashSet<>();
-        userIds1.add(UUID.randomUUID().toString());
+        userIds1.add(randomUUID());
         delUserProfileRequest.setUserIds(userIds1);
         assertThat(delUserProfileRequest.getUserIds()).containsAll(userIds1);
 

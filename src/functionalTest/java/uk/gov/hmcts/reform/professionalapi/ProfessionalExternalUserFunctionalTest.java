@@ -30,7 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -51,6 +50,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @SerenityTest
 @SpringBootTest
@@ -871,9 +871,9 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
 
-        var deleteMultipleAddressRequest01 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
-        var deleteMultipleAddressRequest02 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
-        var deleteMultipleAddressRequest03 = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var deleteMultipleAddressRequest01 = new DeleteMultipleAddressRequest(randomUUID());
+        var deleteMultipleAddressRequest02 = new DeleteMultipleAddressRequest(randomUUID());
+        var deleteMultipleAddressRequest03 = new DeleteMultipleAddressRequest(randomUUID());
         var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest01,
                 deleteMultipleAddressRequest02, deleteMultipleAddressRequest03));
 
@@ -890,7 +890,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
 
-        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(UUID.randomUUID().toString());
+        var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest(randomUUID());
         var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
 
         professionalApiClient.deleteMultipleAddressesOfOrganisation(requestArrayList,

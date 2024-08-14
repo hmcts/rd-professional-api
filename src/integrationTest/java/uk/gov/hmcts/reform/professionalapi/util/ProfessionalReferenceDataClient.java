@@ -51,6 +51,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application.yml")
@@ -571,7 +572,7 @@ public class ProfessionalReferenceDataClient {
     public String getAndReturnBearerToken(String userId, String role) {
         String bearerToken;
         if (bearerTokenMap.get(role) == null && userId != null) {
-            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? randomUUID()
                     : userId, role));
             bearerTokenMap.put(role, bearerToken);
         } else if (bearerTokenMap.get(role + userId) == null) {

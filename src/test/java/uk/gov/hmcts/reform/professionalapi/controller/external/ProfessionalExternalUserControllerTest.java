@@ -54,6 +54,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -99,7 +100,7 @@ class ProfessionalExternalUserControllerTest {
         idamRepositoryMock = mock(IdamRepository.class);
         userInfoMock = mock(UserInfo.class);
 
-        organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
+        organisation.setOrganisationIdentifier(randomUUID());
 
         MockitoAnnotations.openMocks(this);
     }

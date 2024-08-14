@@ -52,6 +52,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_organisationalExternalPbas")
 @Import(OrganisationalExternalControllerProviderTestConfiguration.class)
@@ -133,7 +134,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+        UserProfile profile = new UserProfile(randomUUID(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);

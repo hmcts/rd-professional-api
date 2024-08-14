@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getMinimalOrganisation;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserConfiguredAccesses;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @Provider("referenceData_professionalInternalUsers")
 @WebMvcTest({ProfessionalUserInternalController.class})
@@ -38,7 +39,7 @@ public class ProfessionalUserInternalControllerProviderTest extends WebMvcProvid
     public void toRetrieveRefreshUserUsingUserIdentifier() {
         ProfessionalUser professionalUser = setupProfessionalUserWithOrganisation();
 
-        when(professionalUserRepositoryMock.findByUserIdentifier(any(String.class)))
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(UUID.class)))
                 .thenReturn(professionalUser);
     }
 
@@ -75,7 +76,7 @@ public class ProfessionalUserInternalControllerProviderTest extends WebMvcProvid
         ProfessionalUser professionalUser = new ProfessionalUser("firstName", "lastName",
                 "email@org.com", organisation);
 
-        professionalUser.setUserIdentifier("123");
+        professionalUser.setUserIdentifier(generateRandomUUID());
         professionalUser.setId(UUID.randomUUID());
         professionalUser.setLastUpdated(LocalDateTime.now());
         professionalUser.setUserConfiguredAccesses(getUserConfiguredAccesses(professionalUser));

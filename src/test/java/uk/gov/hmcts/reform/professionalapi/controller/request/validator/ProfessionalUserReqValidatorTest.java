@@ -13,12 +13,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
-import java.util.UUID;
-
 import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserReqValidatorTest {
@@ -73,7 +72,7 @@ class ProfessionalUserReqValidatorTest {
 
     @Test
     void test_validateUuidDoesNotThrow400ForValidUuid() {
-        String id = UUID.randomUUID().toString();
+        String id = randomUUID();
         assertTrue(profUserReqValidator.validateUuid(id));
     }
 
@@ -130,7 +129,7 @@ class ProfessionalUserReqValidatorTest {
     void test_validateModifyRolesRequestThrows400ForInvalidAddRoleName() {
         userProfileUpdatedData.setRolesAdd((singleton(new RoleName(""))));
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         assertThrows(InvalidRequest.class, () ->
                 profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, uuid));
@@ -141,7 +140,7 @@ class ProfessionalUserReqValidatorTest {
         userProfileUpdatedData.setRolesAdd((singleton(new RoleName("pui-user-manager"))));
         userProfileUpdatedData.setRolesDelete((singleton(new RoleName(""))));
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID();
 
         assertThrows(InvalidRequest.class, () ->
                 profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, uuid));
@@ -150,6 +149,6 @@ class ProfessionalUserReqValidatorTest {
     @Test
     void test_validateModifyRolesRequestDoesNotThrow400WhenRequestIsValid() {
         assertDoesNotThrow(() ->
-                profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString()));
+                profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, randomUUID()));
     }
 }

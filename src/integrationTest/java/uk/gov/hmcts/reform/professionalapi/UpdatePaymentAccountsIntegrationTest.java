@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
@@ -24,6 +23,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.REJECTED;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -184,7 +184,7 @@ class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
     void update_pba_account_numbers_with_non_prdAdmin_role_403_failure_scenario() {
         Map<String, Object> updatePbaResponse =
                 professionalReferenceDataClient.updatePaymentsAccountsByOrgId(new UpdatePbaRequest(),
-                        UUID.randomUUID().toString(), puiUserManager, null);
+                        randomUUID(), puiUserManager, null);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("403");

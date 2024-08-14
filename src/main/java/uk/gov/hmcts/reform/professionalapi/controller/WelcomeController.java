@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 
 @Slf4j
@@ -24,7 +23,7 @@ public class WelcomeController {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
-    private static final String INSTANCE_ID = UUID.randomUUID().toString();
+    private static final String INSTANCE_ID = randomUUID();
     private static final String MESSAGE = "Welcome to the System Reference Data API";
 
     /**

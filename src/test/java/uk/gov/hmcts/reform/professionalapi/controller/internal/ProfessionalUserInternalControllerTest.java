@@ -49,6 +49,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserInternalControllerTest {
@@ -85,7 +86,7 @@ class ProfessionalUserInternalControllerTest {
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         userProfileUpdateRequestValidatorMock = mock(UserProfileUpdateRequestValidator.class);
         responseEntityMock = mock(ResponseEntity.class);
-        organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
+        organisation.setOrganisationIdentifier(randomUUID());
         prdAdminRoles = new ArrayList<>();
         prdAdminRoles.add("prd-admin");
         systemUserRoles = new ArrayList<>();
@@ -294,7 +295,7 @@ class ProfessionalUserInternalControllerTest {
                 .thenReturn(responseEntity);
 
         ResponseEntity<Object> actualData = professionalUserInternalController
-                .getRefreshUsers(null, UUID.randomUUID().toString(), null, null);
+                .getRefreshUsers(null, randomUUID(), null, null);
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);

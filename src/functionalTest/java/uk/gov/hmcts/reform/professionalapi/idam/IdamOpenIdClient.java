@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 
 @Slf4j
@@ -38,7 +38,7 @@ public class IdamOpenIdClient extends IdamOpenId {
         //Generating a random user
         String userGroup = "";
 
-        String id = UUID.randomUUID().toString();
+        String id = randomUUID();
         List<Role> roles = new ArrayList<>();
         userRoles.forEach(userRole -> {
             Role role = new Role(userRole);

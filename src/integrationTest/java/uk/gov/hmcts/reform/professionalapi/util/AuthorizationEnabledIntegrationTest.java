@@ -75,6 +75,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.decodeJwtTok
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
 import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwksResponse;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Configuration
 @SerenityTest
@@ -232,7 +233,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void userProfileGetUserWireMock() throws Exception {
 
         HashMap<Object,Object> data = new HashMap<>();
-        data.put("userIdentifier", UUID.randomUUID().toString());
+        data.put("userIdentifier", randomUUID());
         data.put("firstName","testFn");
         data.put("lastName","testLn");
         data.put("email","dummy@email.com");
@@ -248,7 +249,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void userProfileGetPendingUserWireMock() {
 
         HashMap<Object,Object> data = new HashMap<>();
-        data.put("userIdentifier", UUID.randomUUID().toString());
+        data.put("userIdentifier", randomUUID());
         data.put("firstName","testFn");
         data.put("lastName","dummy");
         data.put("email","dummy@email.com");
@@ -267,7 +268,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void userProfilePostPendingUserWireMock(boolean resend) {
 
         HashMap<Object,Object> data = new HashMap<>();
-        data.put("idamId", UUID.randomUUID().toString());
+        data.put("idamId", randomUUID());
         data.put("idamRegistrationResponse",201);
         try {
             userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
@@ -564,7 +565,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         String body = null;
         body = "{"
-                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"idamId\":\"" + randomUUID() + "\","
                 + "  \"idamRegistrationResponse\":\"201\""
                 + "}";
 
@@ -682,7 +683,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         try {
             if (status.is2xxSuccessful()) {
                 HashMap<String, String> data = new HashMap<>();
-                data.put("idamId", UUID.randomUUID().toString());
+                data.put("idamId", randomUUID());
                 data.put("idamRegistrationResponse", "201");
                 body = WireMockUtil.getObjectMapper().writeValueAsString(data);
             } else if (status == HttpStatus.BAD_REQUEST) {
@@ -845,7 +846,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             if (replaceParams > 0) {
                 if (replaceParams > userIds.size()) {
                     while (replaceParams != userIds.size()) {
-                        userIds.add(UUID.randomUUID().toString());
+                        userIds.add(randomUUID());
                     }
                 }
 

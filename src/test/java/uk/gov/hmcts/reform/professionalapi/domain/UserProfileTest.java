@@ -5,16 +5,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class UserProfileTest {
 
     @Test
     void test_UserProfile() {
-        String id = UUID.randomUUID().toString();
+        String id = randomUUID();
         String email = "test@email.com";
         String firstName = "fName";
         String lastName = "lName";

@@ -88,6 +88,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -243,7 +244,7 @@ class OrganisationExternalControllerTest {
     void test_RetrieveOrganisationByIdentifier() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        String id = UUID.randomUUID().toString().substring(0, 7);
+        String id = randomUUID().substring(0, 7);
         when(organisationServiceMock.retrieveOrganisation(id, true)).thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id, "");
@@ -277,7 +278,7 @@ class OrganisationExternalControllerTest {
 
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(
-                UUID.randomUUID().toString().substring(0, 7));
+                randomUUID().substring(0, 7));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -299,7 +300,7 @@ class OrganisationExternalControllerTest {
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(
-                UUID.randomUUID().toString().substring(0, 7));
+                randomUUID().substring(0, 7));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -313,7 +314,7 @@ class OrganisationExternalControllerTest {
     @Test
     void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
@@ -321,9 +322,9 @@ class OrganisationExternalControllerTest {
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamId(randomUUID());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
-        String userId = UUID.randomUUID().toString();
+        String userId = randomUUID();
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
@@ -383,8 +384,8 @@ class OrganisationExternalControllerTest {
         deletePbaRequest.setPaymentAccounts(accountsToDelete);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
 
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
+        String orgId = randomUUID().substring(0, 7);
+        String userId = randomUUID();
         organisationExternalController
                 .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId);
 
@@ -402,8 +403,8 @@ class OrganisationExternalControllerTest {
         PbaRequest deletePbaRequest = new PbaRequest();
         var accountsToDelete = new HashSet<String>();
         deletePbaRequest.setPaymentAccounts(accountsToDelete);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-        String userId = UUID.randomUUID().toString();
+        String orgId = randomUUID().substring(0, 7);
+        String userId = randomUUID();
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
                 .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId));
@@ -422,7 +423,7 @@ class OrganisationExternalControllerTest {
                 .status(200)
                 .body(addPbaResponse);
 
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         UUID userId = UUID.randomUUID();
         String userIdStr = userId.toString();
 
@@ -510,7 +511,7 @@ class OrganisationExternalControllerTest {
     void test_deleteMultipleAddressesOfOrganisation_EmptyAddressIdPassed() {
         var deleteMultipleAddressRequest = new DeleteMultipleAddressRequest("");
         var requestArrayList = new ArrayList<>(List.of(deleteMultipleAddressRequest));
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String orgId = randomUUID().substring(0, 7);
         assertThrows(InvalidRequest.class,() ->
                 organisationExternalController
                         .deleteMultipleAddressesOfOrganisation(requestArrayList, orgId));

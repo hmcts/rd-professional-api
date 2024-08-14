@@ -42,6 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_organisationalInternalV2")
 @Import(OrganisationalInternalControllerV2ProviderTestConfiguration.class)
@@ -147,7 +148,7 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(randomUUID());
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -177,7 +178,7 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
                 "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfileResponse.setUserIdentifier(randomUUID());
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.getUsers().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,

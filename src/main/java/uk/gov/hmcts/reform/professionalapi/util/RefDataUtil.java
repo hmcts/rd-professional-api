@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 
 @Component
 @Slf4j
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class RefDataUtil {
 
     private RefDataUtil() {
@@ -639,4 +640,11 @@ public class RefDataUtil {
         return UUID.fromString(userIdentifier);
     }
 
+    public static final String randomUUID() {
+        return generateRandomUUID().toString();
+    }
+
+    public static final UUID generateRandomUUID() {
+        return UUID.randomUUID();
+    }
 }

@@ -44,7 +44,6 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,6 +55,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference.EN;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -188,7 +188,7 @@ class OrganisationExternalControllerV2Test {
     void test_RetrieveOrganisationByIdentifier() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        String id = UUID.randomUUID().toString().substring(0, 7);
+        String id = randomUUID().substring(0, 7);
         when(organisationServiceMock.retrieveOrganisationForV2Api(id, true))
                 .thenReturn(organisationEntityResponse);
 
