@@ -1316,7 +1316,7 @@ public class ProfessionalApiClient {
     }
 
     public void updatesOrganisationName(OrganisationCreationRequest organisationCreationRequest, String role,
-                                   String organisationIdentifier, HttpStatus expectedStatus) {
+                                        String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(organisationCreationRequest)

@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
@@ -726,23 +727,24 @@ public class OrganisationInternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured({"prd-admin"})
-    public ResponseEntity<OrganisationResponse> updateOrganisationNameOrSra(
+    public ResponseEntity<OrganisationsDetailResponse> updateOrganisationNameOrSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-        @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
+        @Valid @NotNull @RequestBody OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest,
         @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
         var orgId = removeEmptySpaces(organisationIdentifier);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
 
-        if (isBlank(organisationCreationRequest.getName()) && isBlank(organisationCreationRequest.getSraId())) {
+        if (isBlank(organisationNameSraUpdateRequest.getName())
+            && isBlank(organisationNameSraUpdateRequest.getSraId())) {
             throw new InvalidRequest("Name or SRA Id is required");
         }
 
-        OrganisationResponse organisationResponse = organisationService
-            .updateOrganisationNameOrSra(organisationCreationRequest, orgId);
+        OrganisationsDetailResponse organisationsDetailResponse = organisationService
+            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest, orgId);
 
-        ResponseEntity<OrganisationResponse> resp =  ResponseEntity.status(200).body(organisationResponse);
+        ResponseEntity<OrganisationsDetailResponse> resp = ResponseEntity.status(200).body(organisationsDetailResponse);
         return resp;
     }
 

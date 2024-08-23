@@ -1040,6 +1040,7 @@ public class ProfessionalReferenceDataClient {
 
         Map<String, Object> organisationResponse = new HashMap<>();
         organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        organisationResponse.put("response_body", responseEntity.getBody());
         return organisationResponse;
     }
 }

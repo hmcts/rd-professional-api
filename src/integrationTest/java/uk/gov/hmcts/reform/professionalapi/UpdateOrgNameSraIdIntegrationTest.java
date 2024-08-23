@@ -28,6 +28,10 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
                 .updateOrgNameSraIdStatus(null,  hmctsAdmin,getOrganisationId());
 
         assertThat(updateResponse).containsEntry("http_status", "400");
+        assertThat(updateResponse.get("response_body").toString())
+            .contains("Required request body is missing:"
+                + " public org.springframework.http.ResponseEntity"
+                + "<uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse>");
     }
 
     @Test
