@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -75,11 +76,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
@@ -98,6 +99,7 @@ class OrganisationInternalControllerTest {
 
     private ContactInformationCreationRequest contactInformationCreationRequest;
 
+    private OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest;
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
@@ -176,6 +178,7 @@ class OrganisationInternalControllerTest {
             "addressLine2","addressLine3", "some-country1","some-county1","som1-town-city",
             "som1-post-code",Arrays.asList(dxAddressCreationRequest()
             .dxNumber("DX 1234567890").dxExchange("dxExchange").build()));
+        organisationNameSraUpdateRequest = new OrganisationNameSraUpdateRequest("name","sraId");
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -604,6 +607,40 @@ class OrganisationInternalControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
+
+    @Test
+    void testUpdateOrgNameAndSra() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String updatedName = "NewName";
+        String updatedSra = "NewSRA";
+        organisation.setName(updatedName);
+        organisation.setSraId(updatedSra);
+        organisationNameSraUpdateRequest.setName(updatedName);
+        organisationNameSraUpdateRequest.setSraId(updatedSra);
+
+        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
+        assertThat(organisationNameSraUpdateRequest.getName()).isNotEmpty();
+        assertThat(organisationNameSraUpdateRequest.getSraId()).isNotEmpty();
+
+
+        when(organisationServiceMock.updateOrganisationNameOrSra(organisationNameSraUpdateRequest,
+            organisation.getOrganisationIdentifier())).thenReturn(new OrganisationsDetailResponse(List.of(organisation),
+            false,false,false));
+
+        ResponseEntity<OrganisationsDetailResponse> response = organisationInternalController
+            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest,organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+
+        verify(organisationCreationRequestValidatorMock, times(1))
+            .validateOrganisationIdentifier(any(String.class));
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest, organisation.getOrganisationIdentifier());
+
+    }
+
 
     @Test
     void testDeleteProfessionalUserFromOrganisation() {

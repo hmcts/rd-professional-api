@@ -23,6 +23,7 @@ public class ProfessionalApiConstants {
 
     public static final String NO_ORG_FOUND_FOR_GIVEN_ID
             = "No Organisation was found with the given organisationIdentifier ";
+
     public static final String ORG_NOT_ACTIVE_NO_USERS_RETURNED
             = "Organisation is not Active hence not returning any users";
     public static final String ERROR_MESSAGE_403_FORBIDDEN = "403 Forbidden";
@@ -131,6 +132,10 @@ public class ProfessionalApiConstants {
     public static final String DEL_ORG_PBA_NOTES_4 =
             "<br>- Passed payment account numbers are in an invalid format.<br>";
     public static final String DEL_ORG_PBA_NOTES_5 = "-The payment accounts are not associated with users organisation";
+
+    public static final String DEL_USER_UP = "- Users  deleted successfully.";
+
+    public static final String ERROR_USER_DELETED_UP = "- Error in deleting users.";
 
     public static final String GET_PBA_EMAIL_NOTES_1 =
             "**IDAM Roles to access API** : <br> pui-finance-manager,<br>pui-";

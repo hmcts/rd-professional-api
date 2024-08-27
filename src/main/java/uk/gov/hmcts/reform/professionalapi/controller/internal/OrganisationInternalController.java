@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
@@ -62,12 +63,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_1;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -703,6 +706,70 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("userId") String userId) {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
+
+    @Operation(
+        summary = "Updates an Organisation's name",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        })
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Organisation name has been updated",
+        content = @Content(schema = @Schema(implementation = String.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "If Organisation request sent with null/invalid values for mandatory fields",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "No Organisation found with the given ID",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @PutMapping(
+        value = "/nameSra/{orgId}",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured({"prd-admin"})
+    public ResponseEntity<OrganisationsDetailResponse> updateOrganisationNameOrSra(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+        @Valid @NotNull @RequestBody OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest,
+        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
+
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+
+        if (isBlank(organisationNameSraUpdateRequest.getName())
+            && isBlank(organisationNameSraUpdateRequest.getSraId())) {
+            throw new InvalidRequest("Name or SRA Id is required");
+        }
+
+        OrganisationsDetailResponse organisationsDetailResponse = organisationService
+            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest, orgId);
+
+        ResponseEntity<OrganisationsDetailResponse> resp = ResponseEntity.status(200).body(organisationsDetailResponse);
+        return resp;
+    }
+
 
     @Operation(
         summary = "Deletes the provided list of user accounts from the organisation.",

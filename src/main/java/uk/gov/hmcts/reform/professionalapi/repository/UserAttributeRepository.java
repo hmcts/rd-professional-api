@@ -17,4 +17,7 @@ public interface UserAttributeRepository extends JpaRepository<UserAttribute, UU
     void deleteByProfessionalUserId(UUID profUserId);
 
 
+    @Query(value = "Select * from dbrefdata.user_attribute ua where ua.professional_user_id=:profUserId",
+        nativeQuery = true)
+    UserAttribute findByProfessionalUserId(UUID profUserId);
 }

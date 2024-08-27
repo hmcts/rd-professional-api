@@ -1022,6 +1022,30 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+
+
+    public Map<String, Object> updateOrgNameSraIdStatus(
+        OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/nameSra/" + organisationIdentifier;
+        try {
+            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
+                getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> organisationResponse = new HashMap<>();
+        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        organisationResponse.put("response_body", responseEntity.getBody());
+        return organisationResponse;
+    }
+
     public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(
             UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
             UUID searchAfterUser, UUID searchAfterOrganisation) {
@@ -1038,6 +1062,7 @@ public class ProfessionalReferenceDataClient {
         }
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
+
     }
 
     public Map<String, Object> updateOrgContactInformation(

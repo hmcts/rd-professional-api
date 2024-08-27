@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
@@ -52,6 +53,9 @@ public interface OrganisationService {
                                                                    Pageable pageable);
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
+
+    OrganisationsDetailResponse updateOrganisationNameOrSra(
+        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest, String organisationIdentifier);
 
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
                                             String organisationIdentifier,Boolean isOrgApprovalRequest);

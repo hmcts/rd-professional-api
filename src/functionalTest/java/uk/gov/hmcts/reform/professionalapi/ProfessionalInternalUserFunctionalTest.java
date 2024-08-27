@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
@@ -780,6 +781,82 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
 
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
+    void updateOrganisationNameAndSraShouldReturnSuccess() {
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        String updatedName = "updatedName";
+        String updatedSra = randomAlphabetic(7);
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+
+        assertNotNull(orgResponse.get("name"));
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .name(updatedName).sraId(updatedSra).build();
+
+        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest =
+            new OrganisationNameSraUpdateRequest(updatedName,updatedSra);
+
+        organisationCreationRequest.setSraId(organisationNameSraUpdateRequest.getSraId());
+        organisationCreationRequest.setName(organisationNameSraUpdateRequest.getName());
+
+        professionalApiClient.updatesOrganisationName(organisationCreationRequest,
+            hmctsAdmin,organisationIdentifier, OK);
+
+        JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertThat(response).isNotNull();
+        assertNotNull(orgUpdatedNameResponse.get("name"));
+        assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+        assertNotNull(orgUpdatedNameResponse.get("sraId"));
+        assertThat(orgUpdatedNameResponse.get("sraId").toString()).contains(updatedSra);
+  
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
+    void updateOrganisationNameAndSraShouldReturnFailure() {
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        String updatedName = "updatedName";
+        String updatedSra = "updatedSraId";
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+
+        assertNotNull(orgResponse.get("name"));
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .name(updatedName).sraId(updatedSra).build();
+
+        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest =
+            new OrganisationNameSraUpdateRequest(updatedName,updatedSra);
+
+        organisationCreationRequest.setSraId(organisationNameSraUpdateRequest.getSraId());
+        organisationCreationRequest.setName(organisationNameSraUpdateRequest.getName());
+
+        professionalApiClient.updatesOrganisationName(organisationCreationRequest,
+            hmctsAdmin,organisationIdentifier, OK);
+
+        JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertThat(response).isNotNull();
+        assertNotNull(orgUpdatedNameResponse.get("name"));
+        assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+        assertNotNull(orgUpdatedNameResponse.get("sraId"));
+        assertThat(orgUpdatedNameResponse.get("sraId").toString()).contains(updatedSra);
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
 
     @Test
