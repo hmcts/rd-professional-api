@@ -1093,7 +1093,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdateRequest.getName()));
             }
             if (isNotBlank(organisationNameSraUpdateRequest.getSraId())) {
-                OrgAttribute savedAttribute = saveOrganisationAttributes(existingOrganisation,organisationNameSraUpdateRequest);
+                OrgAttribute savedAttribute = saveOrganisationAttributes
+                    (existingOrganisation,organisationNameSraUpdateRequest);
                 if (savedAttribute == null) {
                     log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
                     throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
