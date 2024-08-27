@@ -15,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
     port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
     @VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
+@SuppressWarnings("checkstyle:Indentation")
 public abstract class BaseProviderTest {
 
     @TestTemplate

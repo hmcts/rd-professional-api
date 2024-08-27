@@ -1,7 +1,8 @@
 spring:
   flyway:
     schemas: DBREFDATA
-    locations: classpath:db/migration
+    locations: classpath:db/testmigration
+    out-of-order: true
 
   jpa:
     show-sql: true

@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExter
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -213,6 +216,17 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     }
 
+    @State({"User exists"})
+    public void toRetrieveUser() {
+        ProfessionalUser professionalUser = setUpProfessionalUser();
+        professionalUser.setUserIdentifier("someUserIdentifier");
+        ResponseEntity<NewUserResponse> response = ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new NewUserResponse(professionalUser));
+
+        when(professionalUserServiceMock.findUserStatusByEmailAddress(anyString()))
+                .thenReturn(response);
+    }
 
     private void setUpUserProfileClientInteraction() throws JsonProcessingException {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();

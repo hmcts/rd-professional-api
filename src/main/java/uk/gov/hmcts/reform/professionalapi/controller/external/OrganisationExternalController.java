@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisa
 )
 @RestController
 @Slf4j
+@SuppressWarnings("checkstyle:Indentation")
 public class OrganisationExternalController extends SuperController {
 
 

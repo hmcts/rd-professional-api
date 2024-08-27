@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.O
 )
 @RestController
 @Slf4j
+@SuppressWarnings("checkstyle:Indentation")
 public class ProfessionalExternalUserController extends SuperController {
 
     @Operation(

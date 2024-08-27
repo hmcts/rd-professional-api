@@ -3,8 +3,8 @@ java:
   ingressHost: rd-professional-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: rd
   environment:
-    POSTGRES_HOST: rd-professional-api-postgres-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
-    POSTGRES_USERNAME: dbrefdata@rd-professional-api-postgres-db-v11-{{ .Values.global.environment }}
+    POSTGRES_HOST: rd-professional-api-postgres-db-v16-{{ .Values.global.environment }}.postgres.database.azure.com
+    POSTGRES_USERNAME: pgadmin
     POSTGRES_PORT: 5432
     CONTAINER_NAME: rd-prd-data
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal

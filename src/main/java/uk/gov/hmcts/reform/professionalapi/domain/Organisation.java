@@ -46,6 +46,7 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
                 @NamedAttributeNode(value = "users"),
         }
 )
+@SuppressWarnings("checkstyle:Indentation")
 public class Organisation implements Serializable {
 
     @Id

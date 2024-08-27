@@ -72,6 +72,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySp
 @RestController
 @Slf4j
 @NoArgsConstructor
+@SuppressWarnings("checkstyle:Indentation")
 public class OrganisationInternalController extends SuperController {
 
     protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;

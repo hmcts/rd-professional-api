@@ -562,8 +562,8 @@ class OrganisationCreationRequestValidatorTest {
             ",testValue",
             "testKey, ",
             "'',testValue"
-
     })
+    @SuppressWarnings("checkstyle:Indentation")
     void test_validateOrganisationRequestWithOrgAttributeKeyEmpty(String key,String value) {
 
         OrgAttributeRequest orgAttribute = new OrgAttributeRequest();

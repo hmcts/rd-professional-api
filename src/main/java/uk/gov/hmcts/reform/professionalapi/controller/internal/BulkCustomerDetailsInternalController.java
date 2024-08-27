@@ -31,6 +31,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Slf4j
 @NoArgsConstructor
+@SuppressWarnings("checkstyle:Indentation")
 public class BulkCustomerDetailsInternalController extends SuperController {
 
     @Value("${loggingComponentName}")
