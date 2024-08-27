@@ -1085,7 +1085,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        OrgAttribute savedAttribute = null;
+        Organisation savedOrganisation = null;
         if (existingOrganisation == null) {
             throw new EmptyResultDataAccessException(ONE);
         } else {
@@ -1093,15 +1093,13 @@ public class OrganisationServiceImpl implements OrganisationService {
                 existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdateRequest.getName()));
             }
             if (isNotBlank(organisationNameSraUpdateRequest.getSraId())) {
-                savedAttribute = saveOrganisationAttributes(existingOrganisation,organisationNameSraUpdateRequest);
+                OrgAttribute savedAttribute = saveOrganisationAttributes(existingOrganisation,organisationNameSraUpdateRequest);
+                if (savedAttribute == null) {
+                    log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
+                    throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
+                }
             }
-        }
-        Organisation savedOrganisation;
-        if (savedAttribute != null) {
             savedOrganisation = organisationRepository.save(existingOrganisation);
-        } else {
-            log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
-            throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
         }
 
         return new OrganisationsDetailResponse(List.of(savedOrganisation),false,false,false);
