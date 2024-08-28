@@ -363,7 +363,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = true;
         int expectedOrganisationsCount = 1;
-        int expectedUsersCount = 1;
+        int expectedUsersCount = 3;
 
         // act
         Map<String, Object> response =

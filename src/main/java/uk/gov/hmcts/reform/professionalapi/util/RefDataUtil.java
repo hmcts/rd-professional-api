@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import feign.FeignException;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -637,7 +638,7 @@ public class RefDataUtil {
         if (StringUtils.isEmpty(value)) {
             return null;
         }
-        return UUID.fromString(value);
+        return UuidCreator.fromString(value);
     }
 
     public static final String randomUUID() {
@@ -645,6 +646,6 @@ public class RefDataUtil {
     }
 
     public static final UUID generateRandomUUID() {
-        return UUID.randomUUID();
+        return UuidCreator.getTimeOrdered();
     }
 }

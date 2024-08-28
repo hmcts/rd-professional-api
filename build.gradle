@@ -385,6 +385,8 @@ dependencies {
     implementation group: 'org.glassfish', name: 'javax.el', version: '3.0.0'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
+    implementation group: 'com.github.f4b6a3', name: 'uuid-creator', version: '6.0.0'
+
     implementation (group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk) {
         exclude group: 'com.google.guava', module: 'guava'
     }
