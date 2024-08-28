@@ -109,17 +109,17 @@ public class OrganisationCreationRequestValidator {
                 throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
             }
 
-            if(dxAddressRequired){
-                validateDXAdd(dxAddressRequired,contactInformation);
+            if (dxAddressRequired) {
+                validateDxAdd(dxAddressRequired,contactInformation);
             }
 
-            if(contactInformationUpdate){
+            if (contactInformationUpdate) {
                 validateContactInfo(contactInformation);
             }
 
-            if(dxAddressRequired && contactInformationUpdate){
+            if (dxAddressRequired && contactInformationUpdate) {
                 validateContactInfo(contactInformation);
-                validateDXAdd(dxAddressRequired,contactInformation);
+                validateDxAdd(dxAddressRequired,contactInformation);
             }
 
         } catch (InvalidRequest invalidRequest) {
@@ -128,8 +128,8 @@ public class OrganisationCreationRequestValidator {
 
     }
 
-    public void validateDXAdd(boolean dxAddressRequired,
-                              ContactInformationCreationRequest contactInformation){
+    public void validateDxAdd(boolean dxAddressRequired,
+                              ContactInformationCreationRequest contactInformation) {
         if (dxAddressRequired) {
             List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
             if (dxAddressList != null && dxAddressList.isEmpty()) {
@@ -140,7 +140,7 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
-    public void validateContactInfo(ContactInformationCreationRequest contactInformation){
+    public void validateContactInfo(ContactInformationCreationRequest contactInformation) {
         if (isEmptyValue(contactInformation.getUprn())
             && isEmptyValue(contactInformation.getAddressLine1())
             && isEmptyValue(contactInformation.getAddressLine2())

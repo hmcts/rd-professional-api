@@ -1758,11 +1758,12 @@ public class ProfessionalApiClient {
         ContactInformationCreationRequest
             contactInformationCreationRequest,
         HttpStatus expectedStatus,
-        String organisationId,Boolean dxAddressRequired) {
+        String organisationId,Boolean dxAddressUpdate,Boolean contactInformationUpdate,String addressid) {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(contactInformationCreationRequest)
-            .put("/refdata/internal/v1/organisations/contactInformation/" + dxAddressRequired + "/" + organisationId)
+            .put("/refdata/internal/v1/organisations/contactInformation/"+organisationId+"/?dxAddressUpdate="
+        + dxAddressUpdate +"&contactInformationUpdate="+ contactInformationUpdate + "&addressid="+ addressid)
             .andReturn();
 
         response.then()

@@ -88,6 +88,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1057,29 +1058,35 @@ public class OrganisationServiceImpl implements OrganisationService {
         return !pageableOrganisations.isLast();
     }
 
-    public void updateContacts( Boolean dxAddressUpdate, Boolean contactInformationUpdate,
+    public void updateContacts(Boolean contactInformationUpdate, Boolean dxAddressUpdate,
                                 ContactInformationCreationRequest contactInformationRequest,
                                 List<ContactInformation> existingContactInformationList,
-                                Organisation organisation){
+                                Organisation organisation) {
         ContactInformation savedContactInformation = null;
         //If single address is present and contact info needs updating then update details
         if (contactInformationUpdate) {
-            savedContactInformation = updateContactInformation(existingContactInformationList.get(0), contactInformationRequest,
+            savedContactInformation = updateContactInformation(existingContactInformationList.get(0),
+                contactInformationRequest,
                 organisation);
         }
         //if both contact info and dx add needs updating
-        if(dxAddressUpdate && contactInformationUpdate){
+        if (dxAddressUpdate && contactInformationUpdate) {
             updateDxAddress(contactInformationRequest,dxAddressUpdate,savedContactInformation);
         }
         // if only dxaddress needs updating
-        if(dxAddressUpdate && !contactInformationUpdate){
+        if (dxAddressUpdate && !contactInformationUpdate) {
             updateDxAddress(contactInformationRequest,dxAddressUpdate,existingContactInformationList.get(0));
+        }
+        // if both are false no update takes place
+        if (!dxAddressUpdate && !contactInformationUpdate) {
+            throw new InvalidRequest("dxAddressUpdate and contactInformationUpdate are both false no update took place");
         }
     }
 
 
     private ContactInformation updateContactInformation(ContactInformation existingContactInformation,
-                                                        ContactInformationCreationRequest contactInfoRequest,Organisation organisation
+                                                        ContactInformationCreationRequest contactInfoRequest,
+                                                        Organisation organisation
     ) {
         existingContactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
         existingContactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
@@ -1094,7 +1101,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void updateDxAddress(ContactInformationCreationRequest contactInfoRequest,
-                                 Boolean dxAddressRequired , ContactInformation savedContactInformation) {
+                                 Boolean dxAddressRequired, ContactInformation savedContactInformation) {
 
         if (dxAddressRequired && contactInfoRequest.getDxAddress().isEmpty()) {
             throw new ResourceNotFoundException("No Dx Address Information provided in request");
@@ -1124,18 +1131,22 @@ public class OrganisationServiceImpl implements OrganisationService {
                         existingContactInformationList,organisation);
                 } else {
                     //if multiple records found then update the one fro which the id is provided
-                    if(addressid.isEmpty()){
-                        throw new ResourceNotFoundException("Multiple addresses found for organisation . Please enter specific address id " +
-                            "of the contact information to be pdated");
-                    } else{
+                    if (addressid.isEmpty()) {
+                        throw new ResourceNotFoundException("Multiple addresses found for organisation . "
+                            + "Please enter specific address id of the contact information to be updated");
+                    } else {
+                        AtomicBoolean idFound = new AtomicBoolean(false);
                         existingContactInformationList.forEach(existingInfo -> {
-                            if(existingInfo.getId().toString().equalsIgnoreCase(addressid)){
-                                updateContacts(contactInformationUpdate,dxAddressUpdate,contactInformationRequest,
-                                    existingContactInformationList,organisation);
-                            } else{
-                                throw new ResourceNotFoundException(" Could not find address to update for the id provided please check and try again");
+                            if (existingInfo.getId().toString().equalsIgnoreCase(addressid)) {
+                               idFound.set(true);
+                               updateContacts(contactInformationUpdate, dxAddressUpdate, contactInformationRequest,
+                                   existingContactInformationList, organisation);
                             }
                         });
+                        if(!idFound.get()) {
+                            throw new ResourceNotFoundException(" Could not find address to update for the "
+                                + "id provided please check and try again");
+                        }
                     }
                 }
             } else { // If contact information does not exist in db for the organisation
