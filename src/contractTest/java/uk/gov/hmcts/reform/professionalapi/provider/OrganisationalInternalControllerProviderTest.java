@@ -62,6 +62,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_organisationalInternal")
@@ -308,7 +309,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationWithPageSize() {
         Organisation organisation = getOrganisation();
         organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
-        organisation.setId(UUID.randomUUID());
+        organisation.setId(generateRandomUUID());
         organisation.setLastUpdated(LocalDateTime.now());
 
         Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
@@ -323,7 +324,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationWithPageSizeAndSearchAfter() {
         Organisation organisation = getOrganisation();
         organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
-        organisation.setId(UUID.randomUUID());
+        organisation.setId(generateRandomUUID());
         organisation.setLastUpdated(LocalDateTime.now());
 
         Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
@@ -336,7 +337,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
                 "some-email-address", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID());
+        superUser.setUserIdentifier(generateRandomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -355,12 +356,12 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
         contactInformation.setCreated(LocalDateTime.now());
-        contactInformation.setId(UUID.randomUUID());
+        contactInformation.setId(generateRandomUUID());
         organisation.setContactInformations(List.of(contactInformation));
 
         SuperUser superUser = new SuperUser("firstName", "lastName",
                 "email", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID());
+        superUser.setUserIdentifier(generateRandomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setUsers(users);

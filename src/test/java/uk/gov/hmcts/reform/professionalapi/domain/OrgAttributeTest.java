@@ -3,9 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 class OrgAttributeTest {
 
@@ -15,7 +14,7 @@ class OrgAttributeTest {
     @BeforeEach
     void setUp() {
         orgAttribute = new OrgAttribute();
-        orgAttribute.setId(UUID.randomUUID());
+        orgAttribute.setId(generateRandomUUID());
         orgAttribute.setKey("test-key");
         orgAttribute.setValue("test-value");
         orgAttribute.setOrganisation(organisation);

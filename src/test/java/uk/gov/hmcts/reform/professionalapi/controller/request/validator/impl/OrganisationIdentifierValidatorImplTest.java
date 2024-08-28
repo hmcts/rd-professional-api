@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -152,7 +153,7 @@ class OrganisationIdentifierValidatorImplTest {
 
     @Test
     void test_validateGetRefreshUsersParamsWithInvalidSize() {
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = generateRandomUUID();
         assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
                 .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, uuid));
     }

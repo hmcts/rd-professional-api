@@ -88,6 +88,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -424,7 +425,7 @@ class OrganisationExternalControllerTest {
                 .body(addPbaResponse);
 
         String orgId = randomUUID().substring(0, 7);
-        UUID userId = UUID.randomUUID();
+        UUID userId = generateRandomUUID();
         String userIdStr = userId.toString();
 
         when(organisationServiceMock.addPaymentAccountsToOrganisation(pbaRequest, orgId, userId))
@@ -481,12 +482,12 @@ class OrganisationExternalControllerTest {
     void testDeleteMultipleAddressesOfOrganisation() {
         ContactInformation contactInformation01 = new ContactInformation();
         contactInformation01.setAddressLine1("addressLine1");
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = generateRandomUUID();
         contactInformation01.setId(uuid);
 
         ContactInformation contactInformation02 = new ContactInformation();
         contactInformation02.setAddressLine1("addressLine2");
-        contactInformation02.setId(UUID.randomUUID());
+        contactInformation02.setId(generateRandomUUID());
 
         var contacts = new ArrayList<>(List.of(contactInformation01, contactInformation02));
         organisation.setContactInformations(contacts);

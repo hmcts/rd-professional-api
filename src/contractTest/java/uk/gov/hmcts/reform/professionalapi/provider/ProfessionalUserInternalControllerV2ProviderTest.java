@@ -19,13 +19,13 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserConfiguredAccesses;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @Provider("referenceData_professionalInternalUsersV2")
 @WebMvcTest({ProfessionalUserInternalControllerV2.class})
@@ -68,8 +68,8 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
 
     private ProfessionalUser getProfessionalUser() {
         ProfessionalUser professionalUser = new ProfessionalUser();
-        professionalUser.setId(UUID.randomUUID());
-        professionalUser.setUserIdentifier(UUID.randomUUID());
+        professionalUser.setId(generateRandomUUID());
+        professionalUser.setUserIdentifier(generateRandomUUID());
         professionalUser.setFirstName("some name");
         professionalUser.setLastName("last name");
         professionalUser.setEmailAddress("test@email.com");
@@ -85,7 +85,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
     private Organisation getOrganisation() {
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
                 COMPANY_NUMBER, false, COMPANY_URL);
-        organisation.setId(UUID.randomUUID());
+        organisation.setId(generateRandomUUID());
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
         ContactInformation contactInformation = new ContactInformation();
@@ -95,7 +95,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
         contactInformation.setCreated(LocalDateTime.now());
-        contactInformation.setId(UUID.randomUUID());
+        contactInformation.setId(generateRandomUUID());
         organisation.setContactInformations(List.of(contactInformation));
         return organisation;
     }

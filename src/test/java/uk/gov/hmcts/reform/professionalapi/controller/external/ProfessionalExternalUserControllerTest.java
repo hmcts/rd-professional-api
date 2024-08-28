@@ -54,6 +54,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,7 +74,7 @@ class ProfessionalExternalUserControllerTest {
     private IdamRepository idamRepositoryMock;
     private SecurityContext securityContext;
     private UserInfo userInfoMock;
-    private final UUID userIdentifier = UUID.randomUUID();
+    private final UUID userIdentifier = generateRandomUUID();
     private static final String USER_JWT = "Bearer 8gf364fg367f67";
 
 
@@ -375,7 +376,7 @@ class ProfessionalExternalUserControllerTest {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
                 "lastName", IdamStatus.ACTIVE.name(), null, null, null);
         String orgId = "org123";
-        UUID userId = UUID.randomUUID();
+        UUID userId = generateRandomUUID();
         String userIdStr = userId.toString();
         String origin = "EXUI";
         Optional<String> originOpt = Optional.of(origin);

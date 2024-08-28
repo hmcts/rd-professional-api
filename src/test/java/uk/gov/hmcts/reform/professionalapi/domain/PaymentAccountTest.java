@@ -7,11 +7,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentAccountTest {
@@ -26,11 +26,11 @@ class PaymentAccountTest {
         paymentAccount.setOrganisation(organisation);
         paymentAccount.setLastUpdated(LocalDateTime.now());
         paymentAccount.setCreated(LocalDateTime.now());
-        paymentAccount.setId(UUID.randomUUID());
+        paymentAccount.setId(generateRandomUUID());
         paymentAccount.setPbaNumber("some-pba-number");
         paymentAccount.setPbaStatus(ACCEPTED);
         paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED);
-        paymentAccount.setOrganisationId(UUID.randomUUID());
+        paymentAccount.setOrganisationId(generateRandomUUID());
 
         assertThat(paymentAccount.getOrganisation()).isSameAs(organisation);
         assertThat(paymentAccount.getLastUpdated()).isNotNull();

@@ -346,10 +346,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         Pageable pageableObject = PageRequest.of(0, pageSize);
         Page<ProfessionalUser> users;
+        List<String> orgIdentifiers = organisationIdentifiers == null || organisationIdentifiers.isEmpty()
+                ? null : organisationIdentifiers;
         if (searchAfterOrganisation == null && searchAfterUser == null) {
-            users = professionalUserRepository.findUsersInOrganisations(organisationIdentifiers, pageableObject);
+            users = professionalUserRepository.findUsersInOrganisations(orgIdentifiers, pageableObject);
         } else {
-            users = professionalUserRepository.findUsersInOrganisationsSearchAfter(organisationIdentifiers,
+            users = professionalUserRepository.findUsersInOrganisationsSearchAfter(orgIdentifiers,
                     searchAfterOrganisation.toString(),
                     searchAfterUser.toString(),
                     pageableObject);

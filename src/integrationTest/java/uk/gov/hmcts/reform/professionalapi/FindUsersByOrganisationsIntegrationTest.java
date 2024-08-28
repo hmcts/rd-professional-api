@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,6 +46,9 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
 @SuppressWarnings("unchecked")
 class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
+    public static final String USER_1_ORG_1_TEST_COM = "user1.org1@test.com";
+    public static final String USER_2_ORG_1_TEST_COM = "user2.org1@test.com";
+    public static final String USER_3_ORG_1_TEST_COM = "user3.org1@test.com";
     @Autowired
     private OrganisationRepository organisationRepository;
 
@@ -58,7 +62,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     // key: organisationIdentifier, value: list of userIdentifiers
     private Map<String, List<UUID>> unorderedUsersInOrganisation;
     // key: organisationId, value: list of professionalUsers
-    private LinkedHashMap<UUID, LinkedList<ProfessionalUser>> sortedUsersInOrganisation;
+    private LinkedHashMap<UUID, List<ProfessionalUser>> sortedUsersInOrganisation;
     private ProfessionalUser deletedUser;
 
     @BeforeEach
@@ -79,13 +83,13 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         organisationIdentifier1 = createAndActivateOrganisationWithGivenRequest(newOrgRequest1);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        UUID userIdentifier1Org1 = addAUserToOrganisation("user1.org1@test.com", organisationIdentifier1);
+        UUID userIdentifier1Org1 = addAUserToOrganisation(USER_1_ORG_1_TEST_COM, organisationIdentifier1);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        UUID userIdentifier2Org1 = addAUserToOrganisation("user2.org1@test.com", organisationIdentifier1);
+        UUID userIdentifier2Org1 = addAUserToOrganisation(USER_2_ORG_1_TEST_COM, organisationIdentifier1);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        UUID userIdentifier3Org1 = addAUserToOrganisation("user3.org1@test.com", organisationIdentifier1);
+        UUID userIdentifier3Org1 = addAUserToOrganisation(USER_3_ORG_1_TEST_COM, organisationIdentifier1);
 
         unorderedUsersInOrganisation.put(organisationIdentifier1, Arrays.asList(userIdentifier1Org1,
                 userIdentifier2Org1, userIdentifier3Org1));
@@ -134,13 +138,11 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         organisation3 = organisationRepository.findByOrganisationIdentifier(organisationIdentifier3);
 
         List<Organisation> organisations = Arrays.asList(organisation1, organisation2, organisation3);
-        organisations.sort(Comparator.comparing(Organisation::getId));
 
         for (Organisation organisation : organisations) {
             List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-            users.sort(Comparator.comparing(ProfessionalUser::getId));
-            LinkedList<ProfessionalUser> usersLinkedList = new LinkedList<>(users);
-            sortedUsersInOrganisation.put(organisation.getId(), usersLinkedList);
+            users.sort(Comparator.comparing((ProfessionalUser p) -> p.getId().toString()));
+            sortedUsersInOrganisation.put(organisation.getId(), users);
         }
     }
 
@@ -185,7 +187,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     @Test
     void return_all_users_for_single_organisation_with_deleted_users() {
         // arrange
-        LinkedList<ProfessionalUser> expectedUsers = sortedUsersInOrganisation.get(organisation1.getId());
+        List<ProfessionalUser> expectedUsers = sortedUsersInOrganisation.get(organisation1.getId());
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
         request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1));
@@ -314,7 +316,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
 
         Integer pageSize = 15;
 
-        Map.Entry<UUID, LinkedList<ProfessionalUser>> firstEntry =
+        Map.Entry<UUID, List<ProfessionalUser>> firstEntry =
                 sortedUsersInOrganisation.entrySet().iterator().next();
         // skip the first user in first org (not necessarily organisation 1)
         UUID searchAfterUser = firstEntry.getValue().get(0).getId();
@@ -340,27 +342,27 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
     void return_small_paged_all_users_for_given_orgs_when_org_filter_and_search_after_provided() {
         // arrange
         // org 1 has a deleted user, so it must be used in the test
-        List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
-                getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
-        // cannot assume org 1 is first
-        orgsForTest.sort(Comparator.comparing(Organisation::getId));
+        List<Organisation> orgsForTest = new LinkedList<>();
+        orgsForTest.add(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1));
+        orgsForTest.add(getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
 
+
+        List<String> orgIdentifiers = new LinkedList<>();
+        orgIdentifiers.add(organisationIdentifier1);
+        orgIdentifiers.add(organisationIdentifier2);
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
                 new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        request.setOrganisationIdentifiers(Arrays.asList(organisationIdentifier1, organisationIdentifier2));
-
+        request.setOrganisationIdentifiers(orgIdentifiers);
         Integer pageSize = 3;
 
         List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
         // 7 users in both orgs. skip the first user in org 1. expect 2 from the first org and 1 from the second
-        UUID searchAfterUser = professionalUsers.get(0).getId();
-        UUID searchAfterOrganisation = orgsForTest.get(0).getId();
-
-        boolean isOrg1First = orgsForTest.get(0).getId().equals(organisation1.getId());
+        UUID searchAfterUser = getProfessionalUserUuid(professionalUsers, USER_1_ORG_1_TEST_COM);
+        UUID searchAfterOrganisation = organisation1.getId();
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = true;
-        int expectedOrganisationsCount = isOrg1First ? 1 : 2; // org 1 has 4 users, org 2 has 3 users
+        int expectedOrganisationsCount = 1;
         int expectedUsersCount = 3;
 
         // act
@@ -386,9 +388,9 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         Integer pageSize = 5;
 
         // get org 1 and org 2 in order
-        List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1),
-                getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
-        orgsForTest.sort(Comparator.comparing(Organisation::getId));
+        List<Organisation> orgsForTest = new LinkedList<>();
+        orgsForTest.add(getMatchingOrganisationKeyByIdentifier(organisationIdentifier1));
+        orgsForTest.add(getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
 
         List<ProfessionalUser> professionalUsers = sortedUsersInOrganisation.get(orgsForTest.get(0).getId());
         // skip the first user in first org (not necessarily organisation 1)
@@ -415,9 +417,9 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         // arrange
 
         // use 2 organisations with same number of users for simplicity
-        List<Organisation> orgsForTest = Arrays.asList(getMatchingOrganisationKeyByIdentifier(organisationIdentifier2),
-                getMatchingOrganisationKeyByIdentifier(organisationIdentifier3));
-        orgsForTest.sort(Comparator.comparing(Organisation::getId));
+        List<Organisation> orgsForTest = new LinkedList<>();
+        orgsForTest.add(getMatchingOrganisationKeyByIdentifier(organisationIdentifier2));
+        orgsForTest.add(getMatchingOrganisationKeyByIdentifier(organisationIdentifier3));
 
         List<ProfessionalUser> professionUsersForTest =
                 new ArrayList<>(sortedUsersInOrganisation.get(orgsForTest.get(0).getId()));
@@ -814,5 +816,11 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
             }
         }
         return null;
+    }
+
+    private UUID getProfessionalUserUuid(List<ProfessionalUser> professionalUsers, String emailId) {
+        Optional<ProfessionalUser> user =
+                professionalUsers.stream().filter(pu -> pu.getEmailAddress().equalsIgnoreCase(emailId)).findFirst();
+        return user.isPresent() ? user.get().getId() : null;
     }
 }

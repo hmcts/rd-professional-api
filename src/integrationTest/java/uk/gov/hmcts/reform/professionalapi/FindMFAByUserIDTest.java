@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,6 +20,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_USER_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Slf4j
@@ -53,7 +53,7 @@ class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
         ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", pendingOrganisation);
-        superUser.setUserIdentifier(UUID.randomUUID());
+        superUser.setUserIdentifier(generateRandomUUID());
         professionalUserRepository.save(superUser);
 
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(superUser

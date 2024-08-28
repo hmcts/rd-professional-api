@@ -55,7 +55,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -82,6 +81,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_IDS_DOES_NOT_MATCH;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
@@ -115,7 +115,7 @@ class RefDataUtilTest {
                 "soMeone@somewhere.com", organisation);
         professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
         professionalUser.setOrganisation(organisation);
-        professionalUser.setUserIdentifier(UUID.randomUUID());
+        professionalUser.setUserIdentifier(generateRandomUUID());
         professionalUser.setLastUpdated(LocalDateTime.of(2023, 12, 31, 23, 59, 59, 987654321));
         userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         userAccountMap = new UserAccountMap(userAccountMapId);
@@ -125,7 +125,7 @@ class RefDataUtilTest {
         getUserProfileResponse.setRoles(singletonList("pui-case-manager"));
         getUserProfileResponse.setIdamStatusCode("400");
         getUserProfileResponse.setIdamMessage("BAD REQUEST");
-        paymentAccount.setId(UUID.randomUUID());
+        paymentAccount.setId(generateRandomUUID());
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         jsonFeignResponseUtil = mock(JsonFeignResponseUtil.class);
     }
@@ -1339,7 +1339,7 @@ class RefDataUtilTest {
     void testCheckOrganisationAndMoreThanTwoAddressExists_equal_size() {
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1("addressLine1");
-        contactInformation.setId(UUID.randomUUID());
+        contactInformation.setId(generateRandomUUID());
         organisation.setContactInformations(Arrays.asList(contactInformation));
 
         assertThat(catchThrowable(() -> RefDataUtil
@@ -1352,7 +1352,7 @@ class RefDataUtilTest {
     void testMatchAddressIdsWithOrgContactInformationIds_equal_size() {
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1("addressLine1");
-        contactInformation.setId(UUID.randomUUID());
+        contactInformation.setId(generateRandomUUID());
         organisation.setContactInformations(Arrays.asList(contactInformation));
 
         assertThat(catchThrowable(() -> RefDataUtil

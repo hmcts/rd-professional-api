@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class BulkCustomerDetailsTest {
@@ -22,7 +21,7 @@ class BulkCustomerDetailsTest {
 
         bulkCustomerDetails = new BulkCustomerDetails();
         bulkCustomerDetails.setBulkCustomerId("6601e79e-3169-461d-a751-59a33a5sdfd");
-        bulkCustomerDetails.setId(UUID.randomUUID());
+        bulkCustomerDetails.setId(generateRandomUUID());
         bulkCustomerDetails.setPbaNumber("pba-1234567");
         bulkCustomerDetails.setSidamId("6601e79e-3169-461d-a751-59a33a5sdfd");
         bulkCustomerDetails.setOrganisationId("orgId");

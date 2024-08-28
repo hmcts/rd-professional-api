@@ -47,6 +47,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_organisationalExternalPbasV2")
@@ -234,7 +235,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
         contactInformation.setCreated(LocalDateTime.now());
-        contactInformation.setId(UUID.randomUUID());
+        contactInformation.setId(generateRandomUUID());
         organisation.setContactInformations(List.of(contactInformation));
         return organisation;
     }

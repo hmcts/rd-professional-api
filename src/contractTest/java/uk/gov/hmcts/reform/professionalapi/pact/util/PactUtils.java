@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 public class PactUtils {
@@ -31,8 +32,8 @@ public class PactUtils {
     private PactUtils() {
     }
 
-    public static final UUID PROFESSIONAL_USER_ID = UUID.randomUUID();
-    public static final UUID PROFESSIONAL_USER_ID2 = UUID.randomUUID();
+    public static final UUID PROFESSIONAL_USER_ID = generateRandomUUID();
+    public static final UUID PROFESSIONAL_USER_ID2 = generateRandomUUID();
     public static final String PROFESSIONAL_USER_ID_STR = "123456";
     public static final String PROFESSIONAL_USER_ID2_STR = "234567";
     public static final String ORGANISATION_IDENTIFIER = "HM2OHHS";
@@ -46,7 +47,7 @@ public class PactUtils {
     public static void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
                 "some-email-address", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID());
+        superUser.setUserIdentifier(generateRandomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -114,8 +115,8 @@ public class PactUtils {
     public static ProfessionalUser getProfessionalUser(Organisation organisation, int i) {
         ProfessionalUser professionalUser = new ProfessionalUser("firstName" + i, "lastName" + i,
                 "email" + 1 + "@org.com", organisation);
-        professionalUser.setId(UUID.randomUUID());
-        professionalUser.setUserIdentifier(UUID.randomUUID());
+        professionalUser.setId(generateRandomUUID());
+        professionalUser.setUserIdentifier(generateRandomUUID());
         professionalUser.setIdamStatus(IdamStatus.ACTIVE);
         professionalUser.setIdamStatusCode("200");
         professionalUser.setLastUpdated(LocalDateTime.now());

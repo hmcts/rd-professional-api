@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -52,6 +51,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_organisationalExternalPbas")
@@ -233,10 +233,10 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
                 .thenReturn(organisationMock);
         ContactInformation contactInformation01 = new ContactInformation();
         contactInformation01.setAddressLine1("addressLine1");
-        contactInformation01.setId(UUID.randomUUID());
+        contactInformation01.setId(generateRandomUUID());
         ContactInformation contactInformation02 = new ContactInformation();
         contactInformation02.setAddressLine1("addressLine2");
-        contactInformation02.setId(UUID.randomUUID());
+        contactInformation02.setId(generateRandomUUID());
 
         when(organisationMock.getContactInformation()).thenReturn(
                 Arrays.asList(contactInformation01, contactInformation02));

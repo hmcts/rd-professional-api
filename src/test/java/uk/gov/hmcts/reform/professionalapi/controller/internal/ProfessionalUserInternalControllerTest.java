@@ -49,6 +49,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,7 +65,7 @@ class ProfessionalUserInternalControllerTest {
     private UserProfileUpdatedData userProfileUpdatedData;
     List<String> prdAdminRoles;
     List<String> systemUserRoles;
-    private final UUID userIdentifier = UUID.randomUUID();
+    private final UUID userIdentifier = generateRandomUUID();
     @InjectMocks
     private ProfessionalUserInternalController professionalUserInternalController;
     @Mock
@@ -233,7 +234,7 @@ class ProfessionalUserInternalControllerTest {
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(body);
         when(professionalUserServiceMock.modifyRolesForUser(any(), any(), any())).thenReturn(responseEntity);
 
-        UUID userId = UUID.randomUUID();
+        UUID userId = generateRandomUUID();
         ResponseEntity<Object> actualData = professionalUserInternalController
                 .modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A",
                         userId.toString(), "EXUI");
@@ -257,7 +258,7 @@ class ProfessionalUserInternalControllerTest {
                 new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("SOLICITOR"));
         RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser),
-                UUID.randomUUID(), false);
+                generateRandomUUID(), false);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
@@ -287,7 +288,7 @@ class ProfessionalUserInternalControllerTest {
                 new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of("SOLICITOR"));
         RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
         GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser),
-                UUID.randomUUID(), false);
+                generateRandomUUID(), false);
 
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
 

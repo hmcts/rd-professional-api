@@ -7,13 +7,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationTest {
@@ -23,7 +23,7 @@ class OrganisationTest {
 
         BulkCustomerDetails bulkCustomerDetails = new BulkCustomerDetails();
         bulkCustomerDetails.setBulkCustomerId("6601e79e-3169-461d-a751-59a33a5sdfd");
-        bulkCustomerDetails.setId(UUID.randomUUID());
+        bulkCustomerDetails.setId(generateRandomUUID());
         bulkCustomerDetails.setPbaNumber("pba-1234567");
         bulkCustomerDetails.setSidamId("6601e79e-3169-461d-a751-59a33a5sdfd");
 
@@ -90,7 +90,7 @@ class OrganisationTest {
         PaymentAccount paymentAccount = new PaymentAccount();
         Organisation organisation = new Organisation();
         organisation.addPaymentAccount(paymentAccount);
-        organisation.setId(UUID.randomUUID());
+        organisation.setId(generateRandomUUID());
         organisation.setSraRegulated(false);
 
         assertThat(organisation.getPaymentAccounts()).containsExactly(paymentAccount);

@@ -23,12 +23,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
-import java.util.UUID;
-
 import static java.util.Objects.nonNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 
 @Provider("referenceData_bulkCustomerDetails")
@@ -109,7 +108,7 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
         bulkCustomerDetails.setOrganisation(organisation);
         bulkCustomerDetails.setSidamId("sidamId");
         bulkCustomerDetails.setPbaNumber(PBA_NUMBER);
-        bulkCustomerDetails.setId(UUID.randomUUID());
+        bulkCustomerDetails.setId(generateRandomUUID());
         bulkCustomerDetails.setBulkCustomerId("BulkcustId");
 
         return bulkCustomerDetails;

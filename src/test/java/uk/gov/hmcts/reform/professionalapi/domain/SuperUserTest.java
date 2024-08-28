@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class SuperUserTest {
@@ -43,7 +44,7 @@ class SuperUserTest {
         Organisation organisation = new Organisation();
         SuperUser superUser = new SuperUser("some-fname", "some-lname", "some-email-address", organisation);
 
-        UUID id = UUID.randomUUID();
+        UUID id = generateRandomUUID();
         superUser.setUserIdentifier(id);
         superUser.setId(id);
         superUser.setCreated(LocalDateTime.now());

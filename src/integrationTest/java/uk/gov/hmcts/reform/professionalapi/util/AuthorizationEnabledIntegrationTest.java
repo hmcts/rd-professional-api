@@ -75,6 +75,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.decodeJwtTok
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
 import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwksResponse;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Configuration
@@ -450,7 +451,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         int returnHttpStaus = status.value();
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"idamId\":\"" + UUID.randomUUID() + "\","
+                    + "  \"idamId\":\"" + generateRandomUUID() + "\","
                     + "  \"idamRegistrationResponse\":\"201\""
                     + "}";
             returnHttpStaus = 201;

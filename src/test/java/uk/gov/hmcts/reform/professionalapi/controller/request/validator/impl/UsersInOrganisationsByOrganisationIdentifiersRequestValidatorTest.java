@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorTest {
@@ -19,31 +20,31 @@ class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorTest {
     @Test
     void shouldNotThrowExceptionWhenPageSizeAndSearchAfterAreValid() {
         Integer pageSize = 10;
-        UUID searchAfterUser = UUID.randomUUID();
-        UUID searchAfterOrg = UUID.randomUUID();
+        UUID searchAfterUser = generateRandomUUID();
+        UUID searchAfterOrg = generateRandomUUID();
         assertDoesNotThrow(() -> validator.validate(pageSize, searchAfterOrg, searchAfterUser));
     }
 
     @Test
     void shouldThrowExceptionWhenPageSizeIsLessThanOne() {
         Integer pageSize = -1;
-        UUID searchAfterUser = UUID.randomUUID();
-        UUID searchAfterOrg = UUID.randomUUID();
+        UUID searchAfterUser = generateRandomUUID();
+        UUID searchAfterOrg = generateRandomUUID();
         assertThrows(InvalidRequest.class, () -> validator.validate(pageSize, searchAfterOrg, searchAfterUser));
     }
 
     @Test
     void shouldThrowExceptionWhenPageSizeIsNullAndSearchAfterIsValid() {
         Integer pageSize = null;
-        UUID searchAfterUser = UUID.randomUUID();
-        UUID searchAfterOrg = UUID.randomUUID();
+        UUID searchAfterUser = generateRandomUUID();
+        UUID searchAfterOrg = generateRandomUUID();
         assertThrows(InvalidRequest.class, () -> validator.validate(pageSize, searchAfterOrg, searchAfterUser));
     }
 
     @Test
     void shouldThrowExceptionWhenPageSearchAfterOrgIsInvalid() {
         Integer pageSize = 10;
-        UUID searchAfterUser = UUID.randomUUID();
+        UUID searchAfterUser = generateRandomUUID();
         UUID searchAfterOrg = null;
         assertThrows(InvalidRequest.class, () -> validator.validate(pageSize, searchAfterOrg, searchAfterUser));
     }
@@ -52,7 +53,7 @@ class UsersInOrganisationsByOrganisationIdentifiersRequestValidatorTest {
     void shouldThrowExceptionWhenPageSearchAfterUserIsInvalid() {
         Integer pageSize = 10;
         UUID searchAfterUser = null;
-        UUID searchAfterOrg = UUID.randomUUID();
+        UUID searchAfterOrg = generateRandomUUID();
         assertThrows(InvalidRequest.class, () -> validator.validate(pageSize, searchAfterOrg, searchAfterUser));
     }
 }

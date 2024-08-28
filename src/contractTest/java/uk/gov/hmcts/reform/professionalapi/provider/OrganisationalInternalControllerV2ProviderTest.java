@@ -35,13 +35,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.fromString;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @Provider("referenceData_organisationalInternalV2")
@@ -201,7 +201,7 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser(FIRST_NAME, LAST_NAME,
                 ORGANISATION_EMAIL, organisation);
-        superUser.setUserIdentifier(UUID.randomUUID());
+        superUser.setUserIdentifier(generateRandomUUID());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -232,7 +232,7 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
         contactInformation.setCreated(LocalDateTime.now());
-        contactInformation.setId(UUID.randomUUID());
+        contactInformation.setId(generateRandomUUID());
         return contactInformation;
     }
 

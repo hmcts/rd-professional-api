@@ -77,7 +77,7 @@ public class ProfessionalUserInternalControllerProviderTest extends WebMvcProvid
                 "email@org.com", organisation);
 
         professionalUser.setUserIdentifier(generateRandomUUID());
-        professionalUser.setId(UUID.randomUUID());
+        professionalUser.setId(generateRandomUUID());
         professionalUser.setLastUpdated(LocalDateTime.now());
         professionalUser.setUserConfiguredAccesses(getUserConfiguredAccesses(professionalUser));
 

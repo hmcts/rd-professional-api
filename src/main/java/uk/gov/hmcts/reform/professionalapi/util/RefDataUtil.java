@@ -633,11 +633,11 @@ public class RefDataUtil {
         }
     }
 
-    public static final UUID fromString(String userIdentifier) {
-        if (StringUtils.isEmpty(userIdentifier)) {
+    public static final UUID fromString(String value) {
+        if (StringUtils.isEmpty(value)) {
             return null;
         }
-        return UUID.fromString(userIdentifier);
+        return UUID.fromString(value);
     }
 
     public static final String randomUUID() {

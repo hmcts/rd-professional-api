@@ -11,11 +11,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class NewUserResponseTest {
 
-    private final UUID userIdentifier = UUID.randomUUID();
+    private final UUID userIdentifier = generateRandomUUID();
     private ProfessionalUser professionalUser;
     private Organisation organisation;
     private NewUserResponse newUserResponse;

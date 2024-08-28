@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class OrgAttributeResponseTest {
@@ -16,7 +17,7 @@ class OrgAttributeResponseTest {
 
     final String value = "TestValue";
 
-    final UUID id = UUID.randomUUID();
+    final UUID id = generateRandomUUID();
 
     @Test
     void testGetOrgAttributeResponseResponse() {

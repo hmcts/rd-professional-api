@@ -34,7 +34,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     @Query(value = """
             SELECT pu FROM professional_user pu
-            WHERE (COALESCE(:organisationIdentifiers) is NULL
+            WHERE (COALESCE(:organisationIdentifiers, NULL) is NULL
             OR pu.organisation.organisationIdentifier IN :organisationIdentifiers)
             ORDER BY pu.organisation.id ,pu.id
             """)
@@ -44,8 +44,8 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     @Query(value = """
        SELECT pu.* FROM dbrefdata.professional_user pu
        INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
-       WHERE (COALESCE(:organisationIdentifiers) is NULL
-       OR organisation.organisation_identifier in :organisationIdentifiers)
+       WHERE (COALESCE(:organisationIdentifiers, NULL) is NULL
+       OR organisation.organisation_identifier in (:organisationIdentifiers))
        AND (
            (organisation.Id::text = :searchAfterOrgId AND pu.Id::text > :searchAfterUserId)
            OR (organisation.Id::text > :searchAfterOrgId)

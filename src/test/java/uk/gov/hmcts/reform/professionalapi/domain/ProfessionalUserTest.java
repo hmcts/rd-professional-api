@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserTest {
@@ -141,7 +142,7 @@ class ProfessionalUserTest {
         List<UserAttribute> userAttributes = new ArrayList<>();
         userAttributes.add(userAttribute);
 
-        UUID id = UUID.randomUUID();
+        UUID id = generateRandomUUID();
         professionalUser.setUserIdentifier(id);
         professionalUser.setId(id);
         professionalUser.setCreated(LocalDateTime.now());

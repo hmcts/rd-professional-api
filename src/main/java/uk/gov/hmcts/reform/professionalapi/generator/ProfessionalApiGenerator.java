@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiC
 
 import java.util.UUID;
 
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
+
 
 /**
  * This interface is responsible for generating unique IDs.
@@ -17,7 +19,7 @@ public interface ProfessionalApiGenerator {
      * @return UUID
      */
     static UUID generateUniqueUuid() {
-        return UUID.randomUUID();
+        return generateRandomUUID();
     }
 
     /**

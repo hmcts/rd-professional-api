@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,6 +48,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_INVALID;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.randomUUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -100,7 +100,7 @@ class PaymentAccountServiceImplTest {
         pbaDeleteRequest.setPaymentAccounts(pbas);
         userAccountMaps.add(userAccountMapMock);
 
-        paymentAccount.setId(UUID.randomUUID());
+        paymentAccount.setId(generateRandomUUID());
 
         organisation.setPaymentAccounts(paymentAccounts);
         organisation.setOrganisationIdentifier("AK57L4T");

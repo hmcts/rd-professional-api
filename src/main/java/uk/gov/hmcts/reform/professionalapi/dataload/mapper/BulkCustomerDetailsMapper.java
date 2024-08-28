@@ -5,9 +5,9 @@ import uk.gov.hmcts.reform.professionalapi.dataload.binder.BulkCustomerDetails;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.trim;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateRandomUUID;
 
 @Component
 public class BulkCustomerDetailsMapper implements IMapper {
@@ -17,7 +17,7 @@ public class BulkCustomerDetailsMapper implements IMapper {
     public Map<String, Object> getMap(Object bulkCustomerDetailsObj) {
         BulkCustomerDetails bulkCustomerDetails = (BulkCustomerDetails) bulkCustomerDetailsObj;
         Map<String, Object> bulkCustomerDetailsParamMap = new HashMap<>();
-        bulkCustomerDetailsParamMap.put("id", UUID.randomUUID());
+        bulkCustomerDetailsParamMap.put("id", generateRandomUUID());
         bulkCustomerDetailsParamMap.put("organisation_id", bulkCustomerDetails.getOrganisationId());
         bulkCustomerDetailsParamMap.put("bulk_customer_id", trim(bulkCustomerDetails.getBulkCustomerId()));
         bulkCustomerDetailsParamMap.put("sidam_id", trim(bulkCustomerDetails.getSidamId()));
