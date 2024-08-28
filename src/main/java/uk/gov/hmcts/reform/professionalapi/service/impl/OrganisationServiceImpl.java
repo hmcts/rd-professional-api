@@ -1148,27 +1148,5 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
-    private void updateContactInformation(List<ContactInformation> existingContactInformationList,
-                                       ContactInformationCreationRequest contactInfoRequest,Organisation organisation,
-                                          Boolean dxAddressRequired) {
-        existingContactInformationList.forEach(existingInfo -> {
-            existingInfo.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
-            existingInfo.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
-            existingInfo.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine3()));
-            existingInfo.setTownCity(RefDataUtil.removeEmptySpaces(contactInfoRequest.getTownCity()));
-            existingInfo.setCounty(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCounty()));
-            existingInfo.setCountry(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCountry()));
-            existingInfo.setPostCode(RefDataUtil.removeEmptySpaces(contactInfoRequest.getPostCode()));
-            existingInfo.setOrganisation(organisation);
-            existingInfo.setLastUpdated(LocalDateTime.now());
-            ContactInformation savedContactInformation = contactInformationRepository.save(existingInfo);
-            if (dxAddressRequired && contactInfoRequest.getDxAddress().isEmpty()) {
-                throw new ResourceNotFoundException("No Dx Address Information provided in request");
-            } else if (dxAddressRequired) {
-                addDxAddressToContactInformation(contactInfoRequest.getDxAddress(), savedContactInformation);
-            }
-        });
-    }
-
 }
 
