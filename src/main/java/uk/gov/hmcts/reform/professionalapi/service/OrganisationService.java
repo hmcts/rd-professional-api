@@ -38,7 +38,8 @@ public interface OrganisationService {
                                                                                        String idamId);
 
     ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
-        ContactInformationCreationRequest contactInfo, String organisationIdentifier,Boolean dxAddressRequired);
+        ContactInformationCreationRequest contactInfo, String organisationIdentifier,Boolean dxAddressRequired,
+        Boolean contactInformationUpdate, String addressid);
 
     OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
 

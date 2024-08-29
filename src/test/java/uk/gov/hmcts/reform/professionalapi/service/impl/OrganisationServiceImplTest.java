@@ -2809,7 +2809,8 @@ class OrganisationServiceImplTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
 
         ResponseEntity<ContactInformationResponse> updatedOrganisationContact =
-            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,orgId,true);
+            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,orgId,true,
+                true,"");
 
         assertThat(updatedOrganisationContact).isNotNull();
         assertThat(updatedOrganisationContact.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -2823,7 +2824,7 @@ class OrganisationServiceImplTest {
         verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
         assertThrows(ResourceNotFoundException.class, () ->
             sut.updateContactInformationForOrganisation(contactInformationCreationRequest,
-                null,true));
+                null,true,true,""));
     }
 
     @Test
@@ -2854,7 +2855,7 @@ class OrganisationServiceImplTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         assertThrows(ResourceNotFoundException.class, () ->
             sut.updateContactInformationForOrganisation(contactInformationCreationRequest,
-                orgId,true));
+                orgId,true,true,""));
     }
 
 

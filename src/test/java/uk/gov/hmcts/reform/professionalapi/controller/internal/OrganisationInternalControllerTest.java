@@ -667,10 +667,11 @@ class OrganisationInternalControllerTest {
         .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
 
         when(organisationServiceMock.updateContactInformationForOrganisation(contactInformationCreationRequest,
-            organisation.getOrganisationIdentifier(),true)).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
+            organisation.getOrganisationIdentifier(),true,true,""))
+            .thenReturn(ResponseEntity.status(HttpStatus.OK).build());
 
         ResponseEntity<ContactInformationResponse> response = organisationInternalController
-            .updateContactInformationForOrganisation(contactInformationCreationRequest,true,
+            .updateContactInformationForOrganisation(contactInformationCreationRequest,true,true,"",
                 organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
@@ -680,7 +681,7 @@ class OrganisationInternalControllerTest {
             .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
         verify(organisationServiceMock, times(1))
             .updateContactInformationForOrganisation(contactInformationCreationRequest,
-                organisation.getOrganisationIdentifier(),true);
+                organisation.getOrganisationIdentifier(),true,true,"");
 
     }
 

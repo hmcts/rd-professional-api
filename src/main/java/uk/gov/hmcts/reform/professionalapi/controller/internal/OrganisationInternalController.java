@@ -918,9 +918,8 @@ public class OrganisationInternalController extends SuperController {
         content = @Content
     )
 
-
     @PutMapping(
-        path = "/contactInformation/{orgId}",
+        path = "/contactInformation/{dxAddressRequired}/{orgId}",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -929,14 +928,18 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
         @Valid @NotNull @RequestBody ContactInformationCreationRequest contactInformationCreationRequest,
-        @RequestParam(value = "dxAddressRequired", required = true, defaultValue = "false") boolean dxAddressRequired,
+        @RequestParam("dxAddressUpdate") boolean dxAddressUpdate,
+        @RequestParam("contactInformationUpdate") boolean contactInformationUpdate,
+        @RequestParam("addressid") String addressid,
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
-        organisationCreationRequestValidator.validateContactInformations(Arrays
-            .asList(contactInformationCreationRequest));
+        organisationCreationRequestValidator.validateContactInformationRequest(
+            contactInformationCreationRequest,dxAddressUpdate,contactInformationUpdate);
 
         return organisationService.updateContactInformationForOrganisation(
-            contactInformationCreationRequest,organisationIdentifier,dxAddressRequired);
+            contactInformationCreationRequest,organisationIdentifier,dxAddressUpdate,
+            contactInformationUpdate,addressid);
 
     }
 }
+
