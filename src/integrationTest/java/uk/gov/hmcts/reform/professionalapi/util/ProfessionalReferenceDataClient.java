@@ -171,7 +171,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> retrieveExternalOrganisationForV2Api(String id, String role) {
-        return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
+        return getRequestForExternal(APP_EXT_V2_BASE_PATH, role, id);
     }
 
     public Map<String, Object> retrieveExternalOrganisationWithPendingPbas(String id, String pbaStatus, String role) {
