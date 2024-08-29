@@ -638,7 +638,7 @@ public class RefDataUtil {
         if (StringUtils.isEmpty(value) || "null".equalsIgnoreCase(value)) {
             return null;
         }
-        return UuidCreator.fromString(value);
+        return UUID.fromString(value);
     }
 
     public static final String randomUUID() {
