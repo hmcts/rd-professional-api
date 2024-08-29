@@ -253,6 +253,22 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
         deleteOrganisation(organisationIdentifier);
     }
 
+    @Test
+    void shoudlReturn400ForMissingDxAddress() {
+        ContactInformationCreationRequest contactInformationCreationRequest =
+            createContactInformationRequestWithoutDxAddress().build();
+        String organisationIdentifier = createOrganisationRequest();
+        Map<String, Object> updateResponse = professionalReferenceDataClient
+            .updateOrgContactInformation(contactInformationCreationRequest, hmctsAdmin,organisationIdentifier,
+                true,true,"");
+
+        assertThat(updateResponse).containsEntry("http_status", "500");
+        assertThat(updateResponse.get("response_body").toString())
+            .contains("Cannot invoke \\\"java.util.List.isEmpty()\\\" because \\\"dxAddressList\\\" is null");
+        deleteOrganisation(organisationIdentifier);
+    }
+
+
     public void deleteOrganisation(String orgIdentifier) {
         Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,
             orgIdentifier);
