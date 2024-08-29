@@ -817,7 +817,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
         assertNotNull(orgUpdatedNameResponse.get("sraId"));
         assertThat(orgUpdatedNameResponse.get("sraId").toString()).contains(updatedSra);
-  
+
+        deleteOrganisation(organisationIdentifier);
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
 
@@ -855,6 +856,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
         assertNotNull(orgUpdatedNameResponse.get("sraId"));
         assertThat(orgUpdatedNameResponse.get("sraId").toString()).contains(updatedSra);
+
+        deleteOrganisation(organisationIdentifier);
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
