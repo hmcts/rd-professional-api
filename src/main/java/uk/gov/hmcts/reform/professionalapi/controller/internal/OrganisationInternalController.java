@@ -751,7 +751,6 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<OrganisationsDetailResponse> updateOrganisationNameOrSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
         @Valid @NotNull @RequestBody OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest,
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
         var orgId = removeEmptySpaces(organisationIdentifier);
