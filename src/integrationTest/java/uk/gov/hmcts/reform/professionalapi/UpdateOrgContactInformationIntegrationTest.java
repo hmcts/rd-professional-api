@@ -101,6 +101,18 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
 
 
         assertThat(updateResponse).containsEntry("http_status", 200);
+
+        assertThat(existing.get("addressLine1").toString())
+            .isEqualTo(contactInformationCreationRequest.get(0).getAddressLine1());
+        assertThat(existing.get("addressLine2").toString())
+            .isEqualTo(contactInformationCreationRequest.get(0).getAddressLine2());
+        assertThat(existing.get("addressLine3").toString())
+            .isEqualTo(contactInformationCreationRequest.get(0).getAddressLine3());
+        assertThat(existing.get("country").toString())
+            .isEqualTo(contactInformationCreationRequest.get(0).getCountry());
+        assertThat(existing.get("postCode").toString())
+            .isEqualTo(contactInformationCreationRequest.get(0).getPostCode());
+
         deleteOrganisation(orgIdentifier);
     }
 
@@ -124,7 +136,22 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
                 existing.get("addressId").toString()
                 );
 
+        java.util.Map<String, Object> retrieveOrganisationResponseAfterUpdate = professionalReferenceDataClient
+            .retrieveSingleOrganisation(orgIdentifier, hmctsAdmin);
+        List existingContactsUpdated = (List)retrieveOrganisationResponseAfterUpdate.get("contactInformation");
+        LinkedHashMap existingUpdated = (LinkedHashMap)existingContactsUpdated.get(0);
+        List dxAddressesUpdated = (List)existingUpdated.get("dxAddress");
+        LinkedHashMap dxAdd = (LinkedHashMap)dxAddressesUpdated.get(1);
+        String dxNumber = (String)dxAdd.get("dxNumber").toString();
+        String dxExchange = (String)dxAdd.get("dxExchange").toString();
+
         assertThat(updateResponse).containsEntry("http_status", 200);
+        assertThat(dxNumber).isEqualTo(contactInformationCreationRequest.get(0)
+                .getDxAddress().get(0).getDxNumber());
+        assertThat(dxExchange).isEqualTo(contactInformationCreationRequest.get(0)
+                .getDxAddress().get(0).getDxExchange());
+
+
         deleteOrganisation(orgIdentifier);
     }
 
