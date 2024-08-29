@@ -64,13 +64,13 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
         if (null != userInfo && StringUtils.isNotEmpty(userInfo.getUid())) {
             userId = userInfo.getUid();
-            professionalUser = professionalUserRepository.findByUserIdentifier(fromString(userId.trim()));
+            professionalUser = professionalUserRepository.findByUserIdentifier(fromString(userId));
             if (null != professionalUser && null != professionalUser.getOrganisation()) {
 
                 organisation = professionalUser.getOrganisation();
                 orgId = organisation.getOrganisationIdentifier();
             } else {
-                log.error("{}:: ProfessionalUserUser info null::", loggingComponentName);
+                log.error("{}:: ProfessionalUserUser info null for user id {}::", loggingComponentName, userId);
                 throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
             }
 
