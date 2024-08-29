@@ -1319,7 +1319,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         HashMap existingContactInfo = existingContactInformationList.get(0);
 
         Response result = professionalApiClient.updateContactInformationsToOrganisation(
-            aContactInformationCreationRequest().dxAddress(contactInformationCreationRequest
+            aContactInformationCreationRequest().addressLine1("addressLine1")
+                .dxAddress(contactInformationCreationRequest
                     .getDxAddress())
                     .build(),
                 OK,organisationIdentifier,true,false,
