@@ -1079,7 +1079,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
         // if both are false no update takes place
         if (!dxAddressUpdate && !contactInformationUpdate) {
-            throw new InvalidRequest("dxAddressUpdate and contactInformationUpdate are both false no update took place");
+            throw new InvalidRequest(
+                "dxAddressUpdate and contactInformationUpdate are both false no update took place");
         }
     }
 
@@ -1138,12 +1139,12 @@ public class OrganisationServiceImpl implements OrganisationService {
                         AtomicBoolean idFound = new AtomicBoolean(false);
                         existingContactInformationList.forEach(existingInfo -> {
                             if (existingInfo.getId().toString().equalsIgnoreCase(addressid)) {
-                               idFound.set(true);
-                               updateContacts(contactInformationUpdate, dxAddressUpdate, contactInformationRequest,
-                                   existingContactInformationList, organisation);
+                                idFound.set(true);
+                                updateContacts(contactInformationUpdate, dxAddressUpdate, contactInformationRequest,
+                                    existingContactInformationList, organisation);
                             }
                         });
-                        if(!idFound.get()) {
+                        if (!idFound.get()) {
                             throw new ResourceNotFoundException(" Could not find address to update for the "
                                 + "id provided please check and try again");
                         }

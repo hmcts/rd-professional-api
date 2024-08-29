@@ -2772,7 +2772,7 @@ class OrganisationServiceImplTest {
     }
 
     @Test
-    void testUpdateOrgContactInformationWithMultipleRequestsButEmptyUPRN() {
+    void testUpdateOrgContactInformationWithMultipleRequestsButEmptyAddressId() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         var contactInformation = new ContactInformation();
         contactInformation.setCountry("TestCountry");

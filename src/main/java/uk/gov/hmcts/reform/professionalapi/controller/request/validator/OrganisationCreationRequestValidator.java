@@ -125,7 +125,6 @@ public class OrganisationCreationRequestValidator {
         } catch (InvalidRequest invalidRequest) {
             throw new InvalidRequest("Invalid Contact information" + invalidRequest.getMessage());
         }
-
     }
 
     public void validateDxAdd(boolean dxAddressRequired,

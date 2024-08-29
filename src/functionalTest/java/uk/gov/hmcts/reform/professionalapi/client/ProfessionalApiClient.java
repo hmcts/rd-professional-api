@@ -1762,8 +1762,8 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(contactInformationCreationRequest)
-            .put("/refdata/internal/v1/organisations/contactInformation/"+organisationId+"/?dxAddressUpdate="
-        + dxAddressUpdate +"&contactInformationUpdate="+ contactInformationUpdate + "&addressid="+ addressid)
+            .put("/refdata/internal/v1/organisations/contactInformation/" + organisationId + "/?dxAddressUpdate="
+            + dxAddressUpdate + "&contactInformationUpdate=" + contactInformationUpdate + "&addressid=" + addressid)
             .andReturn();
 
         response.then()

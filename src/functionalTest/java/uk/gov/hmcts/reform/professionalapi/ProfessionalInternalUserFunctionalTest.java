@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -38,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1272,8 +1269,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(existingContactInfo.get("country")).isNotNull();
         assertThat(existingContactInfo.get("postCode")).isNotNull();
 
-        Response result = professionalApiClient.updateContactInformationsToOrganisation
-            (aContactInformationCreationRequest()
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest()
                     .uprn(contactInformationCreationRequest.getUprn())
                     .addressLine1(contactInformationCreationRequest.getAddressLine1())
                     .addressLine2(contactInformationCreationRequest.getAddressLine2())
@@ -1321,9 +1318,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         //Assuming only one record found
         HashMap existingContactInfo = existingContactInformationList.get(0);
 
-        Response result = professionalApiClient.updateContactInformationsToOrganisation
-            (aContactInformationCreationRequest()
-                    .dxAddress(contactInformationCreationRequest.getDxAddress())
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest().dxAddress(contactInformationCreationRequest
+                    .getDxAddress())
                     .build(),
                 OK,organisationIdentifier,true,false,
                 existingContactInfo.get("addressId").toString());
@@ -1372,8 +1369,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(existingContactInfo.get("country")).isNotNull();
         assertThat(existingContactInfo.get("postCode")).isNotNull();
 
-        Response result = professionalApiClient.updateContactInformationsToOrganisation
-            (aContactInformationCreationRequest()
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest()
                     .uprn(contactInformationCreationRequest.getUprn())
                     .addressLine1(contactInformationCreationRequest.getAddressLine1())
                     .addressLine2(contactInformationCreationRequest.getAddressLine2())
@@ -1429,24 +1426,24 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(existingContactInfo.get("country")).isNotNull();
         assertThat(existingContactInfo.get("postCode")).isNotNull();
 
-            Response result = professionalApiClient.updateContactInformationsToOrganisation
-                (aContactInformationCreationRequest()
-                        .uprn(contactInformationCreationRequest.getUprn())
-                        .addressLine1(contactInformationCreationRequest.getAddressLine1())
-                        .addressLine2(contactInformationCreationRequest.getAddressLine2())
-                        .addressLine3(contactInformationCreationRequest.getAddressLine3())
-                        .country(contactInformationCreationRequest.getCountry())
-                        .county(contactInformationCreationRequest.getCounty())
-                        .townCity(contactInformationCreationRequest.getTownCity())
-                        .postCode(contactInformationCreationRequest.getPostCode())
-                        .dxAddress(contactInformationCreationRequest.getDxAddress())
-                        .build(),
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest()
+                    .uprn(contactInformationCreationRequest.getUprn())
+                    .addressLine1(contactInformationCreationRequest.getAddressLine1())
+                    .addressLine2(contactInformationCreationRequest.getAddressLine2())
+                    .addressLine3(contactInformationCreationRequest.getAddressLine3())
+                    .country(contactInformationCreationRequest.getCountry())
+                    .county(contactInformationCreationRequest.getCounty())
+                    .townCity(contactInformationCreationRequest.getTownCity())
+                    .postCode(contactInformationCreationRequest.getPostCode())
+                    .dxAddress(contactInformationCreationRequest.getDxAddress())
+                    .build(),
                     OK,organisationIdentifier,true,true,
                     existingContactInfo.get("addressId").toString());
 
-            assertNotNull(result);
-            assertThat(result.getBody()).isNotNull();
-            assertThat(result.statusCode()).isEqualTo(200);
+        assertNotNull(result);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.statusCode()).isEqualTo(200);
         //clean up
         deleteOrganisation(organisationIdentifier);
         log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: END");
@@ -1454,7 +1451,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void ContactInformationAndDxAddressBothFalseShouldReturnFailure() {
+    void contactInformationAndDxAddressBothFalseShouldReturnFailure() {
         log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: STARTED");
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -1478,8 +1475,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         //Assuming only one record found
         HashMap existingContactInfo = existingContactInformationList.get(0);
 
-        Response result = professionalApiClient.updateContactInformationsToOrganisation
-            (aContactInformationCreationRequest().build(),BAD_REQUEST,organisationIdentifier,false,
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest().build(),BAD_REQUEST,organisationIdentifier,false,
                 false,existingContactInfo.get("addressId").toString());
 
         assertNotNull(result);
