@@ -30,6 +30,24 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
                 hmctsAdmin,organisationIdentifier,true,true,"");
 
         assertThat(updateResponse).containsEntry("http_status", 200);
+
+        java.util.Map<String, Object> retrieveOrganisationResponse = professionalReferenceDataClient
+            .retrieveSingleOrganisation(organisationIdentifier, hmctsAdmin);
+
+        List existingContacts = (List)retrieveOrganisationResponse.get("contactInformation");
+        LinkedHashMap existing = (LinkedHashMap)existingContacts.get(0);
+
+        assertThat(existing.get("addressLine1").toString())
+            .isEqualTo(contactInformationCreationRequest.getAddressLine1());
+        assertThat(existing.get("addressLine2").toString())
+            .isEqualTo(contactInformationCreationRequest.getAddressLine2());
+        assertThat(existing.get("addressLine3").toString())
+            .isEqualTo(contactInformationCreationRequest.getAddressLine3());
+        assertThat(existing.get("country").toString())
+            .isEqualTo(contactInformationCreationRequest.getCountry());
+        assertThat(existing.get("postCode").toString())
+            .isEqualTo(contactInformationCreationRequest.getPostCode());
+
         deleteOrganisation(organisationIdentifier);
     }
 

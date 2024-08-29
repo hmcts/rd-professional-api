@@ -352,14 +352,14 @@ public class OrganisationFixtures {
         .ContactInformationCreationRequestBuilder createContactInformationRequest() {
 
         return aContactInformationCreationRequest()
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
+                .addressLine1("addLine1")
+                .addressLine2("addLine2")
+                .addressLine3("addLine3")
                 .country("country")
                 .county("county")
                 .townCity("town-city")
                 .uprn("uprn1")
-                .postCode("some-post-code")
+                .postCode("post-code")
                 .dxAddress(Arrays.asList(dxAddressCreationRequest()
                     .dxNumber("DX 1234567890")
                     .dxExchange("dxExchange").build()));
