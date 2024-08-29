@@ -463,6 +463,57 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
+    void test_validate_contacts_informations_empty() {
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateContactInformationRequest(null,
+                true,true));
+    }
+
+    @Test
+    void test_contact_info() {
+        ContactInformationCreationRequest contactInformationCreationReq = aContactInformationCreationRequest()
+            .uprn("")
+            .addressLine1("")
+            .addressLine2("")
+            .addressLine3("")
+            .country("")
+            .county("")
+            .townCity("")
+            .postCode("")
+            .dxAddress(null)
+            .build();
+
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateContactInfo(contactInformationCreationReq));
+
+    }
+
+    @Test
+    void test_Dx_Address_success() {
+        ContactInformationCreationRequest contactInformationCreationReq = aContactInformationCreationRequest()
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build()))
+            .build();
+
+        organisationCreationRequestValidator.validateDxAdd(true,contactInformationCreationReq);
+        assertTrue(true);
+    }
+
+    @Test
+    void test_Dx_Address() {
+        ContactInformationCreationRequest contactInformationCreationReq = aContactInformationCreationRequest()
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("")
+                .dxExchange("").build()))
+            .build();
+
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateDxAdd(true,contactInformationCreationReq));
+
+    }
+
+    @Test
     void test_add_contacts_informations_to_orgs_valid_dx_address() {
         List<ContactInformationCreationRequest> contactInformationCreationRequests =
                 Arrays.asList(aContactInformationCreationRequest()
