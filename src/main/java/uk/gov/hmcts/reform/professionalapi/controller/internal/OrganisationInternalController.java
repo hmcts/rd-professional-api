@@ -54,7 +54,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusRe
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -919,7 +918,7 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @PutMapping(
-        path = "/contactInformation/{dxAddressRequired}/{orgId}",
+        path = "/contactInformation/{orgId}/",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -928,8 +927,8 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
         @Valid @NotNull @RequestBody ContactInformationCreationRequest contactInformationCreationRequest,
-        @RequestParam("dxAddressUpdate") boolean dxAddressUpdate,
-        @RequestParam("contactInformationUpdate") boolean contactInformationUpdate,
+        @RequestParam(value = "dxAddressUpdate", required = true) boolean dxAddressUpdate,
+        @RequestParam(value = "contactInformationUpdate", required = true) boolean contactInformationUpdate,
         @RequestParam("addressid") String addressid,
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 

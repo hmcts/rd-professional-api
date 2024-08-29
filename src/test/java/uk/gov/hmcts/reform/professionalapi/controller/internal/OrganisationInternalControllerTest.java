@@ -664,7 +664,7 @@ class OrganisationInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         doNothing().when(organisationCreationRequestValidatorMock)
-        .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
+        .validateContactInformationRequest(contactInformationCreationRequest,true,true);
 
         when(organisationServiceMock.updateContactInformationForOrganisation(contactInformationCreationRequest,
             organisation.getOrganisationIdentifier(),true,true,""))
@@ -678,7 +678,7 @@ class OrganisationInternalControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationCreationRequestValidatorMock, times(1))
-            .validateContactInformations(Arrays.asList(contactInformationCreationRequest));
+            .validateContactInformationRequest(contactInformationCreationRequest,true,true);
         verify(organisationServiceMock, times(1))
             .updateContactInformationForOrganisation(contactInformationCreationRequest,
                 organisation.getOrganisationIdentifier(),true,true,"");
