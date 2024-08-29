@@ -1310,7 +1310,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             .hasSizeGreaterThan(0);
 
         List<ContactInformationCreationRequest> contactInformationCreationRequestList =
-            professionalApiClient.createContactInformationCreationRequests();
+            professionalApiClient.createContactInformationRequests();
         assertThat(contactInformationCreationRequestList).isNotEmpty()
             .hasSizeGreaterThan(0);
         ContactInformationCreationRequest contactInformationCreationRequest =
