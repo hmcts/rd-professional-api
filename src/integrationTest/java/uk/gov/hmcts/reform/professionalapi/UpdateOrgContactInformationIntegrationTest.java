@@ -189,7 +189,20 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
                 hmctsAdmin,orgIdentifier,true,
                 false,"");
 
+        java.util.Map<String, Object> retrieveOrganisationResponseAfterUpdate = professionalReferenceDataClient
+            .retrieveSingleOrganisation(orgIdentifier, hmctsAdmin);
+        List existingContactsUpdated = (List)retrieveOrganisationResponseAfterUpdate.get("contactInformation");
+        LinkedHashMap existingUpdated = (LinkedHashMap)existingContactsUpdated.get(0);
+        List dxAddressesUpdated = (List)existingUpdated.get("dxAddress");
+        LinkedHashMap dxAdd = (LinkedHashMap)dxAddressesUpdated.get(1);
+        String dxNumber = (String)dxAdd.get("dxNumber").toString();
+        String dxExchange = (String)dxAdd.get("dxExchange").toString();
+
         assertThat(updateResponse).containsEntry("http_status", 200);
+        assertThat(dxNumber).isEqualTo(contactInformationCreationRequest
+            .getDxAddress().get(0).getDxNumber());
+        assertThat(dxExchange).isEqualTo(contactInformationCreationRequest
+            .getDxAddress().get(0).getDxExchange());
         deleteOrganisation(orgIdentifier);
     }
 
