@@ -99,18 +99,23 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
                 hmctsAdmin,orgIdentifier,false,true,
                 addressId);
 
+        java.util.Map<String, Object> retrieveOrganisationResponseUpdated = professionalReferenceDataClient
+            .retrieveSingleOrganisation(orgIdentifier, hmctsAdmin);
+
+        List existingContactsUpdated = (List)retrieveOrganisationResponseUpdated.get("contactInformation");
+        LinkedHashMap existingUpdated = (LinkedHashMap)existingContactsUpdated.get(0);
 
         assertThat(updateResponse).containsEntry("http_status", 200);
 
-        assertThat(existing.get("addressLine1").toString())
+        assertThat(existingUpdated.get("addressLine1").toString())
             .isEqualTo(contactInformationCreationRequest.get(0).getAddressLine1());
-        assertThat(existing.get("addressLine2").toString())
+        assertThat(existingUpdated.get("addressLine2").toString())
             .isEqualTo(contactInformationCreationRequest.get(0).getAddressLine2());
-        assertThat(existing.get("addressLine3").toString())
+        assertThat(existingUpdated.get("addressLine3").toString())
             .isEqualTo(contactInformationCreationRequest.get(0).getAddressLine3());
-        assertThat(existing.get("country").toString())
+        assertThat(existingUpdated.get("country").toString())
             .isEqualTo(contactInformationCreationRequest.get(0).getCountry());
-        assertThat(existing.get("postCode").toString())
+        assertThat(existingUpdated.get("postCode").toString())
             .isEqualTo(contactInformationCreationRequest.get(0).getPostCode());
 
         deleteOrganisation(orgIdentifier);
