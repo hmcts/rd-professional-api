@@ -2145,6 +2145,43 @@ class OrganisationServiceImplTest {
 
     }
 
+    @Test
+    void testDeleteActiveOrganisationWithOrgAdminActiveGives400WithMessage() throws Exception {
+
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+
+
+        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
+        deleteOrganisationResponse.setStatusCode(ERROR_CODE_400);
+        deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
+        ObjectMapper mapperOne = new ObjectMapper();
+        String deleteBody = mapperOne.writeValueAsString(newUserResponse);
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
+            .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
+        Organisation organisation = getDeleteOrganisation(ACTIVE);
+
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(organisationRepository, times(1)).deleteById(any());
+        verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
+        verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
+
+    }
+
+
 
     @Test
     void testDeleteActiveOrganisationWithMultiUsersGives400WithMessage() {
@@ -2824,32 +2861,6 @@ class OrganisationServiceImplTest {
     }
 
 
-    @Test
-    @SuppressWarnings("unchecked")
-    void test_deleteUserForOrganisation() throws JsonProcessingException {
-        String deleteBody = new ObjectMapper().writeValueAsString(new NewUserResponse());
-
-        when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
-        doNothing().when(userAttributeRepositoryMock).deleteByProfessionalUserId(professionalUser.getId());
-        doNothing().when(professionalUserRepositoryMock).delete(professionalUser);
-
-        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
-            .status(STATUS_CODE_204).reason("OK").body(deleteBody, UTF_8)
-            .request(mock(Request.class)).build());
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
-        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
-
-        DeleteUserResponse deleteUserResponse = new DeleteUserResponse(
-            STATUS_CODE_204, "The organisation has deleted successfully");
-        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
-        deleteUserResponse = sut.deleteUserForOrganisation(emails);
-        assertThat(deleteUserResponse).isNotNull();
-        assertThat(deleteUserResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
-        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
-
-    }
 
     @Test
     void test_deleteUserForOrganisationWithEmptyEmails() {
