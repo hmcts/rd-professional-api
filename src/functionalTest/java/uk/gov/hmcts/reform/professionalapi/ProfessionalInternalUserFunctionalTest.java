@@ -567,6 +567,20 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("deleteActiveOrganisationShouldReturnSuccess :: END");
     }
 
+    @Test
+    public void deleteActiveOrganisationShouldReturnErrorWithMultipleUsers() {
+        log.info("deleteActiveOrganisationShouldReturnSuccess :: STARTED");
+        String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        newUserCreationRequest.setEmail("newUserEmail@hmcts.com");
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+            hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
+
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
+        log.info("deleteActiveOrganisationShouldReturnSuccess :: END");
+    }
+
     public void validateRoles(List<String> rolesToValidate) {
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(
                 intActiveOrgId, hmctsAdmin, HttpStatus.OK);
