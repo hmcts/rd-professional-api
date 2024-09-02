@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
@@ -799,11 +799,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
             .name(updatedName).sraId(updatedSra).build();
 
-        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest =
-            new OrganisationNameSraUpdateRequest(updatedName,updatedSra);
+        OrganisationSraUpdateRequest organisationNameSraUpdateRequest =
+            new OrganisationSraUpdateRequest(updatedSra);
 
         organisationCreationRequest.setSraId(organisationNameSraUpdateRequest.getSraId());
-        organisationCreationRequest.setName(organisationNameSraUpdateRequest.getName());
 
         professionalApiClient.updatesOrganisationName(organisationCreationRequest,
             hmctsAdmin,organisationIdentifier, OK);
@@ -837,11 +836,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
             .name(updatedName).sraId(updatedSra).build();
 
-        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest =
-            new OrganisationNameSraUpdateRequest(updatedName,updatedSra);
+        OrganisationSraUpdateRequest organisationNameSraUpdateRequest =
+            new OrganisationSraUpdateRequest(updatedSra);
 
         organisationCreationRequest.setSraId(organisationNameSraUpdateRequest.getSraId());
-        organisationCreationRequest.setName(organisationNameSraUpdateRequest.getName());
 
         professionalApiClient.updatesOrganisationName(organisationCreationRequest,
             hmctsAdmin,organisationIdentifier, OK);

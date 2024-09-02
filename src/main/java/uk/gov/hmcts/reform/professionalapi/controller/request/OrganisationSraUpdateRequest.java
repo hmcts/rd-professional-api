@@ -11,17 +11,14 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @Builder(builderMethodName = "anOrganisationCreationRequest")
-public class OrganisationNameSraUpdateRequest {
+public class OrganisationSraUpdateRequest {
 
     @NotNull
-    private String name;
     private  String sraId;
 
     @JsonCreator
-    public OrganisationNameSraUpdateRequest(
-            @JsonProperty("name") String name,
+    public OrganisationSraUpdateRequest(
             @JsonProperty("sraId") String sraId) {
-        this.name = name;
         this.sraId = sraId;
     }
 }
