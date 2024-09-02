@@ -1192,7 +1192,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     void error_if_organisation_id_invalid_for_v2_ext_api() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(null,
             puiCaseManager);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
@@ -1234,7 +1234,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
     void forbidden_for_v2_if_user_is_null_in_org_pui_finance_manager_try_access_organisation_id() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisationForV2Api(null,
             puiFinanceManager);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
