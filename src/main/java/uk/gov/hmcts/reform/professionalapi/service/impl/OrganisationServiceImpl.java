@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
@@ -25,15 +26,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -96,7 +96,6 @@ import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -822,42 +821,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
-    @Override
-    @Transactional
-    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
-        var deleteOrganisationResponse = new DeleteOrganisationResponse();
-        if (emails.isEmpty()) {
-            throw new InvalidRequest("Please provide both email addresses");
-        }
-
-        Set<String> userIdsToBeDeleted = emails.stream().map(
-            email -> {
-                Set<String> userIds = new HashSet<>();
-                Optional.ofNullable(professionalUserRepository
-                    .findByEmailAddress(RefDataUtil.removeAllSpaces(email)))
-                    .ifPresent(professionalUser -> {
-                        userIds.add(professionalUser.getUserIdentifier());
-                        userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
-                        professionalUserRepository.delete(professionalUser);
-                });
-                return userIds.stream().iterator().next();
-            }).collect(Collectors.toSet());;
-
-        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
-        deleteOrganisationResponse = RefDataUtil
-            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-        if (deleteOrganisationResponse == null) {
-            throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
-        }
-
-        return new DeleteUserResponse(deleteOrganisationResponse.getStatusCode(),
-            deleteOrganisationResponse.getMessage());
-    }
-
-
-
-
-
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {
 
@@ -874,13 +837,16 @@ public class OrganisationServiceImpl implements OrganisationService {
                 deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
                 deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
 
-            } else {
-                // user will be deleted even if he is in active state
+            } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
+                // If user is not active in the up will send the request to delete
                 var userIds = new HashSet<String>();
                 userIds.add(user.getUserIdentifier());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
                         .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
+            } else {
+                deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
+                deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
             }
         } else {
             deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
@@ -1096,7 +1062,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
-                                                   OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest) {
+                                                   OrganisationSraUpdateRequest organisationNameSraUpdateRequest) {
         final String attributeKey = "regulators-0";
         final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
             + "\"organisationRegistrationNumber\":\"" + organisationNameSraUpdateRequest.getSraId() + "\"}";
@@ -1118,20 +1084,17 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public OrganisationsDetailResponse updateOrganisationNameOrSra(
-        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest, String organisationIdentifier) {
+    public OrganisationsDetailResponse updateOrganisationSra(
+        OrganisationSraUpdateRequest organisationSraUpdateRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         Organisation savedOrganisation = null;
         if (existingOrganisation == null) {
             throw new EmptyResultDataAccessException(ONE);
         } else {
-            if (isNotBlank(organisationNameSraUpdateRequest.getName())) {
-                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdateRequest.getName()));
-            }
-            if (isNotBlank(organisationNameSraUpdateRequest.getSraId())) {
-                OrgAttribute savedAttribute = saveOrganisationAttributes
-                    (existingOrganisation,organisationNameSraUpdateRequest);
+            if (isNotBlank(organisationSraUpdateRequest.getSraId())) {
+                OrgAttribute savedAttribute = saveOrganisationAttributes(
+                    existingOrganisation,organisationSraUpdateRequest);
                 if (savedAttribute == null) {
                     log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
                     throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
@@ -1140,7 +1103,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             savedOrganisation = organisationRepository.save(existingOrganisation);
         }
 
-        return new OrganisationsDetailResponse(List.of(savedOrganisation),false,false,false);
+        return new OrganisationsDetailResponse(List.of(savedOrganisation),false,
+            false,false);
     }
 
 

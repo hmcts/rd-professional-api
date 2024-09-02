@@ -24,11 +24,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
@@ -36,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOr
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -60,7 +58,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -81,7 +78,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -93,7 +89,7 @@ class OrganisationInternalControllerTest {
     private PaymentAccountService paymentAccountServiceMock;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
-    private OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest;
+    private OrganisationSraUpdateRequest organisationSraUpdateRequest;
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
@@ -175,7 +171,7 @@ class OrganisationInternalControllerTest {
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false, false, true);
-
+        organisationSraUpdateRequest = new OrganisationSraUpdateRequest("some-sraId");
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -599,26 +595,22 @@ class OrganisationInternalControllerTest {
     }
 
     @Test
-    void testUpdateOrgNameAndSra() {
+    void testUpdateOrgSra() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String updatedName = "NewName";
         String updatedSra = "NewSRA";
-        organisation.setName(updatedName);
         organisation.setSraId(updatedSra);
-        organisationNameSraUpdateRequest.setName(updatedName);
-        organisationNameSraUpdateRequest.setSraId(updatedSra);
+        organisationSraUpdateRequest.setSraId(updatedSra);
 
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
-        assertThat(organisationNameSraUpdateRequest.getName()).isNotEmpty();
-        assertThat(organisationNameSraUpdateRequest.getSraId()).isNotEmpty();
+        assertThat(organisationSraUpdateRequest.getSraId()).isNotEmpty();
 
 
-        when(organisationServiceMock.updateOrganisationNameOrSra(organisationNameSraUpdateRequest,
+        when(organisationServiceMock.updateOrganisationSra(organisationSraUpdateRequest,
             organisation.getOrganisationIdentifier())).thenReturn(new OrganisationsDetailResponse(List.of(organisation),
             false,false,false));
 
         ResponseEntity<OrganisationsDetailResponse> response = organisationInternalController
-            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest,organisation.getOrganisationIdentifier());
+            .updateOrganisationNameOrSra(organisationSraUpdateRequest,organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -627,7 +619,7 @@ class OrganisationInternalControllerTest {
         verify(organisationCreationRequestValidatorMock, times(1))
             .validateOrganisationIdentifier(any(String.class));
         verify(organisationServiceMock, times(1))
-            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest, organisation.getOrganisationIdentifier());
+            .updateOrganisationSra(organisationSraUpdateRequest, organisation.getOrganisationIdentifier());
 
     }
 
