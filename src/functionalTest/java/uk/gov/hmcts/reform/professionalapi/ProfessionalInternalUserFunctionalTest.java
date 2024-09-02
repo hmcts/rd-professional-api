@@ -1308,4 +1308,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .sorted(Comparator.comparing(map -> (String) map.get(key)))
                 .collect(Collectors.toList());
     }
+
+    public void deleteOrganisation(String orgIdentifierResponse) {
+        log.info("deleteActiveOrganisation :: STARTED");
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
+        log.info("deleteActiveOrganisation :: END");
+    }
 }
