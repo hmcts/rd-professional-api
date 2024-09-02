@@ -822,6 +822,38 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
 
+<<<<<<< HEAD
+=======
+    @Override
+    @Transactional
+    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
+        if (emails.isEmpty()) {
+            throw new InvalidRequest("Please provide both email addresses");
+        }
+        Set<String> userIdsToBeDeleted = new HashSet<>();
+        emails.forEach(email -> {
+            Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
+                .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
+            if (!professionalUser.isEmpty()) {
+                userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                userAttributeRepository.deleteByProfessionalUserId(professionalUser.get().getId());
+                professionalUserRepository.delete(professionalUser.get());
+            }
+
+        });
+        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
+        Optional<DeleteOrganisationResponse> deleteOrganisationResponse = Optional.ofNullable(RefDataUtil
+            .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient));
+        if (deleteOrganisationResponse.isEmpty()) {
+            throw new InvalidRequest(ERROR_MESSAGE_UP_FAILED);
+        }
+        return new DeleteUserResponse(deleteOrganisationResponse.get().getStatusCode(),
+            deleteOrganisationResponse.get().getMessage());
+    }
+
+
+
+>>>>>>> 89ca7e52 (fixing review comments)
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {
 

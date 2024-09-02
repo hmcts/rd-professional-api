@@ -185,6 +185,8 @@ class OrganisationServiceImplTest {
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
 
+    private OrganisationSraUpdateRequest organisationSraUpdateRequest;
+
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
     private List<Organisation> organisations;
@@ -279,6 +281,8 @@ class OrganisationServiceImplTest {
                 "number02", "company-url", superUserCreationRequest, paymentAccountList,
                 contactInformationCreationRequests, "Doctor", orgAttributeRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
+
+        organisationSraUpdateRequest = new OrganisationSraUpdateRequest("sraId");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
@@ -1934,6 +1938,49 @@ class OrganisationServiceImplTest {
         verify(paymentAccountMock, times(1)).setPbaStatus(pbaStatusMock);
         verify(paymentAccountMock, times(1)).setStatusMessage("statusMessage");
     }
+
+
+    @Test
+    void test_updateOrganisationSraId() {
+        String newSraId = "TestSraId";
+        final String orgIdentifier = "9KS20WT";
+        organisationSraUpdateRequest.setSraId(newSraId);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+
+        when(organisationRepository.findByOrganisationIdentifier(orgId)).thenReturn(null);
+        assertThrows(EmptyResultDataAccessException.class, () ->
+            sut.retrieveOrganisation(orgId, false));
+        verify(organisationRepository, times(1))
+            .findByOrganisationIdentifier(any(String.class));
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
+            .thenReturn(organisationMock);
+
+        assertNotNull(organisationSraUpdateRequest.getSraId());
+
+        organisationMock.setSraId(newSraId);
+
+        OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
+
+        when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
+
+        when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
+
+        OrganisationsDetailResponse updatedOrganisation = sut.updateOrganisationSra(
+            organisationSraUpdateRequest,orgIdentifier);
+
+        assertThat(updatedOrganisation).isNotNull();
+
+        verify(organisationRepository, times(1))
+            .findByOrganisationIdentifier(orgIdentifier);
+        verify(organisationRepository, times(1))
+            .save(organisationMock);
+        verify(orgAttributeRepository, times(1))
+            .save(any(OrgAttribute.class));
+    }
+
+
 
     @Test
     void test_AllAttributesAddedToSuperUser() {
