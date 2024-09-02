@@ -1320,10 +1320,10 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(organisationCreationRequest)
-            .put("/refdata/internal/v1/organisations/nameSra/" + organisationIdentifier)
+            .put("/refdata/internal/v1/organisations/name/" + organisationIdentifier)
             .andReturn();
 
-        log.info("{}:: Update organisation Name or SRA id response: {}",
+        log.info("{}:: Update organisation Name  response: {}",
             loggingComponentName, response.getStatusCode());
 
         response.then()
