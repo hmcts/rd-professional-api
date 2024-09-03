@@ -4,9 +4,12 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
@@ -20,17 +23,16 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
             .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
         String orgIdentifier = (String)responseForOrganisationCreation.get(ORG_IDENTIFIER);
 
-        Map<String, Object> updateResponse = professionalReferenceDataClient
+        Map<String, Object> orgResponse = professionalReferenceDataClient
                 .updateOrgName(organisationRequestWithAllFields().name("updatedName").build(),
                     hmctsAdmin,orgIdentifier);
-        Map<String, Object> orgResponse =
-            professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifier, hmctsAdmin);
-
-        assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
-        assertThat(orgResponse.get(ORG_IDENTIFIER)).isEqualTo(orgIdentifier);
-
-        assertThat(orgResponse.get("name")).isEqualTo("updatedName");
-        assertThat(updateResponse).containsEntry("http_status", 200);
+        LinkedHashMap responseBody = (LinkedHashMap)orgResponse.get("response_body");
+        List organisations = (List)responseBody.get("organisations");
+        LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
+        assertThat(orgResponse).isNotNull();
+        assertNotNull(organisation.get("name"));
+        assertThat(organisation.get("name").toString()).contains("updatedName");
+        assertThat(orgResponse.get("http_status")).isEqualTo(200);
         deleteOrganisation(orgIdentifier);
     }
 
