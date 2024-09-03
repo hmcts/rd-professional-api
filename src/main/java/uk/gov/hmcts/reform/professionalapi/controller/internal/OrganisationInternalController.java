@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
@@ -735,27 +735,27 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @PutMapping(
-        value = "/name/{orgId}",
+        value = "/sra/{orgId}",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured({"prd-admin"})
-    public ResponseEntity<OrganisationsDetailResponse> updateOrganisationName(
+    public ResponseEntity<OrganisationsDetailResponse> updateOrganisationSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-        @Valid @NotNull @RequestBody OrganisationNameUpdateRequest organisationNameUpdateRequest,
+        @Valid @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest,
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
         var orgId = removeEmptySpaces(organisationIdentifier);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
 
-        if (isBlank(organisationNameUpdateRequest.getName())) {
-            throw new InvalidRequest("Name is required");
+        if (isBlank(organisationSraUpdateRequest.getSraId())) {
+            throw new InvalidRequest("SRA Id is required");
         }
 
         OrganisationsDetailResponse organisationsDetailResponse = organisationService
-            .updateOrganisationName(organisationNameUpdateRequest, orgId);
+            .updateOrganisationSra(organisationSraUpdateRequest, orgId);
 
         ResponseEntity<OrganisationsDetailResponse> resp = ResponseEntity.status(200).body(organisationsDetailResponse);
         return resp;

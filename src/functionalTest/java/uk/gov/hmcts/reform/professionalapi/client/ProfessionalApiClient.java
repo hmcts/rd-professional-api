@@ -21,8 +21,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -1316,12 +1316,12 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
-    public Map<String, Object> updatesOrganisationName(OrganisationNameUpdateRequest organisationNameUpdateRequest, String role,
-                                        String organisationIdentifier, HttpStatus expectedStatus) {
+    public Map<String, Object> updatesOrganisationSra(OrganisationSraUpdateRequest organisationSraUpdateRequest, String role,
+                                                      String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
-            .body(organisationNameUpdateRequest)
-            .put("/refdata/internal/v1/organisations/name/" + organisationIdentifier)
+            .body(organisationSraUpdateRequest)
+            .put("/refdata/internal/v1/organisations/sra/" + organisationIdentifier)
             .andReturn();
 
         log.info("{}:: Update organisation Name  response: {}",

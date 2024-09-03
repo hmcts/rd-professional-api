@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -182,7 +182,7 @@ class OrganisationServiceImplTest {
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
 
-    private OrganisationNameUpdateRequest organisationNameUpdateRequest;
+    private OrganisationSraUpdateRequest organisationSraUpdateRequest;
 
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
@@ -279,7 +279,7 @@ class OrganisationServiceImplTest {
                 contactInformationCreationRequests, "Doctor", orgAttributeRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
 
-        organisationNameUpdateRequest = new OrganisationNameUpdateRequest("name");
+        organisationSraUpdateRequest = new OrganisationSraUpdateRequest("sraId");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
@@ -1938,10 +1938,10 @@ class OrganisationServiceImplTest {
 
 
     @Test
-    void test_updateOrganisationNameAndSra() {
-        String newName = "TestOrgName";
+    void test_updateOrganisationSra() {
+        String newSraId = "TestOrgName";
         final String orgIdentifier = "9KS20WT";
-        organisationNameUpdateRequest.setName(newName);
+        organisationSraUpdateRequest.setSraId(newSraId);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
 
         when(organisationRepository.findByOrganisationIdentifier(orgId)).thenReturn(null);
@@ -1954,9 +1954,9 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
             .thenReturn(organisationMock);
 
-        assertNotNull(organisationNameUpdateRequest.getName());
+        assertNotNull(organisationSraUpdateRequest.getSraId());
 
-        organisationMock.setName(newName);
+        organisationMock.setSraId(newSraId);
 
         OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
 
@@ -1964,8 +1964,8 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
 
-        OrganisationsDetailResponse updatedOrganisation = sut.updateOrganisationName(
-            organisationNameUpdateRequest,orgIdentifier);
+        OrganisationsDetailResponse updatedOrganisation = sut.updateOrganisationSra(
+            organisationSraUpdateRequest,orgIdentifier);
 
         assertThat(updatedOrganisation).isNotNull();
 

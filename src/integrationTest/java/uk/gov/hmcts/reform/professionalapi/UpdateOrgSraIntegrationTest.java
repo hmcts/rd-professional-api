@@ -14,30 +14,30 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 
-class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
+class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
 
     @Test
-    void update_name_of_an_active_organisation_with_prd_admin_role_should_return_200() {
+    void update_sra_of_an_active_organisation_with_prd_admin_role_should_return_200() {
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
             .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
         String orgIdentifier = (String)responseForOrganisationCreation.get(ORG_IDENTIFIER);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .updateOrgName(organisationRequestWithAllFields().name("updatedName").build(),
+                .updateOrgName(organisationRequestWithAllFields().sraId("sraId").build(),
                     hmctsAdmin,orgIdentifier);
         LinkedHashMap responseBody = (LinkedHashMap)orgResponse.get("response_body");
         List organisations = (List)responseBody.get("organisations");
         LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
         assertThat(orgResponse).isNotNull();
-        assertNotNull(organisation.get("name"));
-        assertThat(organisation.get("name").toString()).contains("updatedName");
+        assertNotNull(organisation.get("sraId"));
+        assertThat(organisation.get("sraId").toString()).contains("sraId");
         assertThat(orgResponse.get("http_status")).isEqualTo(200);
         deleteOrganisation(orgIdentifier);
     }
 
     @Test
-    void update_name_with_bad_request_should_return_400() {
+    void update_sra_with_bad_request_should_return_400() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgName(null,  hmctsAdmin,getOrganisationId());
 
@@ -49,7 +49,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void update_name_with_bad_request_OrgId_missing_should_return_400() {
+    void update_sra_with_bad_request_OrgId_missing_should_return_400() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgName(organisationRequestWithAllFields().build(),  hmctsAdmin,null);
 
@@ -60,7 +60,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void update_name_with_invalid_name_should_return_400() {
+    void update_sra_with_invalid_name_should_return_400() {
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
             .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
 
@@ -78,7 +78,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void update_name_with_invalid_name_should_return_200() {
+    void update_sra_with_invalid_name_should_return_200() {
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
             .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
 
