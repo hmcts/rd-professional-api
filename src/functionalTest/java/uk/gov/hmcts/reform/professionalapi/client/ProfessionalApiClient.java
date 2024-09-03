@@ -1316,7 +1316,7 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
-    public Map<String, Object> updatesOrganisationSra(OrganisationSraUpdateRequest organisationSraUpdateRequest, String role,
+    public Map<String, Object> updatesOrganisationSra(OrganisationSraUpdateRequest organisationSraUpdateRequest,
                                                       String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()

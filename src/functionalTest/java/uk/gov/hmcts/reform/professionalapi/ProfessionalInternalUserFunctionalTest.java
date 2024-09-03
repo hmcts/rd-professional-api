@@ -799,7 +799,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         //call endpoint to update name as 'updatedname'
         Map<String, Object> orgUpdatedNameResponse =  professionalApiClient.updatesOrganisationSra(
-            organisationSraUpdateRequest,hmctsAdmin,organisationIdentifier, OK);
+            organisationSraUpdateRequest,organisationIdentifier, OK);
         List organisations = (List)orgUpdatedNameResponse.get("organisations");
         LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
         assertThat(orgUpdatedNameResponse).isNotNull();
@@ -822,7 +822,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             new OrganisationSraUpdateRequest("");
 
         Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationSra(
-            organisationSraUpdateRequest,hmctsAdmin,organisationIdentifier, BAD_REQUEST);
+            organisationSraUpdateRequest,organisationIdentifier, BAD_REQUEST);
 
         assertThat((String) orgUpdatedNameResponse.get("errorDescription")).contains("SraId is required");
         deleteOrganisation(organisationIdentifier);
