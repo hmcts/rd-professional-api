@@ -92,7 +92,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
                 hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER));
 
         assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString()).contains("Name is required");
+        assertThat(updateResponse.get("response_body").toString()).contains("SraId is required");
         deleteOrganisation((String) responseForOrganisationCreation.get(ORG_IDENTIFIER));
     }
 
