@@ -1074,7 +1074,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             savedOrganisation = organisationRepository.save(existingOrganisation);
         }
 
-        return new OrganisationsDetailResponse(List.of(savedOrganisation),false,false,false);
+        return new OrganisationsDetailResponse(List.of(savedOrganisation),
+            false,false,false);
     }
 
 }

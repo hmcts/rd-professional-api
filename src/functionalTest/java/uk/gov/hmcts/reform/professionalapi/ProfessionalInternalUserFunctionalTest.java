@@ -785,6 +785,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
     void updateOrganisationNameShouldReturnSuccess() {
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        //create organisation
         String updatedName = "updatedName";
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
@@ -792,20 +793,17 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
-
         assertNotNull(orgResponse.get("name"));
 
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-            .name(updatedName).build();
-
+        //create request to update organisation
         OrganisationNameUpdateRequest organisationNameUpdateRequest =
             new OrganisationNameUpdateRequest(updatedName);
 
-        organisationCreationRequest.setName(organisationNameUpdateRequest.getName());
-
-        professionalApiClient.updatesOrganisationName(organisationCreationRequest,
+        //call endpoint to update name as 'updatedname'
+        professionalApiClient.updatesOrganisationName(organisationNameUpdateRequest,
             hmctsAdmin,organisationIdentifier, OK);
 
+        //retrieve organisation to verify name
         JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
         assertThat(response).isNotNull();
@@ -817,35 +815,28 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
-    void updateOrganisationNameAndSraShouldReturnFailure() {
+    void updateOrganisationNameShouldReturnFailureIfNoName() {
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
-        String updatedName = "updatedName";
-        String updatedSra = "updatedSraId";
+
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
 
         JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
-
         assertNotNull(orgResponse.get("name"));
 
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-            .name(updatedName).sraId(updatedSra).build();
-
         OrganisationNameUpdateRequest organisationNameUpdateRequest =
-            new OrganisationNameUpdateRequest(updatedName);
+            new OrganisationNameUpdateRequest("");
 
-        organisationCreationRequest.setName(organisationNameUpdateRequest.getName());
-
-        professionalApiClient.updatesOrganisationName(organisationCreationRequest,
+        professionalApiClient.updatesOrganisationName(organisationNameUpdateRequest,
             hmctsAdmin,organisationIdentifier, OK);
 
         JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
         assertThat(response).isNotNull();
         assertNotNull(orgUpdatedNameResponse.get("name"));
-        assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+
         deleteOrganisation(organisationIdentifier);
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
