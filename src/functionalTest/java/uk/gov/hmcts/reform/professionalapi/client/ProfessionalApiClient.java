@@ -1316,7 +1316,7 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
-    public void updatesOrganisationName(OrganisationNameUpdateRequest organisationNameUpdateRequest, String role,
+    public Map<String, Object> updatesOrganisationName(OrganisationNameUpdateRequest organisationNameUpdateRequest, String role,
                                         String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
@@ -1330,6 +1330,8 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(expectedStatus.value());
+
+        return response.body().as(Map.class);
     }
 
     public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {

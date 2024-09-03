@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -246,7 +249,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(existingUserCreationRequest.getEmail());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
+                hmctsAdmin, newUserCreationRequest, CONFLICT);
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
         log.info("inviteUserWithDuplicateUserShouldReturnConflict :: END");
     }
@@ -791,24 +794,18 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
 
-        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
-            organisationIdentifier, hmctsAdmin,OK);
-        assertNotNull(orgResponse.get("name"));
-
         //create request to update organisation
         OrganisationNameUpdateRequest organisationNameUpdateRequest =
             new OrganisationNameUpdateRequest(updatedName);
 
         //call endpoint to update name as 'updatedname'
-        professionalApiClient.updatesOrganisationName(organisationNameUpdateRequest,
-            hmctsAdmin,organisationIdentifier, OK);
-
-        //retrieve organisation to verify name
-        JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
-            organisationIdentifier, hmctsAdmin,OK);
-        assertThat(response).isNotNull();
-        assertNotNull(orgUpdatedNameResponse.get("name"));
-        assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+        Map<String, Object> orgUpdatedNameResponse =  professionalApiClient.updatesOrganisationName(
+            organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, OK);
+        List organisations = (List)orgUpdatedNameResponse.get("organisations");
+        LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
+        assertThat(orgUpdatedNameResponse).isNotNull();
+        assertNotNull(organisation.get("name"));
+        assertThat(organisation.get("name").toString()).contains(updatedName);
         deleteOrganisation(organisationIdentifier);
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
@@ -822,21 +819,14 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
 
-        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
-            organisationIdentifier, hmctsAdmin,OK);
-        assertNotNull(orgResponse.get("name"));
 
         OrganisationNameUpdateRequest organisationNameUpdateRequest =
             new OrganisationNameUpdateRequest("");
 
-        professionalApiClient.updatesOrganisationName(organisationNameUpdateRequest,
-            hmctsAdmin,organisationIdentifier, OK);
+        Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+            organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, BAD_REQUEST);
 
-        JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
-            organisationIdentifier, hmctsAdmin,OK);
-        assertThat(response).isNotNull();
-        assertNotNull(orgUpdatedNameResponse.get("name"));
-
+        assertThat((String) orgUpdatedNameResponse.get("errorDescription")).contains("Name is required");
         deleteOrganisation(organisationIdentifier);
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
