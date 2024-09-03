@@ -1316,8 +1316,9 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
-    public Map<String, Object> updatesOrganisationName(OrganisationNameUpdateRequest organisationNameUpdateRequest, String role,
-                                        String organisationIdentifier, HttpStatus expectedStatus) {
+    public Map<String, Object> updatesOrganisationName(OrganisationNameUpdateRequest organisationNameUpdateRequest,
+                                                       String role,String organisationIdentifier,
+                                                       HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(organisationNameUpdateRequest)
