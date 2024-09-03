@@ -1324,7 +1324,7 @@ public class ProfessionalApiClient {
             .put("/refdata/internal/v1/organisations/sra/" + organisationIdentifier)
             .andReturn();
 
-        log.info("{}:: Update organisation Name  response: {}",
+        log.info("{}:: Update organisation SraId  response: {}",
             loggingComponentName, response.getStatusCode());
 
         response.then()

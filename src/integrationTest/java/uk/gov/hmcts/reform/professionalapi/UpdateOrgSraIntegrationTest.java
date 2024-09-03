@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
@@ -24,7 +25,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         String orgIdentifier = (String)responseForOrganisationCreation.get(ORG_IDENTIFIER);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .updateOrgName(organisationRequestWithAllFields().sraId("sraId").build(),
+                .updateOrgName(organisationRequestWithAllFields().sraId(randomAlphabetic(7)).build(),
                     hmctsAdmin,orgIdentifier);
         LinkedHashMap responseBody = (LinkedHashMap)orgResponse.get("response_body");
         List organisations = (List)responseBody.get("organisations");
@@ -65,7 +66,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
             .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-            .name("")
+            .sraId("")
             .build();
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
@@ -83,7 +84,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
             .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-            .name("   ")
+            .sraId("   ")
             .build();
 
         Map<String, Object> updateResponse = professionalReferenceDataClient

@@ -788,7 +788,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void updateOrganisationSraIdShouldReturnSuccess() {
         log.info("updateOrganisationSraIdShouldReturnSuccess :: STARTED");
         //create organisation
-        String updatedSra = "updatedSraId";
+        String updatedSra = randomAlphabetic(7);
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
@@ -798,11 +798,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             new OrganisationSraUpdateRequest(updatedSra);
 
         //call endpoint to update name as 'updatedname'
-        Map<String, Object> orgUpdatedNameResponse =  professionalApiClient.updatesOrganisationSra(
+        Map<String, Object> orgUpdatedSraResponse =  professionalApiClient.updatesOrganisationSra(
             organisationSraUpdateRequest,organisationIdentifier, OK);
-        List organisations = (List)orgUpdatedNameResponse.get("organisations");
+        List organisations = (List)orgUpdatedSraResponse.get("organisations");
         LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
-        assertThat(orgUpdatedNameResponse).isNotNull();
+        assertThat(orgUpdatedSraResponse).isNotNull();
         assertNotNull(organisation.get("sraId"));
         assertThat(organisation.get("sraId").toString()).contains(updatedSra);
         deleteOrganisation(organisationIdentifier);

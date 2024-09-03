@@ -66,6 +66,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Collections.singletonList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -578,7 +579,7 @@ class OrganisationInternalControllerTest {
     @Test
     void testUpdateOrgSraId() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String updatedSraId = "updatedSraId";
+        String updatedSraId = randomAlphabetic(7);
         organisation.setSraId(updatedSraId);
         organisationSraUpdateRequest.setSraId(updatedSraId);
 

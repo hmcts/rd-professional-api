@@ -98,6 +98,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -1939,7 +1940,7 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_updateOrganisationSra() {
-        String newSraId = "TestOrgName";
+        String newSraId = randomAlphabetic(7);
         final String orgIdentifier = "9KS20WT";
         organisationSraUpdateRequest.setSraId(newSraId);
         String orgId = UUID.randomUUID().toString().substring(0, 7);

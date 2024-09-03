@@ -743,7 +743,7 @@ public class OrganisationInternalController extends SuperController {
     @ResponseBody
     @Secured({"prd-admin"})
     public ResponseEntity<OrganisationsDetailResponse> updateOrganisationSra(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationsraUpdateRequest")
         @Valid @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest,
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
 
