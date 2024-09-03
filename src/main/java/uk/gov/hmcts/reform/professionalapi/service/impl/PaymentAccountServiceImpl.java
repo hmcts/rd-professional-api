@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +32,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
