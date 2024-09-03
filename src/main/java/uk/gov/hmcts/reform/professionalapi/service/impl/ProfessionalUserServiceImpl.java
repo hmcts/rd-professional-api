@@ -352,8 +352,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             users = professionalUserRepository.findUsersInOrganisations(orgIdentifiers, pageableObject);
         } else {
             users = professionalUserRepository.findUsersInOrganisationsSearchAfter(orgIdentifiers,
-                    searchAfterOrganisation.toString(),
-                    searchAfterUser.toString(),
+                    searchAfterOrganisation,
+                    searchAfterUser,
                     pageableObject);
         }
 

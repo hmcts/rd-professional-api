@@ -47,14 +47,14 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
        WHERE (COALESCE(:organisationIdentifiers, NULL) is NULL
        OR organisation.organisation_identifier in (:organisationIdentifiers))
        AND (
-           (organisation.Id::text = :searchAfterOrgId AND pu.Id::text > :searchAfterUserId)
-           OR (organisation.Id::text > :searchAfterOrgId)
+           (organisation.Id = :searchAfterOrgId AND pu.Id > :searchAfterUserId)
+           OR (organisation.Id > :searchAfterOrgId)
        )
        ORDER BY pu.organisation_id, pu.id
         """, nativeQuery = true)
     Page<ProfessionalUser> findUsersInOrganisationsSearchAfter(
             @Param("organisationIdentifiers") List<String> organisationIdentifiers,
-            @Param("searchAfterOrgId") String searchAfterOrgId, @Param("searchAfterUserId") String searchAfterUserId,
+            @Param("searchAfterOrgId") UUID searchAfterOrgId, @Param("searchAfterUserId") UUID searchAfterUserId,
             Pageable pageable);
 
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);

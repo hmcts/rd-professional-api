@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -141,7 +140,6 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
 
         for (Organisation organisation : organisations) {
             List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-            users.sort(Comparator.comparing((ProfessionalUser p) -> p.getId().toString()));
             sortedUsersInOrganisation.put(organisation.getId(), users);
         }
     }

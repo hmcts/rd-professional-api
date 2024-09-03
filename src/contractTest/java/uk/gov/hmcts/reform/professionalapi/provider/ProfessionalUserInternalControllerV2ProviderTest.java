@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -51,7 +52,7 @@ public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProv
 
         when(professionalUserRepository
                 .findUsersInOrganisationsSearchAfter(anyList(),
-                        any(String.class), any(String.class), any(Pageable.class))).thenReturn(professionalUserPage);
+                        any(UUID.class), any(UUID.class), any(Pageable.class))).thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
     }
 
