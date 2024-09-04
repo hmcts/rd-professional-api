@@ -66,7 +66,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -596,8 +595,9 @@ class OrganisationInternalControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationCreationRequestValidatorMock, times(1))
-            .validateOrganisationIdentifier(randomAlphabetic(7));
+
+        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsWithGivenOrgId(
+            organisation.getOrganisationIdentifier());
         verify(organisationServiceMock, times(1))
             .updateOrganisationName(organisationNameUpdateRequest, organisation.getOrganisationIdentifier());
 
