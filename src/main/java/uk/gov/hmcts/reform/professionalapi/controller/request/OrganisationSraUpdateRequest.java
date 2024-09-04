@@ -13,8 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-@Builder(builderMethodName = "anOrganisationCreationRequest")
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Builder(builderMethodName = "anOrganisationSraUpdateRequest")
 public class OrganisationSraUpdateRequest {
 
     @Valid
