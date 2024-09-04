@@ -209,7 +209,7 @@ public class BulkCivilApiFunctionalTest {
         Map<String, Object> bulkOrganisationResponse = retrieveOrganisationForBulkCustomerDetails(bulkCustomerRequest,
                 HttpStatus.FORBIDDEN, "pui-user-manager");
         assertThat(bulkOrganisationResponse.get("errorDescription").toString())
-                .contains("Access is denied");
+                .contains("Access Denied");
 
 
     }
