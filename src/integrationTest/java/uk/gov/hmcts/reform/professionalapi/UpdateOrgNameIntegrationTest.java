@@ -19,9 +19,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void update_name_of_an_active_organisation_with_prd_admin_role_should_return_200() {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
-            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
-        String orgIdentifier = (String)responseForOrganisationCreation.get(ORG_IDENTIFIER);
+        String orgIdentifier = getOrganisationId();
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .updateOrgName(organisationRequestWithAllFields().name("updatedName").build(),
@@ -33,7 +31,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
         assertNotNull(organisation.get("name"));
         assertThat(organisation.get("name").toString()).isEqualTo("updatedName");
         assertThat(orgResponse.get("http_status")).isEqualTo(200);
-        deleteOrganisation(orgIdentifier);
+
     }
 
     @Test
@@ -48,37 +46,37 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void update_name_with_bad_request_OrgId_missing_should_return_400() {
-        Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgName(organisationRequestWithAllFields().build(),  hmctsAdmin,null);
+        String orgIdentifier = getOrganisationId();
 
-        assertThat(updateResponse).containsEntry("http_status", "404");
+        Map<String, Object> updateResponse = professionalReferenceDataClient
+            .updateOrgName(organisationRequestWithAllFields().name("updatedName").build(),
+                hmctsAdmin,null);
+
+        assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
-            .contains("Resource not found");
+            .contains("The given organisationIdentifier must be 7 Alphanumeric Characters");
 
     }
 
     @Test
     void update_name_with_invalid_name_should_return_400() {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
-            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
+        String orgIdentifier = getOrganisationId();
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
             .name("")
             .build();
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgName(organisationUpdateRequest,
-                    hmctsAdmin,(String) responseForOrganisationCreation.get(ORG_IDENTIFIER));
+                .updateOrgName(organisationUpdateRequest, hmctsAdmin,orgIdentifier);
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString()).contains("Name is required");
-        deleteOrganisation((String) responseForOrganisationCreation.get(ORG_IDENTIFIER));
+
     }
 
     @Test
-    void update_name_with_invalid_name_should_return_200() {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
-            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
+    void update_name_with_blank_name_should_return_400() {
+        String orgIdentifier = getOrganisationId();
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
             .name("   ")
@@ -86,13 +84,12 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgName(organisationUpdateRequest,
-                hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER));
+                hmctsAdmin,orgIdentifier);
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString()).contains("Name is required");
-        deleteOrganisation((String) responseForOrganisationCreation.get(ORG_IDENTIFIER));
-    }
 
+    }
 
     private String getOrganisationId() {
         String organisationIdentifier = createOrganisationRequest();
@@ -101,11 +98,5 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
         return organisationIdentifier;
     }
 
-    public void deleteOrganisation(String orgIdentifier) {
-        Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,
-            orgIdentifier);
 
-        assertThat(deleteResponse.get("http_status")).isEqualTo(204);
-
-    }
 }

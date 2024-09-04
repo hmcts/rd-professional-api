@@ -1028,7 +1028,7 @@ public class ProfessionalReferenceDataClient {
         OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
 
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH  + organisationIdentifier + "/name";
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier + "/name";
         try {
             HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
                 getMultipleAuthHeaders(role));
