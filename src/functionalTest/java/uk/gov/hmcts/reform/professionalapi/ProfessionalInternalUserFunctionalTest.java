@@ -784,7 +784,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
     void updateOrganisationNameShouldReturnSuccess() {
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
         //create organisation
@@ -804,13 +803,12 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
         assertThat(orgUpdatedNameResponse).isNotNull();
         assertNotNull(organisation.get("name"));
-        assertThat(organisation.get("name").toString()).contains(updatedName);
+        assertThat(organisation.get("name").toString()).isEqualTo(updatedName);
         deleteOrganisation(organisationIdentifier);
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
     void updateOrganisationNameShouldReturnFailureIfNoName() {
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
 
@@ -825,7 +823,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
             organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, BAD_REQUEST);
 
-        assertThat((String) orgUpdatedNameResponse.get("errorDescription")).contains("Name is required");
+        assertThat((String) orgUpdatedNameResponse.get("errorDescription")).isEqualTo("Name is required");
         deleteOrganisation(organisationIdentifier);
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }

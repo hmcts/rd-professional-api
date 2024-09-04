@@ -31,7 +31,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
         LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
         assertThat(orgResponse).isNotNull();
         assertNotNull(organisation.get("name"));
-        assertThat(organisation.get("name").toString()).contains("updatedName");
+        assertThat(organisation.get("name").toString()).isEqualTo("updatedName");
         assertThat(orgResponse.get("http_status")).isEqualTo(200);
         deleteOrganisation(orgIdentifier);
     }
@@ -43,9 +43,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
-            .contains("Required request body is missing:"
-                + " public org.springframework.http.ResponseEntity"
-                + "<uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse>");
+            .contains("Required request body is missing:");
     }
 
     @Test

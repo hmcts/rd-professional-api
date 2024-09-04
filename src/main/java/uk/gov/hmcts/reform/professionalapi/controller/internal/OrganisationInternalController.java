@@ -735,7 +735,7 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @PutMapping(
-        value = "/name/{orgId}",
+        value = "/{orgId}/name",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -745,10 +745,13 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<OrganisationsDetailResponse> updateOrganisationName(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
         @Valid @NotNull @RequestBody OrganisationNameUpdateRequest organisationNameUpdateRequest,
-        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
+        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+            message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
 
         var orgId = removeEmptySpaces(organisationIdentifier);
-        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(orgId);
 
         if (isBlank(organisationNameUpdateRequest.getName())) {
             throw new InvalidRequest("Name is required");
