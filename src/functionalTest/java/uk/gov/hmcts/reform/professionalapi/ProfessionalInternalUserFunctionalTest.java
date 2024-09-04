@@ -792,6 +792,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
 
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier);
         //create request to update organisation
         OrganisationNameUpdateRequest organisationNameUpdateRequest =
             new OrganisationNameUpdateRequest(updatedName);
@@ -804,7 +807,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(orgUpdatedNameResponse).isNotNull();
         assertNotNull(organisation.get("name"));
         assertThat(organisation.get("name").toString()).isEqualTo(updatedName);
-        deleteOrganisation(organisationIdentifier);
+
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
 
@@ -816,6 +819,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
 
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier);
 
         OrganisationNameUpdateRequest organisationNameUpdateRequest =
             new OrganisationNameUpdateRequest("");
@@ -824,7 +830,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, BAD_REQUEST);
 
         assertThat((String) orgUpdatedNameResponse.get("errorDescription")).isEqualTo("Name is required");
-        deleteOrganisation(organisationIdentifier);
+
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
 
@@ -1280,10 +1286,5 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .collect(Collectors.toList());
     }
 
-    public void deleteOrganisation(String orgIdentifierResponse) {
-        log.info("deleteActiveOrganisation :: STARTED");
-        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
-        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
-        log.info("deleteActiveOrganisation :: END");
-    }
+
 }
