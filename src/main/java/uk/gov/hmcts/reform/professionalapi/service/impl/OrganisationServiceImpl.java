@@ -846,16 +846,15 @@ public class OrganisationServiceImpl implements OrganisationService {
 
             } else {
                 finalDeleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
-                finalDeleteOrganisationResponse.setMessage(ProfessionalApiConstants.
-                    ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
+                finalDeleteOrganisationResponse.setMessage(ProfessionalApiConstants
+                    .ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
             }
 
         });
         if (userIds.size() > 0) {
             DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
             return  RefDataUtil.deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-        }
-        else {
+        } else {
             return finalDeleteOrganisationResponse;
         }
     }
