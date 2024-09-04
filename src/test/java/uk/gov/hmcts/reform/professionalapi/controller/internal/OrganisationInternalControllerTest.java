@@ -582,7 +582,6 @@ class OrganisationInternalControllerTest {
         organisation.setName(updatedName);
         organisationNameUpdateRequest.setName(updatedName);
 
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
         assertThat(organisationNameUpdateRequest.getName()).isNotEmpty();
 
         when(organisationServiceMock.updateOrganisationName(organisationNameUpdateRequest,
@@ -596,7 +595,7 @@ class OrganisationInternalControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
 
-        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsWithGivenOrgId(
+        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsAndActive(
             organisation.getOrganisationIdentifier());
         verify(organisationServiceMock, times(1))
             .updateOrganisationName(organisationNameUpdateRequest, organisation.getOrganisationIdentifier());
