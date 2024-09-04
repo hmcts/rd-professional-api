@@ -2122,14 +2122,14 @@ class OrganisationServiceImplTest {
     }
 
     @Test
-    void testDeleteActiveOrganisationWithMultiUsersGives400WithMessage() {
+    void testDeleteActiveOrganisationWithMultiUsersGivesSuccessMessage() {
 
         Organisation organisation = getDeleteOrganisation(ACTIVE);
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(2);
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ERROR_CODE_400);
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
         assertThat(deleteOrganisationResponse.getMessage())
                 .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
         verify(organisationRepository, times(0)).deleteById(any());

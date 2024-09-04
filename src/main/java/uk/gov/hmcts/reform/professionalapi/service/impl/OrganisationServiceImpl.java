@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
@@ -53,6 +54,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -792,7 +794,14 @@ public class OrganisationServiceImpl implements OrganisationService {
             case PENDING,REVIEW:
                 return deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId);
             case ACTIVE:
-                deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
+                //if organisation contains users then they will be deleted
+                if (ProfessionalApiConstants.USER_COUNT != professionalUserRepository
+                    .findByUserCountByOrganisationId(organisation.getId())) {
+                    deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
+                } else {
+                    deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
+                }
+                //if all users from user profile are successfully deleted then delete organisation
                 return deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
                         ? deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId)
                         : deleteOrganisationResponse;
@@ -820,32 +829,35 @@ public class OrganisationServiceImpl implements OrganisationService {
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {
 
-        // if user count more than one in the current organisation then throw exception
-        if (ProfessionalApiConstants.USER_COUNT == professionalUserRepository
-                .findByUserCountByOrganisationId(organisation.getId())) {
-            var user = organisation.getUsers()
-                    .get(ZERO_INDEX).toProfessionalUser();
+        var userIds = new HashSet<String>();
+        List<SuperUser> users = organisation.getUsers();
+        DeleteOrganisationResponse finalDeleteOrganisationResponse = deleteOrganisationResponse;
+        users.forEach(user -> {
             var newUserResponse = RefDataUtil
                     .findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
-
             if (ObjectUtils.isEmpty(newUserResponse.getIdamStatus())) {
 
-                deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
-                deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
+                finalDeleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
+                finalDeleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
+
+            } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
+                // If user is not active in the up will send the request to delete
+                userIds.add(user.getUserIdentifier());
 
             } else {
-                // user will be deleted even if he is in active state
-                var userIds = new HashSet<String>();
-                userIds.add(user.getUserIdentifier());
-                DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
-                deleteOrganisationResponse = RefDataUtil
-                        .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
+                finalDeleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
+                finalDeleteOrganisationResponse.setMessage(ProfessionalApiConstants.
+                    ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
             }
-        } else {
-            deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
-            deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
+
+        });
+        if (userIds.size() > 0) {
+            DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
+            return  RefDataUtil.deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
         }
-        return deleteOrganisationResponse;
+        else {
+            return finalDeleteOrganisationResponse;
+        }
     }
 
     public List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable) {
