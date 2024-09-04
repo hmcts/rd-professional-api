@@ -289,7 +289,7 @@ public class BulkCivilApiFunctionalTest {
                                                                           HttpStatus status, String role) {
         Response response = getMultipleAuthHeadersInternal(role)
                 .body(request)
-                .post("/refdata/internal/v1/bulkCustomer/")
+                .post("/refdata/internal/v1/bulkCustomer")
                 .andReturn();
 
         response.then()
