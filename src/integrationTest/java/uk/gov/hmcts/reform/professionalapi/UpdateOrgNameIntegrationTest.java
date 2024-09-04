@@ -46,8 +46,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void update_name_with_bad_request_OrgId_missing_should_return_400() {
-        String orgIdentifier = getOrganisationId();
-
+   
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgName(organisationRequestWithAllFields().name("updatedName").build(),
                 hmctsAdmin,null);
@@ -60,14 +59,13 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void update_name_with_invalid_name_should_return_400() {
-        String orgIdentifier = getOrganisationId();
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
             .name("")
             .build();
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgName(organisationUpdateRequest, hmctsAdmin,orgIdentifier);
+                .updateOrgName(organisationUpdateRequest, hmctsAdmin,getOrganisationId());
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString()).contains("Name is required");
