@@ -801,7 +801,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         //call endpoint to update name as 'updatedname'
         Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
             organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, OK);
-        assertThat(orgUpdatedNameResponse.get("https-status")).isEqualTo(OK);
+        assertThat(orgUpdatedNameResponse.get("http_status")).isEqualTo(OK);
 
         //retrieve saved organisation by id
         var orgResponse = professionalApiClient.retrieveOrganisationDetails(
@@ -831,7 +831,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         //call endpoint to update empty name
         Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
             organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, BAD_REQUEST);
-        assertThat(orgUpdatedNameResponse.get("statusCode")).isEqualTo(BAD_REQUEST);
+        assertThat(orgUpdatedNameResponse.get("http_status")).isEqualTo(BAD_REQUEST);
         assertThat((String) orgUpdatedNameResponse.get("errorDescription")).isEqualTo("Name is required");
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
