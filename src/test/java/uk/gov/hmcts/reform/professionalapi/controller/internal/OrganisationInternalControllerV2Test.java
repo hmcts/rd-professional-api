@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
@@ -47,6 +48,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Collections.singletonList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,6 +71,8 @@ class OrganisationInternalControllerV2Test {
 
     private ProfessionalUserService professionalUserServiceMock;
 
+    private OrganisationIdentifierValidatorImpl orgIdValidatorMock;
+
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
     private UserCreationRequest userCreationRequest;
@@ -88,6 +92,7 @@ class OrganisationInternalControllerV2Test {
 
     private List<PrdEnum> prdEnumList;
 
+    private OrganisationSraUpdateRequest organisationSraUpdateRequest;
 
     @InjectMocks
     private OrganisationInternalControllerV2 organisationInternalController;
@@ -125,10 +130,11 @@ class OrganisationInternalControllerV2Test {
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
                 "some@email.com", userRoles, false, userAccessTypes);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
+        orgIdValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         organisation.setOrganisationIdentifier("AK57L4T");
-
+        organisationSraUpdateRequest = new OrganisationSraUpdateRequest("sraId");
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING",
                 "Status message",
                 "sra-id", "false", "number02", "company-url",
@@ -334,5 +340,32 @@ class OrganisationInternalControllerV2Test {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserById(any());
     }
+
+    @Test
+    void testUpdateOrgSraId() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String updatedSraId = randomAlphabetic(7);
+        organisation.setSraId(updatedSraId);
+        organisationSraUpdateRequest.setSraId(updatedSraId);
+
+        assertThat(organisationSraUpdateRequest.getSraId()).isNotEmpty();
+
+        when(organisationServiceMock.updateOrganisationSra(organisationSraUpdateRequest,
+            organisation.getOrganisationIdentifier())).thenReturn(new OrganisationsDetailResponseV2(
+                List.of(organisation),true, false, false,
+            true));
+
+        ResponseEntity<OrganisationsDetailResponseV2> response = organisationInternalController
+            .updateOrganisationSra(organisationSraUpdateRequest,organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsAndActive(
+            organisation.getOrganisationIdentifier());
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationSra(organisationSraUpdateRequest, organisation.getOrganisationIdentifier());
+    }
+
 
 }

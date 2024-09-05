@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
@@ -36,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -784,52 +782,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
-    void updateOrganisationSraIdShouldReturnSuccess() {
-        log.info("updateOrganisationSraIdShouldReturnSuccess :: STARTED");
-        //create organisation
-        String updatedSra = randomAlphabetic(7);
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String organisationIdentifier = (String) response.get("organisationIdentifier");
-        assertThat(organisationIdentifier).isNotEmpty();
-
-        //create request to update organisation
-        OrganisationSraUpdateRequest organisationSraUpdateRequest =
-            new OrganisationSraUpdateRequest(updatedSra);
-
-        //call endpoint to update name as 'updatedname'
-        Map<String, Object> orgUpdatedSraResponse =  professionalApiClient.updatesOrganisationSra(
-            organisationSraUpdateRequest,organisationIdentifier, OK);
-        List organisations = (List)orgUpdatedSraResponse.get("organisations");
-        LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
-        assertThat(orgUpdatedSraResponse).isNotNull();
-        assertNotNull(organisation.get("sraId"));
-        assertThat(organisation.get("sraId").toString()).contains(updatedSra);
-        deleteOrganisation(organisationIdentifier);
-        log.info("updateOrganisationSraIdShouldReturnSuccess :: END");
-    }
-
-    @Test
-    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
-    void updateOrganisationNameShouldReturnFailureIfNoName() {
-        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
-
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String organisationIdentifier = (String) response.get("organisationIdentifier");
-        assertThat(organisationIdentifier).isNotEmpty();
-
-        OrganisationSraUpdateRequest organisationSraUpdateRequest =
-            new OrganisationSraUpdateRequest("");
-
-        Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationSra(
-            organisationSraUpdateRequest,organisationIdentifier, BAD_REQUEST);
-
-        assertThat((String) orgUpdatedNameResponse.get("errorDescription")).contains("SraId is required");
-        deleteOrganisation(organisationIdentifier);
-        log.info("updateOrganisationNameShouldReturnSuccess :: END");
-    }
-
-    @Test
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisation();
@@ -1281,10 +1233,4 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .collect(Collectors.toList());
     }
 
-    public void deleteOrganisation(String orgIdentifierResponse) {
-        log.info("deleteActiveOrganisation :: STARTED");
-        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
-        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
-        log.info("deleteActiveOrganisation :: END");
-    }
 }

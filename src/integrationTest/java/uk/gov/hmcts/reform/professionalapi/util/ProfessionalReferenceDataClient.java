@@ -1024,11 +1024,11 @@ public class ProfessionalReferenceDataClient {
 
 
 
-    public Map<String, Object> updateOrgName(
+    public Map<String, Object> updateOrgSra(
         OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
 
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/name/" + organisationIdentifier;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier + "/sra";
         try {
             HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
                 getMultipleAuthHeaders(role));

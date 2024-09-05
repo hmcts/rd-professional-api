@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -25,11 +26,15 @@ import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -528,5 +533,44 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             }
         });
     }
+
+
+    @Test
+    void updateOrganisationSraIdShouldReturnSuccess() {
+        log.info("updateOrganisationSraIdShouldReturnSuccess :: STARTED");
+        String updatedSra = randomAlphabetic(7);
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest =
+            new OrganisationSraUpdateRequest(updatedSra);
+
+        //call endpoint to update name as 'updatedname'
+        Map<String, Object> orgUpdatedSraResponse =  professionalApiClient.updatesOrganisationSra(
+            organisationSraUpdateRequest,intActiveOrgId, OK);
+        List organisations = (List)orgUpdatedSraResponse.get("organisations");
+        LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
+        assertThat(orgUpdatedSraResponse).isNotNull();
+        assertNotNull(organisation.get("sraId"));
+        assertThat(organisation.get("sraId").toString()).isEqualTo(updatedSra);
+
+        List organisationAttributes = (List)organisation.get("organisationAttributes");
+        //assertThat(organisation.get("organisationAttributes").toString()).contains(updatedSra);
+        log.info("updateOrganisationSraIdShouldReturnSuccess :: END");
+    }
+
+    @Test
+    void updateOrganisationNameShouldReturnFailureIfNoName() {
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+
+        OrganisationSraUpdateRequest organisationSraUpdateRequest =
+            new OrganisationSraUpdateRequest("");
+
+        Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationSra(
+            organisationSraUpdateRequest,intActiveOrgId, BAD_REQUEST);
+
+        assertThat((String) orgUpdatedNameResponse.get("errorDescription")).isEqualTo("SraId is required");
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+    }
+
 
 }

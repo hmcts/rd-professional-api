@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
@@ -66,13 +65,11 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -90,7 +87,6 @@ class OrganisationInternalControllerTest {
     private PaymentAccountService paymentAccountServiceMock;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
-    private OrganisationSraUpdateRequest organisationSraUpdateRequest;
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
@@ -165,7 +161,7 @@ class OrganisationInternalControllerTest {
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null,"Doctor",null);
-        organisationSraUpdateRequest = new OrganisationSraUpdateRequest("sraId");
+
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -576,31 +572,5 @@ class OrganisationInternalControllerTest {
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
 
-    @Test
-    void testUpdateOrgSraId() {
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String updatedSraId = randomAlphabetic(7);
-        organisation.setSraId(updatedSraId);
-        organisationSraUpdateRequest.setSraId(updatedSraId);
-
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
-        assertThat(organisationSraUpdateRequest.getSraId()).isNotEmpty();
-
-        when(organisationServiceMock.updateOrganisationSra(organisationSraUpdateRequest,
-            organisation.getOrganisationIdentifier())).thenReturn(new OrganisationsDetailResponse(List.of(organisation),
-            false,false,false));
-
-        ResponseEntity<OrganisationsDetailResponse> response = organisationInternalController
-            .updateOrganisationSra(organisationSraUpdateRequest,organisation.getOrganisationIdentifier());
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
-
-        verify(organisationCreationRequestValidatorMock, times(1))
-            .validateOrganisationIdentifier(any(String.class));
-        verify(organisationServiceMock, times(1))
-            .updateOrganisationSra(organisationSraUpdateRequest, organisation.getOrganisationIdentifier());
-
-    }
 
 }

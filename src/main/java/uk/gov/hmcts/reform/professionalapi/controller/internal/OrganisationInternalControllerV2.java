@@ -25,7 +25,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
@@ -35,9 +37,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RequestMapping(
         path = "refdata/internal/v2/organisations"
@@ -242,4 +246,68 @@ public class OrganisationInternalControllerV2 extends SuperController {
 
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }
+
+
+    @Operation(
+        summary = "Updates an Organisation's name",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        })
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Organisation name has been updated",
+        content = @Content(schema = @Schema(implementation = String.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "If Organisation request sent with null/invalid values for mandatory fields",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "No Organisation found with the given ID",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @PutMapping(
+        value = "/{orgId}/sra",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured({"prd-admin"})
+    public ResponseEntity<OrganisationsDetailResponseV2> updateOrganisationSra(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationsraUpdateRequest")
+        @Valid @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest,
+        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
+
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(orgId);
+
+        if (isBlank(organisationSraUpdateRequest.getSraId())) {
+            throw new InvalidRequest("SRA Id is required");
+        }
+
+        OrganisationsDetailResponseV2 organisationsDetailResponse = organisationService
+            .updateOrganisationSra(organisationSraUpdateRequest, orgId);
+
+        ResponseEntity<OrganisationsDetailResponseV2> resp = ResponseEntity.status(200).body(
+            organisationsDetailResponse);
+        return resp;
+    }
+
 }

@@ -25,7 +25,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         String orgIdentifier = (String)responseForOrganisationCreation.get(ORG_IDENTIFIER);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .updateOrgName(organisationRequestWithAllFields().sraId(randomAlphabetic(7)).build(),
+                .updateOrgSra(organisationRequestWithAllFields().sraId(randomAlphabetic(7)).build(),
                     hmctsAdmin,orgIdentifier);
         LinkedHashMap responseBody = (LinkedHashMap)orgResponse.get("response_body");
         List organisations = (List)responseBody.get("organisations");
@@ -34,66 +34,61 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         assertNotNull(organisation.get("sraId"));
         assertThat(organisation.get("sraId").toString()).contains("sraId");
         assertThat(orgResponse.get("http_status")).isEqualTo(200);
-        deleteOrganisation(orgIdentifier);
+
+        List organisationAttributes = (List)organisation.get("organisationAttributes");
+        //assertThat(organisation.get("organisationAttributes").toString()).contains(updatedSra);
     }
 
     @Test
     void update_sra_with_bad_request_should_return_400() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgName(null,  hmctsAdmin,getOrganisationId());
+                .updateOrgSra(null,  hmctsAdmin,getOrganisationId());
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
-            .contains("Required request body is missing:"
-                + " public org.springframework.http.ResponseEntity"
-                + "<uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse>");
+            .contains("Required request body is missing:");
     }
 
     @Test
     void update_sra_with_bad_request_OrgId_missing_should_return_400() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgName(organisationRequestWithAllFields().build(),  hmctsAdmin,null);
+            .updateOrgSra(organisationRequestWithAllFields().build(),  hmctsAdmin,null);
 
-        assertThat(updateResponse).containsEntry("http_status", "404");
+        assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
-            .contains("Resource not found");
+            .contains("The given organisationIdentifier must be 7 Alphanumeric Characters");
 
     }
 
     @Test
     void update_sra_with_invalid_name_should_return_400() {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
-            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
             .sraId("")
             .build();
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgName(organisationUpdateRequest,
-                    hmctsAdmin,(String) responseForOrganisationCreation.get(ORG_IDENTIFIER));
+                .updateOrgSra(organisationUpdateRequest,
+                    hmctsAdmin,getOrganisationId());
 
         assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString()).contains("Name is required");
-        deleteOrganisation((String) responseForOrganisationCreation.get(ORG_IDENTIFIER));
+        assertThat(updateResponse.get("response_body").toString()).isEqualTo("Sra Id is required");
+
     }
 
     @Test
     void update_sra_with_invalid_name_should_return_200() {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
-            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
-
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
             .sraId("   ")
             .build();
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgName(organisationUpdateRequest,
-                hmctsAdmin,(String)responseForOrganisationCreation.get(ORG_IDENTIFIER));
+            .updateOrgSra(organisationUpdateRequest,
+                hmctsAdmin,getOrganisationId());
 
         assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString()).contains("SraId is required");
-        deleteOrganisation((String) responseForOrganisationCreation.get(ORG_IDENTIFIER));
+        assertThat(updateResponse.get("response_body").toString()).isEqualTo("SraId is required");
+
     }
 
 
@@ -104,11 +99,4 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         return organisationIdentifier;
     }
 
-    public void deleteOrganisation(String orgIdentifier) {
-        Map<String, Object> deleteResponse = professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,
-            orgIdentifier);
-
-        assertThat(deleteResponse.get("http_status")).isEqualTo(204);
-
-    }
 }

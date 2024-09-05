@@ -1083,7 +1083,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public OrganisationsDetailResponse updateOrganisationSra(
+    public OrganisationsDetailResponseV2 updateOrganisationSra(
         OrganisationSraUpdateRequest organisationSraUpdateRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
@@ -1101,9 +1101,14 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
             savedOrganisation = organisationRepository.save(existingOrganisation);
         }
+        List<Organisation> organisationList = new ArrayList<>();
+        organisationList.add(savedOrganisation);
+        OrganisationsDetailResponseV2 organisationsDetailResponse = new OrganisationsDetailResponseV2(
+            organisationList, true, false, false,
+            true);
 
-        return new OrganisationsDetailResponse(List.of(savedOrganisation),false,
-            false,false);
+        return organisationsDetailResponse;
+
     }
 
 
