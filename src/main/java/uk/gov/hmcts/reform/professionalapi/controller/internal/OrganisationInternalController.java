@@ -742,7 +742,7 @@ public class OrganisationInternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured({"prd-admin"})
-    public ResponseEntity<OrganisationsDetailResponse> updateOrganisationName(
+    public ResponseEntity<Object> updateOrganisationName(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
         @Valid @NotNull @RequestBody OrganisationNameUpdateRequest organisationNameUpdateRequest,
         @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
@@ -757,11 +757,10 @@ public class OrganisationInternalController extends SuperController {
             throw new InvalidRequest("Name is required");
         }
 
-        OrganisationsDetailResponse organisationsDetailResponse = organisationService
+        ResponseEntity<Object> organisationsDetailResponse = organisationService
             .updateOrganisationName(organisationNameUpdateRequest, orgId);
 
-        ResponseEntity<OrganisationsDetailResponse> resp = ResponseEntity.status(200).body(organisationsDetailResponse);
-        return resp;
+        return ResponseEntity.status(organisationsDetailResponse.getStatusCode()).build();
     }
 
 

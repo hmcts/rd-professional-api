@@ -584,15 +584,13 @@ class OrganisationInternalControllerTest {
         assertThat(organisationNameUpdateRequest.getName()).isNotEmpty();
 
         when(organisationServiceMock.updateOrganisationName(organisationNameUpdateRequest,
-            organisation.getOrganisationIdentifier())).thenReturn(new OrganisationsDetailResponse(List.of(organisation),
-            false,false,false));
+            organisation.getOrganisationIdentifier())).thenReturn(ResponseEntity.status(200).build());
 
-        ResponseEntity<OrganisationsDetailResponse> response = organisationInternalController
+        ResponseEntity<Object> response = organisationInternalController
             .updateOrganisationName(organisationNameUpdateRequest,organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
-
 
         verify(orgIdValidatorMock, times(1)).validateOrganisationExistsAndActive(
             organisation.getOrganisationIdentifier());

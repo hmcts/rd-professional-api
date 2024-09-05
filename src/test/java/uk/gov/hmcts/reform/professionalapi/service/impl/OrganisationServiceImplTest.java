@@ -1964,10 +1964,11 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
 
-        OrganisationsDetailResponse updatedOrganisation = sut.updateOrganisationName(
+        ResponseEntity<Object> responseEntity = sut.updateOrganisationName(
             organisationNameUpdateRequest,orgIdentifier);
 
-        assertThat(updatedOrganisation).isNotNull();
+        assertNotNull(responseEntity);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(organisationRepository, times(1))
             .findByOrganisationIdentifier(orgIdentifier);

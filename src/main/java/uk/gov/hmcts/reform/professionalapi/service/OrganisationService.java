@@ -47,7 +47,7 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
-    OrganisationsDetailResponse updateOrganisationName(
+    ResponseEntity<Object> updateOrganisationName(
         OrganisationNameUpdateRequest organisationNameUpdateRequest, String organisationIdentifier);
 
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,

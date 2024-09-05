@@ -1,17 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 
 class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -20,17 +16,16 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void update_name_of_an_active_organisation_with_prd_admin_role_should_return_200() {
         String orgIdentifier = getOrganisationId();
-
-        Map<String, Object> orgResponse = professionalReferenceDataClient
-                .updateOrgName(organisationRequestWithAllFields().name("updatedName").build(),
+        OrganisationNameUpdateRequest organisationNameUpdateRequest =
+            new OrganisationNameUpdateRequest("updatedName");
+        Map<String, Object> orgUpdatedNameResponse = professionalReferenceDataClient
+                .updateOrgName(organisationNameUpdateRequest,
                     hmctsAdmin,orgIdentifier);
-        LinkedHashMap responseBody = (LinkedHashMap)orgResponse.get("response_body");
-        List organisations = (List)responseBody.get("organisations");
-        LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
-        assertThat(orgResponse).isNotNull();
-        assertNotNull(organisation.get("name"));
-        assertThat(organisation.get("name").toString()).isEqualTo("updatedName");
-        assertThat(orgResponse.get("http_status")).isEqualTo(200);
+        assertThat(orgUpdatedNameResponse.get("http_status")).isEqualTo(200);
+        Map<String, Object> responseBody = professionalReferenceDataClient
+            .retrieveSingleOrganisation(orgIdentifier,hmctsAdmin);
+        assertNotNull(responseBody.get("name"));
+        assertThat(responseBody.get("name").toString()).isEqualTo("updatedName");
 
     }
 
@@ -48,7 +43,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
     void update_name_with_bad_request_OrgId_missing_should_return_400() {
    
         Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgName(organisationRequestWithAllFields().name("updatedName").build(),
+            .updateOrgName(new OrganisationNameUpdateRequest("some-Name"),
                 hmctsAdmin,null);
 
         assertThat(updateResponse).containsEntry("http_status", "400");
@@ -60,12 +55,8 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void update_name_with_invalid_name_should_return_400() {
 
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-            .name("")
-            .build();
-
         Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgName(organisationUpdateRequest, hmctsAdmin,getOrganisationId());
+                .updateOrgName(new OrganisationNameUpdateRequest(""), hmctsAdmin,getOrganisationId());
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString()).contains("Name is required");
@@ -74,15 +65,10 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void update_name_with_blank_name_should_return_400() {
-        String orgIdentifier = getOrganisationId();
-
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-            .name("   ")
-            .build();
 
         Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgName(organisationUpdateRequest,
-                hmctsAdmin,orgIdentifier);
+            .updateOrgName(new OrganisationNameUpdateRequest("    "),
+                hmctsAdmin,getOrganisationId());
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString()).contains("Name is required");

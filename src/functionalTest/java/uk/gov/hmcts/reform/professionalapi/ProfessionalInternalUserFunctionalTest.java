@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -800,13 +799,16 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             new OrganisationNameUpdateRequest(updatedName);
 
         //call endpoint to update name as 'updatedname'
-        Map<String, Object> orgUpdatedNameResponse =  professionalApiClient.updatesOrganisationName(
+        Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
             organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, OK);
-        List organisations = (List)orgUpdatedNameResponse.get("organisations");
-        LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
-        assertThat(orgUpdatedNameResponse).isNotNull();
-        assertNotNull(organisation.get("name"));
-        assertThat(organisation.get("name").toString()).isEqualTo(updatedName);
+        assertThat(orgUpdatedNameResponse.get("https-status")).isEqualTo(OK);
+
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            intActiveOrgId, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+        assertNotNull(orgResponse.get("name"));
+        assertThat(orgResponse.get("name").toString()).isEqualTo(updatedName);
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
@@ -826,9 +828,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationNameUpdateRequest organisationNameUpdateRequest =
             new OrganisationNameUpdateRequest("");
 
+        //call endpoint to update empty name
         Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
             organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, BAD_REQUEST);
-
+        assertThat(orgUpdatedNameResponse.get("statusCode")).isEqualTo(BAD_REQUEST);
         assertThat((String) orgUpdatedNameResponse.get("errorDescription")).isEqualTo("Name is required");
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");

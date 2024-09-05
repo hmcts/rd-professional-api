@@ -1062,7 +1062,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public OrganisationsDetailResponse updateOrganisationName(
+    public ResponseEntity<Object> updateOrganisationName(
         OrganisationNameUpdateRequest organisationNameUpdateRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
@@ -1071,11 +1071,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(ONE);
         } else if (isNotBlank(organisationNameUpdateRequest.getName())) {
             existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameUpdateRequest.getName()));
-            savedOrganisation = organisationRepository.save(existingOrganisation);
+            organisationRepository.save(existingOrganisation);
         }
 
-        return new OrganisationsDetailResponse(List.of(savedOrganisation),
-            false,false,false);
+        return ResponseEntity.status(200).build();
     }
 
 }

@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
@@ -1025,14 +1026,15 @@ public class ProfessionalReferenceDataClient {
 
 
     public Map<String, Object> updateOrgName(
-        OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
+        OrganisationNameUpdateRequest organisationNameUpdateRequest, String role, String organisationIdentifier) {
 
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier + "/name";
         try {
-            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
+            HttpEntity<OrganisationNameUpdateRequest> requestEntity = new HttpEntity<>(organisationNameUpdateRequest,
                 getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
