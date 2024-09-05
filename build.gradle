@@ -43,7 +43,7 @@ def versions = [
         launchDarklySdk : '5.10.9',
         junit           : '5.9.2',
         junitPlatform   : '1.10.3',
-        log4j           : '2.20.0',
+        log4j           : '2.23.1',
         reformS2sClient : '5.1.0',
         feign           : '3.8.0',
         bytebuddy       : '1.15.0',
@@ -385,8 +385,6 @@ dependencies {
     implementation group: 'org.glassfish', name: 'javax.el', version: '3.0.0'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
-    implementation group: 'com.github.f4b6a3', name: 'uuid-creator', version: '6.0.0'
-
     implementation (group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk) {
         exclude group: 'com.google.guava', module: 'guava'
     }
@@ -501,7 +499,7 @@ dependencies {
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.5.3'
 
 
-    contractTestImplementation (group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version)
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
@@ -607,7 +605,6 @@ dependencyUpdates.resolutionStrategy = {
 gradle.startParameter.continueOnFailure = true
 
 bootJar {
-    loaderImplementation = org.springframework.boot.loader.tools.LoaderImplementation.CLASSIC
     archiveFileName = jarName
     manifest {
         attributes('Implementation-Version': project.version.toString())
