@@ -20,23 +20,30 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     void update_sra_of_an_active_organisation_with_prd_admin_role_should_return_200() {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
-            .createOrganisation(organisationRequestWithAllFieldsAreUpdated().build());
-        String orgIdentifier = (String)responseForOrganisationCreation.get(ORG_IDENTIFIER);
 
+        String orgIdentifier = getOrganisationId();
+        String sraId = randomAlphabetic(7);
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .updateOrgSra(organisationRequestWithAllFields().sraId(randomAlphabetic(7)).build(),
+                .updateOrgSra(organisationRequestWithAllFields().sraId(sraId).build(),
                     hmctsAdmin,orgIdentifier);
         LinkedHashMap responseBody = (LinkedHashMap)orgResponse.get("response_body");
         List organisations = (List)responseBody.get("organisations");
         LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
         assertThat(orgResponse).isNotNull();
         assertNotNull(organisation.get("sraId"));
-        assertThat(organisation.get("sraId").toString()).contains("sraId");
+        assertThat(organisation.get("sraId").toString()).contains(sraId);
         assertThat(orgResponse.get("http_status")).isEqualTo(200);
 
-        List organisationAttributes = (List)organisation.get("organisationAttributes");
-        //assertThat(organisation.get("organisationAttributes").toString()).contains(updatedSra);
+        List organisationAttributes = (List)organisation.get("orgAttributes");
+        assertThat(organisationAttributes).isNotNull();
+
+        LinkedHashMap<String, Object> attr = (LinkedHashMap)organisationAttributes.get(0);
+        assertThat(attr).isNotNull();
+        assertThat(attr.get("key")).isEqualTo("regulators-0");
+        assertThat(attr.get("value").toString()).isEqualTo(
+            "{\"regulatorType\":\"Solicitor Regulation Authority " +
+            "(SRA)\",\"organisationRegistrationNumber\":\""+sraId+"\"}");
+
     }
 
     @Test

@@ -1321,7 +1321,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(organisationSraUpdateRequest)
-            .put("/refdata/internal/v1/organisations/" + organisationIdentifier + "/sra")
+            .put("/refdata/internal/v2/organisations/" + organisationIdentifier + "/sra")
             .andReturn();
 
         log.info("{}:: Update organisation SraId  response: {}",
