@@ -41,8 +41,8 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         assertThat(attr).isNotNull();
         assertThat(attr.get("key")).isEqualTo("regulators-0");
         assertThat(attr.get("value").toString()).isEqualTo(
-            "{\"regulatorType\":\"Solicitor Regulation Authority " +
-            "(SRA)\",\"organisationRegistrationNumber\":\""+sraId+"\"}");
+            "{\"regulatorType\":\"Solicitor Regulation Authority "
+                + "(SRA)\",\"organisationRegistrationNumber\":\"" + sraId + "\"}");
 
     }
 

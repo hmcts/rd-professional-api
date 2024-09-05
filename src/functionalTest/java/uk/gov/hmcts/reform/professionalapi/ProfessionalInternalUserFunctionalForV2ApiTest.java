@@ -552,8 +552,15 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertNotNull(organisation.get("sraId"));
         assertThat(organisation.get("sraId").toString()).isEqualTo(updatedSra);
 
-        List organisationAttributes = (List)organisation.get("organisationAttributes");
-        //assertThat(organisation.get("organisationAttributes").toString()).contains(updatedSra);
+        List organisationAttributes = (List)organisation.get("orgAttributes");
+        assertThat(organisationAttributes).isNotNull();
+
+        LinkedHashMap<String, Object> attr = (LinkedHashMap)organisationAttributes.get(0);
+        assertThat(attr).isNotNull();
+        assertThat(attr.get("key")).isEqualTo("regulators-0");
+        assertThat(attr.get("value").toString()).isEqualTo(
+            "{\"regulatorType\":\"Solicitor Regulation Authority "
+                + "(SRA)\",\"organisationRegistrationNumber\":\"" + updatedSra + "\"}");
         log.info("updateOrganisationSraIdShouldReturnSuccess :: END");
     }
 
