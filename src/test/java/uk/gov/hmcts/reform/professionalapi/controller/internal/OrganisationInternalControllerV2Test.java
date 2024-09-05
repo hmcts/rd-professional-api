@@ -71,8 +71,6 @@ class OrganisationInternalControllerV2Test {
 
     private ProfessionalUserService professionalUserServiceMock;
 
-    private OrganisationIdentifierValidatorImpl orgIdValidatorMock;
-
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
     private UserCreationRequest userCreationRequest;
@@ -130,7 +128,6 @@ class OrganisationInternalControllerV2Test {
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
                 "some@email.com", userRoles, false, userAccessTypes);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
-        orgIdValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         organisation.setOrganisationIdentifier("AK57L4T");
@@ -361,10 +358,11 @@ class OrganisationInternalControllerV2Test {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsAndActive(
+        verify(organisationIdentifierValidatorImpl, times(1)).validateOrganisationExistsAndActive(
             organisation.getOrganisationIdentifier());
         verify(organisationServiceMock, times(1))
             .updateOrganisationSra(organisationSraUpdateRequest, organisation.getOrganisationIdentifier());
+
     }
 
 
