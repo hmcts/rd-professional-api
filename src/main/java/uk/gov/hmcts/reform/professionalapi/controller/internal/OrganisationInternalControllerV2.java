@@ -290,7 +290,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured({"prd-admin"})
-    public ResponseEntity<OrganisationsDetailResponseV2> updateOrganisationSra(
+    public ResponseEntity<Object> updateOrganisationSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationsraUpdateRequest")
         @Valid @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest,
         @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
@@ -302,12 +302,10 @@ public class OrganisationInternalControllerV2 extends SuperController {
             throw new InvalidRequest("SRA Id is required");
         }
 
-        OrganisationsDetailResponseV2 organisationsDetailResponse = organisationService
+        ResponseEntity<Object> organisationsDetailResponse = organisationService
             .updateOrganisationSra(organisationSraUpdateRequest, orgId);
 
-        ResponseEntity<OrganisationsDetailResponseV2> resp = ResponseEntity.status(200).body(
-            organisationsDetailResponse);
-        return resp;
+        return ResponseEntity.status(organisationsDetailResponse.getStatusCode()).build();
     }
 
 }

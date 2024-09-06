@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
@@ -1025,12 +1026,13 @@ public class ProfessionalReferenceDataClient {
 
 
     public Map<String, Object> updateOrgSra(
-        OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
+        OrganisationSraUpdateRequest organisationSraUpdateRequest, String role, String organisationIdentifier) {
 
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH + "/" + organisationIdentifier + "/sra";
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH
+            + "/" + organisationIdentifier + "/sra";
         try {
-            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
+            HttpEntity<OrganisationSraUpdateRequest> requestEntity = new HttpEntity<>(organisationSraUpdateRequest,
                 getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {

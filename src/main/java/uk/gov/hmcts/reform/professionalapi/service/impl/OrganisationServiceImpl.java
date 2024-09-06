@@ -1083,7 +1083,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public OrganisationsDetailResponseV2 updateOrganisationSra(
+    public ResponseEntity<Object> updateOrganisationSra(
         OrganisationSraUpdateRequest organisationSraUpdateRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
@@ -1093,24 +1093,16 @@ public class OrganisationServiceImpl implements OrganisationService {
         } else {
             if (isNotBlank(organisationSraUpdateRequest.getSraId())) {
                 OrgAttribute savedAttribute = saveOrganisationAttributes(
-                    existingOrganisation,organisationSraUpdateRequest);
+                    existingOrganisation, organisationSraUpdateRequest);
                 if (savedAttribute == null) {
                     log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
                     throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
                 }
             }
-            savedOrganisation = organisationRepository.save(existingOrganisation);
+            organisationRepository.save(existingOrganisation);
         }
-        List<Organisation> organisationList = new ArrayList<>();
-        organisationList.add(savedOrganisation);
-        OrganisationsDetailResponseV2 organisationsDetailResponse = new OrganisationsDetailResponseV2(
-            organisationList, true, false, false,
-            true);
-
-        return organisationsDetailResponse;
-
+        return ResponseEntity.status(200).build();
     }
-
 
 }
 

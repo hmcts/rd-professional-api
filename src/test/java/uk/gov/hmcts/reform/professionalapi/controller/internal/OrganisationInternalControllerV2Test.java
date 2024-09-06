@@ -348,18 +348,16 @@ class OrganisationInternalControllerV2Test {
         assertThat(organisationSraUpdateRequest.getSraId()).isNotEmpty();
 
         when(organisationServiceMock.updateOrganisationSra(organisationSraUpdateRequest,
-            organisation.getOrganisationIdentifier())).thenReturn(new OrganisationsDetailResponseV2(
-                List.of(organisation),true, false, false,
-            true));
+            organisation.getOrganisationIdentifier())).thenReturn(ResponseEntity.status(200).build());
 
-        ResponseEntity<OrganisationsDetailResponseV2> response = organisationInternalController
+        ResponseEntity<Object> response = organisationInternalController
             .updateOrganisationSra(organisationSraUpdateRequest,organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationIdentifierValidatorImpl, times(1)).validateOrganisationExistsAndActive(
-            organisation.getOrganisationIdentifier());
+        verify(organisationIdentifierValidatorImpl, times(1))
+            .validateOrganisationExistsAndActive(organisation.getOrganisationIdentifier());
         verify(organisationServiceMock, times(1))
             .updateOrganisationSra(organisationSraUpdateRequest, organisation.getOrganisationIdentifier());
 

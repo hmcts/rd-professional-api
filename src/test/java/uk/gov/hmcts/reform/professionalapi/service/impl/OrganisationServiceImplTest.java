@@ -1965,16 +1965,19 @@ class OrganisationServiceImplTest {
 
         when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
 
-        OrganisationsDetailResponseV2 updatedOrganisation = sut.updateOrganisationSra(
+        ResponseEntity<Object> updatedOrganisation = sut.updateOrganisationSra(
             organisationSraUpdateRequest,orgIdentifier);
 
         assertThat(updatedOrganisation).isNotNull();
 
         verify(organisationRepository, times(1))
             .findByOrganisationIdentifier(orgIdentifier);
+
+        verify(orgAttributeRepository, times(1))
+            .save(any(OrgAttribute.class));
+
         verify(organisationRepository, times(1))
             .save(organisationMock);
-
     }
 
 

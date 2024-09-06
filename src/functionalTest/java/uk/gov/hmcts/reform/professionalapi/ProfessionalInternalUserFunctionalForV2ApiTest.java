@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
@@ -38,6 +39,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
@@ -539,20 +541,24 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     void updateOrganisationSraIdShouldReturnSuccess() {
         log.info("updateOrganisationSraIdShouldReturnSuccess :: STARTED");
         String updatedSra = randomAlphabetic(7);
-        //create request to update organisation
+        String organisationIdentifier = getActiveOrganisationId();
+        //create request to update sraid
         OrganisationSraUpdateRequest organisationSraUpdateRequest =
             new OrganisationSraUpdateRequest(updatedSra);
 
-        //call endpoint to update name as 'updatedname'
-        Map<String, Object> orgUpdatedSraResponse =  professionalApiClient.updatesOrganisationSra(
-            organisationSraUpdateRequest,intActiveOrgId, OK);
-        List organisations = (List)orgUpdatedSraResponse.get("organisations");
-        LinkedHashMap organisation = (LinkedHashMap)organisations.get(0);
-        assertThat(orgUpdatedSraResponse).isNotNull();
-        assertNotNull(organisation.get("sraId"));
-        assertThat(organisation.get("sraId").toString()).isEqualTo(updatedSra);
+        //call endpoint to update name as 'updatedsraid'
+        Response orgUpdatedSraResponse =  professionalApiClient.updatesOrganisationSra(
+            organisationSraUpdateRequest,organisationIdentifier, OK);
+        assertNotNull(orgUpdatedSraResponse);
+        assertThat(orgUpdatedSraResponse.statusCode()).isEqualTo(200);
 
-        List organisationAttributes = (List)organisation.get("orgAttributes");
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+        assertNotNull(orgResponse.get("sraId"));
+        assertThat(orgResponse.get("sraId").toString()).isEqualTo(updatedSra);
+
+        List organisationAttributes = (List)orgResponse.get("orgAttributes");
         assertThat(organisationAttributes).isNotNull();
 
         LinkedHashMap<String, Object> attr = (LinkedHashMap)organisationAttributes.get(0);
@@ -565,18 +571,31 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
     @Test
-    void updateOrganisationNameShouldReturnFailureIfNoName() {
-        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
-
+    void updateOrganisationSraIdShouldReturnFailureIfNoSraId() {
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: STARTED");
+        String organisationIdentifier = getActiveOrganisationId();
         OrganisationSraUpdateRequest organisationSraUpdateRequest =
             new OrganisationSraUpdateRequest("");
 
-        Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationSra(
-            organisationSraUpdateRequest,intActiveOrgId, BAD_REQUEST);
+        Response orgUpdatedSraIdResponse = professionalApiClient.updatesOrganisationSra(
+            organisationSraUpdateRequest,organisationIdentifier, BAD_REQUEST);
 
-        assertThat((String) orgUpdatedNameResponse.get("errorDescription")).isEqualTo("SraId is required");
+        assertNotNull(orgUpdatedSraIdResponse);
+        assertThat(orgUpdatedSraIdResponse.statusCode()).isEqualTo(400);
 
-        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: END");
+    }
+
+    private String getActiveOrganisationId() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier,OK);
+
+        return organisationIdentifier;
     }
 
 
