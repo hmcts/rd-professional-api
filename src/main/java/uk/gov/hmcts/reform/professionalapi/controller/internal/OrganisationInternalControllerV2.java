@@ -293,7 +293,9 @@ public class OrganisationInternalControllerV2 extends SuperController {
     public ResponseEntity<Object> updateOrganisationSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationsraUpdateRequest")
         @Valid @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest,
-        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
+        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+            message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         var orgId = removeEmptySpaces(organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(orgId);

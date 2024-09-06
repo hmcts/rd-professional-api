@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class OrganisationSraUpdateRequest {
 
     @Valid
-    @NotNull(message = "SraId is required.")
+    @NotNull(message = "SRA Id is required.")
     private  String sraId;
 
     @JsonCreator

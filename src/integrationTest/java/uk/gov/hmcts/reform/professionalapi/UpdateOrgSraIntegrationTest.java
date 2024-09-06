@@ -62,7 +62,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgSra(new OrganisationSraUpdateRequest("some-SraId"),  hmctsAdmin,null);
 
-        assertThat(updateResponse).containsEntry("http_status", "404");
+        assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
             .contains("The given organisationIdentifier must be 7 Alphanumeric Characters");
 
