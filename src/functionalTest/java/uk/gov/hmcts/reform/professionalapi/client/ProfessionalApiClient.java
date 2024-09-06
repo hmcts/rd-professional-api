@@ -1316,7 +1316,7 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
-    public Map<String, Object> updatesOrganisationName(OrganisationNameUpdateRequest organisationNameUpdateRequest,
+    public Response updatesOrganisationName(OrganisationNameUpdateRequest organisationNameUpdateRequest,
                                                        String role,String organisationIdentifier,
                                                        HttpStatus expectedStatus) {
 
@@ -1328,11 +1328,7 @@ public class ProfessionalApiClient {
         log.info("{}:: Update organisation Name  response: {}",
             loggingComponentName, response.getStatusCode());
 
-        response.then()
-            .assertThat()
-            .statusCode(expectedStatus.value());
-
-        return response.body().as(Map.class);
+        return response;
     }
 
     public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {

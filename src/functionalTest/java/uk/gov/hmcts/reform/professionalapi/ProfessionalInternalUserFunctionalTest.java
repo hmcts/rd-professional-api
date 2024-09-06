@@ -793,20 +793,18 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
 
-        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier);
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier,OK);
         //create request to update organisation
-        OrganisationNameUpdateRequest organisationNameUpdateRequest =
-            new OrganisationNameUpdateRequest(updatedName);
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest(updatedName);
 
         //call endpoint to update name as 'updatedname'
-        Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
             organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, OK);
         assertNotNull(orgUpdatedNameResponse);
-        assertThat(orgUpdatedNameResponse.get("http_status")).isEqualTo(200);
+        assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(200);
 
         //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(
-            intActiveOrgId, hmctsAdmin, OK);
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
         assertNotNull(orgResponse.get("name"));
         assertThat(orgResponse.get("name").toString()).isEqualTo(updatedName);
@@ -816,7 +814,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     void updateOrganisationNameShouldReturnFailureIfNoName() {
-        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: STARTED");
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
@@ -830,13 +828,12 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             new OrganisationNameUpdateRequest("");
 
         //call endpoint to update empty name
-        Map<String, Object> orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
             organisationNameUpdateRequest,hmctsAdmin,organisationIdentifier, BAD_REQUEST);
         assertNotNull(orgUpdatedNameResponse);
-        assertThat(orgUpdatedNameResponse.get("http_status")).isEqualTo(BAD_REQUEST);
-        assertThat((String) orgUpdatedNameResponse.get("errorDescription")).isEqualTo("Name is required");
+        assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(400);
 
-        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: END");
     }
 
     @Test

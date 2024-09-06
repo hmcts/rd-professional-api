@@ -749,7 +749,6 @@ public class OrganisationInternalController extends SuperController {
             message = ORG_ID_VALIDATION_ERROR_MESSAGE)
         @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
-
         var orgId = removeEmptySpaces(organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(orgId);
 
