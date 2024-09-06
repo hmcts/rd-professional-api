@@ -553,7 +553,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedSraResponse.statusCode()).isEqualTo(200);
 
         //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(organisationIdentifier, hmctsAdmin, OK);
+        var orgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(organisationIdentifier, hmctsAdmin,
+            OK);
         assertThat(orgResponse).isNotNull();
         assertNotNull(orgResponse.get("sraId"));
         assertThat(orgResponse.get("sraId").toString()).isEqualTo(updatedSra);
