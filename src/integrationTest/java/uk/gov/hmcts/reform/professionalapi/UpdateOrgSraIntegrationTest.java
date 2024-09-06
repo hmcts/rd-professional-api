@@ -30,7 +30,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("http_status")).isEqualTo(200);
 
         Map<String, Object> responseBody = professionalReferenceDataClient
-            .retrieveSingleOrganisation(orgIdentifier,hmctsAdmin);
+            .retrieveSingleOrganisationForV2Api(orgIdentifier,hmctsAdmin);
         assertThat(responseBody).isNotNull();
         assertNotNull(responseBody.get("sraId"));
         assertThat(responseBody.get("sraId").toString()).isEqualTo(sraId);
