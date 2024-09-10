@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 public class OrganisationNameUpdateRequest {
 
     @Valid
-    @NotNull(message = "Name is required.")
+    @NotNull(message = "NewEndpoint Name is required")
     private String name;
 
     @JsonCreator

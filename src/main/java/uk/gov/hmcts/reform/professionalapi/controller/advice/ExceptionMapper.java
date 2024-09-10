@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -46,6 +49,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorCons
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.METHOD_ARG_NOT_VALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_LENGTH;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MFA_VALUE;
 
 @Slf4j
@@ -197,6 +201,12 @@ public class ExceptionMapper {
 
         if (mfaEnumException(ex)) {
             errorDescription = INVALID_MFA_VALUE;
+        } else if (StringUtils.isNotEmpty(ex.getMessage()) && ex.getMessage().contains("NewEndpoint")) {
+            // all new endpoints will have 'NewEndpoint' in the validation message for distinction
+            // when the request body is empty only the violation exception will be shown not the entire stack trace
+            ObjectError error = ((BeanPropertyBindingResult)((MethodArgumentNotValidException) ex)
+                .getBindingResult()).getAllErrors().get(0);
+            errorDescription = error.getDefaultMessage().substring(ERROR_LENGTH);
         }
 
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, errorDescription,
