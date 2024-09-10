@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,17 +13,21 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 
 import javax.validation.ConstraintViolationException;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -33,6 +38,15 @@ class ExceptionMapperTest {
 
     @InjectMocks
     private ExceptionMapper exceptionMapper;
+
+    @BeforeAll
+    public static void setUp() {
+        final MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI(randomAlphabetic(5));
+        final ServletRequestAttributes servletRequestAttributes =
+                new ServletRequestAttributes(request);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+    }
 
     @Test
     void test_handle_empty_result_exception() {

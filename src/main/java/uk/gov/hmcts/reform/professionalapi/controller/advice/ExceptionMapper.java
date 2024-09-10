@@ -32,13 +32,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -122,7 +122,7 @@ public class ExceptionMapper {
     private boolean isNewEndpointPoint() {
         ServletRequestAttributes requestAttributes =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (Objects.nonNull(requestAttributes)) {
+        if (nonNull(requestAttributes)) {
             HttpServletRequest request = requestAttributes.getRequest();
             String requestUri = request.getRequestURI();
 
