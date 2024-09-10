@@ -65,8 +65,10 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
                 arguments(named("Should return 400 when request body is missing", requestBodyIsNull)),
                 arguments(named("Should return 400 when org id is missing", orgIdIsNull)),
                 arguments(named("Should return 404 when org is not found", nonExistOrgId)),
-                arguments(named("Should return 400 when org name is empty", invalidEmptyOrgName)),
-                arguments(named("Should return 400 when org name is null", nullOrgName)));
+                arguments(named("Should return 400 when org name is empty",
+                        invalidEmptyOrgName)),
+                arguments(named("Should return 400 when org name is null", nullOrgName))
+        );
     }
 
     @Test
