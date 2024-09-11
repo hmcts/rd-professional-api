@@ -1057,18 +1057,18 @@ public class OrganisationServiceImpl implements OrganisationService {
         return !pageableOrganisations.isLast();
     }
 
+    @Transactional
     public void updateContacts(Boolean contactInformationUpdate, Boolean dxAddressUpdate,
                                 ContactInformationCreationRequest contactInformationRequest,
                                 List<ContactInformation> existingContactInformationList,
                                 Organisation organisation) {
-        ContactInformation savedContactInformation = null;
         // if only dxaddress needs updating
         if (dxAddressUpdate) {
             updateDxAddress(contactInformationRequest,dxAddressUpdate,existingContactInformationList.get(0));
         }
         //If single address is present and contact info needs updating then update details
         if (contactInformationUpdate) {
-            savedContactInformation = updateContactInformation(existingContactInformationList.get(0),
+            updateContactInformation(existingContactInformationList.get(0),
                 contactInformationRequest,
                 organisation);
         }
@@ -1080,7 +1080,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
-    private ContactInformation updateContactInformation(ContactInformation existingContactInformation,
+    private void updateContactInformation(ContactInformation existingContactInformation,
                                                         ContactInformationCreationRequest contactInfoRequest,
                                                         Organisation organisation
     ) {
@@ -1110,8 +1110,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
         existingContactInformation.setOrganisation(organisation);
         existingContactInformation.setLastUpdated(LocalDateTime.now());
-        ContactInformation savedContactInformation = contactInformationRepository.save(existingContactInformation);
-        return savedContactInformation;
+        contactInformationRepository.save(existingContactInformation);
     }
 
     private void updateDxAddress(ContactInformationCreationRequest contactInfoRequest,
@@ -1125,6 +1124,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Object> updateContactInformationForOrganisation(
         ContactInformationCreationRequest contactInformationRequest, String organisationIdentifier,
         Boolean dxAddressUpdate, Boolean contactInformationUpdate, String addressid) {
