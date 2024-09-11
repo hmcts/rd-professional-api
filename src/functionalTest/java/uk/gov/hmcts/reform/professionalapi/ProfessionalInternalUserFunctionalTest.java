@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUp
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
@@ -59,8 +60,6 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
@@ -79,357 +78,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     List<String> invitedUserIds = new ArrayList<>();
     String lastRecordIdInPage;
     OrganisationCreationRequest organisationCreationRequest;
-
-    private static void verifyOrganisationDetails(JsonPath response) {
-
-        String companyUrl = response.get("companyUrl");
-        assertThat(companyUrl)
-                .isNotNull()
-                .endsWith("-prd-func-test-company-url");
-
-        String organisationIdentifier = response.get("organisationIdentifier");
-        assertThat(organisationIdentifier)
-                .isNotNull();
-
-        Map<String, String> superUser = response.get("superUser");
-        assertThat(superUser)
-                .isNotNull();
-
-        String firstName = superUser.get("firstName");
-        assertThat(firstName)
-                .isNotNull()
-                .isEqualTo("firstName");
-
-        String lastName = superUser.get("lastName");
-        assertThat(lastName)
-                .isNotNull()
-                .endsWith("lastName");
-
-        String email = superUser.get("email");
-        assertThat(email)
-                .isNotNull()
-                .endsWith("@prdfunctestuser.com");
-
-        String sraId = response.get("sraId");
-        assertThat(sraId)
-                .isNotNull()
-                .endsWith("-prd-func-test-sra-id");
-
-        String companyNumber = response.get("companyNumber");
-        assertThat(companyNumber)
-                .isNotNull()
-                .endsWith("com");
-
-        String dateReceived = response.get("dateReceived");
-        assertThat(dateReceived)
-                .isNotNull();
-
-        String dateApproved = response.get("dateApproved");
-        assertThat(dateApproved)
-                .isNotNull();
-
-        String name = response.get("name");
-        assertThat(name)
-                .isNotNull()
-                .endsWith("-prd-func-test-name");
-
-        Boolean sraRegulated = response.get("sraRegulated");
-        assertThat(sraRegulated)
-                .isNotNull()
-                .isEqualTo(false);
-
-        String status = response.get("status");
-        assertThat(status)
-                .isNotNull()
-                .isEqualTo("ACTIVE");
-
-        List<String> pendingPaymentAccount = response.getList("pendingPaymentAccount");
-        assertThat(pendingPaymentAccount)
-                .isNotNull()
-                .isEmpty();
-
-        verifyContactInformationDetails(response);
-    }
-
-    private static void verifyOrganisationDetailsBySinceDate(Map<String, Object> response,
-                                                             String pageSize, String sinceDate) {
-
-        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
-
-        assertThat(organisations)
-                .isNotNull()
-                .isNotEmpty();
-
-        if (pageSize != null) {
-            assertThat(organisations)
-                    .hasSize(Integer.parseInt(pageSize));
-        }
-        assertThat(response.get("moreAvailable"))
-                .isNotNull();
-
-        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
-
-        organisations.forEach(org -> {
-
-            assertThat(org.get("organisationIdentifier"))
-                    .isNotNull();
-
-            assertThat(org.get("lastUpdated"))
-                    .isNotNull();
-
-            String dateString = (String) org.get("lastUpdated");
-            String formattedDateString = DateUtils.formatDateString(dateString);
-            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
-            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
-
-            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
-
-            if (organisationProfileIds != null) {
-
-                assertThat(organisationProfileIds)
-                        .isNotEmpty()
-                        .hasSizeGreaterThan(0);
-
-                assertThat(organisationProfileIds.get(0))
-                        .isEqualTo("SOLICITOR_PROFILE");
-            }
-        });
-    }
-
-    private static void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response,
-                                                               String pageSize, String sinceDate) {
-
-        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
-
-        assertThat(organisations)
-                .isNotNull()
-                .isNotEmpty();
-
-        if (pageSize != null) {
-            assertThat(organisations)
-                    .hasSize(Integer.parseInt(pageSize));
-        }
-        assertThat(response.get("moreAvailable"))
-                .isNotNull();
-
-        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
-
-        organisations.forEach(org -> {
-
-            assertThat(org.get("organisationIdentifier"))
-                    .isNotNull();
-
-            assertThat(org.get("lastUpdated"))
-                    .isNotNull();
-
-            String dateString = (String) org.get("lastUpdated");
-            String formattedDateString = DateUtils.formatDateString(dateString);
-            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
-            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
-
-            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
-            assertThat(organisationProfileIds)
-                    .isNotEmpty()
-                    .hasSizeGreaterThan(0);
-
-            assertThat(organisationProfileIds.get(0))
-                    .isEqualTo("SOLICITOR_PROFILE");
-        });
-    }
-
-    private static void verifyContactInformationDetails(JsonPath response) {
-
-        List<Map<String, Object>> contactInformation = response.getList("contactInformation");
-        assertThat(contactInformation)
-                .isNotNull()
-                .hasSize(2);
-
-        contactInformation = sortByValue(contactInformation, "addressLine1");
-
-        final Map<String, Object> contactInformation1 = contactInformation.get(0);
-        final Map<String, Object> contactInformation2 = contactInformation.get(1);
-
-        String firstAddressUprn = (String) contactInformation1.get("uprn");
-        assertThat(firstAddressUprn)
-                .isNotNull()
-                .isEqualTo("uprn");
-
-        String firstAddressCountry = (String) contactInformation1.get("country");
-        assertThat(firstAddressCountry)
-                .isNotNull()
-                .isEqualTo("some-country");
-
-        String firstAddressCreated = (String) contactInformation1.get("created");
-        assertThat(firstAddressCreated)
-                .isNotNull();
-
-        String firstAddressTownCity = (String) contactInformation1.get("townCity");
-        assertThat(firstAddressTownCity)
-                .isNotNull()
-                .isEqualTo("some-town-city");
-
-        String firstAddressCounty = (String) contactInformation1.get("county");
-        assertThat(firstAddressCounty)
-                .isNotNull()
-                .isEqualTo("some-county");
-
-        String firstAddressAddressLine1 = (String) contactInformation1.get("addressLine1");
-        assertThat(firstAddressAddressLine1)
-                .isNotNull()
-                .isEqualTo("addLine1");
-
-        assertThat(firstAddressCountry)
-                .isNotNull()
-                .isEqualTo("some-country");
-
-        String firstAddressAddressLine2 = (String) contactInformation1.get("addressLine2");
-        assertThat(firstAddressAddressLine2)
-                .isNotNull()
-                .isEqualTo("addLine2");
-
-        String firstAddressPostCode1 = (String) contactInformation1.get("postCode");
-        assertThat(firstAddressPostCode1)
-                .isNotNull()
-                .isEqualTo("some-post-code");
-
-        String firstAddressAddressLine3 = (String) contactInformation1.get("addressLine3");
-        assertThat(firstAddressAddressLine3)
-                .isNotNull()
-                .isEqualTo("addLine3");
-
-        String firstAddressAddressId = (String) contactInformation1.get("addressId");
-        assertThat(firstAddressAddressId)
-                .isNotNull();
-
-        List<Map<String, Object>> firstAddressDxAddress =
-                (List<Map<String, Object>>) contactInformation1.get("dxAddress");
-        assertThat(firstAddressDxAddress)
-                .isNotNull()
-                .hasSize(2);
-
-        firstAddressDxAddress = sortByValue(firstAddressDxAddress, "dxNumber");
-
-        final Map<String, Object> firstAddressDxAddress1 = firstAddressDxAddress.get(0);
-        final Map<String, Object> firstAddressDxAddress2 = firstAddressDxAddress.get(1);
-
-        Object firstAddressDxNumber1 = firstAddressDxAddress1.get("dxNumber");
-        assertThat(firstAddressDxNumber1)
-                .isNotNull()
-                .isEqualTo("DX 123452222");
-
-        Object firstAddressDxExchange1 = firstAddressDxAddress1.get("dxExchange");
-        assertThat(firstAddressDxExchange1)
-                .isNotNull()
-                .isEqualTo("dxExchange");
-
-        Object firstAddressDxNumber2 = firstAddressDxAddress2.get("dxNumber");
-        assertThat(firstAddressDxNumber2)
-                .isNotNull()
-                .isEqualTo("DX 123456333");
-
-        Object firstAddressDxExchange2 = firstAddressDxAddress2.get("dxExchange");
-        assertThat(firstAddressDxExchange2)
-                .isNotNull()
-                .isEqualTo("dxExchange");
-
-        String secondAddressUprn = (String) contactInformation2.get("uprn");
-        assertThat(secondAddressUprn)
-                .isNotNull()
-                .isEqualTo("uprn1");
-
-        String secondAddressCountry = (String) contactInformation2.get("country");
-        assertThat(secondAddressCountry)
-                .isNotNull()
-                .isEqualTo("some-country");
-
-        String secondAddressCreated = (String) contactInformation2.get("created");
-        assertThat(secondAddressCreated)
-                .isNotNull();
-
-        String secondAddressTownCity = (String) contactInformation2.get("townCity");
-        assertThat(secondAddressTownCity)
-                .isNotNull()
-                .isEqualTo("some-town-city");
-
-        String secondAddressCounty = (String) contactInformation2.get("county");
-        assertThat(secondAddressCounty)
-                .isNotNull()
-                .isEqualTo("some-county");
-
-        String secondAddressAddressLine1 = (String) contactInformation2.get("addressLine1");
-        assertThat(secondAddressAddressLine1)
-                .isNotNull()
-                .isEqualTo("addressLine1");
-
-        String secondAddressAddressLine2 = (String) contactInformation2.get("addressLine2");
-        assertThat(secondAddressAddressLine2)
-                .isNotNull()
-                .isEqualTo("addressLine2");
-
-        String secondAddressPostCode = (String) contactInformation2.get("postCode");
-        assertThat(secondAddressPostCode)
-                .isNotNull()
-                .isEqualTo("some-post-code");
-
-        String secondAddressAddressLine3 = (String) contactInformation2.get("addressLine3");
-        assertThat(secondAddressAddressLine3)
-                .isNotNull()
-                .isEqualTo("addressLine3");
-
-        String secondAddressAddressId = (String) contactInformation2.get("addressId");
-        assertThat(secondAddressAddressId)
-                .isNotNull();
-
-        List<Map<String, Object>> secondAddressDxAddress =
-                (List<Map<String, Object>>) contactInformation2.get("dxAddress");
-        assertThat(secondAddressDxAddress)
-                .isNotNull()
-                .hasSize(3);
-
-        secondAddressDxAddress = sortByValue(secondAddressDxAddress, "dxNumber");
-
-        final Map<String, Object> secondAddressDxAddress1 = secondAddressDxAddress.get(0);
-        final Map<String, Object> secondAddressDxAddress2 = secondAddressDxAddress.get(1);
-        final Map<String, Object> secondAddressDxAddress3 = secondAddressDxAddress.get(2);
-
-        Object secondAddressDxNumber1 = secondAddressDxAddress1.get("dxNumber");
-        assertThat(secondAddressDxNumber1)
-                .isNotNull()
-                .isEqualTo("DX 123456777");
-
-        Object secondAddressDxExchange1 = secondAddressDxAddress1.get("dxExchange");
-        assertThat(secondAddressDxExchange1)
-                .isNotNull()
-                .isEqualTo("dxExchange");
-
-        Object secondAddressDxNumber2 = secondAddressDxAddress2.get("dxNumber");
-        assertThat(secondAddressDxNumber2)
-                .isNotNull()
-                .isEqualTo("DX 123456788");
-
-        Object secondAddressDxExchange2 = secondAddressDxAddress2.get("dxExchange");
-        assertThat(secondAddressDxExchange2)
-                .isNotNull()
-                .isEqualTo("dxExchange");
-
-        Object secondAddressDxNumber3 = secondAddressDxAddress3.get("dxNumber");
-        assertThat(secondAddressDxNumber3)
-                .isNotNull()
-                .isEqualTo("DX 1234567890");
-
-        Object secondAddressDxExchange3 = secondAddressDxAddress3.get("dxExchange");
-        assertThat(secondAddressDxExchange3)
-                .isNotNull()
-                .isEqualTo("dxExchange");
-    }
-
-    private static List<Map<String, Object>> sortByValue(final List<Map<String, Object>> maps,
-                                                         final String key) {
-        return maps
-                .stream()
-                .sorted(Comparator.comparing(map -> (String) map.get(key)))
-                .collect(Collectors.toList());
-    }
 
     @Test
     @DisplayName("PRD Internal Test Scenarios")
@@ -498,7 +146,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         superUserEmail = generateRandomEmail();
         invitedUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest()
+                .superUser(UserCreationRequest.aUserCreationRequest()
                         .firstName("firstName")
                         .lastName("lastName")
                         .email(superUserEmail)
@@ -568,7 +216,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
         Response response =
-                professionalApiClient.createOrganisationWithoutS2SToken(anOrganisationCreationRequest().build());
+                professionalApiClient
+                        .createOrganisationWithoutS2SToken(OrganisationCreationRequest
+                                .anOrganisationCreationRequest().build());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
@@ -977,7 +627,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("updateOrgMFAShouldReturn403 :: END");
     }
 
-    public void updateOrgStatusScenarios() {
+    public void  updateOrgStatusScenarios() {
         updateOrgStatusShouldBeSuccess();
     }
 
@@ -1081,58 +731,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         log.info("updatePaymentAccountsShouldReturnSuccess :: END");
     }
-
-    //Will add below code as soon as RDCC-7024 will be pushed in Dev branch
-    /*@Test
-    @DisplayName("PRD OrganisationDetail for bulk Customer when Org is ACTIVE")
-    void findOrganisationsForBulkCustomerShouldReturnSuccess() {
-        log.info("findOrganisationsForBulkCustomerShouldReturnSuccess :: STARTED");
-        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfk";
-        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf4";
-        Map<String, Object> organisations = professionalApiClient
-                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, civilAdmin,sidamId, OK);
-
-        assertThat(organisations).isNotNull().hasSize(3);
-        assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a855");
-        assertThat(organisations.get("organisationName")).toString().contains("ORGTESTUSER-PBA-ACCEPTED");
-        assertThat(organisations.get("paymentAccount")).toString().contains("pba-3234569");
-
-
-        log.info("findOrganisationsForBulkCustomerShouldReturnSuccess :: END");
-    }
-
-    @Test
-    @DisplayName("PRD OrganisationDetail for bulk Customer when PBA statis is not ACCEPTED")
-    void findOrganisationsForBulkCustomerForPbaStatusIsNotAccepted() {
-        log.info("findOrganisationsForBulkCustomerForPBAStatusIsNotAccepted :: STARTED");
-        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfj";
-        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf6";
-        Map<String, Object> organisations = professionalApiClient
-                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, civilAdmin, sidamId, OK);
-
-        assertThat(organisations).isNotNull().hasSize(3);
-        assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a857");
-        assertThat(organisations.get("organisationName")).toString().contains("ORGTESTUSER-PBA-ACCEPTED");
-        assertThat(organisations.get("paymentAccount")).toString().contains("");
-
-
-        log.info("findOrganisationsForBulkCustomerForPBAStatusIsNotAccepted :: END");
-    }
-
-    @Test
-    @DisplayName("PRD OrganisationDetail for bulk Customer when Org is PENDING")
-    void findOrganisationsForBulkCustomerForPendingOrg() {
-        log.info("findOrganisationsForBulkCustomerForPendingOrg :: STARTED");
-        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfl";
-        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf5";
-        Map<String, Object> organisations = professionalApiClient
-                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId,civilAdmin, sidamId, NOT_FOUND);
-
-        assertThat(organisations.get("status")).toString().contains("No Organisations found");
-
-
-        log.info("findOrganisationsForBulkCustomerForPendingOrg :: END");
-    }*/
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
@@ -1262,12 +860,64 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisation();
         Map<String, Object> organisations = professionalApiClient
-                .retrieveAllOrganisationsWithPagination(hmctsAdmin, "1", "2");
+            .retrieveAllOrganisationsWithPagination(hmctsAdmin, "1", "2");
 
         assertThat(organisations).isNotNull().hasSize(2);
 
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
     }
+
+    //Will add below code as soon as RDCC-7024 will be pushed in Dev branch
+    /*@Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when Org is ACTIVE")
+    void findOrganisationsForBulkCustomerShouldReturnSuccess() {
+        log.info("findOrganisationsForBulkCustomerShouldReturnSuccess :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfk";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf4";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, civilAdmin,sidamId, OK);
+
+        assertThat(organisations).isNotNull().hasSize(3);
+        assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a855");
+        assertThat(organisations.get("organisationName")).toString().contains("ORGTESTUSER-PBA-ACCEPTED");
+        assertThat(organisations.get("paymentAccount")).toString().contains("pba-3234569");
+
+
+        log.info("findOrganisationsForBulkCustomerShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when PBA statis is not ACCEPTED")
+    void findOrganisationsForBulkCustomerForPbaStatusIsNotAccepted() {
+        log.info("findOrganisationsForBulkCustomerForPBAStatusIsNotAccepted :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfj";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf6";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, civilAdmin, sidamId, OK);
+
+        assertThat(organisations).isNotNull().hasSize(3);
+        assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a857");
+        assertThat(organisations.get("organisationName")).toString().contains("ORGTESTUSER-PBA-ACCEPTED");
+        assertThat(organisations.get("paymentAccount")).toString().contains("");
+
+
+        log.info("findOrganisationsForBulkCustomerForPBAStatusIsNotAccepted :: END");
+    }
+
+    @Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when Org is PENDING")
+    void findOrganisationsForBulkCustomerForPendingOrg() {
+        log.info("findOrganisationsForBulkCustomerForPendingOrg :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfl";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf5";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId,civilAdmin, sidamId, NOT_FOUND);
+
+        assertThat(organisations.get("status")).toString().contains("No Organisations found");
+
+
+        log.info("findOrganisationsForBulkCustomerForPendingOrg :: END");
+    }*/
 
     @Test
     @DisplayName("PRD Internal Delete Organisation with status REVIEW Test Scenarios")
@@ -1290,6 +940,77 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
     }
 
+    private static void verifyOrganisationDetails(JsonPath response) {
+
+        String companyUrl = response.get("companyUrl");
+        assertThat(companyUrl)
+                .isNotNull()
+                .endsWith("-prd-func-test-company-url");
+
+        String organisationIdentifier = response.get("organisationIdentifier");
+        assertThat(organisationIdentifier)
+                .isNotNull();
+
+        Map<String, String> superUser = response.get("superUser");
+        assertThat(superUser)
+                .isNotNull();
+
+        String firstName = superUser.get("firstName");
+        assertThat(firstName)
+                .isNotNull()
+                .isEqualTo("firstName");
+
+        String lastName = superUser.get("lastName");
+        assertThat(lastName)
+                .isNotNull()
+                .endsWith("lastName");
+
+        String email = superUser.get("email");
+        assertThat(email)
+                .isNotNull()
+                .endsWith("@prdfunctestuser.com");
+
+        String sraId = response.get("sraId");
+        assertThat(sraId)
+                .isNotNull()
+                .endsWith("-prd-func-test-sra-id");
+
+        String companyNumber = response.get("companyNumber");
+        assertThat(companyNumber)
+                .isNotNull()
+                .endsWith("com");
+
+        String dateReceived = response.get("dateReceived");
+        assertThat(dateReceived)
+                .isNotNull();
+
+        String dateApproved = response.get("dateApproved");
+        assertThat(dateApproved)
+                .isNotNull();
+
+        String name = response.get("name");
+        assertThat(name)
+                .isNotNull()
+                .endsWith("-prd-func-test-name");
+
+        Boolean sraRegulated = response.get("sraRegulated");
+        assertThat(sraRegulated)
+                .isNotNull()
+                .isEqualTo(false);
+
+        String status = response.get("status");
+        assertThat(status)
+                .isNotNull()
+                .isEqualTo("ACTIVE");
+
+        List<String> pendingPaymentAccount = response.getList("pendingPaymentAccount");
+        assertThat(pendingPaymentAccount)
+                .isNotNull()
+                .isEmpty();
+
+        verifyContactInformationDetails(response);
+    }
+
     public void findOrganisationWithSinceDateScenarios(String sinceDate) {
         findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, null, null);
         findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, "1", "2");
@@ -1305,5 +1026,284 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findOrganisationBySinceDateInternalShouldBeSuccess :: END");
     }
 
+    private static void verifyOrganisationDetailsBySinceDate(Map<String, Object> response,
+                                                             String pageSize, String sinceDate) {
 
+        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
+
+        assertThat(organisations)
+                .isNotNull()
+                .isNotEmpty();
+
+        if (pageSize != null) {
+            assertThat(organisations)
+                    .hasSize(Integer.parseInt(pageSize));
+        }
+        assertThat(response.get("moreAvailable"))
+                .isNotNull();
+
+        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
+
+        organisations.forEach(org -> {
+
+            assertThat(org.get("organisationIdentifier"))
+                    .isNotNull();
+
+            assertThat(org.get("lastUpdated"))
+                    .isNotNull();
+
+            String dateString = (String) org.get("lastUpdated");
+            String formattedDateString = DateUtils.formatDateString(dateString);
+            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
+            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
+
+            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
+
+            if (organisationProfileIds != null) {
+
+                assertThat(organisationProfileIds)
+                        .isNotEmpty()
+                        .hasSizeGreaterThan(0);
+
+                assertThat(organisationProfileIds.get(0))
+                        .isEqualTo("SOLICITOR_PROFILE");
+            }
+        });
+    }
+
+    private static void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response,
+                                                               String pageSize, String sinceDate) {
+
+        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
+
+        assertThat(organisations)
+                .isNotNull()
+                .isNotEmpty();
+
+        if (pageSize != null) {
+            assertThat(organisations)
+                    .hasSize(Integer.parseInt(pageSize));
+        }
+        assertThat(response.get("moreAvailable"))
+                .isNotNull();
+
+        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
+
+        organisations.forEach(org -> {
+
+            assertThat(org.get("organisationIdentifier"))
+                    .isNotNull();
+
+            assertThat(org.get("lastUpdated"))
+                    .isNotNull();
+
+            String dateString = (String) org.get("lastUpdated");
+            String formattedDateString = DateUtils.formatDateString(dateString);
+            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
+            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
+
+            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
+            assertThat(organisationProfileIds)
+                    .isNotEmpty()
+                    .hasSizeGreaterThan(0);
+
+            assertThat(organisationProfileIds.get(0))
+                    .isEqualTo("SOLICITOR_PROFILE");
+        });
+    }
+
+
+    private static void verifyContactInformationDetails(JsonPath response) {
+
+        List<Map<String, Object>> contactInformation = response.getList("contactInformation");
+        assertThat(contactInformation)
+                .isNotNull()
+                .hasSize(2);
+
+        contactInformation = sortByValue(contactInformation, "addressLine1");
+
+        final Map<String, Object> contactInformation1 = contactInformation.get(0);
+        final Map<String, Object> contactInformation2 = contactInformation.get(1);
+
+        String firstAddressUprn = (String) contactInformation1.get("uprn");
+        assertThat(firstAddressUprn)
+                .isNotNull()
+                .isEqualTo("uprn");
+
+        String firstAddressCountry = (String) contactInformation1.get("country");
+        assertThat(firstAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String firstAddressCreated = (String) contactInformation1.get("created");
+        assertThat(firstAddressCreated)
+                .isNotNull();
+
+        String firstAddressTownCity = (String) contactInformation1.get("townCity");
+        assertThat(firstAddressTownCity)
+                .isNotNull()
+                .isEqualTo("some-town-city");
+
+        String firstAddressCounty = (String) contactInformation1.get("county");
+        assertThat(firstAddressCounty)
+                .isNotNull()
+                .isEqualTo("some-county");
+
+        String firstAddressAddressLine1 = (String) contactInformation1.get("addressLine1");
+        assertThat(firstAddressAddressLine1)
+                .isNotNull()
+                .isEqualTo("addLine1");
+
+        assertThat(firstAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String firstAddressAddressLine2 = (String) contactInformation1.get("addressLine2");
+        assertThat(firstAddressAddressLine2)
+                .isNotNull()
+                .isEqualTo("addLine2");
+
+        String firstAddressPostCode1 = (String) contactInformation1.get("postCode");
+        assertThat(firstAddressPostCode1)
+                .isNotNull()
+                .isEqualTo("some-post-code");
+
+        String firstAddressAddressLine3 = (String) contactInformation1.get("addressLine3");
+        assertThat(firstAddressAddressLine3)
+                .isNotNull()
+                .isEqualTo("addLine3");
+
+        String firstAddressAddressId = (String) contactInformation1.get("addressId");
+        assertThat(firstAddressAddressId)
+                .isNotNull();
+
+        List<Map<String, Object>> firstAddressDxAddress =
+                (List<Map<String, Object>>) contactInformation1.get("dxAddress");
+        assertThat(firstAddressDxAddress)
+                .isNotNull()
+                .hasSize(2);
+
+        firstAddressDxAddress = sortByValue(firstAddressDxAddress, "dxNumber");
+
+        final Map<String, Object> firstAddressDxAddress1 = firstAddressDxAddress.get(0);
+        final Map<String, Object> firstAddressDxAddress2 = firstAddressDxAddress.get(1);
+
+        Object firstAddressDxNumber1 = firstAddressDxAddress1.get("dxNumber");
+        assertThat(firstAddressDxNumber1)
+                .isNotNull()
+                .isEqualTo("DX 123452222");
+
+        Object firstAddressDxExchange1 = firstAddressDxAddress1.get("dxExchange");
+        assertThat(firstAddressDxExchange1)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object firstAddressDxNumber2 = firstAddressDxAddress2.get("dxNumber");
+        assertThat(firstAddressDxNumber2)
+                .isNotNull()
+                .isEqualTo("DX 123456333");
+
+        Object firstAddressDxExchange2 = firstAddressDxAddress2.get("dxExchange");
+        assertThat(firstAddressDxExchange2)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        String secondAddressUprn = (String) contactInformation2.get("uprn");
+        assertThat(secondAddressUprn)
+                .isNotNull()
+                .isEqualTo("uprn1");
+
+        String secondAddressCountry = (String) contactInformation2.get("country");
+        assertThat(secondAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String secondAddressCreated = (String) contactInformation2.get("created");
+        assertThat(secondAddressCreated)
+                .isNotNull();
+
+        String secondAddressTownCity = (String) contactInformation2.get("townCity");
+        assertThat(secondAddressTownCity)
+                .isNotNull()
+                .isEqualTo("some-town-city");
+
+        String secondAddressCounty = (String) contactInformation2.get("county");
+        assertThat(secondAddressCounty)
+                .isNotNull()
+                .isEqualTo("some-county");
+
+        String secondAddressAddressLine1 = (String) contactInformation2.get("addressLine1");
+        assertThat(secondAddressAddressLine1)
+                .isNotNull()
+                .isEqualTo("addressLine1");
+
+        String secondAddressAddressLine2 = (String) contactInformation2.get("addressLine2");
+        assertThat(secondAddressAddressLine2)
+                .isNotNull()
+                .isEqualTo("addressLine2");
+
+        String secondAddressPostCode = (String) contactInformation2.get("postCode");
+        assertThat(secondAddressPostCode)
+                .isNotNull()
+                .isEqualTo("some-post-code");
+
+        String secondAddressAddressLine3 = (String) contactInformation2.get("addressLine3");
+        assertThat(secondAddressAddressLine3)
+                .isNotNull()
+                .isEqualTo("addressLine3");
+
+        String secondAddressAddressId = (String) contactInformation2.get("addressId");
+        assertThat(secondAddressAddressId)
+                .isNotNull();
+
+        List<Map<String, Object>> secondAddressDxAddress =
+                (List<Map<String, Object>>) contactInformation2.get("dxAddress");
+        assertThat(secondAddressDxAddress)
+                .isNotNull()
+                .hasSize(3);
+
+        secondAddressDxAddress = sortByValue(secondAddressDxAddress, "dxNumber");
+
+        final Map<String, Object> secondAddressDxAddress1 = secondAddressDxAddress.get(0);
+        final Map<String, Object> secondAddressDxAddress2 = secondAddressDxAddress.get(1);
+        final Map<String, Object> secondAddressDxAddress3 = secondAddressDxAddress.get(2);
+
+        Object secondAddressDxNumber1 = secondAddressDxAddress1.get("dxNumber");
+        assertThat(secondAddressDxNumber1)
+                .isNotNull()
+                .isEqualTo("DX 123456777");
+
+        Object secondAddressDxExchange1 = secondAddressDxAddress1.get("dxExchange");
+        assertThat(secondAddressDxExchange1)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object secondAddressDxNumber2 = secondAddressDxAddress2.get("dxNumber");
+        assertThat(secondAddressDxNumber2)
+                .isNotNull()
+                .isEqualTo("DX 123456788");
+
+        Object secondAddressDxExchange2 = secondAddressDxAddress2.get("dxExchange");
+        assertThat(secondAddressDxExchange2)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object secondAddressDxNumber3 = secondAddressDxAddress3.get("dxNumber");
+        assertThat(secondAddressDxNumber3)
+                .isNotNull()
+                .isEqualTo("DX 1234567890");
+
+        Object secondAddressDxExchange3 = secondAddressDxAddress3.get("dxExchange");
+        assertThat(secondAddressDxExchange3)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+    }
+
+    private static List<Map<String, Object>> sortByValue(final List<Map<String, Object>> maps,
+                                                         final String key) {
+        return maps
+                .stream()
+                .sorted(Comparator.comparing(map -> (String) map.get(key)))
+                .collect(Collectors.toList());
+    }
 }
