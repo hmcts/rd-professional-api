@@ -851,6 +851,15 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 organisationNameUpdateRequest, hmctsAdmin, organisationIdentifier, BAD_REQUEST);
         assertNotNull(orgUpdatedNameResponse);
         assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedNameResponse.as(Map.class).get("errorDescription"))
+                .asInstanceOf(STRING)
+                .isNotNull()
+                .isEqualTo("Name is required");
+
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(organisationIdentifier,
+                hmctsAdmin, NO_CONTENT);
 
         log.info("updateOrganisationNameShouldReturnFailureIfNoName :: END");
     }
