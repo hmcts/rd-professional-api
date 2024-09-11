@@ -112,7 +112,8 @@ public class OrganisationCreationRequestValidator {
             if (dxAddressRequired) {
                 validateDxAdd(dxAddressRequired,contactInformation);
             }
-             if (contactInformationUpdate) {
+
+            if (contactInformationUpdate) {
                 validateContactInfo(contactInformation);
             }
 

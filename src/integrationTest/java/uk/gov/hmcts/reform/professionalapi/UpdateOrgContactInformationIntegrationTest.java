@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import org.bouncycastle.asn1.cryptopro.CryptoProObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.jcajce.provider.symmetric.util.PBE;
-import org.bouncycastle.util.Integers;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -25,7 +21,6 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.cr
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.getContactInformationList;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.getContactInformationWithoutDxAddress;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 
 class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -265,6 +260,7 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
             .contains("Invalid Contact informationDX Number or DX Exchange cannot be empty");
 
     }
+
     //to update DX Exchange field alone
     @Test
     void shoudlReturn200ForOnlyDxNumberChange() {
@@ -385,36 +381,29 @@ class UpdateOrgContactInformationIntegrationTest extends AuthorizationEnabledInt
         String orgIdentifier = createActiveOrganisation();
         Map<String, Object> updateResponse = professionalReferenceDataClient
             .updateOrgContactInformation(contactInformationCreationRequest, hmctsAdmin,orgIdentifier,
-                null,true,null);
+                true,true,null);
 
         assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
-            .contains("dxAddressUpdateRequired value is required");
+            .contains("No Dx Address Information provided in request");
     }
-    //add below test cases for dx address update, sometimes we may have to update only one field:
 
-    //to update DX Exchange field alone
-    //to update DX address number alone
-    //add test case to update single address details without dx address, AddressLine3 and assert updated address details
-    //add test case for missing dxAddressUpdateRequired query param to update dx address and assert bad request with error message "dxAddressUpdateRequired value is required"
+    private String createActiveOrganisation() {
+        OrganisationCreationRequest organisationCreationRst = organisationRequestWithAllFields().build();
+        return createAndActivateOrganisationWithGivenRequest(organisationCreationRst);
+    }
 
-   private String createActiveOrganisation(){
-       OrganisationCreationRequest organisationCreationRst = organisationRequestWithAllFields().build();
-       return createAndActivateOrganisationWithGivenRequest(organisationCreationRst);
-
-   }
-
-   private Map getAddressIdFromSavedCreatedOrg(){
+    private Map getAddressIdFromSavedCreatedOrg() {
         String activeOrgId = createActiveOrganisation();
-       java.util.Map<String, Object> retrieveOrganisationResponse = professionalReferenceDataClient
-           .retrieveSingleOrganisation(activeOrgId, hmctsAdmin);
+        java.util.Map<String, Object> retrieveOrganisationResponse = professionalReferenceDataClient
+            .retrieveSingleOrganisation(activeOrgId, hmctsAdmin);
 
-       List existingSavedContacts = (List)retrieveOrganisationResponse.get("contactInformation");
-       LinkedHashMap existingSavedContact = (LinkedHashMap)existingSavedContacts.get(0);
-       Map ids = new HashMap();
-       ids.put("activeOrgId", activeOrgId);
-       ids.put("addressId", existingSavedContact.get("addressId").toString());
-       return ids;
-   }
+        List existingSavedContacts = (List)retrieveOrganisationResponse.get("contactInformation");
+        LinkedHashMap existingSavedContact = (LinkedHashMap)existingSavedContacts.get(0);
+        Map ids = new HashMap();
+        ids.put("activeOrgId", activeOrgId);
+        ids.put("addressId", existingSavedContact.get("addressId").toString());
+        return ids;
+    }
 
 }

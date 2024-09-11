@@ -266,7 +266,7 @@ public class OrganisationFixtures {
 
     public static ContactInformationCreationRequest getContactInformationWithoutDxAddress() {
 
-       return  aContactInformationCreationRequest()
+        return  aContactInformationCreationRequest()
                 .uprn("uprn1")
                 .addressLine1("Updated-addressLine1")
                 .addressLine2("Updated-addressLine2")
@@ -276,8 +276,6 @@ public class OrganisationFixtures {
                 .townCity("Updated-town-city")
                 .postCode("Uppost-code")
                 .build();
-
-
     }
 
     public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {

@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -1255,7 +1254,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             organisationIdentifier, hmctsAdmin,OK);
         assertNotNull(activeOrgResponse);
 
-       // List<ContactInformation> contactInformationList = activeOrgResponse.get("contactInformation");
+        // List<ContactInformation> contactInformationList = activeOrgResponse.get("contactInformation");
         List contacts = activeOrgResponse.get("contactInformation");
         HashMap  contact = (HashMap)contacts.get(0);
         String addId = contact.get("addressId").toString();
