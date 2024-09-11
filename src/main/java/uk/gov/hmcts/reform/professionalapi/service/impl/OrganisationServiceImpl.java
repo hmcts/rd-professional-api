@@ -1066,7 +1066,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         OrganisationNameUpdateRequest organisationNameUpdateRequest, String organisationIdentifier) {
 
         var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        Organisation savedOrganisation = null;
+
         if (existingOrganisation == null) {
             throw new EmptyResultDataAccessException(ONE);
         } else if (isNotBlank(organisationNameUpdateRequest.getName())) {
