@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.client.HttpClientErrorException;
@@ -24,8 +27,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 
+import java.util.List;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import static java.util.Objects.requireNonNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,13 +43,28 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ExceptionMapperTest {
 
+    @Mock
+    private MethodArgumentNotValidException methodArgumentNotValidException;
+
+    @Mock
+    private ConstraintViolationException constraintViolationException;
+
+    @Mock
+    private ConstraintViolation<?> constraintViolation;
+
+    @Mock
+    private FieldError fieldError;
+
+    @Mock
+    private BindingResult bindingResult;
+
     @InjectMocks
     private ExceptionMapper exceptionMapper;
 
     @BeforeAll
     public static void setUp() {
         final MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRequestURI(randomAlphabetic(5));
+        request.setRequestURI("refdata/internal/v1/organisations/123/name");
         final ServletRequestAttributes servletRequestAttributes =
                 new ServletRequestAttributes(request);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
@@ -142,13 +164,16 @@ class ExceptionMapperTest {
 
     @Test
     void test_handle_method_not_valid_exception() {
-        MethodArgumentNotValidException methodArgumentNotValidException = mock(MethodArgumentNotValidException.class);
+        final String errorDescription = randomAlphabetic(10);
+        when(methodArgumentNotValidException.getBindingResult()).thenReturn(bindingResult);
+        when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
+        when(fieldError.getDefaultMessage()).thenReturn(errorDescription);
 
         ResponseEntity<Object> responseEntity
                 = exceptionMapper.annotationDrivenValidationError(methodArgumentNotValidException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(methodArgumentNotValidException.getMessage(), ((ErrorResponse) responseEntity.getBody())
+        assertEquals(errorDescription, ((ErrorResponse) requireNonNull(responseEntity.getBody()))
                 .getErrorDescription());
 
     }
@@ -169,7 +194,7 @@ class ExceptionMapperTest {
     @ValueSource(strings = {"bulkCustomerId", "idamId"})
     void test_handle_missing_parameter_in_request(String parameterName) {
         MissingServletRequestParameterException mex = new MissingServletRequestParameterException(parameterName,
-                                                                                                    "String");
+                "String");
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleMissingParams(mex);
 
@@ -177,7 +202,6 @@ class ExceptionMapperTest {
         assertEquals(mex.getMessage(), ((ErrorResponse) responseEntity.getBody()).getErrorDescription());
 
     }
-
 
 
     @Test
@@ -207,13 +231,14 @@ class ExceptionMapperTest {
 
     @Test
     void test_handle_constraint_violation_exception() {
-        ConstraintViolationException constraintViolationException
-                = new ConstraintViolationException("Constraint Violation", null);
+        final String errorDescription = randomAlphabetic(10);
+        when(constraintViolationException.getConstraintViolations()).thenReturn(Set.of(constraintViolation));
+        when(constraintViolation.getMessage()).thenReturn(errorDescription);
 
         ResponseEntity<Object> responseEntity = exceptionMapper.constraintViolationError(constraintViolationException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(constraintViolationException.getMessage(), ((ErrorResponse) responseEntity.getBody())
+        assertEquals(errorDescription, ((ErrorResponse) requireNonNull(responseEntity.getBody()))
                 .getErrorDescription());
 
     }

@@ -81,13 +81,13 @@ public class ExceptionMapper {
 
     private static ResponseEntity<Object> collectErrors(MethodArgumentNotValidException ex) {
         // Get all the field errors
-        final String errorMessages =
+        final String errorDescription =
                 ex.getBindingResult().getFieldErrors().stream()
                         .map(FieldError::getDefaultMessage) // Extract default message
                         .collect(Collectors.joining(", "));
         final ErrorResponse errorDetails =
                 new ErrorResponse(METHOD_ARG_NOT_VALID.getErrorMessage(),
-                        errorMessages,
+                        errorDescription,
                         getTimeStamp());
         return new ResponseEntity<>(errorDetails, BAD_REQUEST);
     }
@@ -95,13 +95,13 @@ public class ExceptionMapper {
     private static ResponseEntity<Object> collectErrors(ConstraintViolationException ex) {
 
         // Get all the field errors
-        final String errorMessages = ex.getConstraintViolations().stream()
+        final String errorDescription = ex.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining(", "));
 
         final ErrorResponse errorDetails =
                 new ErrorResponse(INVALID_REQUEST.getErrorMessage(),
-                        errorMessages,
+                        errorDescription,
                         getTimeStamp());
         return new ResponseEntity<>(errorDetails, BAD_REQUEST);
 
