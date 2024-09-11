@@ -9,12 +9,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUp
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.util.TestDataArguments;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.time.LocalDateTime.parse;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -74,16 +76,25 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
     @Test
     void update_name_of_an_active_organisation_with_prd_admin_role_should_return_200() {
         String orgIdentifier = getOrganisationId();
+        String updatedName = "updatedName";
         OrganisationNameUpdateRequest organisationNameUpdateRequest =
-                new OrganisationNameUpdateRequest("updatedName");
+                new OrganisationNameUpdateRequest(updatedName);
         Map<String, Object> orgUpdatedNameResponse =
                 professionalReferenceDataClient.updateOrgName(
                         organisationNameUpdateRequest, hmctsAdmin, orgIdentifier);
         assertThat(orgUpdatedNameResponse.get("http_status")).isEqualTo(200);
         Map<String, Object> responseBody =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifier, hmctsAdmin);
-        assertNotNull(responseBody.get("name"));
-        assertThat(responseBody.get("name").toString()).isEqualTo("updatedName");
+        final Object name = responseBody.get("name");
+        final Object lastUpdated = responseBody.get("lastUpdated");
+        assertThat(name).isNotNull().isEqualTo(updatedName);
+        assertThat(lastUpdated)
+                .asInstanceOf(STRING)
+                .satisfies(localDateTime -> {
+                    final LocalDate localDate =
+                            parse(localDateTime).toLocalDate();
+                    assertThat(localDate).isEqualTo(LocalDate.now());
+                });
     }
 
     @DisplayName("Negative - Organisation name update failure scenarios")

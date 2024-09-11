@@ -1071,6 +1071,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(ONE);
         } else if (isNotBlank(organisationNameUpdateRequest.getName())) {
             existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameUpdateRequest.getName()));
+            existingOrganisation.setLastUpdated(LocalDateTime.now());
             organisationRepository.save(existingOrganisation);
         }
 
