@@ -808,7 +808,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         //retrieve saved organisation by id
         var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
-
         assertThat(orgResponse).isNotNull();
 
         final Object orgName = orgResponse.get("name");
@@ -850,7 +849,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
                 organisationNameUpdateRequest, hmctsAdmin, organisationIdentifier, BAD_REQUEST);
         assertNotNull(orgUpdatedNameResponse);
-        assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(400);
         assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(400);
         assertThat(orgUpdatedNameResponse.as(Map.class).get("errorDescription"))
                 .asInstanceOf(STRING)
