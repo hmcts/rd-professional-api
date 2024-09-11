@@ -11,11 +11,13 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Builder(builderMethodName = "aContactInformationCreationRequest")
+@NotNull(message = "ContactInformationCreationRequest is required")
 public class ContactInformationCreationRequest {
 
     private final String uprn;
 
-    @NotNull@NotEmpty
+    @NotEmpty
+    @NotNull(message = "AddressLine1 is required")
     private final String addressLine1;
 
     private final String addressLine2;

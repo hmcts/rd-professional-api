@@ -304,6 +304,33 @@ public class ProfessionalApiClient {
         return contactInfoList;
     }
 
+    public ContactInformationCreationRequest  createContactInformationWithDXAddUpdatedInfoRequests() {
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX1234567890")
+            .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX123456777")
+            .dxExchange("dxExchange1").build());
+
+
+        ContactInformationCreationRequest updatedContactInfoRequest =
+            aContactInformationCreationRequest()
+            .uprn("uuprn")
+            .addressLine1("updatedaddressLine1")
+            .addressLine2("updatedaddressLine2")
+            .addressLine3("updatedaddressLine3")
+            .country("updatedcountry")
+            .county("updatedcounty")
+            .townCity("updatedtowncity")
+            .postCode("uppostcode")
+            .dxAddress(dx1)
+            .build();
+
+        return updatedContactInfoRequest;
+    }
+
     public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
@@ -1806,7 +1833,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(contactInformationCreationRequest)
-            .put("/refdata/internal/v1/organisations/contactInformation/" + organisationId + "/?dxAddressUpdate="
+            .put("/refdata/internal/v1/organisations/" + organisationId + "/contactInformation/?dxAddressUpdate="
             + dxAddressUpdate + "&contactInformationUpdate=" + contactInformationUpdate + "&addressid=" + addressid)
             .andReturn();
 

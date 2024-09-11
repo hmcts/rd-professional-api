@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
@@ -2728,19 +2727,19 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_updateOrganisationContactInformation() {
-        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
         var contactInformation = new ContactInformation();
-        contactInformation.setCountry("TestCountry");
+        contactInformation.setAddressLine1("NewUpdated-addLine1");
+        contactInformation.setCountry("NewUpdated-Country");
         contactInformation.setCreated(LocalDateTime.now());
-        existingContactInformationList.add(contactInformation);
+
+        //create organisation
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        Organisation organisationMock = mock(Organisation.class);
-        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        //Organisation organisationMock = mock(Organisation.class);
+        organisation.setContactInformations(List.of(contactInformation));
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
 
-        when(organisationMock.getContactInformation()).thenReturn(existingContactInformationList);
         assertNotNull(contactInformationCreationRequest);
-
         ContactInformation existingContactInformation = new ContactInformation();
         existingContactInformation.setAddressLine1(contactInformationCreationRequest.getAddressLine1());
         existingContactInformation.setTownCity(contactInformationCreationRequest.getTownCity());
@@ -2752,7 +2751,7 @@ class OrganisationServiceImplTest {
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
 
-        ResponseEntity<ContactInformationResponse> updatedOrganisationContact =
+        ResponseEntity<Object> updatedOrganisationContact =
             sut.updateContactInformationForOrganisation(contactInformationCreationRequest,orgId,true,
                 true,"");
 

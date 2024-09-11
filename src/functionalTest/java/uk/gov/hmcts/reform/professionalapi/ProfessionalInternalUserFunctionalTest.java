@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1234,109 +1237,128 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .collect(Collectors.toList());
     }
 
+
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    void updateBothContactInformationAndDxAdressForOrgShouldReturnSuccess() {
-        log.info("updateBothContactInformationAndDxAdressForOrgShouldReturnSuccess :: STARTED");
+    void updateBothContactInformationAndDxAdressForOrgNeedUpdatingSuccessScenario() {
+        log.info("updateBothContactInformationAndDxAdressForOrgNeedUpdatingSuccessScenario :: STARTED");
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
-
         assertThat(organisationIdentifier).isNotEmpty();
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE")
+            .build();
+        //make organisation active
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier,OK);
+
+        JsonPath activeOrgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertNotNull(activeOrgResponse);
+
+       // List<ContactInformation> contactInformationList = activeOrgResponse.get("contactInformation");
+        List contacts = activeOrgResponse.get("contactInformation");
+        HashMap  contact = (HashMap)contacts.get(0);
+        String addId = contact.get("addressId").toString();
+        //create request to update organisation
+        ContactInformationCreationRequest updatedContactInfoRequest =
+            professionalApiClient.createContactInformationWithDXAddUpdatedInfoRequests();
+        assertThat(updatedContactInfoRequest).isNotNull();
+
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            updatedContactInfoRequest,OK,organisationIdentifier,false,true,
+            addId);
+
+        assertNotNull(result);
+        assertThat(result.statusCode()).isEqualTo(200);
+
+        //retrieve saved contact info from organisation
         JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
         assertNotNull(orgResponse);
-        List<HashMap>  existingContactInformationList =  (List) orgResponse.get("contactInformation");
+        List<HashMap>  savedContactInformationList =  (List) orgResponse.get("contactInformation");
 
-        assertThat(existingContactInformationList).isNotEmpty()
-            .hasSizeGreaterThan(0);
+        assertThat(savedContactInformationList).isNotEmpty().hasSize(1);
 
-        List<ContactInformationCreationRequest> contactInformationCreationRequestList =
-            professionalApiClient.createContactInformationCreationRequests();
-        assertThat(contactInformationCreationRequestList).isNotEmpty()
-            .hasSizeGreaterThan(0);
-        ContactInformationCreationRequest contactInformationCreationRequest =
-            contactInformationCreationRequestList.get(0);
         //Assuming only one record found
-        HashMap existingContactInfo = existingContactInformationList.get(0);
+        HashMap savedContactInfo = savedContactInformationList.get(0);
 
-        assertThat(existingContactInfo.get("addressLine1")).isNotNull();
-        assertThat(existingContactInfo.get("addressLine2")).isNotNull();
-        assertThat(existingContactInfo.get("addressLine3")).isNotNull();
-        assertThat(existingContactInfo.get("uprn")).isNotNull();
-        assertThat(existingContactInfo.get("country")).isNotNull();
-        assertThat(existingContactInfo.get("townCity")).isNotNull();
-        assertThat(existingContactInfo.get("country")).isNotNull();
-        assertThat(existingContactInfo.get("postCode")).isNotNull();
+        assertThat(savedContactInfo.get("addressLine1")).isNotNull();
+        assertThat(savedContactInfo.get("addressLine2")).isNotNull();
+        assertThat(savedContactInfo.get("addressLine3")).isNotNull();
+        assertThat(savedContactInfo.get("uprn")).isNotNull();
+        assertThat(savedContactInfo.get("county")).isNotNull();
+        assertThat(savedContactInfo.get("townCity")).isNotNull();
+        assertThat(savedContactInfo.get("country")).isNotNull();
+        assertThat(savedContactInfo.get("postCode")).isNotNull();
 
-        Response result = professionalApiClient.updateContactInformationsToOrganisation(
-            aContactInformationCreationRequest()
-                    .uprn(contactInformationCreationRequest.getUprn())
-                    .addressLine1(contactInformationCreationRequest.getAddressLine1())
-                    .addressLine2(contactInformationCreationRequest.getAddressLine2())
-                    .addressLine3(contactInformationCreationRequest.getAddressLine3())
-                    .country(contactInformationCreationRequest.getCountry())
-                    .county(contactInformationCreationRequest.getCounty())
-                    .townCity(contactInformationCreationRequest.getTownCity())
-                    .postCode(contactInformationCreationRequest.getPostCode())
-                    .dxAddress(contactInformationCreationRequest.getDxAddress())
-                    .build(),
-                OK,organisationIdentifier,true,true,
-                existingContactInfo.get("addressId").toString());
+        assertThat(savedContactInfo.get("addressLine1")).isEqualTo(updatedContactInfoRequest.getAddressLine1());
+        assertThat(savedContactInfo.get("addressLine2")).isEqualTo(updatedContactInfoRequest.getAddressLine2());
+        assertThat(savedContactInfo.get("addressLine3")).isEqualTo(updatedContactInfoRequest.getAddressLine3());
+        assertThat(savedContactInfo.get("uprn")).isEqualTo(updatedContactInfoRequest.getUprn());
+        assertThat(savedContactInfo.get("county")).isEqualTo(updatedContactInfoRequest.getCounty());
+        assertThat(savedContactInfo.get("townCity")).isEqualTo(updatedContactInfoRequest.getTownCity());
+        assertThat(savedContactInfo.get("country")).isEqualTo(updatedContactInfoRequest.getCountry());
+        assertThat(savedContactInfo.get("postCode")).isEqualTo(updatedContactInfoRequest.getPostCode());
 
-        assertNotNull(result);
-        assertThat(result.getBody()).isNotNull();
-        assertThat(result.statusCode()).isEqualTo(200);
-        //clean up
-        deleteOrganisation(organisationIdentifier);
-        log.info("updateBothContactInformationAndDxAdressForOrgShouldReturnSuccess :: END");
+        //DxAddressCreationRequest assertion
+        List dxAddressesUpdated = (List)savedContactInfo.get("dxAddress");
+        LinkedHashMap dxAdd = (LinkedHashMap)dxAddressesUpdated.get(1);
+
+        assertThat(dxAdd.get("dxNumber").toString()).isEqualTo(updatedContactInfoRequest
+            .getDxAddress().get(0).getDxNumber());
+        assertThat(dxAdd.get("dxExchange").toString()).isEqualTo(updatedContactInfoRequest
+            .getDxAddress().get(0).getDxExchange());
+
+        log.info("updateBothContactInformationAndDxAdressForOrgNeedUpdatingSuccessScenario :: END");
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updateOnlyDxAddressDetailsForOrgShouldReturnSuccess() {
         log.info("updateOnlyDxAddressDetailsForOrgShouldReturnSuccess :: STARTED");
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
-
         assertThat(organisationIdentifier).isNotEmpty();
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE")
+            .build();
+        //make organisation active
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier,OK);
+
+        JsonPath activeOrgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertNotNull(activeOrgResponse);
+
+        List<ContactInformation> existingContactInformationList = activeOrgResponse.get("contactInformation");
+        List contacts = activeOrgResponse.get("contactInformation");
+        HashMap  contact = (HashMap)contacts.get(0);
+        String addId = contact.get("addressId").toString();
+        List dxAddresses = (List)contact.get("dxAddress");
+
+        //create request to update organisation
+        ContactInformationCreationRequest updatedContactInfoRequest =
+            professionalApiClient.createContactInformationWithDXAddUpdatedInfoRequests();
+        assertThat(updatedContactInfoRequest).isNotNull();
+
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            updatedContactInfoRequest,OK,organisationIdentifier,true,false,
+            addId);
+
+        assertNotNull(result);
+        assertThat(result.statusCode()).isEqualTo(200);
+
+        //retrieve saved contact info from organisation
         JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
             organisationIdentifier, hmctsAdmin,OK);
         assertNotNull(orgResponse);
-        List<HashMap>  existingContactInformationList =  (List) orgResponse.get("contactInformation");
+        List<HashMap>  savedContactInformationList =  (List) orgResponse.get("contactInformation");
 
-        assertThat(existingContactInformationList).isNotEmpty()
-            .hasSizeGreaterThan(0);
-
-        List<ContactInformationCreationRequest> contactInformationCreationRequestList =
-            professionalApiClient.createContactInformationRequests();
-        assertThat(contactInformationCreationRequestList).isNotEmpty()
-            .hasSizeGreaterThan(0);
-        ContactInformationCreationRequest contactInformationCreationRequest =
-            contactInformationCreationRequestList.get(0);
-        //Assuming only one record found
-        HashMap existingContactInfo = existingContactInformationList.get(0);
-
-        Response result = professionalApiClient.updateContactInformationsToOrganisation(
-            aContactInformationCreationRequest().addressLine1("addressLine1")
-                .dxAddress(contactInformationCreationRequest
-                    .getDxAddress())
-                    .build(),
-                OK,organisationIdentifier,true,false,
-                existingContactInfo.get("addressId").toString());
-
-        assertNotNull(result);
-        assertThat(result.getBody()).isNotNull();
-        assertThat(result.statusCode()).isEqualTo(200);
-        //clean up
-        deleteOrganisation(organisationIdentifier);
+        assertThat(savedContactInformationList).isNotEmpty().hasSize(1);
 
         log.info("updateOnlyDxAddressDetailsForOrgShouldReturnSuccess :: END");
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updateOnlyContactInformationForOrgShouldReturnSuccess() {
         log.info("updateOnlyContactInformationForOrgShouldReturnSuccess :: STARTED");
 
@@ -1385,15 +1407,12 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 existingContactInfo.get("addressId").toString());
 
         assertNotNull(result);
-        assertThat(result.getBody()).isNotNull();
         assertThat(result.statusCode()).isEqualTo(200);
-        //clean up
-        deleteOrganisation(organisationIdentifier);
+
         log.info("updateOnlyContactInformationForOrgShouldReturnSuccess :: END");
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess() {
         log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: STARTED");
 
@@ -1443,15 +1462,12 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                     existingContactInfo.get("addressId").toString());
 
         assertNotNull(result);
-        assertThat(result.getBody()).isNotNull();
         assertThat(result.statusCode()).isEqualTo(200);
-        //clean up
-        deleteOrganisation(organisationIdentifier);
+
         log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: END");
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void contactInformationAndDxAddressBothFalseShouldReturnFailure() {
         log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: STARTED");
 
@@ -1483,17 +1499,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertNotNull(result);
         assertThat(result.getBody()).isNotNull();
         assertThat(result.statusCode()).isEqualTo(400);
-        //clean up
-        deleteOrganisation(organisationIdentifier);
+
         log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: END");
     }
-
-    public void deleteOrganisation(String orgIdentifierResponse) {
-        log.info("deleteActiveOrganisation :: STARTED");
-        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
-        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
-        log.info("deleteActiveOrganisation :: END");
-    }
-
 
 }

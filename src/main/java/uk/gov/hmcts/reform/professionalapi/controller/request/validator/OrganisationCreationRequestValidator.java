@@ -112,14 +112,8 @@ public class OrganisationCreationRequestValidator {
             if (dxAddressRequired) {
                 validateDxAdd(dxAddressRequired,contactInformation);
             }
-
-            if (contactInformationUpdate) {
+             if (contactInformationUpdate) {
                 validateContactInfo(contactInformation);
-            }
-
-            if (dxAddressRequired && contactInformationUpdate) {
-                validateContactInfo(contactInformation);
-                validateDxAdd(dxAddressRequired,contactInformation);
             }
 
         } catch (InvalidRequest invalidRequest) {
@@ -131,7 +125,7 @@ public class OrganisationCreationRequestValidator {
                               ContactInformationCreationRequest contactInformation) {
         if (dxAddressRequired) {
             List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
-            if (dxAddressList.isEmpty()) {
+            if (dxAddressList == null || dxAddressList.size() == 0) {
                 throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
             } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
                 dxAddressList.forEach(this::isDxAddressValid);
@@ -140,17 +134,13 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void validateContactInfo(ContactInformationCreationRequest contactInformation) {
-        if (isEmptyValue(contactInformation.getUprn())
-            && isEmptyValue(contactInformation.getAddressLine1())
-            && isEmptyValue(contactInformation.getAddressLine2())
-            && isEmptyValue(contactInformation.getAddressLine3())
-            && isEmptyValue(contactInformation.getCounty())
-            && isEmptyValue(contactInformation.getCountry())
-            && isEmptyValue(contactInformation.getPostCode())
-            && isEmptyValue(contactInformation.getTownCity())) {
-
-            throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
+        if (StringUtils.isBlank(contactInformation.getAddressLine1())) {
+            throw new InvalidRequest("AddressLine1 cannot be empty");
         }
+        if (null != contactInformation.getUprn() && contactInformation.getUprn().length() > 14) {
+            throw new InvalidRequest("Uprn must not be greater than 14 characters long");
+        }
+
     }
 
 

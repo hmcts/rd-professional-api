@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -63,6 +62,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -788,19 +788,24 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @PutMapping(
-        path = "/contactInformation/{orgId}/",
+        path = "/{orgId}/contactInformation",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.CREATED)
     @Secured({"prd-admin"})
-    public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+    public ResponseEntity<Object> updateContactInformationForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
         @Valid @NotNull @RequestBody ContactInformationCreationRequest contactInformationCreationRequest,
         @RequestParam(value = "dxAddressUpdate", required = true) boolean dxAddressUpdate,
         @RequestParam(value = "contactInformationUpdate", required = true) boolean contactInformationUpdate,
         @RequestParam("addressid") String addressid,
-        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
+        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+            message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(orgId);
 
         organisationCreationRequestValidator.validateContactInformationRequest(
             contactInformationCreationRequest,dxAddressUpdate,contactInformationUpdate);

@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -77,7 +76,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
@@ -587,22 +585,20 @@ class OrganisationInternalControllerTest {
     void testUpdateOrgContactInformation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        doNothing().when(organisationCreationRequestValidatorMock)
-        .validateContactInformationRequest(contactInformationCreationRequest,true,true);
-
         when(organisationServiceMock.updateContactInformationForOrganisation(contactInformationCreationRequest,
             organisation.getOrganisationIdentifier(),true,true,""))
             .thenReturn(ResponseEntity.status(HttpStatus.OK).build());
 
-        ResponseEntity<ContactInformationResponse> response = organisationInternalController
+        ResponseEntity<Object> response = organisationInternalController
             .updateContactInformationForOrganisation(contactInformationCreationRequest,true,true,"",
                 organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationCreationRequestValidatorMock, times(1))
-            .validateContactInformationRequest(contactInformationCreationRequest,true,true);
+        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsAndActive(
+            organisation.getOrganisationIdentifier());
+
         verify(organisationServiceMock, times(1))
             .updateContactInformationForOrganisation(contactInformationCreationRequest,
                 organisation.getOrganisationIdentifier(),true,true,"");

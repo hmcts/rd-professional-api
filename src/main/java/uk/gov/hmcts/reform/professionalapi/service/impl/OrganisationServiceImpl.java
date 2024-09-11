@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
@@ -1063,24 +1062,20 @@ public class OrganisationServiceImpl implements OrganisationService {
                                 List<ContactInformation> existingContactInformationList,
                                 Organisation organisation) {
         ContactInformation savedContactInformation = null;
+        // if only dxaddress needs updating
+        if (dxAddressUpdate) {
+            updateDxAddress(contactInformationRequest,dxAddressUpdate,existingContactInformationList.get(0));
+        }
         //If single address is present and contact info needs updating then update details
         if (contactInformationUpdate) {
             savedContactInformation = updateContactInformation(existingContactInformationList.get(0),
                 contactInformationRequest,
                 organisation);
         }
-        //if both contact info and dx add needs updating
-        if (dxAddressUpdate && contactInformationUpdate) {
-            updateDxAddress(contactInformationRequest,dxAddressUpdate,savedContactInformation);
-        }
-        // if only dxaddress needs updating
-        if (dxAddressUpdate && !contactInformationUpdate) {
-            updateDxAddress(contactInformationRequest,dxAddressUpdate,existingContactInformationList.get(0));
-        }
         // if both are false no update takes place
         if (!dxAddressUpdate && !contactInformationUpdate) {
             throw new InvalidRequest(
-                "dxAddressUpdate and contactInformationUpdate are both false no update took place");
+                "dxAddressUpdate and contactInformationUpdate are both false . Cannot update contact information");
         }
     }
 
@@ -1089,16 +1084,34 @@ public class OrganisationServiceImpl implements OrganisationService {
                                                         ContactInformationCreationRequest contactInfoRequest,
                                                         Organisation organisation
     ) {
-        existingContactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
-        existingContactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
-        existingContactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine3()));
-        existingContactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfoRequest.getTownCity()));
-        existingContactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCounty()));
-        existingContactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCountry()));
-        existingContactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfoRequest.getPostCode()));
+        if (StringUtils.isNotEmpty(contactInfoRequest.getAddressLine1())) {
+            existingContactInformation.setAddressLine1(
+                RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
+        }
+        if (StringUtils.isNotEmpty(contactInfoRequest.getAddressLine2())) {
+            existingContactInformation.setAddressLine2(
+                RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
+        }
+        if (StringUtils.isNotEmpty(contactInfoRequest.getAddressLine3())) {
+            existingContactInformation.setAddressLine3(
+                RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine3()));
+        }
+        if (StringUtils.isNotEmpty(contactInfoRequest.getTownCity())) {
+            existingContactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfoRequest.getTownCity()));
+        }
+        if (StringUtils.isNotEmpty(contactInfoRequest.getCounty())) {
+            existingContactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCounty()));
+        }
+        if (StringUtils.isNotEmpty(contactInfoRequest.getCountry())) {
+            existingContactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCountry()));
+        }
+        if (StringUtils.isNotEmpty(contactInfoRequest.getPostCode())) {
+            existingContactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfoRequest.getPostCode()));
+        }
         existingContactInformation.setOrganisation(organisation);
         existingContactInformation.setLastUpdated(LocalDateTime.now());
-        return contactInformationRepository.save(existingContactInformation);
+        ContactInformation savedContactInformation = contactInformationRepository.save(existingContactInformation);
+        return savedContactInformation;
     }
 
     private void updateDxAddress(ContactInformationCreationRequest contactInfoRequest,
@@ -1112,7 +1125,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+    public ResponseEntity<Object> updateContactInformationForOrganisation(
         ContactInformationCreationRequest contactInformationRequest, String organisationIdentifier,
         Boolean dxAddressUpdate, Boolean contactInformationUpdate, String addressid) {
 
@@ -1131,7 +1144,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     updateContacts(contactInformationUpdate,dxAddressUpdate,contactInformationRequest,
                         existingContactInformationList,organisation);
                 } else {
-                    //if multiple records found then update the one fro which the id is provided
+                    //if multiple records found then update the one for which the id is provided
                     if (addressid.isEmpty()) {
                         throw new ResourceNotFoundException("Multiple addresses found for organisation . "
                             + "Please enter specific address id of the contact information to be updated");

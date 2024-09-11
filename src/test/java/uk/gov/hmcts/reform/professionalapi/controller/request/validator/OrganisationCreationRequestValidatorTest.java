@@ -470,21 +470,31 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
-    void test_contact_info() {
-        ContactInformationCreationRequest contactInformationCreationReq = aContactInformationCreationRequest()
-            .uprn("")
-            .addressLine1("")
-            .addressLine2("")
-            .addressLine3("")
-            .country("")
-            .county("")
-            .townCity("")
-            .postCode("")
-            .dxAddress(null)
-            .build();
+    void test_contact_info_null_addLine1() {
 
-        assertThrows(InvalidRequest.class, () ->
-            organisationCreationRequestValidator.validateContactInfo(contactInformationCreationReq));
+        Throwable thrown = catchThrowable(() -> {
+            organisationCreationRequestValidator
+                .validateContactInfo(aContactInformationCreationRequest().addressLine1("").build());
+        });
+
+        assertThat(thrown)
+            .isInstanceOf(InvalidRequest.class)
+            .hasMessageContaining("AddressLine1 cannot be empty");
+
+    }
+
+    @Test
+    void test_contact_info_Invalid_Uprn() {
+
+        Throwable thrown = catchThrowable(() -> {
+            organisationCreationRequestValidator
+                .validateContactInfo(aContactInformationCreationRequest().addressLine1("addressLine1")
+                    .uprn("125874596325874585").build());
+        });
+
+        assertThat(thrown)
+            .isInstanceOf(InvalidRequest.class)
+            .hasMessageContaining("Uprn must not be greater than 14 characters long");
 
     }
 

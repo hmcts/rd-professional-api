@@ -264,36 +264,19 @@ public class OrganisationFixtures {
 
     }
 
-    public static List<ContactInformationCreationRequest> getContactInformationListWithoutDxAddress() {
-        List<ContactInformationCreationRequest> contactInformationCreationRequests = new ArrayList<>();
-        contactInformationCreationRequests.add(
-            aContactInformationCreationRequest()
-                .uprn("uprn1")
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .country("country")
-                .county("county")
-                .townCity("town-city")
-                .uprn("uprn")
-                .postCode("some-post-code")
-                .build()
-        );
-        contactInformationCreationRequests.add(
-            aContactInformationCreationRequest()
-                .uprn("uprn2")
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .country("country")
-                .county("county")
-                .townCity("town-city")
-                .uprn("uprn")
-                .postCode("some-post-code")
-                .build()
-        );
+    public static ContactInformationCreationRequest getContactInformationWithoutDxAddress() {
 
-        return contactInformationCreationRequests;
+       return  aContactInformationCreationRequest()
+                .uprn("uprn1")
+                .addressLine1("Updated-addressLine1")
+                .addressLine2("Updated-addressLine2")
+                .addressLine3("Updated-addressLine3")
+                .country("Updated-country")
+                .county("Updated-county")
+                .townCity("Updated-town-city")
+                .postCode("Uppost-code")
+                .build();
+
 
     }
 
@@ -352,17 +335,17 @@ public class OrganisationFixtures {
         .ContactInformationCreationRequestBuilder createContactInformationRequest() {
 
         return aContactInformationCreationRequest()
-                .addressLine1("addLine1")
-                .addressLine2("addLine2")
-                .addressLine3("addLine3")
-                .country("country")
-                .county("county")
-                .townCity("town-city")
-                .uprn("uprn1")
-                .postCode("post-code")
+                .addressLine1("up-addLine1")
+                .addressLine2("up-addLine2")
+                .addressLine3("up-addLine3")
+                .country("up-country")
+                .county("up-county")
+                .townCity("up-town-city")
+                .uprn("up-uprn1")
+                .postCode("up-post-code")
                 .dxAddress(Arrays.asList(dxAddressCreationRequest()
                     .dxNumber("DX 1234567890")
-                    .dxExchange("dxExchange").build()));
+                    .dxExchange("up-dxExchange").build()));
 
     }
 
@@ -370,7 +353,47 @@ public class OrganisationFixtures {
         .ContactInformationCreationRequestBuilder createContactInformationRequestWithOnlyDxAddress() {
 
         return aContactInformationCreationRequest()
+            .addressLine1("Updated-addressLine1")
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("DX 0000000000")
+                .dxExchange("Updated-dxExchange").build()));
+
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder contactInformationWithOnlyDxNumberChanged() {
+
+        return aContactInformationCreationRequest()
             .addressLine1("addressLine1")
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("DX 0000000000")
+                .dxExchange("dxExchange").build()));
+
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder contactInformationWithOnlyDxExchangeChanged() {
+
+        return aContactInformationCreationRequest()
+            .addressLine1("addressLine1")
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("Up-dxExchange").build()));
+
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder contactInformationWithOnlyAddressLine3Changed() {
+
+        return aContactInformationCreationRequest()
+            .addressLine1("addLine1")
+            .addressLine2("addLine2")
+            .addressLine3("up-addLine3")
+            .country("country")
+            .county("county")
+            .townCity("town-city")
+            .uprn("uprn1")
+            .postCode("post-code")
             .dxAddress(Arrays.asList(dxAddressCreationRequest()
                 .dxNumber("DX 1234567890")
                 .dxExchange("dxExchange").build()));
@@ -381,14 +404,14 @@ public class OrganisationFixtures {
         .ContactInformationCreationRequestBuilder createContactInformationRequestWithoutDxAddress() {
 
         return aContactInformationCreationRequest()
-            .addressLine1("addressLine1")
-            .addressLine2("addressLine2")
-            .addressLine3("addressLine3")
-            .country("country")
-            .county("county")
-            .townCity("town-city")
+            .addressLine1("upaddressLine1")
+            .addressLine2("upaddressLine2")
+            .addressLine3("upaddressLine3")
+            .country("upcountry")
+            .county("upcounty")
+            .townCity("uptown-city")
             .uprn("uprn1")
-            .postCode("some-post-code");
+            .postCode("uppost-code");
 
     }
 
