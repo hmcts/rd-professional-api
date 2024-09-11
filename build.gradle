@@ -65,7 +65,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'LINE'
                 value = 'COVEREDRATIO'
-                minimum = 0.79
+                minimum = 0.79 // Raised a ticket DTSRD-3391 to improve test coverage
             }
         }
     }
