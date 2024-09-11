@@ -1228,7 +1228,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         //Delete organisation
         professionalApiClient.deleteOrganisation(organisationIdentifier,
-                hmctsAdmin, NOT_FOUND);
+                    hmctsAdmin, NO_CONTENT);
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
     }
