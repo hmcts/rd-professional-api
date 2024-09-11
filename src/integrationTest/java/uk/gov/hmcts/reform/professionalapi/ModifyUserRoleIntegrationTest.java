@@ -244,7 +244,7 @@ class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest 
         String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         Map<String, Object> response = professionalReferenceDataClient
-                .modifyUserRolesOfOrganisation(createModifyUserProfileData(), "%7C", userIdentifier, hmctsAdmin);
+                .modifyUserRolesOfOrganisation(createModifyUserProfileData(), "ABCD", userIdentifier, hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("400");
 
