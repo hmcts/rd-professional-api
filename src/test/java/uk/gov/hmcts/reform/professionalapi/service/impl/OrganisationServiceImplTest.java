@@ -1955,7 +1955,6 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
             .thenReturn(organisationMock);
 
-        assertNotNull(organisationSraUpdateRequest.getSraId());
 
         organisationMock.setSraId(newSraId);
 

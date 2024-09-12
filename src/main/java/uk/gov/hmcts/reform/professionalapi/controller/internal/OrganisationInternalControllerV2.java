@@ -287,7 +287,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     @Secured({"prd-admin"})
     public ResponseEntity<Object> updateOrganisationSra(

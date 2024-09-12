@@ -572,5 +572,4 @@ class OrganisationInternalControllerTest {
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
 
-
 }
