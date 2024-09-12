@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -27,9 +30,15 @@ import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -53,10 +62,50 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 public class ExceptionMapper {
 
+    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
+    private static final Set<String> NEW_ENDPOINT_SUFFIXES = new HashSet<>();
+    private static final String INTERNAL_V1_REQUEST_MAPPING = "refdata/internal/v1"
+            + "/organisations";
+
+    static {
+        // Add all new endpoint suffixes to the set
+        NEW_ENDPOINT_SUFFIXES.add("/name");
+    }
+
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
-    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
+    private static String getTimeStamp() {
+        return (LocalDateTime.now()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.SSS"));
+    }
+
+    private static ResponseEntity<Object> collectErrors(MethodArgumentNotValidException ex) {
+        // Get all the field errors
+        final String errorDescription =
+                ex.getBindingResult().getFieldErrors().stream()
+                        .map(FieldError::getDefaultMessage) // Extract default message
+                        .collect(Collectors.joining(", "));
+        final ErrorResponse errorDetails =
+                new ErrorResponse(METHOD_ARG_NOT_VALID.getErrorMessage(),
+                        errorDescription,
+                        getTimeStamp());
+        return new ResponseEntity<>(errorDetails, BAD_REQUEST);
+    }
+
+    private static ResponseEntity<Object> collectErrors(ConstraintViolationException ex) {
+
+        // Get all the field errors
+        final String errorDescription = ex.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
+
+        final ErrorResponse errorDetails =
+                new ErrorResponse(INVALID_REQUEST.getErrorMessage(),
+                        errorDescription,
+                        getTimeStamp());
+        return new ResponseEntity<>(errorDetails, BAD_REQUEST);
+
+    }
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
@@ -70,10 +119,32 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
     }
 
+    private boolean isNewEndpointPoint() {
+        ServletRequestAttributes requestAttributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (nonNull(requestAttributes)) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            String requestUri = request.getRequestURI();
+
+            return requestUri.contains(INTERNAL_V1_REQUEST_MAPPING) && matchesNewEndpoint(requestUri);
+        }
+        return false;
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> annotationDrivenValidationError(
             MethodArgumentNotValidException ex) {
+
+        if (isNewEndpointPoint()) {
+            return collectErrors(ex);
+        }
+
         return errorDetailsResponseEntity(ex, BAD_REQUEST, METHOD_ARG_NOT_VALID.getErrorMessage());
+    }
+
+    private boolean matchesNewEndpoint(String requestUri) {
+        // Check if the URI ends with any of the new endpoint suffixes
+        return NEW_ENDPOINT_SUFFIXES.stream().anyMatch(requestUri::endsWith);
     }
 
     @ExceptionHandler(InvalidRequest.class)
@@ -105,7 +176,6 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, CONFLICT, DUPLICATE_USER.getErrorMessage());
     }
 
-
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
         String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
@@ -127,8 +197,12 @@ public class ExceptionMapper {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> constraintViolationError(ConstraintViolationException ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
 
+        if (isNewEndpointPoint()) {
+            return collectErrors(ex);
+        }
+
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -146,7 +220,6 @@ public class ExceptionMapper {
         HttpStatus httpStatus = ex.getStatusCode();
         return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
     }
-
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
@@ -175,11 +248,7 @@ public class ExceptionMapper {
 
     @ExceptionHandler(InvalidContactInformations.class)
     public ResponseEntity<Object> handleContactInformationException(InvalidContactInformations ex) {
-        return  errorDetailsContactInfoResponseEntity(BAD_REQUEST,ex.getContactInfoValidations());
-    }
-
-    private String getTimeStamp() {
-        return (LocalDateTime.now()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.SSS"));
+        return errorDetailsContactInfoResponseEntity(BAD_REQUEST, ex.getContactInfoValidations());
     }
 
     private Throwable getRootException(Throwable exception) {

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
@@ -91,6 +92,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -148,6 +150,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+
+
+
     @Override
     @Transactional
     public OrganisationResponse createOrganisationFrom(
@@ -180,7 +185,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
             addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
         }
-
         return new OrganisationResponse(organisation);
     }
 
@@ -1054,6 +1058,24 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Object> updateOrganisationName(
+        OrganisationNameUpdateRequest organisationNameUpdateRequest, String organisationIdentifier) {
+
+        var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        if (existingOrganisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+        } else if (isNotBlank(organisationNameUpdateRequest.getName())) {
+            existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameUpdateRequest.getName()));
+            existingOrganisation.setLastUpdated(LocalDateTime.now());
+            organisationRepository.save(existingOrganisation);
+        }
+
+        return ResponseEntity.status(200).build();
     }
 
 }

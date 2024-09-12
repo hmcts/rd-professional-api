@@ -16,9 +16,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,13 +43,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.time.LocalDateTime.parse;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -54,8 +60,6 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
@@ -142,7 +146,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         superUserEmail = generateRandomEmail();
         invitedUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest()
+                .superUser(UserCreationRequest.aUserCreationRequest()
                         .firstName("firstName")
                         .lastName("lastName")
                         .email(superUserEmail)
@@ -212,7 +216,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
         Response response =
-                professionalApiClient.createOrganisationWithoutS2SToken(anOrganisationCreationRequest().build());
+                professionalApiClient
+                        .createOrganisationWithoutS2SToken(OrganisationCreationRequest
+                                .anOrganisationCreationRequest().build());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
@@ -245,7 +251,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(existingUserCreationRequest.getEmail());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
+                hmctsAdmin, newUserCreationRequest, CONFLICT);
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
         log.info("inviteUserWithDuplicateUserShouldReturnConflict :: END");
     }
@@ -414,7 +420,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(orgresponse.get("organisations").toString()).contains("status=REVIEW");
         log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: END");
     }
-
 
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");
@@ -778,6 +783,83 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
 
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: END");
+    }
+
+    @Test
+    void updateOrganisationNameShouldReturnSuccess() {
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        //create organisation
+        String updatedName = "updatedName";
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier, OK);
+        //create request to update organisation
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest(updatedName);
+
+        //call endpoint to update name as 'updatedname'
+        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+                organisationNameUpdateRequest, hmctsAdmin, organisationIdentifier, OK);
+        assertNotNull(orgUpdatedNameResponse);
+        assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(200);
+
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+
+        final Object orgName = orgResponse.get("name");
+        final Object lastUpdated = orgResponse.get("lastUpdated");
+
+        assertThat(orgName).isNotNull().isEqualTo(updatedName);
+
+        assertThat(lastUpdated)
+                .asInstanceOf(STRING)
+                .satisfies(localDateTime -> {
+                    final LocalDate localDate =
+                            parse(localDateTime).toLocalDate();
+                    assertThat(localDate).isEqualTo(LocalDate.now());
+                });
+
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(organisationIdentifier,
+                    hmctsAdmin, NO_CONTENT);
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+    }
+
+    @Test
+    void updateOrganisationNameShouldReturnFailureIfNoName() {
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier);
+
+        OrganisationNameUpdateRequest organisationNameUpdateRequest =
+                new OrganisationNameUpdateRequest("");
+
+        //call endpoint to update empty name
+        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+                organisationNameUpdateRequest, hmctsAdmin, organisationIdentifier, BAD_REQUEST);
+        assertNotNull(orgUpdatedNameResponse);
+        assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedNameResponse.as(Map.class).get("errorDescription"))
+                .asInstanceOf(STRING)
+                .isNotNull()
+                .isEqualTo("Name is required");
+
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(organisationIdentifier,
+                hmctsAdmin, NO_CONTENT);
+
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: END");
     }
 
     @Test

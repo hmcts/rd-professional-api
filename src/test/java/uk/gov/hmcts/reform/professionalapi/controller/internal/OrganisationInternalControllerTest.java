@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -87,6 +88,7 @@ class OrganisationInternalControllerTest {
     private PaymentAccountService paymentAccountServiceMock;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
+    private OrganisationNameUpdateRequest organisationNameUpdateRequest;
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
@@ -161,7 +163,7 @@ class OrganisationInternalControllerTest {
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null,"Doctor",null);
-
+        organisationNameUpdateRequest = new OrganisationNameUpdateRequest("name");
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -570,6 +572,29 @@ class OrganisationInternalControllerTest {
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
+    }
+
+    @Test
+    void testUpdateOrgName() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String updatedName = "NewName";
+        organisation.setName(updatedName);
+        organisationNameUpdateRequest.setName(updatedName);
+
+        when(organisationServiceMock.updateOrganisationName(organisationNameUpdateRequest,
+            organisation.getOrganisationIdentifier())).thenReturn(ResponseEntity.status(200).build());
+
+        ResponseEntity<Object> response = organisationInternalController
+            .updateOrganisationName(organisationNameUpdateRequest,organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsAndActive(
+            organisation.getOrganisationIdentifier());
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationName(organisationNameUpdateRequest, organisation.getOrganisationIdentifier());
+
     }
 
 }

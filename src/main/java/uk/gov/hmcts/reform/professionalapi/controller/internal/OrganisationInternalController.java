@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
@@ -56,11 +57,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -698,6 +701,68 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @Operation(
+        summary = "Updates an Organisation's name",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        })
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Organisation name has been updated",
+        content = @Content(schema = @Schema(implementation = String.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "If Organisation request sent with null/invalid values for mandatory fields",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "No Organisation found with the given ID",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @PutMapping(
+        value = "/{orgId}/name",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.OK)
+    @Secured({"prd-admin"})
+    public ResponseEntity<Object> updateOrganisationName(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+        @Valid @NotNull @RequestBody OrganisationNameUpdateRequest organisationNameUpdateRequest,
+        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+            message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(orgId);
+
+        if (isBlank(organisationNameUpdateRequest.getName())) {
+            throw new InvalidRequest("Name is required");
+        }
+
+        ResponseEntity<Object> organisationsDetailResponse = organisationService
+            .updateOrganisationName(organisationNameUpdateRequest, orgId);
+
+        return ResponseEntity.status(organisationsDetailResponse.getStatusCode()).build();
+    }
+
+
+    @Operation(
             summary = "Retrieves Organisations by Organisation Profile IDs",
             description = "**Bearer token not required to access API. Only a valid s2s token**",
             security = {
@@ -745,4 +810,5 @@ public class OrganisationInternalController extends SuperController {
                 .status(HttpStatus.OK)
                 .body(response);
     }
+
 }

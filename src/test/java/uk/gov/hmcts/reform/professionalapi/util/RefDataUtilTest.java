@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -86,7 +85,6 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleU
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 class RefDataUtilTest {
 
     @MockBean
@@ -474,7 +472,7 @@ class RefDataUtilTest {
         Integer page = 0;
         Sort sort = mock(Sort.class);
 
-        Pageable pageable = RefDataUtil.createPageableObject(page, null, sort);
+        Pageable pageable = RefDataUtil.createPageableObject(page, 10, sort);
 
         assertThat(pageable).isNotNull();
         assertThat(pageable.getPageSize()).isEqualTo(10);

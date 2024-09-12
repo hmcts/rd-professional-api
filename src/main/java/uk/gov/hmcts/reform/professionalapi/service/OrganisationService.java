@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
@@ -46,8 +47,11 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
+    ResponseEntity<Object> updateOrganisationName(
+        OrganisationNameUpdateRequest organisationNameUpdateRequest, String organisationIdentifier);
+
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
-                                            String organisationIdentifier,Boolean isOrgApprovalRequest);
+                                            String organisationIdentifier, Boolean isOrgApprovalRequest);
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 

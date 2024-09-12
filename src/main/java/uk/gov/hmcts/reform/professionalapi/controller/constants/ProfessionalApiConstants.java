@@ -54,6 +54,7 @@ public class ProfessionalApiConstants {
     public static final int ERROR_CODE_500 = 500;
     public static final int STATUS_CODE_204 = 204;
     public static final int USER_COUNT = 1;
+    public static final int ERROR_LENGTH = 12;
     public static final String ERROR_MESSAGE_400_ADMIN_NOT_PENDING = "The organisation admin is not in Pending state";
     public static final String ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER = "The organisation has more than one user"
             .concat("registered with HMCTS");
