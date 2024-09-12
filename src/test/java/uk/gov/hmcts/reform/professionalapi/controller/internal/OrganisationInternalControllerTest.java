@@ -581,8 +581,6 @@ class OrganisationInternalControllerTest {
         organisation.setName(updatedName);
         organisationNameUpdateRequest.setName(updatedName);
 
-        assertThat(organisationNameUpdateRequest.getName()).isNotEmpty();
-
         when(organisationServiceMock.updateOrganisationName(organisationNameUpdateRequest,
             organisation.getOrganisationIdentifier())).thenReturn(ResponseEntity.status(200).build());
 

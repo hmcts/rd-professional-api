@@ -1954,7 +1954,6 @@ class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
             .thenReturn(organisationMock);
 
-        assertNotNull(organisationNameUpdateRequest.getName());
 
         organisationMock.setName(newName);
 
