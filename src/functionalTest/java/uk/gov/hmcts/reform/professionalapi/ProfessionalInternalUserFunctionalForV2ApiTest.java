@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -568,6 +569,10 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(attr.get("value").toString()).isEqualTo(
             "{\"regulatorType\":\"Solicitor Regulation Authority "
                 + "(SRA)\",\"organisationRegistrationNumber\":\"" + updatedSra + "\"}");
+
+        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
         log.info("updateOrganisationSraIdShouldReturnSuccess :: END");
     }
 

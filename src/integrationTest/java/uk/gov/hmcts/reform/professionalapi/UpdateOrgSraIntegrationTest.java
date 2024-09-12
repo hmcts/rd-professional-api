@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,8 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
             "{\"regulatorType\":\"Solicitor Regulation Authority "
                 + "(SRA)\",\"organisationRegistrationNumber\":\"" + sraId + "\"}");
 
+        LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
     }
 
     @Test

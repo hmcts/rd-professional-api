@@ -1099,6 +1099,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                     throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
                 }
             }
+            existingOrganisation.setSraId(organisationSraUpdateRequest.getSraId());
+            existingOrganisation.setLastUpdated(LocalDateTime.now());
             organisationRepository.save(existingOrganisation);
         }
         return ResponseEntity.status(200).build();
