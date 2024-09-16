@@ -36,7 +36,7 @@ ext {
 def versions = [
         lombok          : '1.18.32',
         pitest          : '1.16.1',
-        reformLogging   : '6.1.5',
+        reformLogging   : '6.1.6',
         camel           : '3.8.0',
         pact_version    : '4.1.7',
         launchDarklySdk : '5.10.9',
