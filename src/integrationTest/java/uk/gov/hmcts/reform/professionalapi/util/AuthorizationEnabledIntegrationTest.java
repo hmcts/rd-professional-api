@@ -167,7 +167,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACTIVE = "ACTIVE";
     protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE =
             "User status must be Active to perform this operation";
-    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access Denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
     protected static final String ORG_INFO = "organisationInfo";
@@ -180,11 +180,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected FeatureToggleServiceImpl featureToggleService;
 
     @MockBean
-    public static JwtDecoder jwtDecoder;
+    protected JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
+        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration, jwtDecoder);
         when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
     }
 
@@ -292,7 +292,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         orgAttributeRepository.deleteAll();
         bulkCustomerDetailsRepository.deleteAll();
         organisationRepository.deleteAll();
-        JwtDecoderMockBuilder.resetJwtDecoder();
     }
 
     protected String settingUpOrganisation(String role) {
