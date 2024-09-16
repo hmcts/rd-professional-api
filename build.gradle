@@ -9,7 +9,6 @@ buildscript {
     }
 }
 
-
 plugins {
     id 'application'
     id 'uk.gov.hmcts.java' version '0.12.63'
