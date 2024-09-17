@@ -1065,19 +1065,17 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    @Transactional
     public List<UpdateOrgNameResponse> updateOrganisationName(
         Organisation existingOrganisation, OrganisationNameUpdateRequest.OrganisationNameUpdateData
         organisationNameUpdateData,List<UpdateOrgNameResponse> updateOrgNameResponsesList) {
 
         existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameUpdateData.getName()));
         existingOrganisation.setLastUpdated(LocalDateTime.now());
-        Organisation persistedOrganisation = null;
         try {
-            persistedOrganisation = organisationRepository.save(existingOrganisation);
+            organisationRepository.save(existingOrganisation);
             updateOrgNameResponsesList.add(new UpdateOrgNameResponse(existingOrganisation.getOrganisationIdentifier(),
                 "success", HttpStatus.OK.value(),"Name updated successfully"));
-        } catch (ConstraintViolationException ex) {
+        } catch (Exception ex) {
             updateOrgNameResponsesList.add(new UpdateOrgNameResponse(existingOrganisation.getOrganisationIdentifier(),
                 "failure", HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Failed to update the name for the given organisationIdentifier. Reason : "

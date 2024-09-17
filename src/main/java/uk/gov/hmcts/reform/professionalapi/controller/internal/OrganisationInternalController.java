@@ -731,11 +731,6 @@ public class OrganisationInternalController extends SuperController {
         description = "No Organisation found with the given ID",
         content = @Content
     )
-    @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
-    )
 
     @PutMapping(
         value = "/name",
@@ -776,7 +771,7 @@ public class OrganisationInternalController extends SuperController {
                         updateOrgNameResponsesList.add(new UpdateOrgNameResponse(orgId,"failure",
                             HttpStatus.BAD_REQUEST.value(),"Organisation name is missing"));
                     } else {
-                        organisationService.updateOrganisationName(existingOrganisation,
+                       organisationService.updateOrganisationName(existingOrganisation,
                             organisationNameUpdateData, updateOrgNameResponsesList);
                     }
                 }

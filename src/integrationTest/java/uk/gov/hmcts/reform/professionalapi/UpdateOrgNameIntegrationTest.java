@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUpdateRequest;
@@ -134,40 +136,41 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
     }
 
 
-    /* @Test
+
+    @Test
       void update_name_with_exception_during_save_returns_500_partial_success() {
-          //create organisation
-          String orgId1 = getActiveOrganisationId();
-          String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(296);
+        //create organisation
+        String orgId1 = getActiveOrganisationId();
+        String orgId2 = getActiveOrganisationId();
 
-          //create request to update organisation
-          OrganisationNameUpdateRequest organisationNameUpdateRequest= new OrganisationNameUpdateRequest();
-          List<OrganisationNameUpdateRequest.OrganisationNameUpdateData> organisationNameUpdateDataList
-              = new ArrayList<>();
-          OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData1 =
-          new OrganisationNameUpdateRequest.OrganisationNameUpdateData
+        //create request to update organisation
+        String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(296);
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = createOrganisationNameUpdateRequest(
+            organisationNameViolatingDatabaseMaxLengthConstraint,"updatedName1",orgId1,orgId2);
+        //create request to update organisation
 
-              (organisationNameViolatingDatabaseMaxLengthConstraint,orgId1);
-          organisationNameUpdateDataList.add(organisationNameUpdateData1 );
-          organisationNameUpdateRequest.setOrganisationNameUpdateDataList(organisationNameUpdateDataList);
+        Map<String, Object> orgUpdatedNameResponse = professionalReferenceDataClient
+            .updateOrgName(organisationNameUpdateRequest,hmctsAdmin);
+        LinkedHashMap responses = (LinkedHashMap)orgUpdatedNameResponse.get("response_body");
 
-          ResponseEntity<Map> orgUpdatedNameResponse = professionalReferenceDataClient
-              .updateOrgNameException(organisationNameUpdateRequest,hmctsAdmin);*/
+        assertThat(responses.get("status")).isEqualTo("partial_success");
 
-    /* orgUpdatedNameResponse.body().as(Map.class).get("response_body");
+        ArrayList responseList = (ArrayList)responses.get("names");
+        LinkedHashMap result1  = (LinkedHashMap)responseList.get(0);
+        assertThat(result1.get("organisationId")).isEqualTo(orgId1);
+        assertThat(result1.get("status")).isEqualTo("failure");
+        assertThat(result1.get("statusCode")).isEqualTo(500);
+        assertThat(result1.get("message").toString().contains(
+            "Failed to update the name for the given organisationIdentifier. Reason :"));
+        LinkedHashMap result  = (LinkedHashMap)responseList.get(1);
+        assertThat(result.get("organisationId")).isEqualTo(orgId2);
+        assertThat(result.get("status")).isEqualTo("success");
+        assertThat(result.get("statusCode")).isEqualTo(200);
+        assertThat(result.get("message")).isEqualTo("Name updated successfully");
 
-          assertThat(responses.get("status")).isEqualTo("failure");
+        deleteCreatedTestOrganisations(orgId1,  orgId2);
 
-          ArrayList responseList = (ArrayList)responses.get("names");
-          LinkedHashMap result  = (LinkedHashMap)responseList.get(1);
-          assertThat(result.get("organisationId")).isEqualTo(orgId1);
-          assertThat(result.get("status")).isEqualTo("failure");
-          assertThat(result.get("statusCode")).isEqualTo(500);
-          assertThat(result.get("message")).isEqualTo("Organisation name is missing");*/
-
-    //     professionalReferenceDataClient.deleteOrganisation( hmctsAdmin,orgId1);
-
-    // }
+    }
 
 
     private String getActiveOrganisationId() {
