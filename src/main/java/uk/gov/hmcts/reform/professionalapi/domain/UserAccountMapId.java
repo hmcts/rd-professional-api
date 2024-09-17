@@ -16,13 +16,12 @@ import java.io.Serializable;
 public class UserAccountMapId implements Serializable {
 
     @ManyToOne
-    @JoinColumn(name = "PROFESSIONAL_USER_ID",insertable = false,
-            updatable = false, nullable = false)
+    @JoinColumn(name = "PROFESSIONAL_USER_ID",
+            nullable = false)
     private ProfessionalUser professionalUser;
 
     @ManyToOne
-    @JoinColumn(name = "PAYMENT_ACCOUNT_ID", insertable = false,
-            updatable = false, nullable = false)
+    @JoinColumn(name = "PAYMENT_ACCOUNT_ID",nullable = false)
     private PaymentAccount paymentAccount;
 
 }

@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
@@ -656,6 +657,7 @@ public class OrganisationInternalController extends SuperController {
                 .body(updatePbaStatusResponse);
     }
 
+
     @Operation(
             summary = "Retrieves the organisation details of a user",
             description = "**IDAM Roles to access API** : <br> prd-admin",
@@ -745,4 +747,59 @@ public class OrganisationInternalController extends SuperController {
                 .status(HttpStatus.OK)
                 .body(response);
     }
+
+    @Operation(
+        summary = "Updates the  admin user of an Organisation",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+    )
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "The admin user of the organisation has been successfully updated",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "An invalid request was provided",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized Error : "
+            + "The requested resource is restricted and requires authentication",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "No Organisation was found with the given organisationIdentifier",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @PutMapping(
+        path = "/updateadmin",
+        produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<Object> updateOrgAdmin(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "adminUpdateRequest")
+        @Valid @NotNull @RequestBody UserUpdateRequest userUpdateRequest) {
+
+        return updateAdminForOrganisation(userUpdateRequest);
+
+    }
+
 }

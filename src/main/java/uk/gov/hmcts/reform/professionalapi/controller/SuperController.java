@@ -32,10 +32,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -59,6 +61,7 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 import java.time.LocalDateTime;
@@ -114,6 +117,8 @@ public abstract class SuperController {
     @Autowired
     protected PaymentAccountService paymentAccountService;
     @Autowired
+    protected UserAttributeService userAttributeService;
+    @Autowired
     protected PrdEnumService prdEnumService;
     @Autowired
     protected UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
@@ -127,6 +132,8 @@ public abstract class SuperController {
     protected PaymentAccountValidator paymentAccountValidator;
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
+    @Autowired
+    protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
     @Autowired
     protected MfaStatusService mfaStatusService;
     @Autowired
@@ -330,6 +337,9 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false, true, false));
     }
 
+
+
+
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmailForV2Api(String email) {
 
         validateEmail(email);
@@ -342,6 +352,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponseV2(organisation,
                         false, true, false,true));
     }
+
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
@@ -381,8 +392,6 @@ public abstract class SuperController {
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {
-                log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()),
-                        loggingComponentName);
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
@@ -701,6 +710,14 @@ public abstract class SuperController {
                 .collect(Collectors.toSet());
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
     }
+
+    protected ResponseEntity<Object> updateAdminForOrganisation(UserUpdateRequest userUpdateRequest) {
+
+        validateEmail(userUpdateRequest.getExistingAdminEmail());
+        validateEmail(userUpdateRequest.getNewAdminEmail());
+        return organisationService.updateOrganisationAdmin(userUpdateRequest);
+    }
+
 
     public String getUserToken() {
         var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
