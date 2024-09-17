@@ -280,8 +280,6 @@ class OrganisationServiceImplTest {
                 contactInformationCreationRequests, "Doctor", orgAttributeRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
 
-        organisationNameUpdateRequest = new OrganisationNameUpdateRequest("name");
-
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
         when(professionalUserRepositoryMock.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
