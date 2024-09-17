@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgNameResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -1938,41 +1939,26 @@ class OrganisationServiceImplTest {
 
 
     @Test
-    void test_updateOrganisationNameAndSra() {
-        String newName = "TestOrgName";
-        final String orgIdentifier = "9KS20WT";
-        organisationNameUpdateRequest.setName(newName);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-
-        when(organisationRepository.findByOrganisationIdentifier(orgId)).thenReturn(null);
-        assertThrows(EmptyResultDataAccessException.class, () ->
-            sut.retrieveOrganisation(orgId, false));
-        verify(organisationRepository, times(1))
-            .findByOrganisationIdentifier(any(String.class));
+    void test_updateOrganisationName() {
+        Organisation organisation1 = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData1 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(
+                organisation1.getOrganisationIdentifier(),"New Name 1");
+        final List<UpdateOrgNameResponse> updateOrgNameResponsesList = new ArrayList<>();
+        organisation1.setName(RefDataUtil.removeEmptySpaces(organisationNameUpdateData1.getName()));
+        organisation1.setLastUpdated(LocalDateTime.now());
 
         Organisation organisationMock = mock(Organisation.class);
-        when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
-            .thenReturn(organisationMock);
+        when(organisationRepository.save(organisation1)).thenReturn(organisationMock);
 
+        List<UpdateOrgNameResponse> updateNameResponse = sut.updateOrganisationName(organisation1,
+            organisationNameUpdateData1,updateOrgNameResponsesList);
 
-        organisationMock.setName(newName);
-
-        OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
-
-        when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
-
-        when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
-
-        ResponseEntity<Object> responseEntity = sut.updateOrganisationName(
-            organisationNameUpdateRequest,orgIdentifier);
-
-        assertNotNull(responseEntity);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertNotNull(updateNameResponse);
 
         verify(organisationRepository, times(1))
-            .findByOrganisationIdentifier(orgIdentifier);
-        verify(organisationRepository, times(1))
-            .save(organisationMock);
+            .save(organisation1);
 
     }
 

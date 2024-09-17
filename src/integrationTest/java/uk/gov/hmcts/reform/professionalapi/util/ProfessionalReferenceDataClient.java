@@ -1025,11 +1025,24 @@ public class ProfessionalReferenceDataClient {
 
 
 
-    public Map<String, Object> updateOrgName(
-        OrganisationNameUpdateRequest organisationNameUpdateRequest, String role, String organisationIdentifier) {
+    public ResponseEntity<Map> updateOrgNameException(
+        OrganisationNameUpdateRequest organisationNameUpdateRequest, String role) {
 
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier + "/name";
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH +  "/name";
+
+        HttpEntity<OrganisationNameUpdateRequest> requestEntity = new HttpEntity<>(organisationNameUpdateRequest,
+            getMultipleAuthHeaders(role));
+        responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        return responseEntity;
+    }
+
+    public Map<String, Object> updateOrgName(
+        OrganisationNameUpdateRequest organisationNameUpdateRequest, String role) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH +  "/name";
         try {
             HttpEntity<OrganisationNameUpdateRequest> requestEntity = new HttpEntity<>(organisationNameUpdateRequest,
                 getMultipleAuthHeaders(role));

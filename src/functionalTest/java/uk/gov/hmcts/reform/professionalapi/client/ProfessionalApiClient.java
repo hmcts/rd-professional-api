@@ -1317,12 +1317,12 @@ public class ProfessionalApiClient {
     }
 
     public Response updatesOrganisationName(OrganisationNameUpdateRequest organisationNameUpdateRequest,
-                                                       String role,String organisationIdentifier,
+                                                       String role,
                                                        HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(organisationNameUpdateRequest)
-            .put("/refdata/internal/v1/organisations/" + organisationIdentifier + "/name")
+            .put("/refdata/internal/v1/organisations/name")
             .andReturn();
 
         log.info("{}:: Update organisation Name  response: {}",

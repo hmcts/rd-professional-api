@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameUp
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
@@ -38,28 +37,30 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.time.LocalDateTime.parse;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.MULTI_STATUS;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
@@ -146,7 +147,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         superUserEmail = generateRandomEmail();
         invitedUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
-                .superUser(UserCreationRequest.aUserCreationRequest()
+                .superUser(aUserCreationRequest()
                         .firstName("firstName")
                         .lastName("lastName")
                         .email(superUserEmail)
@@ -216,9 +217,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
         Response response =
-                professionalApiClient
-                        .createOrganisationWithoutS2SToken(OrganisationCreationRequest
-                                .anOrganisationCreationRequest().build());
+                professionalApiClient.createOrganisationWithoutS2SToken(anOrganisationCreationRequest().build());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
@@ -420,6 +419,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(orgresponse.get("organisations").toString()).contains("status=REVIEW");
         log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: END");
     }
+
 
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");
@@ -789,77 +789,247 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void updateOrganisationNameShouldReturnSuccess() {
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
         //create organisation
-        String updatedName = "updatedName";
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String organisationIdentifier = (String) response.get("organisationIdentifier");
-        assertThat(organisationIdentifier).isNotEmpty();
-
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
-
-        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier, OK);
+        String orgId1 = createActiveOrganisation();
+        String orgId2 = createActiveOrganisation();
+        String updatedName1 = "updatedName1";
+        String updatedName2 = "updatedName2";
         //create request to update organisation
-        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest(updatedName);
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest();
+        List<OrganisationNameUpdateRequest.OrganisationNameUpdateData> organisationNameUpdateDataList =
+            new ArrayList<>();
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData1 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(updatedName1,orgId1);
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData2 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(updatedName2,orgId2);
+        organisationNameUpdateDataList.add(organisationNameUpdateData1);
+        organisationNameUpdateDataList.add(organisationNameUpdateData2);
+        organisationNameUpdateRequest.setOrganisationNameUpdateDataList(organisationNameUpdateDataList);
 
         //call endpoint to update name as 'updatedname'
         Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
-                organisationNameUpdateRequest, hmctsAdmin, organisationIdentifier, OK);
+            organisationNameUpdateRequest, hmctsAdmin, OK);
         assertNotNull(orgUpdatedNameResponse);
-        assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(200);
-
-        //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+        assertThat(orgUpdatedNameResponse.body().as(Map.class).get("status")).isEqualTo("success");
+        assertThat(orgUpdatedNameResponse.body().as(Map.class).get("message")).isEqualTo(
+            "All names updated successfully");
+        //retrieve 1st saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(orgId1, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
 
         final Object orgName = orgResponse.get("name");
-        final Object lastUpdated = orgResponse.get("lastUpdated");
+        assertThat(orgName).isNotNull().isEqualTo(updatedName1);
 
-        assertThat(orgName).isNotNull().isEqualTo(updatedName);
-
-        assertThat(lastUpdated)
-                .asInstanceOf(STRING)
-                .satisfies(localDateTime -> {
-                    final LocalDate localDate =
-                            parse(localDateTime).toLocalDate();
-                    assertThat(localDate).isEqualTo(LocalDate.now());
-                });
-
+        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
         //Delete organisation
-        professionalApiClient.deleteOrganisation(organisationIdentifier,
-                    hmctsAdmin, NO_CONTENT);
+        professionalApiClient.deleteOrganisation(orgId1,
+            hmctsAdmin, NO_CONTENT);
+
+        //retrieve 2st saved organisation by id
+        var orgResponse2 = professionalApiClient.retrieveOrganisationDetails(orgId2, hmctsAdmin, OK);
+        assertThat(orgResponse2).isNotNull();
+
+        final Object orgName2 = orgResponse2.get("name");
+        assertThat(orgName2).isNotNull().isEqualTo(updatedName2);
+
+        LocalDateTime updatedDate2 =  LocalDateTime.parse(orgResponse2.get("lastUpdated").toString());
+        assertThat(updatedDate2.toLocalDate()).isEqualTo(LocalDate.now());
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(orgId2,
+            hmctsAdmin, NO_CONTENT);
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
+
     }
 
     @Test
     void updateOrganisationNameShouldReturnFailureIfNoName() {
         log.info("updateOrganisationNameShouldReturnFailureIfNoName :: STARTED");
+        //create organisation
+        String orgId1 = createActiveOrganisation();
+        String orgId2 = createActiveOrganisation();
 
+        //create request to update organisation
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest();
+        List<OrganisationNameUpdateRequest.OrganisationNameUpdateData> organisationNameUpdateDataList
+            = new ArrayList<>();
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData1 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(null,orgId1);
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData2 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(null,orgId2);
+        organisationNameUpdateDataList.add(organisationNameUpdateData1);
+        organisationNameUpdateDataList.add(organisationNameUpdateData2);
+        organisationNameUpdateRequest.setOrganisationNameUpdateDataList(organisationNameUpdateDataList);
+
+        //call endpoint to update empty name
+        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+            organisationNameUpdateRequest,hmctsAdmin, MULTI_STATUS);
+        assertNotNull(orgUpdatedNameResponse);
+        assertThat(orgUpdatedNameResponse.body().as(Map.class).get("status")).isEqualTo("failure");
+        ArrayList names = (ArrayList) orgUpdatedNameResponse.body().as(Map.class).get("names");
+        LinkedHashMap response1 = (LinkedHashMap) names.get(0);
+        LinkedHashMap response2 = (LinkedHashMap) names.get(1);
+
+        assertThat(response1.get("organisationId")).isEqualTo(orgId1);
+        assertThat(response2.get("organisationId")).isEqualTo(orgId2);
+
+        assertThat(response1.get("status")).isEqualTo("failure");
+        assertThat(response2.get("status")).isEqualTo("failure");
+
+        assertThat(response1.get("statusCode")).isEqualTo(400);
+        assertThat(response2.get("statusCode")).isEqualTo(400);
+
+        assertThat(response1.get("message")).isEqualTo("Organisation name is missing");
+        assertThat(response2.get("message")).isEqualTo("Organisation name is missing");
+
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(orgId1, hmctsAdmin, NO_CONTENT);
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(orgId2, hmctsAdmin, NO_CONTENT);
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: END");
+    }
+
+    @Test
+    void updateOrganisationNameShouldReturnFailureIfNoOrgId() {
+        log.info("updateOrganisationNameShouldReturnFailureIfNoOrgId :: STARTED");
+
+        //create request to update organisation
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest();
+        List<OrganisationNameUpdateRequest.OrganisationNameUpdateData> organisationNameUpdateDataList
+            = new ArrayList<>();
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData1 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData("updatedName1",null);
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData2 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData("updatedName2",null);
+        organisationNameUpdateDataList.add(organisationNameUpdateData1);
+        organisationNameUpdateDataList.add(organisationNameUpdateData2);
+        organisationNameUpdateRequest.setOrganisationNameUpdateDataList(organisationNameUpdateDataList);
+
+        //call endpoint to update empty name
+        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+            organisationNameUpdateRequest,hmctsAdmin, MULTI_STATUS);
+        assertNotNull(orgUpdatedNameResponse);
+        assertThat(orgUpdatedNameResponse.body().as(Map.class).get("status")).isEqualTo("failure");
+        ArrayList names = (ArrayList) orgUpdatedNameResponse.body().as(Map.class).get("names");
+        LinkedHashMap response1 = (LinkedHashMap) names.get(0);
+        LinkedHashMap response2 = (LinkedHashMap) names.get(1);
+
+        assertThat(response1.get("status")).isEqualTo("failure");
+        assertThat(response2.get("status")).isEqualTo("failure");
+
+        assertThat(response1.get("statusCode")).isEqualTo(400);
+        assertThat(response2.get("statusCode")).isEqualTo(400);
+
+        assertThat(response1.get("message")).isEqualTo("Organisation id is missing");
+        assertThat(response2.get("message")).isEqualTo("Organisation id is missing");
+
+        log.info("updateOrganisationNameShouldReturnFailureIfNoOrgId :: END");
+    }
+
+    @Test
+    void updateOrganisationNameShouldReturnPartiualSuccessIfNoName() {
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: STARTED");
+        //create organisation
+        String orgId1 = createActiveOrganisation();
+        String orgId2 = createActiveOrganisation();
+
+        //create request to update organisation
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest();
+        List<OrganisationNameUpdateRequest.OrganisationNameUpdateData> organisationNameUpdateDataList =
+            new ArrayList<>();
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData1 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(null,orgId1);
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData2 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(null,orgId2);
+        organisationNameUpdateDataList.add(organisationNameUpdateData1);
+        organisationNameUpdateDataList.add(organisationNameUpdateData2);
+        organisationNameUpdateRequest.setOrganisationNameUpdateDataList(organisationNameUpdateDataList);
+
+        //call endpoint to update empty name
+        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+            organisationNameUpdateRequest,hmctsAdmin, MULTI_STATUS);
+        assertNotNull(orgUpdatedNameResponse);
+        assertThat(orgUpdatedNameResponse.body().as(Map.class).get("status")).isEqualTo("failure");
+        ArrayList names = (ArrayList) orgUpdatedNameResponse.body().as(Map.class).get("names");
+        LinkedHashMap response1 = (LinkedHashMap) names.get(0);
+        LinkedHashMap response2 = (LinkedHashMap) names.get(1);
+
+        assertThat(response1.get("organisationId")).isEqualTo(orgId1);
+        assertThat(response2.get("organisationId")).isEqualTo(orgId2);
+
+        assertThat(response1.get("status")).isEqualTo("failure");
+        assertThat(response2.get("status")).isEqualTo("failure");
+
+        assertThat(response1.get("statusCode")).isEqualTo(400);
+        assertThat(response2.get("statusCode")).isEqualTo(400);
+
+        assertThat(response1.get("message")).isEqualTo("Organisation name is missing");
+        assertThat(response2.get("message")).isEqualTo("Organisation name is missing");
+
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(orgId1, hmctsAdmin, NO_CONTENT);
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(orgId2, hmctsAdmin, NO_CONTENT);
+        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: END");
+    }
+
+    @Test
+    void updateOrganisationNameShouldReturnPartialSuccessIfNoName() {
+        log.info("updateOrganisationNameShouldReturnPartialSuccessIfNoName :: STARTED");
+        //create organisation
+        String orgId1 = createActiveOrganisation();
+        String orgId2 = createActiveOrganisation();
+
+        //create request to update organisation
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest();
+        List<OrganisationNameUpdateRequest.OrganisationNameUpdateData> organisationNameUpdateDataList
+            = new ArrayList<>();
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData1 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(null,orgId1);
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData2 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData("updatedName1",orgId2);
+        organisationNameUpdateDataList.add(organisationNameUpdateData1);
+        organisationNameUpdateDataList.add(organisationNameUpdateData2);
+        organisationNameUpdateRequest.setOrganisationNameUpdateDataList(organisationNameUpdateDataList);
+
+        //call endpoint to update empty name
+        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
+            organisationNameUpdateRequest,hmctsAdmin, MULTI_STATUS);
+        assertNotNull(orgUpdatedNameResponse);
+        assertThat(orgUpdatedNameResponse.body().as(Map.class).get("status")).isEqualTo("partial_success");
+        ArrayList names = (ArrayList) orgUpdatedNameResponse.body().as(Map.class).get("names");
+        LinkedHashMap response1 = (LinkedHashMap) names.get(0);
+        LinkedHashMap response2 = (LinkedHashMap) names.get(1);
+
+        assertThat(response1.get("organisationId")).isEqualTo(orgId1);
+        assertThat(response2.get("organisationId")).isEqualTo(orgId2);
+
+        assertThat(response1.get("status")).isEqualTo("failure");
+        assertThat(response2.get("status")).isEqualTo("success");
+
+        assertThat(response1.get("statusCode")).isEqualTo(400);
+        assertThat(response2.get("statusCode")).isEqualTo(200);
+
+        assertThat(response1.get("message")).isEqualTo("Organisation name is missing");
+        assertThat(response2.get("message")).isEqualTo("Name updated successfully");
+
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(orgId1, hmctsAdmin, NO_CONTENT);
+        //Delete organisation
+        professionalApiClient.deleteOrganisation(orgId2, hmctsAdmin, NO_CONTENT);
+        log.info("updateOrganisationNameShouldReturnPartialSuccessIfNoName :: END");
+    }
+
+
+    private String createActiveOrganisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
 
-        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier);
-
-        OrganisationNameUpdateRequest organisationNameUpdateRequest =
-                new OrganisationNameUpdateRequest("");
-
-        //call endpoint to update empty name
-        Response orgUpdatedNameResponse = professionalApiClient.updatesOrganisationName(
-                organisationNameUpdateRequest, hmctsAdmin, organisationIdentifier, BAD_REQUEST);
-        assertNotNull(orgUpdatedNameResponse);
-        assertThat(orgUpdatedNameResponse.statusCode()).isEqualTo(400);
-        assertThat(orgUpdatedNameResponse.as(Map.class).get("errorDescription"))
-                .asInstanceOf(STRING)
-                .isNotNull()
-                .isEqualTo("Name is required");
-
-        //Delete organisation
-        professionalApiClient.deleteOrganisation(organisationIdentifier,
-                hmctsAdmin, NO_CONTENT);
-
-        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: END");
+        professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier,OK);
+        return organisationIdentifier;
     }
 
     @Test
@@ -1313,4 +1483,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .sorted(Comparator.comparing(map -> (String) map.get(key)))
                 .collect(Collectors.toList());
     }
+
+
 }

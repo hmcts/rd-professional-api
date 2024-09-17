@@ -38,6 +38,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisatio
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateNameResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgNameResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -163,7 +165,7 @@ class OrganisationInternalControllerTest {
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null,"Doctor",null);
-        organisationNameUpdateRequest = new OrganisationNameUpdateRequest("name");
+
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -576,25 +578,57 @@ class OrganisationInternalControllerTest {
 
     @Test
     void testUpdateOrgName() {
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String updatedName = "NewName";
-        organisation.setName(updatedName);
-        organisationNameUpdateRequest.setName(updatedName);
+        Organisation organisation1 = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        Organisation organisation2 = new Organisation("Org-Name-2", OrganisationStatus.ACTIVE, "sra-id-1",
+            "companyN", false, "www.org.com");
 
-        when(organisationServiceMock.updateOrganisationName(organisationNameUpdateRequest,
-            organisation.getOrganisationIdentifier())).thenReturn(ResponseEntity.status(200).build());
+        OrganisationNameUpdateRequest organisationNameUpdateRequest = new OrganisationNameUpdateRequest();
+        List<OrganisationNameUpdateRequest.OrganisationNameUpdateData> organisationNameUpdateDataList
+            = new ArrayList<>();
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData1 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(
+                organisation1.getOrganisationIdentifier(),"New Name 1");
+        OrganisationNameUpdateRequest.OrganisationNameUpdateData organisationNameUpdateData2 =
+            new OrganisationNameUpdateRequest.OrganisationNameUpdateData(
+                organisation2.getOrganisationIdentifier(),"New Name 2");
+        organisationNameUpdateDataList.add(organisationNameUpdateData1);
+        organisationNameUpdateDataList.add(organisationNameUpdateData2);
+        organisationNameUpdateRequest.setOrganisationNameUpdateDataList(organisationNameUpdateDataList);
 
-        ResponseEntity<Object> response = organisationInternalController
-            .updateOrganisationName(organisationNameUpdateRequest,organisation.getOrganisationIdentifier());
+        final List<UpdateOrgNameResponse> updateOrgNameResponsesList = new ArrayList<>();
 
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+            .thenReturn(organisationMock);
+        when(orgIdValidatorMock.validateOrganisationId(any(),
+            any(),any())).thenReturn(updateOrgNameResponsesList);
+
+        when(organisationServiceMock. updateOrganisationName(any(),any(),any()))
+            .thenReturn(createResponse(updateOrgNameResponsesList,organisation1.getOrganisationIdentifier()));
+        UpdateNameResponse updateNameResponse = new UpdateNameResponse("success",
+            "All names updated successfully",null);
+        when(organisationServiceMock. generateUpdateNameResponse(any()))
+            .thenReturn(updateNameResponse);
+        UpdateNameResponse response = organisationInternalController.updateOrganisationName(
+            organisationNameUpdateRequest);
         assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+        assertThat(response.getStatus()).isEqualTo("success");
+        assertThat(response.getMessage()).isEqualTo("All names updated successfully");
 
-        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsAndActive(
-            organisation.getOrganisationIdentifier());
-        verify(organisationServiceMock, times(1))
-            .updateOrganisationName(organisationNameUpdateRequest, organisation.getOrganisationIdentifier());
+        verify(organisationServiceMock, times(2)).updateOrganisationName(
+            any(), any(),any());
+        verify(organisationServiceMock, times(2)).getOrganisationByOrgIdentifier(any());
 
+    }
+
+
+    private List<UpdateOrgNameResponse> createResponse(List<UpdateOrgNameResponse> responses,String orgId) {
+
+        responses.add(new UpdateOrgNameResponse(orgId,
+            "success", HttpStatus.OK.value(),"Name updated successfully"));
+
+        return responses;
     }
 
 }

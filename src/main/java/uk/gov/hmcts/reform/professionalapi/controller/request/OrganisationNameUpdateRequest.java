@@ -1,28 +1,43 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+
 @Getter
 @Setter
-@Builder(builderMethodName = "anOrganisationCreationRequest")
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganisationNameUpdateRequest {
 
-    @Valid
-    @NotNull(message = "Name is required")
-    private String name;
+    @JsonProperty(value = "names")
+    private List<OrganisationNameUpdateData> organisationNameUpdateDataList;
 
-    @JsonCreator
-    public OrganisationNameUpdateRequest(
-            @JsonProperty("name") String name) {
-        this.name = name;
+    public OrganisationNameUpdateRequest() {
+
+    }
+
+    @Getter
+    @Setter
+    public static class OrganisationNameUpdateData {
+
+        @Valid
+        @NotNull(message = " Name is required.")
+        private String name;
+        @Valid
+        @NotNull(message = " organisation Id is required.")
+        private String organisationId;
+
+        @JsonCreator
+        public OrganisationNameUpdateData(
+            @JsonProperty("name") String name,
+            @JsonProperty("organisationId") String organisationId) {
+            this.name = name;
+            this.organisationId = organisationId;
+        }
     }
 }

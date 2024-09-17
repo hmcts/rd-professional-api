@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -46,10 +47,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateNameResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgNameResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -57,13 +62,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -735,30 +738,53 @@ public class OrganisationInternalController extends SuperController {
     )
 
     @PutMapping(
-        value = "/{orgId}/name",
+        value = "/name",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.OK)
+    @ResponseBody
     @Secured({"prd-admin"})
-    public ResponseEntity<Object> updateOrganisationName(
+    public UpdateNameResponse updateOrganisationName(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-        @Valid @NotNull @RequestBody OrganisationNameUpdateRequest organisationNameUpdateRequest,
-        @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
-            message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+        @Valid @NotNull @RequestBody OrganisationNameUpdateRequest organisationNameUpdateRequest) {
 
-        var orgId = removeEmptySpaces(organisationIdentifier);
-        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(orgId);
+        //check if request list is empty
+        List<OrganisationNameUpdateRequest.OrganisationNameUpdateData> organisationNameUpdateDataList =
+              organisationNameUpdateRequest.getOrganisationNameUpdateDataList();
 
-        if (isBlank(organisationNameUpdateRequest.getName())) {
-            throw new InvalidRequest("Name is required");
+        if (organisationNameUpdateDataList.isEmpty()) {
+            throw new InvalidRequest("Request is empty");
         }
 
-        ResponseEntity<Object> organisationsDetailResponse = organisationService
-            .updateOrganisationName(organisationNameUpdateRequest, orgId);
+        final List<UpdateOrgNameResponse> updateOrgNameResponsesList = new ArrayList<>();
 
-        return ResponseEntity.status(organisationsDetailResponse.getStatusCode()).build();
+        //iterate over each name/orgid pair and update values
+        organisationNameUpdateDataList.forEach(organisationNameUpdateData -> {
+            String orgId = organisationNameUpdateData.getOrganisationId();
+            String orgName = organisationNameUpdateData.getName();
+            if (StringUtils.isEmpty(orgId)) {
+                updateOrgNameResponsesList.add(new UpdateOrgNameResponse("","failure",
+                    HttpStatus.BAD_REQUEST.value(),"Organisation id is missing"));
+            } else {
+                var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+                organisationIdentifierValidatorImpl.validateOrganisationId(orgId,
+                    updateOrgNameResponsesList, existingOrganisation);
+                if (!updateOrgNameResponsesList.stream().filter(
+                    updateOrg -> orgId.equalsIgnoreCase(updateOrg.getOrganisationId())).findAny().isPresent()) {
+                    if (StringUtils.isEmpty(orgName)) {
+                        updateOrgNameResponsesList.add(new UpdateOrgNameResponse(orgId,"failure",
+                            HttpStatus.BAD_REQUEST.value(),"Organisation name is missing"));
+                    } else {
+                        organisationService.updateOrganisationName(existingOrganisation,
+                            organisationNameUpdateData, updateOrgNameResponsesList);
+                    }
+                }
+            }
+        });
+
+        return organisationService.generateUpdateNameResponse(updateOrgNameResponsesList);
+
     }
 
 

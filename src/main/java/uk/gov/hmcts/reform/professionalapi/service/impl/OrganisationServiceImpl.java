@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateNameResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgNameResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -88,11 +91,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -1062,20 +1066,43 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public ResponseEntity<Object> updateOrganisationName(
-        OrganisationNameUpdateRequest organisationNameUpdateRequest, String organisationIdentifier) {
+    public List<UpdateOrgNameResponse> updateOrganisationName(
+        Organisation existingOrganisation, OrganisationNameUpdateRequest.OrganisationNameUpdateData
+        organisationNameUpdateData,List<UpdateOrgNameResponse> updateOrgNameResponsesList) {
 
-        var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-
-        if (existingOrganisation == null) {
-            throw new EmptyResultDataAccessException(ONE);
-        } else if (isNotBlank(organisationNameUpdateRequest.getName())) {
-            existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameUpdateRequest.getName()));
-            existingOrganisation.setLastUpdated(LocalDateTime.now());
-            organisationRepository.save(existingOrganisation);
+        existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameUpdateData.getName()));
+        existingOrganisation.setLastUpdated(LocalDateTime.now());
+        Organisation persistedOrganisation = null;
+        try {
+            persistedOrganisation = organisationRepository.save(existingOrganisation);
+            updateOrgNameResponsesList.add(new UpdateOrgNameResponse(existingOrganisation.getOrganisationIdentifier(),
+                "success", HttpStatus.OK.value(),"Name updated successfully"));
+        } catch (ConstraintViolationException ex) {
+            updateOrgNameResponsesList.add(new UpdateOrgNameResponse(existingOrganisation.getOrganisationIdentifier(),
+                "failure", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Failed to update the name for the given organisationIdentifier. Reason : "
+                    + ex.getMessage()));
         }
+        return updateOrgNameResponsesList;
+    }
 
-        return ResponseEntity.status(200).build();
+
+    @Override
+    public UpdateNameResponse generateUpdateNameResponse(List<UpdateOrgNameResponse> updateOrgNameResponses) {
+        AtomicReference<String> message = null;
+        boolean result =  updateOrgNameResponses.stream().anyMatch(updateOrgNameResponse ->
+            updateOrgNameResponse.getStatusCode() != 200);
+        List responseList =  updateOrgNameResponses.stream().filter(updateOrgNameResponse ->
+             updateOrgNameResponse.getStatusCode() == 400).collect(toList());
+
+        if (updateOrgNameResponses.size() == responseList.size()) {
+            return new UpdateNameResponse("failure",null,updateOrgNameResponses);
+        }  else if (result) {
+            return new UpdateNameResponse("partial_success",null,updateOrgNameResponses);
+        } else {
+            return new UpdateNameResponse("success","All names updated successfully",
+                null);
+        }
     }
 
 }
