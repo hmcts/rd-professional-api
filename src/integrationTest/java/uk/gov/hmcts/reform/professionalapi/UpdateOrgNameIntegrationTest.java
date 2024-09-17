@@ -28,7 +28,7 @@ class UpdateOrgNameIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         //create request to update organisation
         OrganisationNameUpdateRequest organisationNameUpdateRequest = createOrganisationNameUpdateRequest(
-            "updatedName1","updatedName1",orgId1,orgId2);
+            "updatedName1","updatedName2",orgId1,orgId2);
         //updateName
         Map<String, Object> orgUpdatedNameResponse = professionalReferenceDataClient
                 .updateOrgName(organisationNameUpdateRequest,hmctsAdmin);
