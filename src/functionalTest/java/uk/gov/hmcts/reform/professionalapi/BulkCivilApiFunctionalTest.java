@@ -209,7 +209,7 @@ public class BulkCivilApiFunctionalTest {
         Map<String, Object> bulkOrganisationResponse = retrieveOrganisationForBulkCustomerDetails(bulkCustomerRequest,
                 HttpStatus.FORBIDDEN, "pui-user-manager");
         assertThat(bulkOrganisationResponse.get("errorDescription").toString())
-                .contains("Access is denied");
+                .contains("Access Denied");
 
 
     }
@@ -289,7 +289,7 @@ public class BulkCivilApiFunctionalTest {
                                                                           HttpStatus status, String role) {
         Response response = getMultipleAuthHeadersInternal(role)
                 .body(request)
-                .post("/refdata/internal/v1/bulkCustomer/")
+                .post("/refdata/internal/v1/bulkCustomer")
                 .andReturn();
 
         response.then()
