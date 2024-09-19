@@ -1,42 +1,217 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 
 class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
 
     @Test
-    void update_sra_of_an_active_organisation_with_prd_admin_role_should_return_200() {
+    void update_sra_of_an_active_organisation_should_return_success_if_all_requests_updated() {
+        //create organisation
+        String orgId1 = getActiveOrganisationId();
+        String orgId2 = getActiveOrganisationId();
+        String sraId1 = randomAlphabetic(7);
+        String sraId2 = randomAlphabetic(7);
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            sraId1,sraId2,orgId1,orgId2);
+        //updateSra
+        Map<String, Object> orgUpdatedSraResponse = professionalReferenceDataClient
+            .updateOrgSra(organisationSraUpdateRequest,hmctsAdmin);
 
-        String orgIdentifier = getOrganisationId();
-        String sraId = randomAlphabetic(7);
-        OrganisationSraUpdateRequest organisationSraUpdateRequest =
-            new OrganisationSraUpdateRequest(sraId);
-        Map<String, Object> orgResponse = professionalReferenceDataClient
-                .updateOrgSra(organisationSraUpdateRequest,
-                    hmctsAdmin,orgIdentifier);
-        assertThat(orgResponse).isNotNull();
-        assertThat(orgResponse.get("http_status")).isEqualTo(200);
+        LinkedHashMap responses = (LinkedHashMap)orgUpdatedSraResponse.get("response_body");
+        assertThat(responses.get("status")).isEqualTo("success");
+        assertThat(responses.get("message")).isEqualTo("All SraIds updated successfully");
 
-        Map<String, Object> responseBody = professionalReferenceDataClient
-            .retrieveSingleOrganisationForV2Api(orgIdentifier,hmctsAdmin);
-        assertThat(responseBody).isNotNull();
-        assertNotNull(responseBody.get("sraId"));
-        assertThat(responseBody.get("sraId").toString()).isEqualTo(sraId);
+        verifyRetrievedOrg(orgId1,sraId1);
+        verifyRetrievedOrg(orgId2,sraId2);
 
+        deleteCreatedTestOrganisations(orgId1,  orgId2);
+    }
+
+    @Test
+    void update_Sra_of_an_active_organisation_should_return_partial_success_if_any_fail() {
+        //create organisation
+        String orgId1 = getActiveOrganisationId();
+        String orgId2 = getActiveOrganisationId();
+        String sraId1 = randomAlphabetic(7);
+
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            sraId1,"",orgId1,orgId2);
+
+        Map<String, Object> orgUpdatedSraResponse = professionalReferenceDataClient
+            .updateOrgSra(organisationSraUpdateRequest,hmctsAdmin);
+
+        LinkedHashMap responses = (LinkedHashMap)orgUpdatedSraResponse.get("response_body");
+        assertThat(responses.get("status")).isEqualTo("partial_success");
+
+        //verify successfully saved
+        verifyRetrievedOrg(orgId1,sraId1);
+
+        //verify error response
+        ArrayList responseList = (ArrayList)responses.get("Sras");
+        LinkedHashMap result  = (LinkedHashMap)responseList.get(1);
+        assertThat(result.get("organisationId")).isEqualTo(orgId2);
+        assertThat(result.get("status")).isEqualTo("failure");
+        assertThat(result.get("statusCode")).isEqualTo(400);
+        assertThat(result.get("message")).isEqualTo("Organisation Sra is missing");
+
+        deleteCreatedTestOrganisations(orgId1,  orgId2);
+    }
+
+    @Test
+    void update_Sra_missing_in_all_requests_should_return_failure() {
+        //create organisation
+        String orgId1 = getActiveOrganisationId();
+        String orgId2 = getActiveOrganisationId();
+
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            "",null,orgId1,orgId2);
+
+        Map<String, Object> orgUpdatedSraResponse = professionalReferenceDataClient
+            .updateOrgSra(organisationSraUpdateRequest,hmctsAdmin);
+
+        LinkedHashMap responses = (LinkedHashMap)orgUpdatedSraResponse.get("response_body");
+
+        assertThat(responses.get("status")).isEqualTo("failure");
+
+        ArrayList responseList = (ArrayList)responses.get("Sras");
+        LinkedHashMap firstResult  = (LinkedHashMap)responseList.get(0);
+        LinkedHashMap secondResult  = (LinkedHashMap)responseList.get(1);
+        assertThat(secondResult.get("organisationId")).isEqualTo(orgId2);
+        assertThat(secondResult.get("status")).isEqualTo("failure");
+        assertThat(secondResult.get("statusCode")).isEqualTo(400);
+        assertThat(secondResult.get("message")).isEqualTo("Organisation SraId is missing");
+
+        assertThat(firstResult.get("organisationId")).isEqualTo(orgId1);
+        assertThat(firstResult.get("status")).isEqualTo("failure");
+        assertThat(firstResult.get("statusCode")).isEqualTo(400);
+        assertThat(firstResult.get("message")).isEqualTo("Organisation SraId is missing");
+
+        deleteCreatedTestOrganisations(orgId1,  orgId2);
+    }
+
+    @Test
+    void orgId_missing_in_all_requests_should_return_failure() {
+        String sraId1 = randomAlphabetic(7);
+        String sraId2 = randomAlphabetic(7);
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            sraId1,sraId2,"1235874596555555",null);
+
+        Map<String, Object> orgUpdatedSraResponse = professionalReferenceDataClient
+            .updateOrgSra(organisationSraUpdateRequest,hmctsAdmin);
+
+        LinkedHashMap responses = (LinkedHashMap)orgUpdatedSraResponse.get("response_body");
+
+        assertThat(responses.get("status")).isEqualTo("failure");
+
+        ArrayList responseList = (ArrayList)responses.get("Sras");
+        LinkedHashMap firstResult  = (LinkedHashMap)responseList.get(0);
+        LinkedHashMap secondResult  = (LinkedHashMap)responseList.get(1);
+        assertThat(secondResult.get("organisationId")).isEqualTo("");
+        assertThat(secondResult.get("status")).isEqualTo("failure");
+        assertThat(secondResult.get("statusCode")).isEqualTo(400);
+        assertThat(secondResult.get("message")).isEqualTo("Organisation id is missing");
+
+        assertThat(firstResult.get("organisationId")).isEqualTo("1235874596555555");
+        assertThat(firstResult.get("status")).isEqualTo("failure");
+        assertThat(firstResult.get("statusCode")).isEqualTo(400);
+        assertThat(firstResult.get("message")).isEqualTo(
+            "The given organisationIdentifier must be 7 Alphanumeric Characters");
+
+    }
+
+
+
+    @Test
+    void update_Sra_with_exception_during_save_returns_500_partial_success() {
+        //create organisation
+        String orgId1 = getActiveOrganisationId();
+        String orgId2 = getActiveOrganisationId();
+
+        String sraId2 = randomAlphabetic(7);
+        //create request to update organisation
+        String organisationSraViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(296);
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            organisationSraViolatingDatabaseMaxLengthConstraint,sraId2,orgId1,orgId2);
+        //create request to update organisation
+
+        Map<String, Object> orgUpdatedSraResponse = professionalReferenceDataClient
+            .updateOrgSra(organisationSraUpdateRequest,hmctsAdmin);
+        LinkedHashMap responses = (LinkedHashMap)orgUpdatedSraResponse.get("response_body");
+
+        assertThat(responses.get("status")).isEqualTo("partial_success");
+
+        ArrayList responseList = (ArrayList)responses.get("Sras");
+        LinkedHashMap result1  = (LinkedHashMap)responseList.get(0);
+        assertThat(result1.get("organisationId")).isEqualTo(orgId1);
+        assertThat(result1.get("status")).isEqualTo("failure");
+        assertThat(result1.get("statusCode")).isEqualTo(500);
+        assertThat(result1.get("message").toString().contains(
+            "Failed to update the Sra for the given organisationIdentifier. Reason :"));
+
+        LinkedHashMap result  = (LinkedHashMap)responseList.get(1);
+        assertThat(result.get("organisationId")).isEqualTo(orgId2);
+        assertThat(result.get("status")).isEqualTo("success");
+        assertThat(result.get("statusCode")).isEqualTo(200);
+        assertThat(result.get("message")).isEqualTo("Sra updated successfully");
+        verifyRetrievedOrg(orgId2,sraId2);
+        deleteCreatedTestOrganisations(orgId1,  orgId2);
+
+    }
+
+
+    private String getActiveOrganisationId() {
+        OrganisationCreationRequest organisationCreationRequest2 = someMinimalOrganisationRequest().build();
+        String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest2);
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        return organisationIdentifier;
+    }
+
+    public OrganisationSraUpdateRequest createOrganisationSraUpdateRequest(String sra1, String sra2, String orgId1,
+                                                                           String orgId2) {
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = new OrganisationSraUpdateRequest();
+        List<OrganisationSraUpdateRequest.OrganisationSraUpdateData> organisationSraUpdateDataList
+            = new ArrayList<>();
+        OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData1 =
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(sra1,orgId1);
+        OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData2 =
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(sra2,orgId2);
+        organisationSraUpdateDataList.add(organisationSraUpdateData1);
+        organisationSraUpdateDataList.add(organisationSraUpdateData2);
+        organisationSraUpdateRequest.setOrganisationSraUpdateDataList(organisationSraUpdateDataList);
+
+        return organisationSraUpdateRequest;
+    }
+
+    public void verifyRetrievedOrg(String orgId,String sraId) {
+        // Map<String, Object> responseBody = professionalReferenceDataClient
+        // .retrieveSingleOrganisationForV2Api(orgIdentifier,hmctsAdmin);
+
+        Map<String, Object> responseBody =
+            professionalReferenceDataClient.retrieveSingleOrganisation(orgId, hmctsAdmin);
+        final Object Sra = responseBody.get("sraId");
+        assertThat(Sra).isNotNull().isEqualTo(sraId);
         List organisationAttributes = (List)responseBody.get("orgAttributes");
         assertThat(organisationAttributes).isNotNull();
 
@@ -47,66 +222,19 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
             "{\"regulatorType\":\"Solicitor Regulation Authority "
                 + "(SRA)\",\"organisationRegistrationNumber\":\"" + sraId + "\"}");
 
+        LocalDateTime updatedAttributeDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
+
+        assertThat(updatedAttributeDate.toLocalDate()).isEqualTo(LocalDate.now());
+
         LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
     }
 
-    @Test
-    void update_sra_with_bad_request_should_return_400() {
-        Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgSra(null,  hmctsAdmin,getOrganisationId());
-
-        assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString())
-            .contains("Required request body is missing:");
-    }
-
-    @Test
-    void update_sra_with_bad_request_OrgId_missing_should_return_400() {
-        Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgSra(new OrganisationSraUpdateRequest("some-SraId"),  hmctsAdmin,null);
-
-        assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString())
-            .contains("The given organisationIdentifier must be 7 Alphanumeric Characters");
-
-    }
-
-    @Test
-    void update_sra_with_invalid_name_should_return_400() {
-
-        OrganisationSraUpdateRequest organisationSraUpdateRequest =
-            new OrganisationSraUpdateRequest("");
-
-        Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgSra(organisationSraUpdateRequest,
-                    hmctsAdmin,getOrganisationId());
-
-        assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString()).contains("SRA Id is required");
-
-    }
-
-    @Test
-    void update_sra_with_blank_name_should_return_400() {
-        OrganisationSraUpdateRequest organisationSraUpdateRequest =
-            new OrganisationSraUpdateRequest("    ");
-
-        Map<String, Object> updateResponse = professionalReferenceDataClient
-            .updateOrgSra(organisationSraUpdateRequest,
-                hmctsAdmin,getOrganisationId());
-
-        assertThat(updateResponse).containsEntry("http_status", "400");
-        assertThat(updateResponse.get("response_body").toString()).contains("SRA Id is required");
-
+    public void deleteCreatedTestOrganisations(String orgId1, String orgId2) {
+        professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,orgId1);
+        professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,orgId2);
     }
 
 
-    private String getOrganisationId() {
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-
-        return organisationIdentifier;
-    }
 
 }

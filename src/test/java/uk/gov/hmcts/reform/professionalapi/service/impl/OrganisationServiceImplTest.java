@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgSraResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -279,8 +280,6 @@ class OrganisationServiceImplTest {
                 "number02", "company-url", superUserCreationRequest, paymentAccountList,
                 contactInformationCreationRequests, "Doctor", orgAttributeRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
-
-        organisationSraUpdateRequest = new OrganisationSraUpdateRequest("sraId");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
@@ -1941,42 +1940,33 @@ class OrganisationServiceImplTest {
     @Test
     void test_updateOrganisationSra() {
         String newSraId = randomAlphabetic(7);
-        final String orgIdentifier = "9KS20WT";
-        organisationSraUpdateRequest.setSraId(newSraId);
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
-
-        when(organisationRepository.findByOrganisationIdentifier(orgId)).thenReturn(null);
-        assertThrows(EmptyResultDataAccessException.class, () ->
-            sut.retrieveOrganisation(orgId, false));
-        verify(organisationRepository, times(1))
-            .findByOrganisationIdentifier(any(String.class));
-
-        Organisation organisationMock = mock(Organisation.class);
-        when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
-            .thenReturn(organisationMock);
-
-
-        organisationMock.setSraId(newSraId);
+        Organisation organisation1 = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData1 =
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(
+                organisation1.getOrganisationIdentifier(),newSraId);
+        final List<UpdateOrgSraResponse> updateOrgNameResponsesList = new ArrayList<>();
+        organisation1.setName(RefDataUtil.removeEmptySpaces(organisationSraUpdateData1.getSraId()));
+        organisation1.setLastUpdated(LocalDateTime.now());
 
         OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
 
         when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
 
-        when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.save(organisation1)).thenReturn(organisationMock);
 
-        ResponseEntity<Object> updatedOrganisation = sut.updateOrganisationSra(
-            organisationSraUpdateRequest,orgIdentifier);
+        List<UpdateOrgSraResponse> updateNameResponse = sut.updateOrganisationSra(organisation1,
+            organisationSraUpdateData1,updateOrgNameResponsesList);
 
-        assertThat(updatedOrganisation).isNotNull();
+        assertNotNull(updateNameResponse);
 
         verify(organisationRepository, times(1))
-            .findByOrganisationIdentifier(orgIdentifier);
-
+            .save(organisation1);
         verify(orgAttributeRepository, times(1))
             .save(any(OrgAttribute.class));
 
-        verify(organisationRepository, times(1))
-            .save(organisationMock);
+
     }
 
 

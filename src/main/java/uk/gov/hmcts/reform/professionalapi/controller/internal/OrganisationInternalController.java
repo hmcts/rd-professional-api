@@ -741,7 +741,6 @@ public class OrganisationInternalController extends SuperController {
 
         MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
                         organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
-
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);

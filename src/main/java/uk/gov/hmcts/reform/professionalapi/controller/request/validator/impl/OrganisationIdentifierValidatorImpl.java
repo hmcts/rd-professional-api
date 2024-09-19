@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgSraResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -158,5 +159,23 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
 
         return true;
+    }
+
+    public List<UpdateOrgSraResponse> validateOrganisationId(String orgId,List<UpdateOrgSraResponse>
+        updateOrgSraResponsesList,Organisation existingOrganisation) {
+
+        if (!orgId.matches("^[A-Z0-9]{7}$")) {
+            updateOrgSraResponsesList.add(new UpdateOrgSraResponse(orgId, "failure",
+                HttpStatus.BAD_REQUEST.value(),
+                "The given organisationIdentifier must be 7 Alphanumeric Characters"));
+        } else if (Optional.ofNullable(existingOrganisation).isEmpty()) {
+            updateOrgSraResponsesList.add(new UpdateOrgSraResponse(orgId, "failure",
+                HttpStatus.BAD_REQUEST.value(), NO_ORG_FOUND_FOR_GIVEN_ID));
+        } else if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
+            updateOrgSraResponsesList.add(new UpdateOrgSraResponse(orgId, "failure",
+                HttpStatus.BAD_REQUEST.value(), ORG_NOT_ACTIVE));
+        }
+
+        return updateOrgSraResponsesList;
     }
 }

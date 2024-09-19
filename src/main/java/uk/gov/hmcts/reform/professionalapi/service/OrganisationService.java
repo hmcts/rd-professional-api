@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgSraResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateSraResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -47,8 +49,6 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
-    ResponseEntity<Object> updateOrganisationSra(
-        OrganisationSraUpdateRequest organisationSraUpdateRequest, String organisationIdentifier);
 
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
                                             String organisationIdentifier, Boolean isOrgApprovalRequest);
@@ -84,5 +84,12 @@ public interface OrganisationService {
     void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier);
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
+
+
+    UpdateSraResponse generateUpdateSraResponse(List<UpdateOrgSraResponse> updateOrgNameResponse);
+
+    List<UpdateOrgSraResponse> updateOrganisationSra(
+        Organisation existingOrganisation, OrganisationSraUpdateRequest.OrganisationSraUpdateData
+        organisationNameUpdateData,List<UpdateOrgSraResponse> updateOrgNameResponsesList);
 
 }

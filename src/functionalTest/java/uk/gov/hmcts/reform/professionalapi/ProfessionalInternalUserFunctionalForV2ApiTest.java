@@ -36,7 +36,7 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.MULTI_STATUS;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -540,68 +540,185 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     void updateOrganisationSraIdShouldReturnSuccess() {
-        log.info("updateOrganisationSraIdShouldReturnSuccess :: STARTED");
-        String updatedSra = randomAlphabetic(7);
-        String organisationIdentifier = getActiveOrganisationId();
-        //create request to update sraid
-        OrganisationSraUpdateRequest organisationSraUpdateRequest =
-            new OrganisationSraUpdateRequest(updatedSra);
-
-        //call endpoint to update name as 'updatedsraid'
-        Response orgUpdatedSraResponse =  professionalApiClient.updatesOrganisationSra(
-            organisationSraUpdateRequest,organisationIdentifier, OK);
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        //create organisation
+        String orgId1 = createActiveOrganisation();
+        String orgId2 = createActiveOrganisation();
+        String sraId1 = randomAlphabetic(7);
+        String sraId2 = randomAlphabetic(7);
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            sraId1,sraId2,orgId1,orgId2);
+        //call endpoint to update SraId as 'updatedSraId'
+        Response orgUpdatedSraResponse = professionalApiClient.updatesOrganisationSra(
+            organisationSraUpdateRequest, hmctsAdmin, OK);
         assertNotNull(orgUpdatedSraResponse);
-        assertThat(orgUpdatedSraResponse.statusCode()).isEqualTo(200);
-
-        //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(organisationIdentifier, hmctsAdmin,
-            OK);
-        assertThat(orgResponse).isNotNull();
-        assertNotNull(orgResponse.get("sraId"));
-        assertThat(orgResponse.get("sraId").toString()).isEqualTo(updatedSra);
-
-        List organisationAttributes = (List)orgResponse.get("orgAttributes");
-        assertThat(organisationAttributes).isNotNull();
-
-        LinkedHashMap<String, Object> attr = (LinkedHashMap)organisationAttributes.get(0);
-        assertThat(attr).isNotNull();
-        assertThat(attr.get("key")).isEqualTo("regulators-0");
-        assertThat(attr.get("value").toString()).isEqualTo(
-            "{\"regulatorType\":\"Solicitor Regulation Authority "
-                + "(SRA)\",\"organisationRegistrationNumber\":\"" + updatedSra + "\"}");
-
-        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
-        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
-
+        assertThat(orgUpdatedSraResponse.body().as(Map.class).get("status")).isEqualTo("success");
+        assertThat(orgUpdatedSraResponse.body().as(Map.class).get("message")).isEqualTo(
+            "All SraIds updated successfully");
+        //retrieve 1st saved organisation by id
+        verifyRetrievedOrg(orgId2,sraId1);
+        //retrieve 2st saved organisation by id
+        verifyRetrievedOrg(orgId2,sraId2);
+        //Delete organisation
+        deleteCreatedTestOrganisations(orgId1,orgId2);
         log.info("updateOrganisationSraIdShouldReturnSuccess :: END");
+
     }
+
+
+    @Test
+    void updateOrganisationSraIdShouldReturnFailureIfNoOrgId() {
+        log.info("updateOrganisationSraIdShouldReturnFailureIfNoOrgId :: STARTED");
+        String sraId1 = randomAlphabetic(7);
+        String sraId2 = randomAlphabetic(7);
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            sraId1,sraId2,null,null);
+        //call endpoint to update empty SraId
+        Response orgUpdatedSraIdResponse = professionalApiClient.updatesOrganisationSra(
+            organisationSraUpdateRequest,hmctsAdmin, MULTI_STATUS);
+        assertNotNull(orgUpdatedSraIdResponse);
+        assertThat(orgUpdatedSraIdResponse.body().as(Map.class).get("status")).isEqualTo("failure");
+        ArrayList sraIds = (ArrayList) orgUpdatedSraIdResponse.body().as(Map.class).get("sarIds");
+        LinkedHashMap response1 = (LinkedHashMap) sraIds.get(0);
+        LinkedHashMap response2 = (LinkedHashMap) sraIds.get(1);
+
+        assertThat(response1.get("status")).isEqualTo("failure");
+        assertThat(response2.get("status")).isEqualTo("failure");
+
+        assertThat(response1.get("statusCode")).isEqualTo(400);
+        assertThat(response2.get("statusCode")).isEqualTo(400);
+
+        assertThat(response1.get("message")).isEqualTo("Organisation id is missing");
+        assertThat(response2.get("message")).isEqualTo("Organisation id is missing");
+        log.info("updateOrganisationSraIdShouldReturnFailureIfNoOrgId :: END");
+    }
+
 
     @Test
     void updateOrganisationSraIdShouldReturnFailureIfNoSraId() {
-        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: STARTED");
-        String organisationIdentifier = getActiveOrganisationId();
-        OrganisationSraUpdateRequest organisationSraUpdateRequest =
-            new OrganisationSraUpdateRequest("");
+        log.info("updateOrganisationSraIdShouldReturnFailureIfNoSraId :: STARTED");
+        //create organisation
+        String orgId1 = createActiveOrganisation();
+        String orgId2 = createActiveOrganisation();
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            null,null,orgId1,orgId2);
+        //call endpoint to update empty Sra
+        Response orgUpdatedSraResponse = professionalApiClient.updatesOrganisationSra(
+            organisationSraUpdateRequest,hmctsAdmin, MULTI_STATUS);
+        assertNotNull(orgUpdatedSraResponse);
+        assertThat(orgUpdatedSraResponse.body().as(Map.class).get("status")).isEqualTo("failure");
+        ArrayList sraIds = (ArrayList) orgUpdatedSraResponse.body().as(Map.class).get("sarIds");
+        LinkedHashMap response1 = (LinkedHashMap) sraIds.get(0);
+        LinkedHashMap response2 = (LinkedHashMap) sraIds.get(1);
 
-        Response orgUpdatedSraIdResponse = professionalApiClient.updatesOrganisationSra(
-            organisationSraUpdateRequest,organisationIdentifier, BAD_REQUEST);
+        assertThat(response1.get("organisationId")).isEqualTo(orgId1);
+        assertThat(response2.get("organisationId")).isEqualTo(orgId2);
 
-        assertNotNull(orgUpdatedSraIdResponse);
-        assertThat(orgUpdatedSraIdResponse.statusCode()).isEqualTo(400);
+        assertThat(response1.get("status")).isEqualTo("failure");
+        assertThat(response2.get("status")).isEqualTo("failure");
 
-        log.info("updateOrganisationNameShouldReturnFailureIfNoName :: END");
+        assertThat(response1.get("statusCode")).isEqualTo(400);
+        assertThat(response2.get("statusCode")).isEqualTo(400);
+
+        assertThat(response1.get("message")).isEqualTo("Organisation SraId is missing");
+        assertThat(response2.get("message")).isEqualTo("Organisation SraId is missing");
+
+        //Delete organisation
+        deleteCreatedTestOrganisations(orgId1,orgId2);
+        log.info("updateOrganisationSraIdShouldReturnFailureIfNoSraId :: END");
     }
 
-    private String getActiveOrganisationId() {
+    @Test
+    void updateOrganisationSraShouldReturnPartialSuccessIfNoSraId() {
+        log.info("updateOrganisationSraShouldReturnPartialSuccessIfNoSraId :: STARTED");
+        //create organisation
+        String orgId1 = createActiveOrganisation();
+        String orgId2 = createActiveOrganisation();
+        String sraId1 = randomAlphabetic(7);
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = createOrganisationSraUpdateRequest(
+            null,sraId1,orgId1,orgId2);
+        //call endpoint to update empty Sra
+        Response orgUpdatedSraResponse = professionalApiClient.updatesOrganisationSra(
+            organisationSraUpdateRequest,hmctsAdmin, MULTI_STATUS);
+        assertNotNull(orgUpdatedSraResponse);
+        assertThat(orgUpdatedSraResponse.body().as(Map.class).get("status")).isEqualTo("partial_success");
+        ArrayList sraIds = (ArrayList) orgUpdatedSraResponse.body().as(Map.class).get("sraIds");
+        LinkedHashMap response1 = (LinkedHashMap) sraIds.get(0);
+        LinkedHashMap response2 = (LinkedHashMap) sraIds.get(1);
+
+        assertThat(response1.get("organisationId")).isEqualTo(orgId1);
+        assertThat(response2.get("organisationId")).isEqualTo(orgId2);
+
+        assertThat(response1.get("status")).isEqualTo("failure");
+        assertThat(response2.get("status")).isEqualTo("success");
+
+        assertThat(response1.get("statusCode")).isEqualTo(400);
+        assertThat(response2.get("statusCode")).isEqualTo(200);
+
+        assertThat(response1.get("message")).isEqualTo("Organisation sraId is missing");
+        assertThat(response2.get("message")).isEqualTo("SraId updated successfully");
+
+        //retrieve 2st saved organisation by id
+        verifyRetrievedOrg(orgId2,sraId1);
+        //Delete organisation
+        deleteCreatedTestOrganisations(orgId1,orgId2);
+        log.info("updateOrganisationSraShouldReturnPartialSuccessIfNoSraId :: END");
+    }
+
+
+    private String createActiveOrganisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
-
         professionalApiClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, organisationIdentifier,OK);
-
         return organisationIdentifier;
+    }
+
+    public void deleteCreatedTestOrganisations(String orgId1, String orgId2) {
+        professionalApiClient.deleteOrganisation(orgId1, hmctsAdmin, NO_CONTENT);;
+        professionalApiClient.deleteOrganisation(orgId2, hmctsAdmin, NO_CONTENT);
+    }
+
+    public OrganisationSraUpdateRequest createOrganisationSraUpdateRequest(String sraId1,String sraId2,String orgId1,
+                                                                             String orgId2) {
+        //create request to update organisation
+        OrganisationSraUpdateRequest organisationSraUpdateRequest = new OrganisationSraUpdateRequest();
+        List<OrganisationSraUpdateRequest.OrganisationSraUpdateData> organisationSraUpdateDataList
+            = new ArrayList<>();
+        OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData1 =
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(sraId1,orgId1);
+        OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData2 =
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(sraId2,orgId2);
+        organisationSraUpdateDataList.add(organisationSraUpdateData1);
+        organisationSraUpdateDataList.add(organisationSraUpdateData2);
+        organisationSraUpdateRequest.setOrganisationSraUpdateDataList(organisationSraUpdateDataList);
+        return organisationSraUpdateRequest;
+    }
+
+    public void verifyRetrievedOrg(String orgId,String sraId) {
+
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(orgId, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+        List organisationAttributes2 = (List)orgResponse.get("orgAttributes");
+        assertThat(organisationAttributes2).isNotNull();
+        LinkedHashMap<String, Object> attr2 = (LinkedHashMap)organisationAttributes2.get(0);
+        assertThat(attr2).isNotNull();
+        assertThat(attr2.get("key")).isEqualTo("regulators-0");
+        assertThat(attr2.get("value").toString()).isEqualTo(
+            "{\"regulatorType\":\"Solicitor Regulation Authority "
+                + "(SRA)\",\"organisationRegistrationNumber\":\"" + sraId + "\"}");
+
+        LocalDateTime updatedOrgAttributeDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedOrgAttributeDate.toLocalDate()).isEqualTo(LocalDate.now());
+        final Object sraIdSaved = orgResponse.get("sraId");
+        assertThat(sraIdSaved).isNotNull().isEqualTo(sraId);
+        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
     }
 
 

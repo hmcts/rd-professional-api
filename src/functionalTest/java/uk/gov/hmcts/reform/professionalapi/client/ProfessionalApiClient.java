@@ -1317,19 +1317,16 @@ public class ProfessionalApiClient {
     }
 
     public Response updatesOrganisationSra(OrganisationSraUpdateRequest organisationSraUpdateRequest,
-                                                      String organisationIdentifier, HttpStatus expectedStatus) {
+                                            String role,
+                                            HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
             .body(organisationSraUpdateRequest)
-            .put("/refdata/internal/v2/organisations/" + organisationIdentifier + "/sra")
+            .put("/refdata/internal/v1/organisations/sra")
             .andReturn();
 
-        log.info("{}:: Update organisation SraId  response: {}",
+        log.info("{}:: Update organisation Sra id  response: {}",
             loggingComponentName, response.getStatusCode());
-
-        response.then()
-            .assertThat()
-            .statusCode(expectedStatus.value());
 
         return response;
     }

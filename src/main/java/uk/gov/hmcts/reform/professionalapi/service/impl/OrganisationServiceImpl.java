@@ -43,6 +43,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgSraResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateSraResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -88,11 +90,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -883,7 +886,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
                 .stream()
                 .collect(Collectors.groupingBy(
-                        Organisation::getOrganisationIdentifier, LinkedHashMap::new, Collectors.toList()));
+                        Organisation::getOrganisationIdentifier, LinkedHashMap::new, toList()));
 
         var organisationsWithPbaStatusResponses = new ArrayList<OrganisationsWithPbaStatusResponse>();
 
@@ -1061,50 +1064,84 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
-                                                   OrganisationSraUpdateRequest organisationNameSraUpdateRequest) {
+                                                   OrganisationSraUpdateRequest.OrganisationSraUpdateData
+                                                       organisationSraUpdateData) {
         final String attributeKey = "regulators-0";
         final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
-            + "\"organisationRegistrationNumber\":\"" + organisationNameSraUpdateRequest.getSraId() + "\"}";
+            + "\"organisationRegistrationNumber\":\"" + organisationSraUpdateData.getSraId() + "\"}";
 
         existingOrganisation.setSraId(
-            RefDataUtil.removeEmptySpaces(organisationNameSraUpdateRequest.getSraId()));
+            RefDataUtil.removeEmptySpaces(organisationSraUpdateData.getSraId()));
         OrgAttribute attribute = new OrgAttribute();
         attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
         attribute.setValue(RefDataUtil
             .removeEmptySpaces(attributeValue));
         attribute.setOrganisation(existingOrganisation);
+
         OrgAttribute savedAttribute = orgAttributeRepository.save(attribute);
         List<OrgAttribute> attributes = new ArrayList<>();
-        attributes.add(attribute);
+        attributes.add(savedAttribute);
         existingOrganisation.setOrgAttributes(attributes);
 
         return savedAttribute;
     }
 
     @Override
-    @Transactional
-    public ResponseEntity<Object> updateOrganisationSra(
-        OrganisationSraUpdateRequest organisationSraUpdateRequest, String organisationIdentifier) {
+    public List<UpdateOrgSraResponse> updateOrganisationSra(
+        Organisation existingOrganisation, OrganisationSraUpdateRequest.OrganisationSraUpdateData
+        organisationSraUpdateData, List<UpdateOrgSraResponse> updateOrgSraResponsesList) {
 
-        var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        Organisation savedOrganisation = null;
-        if (existingOrganisation == null) {
-            throw new EmptyResultDataAccessException(ONE);
-        } else {
-            if (isNotBlank(organisationSraUpdateRequest.getSraId())) {
-                OrgAttribute savedAttribute = saveOrganisationAttributes(
-                    existingOrganisation, organisationSraUpdateRequest);
-                if (savedAttribute == null) {
-                    log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
-                    throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
-                }
+        existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(organisationSraUpdateData.getSraId()));
+        existingOrganisation.setLastUpdated(LocalDateTime.now());
+
+
+        try {
+            OrgAttribute savedAttribute = saveOrganisationAttributes(
+                existingOrganisation, organisationSraUpdateData);
+            if (savedAttribute == null) {
+                log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
+                updateOrgSraResponsesList.add(new UpdateOrgSraResponse(existingOrganisation.getOrganisationIdentifier(),
+                    "failure", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "Failed to update Organisation Attributes for the given organisationIdentifier. Reason : "
+                ));
+            } else {
+                updateOrgSraResponsesList.add(new UpdateOrgSraResponse(existingOrganisation.getOrganisationIdentifier(),
+                    "success", HttpStatus.OK.value(), "Organisation Attributes updated successfully"));
+
+                organisationRepository.save(existingOrganisation);
+
+                updateOrgSraResponsesList.add(new UpdateOrgSraResponse(existingOrganisation.getOrganisationIdentifier(),
+                    "success", HttpStatus.OK.value(), "SraId updated successfully"));
             }
-            existingOrganisation.setSraId(organisationSraUpdateRequest.getSraId());
-            existingOrganisation.setLastUpdated(LocalDateTime.now());
-            organisationRepository.save(existingOrganisation);
+        } catch (Exception ex) {
+            updateOrgSraResponsesList.add(new UpdateOrgSraResponse(existingOrganisation.getOrganisationIdentifier(),
+                "failure", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Failed to update the sraId for the given organisationIdentifier. Reason : "
+                    + ex.getMessage()));
         }
-        return ResponseEntity.status(200).build();
+        return updateOrgSraResponsesList;
     }
+
+
+    @Override
+    public UpdateSraResponse generateUpdateSraResponse(List<UpdateOrgSraResponse> updateOrgSraResponses) {
+        AtomicReference<String> message = null;
+        boolean result =  updateOrgSraResponses.stream().anyMatch(updateOrgNameResponse ->
+            updateOrgNameResponse.getStatusCode() != 200);
+        List responseList =  updateOrgSraResponses.stream().filter(updateOrgNameResponse ->
+            updateOrgNameResponse.getStatusCode() == 400).collect(toList());
+
+        if (updateOrgSraResponses.size() == responseList.size()) {
+            return new UpdateSraResponse("failure",null,updateOrgSraResponses);
+        }  else if (result) {
+            return new UpdateSraResponse("partial_success",null,updateOrgSraResponses);
+        } else {
+            return new UpdateSraResponse("success","All names updated successfully",
+                null);
+        }
+    }
+
+
 
 }
 

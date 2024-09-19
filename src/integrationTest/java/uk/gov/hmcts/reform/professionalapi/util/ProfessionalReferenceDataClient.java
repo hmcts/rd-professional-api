@@ -1023,34 +1023,46 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-
-
-    public Map<String, Object> updateOrgSra(
-        OrganisationSraUpdateRequest organisationSraUpdateRequest, String role, String organisationIdentifier) {
+    public ResponseEntity<Map> updateOrgSraException(
+        OrganisationSraUpdateRequest organisationSraUpdateRequest, String role) {
 
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH
-            + "/" + organisationIdentifier + "/sra";
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH +  "/sra";
+
+        HttpEntity<OrganisationSraUpdateRequest> requestEntity = new HttpEntity<>(organisationSraUpdateRequest,
+            getMultipleAuthHeaders(role));
+        responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        return responseEntity;
+    }
+
+    public Map<String, Object> updateOrgSra(
+        OrganisationSraUpdateRequest organisationSraUpdateRequest, String role) {
+
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH +  "/sra";
         try {
             HttpEntity<OrganisationSraUpdateRequest> requestEntity = new HttpEntity<>(organisationSraUpdateRequest,
-                getMultipleAuthHeaders(role));
+                    getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status",String.valueOf(ex.getRawStatusCode()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
-
         Map<String, Object> organisationResponse = new HashMap<>();
         organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         organisationResponse.put("response_body", responseEntity.getBody());
         return organisationResponse;
     }
 
+
     public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(
-            UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
-            UUID searchAfterUser, UUID searchAfterOrganisation) {
+        UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
+        UUID searchAfterUser, UUID searchAfterOrganisation) {
         StringBuilder sb = new StringBuilder(baseV2IntUrl)
                 .append("/users?");
         if (pageSize != null) {
