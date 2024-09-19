@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -95,7 +98,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisation(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-            @Valid @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
+            @Validated @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest) {
 
         //Received request to create a new organisation for internal users
         return createOrganisationFrom(organisationCreationRequest);
@@ -241,7 +244,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<Object> updatesOrganisation(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
-            @Valid @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest,
+            @Validated @NotNull @RequestBody OrganisationOtherOrgsCreationRequest organisationCreationRequest,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @Parameter(hidden = true) @UserId String userId) {
