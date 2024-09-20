@@ -6,9 +6,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +37,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateSraResponse
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -292,7 +288,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
     @Secured({"prd-admin"})
     public UpdateSraResponse updateOrganisationSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationSraUpdateRequest")
-        @Valid @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest) {
+        @Validated @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest) {
 
         //check if request list is empty
         List<OrganisationSraUpdateRequest.OrganisationSraUpdateData> organisationSraUpdateDataList =
