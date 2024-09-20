@@ -1136,7 +1136,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }  else if (result) {
             return new UpdateSraResponse("partial_success",null,updateOrgSraResponses);
         } else {
-            return new UpdateSraResponse("success","All names updated successfully",
+            return new UpdateSraResponse("success","All sraIds updated successfully",
                 null);
         }
     }

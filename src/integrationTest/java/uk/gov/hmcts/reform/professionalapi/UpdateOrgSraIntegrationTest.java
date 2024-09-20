@@ -37,7 +37,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         LinkedHashMap responses = (LinkedHashMap)orgUpdatedSraResponse.get("response_body");
         assertThat(responses.get("status")).isEqualTo("success");
-        assertThat(responses.get("message")).isEqualTo("All SraIds updated successfully");
+        assertThat(responses.get("message")).isEqualTo("All sraIds updated successfully");
 
         verifyRetrievedOrg(orgId1,sraId1);
         verifyRetrievedOrg(orgId2,sraId2);
@@ -66,12 +66,22 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         verifyRetrievedOrg(orgId1,sraId1);
 
         //verify error response
-        ArrayList responseList = (ArrayList)responses.get("Sras");
-        LinkedHashMap result  = (LinkedHashMap)responseList.get(1);
-        assertThat(result.get("organisationId")).isEqualTo(orgId2);
-        assertThat(result.get("status")).isEqualTo("failure");
-        assertThat(result.get("statusCode")).isEqualTo(400);
-        assertThat(result.get("message")).isEqualTo("Organisation Sra is missing");
+        ArrayList responseList = (ArrayList)responses.get("sarIds");
+        LinkedHashMap result  = (LinkedHashMap)responseList.get(0);
+        assertThat(result.get("organisationId")).isEqualTo(orgId1);
+        assertThat(result.get("status")).isEqualTo("success");
+        assertThat(result.get("statusCode")).isEqualTo(200);
+        assertThat(result.get("message")).isEqualTo("Organisation Attributes updated successfully");
+        LinkedHashMap result1  = (LinkedHashMap)responseList.get(1);
+        assertThat(result1.get("organisationId")).isEqualTo(orgId1);
+        assertThat(result1.get("status")).isEqualTo("success");
+        assertThat(result1.get("statusCode")).isEqualTo(200);
+        assertThat(result1.get("message")).isEqualTo("SraId updated successfully");
+        LinkedHashMap result2  = (LinkedHashMap)responseList.get(2);
+        assertThat(result2.get("organisationId")).isEqualTo(orgId2);
+        assertThat(result2.get("status")).isEqualTo("failure");
+        assertThat(result2.get("statusCode")).isEqualTo(400);
+        assertThat(result2.get("message")).isEqualTo("Organisation sraId is missing");
 
         deleteCreatedTestOrganisations(orgId1,  orgId2);
     }
@@ -93,18 +103,18 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(responses.get("status")).isEqualTo("failure");
 
-        ArrayList responseList = (ArrayList)responses.get("Sras");
+        ArrayList responseList = (ArrayList)responses.get("sarIds");
         LinkedHashMap firstResult  = (LinkedHashMap)responseList.get(0);
         LinkedHashMap secondResult  = (LinkedHashMap)responseList.get(1);
         assertThat(secondResult.get("organisationId")).isEqualTo(orgId2);
         assertThat(secondResult.get("status")).isEqualTo("failure");
         assertThat(secondResult.get("statusCode")).isEqualTo(400);
-        assertThat(secondResult.get("message")).isEqualTo("Organisation SraId is missing");
+        assertThat(secondResult.get("message")).isEqualTo("Organisation sraId is missing");
 
         assertThat(firstResult.get("organisationId")).isEqualTo(orgId1);
         assertThat(firstResult.get("status")).isEqualTo("failure");
         assertThat(firstResult.get("statusCode")).isEqualTo(400);
-        assertThat(firstResult.get("message")).isEqualTo("Organisation SraId is missing");
+        assertThat(firstResult.get("message")).isEqualTo("Organisation sraId is missing");
 
         deleteCreatedTestOrganisations(orgId1,  orgId2);
     }
@@ -124,7 +134,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(responses.get("status")).isEqualTo("failure");
 
-        ArrayList responseList = (ArrayList)responses.get("Sras");
+        ArrayList responseList = (ArrayList)responses.get("sarIds");
         LinkedHashMap firstResult  = (LinkedHashMap)responseList.get(0);
         LinkedHashMap secondResult  = (LinkedHashMap)responseList.get(1);
         assertThat(secondResult.get("organisationId")).isEqualTo("");
@@ -161,24 +171,31 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(responses.get("status")).isEqualTo("partial_success");
 
-        ArrayList responseList = (ArrayList)responses.get("Sras");
-        LinkedHashMap result1  = (LinkedHashMap)responseList.get(0);
-        assertThat(result1.get("organisationId")).isEqualTo(orgId1);
-        assertThat(result1.get("status")).isEqualTo("failure");
-        assertThat(result1.get("statusCode")).isEqualTo(500);
-        assertThat(result1.get("message").toString().contains(
-            "Failed to update the Sra for the given organisationIdentifier. Reason :"));
+        ArrayList responseList = (ArrayList)responses.get("sarIds");
+        LinkedHashMap result  = (LinkedHashMap)responseList.get(0);
+        assertThat(result.get("organisationId")).isEqualTo(orgId1);
+        assertThat(result.get("status")).isEqualTo("failure");
+        assertThat(result.get("statusCode")).isEqualTo(500);
+        assertThat(result.get("message").toString().contains(
+            "Failed to update the sraId for the given organisationIdentifier. Reason :"));
 
-        LinkedHashMap result  = (LinkedHashMap)responseList.get(1);
-        assertThat(result.get("organisationId")).isEqualTo(orgId2);
-        assertThat(result.get("status")).isEqualTo("success");
-        assertThat(result.get("statusCode")).isEqualTo(200);
-        assertThat(result.get("message")).isEqualTo("Sra updated successfully");
+        LinkedHashMap result1  = (LinkedHashMap)responseList.get(1);
+        assertThat(result1.get("organisationId")).isEqualTo(orgId2);
+        assertThat(result1.get("status")).isEqualTo("success");
+        assertThat(result1.get("statusCode")).isEqualTo(200);
+        assertThat(result1.get("message")).isEqualTo("Organisation Attributes updated successfully");
         verifyRetrievedOrg(orgId2,sraId2);
+
+        LinkedHashMap result2  = (LinkedHashMap)responseList.get(2);
+        assertThat(result2.get("organisationId")).isEqualTo(orgId2);
+        assertThat(result2.get("status")).isEqualTo("success");
+        assertThat(result2.get("statusCode")).isEqualTo(200);
+        assertThat(result2.get("message")).isEqualTo("SraId updated successfully");
+        verifyRetrievedOrg(orgId2,sraId2);
+
         deleteCreatedTestOrganisations(orgId1,  orgId2);
 
     }
-
 
     private String getActiveOrganisationId() {
         OrganisationCreationRequest organisationCreationRequest2 = someMinimalOrganisationRequest().build();
@@ -194,9 +211,9 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         List<OrganisationSraUpdateRequest.OrganisationSraUpdateData> organisationSraUpdateDataList
             = new ArrayList<>();
         OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData1 =
-            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(sra1,orgId1);
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(orgId1,sra1);
         OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData2 =
-            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(sra2,orgId2);
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(orgId2,sra2);
         organisationSraUpdateDataList.add(organisationSraUpdateData1);
         organisationSraUpdateDataList.add(organisationSraUpdateData2);
         organisationSraUpdateRequest.setOrganisationSraUpdateDataList(organisationSraUpdateDataList);
@@ -205,13 +222,12 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
     }
 
     public void verifyRetrievedOrg(String orgId,String sraId) {
-        // Map<String, Object> responseBody = professionalReferenceDataClient
-        // .retrieveSingleOrganisationForV2Api(orgIdentifier,hmctsAdmin);
 
         Map<String, Object> responseBody =
-            professionalReferenceDataClient.retrieveSingleOrganisation(orgId, hmctsAdmin);
+            professionalReferenceDataClient.retrieveSingleOrganisationForV2Api(orgId, hmctsAdmin);
+
         final Object Sra = responseBody.get("sraId");
-        assertThat(Sra).isNotNull().isEqualTo(sraId);
+        assertThat(Sra.toString()).isEqualTo(sraId);
         List organisationAttributes = (List)responseBody.get("orgAttributes");
         assertThat(organisationAttributes).isNotNull();
 
@@ -222,9 +238,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
             "{\"regulatorType\":\"Solicitor Regulation Authority "
                 + "(SRA)\",\"organisationRegistrationNumber\":\"" + sraId + "\"}");
 
-        LocalDateTime updatedAttributeDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
 
-        assertThat(updatedAttributeDate.toLocalDate()).isEqualTo(LocalDate.now());
 
         LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());

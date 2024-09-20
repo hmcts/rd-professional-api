@@ -291,7 +291,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
     @ResponseBody
     @Secured({"prd-admin"})
     public UpdateSraResponse updateOrganisationSra(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationsraUpdateRequest")
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationSraUpdateRequest")
         @Valid @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest) {
 
         //check if request list is empty

@@ -555,7 +555,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertNotNull(orgUpdatedSraResponse);
         assertThat(orgUpdatedSraResponse.body().as(Map.class).get("status")).isEqualTo("success");
         assertThat(orgUpdatedSraResponse.body().as(Map.class).get("message")).isEqualTo(
-            "All SraIds updated successfully");
+            "All sraIds updated successfully");
         //retrieve 1st saved organisation by id
         verifyRetrievedOrg(orgId2,sraId1);
         //retrieve 2st saved organisation by id
@@ -649,18 +649,22 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         ArrayList sraIds = (ArrayList) orgUpdatedSraResponse.body().as(Map.class).get("sraIds");
         LinkedHashMap response1 = (LinkedHashMap) sraIds.get(0);
         LinkedHashMap response2 = (LinkedHashMap) sraIds.get(1);
-
+        LinkedHashMap response3  = (LinkedHashMap) sraIds.get(2);
         assertThat(response1.get("organisationId")).isEqualTo(orgId1);
-        assertThat(response2.get("organisationId")).isEqualTo(orgId2);
-
         assertThat(response1.get("status")).isEqualTo("failure");
-        assertThat(response2.get("status")).isEqualTo("success");
-
         assertThat(response1.get("statusCode")).isEqualTo(400);
-        assertThat(response2.get("statusCode")).isEqualTo(200);
-
         assertThat(response1.get("message")).isEqualTo("Organisation sraId is missing");
-        assertThat(response2.get("message")).isEqualTo("SraId updated successfully");
+
+        assertThat(response2.get("organisationId")).isEqualTo(orgId2);
+        assertThat(response2.get("status")).isEqualTo("success");
+        assertThat(response2.get("statusCode")).isEqualTo(200);
+        assertThat(response2.get("message")).isEqualTo("Organisation Attributes updated successfully");
+
+        assertThat(response3.get("organisationId")).isEqualTo(orgId2);
+        assertThat(response3.get("status")).isEqualTo("success");
+        assertThat(response3.get("statusCode")).isEqualTo(200);
+        assertThat(response3.get("message")).isEqualTo("SraId updated successfully");
+
 
         //retrieve 2st saved organisation by id
         verifyRetrievedOrg(orgId2,sraId1);
@@ -713,8 +717,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             "{\"regulatorType\":\"Solicitor Regulation Authority "
                 + "(SRA)\",\"organisationRegistrationNumber\":\"" + sraId + "\"}");
 
-        LocalDateTime updatedOrgAttributeDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
-        assertThat(updatedOrgAttributeDate.toLocalDate()).isEqualTo(LocalDate.now());
         final Object sraIdSaved = orgResponse.get("sraId");
         assertThat(sraIdSaved).isNotNull().isEqualTo(sraId);
         LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());

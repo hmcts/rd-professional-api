@@ -24,7 +24,7 @@ public class UpdateSraResponse {
     private String message;
 
     @JsonInclude(NON_NULL)
-    @JsonProperty(value = "names")
+    @JsonProperty(value = "sarIds")
     private List<UpdateOrgSraResponse> updateOrgSraResponse;
 
 }

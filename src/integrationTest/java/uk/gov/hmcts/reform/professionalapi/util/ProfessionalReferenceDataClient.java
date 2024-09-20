@@ -1032,7 +1032,7 @@ public class ProfessionalReferenceDataClient {
         OrganisationSraUpdateRequest organisationSraUpdateRequest, String role) {
 
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH +  "/sra";
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH +  "/sra";
 
         HttpEntity<OrganisationSraUpdateRequest> requestEntity = new HttpEntity<>(organisationSraUpdateRequest,
             getMultipleAuthHeaders(role));
@@ -1046,7 +1046,7 @@ public class ProfessionalReferenceDataClient {
 
 
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH +  "/sra";
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH +  "/sra";
         try {
             HttpEntity<OrganisationSraUpdateRequest> requestEntity = new HttpEntity<>(organisationSraUpdateRequest,
                     getMultipleAuthHeaders(role));
