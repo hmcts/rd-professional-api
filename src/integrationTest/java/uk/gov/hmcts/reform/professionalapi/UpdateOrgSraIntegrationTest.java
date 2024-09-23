@@ -66,7 +66,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
         verifyRetrievedOrg(orgId1,sraId1);
 
         //verify error response
-        ArrayList responseList = (ArrayList)responses.get("sarIds");
+        ArrayList responseList = (ArrayList)responses.get("sraIds");
         LinkedHashMap result  = (LinkedHashMap)responseList.get(0);
         assertThat(result.get("organisationId")).isEqualTo(orgId1);
         assertThat(result.get("status")).isEqualTo("success");
@@ -103,7 +103,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(responses.get("status")).isEqualTo("failure");
 
-        ArrayList responseList = (ArrayList)responses.get("sarIds");
+        ArrayList responseList = (ArrayList)responses.get("sraIds");
         LinkedHashMap firstResult  = (LinkedHashMap)responseList.get(0);
         LinkedHashMap secondResult  = (LinkedHashMap)responseList.get(1);
         assertThat(secondResult.get("organisationId")).isEqualTo(orgId2);
@@ -134,7 +134,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(responses.get("status")).isEqualTo("failure");
 
-        ArrayList responseList = (ArrayList)responses.get("sarIds");
+        ArrayList responseList = (ArrayList)responses.get("sraIds");
         LinkedHashMap firstResult  = (LinkedHashMap)responseList.get(0);
         LinkedHashMap secondResult  = (LinkedHashMap)responseList.get(1);
         assertThat(secondResult.get("organisationId")).isEqualTo("");
@@ -171,7 +171,7 @@ class UpdateOrgSraIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(responses.get("status")).isEqualTo("partial_success");
 
-        ArrayList responseList = (ArrayList)responses.get("sarIds");
+        ArrayList responseList = (ArrayList)responses.get("sraIds");
         LinkedHashMap result  = (LinkedHashMap)responseList.get(0);
         assertThat(result.get("organisationId")).isEqualTo(orgId1);
         assertThat(result.get("status")).isEqualTo("failure");

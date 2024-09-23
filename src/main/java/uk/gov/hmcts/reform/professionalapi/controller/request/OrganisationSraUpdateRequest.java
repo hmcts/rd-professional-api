@@ -15,7 +15,7 @@ import java.util.List;
 public class OrganisationSraUpdateRequest {
 
 
-    @JsonProperty(value = "sarIds")
+    @JsonProperty(value = "sraIds")
     private List<OrganisationSraUpdateData> organisationSraUpdateDataList;
 
     public OrganisationSraUpdateRequest() {

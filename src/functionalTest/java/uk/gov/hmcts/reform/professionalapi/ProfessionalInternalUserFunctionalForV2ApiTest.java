@@ -557,7 +557,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedSraResponse.body().as(Map.class).get("message")).isEqualTo(
             "All sraIds updated successfully");
         //retrieve 1st saved organisation by id
-        verifyRetrievedOrg(orgId2,sraId1);
+        verifyRetrievedOrg(orgId1,sraId1);
         //retrieve 2st saved organisation by id
         verifyRetrievedOrg(orgId2,sraId2);
         //Delete organisation
@@ -580,7 +580,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             organisationSraUpdateRequest,hmctsAdmin, MULTI_STATUS);
         assertNotNull(orgUpdatedSraIdResponse);
         assertThat(orgUpdatedSraIdResponse.body().as(Map.class).get("status")).isEqualTo("failure");
-        ArrayList sraIds = (ArrayList) orgUpdatedSraIdResponse.body().as(Map.class).get("sarIds");
+        ArrayList sraIds = (ArrayList) orgUpdatedSraIdResponse.body().as(Map.class).get("sraIds");
         LinkedHashMap response1 = (LinkedHashMap) sraIds.get(0);
         LinkedHashMap response2 = (LinkedHashMap) sraIds.get(1);
 
@@ -610,7 +610,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             organisationSraUpdateRequest,hmctsAdmin, MULTI_STATUS);
         assertNotNull(orgUpdatedSraResponse);
         assertThat(orgUpdatedSraResponse.body().as(Map.class).get("status")).isEqualTo("failure");
-        ArrayList sraIds = (ArrayList) orgUpdatedSraResponse.body().as(Map.class).get("sarIds");
+        ArrayList sraIds = (ArrayList) orgUpdatedSraResponse.body().as(Map.class).get("sraIds");
         LinkedHashMap response1 = (LinkedHashMap) sraIds.get(0);
         LinkedHashMap response2 = (LinkedHashMap) sraIds.get(1);
 
@@ -623,8 +623,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(response1.get("statusCode")).isEqualTo(400);
         assertThat(response2.get("statusCode")).isEqualTo(400);
 
-        assertThat(response1.get("message")).isEqualTo("Organisation SraId is missing");
-        assertThat(response2.get("message")).isEqualTo("Organisation SraId is missing");
+        assertThat(response1.get("message")).isEqualTo("Organisation sraId is missing");
+        assertThat(response2.get("message")).isEqualTo("Organisation sraId is missing");
 
         //Delete organisation
         deleteCreatedTestOrganisations(orgId1,orgId2);
@@ -695,9 +695,9 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         List<OrganisationSraUpdateRequest.OrganisationSraUpdateData> organisationSraUpdateDataList
             = new ArrayList<>();
         OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData1 =
-            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(sraId1,orgId1);
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(orgId1,sraId1);
         OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData2 =
-            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(sraId2,orgId2);
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(orgId2,sraId2);
         organisationSraUpdateDataList.add(organisationSraUpdateData1);
         organisationSraUpdateDataList.add(organisationSraUpdateData2);
         organisationSraUpdateRequest.setOrganisationSraUpdateDataList(organisationSraUpdateDataList);
@@ -706,14 +706,14 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     public void verifyRetrievedOrg(String orgId,String sraId) {
 
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(orgId, hmctsAdmin, OK);
+        var orgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(orgId, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
-        List organisationAttributes2 = (List)orgResponse.get("orgAttributes");
-        assertThat(organisationAttributes2).isNotNull();
-        LinkedHashMap<String, Object> attr2 = (LinkedHashMap)organisationAttributes2.get(0);
-        assertThat(attr2).isNotNull();
-        assertThat(attr2.get("key")).isEqualTo("regulators-0");
-        assertThat(attr2.get("value").toString()).isEqualTo(
+        List organisationAttributes = (List)orgResponse.get("orgAttributes");
+        assertThat(organisationAttributes).isNotNull();
+        LinkedHashMap<String, Object> attr = (LinkedHashMap)organisationAttributes.get(0);
+        assertThat(attr).isNotNull();
+        assertThat(attr.get("key")).isEqualTo("regulators-0");
+        assertThat(attr.get("value").toString()).isEqualTo(
             "{\"regulatorType\":\"Solicitor Regulation Authority "
                 + "(SRA)\",\"organisationRegistrationNumber\":\"" + sraId + "\"}");
 
