@@ -251,7 +251,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
 
 
     @Operation(
-        summary = "Updates an Organisation's name",
+        summary = "Updates an Organisation's sraId",
         description = "**IDAM Roles to access API** : <br> prd-admin",
         security = {
             @SecurityRequirement(name = "ServiceAuthorization"),
@@ -260,7 +260,7 @@ public class OrganisationInternalControllerV2 extends SuperController {
 
     @ApiResponse(
         responseCode = "200",
-        description = "Organisation name has been updated",
+        description = "Organisation sraId has been updated",
         content = @Content(schema = @Schema(implementation = String.class))
     )
     @ApiResponse(
