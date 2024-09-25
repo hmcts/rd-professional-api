@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -1046,18 +1047,18 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> updateOrgContactInformation(
-        ContactInformationCreationRequest contactInformationCreationRequest,
-        String role, String organisationIdentifier, Boolean dxAddressUpdate,
+        ContactInformationUpdateRequest contactInformationUpdateRequest,
+        String role,  Boolean dxAddressUpdate,
         Boolean contactInformationUpdate, String addressid) {
 
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH
-            + "/" + organisationIdentifier + "/contactInformation/?dxAddressUpdate=" + dxAddressUpdate
+             + "/contactInformation/?dxAddressUpdate=" + dxAddressUpdate
             + "&contactInformationUpdate=" + contactInformationUpdate + "&addressid=" + addressid;
 
         try {
-            HttpEntity<ContactInformationCreationRequest> requestEntity =
-                new HttpEntity<>(contactInformationCreationRequest,
+            HttpEntity<ContactInformationUpdateRequest> requestEntity =
+                new HttpEntity<>(contactInformationUpdateRequest,
                     getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
@@ -1069,6 +1070,7 @@ public class ProfessionalReferenceDataClient {
 
         Map<String, Object> contactInformationResponse = new HashMap<>();
         contactInformationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        contactInformationResponse.put("response_body", responseEntity.getBody());
         return contactInformationResponse;
     }
 }

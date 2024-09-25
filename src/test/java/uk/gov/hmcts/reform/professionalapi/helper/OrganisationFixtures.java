@@ -93,6 +93,28 @@ public class OrganisationFixtures {
                 .build()));
     }
 
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder
+    organisationRequestWithMultipleContactInformations() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        return anOrganisationCreationRequest()
+            .name("some-org-name")
+            .status("PENDING")
+            .sraId("sra-id")
+            .sraRegulated("false")
+            .companyUrl("company -url")
+            .companyNumber(randomAlphabetic(8))
+            .paymentAccount(paymentAccounts)
+            .superUser(aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email("someone@somewhere.com")
+                .build())
+            .contactInformation(getContactInformationList());
+    }
+
+
     public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFields() {
 
         Set<String> paymentAccounts = new HashSet<>();
@@ -384,14 +406,14 @@ public class OrganisationFixtures {
         .ContactInformationCreationRequestBuilder contactInformationWithOnlyAddressLine3Changed() {
 
         return aContactInformationCreationRequest()
-            .addressLine1("addLine1")
-            .addressLine2("addLine2")
-            .addressLine3("up-addLine3")
+            .addressLine1("addressLine1")
+            .addressLine2("addressLine2")
+            .addressLine3("updated-addLine3")
             .country("country")
             .county("county")
             .townCity("town-city")
             .uprn("uprn1")
-            .postCode("post-code")
+            .postCode("some-post-code")
             .dxAddress(Arrays.asList(dxAddressCreationRequest()
                 .dxNumber("DX 1234567890")
                 .dxExchange("dxExchange").build()));

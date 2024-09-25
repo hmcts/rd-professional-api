@@ -25,6 +25,9 @@ public class ProfessionalApiConstants {
             = "No Organisation was found with the given organisationIdentifier ";
     public static final String ORG_NOT_ACTIVE_NO_USERS_RETURNED
             = "Organisation is not Active hence not returning any users";
+
+    public static final String DX_ADDRESS_NOT_FOUND
+        = "DX Number or DX Exchange cannot be empty";
     public static final String ERROR_MESSAGE_403_FORBIDDEN = "403 Forbidden";
     public static final int ZERO_INDEX = 0;
     public static final int ONE = 1;

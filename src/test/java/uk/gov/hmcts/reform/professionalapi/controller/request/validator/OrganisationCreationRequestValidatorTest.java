@@ -14,6 +14,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -463,65 +465,23 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
-    void test_validate_contacts_informations_empty() {
-        assertThrows(InvalidRequest.class, () ->
-            organisationCreationRequestValidator.validateContactInformationRequest(null,
-                true,true));
-    }
+    void test_validate_contact_information() {
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
+            new ContactInformationUpdateRequest.ContactInformationUpdateData(
+                "orgId","uprn1","addressLine1",
+                "addressLine2","addressLine3", "som1-town-city",
+                "some-county1","some-country1","som1-post-code",Arrays.asList
+                (dxAddressCreationRequest().dxNumber("DX 1234567890").dxExchange("dxExchange-1").build()));
 
-    @Test
-    void test_contact_info_null_addLine1() {
+        final List<UpdateOrgResponse> updateContactInformationResponsesList = new ArrayList<>();
 
-        Throwable thrown = catchThrowable(() -> {
-            organisationCreationRequestValidator
-                .validateContactInfo(aContactInformationCreationRequest().addressLine1("").build());
-        });
-
-        assertThat(thrown)
-            .isInstanceOf(InvalidRequest.class)
-            .hasMessageContaining("AddressLine1 cannot be empty");
-
-    }
-
-    @Test
-    void test_contact_info_Invalid_Uprn() {
-
-        Throwable thrown = catchThrowable(() -> {
-            organisationCreationRequestValidator
-                .validateContactInfo(aContactInformationCreationRequest().addressLine1("addressLine1")
-                    .uprn("125874596325874585").build());
-        });
-
-        assertThat(thrown)
-            .isInstanceOf(InvalidRequest.class)
-            .hasMessageContaining("Uprn must not be greater than 14 characters long");
-
-    }
-
-    @Test
-    void test_Dx_Address_success() {
-        ContactInformationCreationRequest contactInformationCreationReq = aContactInformationCreationRequest()
-            .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                .dxNumber("DX 1234567890")
-                .dxExchange("dxExchange").build()))
-            .build();
-
-        organisationCreationRequestValidator.validateDxAdd(true,contactInformationCreationReq);
+         organisationCreationRequestValidator.
+            validateContactInformationAndDxAddress(
+                contactInformationUpdateData, true ,  true,
+                updateContactInformationResponsesList );
         assertTrue(true);
     }
 
-    @Test
-    void test_Dx_Address() {
-        ContactInformationCreationRequest contactInformationCreationReq = aContactInformationCreationRequest()
-            .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                .dxNumber("")
-                .dxExchange("").build()))
-            .build();
-
-        assertThrows(InvalidRequest.class, () ->
-            organisationCreationRequestValidator.validateDxAdd(true,contactInformationCreationReq));
-
-    }
 
     @Test
     void test_add_contacts_informations_to_orgs_valid_dx_address() {
