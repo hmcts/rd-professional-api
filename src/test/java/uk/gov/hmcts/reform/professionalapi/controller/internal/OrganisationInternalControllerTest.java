@@ -598,13 +598,15 @@ class OrganisationInternalControllerTest {
             = new ArrayList<>();
         ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData1 =
             new ContactInformationUpdateRequest.ContactInformationUpdateData(
-                organisation1.getOrganisationIdentifier(),"uprn1","addressLine1",
+                organisation1.getOrganisationIdentifier(),true,true,"",
+                "uprn1","addressLine1",
                 "addressLine2","addressLine3", "som1-town-city",
                 "some-county1","some-country1","som1-post-code",Arrays.asList
                 (dxAddressCreationRequest().dxNumber("DX 1234567890").dxExchange("dxExchange-1").build()));
         ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData2 =
             new ContactInformationUpdateRequest.ContactInformationUpdateData(
-                organisation2.getOrganisationIdentifier(),"uprn2","addressLine2",
+                organisation2.getOrganisationIdentifier(),true,true,"",
+                "uprn2","addressLine2",
                 "addressLine2-2","addressLine3-3", "som2-town-city",
                 "some-county2","some-country2","som2-post-code",Arrays.asList
                 (dxAddressCreationRequest().dxNumber("DX 2234567890").dxExchange("dxExchange-2").build()));
@@ -635,12 +637,11 @@ class OrganisationInternalControllerTest {
             any(),any(),any())).thenReturn(updateContactInformationResponsesList);
 
         UpdateResponseParent updateResponse = new UpdateResponseParent("success",
-            "All names updated successfully",null);
+            "All contactInformations updated successfully",null);
         when(organisationServiceMock. generateUpdateResponse(any(),any())).thenReturn(updateResponse);
 
         UpdateResponseParent response = organisationInternalController
-            .updateContactInformationForOrganisation(contactInformationUpdateRequest,true,
-                true,"");
+            .updateContactInformationForOrganisation(contactInformationUpdateRequest);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo("success");

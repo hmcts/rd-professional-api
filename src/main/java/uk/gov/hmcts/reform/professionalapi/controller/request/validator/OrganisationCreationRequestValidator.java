@@ -106,10 +106,10 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void validateContactInformationAndDxAddress(
-        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformation, boolean dxAddressRequired,
-        boolean contactInformationUpdate,List<UpdateOrgResponse> updateOrgResponsesList) {
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformation,
+        List<UpdateOrgResponse> updateOrgResponsesList) {
 
-            if (dxAddressRequired) {
+            if (contactInformation.isDxAddressUpdate()) {
                 List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
                 if (dxAddressList == null || dxAddressList.size() == 0) {
                     updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
@@ -134,7 +134,7 @@ public class OrganisationCreationRequestValidator {
                     });
                 }
             }
-            if (contactInformationUpdate) {
+            if (contactInformation.isContactInformationUpdate()) {
                 if (StringUtils.isBlank(contactInformation.getAddressLine1())) {
                     updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
                         "failure",HttpStatus.BAD_REQUEST.value(),

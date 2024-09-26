@@ -2828,7 +2828,7 @@ class OrganisationServiceImplTest {
     public ContactInformationUpdateRequest.ContactInformationUpdateData getContactInformationData(){
         ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
             new ContactInformationUpdateRequest.ContactInformationUpdateData(
-                organisation.getOrganisationIdentifier(),"uprn1","addressLine1",
+                organisation.getOrganisationIdentifier(),true,true,"","uprn1","addressLine1",
                 "addressLine2","addressLine3", "som1-town-city",
                 "some-county1","some-country1","som1-post-code",Arrays.asList
                 (dxAddressCreationRequest().dxNumber("DX 1234567890").dxExchange("dxExchange-1").build()));

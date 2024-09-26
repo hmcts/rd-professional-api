@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
@@ -1826,15 +1827,13 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Response updateContactInformationsToOrganisation(
-        ContactInformationCreationRequest
-            contactInformationCreationRequest,
-        HttpStatus expectedStatus,
-        String organisationId,Boolean dxAddressUpdate,Boolean contactInformationUpdate,String addressid) {
+        ContactInformationUpdateRequest
+            contactInformationUpdateRequest,
+        HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
-            .body(contactInformationCreationRequest)
-            .put("/refdata/internal/v1/organisations/" + organisationId + "/contactInformation/?dxAddressUpdate="
-            + dxAddressUpdate + "&contactInformationUpdate=" + contactInformationUpdate + "&addressid=" + addressid)
+            .body(contactInformationUpdateRequest)
+            .put("/refdata/internal/v1/organisations/contactInformation")
             .andReturn();
 
         response.then()

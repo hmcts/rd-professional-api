@@ -29,6 +29,14 @@ public class OrganisationFixtures {
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
 
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX1234567890")
+            .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX123456777")
+            .dxExchange("dxExchange1").build());
+
         return anOrganisationCreationRequest()
                 .name("some-org-name")
                 .status("ACTIVE")
@@ -40,6 +48,7 @@ public class OrganisationFixtures {
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
                         .uprn("uprn")
+                        .dxAddress(dx1)
                         .build()));
     }
 

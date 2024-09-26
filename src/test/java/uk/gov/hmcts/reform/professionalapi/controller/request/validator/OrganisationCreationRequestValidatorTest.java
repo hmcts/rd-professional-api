@@ -468,7 +468,7 @@ class OrganisationCreationRequestValidatorTest {
     void test_validate_contact_information() {
         ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
             new ContactInformationUpdateRequest.ContactInformationUpdateData(
-                "orgId","uprn1","addressLine1",
+                "orgId",true,true,"addId","uprn1","addressLine1",
                 "addressLine2","addressLine3", "som1-town-city",
                 "some-county1","some-country1","som1-post-code",Arrays.asList
                 (dxAddressCreationRequest().dxNumber("DX 1234567890").dxExchange("dxExchange-1").build()));
@@ -477,7 +477,7 @@ class OrganisationCreationRequestValidatorTest {
 
          organisationCreationRequestValidator.
             validateContactInformationAndDxAddress(
-                contactInformationUpdateData, true ,  true,
+                contactInformationUpdateData,
                 updateContactInformationResponsesList );
         assertTrue(true);
     }

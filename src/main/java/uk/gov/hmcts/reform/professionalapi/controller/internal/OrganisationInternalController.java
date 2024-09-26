@@ -801,10 +801,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured({"prd-admin"})
     public UpdateResponseParent updateContactInformationForOrganisation(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationUpdateRequest")
-        @Valid @NotNull @RequestBody ContactInformationUpdateRequest contactInformationUpdateRequest,
-        @RequestParam(value = "dxAddressUpdate", required = true) boolean dxAddressUpdate,
-        @RequestParam(value = "contactInformationUpdate", required = true) boolean contactInformationUpdate,
-        @RequestParam("addressid") String addressid
+        @Valid @NotNull @RequestBody ContactInformationUpdateRequest contactInformationUpdateRequest
        ) {
 
         //check if request list is empty
@@ -827,12 +824,13 @@ public class OrganisationInternalController extends SuperController {
                 organisationIdentifierValidatorImpl.validateOrganisationId(orgId,
                     updateOrgResponsesList, existingOrganisation);
                 organisationCreationRequestValidator.validateContactInformationAndDxAddress(
-                    contactInformationUpdateData,dxAddressUpdate,contactInformationUpdate,updateOrgResponsesList);
+                    contactInformationUpdateData,updateOrgResponsesList);
                 if (!updateOrgResponsesList.stream().filter(
                     updateOrg -> orgId.equalsIgnoreCase(updateOrg.getOrganisationId())).findAny().isPresent()) {
                         organisationService.updateContactInformation(existingOrganisation,
-                            dxAddressUpdate,contactInformationUpdateData,
-                            contactInformationUpdate,addressid,updateOrgResponsesList);
+                            contactInformationUpdateData.isDxAddressUpdate(),contactInformationUpdateData,
+                            contactInformationUpdateData.isContactInformationUpdate(),
+                            contactInformationUpdateData.getAddressid(),updateOrgResponsesList);
                 }
             }
         });

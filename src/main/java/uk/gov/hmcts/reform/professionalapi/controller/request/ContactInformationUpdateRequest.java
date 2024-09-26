@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
 
 @Getter
 @Setter
@@ -29,6 +31,10 @@ public class ContactInformationUpdateRequest {
         @Valid
         @NotNull(message = " organisation Id is required.")
         private String organisationId;
+
+        boolean dxAddressUpdate;
+        boolean contactInformationUpdate;
+        String addressid;
 
         private final String uprn;
 
@@ -53,6 +59,9 @@ public class ContactInformationUpdateRequest {
         @JsonCreator
         public ContactInformationUpdateData(
             @JsonProperty("organisationId") String organisationId,
+            @JsonProperty("dxAddressUpdate") boolean dxAddressUpdate,
+            @JsonProperty("contactInformationUpdate") boolean contactInformationUpdate,
+            @JsonProperty("addressid") String addressid,
             @JsonProperty("uprn") String uprn,
             @JsonProperty("addressLine1") String addressLine1,
             @JsonProperty("addressLine2") String addressLine2,
@@ -63,6 +72,9 @@ public class ContactInformationUpdateRequest {
             @JsonProperty("postCode") String postCode,
             @JsonProperty("dxAddress") List<DxAddressCreationRequest> dxAddress) {
             this.organisationId = organisationId;
+            this.dxAddressUpdate = dxAddressUpdate;
+            this.contactInformationUpdate = contactInformationUpdate;
+            this.addressid = addressid;
             this.uprn = uprn;
             this.addressLine1 = addressLine1;
             this.addressLine2 = addressLine2;

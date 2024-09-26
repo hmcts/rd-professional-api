@@ -98,6 +98,7 @@ import java.util.stream.Stream;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.ObjectUtils.requireNonEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DX_ADDRESS_NOT_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -1076,6 +1077,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 "contactInformationUpdate are both false . Cannot update contact information"));
         } else{
             if (dxAddressUpdate) {
+
                 // if only dxaddress needs updating
                 addDxAddressToContactInformation(contactInformationUpdateData.getDxAddress(),
                     existingContactInformationList.get(0));

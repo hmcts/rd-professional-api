@@ -22,7 +22,7 @@ public class ProfessionalApiConstants {
     public static final String ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX = "[^A-Za-z0-9-]";
 
     public static final String NO_ORG_FOUND_FOR_GIVEN_ID
-            = "No Organisation was found with the given organisationIdentifier ";
+            = "No Organisation was found with the given organisationIdentifier";
     public static final String ORG_NOT_ACTIVE_NO_USERS_RETURNED
             = "Organisation is not Active hence not returning any users";
 
