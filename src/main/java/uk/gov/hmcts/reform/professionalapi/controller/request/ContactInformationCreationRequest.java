@@ -32,7 +32,6 @@ public class ContactInformationCreationRequest {
 
     private final List<DxAddressCreationRequest> dxAddress;
 
-
     @JsonCreator
     public ContactInformationCreationRequest(
             @JsonProperty("uprn") String uprn,

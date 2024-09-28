@@ -79,7 +79,7 @@ public class FeatureToggleConditionExtension implements ExecutionCondition {
 
     @SuppressWarnings("checkstyle:CommentsIndentation")
     private static void initialize() {
-        LDClient ldClient = new LDClient(getenv("LD_SDK_KEY"));
+        LDClient ldClient = new LDClient("sdk-b1310c4a-e522-4512-9e68-d75d23b04c5d");
         featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
         String executionEnvironment = getenv("execution_environment");
         ReflectionTestUtils.setField(featureToggleService, "environment", executionEnvironment);

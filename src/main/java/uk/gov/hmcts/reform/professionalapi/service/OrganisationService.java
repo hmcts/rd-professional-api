@@ -2,12 +2,17 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -32,6 +37,10 @@ public interface OrganisationService {
     BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                        String idamId);
 
+    ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        ContactInformationCreationRequest contactInfo, String organisationIdentifier,Boolean dxAddressRequired,
+        Boolean contactInformationUpdate, String addressid);
+
     OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
 
     OrganisationEntityResponseV2 retrieveOrganisationForV2Api(String organisationIdentifier,
@@ -46,6 +55,9 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
+    OrganisationsDetailResponse updateOrganisationNameOrSra(
+        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest, String organisationIdentifier);
+
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
                                             String organisationIdentifier,Boolean isOrgApprovalRequest);
 
@@ -55,6 +67,9 @@ public interface OrganisationService {
                                                          Pageable pageable);
 
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
+
+    @Transactional
+    DeleteUserResponse deleteUserForOrganisation(List<String> emails);
 
     List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable);
 

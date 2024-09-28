@@ -32,12 +32,15 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -77,6 +80,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
@@ -96,6 +100,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -112,12 +117,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_400;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.BLOCKED;
@@ -136,9 +143,14 @@ class OrganisationServiceImplTest {
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final OrgAttributeRepository orgAttributeRepository = mock(OrgAttributeRepository.class);
 
+    private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
+
+    private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
+
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
+    private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock
             = mock(ContactInformationRepository.class);
     private final BulkCustomerDetailsRepository bulkCustomerDetailsRepositoryMock =
@@ -181,6 +193,8 @@ class OrganisationServiceImplTest {
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
 
+    private OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest;
+
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
     private List<Organisation> organisations;
@@ -205,6 +219,7 @@ class OrganisationServiceImplTest {
 
     private final ProfessionalUserService professionalUserServiceMock
             = mock(ProfessionalUserService.class);
+
 
     @BeforeEach
     void setUp() {
@@ -275,6 +290,8 @@ class OrganisationServiceImplTest {
                 "number02", "company-url", superUserCreationRequest, paymentAccountList,
                 contactInformationCreationRequests, "Doctor", orgAttributeRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
+
+        organisationNameSraUpdateRequest = new OrganisationNameSraUpdateRequest("name","sraId");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
@@ -1931,6 +1948,53 @@ class OrganisationServiceImplTest {
         verify(paymentAccountMock, times(1)).setStatusMessage("statusMessage");
     }
 
+
+    @Test
+    void test_updateOrganisationNameAndSra() {
+        String newName = "TestOrgName";
+        String newSraId = "TestSraId";
+        final String orgIdentifier = "9KS20WT";
+        organisationNameSraUpdateRequest.setName(newName);
+        organisationNameSraUpdateRequest.setSraId(newSraId);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+
+        when(organisationRepository.findByOrganisationIdentifier(orgId)).thenReturn(null);
+        assertThrows(EmptyResultDataAccessException.class, () ->
+            sut.retrieveOrganisation(orgId, false));
+        verify(organisationRepository, times(1))
+            .findByOrganisationIdentifier(any(String.class));
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class)))
+            .thenReturn(organisationMock);
+
+        assertNotNull(organisationNameSraUpdateRequest.getName());
+        assertNotNull(organisationNameSraUpdateRequest.getSraId());
+
+        organisationMock.setName(newName);
+        organisationMock.setSraId(newSraId);
+
+        OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
+
+        when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
+
+        when(organisationRepository.save(organisationMock)).thenReturn(organisationMock);
+
+        OrganisationsDetailResponse updatedOrganisation = sut.updateOrganisationNameOrSra(
+            organisationNameSraUpdateRequest,orgIdentifier);
+
+        assertThat(updatedOrganisation).isNotNull();
+
+        verify(organisationRepository, times(1))
+            .findByOrganisationIdentifier(orgIdentifier);
+        verify(organisationRepository, times(1))
+            .save(organisationMock);
+        verify(orgAttributeRepository, times(1))
+            .save(any(OrgAttribute.class));
+    }
+
+
+
     @Test
     void test_AllAttributesAddedToSuperUser() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"),
@@ -2091,7 +2155,7 @@ class OrganisationServiceImplTest {
 
 
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
+        deleteOrganisationResponse.setStatusCode(ERROR_CODE_400);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
         ObjectMapper mapperOne = new ObjectMapper();
         String deleteBody = mapperOne.writeValueAsString(newUserResponse);
@@ -2099,25 +2163,25 @@ class OrganisationServiceImplTest {
 
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(400).build());
+            .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
         Organisation organisation = getDeleteOrganisation(ACTIVE);
 
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
-        assertThat(deleteOrganisationResponse.getMessage())
-                .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
-        verify(organisationRepository, times(0)).deleteById(any());
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(organisationRepository, times(1)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
-        verify(orgAttributeRepository, times(0)).deleteByOrganistion(any());
-        verify(bulkCustomerDetailsRepositoryMock, times(0)).deleteByOrganistion(any());
+        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
+        verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
+
+
 
     @Test
     void testDeleteActiveOrganisationWithMultiUsersGives400WithMessage() {
@@ -2127,7 +2191,7 @@ class OrganisationServiceImplTest {
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ERROR_CODE_400);
         assertThat(deleteOrganisationResponse.getMessage())
                 .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
         verify(organisationRepository, times(0)).deleteById(any());
@@ -2717,5 +2781,116 @@ class OrganisationServiceImplTest {
         // assert
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_updateOrganisationContactInformation() {
+        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+        existingContactInformationList.add(contactInformation);
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+
+        when(organisationMock.getContactInformation()).thenReturn(existingContactInformationList);
+        assertNotNull(contactInformationCreationRequest);
+
+        ContactInformation existingContactInformation = new ContactInformation();
+        existingContactInformation.setAddressLine1(contactInformationCreationRequest.getAddressLine1());
+        existingContactInformation.setTownCity(contactInformationCreationRequest.getTownCity());
+
+        when(contactInformationRepository.save(existingContactInformation)).thenReturn(existingContactInformation);
+        assertNotNull(existingContactInformation);
+        assertThat(existingContactInformation.getAddressLine1())
+            .isEqualTo(contactInformationCreationRequest.getAddressLine1());
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+
+        ResponseEntity<ContactInformationResponse> updatedOrganisationContact =
+            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,orgId,true,
+                true,"");
+
+        assertThat(updatedOrganisationContact).isNotNull();
+        assertThat(updatedOrganisationContact.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+    }
+
+    @Test
+    void testUpdateOrgContactInformationWithEmptyOrgIdentifier() {
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(null)).thenReturn(null);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+        assertThrows(ResourceNotFoundException.class, () ->
+            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,
+                null,true,true,""));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_deleteUserForOrganisation() throws JsonProcessingException {
+        String deleteBody = new ObjectMapper().writeValueAsString(new NewUserResponse());
+
+        when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
+        doNothing().when(userAttributeRepositoryMock).deleteByProfessionalUserId(professionalUser.getId());
+        doNothing().when(professionalUserRepositoryMock).delete(professionalUser);
+
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
+            .status(STATUS_CODE_204).reason("OK").body(deleteBody, UTF_8)
+            .request(mock(Request.class)).build());
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
+
+        DeleteUserResponse deleteUserResponse = new DeleteUserResponse(
+            STATUS_CODE_204, "The organisation has deleted successfully");
+        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
+        deleteUserResponse = sut.deleteUserForOrganisation(emails);
+        assertThat(deleteUserResponse).isNotNull();
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+
+    }
+
+    @Test
+    void testUpdateOrgContactInformationWithMultipleRequestsButEmptyAddressId() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+
+        var contactInformation1 = new ContactInformation();
+        contactInformation1.setCountry("TestAnotherCountry");
+        contactInformation1.setCreated(LocalDateTime.now());
+        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
+        existingContactInformationList.addAll(List.of(contactInformation1, contactInformation));
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+
+        when(organisationMock.getContactInformation()).thenReturn(existingContactInformationList);
+        assertNotNull(existingContactInformationList);
+        assertNotNull(contactInformationCreationRequest);
+
+        ContactInformation existingContactInformation = new ContactInformation();
+
+        existingContactInformation.setAddressLine1(contactInformationCreationRequest.getAddressLine1());
+        existingContactInformation.setTownCity(contactInformationCreationRequest.getTownCity());
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        assertThrows(ResourceNotFoundException.class, () ->
+            sut.updateContactInformationForOrganisation(contactInformationCreationRequest,
+                orgId,true,true,""));
+    }
+
+
+
+    @Test
+    void test_deleteUserForOrganisationWithEmptyEmails() {
+        assertThrows(InvalidRequest.class, () ->
+            sut.deleteUserForOrganisation(new ArrayList<>()));
     }
 }

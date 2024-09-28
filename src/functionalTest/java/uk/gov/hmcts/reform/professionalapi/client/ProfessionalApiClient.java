@@ -260,6 +260,50 @@ public class ProfessionalApiClient {
         return  organisationOtherOrgsCreationRequest;
     }
 
+    public static List<ContactInformationCreationRequest> createContactInformationRequests() {
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX 1234567890")
+            .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX 123456777")
+            .dxExchange("dxExchange").build());
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
+        dx2.add(dxAddressCreationRequest()
+            .dxNumber("DX 123452222")
+            .dxExchange("dxExchange").build());
+        dx2.add(dxAddressCreationRequest()
+            .dxNumber("DX 123456333")
+            .dxExchange("dxExchange").build());
+
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+            .uprn("u1")
+            .addressLine1("address1")
+            .addressLine2("address2")
+            .addressLine3("address3")
+            .country("country")
+            .county("county")
+            .townCity("city")
+            .postCode("code")
+            .dxAddress(dx1)
+            .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+            .uprn("up2")
+            .addressLine1("add")
+            .addressLine2("add2")
+            .addressLine3("add3")
+            .country("country2")
+            .county("county2")
+            .townCity("city2")
+            .postCode("code2")
+            .dxAddress(dx2)
+            .build());
+
+        return contactInfoList;
+    }
+
     public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
@@ -1315,6 +1359,22 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
+    public void updatesOrganisationName(OrganisationCreationRequest organisationCreationRequest, String role,
+                                        String organisationIdentifier, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+            .body(organisationCreationRequest)
+            .put("/refdata/internal/v1/organisations/nameSra/" + organisationIdentifier)
+            .andReturn();
+
+        log.info("{}:: Update organisation Name or SRA id response: {}",
+            loggingComponentName, response.getStatusCode());
+
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
+    }
+
     public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
@@ -1751,5 +1811,29 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
+    }
+
+    @SuppressWarnings("unchecked")
+    public Response updateContactInformationsToOrganisation(
+        ContactInformationCreationRequest
+            contactInformationCreationRequest,
+        HttpStatus expectedStatus,
+        String organisationId,Boolean dxAddressUpdate,Boolean contactInformationUpdate,String addressid) {
+
+        Response response = getMultipleAuthHeadersInternal()
+            .body(contactInformationCreationRequest)
+            .put("/refdata/internal/v1/organisations/contactInformation/" + organisationId + "/?dxAddressUpdate="
+            + dxAddressUpdate + "&contactInformationUpdate=" + contactInformationUpdate + "&addressid=" + addressid)
+            .andReturn();
+
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
+
+        log.info("{}:: Update organisation contact information response: {}",
+            loggingComponentName, response.getStatusCode());
+
+        return response;
+
     }
 }
