@@ -43,7 +43,7 @@ def versions = [
         junit           : '5.9.2',
         junitPlatform   : '1.10.3',
         log4j           : '2.23.1',
-        reformS2sClient : '5.1.0',
+        reformS2sClient : '5.2.0',
         feign           : '3.8.0',
         bytebuddy       : '1.15.3',
         bouncycastle    : '1.78.1',
