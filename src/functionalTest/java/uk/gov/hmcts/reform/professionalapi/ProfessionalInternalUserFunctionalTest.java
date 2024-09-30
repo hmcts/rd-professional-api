@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
@@ -60,8 +58,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest.dxAddressUpdateRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
@@ -1251,7 +1248,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         ContactInformationUpdateRequest contactInformationCreationRequest =
             createContactInformationUpdateRequestWithDxAddress(orgId1,"addressLine1",
                 "addressLine3","uprn1",orgId2,"addLine1","addLine3","uprn2",
-                true,true ,true,true,null,null);
+                true,true,true,true,null,null);
 
 
         Response result = professionalApiClient.updateContactInformationsToOrganisation(
@@ -1319,8 +1316,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("updateBothContactInformationAndDxAdressForOrgNeedUpdatingSuccessScenario :: END");
     }
 
-  /*  @Test
-    void updateOnlyDxAddressDetailsForOrgShouldReturnSuccess() {
+    /*  @Test
+       void updateOnlyDxAddressDetailsForOrgShouldReturnSuccess() {
         log.info("updateOnlyDxAddressDetailsForOrgShouldReturnSuccess :: STARTED");
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -1523,7 +1520,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         professionalApiClient.deleteOrganisation(orgId2, hmctsAdmin, NO_CONTENT);
     }
 
-    public ContactInformationUpdateRequest createContactInformationUpdateRequestWithDxAddress( String orgId1,
+    public ContactInformationUpdateRequest createContactInformationUpdateRequestWithDxAddress(String orgId1,
                                                                                                String addressLine1,
                                                                                                String addressLine3,
                                                                                                String uprn1,
@@ -1543,13 +1540,13 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         contactInformationUpdateDataList.add(new ContactInformationUpdateRequest.ContactInformationUpdateData(
             orgId1, dxAdd, contactUpdate, addId,uprn1,addressLine1,
             "addressLine2",addressLine3, "som1-town-city",
-            "some-county1","some-country1","som1-post-code", Arrays.asList
-            (dxAddressCreationRequest().dxNumber("DX 1234567890").dxExchange("dxExchange-1").build())));
+            "some-county1","some-country1","som1-post-code", Arrays.asList(
+            dxAddressUpdateRequest().dxNumber("DX 1234567890").dxExchange("dxExchange-1").build())));
         contactInformationUpdateDataList.add(new ContactInformationUpdateRequest.ContactInformationUpdateData(
-            orgId2,dxAdd1, contactUpdate1, addId1,uprn2,addLine1,
-            "addLine2",addLine3, "som2-town-city",
-            "some-county2","some-country2","som2-post-code",Arrays.asList
-            (dxAddressCreationRequest().dxNumber("DX 2234567890").dxExchange("dxExchange-2").build())));
+            orgId2,dxAdd1, contactUpdate1, addId1,uprn2,addLine1, "addLine2",addLine3,
+            "som2-town-city","some-county2","some-country2","som2-post-code",
+            Arrays.asList(dxAddressUpdateRequest().dxAddressId("12345678").dxNumber("DX 2234567890").dxExchange(
+                "dxExchange-2").build())));
         contactInformationUpdateRequest.setContactInformationUpdateData(contactInformationUpdateDataList);
 
         return contactInformationUpdateRequest;

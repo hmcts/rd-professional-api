@@ -84,6 +84,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest.dxAddressUpdateRequest;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -601,15 +602,17 @@ class OrganisationInternalControllerTest {
                 organisation1.getOrganisationIdentifier(),true,true,"",
                 "uprn1","addressLine1",
                 "addressLine2","addressLine3", "som1-town-city",
-                "some-county1","some-country1","som1-post-code",Arrays.asList
-                (dxAddressCreationRequest().dxNumber("DX 1234567890").dxExchange("dxExchange-1").build()));
+                "some-county1","some-country1","som1-post-code",Arrays.asList(
+                    dxAddressUpdateRequest().dxAddressId("12345678").dxNumber("DX 1234567890")
+                        .dxExchange("dxExchange-1").build()));
         ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData2 =
             new ContactInformationUpdateRequest.ContactInformationUpdateData(
                 organisation2.getOrganisationIdentifier(),true,true,"",
                 "uprn2","addressLine2",
                 "addressLine2-2","addressLine3-3", "som2-town-city",
-                "some-county2","some-country2","som2-post-code",Arrays.asList
-                (dxAddressCreationRequest().dxNumber("DX 2234567890").dxExchange("dxExchange-2").build()));
+                "some-county2","some-country2","som2-post-code",Arrays.asList(
+                    dxAddressUpdateRequest().dxAddressId("12345678").dxNumber("DX 2234567890")
+                        .dxExchange("dxExchange-2").build()));
         contactInformationUpdateDataList.add(contactInformationUpdateData1);
         contactInformationUpdateDataList.add(contactInformationUpdateData2);
         contactInformationUpdateRequest.setContactInformationUpdateData(contactInformationUpdateDataList);

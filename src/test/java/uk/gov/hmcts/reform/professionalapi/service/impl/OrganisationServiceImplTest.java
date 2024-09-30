@@ -121,7 +121,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest.dxAddressUpdateRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.BLOCKED;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
@@ -2730,13 +2730,7 @@ class OrganisationServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_updateOrganisationContactInformation() {
-
-        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
-            getContactInformationData();
-
-
         final List<UpdateOrgResponse> updateOrgNameResponsesList = new ArrayList<>();
-
         organisation.setContactInformations(List.of(contactInformation));
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
@@ -2751,6 +2745,8 @@ class OrganisationServiceImplTest {
         assertThat(existingContactInformation.getAddressLine1())
             .isEqualTo(contactInformationCreationRequest.getAddressLine1());
 
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
+            getContactInformationData();
         List<UpdateOrgResponse> updateContactInformationResponse =
             sut.updateContactInformation(organisation,true,contactInformationUpdateData,true,
                 "",updateOrgNameResponsesList);
@@ -2758,10 +2754,12 @@ class OrganisationServiceImplTest {
         assertThat(updateContactInformationResponse).isNotNull();
         assertThat(updateContactInformationResponse.get(0).getStatus()).isEqualTo("success");
         assertThat(updateContactInformationResponse.get(0).getStatusCode()).isEqualTo(200);
-        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase("dxAddress updated successfully");
+        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase(
+            "dxAddress updated successfully");
         assertThat(updateContactInformationResponse.get(1).getStatus()).isEqualTo("success");
         assertThat(updateContactInformationResponse.get(1).getStatusCode()).isEqualTo(200);
-        assertThat(updateContactInformationResponse.get(1).getMessage()).isEqualToIgnoringCase("contactInformation updated successfully");
+        assertThat(updateContactInformationResponse.get(1).getMessage()).isEqualToIgnoringCase(
+            "contactInformation updated successfully");
 
     }
 
@@ -2789,9 +2787,9 @@ class OrganisationServiceImplTest {
                 null,updateOrgNameResponsesList);
         assertThat(updateContactInformationResponse).isNotNull();
         assertThat(updateContactInformationResponse.size()).isEqualTo(1);
-        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase("Multiple" +
-            " addresses found for organisation . Please enter specific address " +
-            "id of the contact information to be updated");
+        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase("Multiple"
+            + " addresses found for organisation . Please enter specific address "
+            + "id of the contact information to be updated");
     }
 
     @Test
@@ -2820,20 +2818,21 @@ class OrganisationServiceImplTest {
                 "12345",updateOrgNameResponsesList);
         assertThat(updateContactInformationResponse).isNotNull();
         assertThat(updateContactInformationResponse.size()).isEqualTo(1);
-        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase("Could " +
-            "not find address to update for the id provided please check and try again");
+        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase("Could "
+            + "not find address to update for the id provided please check and try again");
     }
 
 
-    public ContactInformationUpdateRequest.ContactInformationUpdateData getContactInformationData(){
+    public ContactInformationUpdateRequest.ContactInformationUpdateData getContactInformationData() {
         ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
             new ContactInformationUpdateRequest.ContactInformationUpdateData(
-                organisation.getOrganisationIdentifier(),true,true,"","uprn1","addressLine1",
-                "addressLine2","addressLine3", "som1-town-city",
-                "some-county1","some-country1","som1-post-code",Arrays.asList
-                (dxAddressCreationRequest().dxNumber("DX 1234567890").dxExchange("dxExchange-1").build()));
+                organisation.getOrganisationIdentifier(),true,true,"",
+                "uprn1","addressLine1","addressLine2","addressLine3",
+                "som1-town-city","some-county1","some-country1","som1-post-code",
+                Arrays.asList(dxAddressUpdateRequest().dxAddressId("12345678").dxNumber("DX 1234567890")
+                    .dxExchange("dxExchange-1").build()));
 
-   return contactInformationUpdateData;
+        return contactInformationUpdateData;
     }
 
 }

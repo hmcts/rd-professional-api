@@ -103,7 +103,7 @@ public class OrganisationFixtures {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder
-    organisationRequestWithMultipleContactInformations() {
+        organisationRequestWithMultipleContactInformations() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 

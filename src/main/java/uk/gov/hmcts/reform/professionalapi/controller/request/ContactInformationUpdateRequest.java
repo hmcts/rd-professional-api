@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
@@ -11,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 
 @Getter
 @Setter
@@ -54,7 +52,7 @@ public class ContactInformationUpdateRequest {
 
         private final String postCode;
 
-        private final List<DxAddressCreationRequest> dxAddress;
+        private final List<DxAddressUpdateRequest> dxAddress;
 
         @JsonCreator
         public ContactInformationUpdateData(
@@ -70,7 +68,7 @@ public class ContactInformationUpdateRequest {
             @JsonProperty("county") String county,
             @JsonProperty("country") String country,
             @JsonProperty("postCode") String postCode,
-            @JsonProperty("dxAddress") List<DxAddressCreationRequest> dxAddress) {
+            @JsonProperty("dxAddress") List<DxAddressUpdateRequest> dxAddress) {
             this.organisationId = organisationId;
             this.dxAddressUpdate = dxAddressUpdate;
             this.contactInformationUpdate = contactInformationUpdate;

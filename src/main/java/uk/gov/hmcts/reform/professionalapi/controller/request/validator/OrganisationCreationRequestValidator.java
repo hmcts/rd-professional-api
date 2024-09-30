@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -39,7 +40,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_INVALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_REGEX;
@@ -109,43 +109,43 @@ public class OrganisationCreationRequestValidator {
         ContactInformationUpdateRequest.ContactInformationUpdateData contactInformation,
         List<UpdateOrgResponse> updateOrgResponsesList) {
 
-            if (contactInformation.isDxAddressUpdate()) {
-                List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
-                if (dxAddressList == null || dxAddressList.size() == 0) {
-                    updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
-                        "failure", HttpStatus.BAD_REQUEST.value(), DX_ADDRESS_NOT_FOUND));
-                } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
-                    dxAddressList.forEach(dxAddress -> {
-                        if (StringUtils.isBlank(dxAddress.getDxNumber()) ||
-                            StringUtils.isBlank(dxAddress.getDxExchange())) {
-                            updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
-                                "failure", HttpStatus.BAD_REQUEST.value(),
-                                "DX Number or DX Exchange cannot be empty"));
-                        } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 41) {
-                            updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
-                                "failure",HttpStatus.BAD_REQUEST.value(),
-                                "DX Number (max=13) or DX Exchange (max=40) has invalid length"));
-                        } else if (!dxAddress.getDxNumber().matches("^[a-zA-Z0-9 ]*$")) {
-                            updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
-                                "failure",HttpStatus.BAD_REQUEST.value(),
-                                "Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain "
-                                    .concat("numbers, letters and spaces")));
-                        }
-                    });
-                }
+        if (contactInformation.isDxAddressUpdate()) {
+            List<DxAddressUpdateRequest> dxAddressList = contactInformation.getDxAddress();
+            if (dxAddressList == null || dxAddressList.size() == 0) {
+                updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                    "failure", HttpStatus.BAD_REQUEST.value(), DX_ADDRESS_NOT_FOUND));
+            } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
+                dxAddressList.forEach(dxAddress -> {
+                    if (StringUtils.isBlank(dxAddress.getDxNumber())
+                        || StringUtils.isBlank(dxAddress.getDxExchange())) {
+                        updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                            "failure", HttpStatus.BAD_REQUEST.value(),
+                            "DX Number or DX Exchange cannot be empty"));
+                    } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 41) {
+                        updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                            "failure",HttpStatus.BAD_REQUEST.value(),
+                            "DX Number (max=13) or DX Exchange (max=40) has invalid length"));
+                    } else if (!dxAddress.getDxNumber().matches("^[a-zA-Z0-9 ]*$")) {
+                        updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                            "failure",HttpStatus.BAD_REQUEST.value(),
+                            "Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain "
+                                .concat("numbers, letters and spaces")));
+                    }
+                });
             }
-            if (contactInformation.isContactInformationUpdate()) {
-                if (StringUtils.isBlank(contactInformation.getAddressLine1())) {
-                    updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
-                        "failure",HttpStatus.BAD_REQUEST.value(),
-                        "AddressLine1 cannot be empty"));
-                }
-                if (null != contactInformation.getUprn() && contactInformation.getUprn().length() > 14) {
-                    updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
-                        "failure",HttpStatus.BAD_REQUEST.value(),
-                        "Uprn must not be greater than 14 characters long"));
-                }
+        }
+        if (contactInformation.isContactInformationUpdate()) {
+            if (StringUtils.isBlank(contactInformation.getAddressLine1())) {
+                updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                    "failure",HttpStatus.BAD_REQUEST.value(),
+                    "AddressLine1 cannot be empty"));
             }
+            if (null != contactInformation.getUprn() && contactInformation.getUprn().length() > 14) {
+                updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                    "failure",HttpStatus.BAD_REQUEST.value(),
+                    "Uprn must not be greater than 14 characters long"));
+            }
+        }
 
     }
 
