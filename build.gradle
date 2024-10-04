@@ -351,7 +351,7 @@ dependencies {
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: versions.feign
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: versions.feign
     implementation "io.github.openfeign:feign-httpclient:11.10"
-    implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.0.0'
+    implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
