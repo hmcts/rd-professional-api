@@ -39,7 +39,7 @@ def versions = [
         pitest          : '1.16.1',
         reformLogging   : '6.1.6',
         camel           : '3.8.0',
-        pact_version    : '4.1.7',
+        pact_version    : '4.6.14',
         launchDarklySdk : '5.10.9',
         junit           : '5.9.2',
         junitPlatform   : '1.10.3',
