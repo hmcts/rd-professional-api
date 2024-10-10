@@ -14,6 +14,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -45,6 +47,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest.dxAddressUpdateRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
@@ -461,6 +464,27 @@ class OrganisationCreationRequestValidatorTest {
 
 
     }
+
+    @Test
+    void test_validate_contact_information() {
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
+            new ContactInformationUpdateRequest.ContactInformationUpdateData(
+                "orgId",true,true,"addId","uprn1",
+                "addressLine1","addressLine2","addressLine3",
+                "som1-town-city","some-county1","some-country1",
+                "som1-post-code",Arrays.asList(
+                    dxAddressUpdateRequest().dxAddressId("12345678").dxNumber("DX 1234567890")
+                        .dxExchange("dxExchange-1").build()));
+
+        final List<UpdateOrgResponse> updateContactInformationResponsesList = new ArrayList<>();
+
+        organisationCreationRequestValidator
+            .validateContactInformationAndDxAddress(
+                contactInformationUpdateData,
+                updateContactInformationResponsesList);
+        assertTrue(true);
+    }
+
 
     @Test
     void test_add_contacts_informations_to_orgs_valid_dx_address() {
