@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -81,4 +82,5 @@ public interface OrganisationService {
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
 
+    DeleteUserResponse deleteUserForOrganisation(List<String> emails);
 }
