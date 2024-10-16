@@ -42,7 +42,7 @@ class PrdEnumRepositoryTest extends BaseRepository {
     }
 
     @Test
-    void test_findAll_manageOrg_employment_roles() {
+    void test_findAll_manageOrg_privateLaw_roles() {
         List<PrdEnum> prdEnums = prdEnumRepository.findAll();
 
         assertThat(prdEnums.get(47).getEnumName()).isEqualTo("caseworker-privatelaw");
