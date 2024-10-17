@@ -30,7 +30,7 @@ class SwaggerPublisherTest extends AuthorizationEnabledIntegrationTest {
 
     private static final Logger LOG = getLogger(SwaggerPublisherTest.class);
 
-    private static final String SWAGGER_DOC_JSON_FILE = "/tmp/swagger-specs.json";
+    private static final String SWAGGER_DOC_JSON_FILE = "/tmp/openapi-specs.json";
 
     private MockMvc mockMvc;
 
