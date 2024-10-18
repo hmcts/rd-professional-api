@@ -29,6 +29,14 @@ public class OrganisationFixtures {
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
 
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX1234567890")
+            .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX123456777")
+            .dxExchange("dxExchange1").build());
+
         return anOrganisationCreationRequest()
                 .name("some-org-name")
                 .status("ACTIVE")
@@ -40,6 +48,7 @@ public class OrganisationFixtures {
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
                         .uprn("uprn")
+                        .dxAddress(dx1)
                         .build()));
     }
 
@@ -92,6 +101,28 @@ public class OrganisationFixtures {
                         .dxExchange("dxExchange").build()))
                 .build()));
     }
+
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder
+        organisationRequestWithMultipleContactInformations() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        return anOrganisationCreationRequest()
+            .name("some-org-name")
+            .status("PENDING")
+            .sraId("sra-id")
+            .sraRegulated("false")
+            .companyUrl("company -url")
+            .companyNumber(randomAlphabetic(8))
+            .paymentAccount(paymentAccounts)
+            .superUser(aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email("someone@somewhere.com")
+                .build())
+            .contactInformation(getContactInformationList());
+    }
+
 
     public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFields() {
 
@@ -264,6 +295,20 @@ public class OrganisationFixtures {
 
     }
 
+    public static ContactInformationCreationRequest getContactInformationWithoutDxAddress() {
+
+        return  aContactInformationCreationRequest()
+                .uprn("uprn1")
+                .addressLine1("Updated-addressLine1")
+                .addressLine2("Updated-addressLine2")
+                .addressLine3("Updated-addressLine3")
+                .country("Updated-country")
+                .county("Updated-county")
+                .townCity("Updated-town-city")
+                .postCode("Uppost-code")
+                .build();
+    }
+
     public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
@@ -313,6 +358,90 @@ public class OrganisationFixtures {
                 .build());
 
         return contactInfoList;
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder createContactInformationRequest() {
+
+        return aContactInformationCreationRequest()
+                .addressLine1("up-addLine1")
+                .addressLine2("up-addLine2")
+                .addressLine3("up-addLine3")
+                .country("up-country")
+                .county("up-county")
+                .townCity("up-town-city")
+                .uprn("up-uprn1")
+                .postCode("up-post-code")
+                .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                    .dxNumber("DX 1234567890")
+                    .dxExchange("up-dxExchange").build()));
+
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder createContactInformationRequestWithOnlyDxAddress() {
+
+        return aContactInformationCreationRequest()
+            .addressLine1("Updated-addressLine1")
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("DX 0000000000")
+                .dxExchange("Updated-dxExchange").build()));
+
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder contactInformationWithOnlyDxNumberChanged() {
+
+        return aContactInformationCreationRequest()
+            .addressLine1("addressLine1")
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("DX 0000000000")
+                .dxExchange("dxExchange").build()));
+
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder contactInformationWithOnlyDxExchangeChanged() {
+
+        return aContactInformationCreationRequest()
+            .addressLine1("addressLine1")
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("Up-dxExchange").build()));
+
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder contactInformationWithOnlyAddressLine3Changed() {
+
+        return aContactInformationCreationRequest()
+            .addressLine1("addressLine1")
+            .addressLine2("addressLine2")
+            .addressLine3("updated-addLine3")
+            .country("country")
+            .county("county")
+            .townCity("town-city")
+            .uprn("uprn1")
+            .postCode("some-post-code")
+            .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build()));
+
+    }
+
+    public static ContactInformationCreationRequest
+        .ContactInformationCreationRequestBuilder createContactInformationRequestWithoutDxAddress() {
+
+        return aContactInformationCreationRequest()
+            .addressLine1("upaddressLine1")
+            .addressLine2("upaddressLine2")
+            .addressLine3("upaddressLine3")
+            .country("upcountry")
+            .county("upcounty")
+            .townCity("uptown-city")
+            .uprn("uprn1")
+            .postCode("uppost-code");
+
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder

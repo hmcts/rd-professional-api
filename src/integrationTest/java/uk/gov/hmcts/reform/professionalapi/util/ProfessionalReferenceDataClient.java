@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -1043,5 +1044,30 @@ public class ProfessionalReferenceDataClient {
         }
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
+    }
+
+    public Map<String, Object> updateOrgContactInformation(
+        ContactInformationUpdateRequest contactInformationUpdateRequest,
+        String role) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/contactInformation";
+
+        try {
+            HttpEntity<ContactInformationUpdateRequest> requestEntity =
+                new HttpEntity<>(contactInformationUpdateRequest,
+                    getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> contactInformationResponse = new HashMap<>();
+        contactInformationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        contactInformationResponse.put("response_body", responseEntity.getBody());
+        return contactInformationResponse;
     }
 }

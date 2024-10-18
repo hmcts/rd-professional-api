@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
@@ -258,6 +259,77 @@ public class ProfessionalApiClient {
                         orgAttributeRequests);
 
         return  organisationOtherOrgsCreationRequest;
+    }
+
+    public static List<ContactInformationCreationRequest> createContactInformationRequests() {
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX 1234567890")
+            .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX 123456777")
+            .dxExchange("dxExchange").build());
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
+        dx2.add(dxAddressCreationRequest()
+            .dxNumber("DX 123452222")
+            .dxExchange("dxExchange").build());
+        dx2.add(dxAddressCreationRequest()
+            .dxNumber("DX 123456333")
+            .dxExchange("dxExchange").build());
+
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+            .uprn("u1")
+            .addressLine1("address1")
+            .addressLine2("address2")
+            .addressLine3("address3")
+            .country("country")
+            .county("county")
+            .townCity("city")
+            .postCode("code")
+            .dxAddress(dx1)
+            .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+            .uprn("up2")
+            .addressLine1("add")
+            .addressLine2("add2")
+            .addressLine3("add3")
+            .country("country2")
+            .county("county2")
+            .townCity("city2")
+            .postCode("code2")
+            .dxAddress(dx2)
+            .build());
+
+        return contactInfoList;
+    }
+
+    public ContactInformationCreationRequest  createContactInformationWithDXAddUpdatedInfoRequests() {
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX1234567890")
+            .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+            .dxNumber("DX123456777")
+            .dxExchange("dxExchange1").build());
+
+
+        ContactInformationCreationRequest updatedContactInfoRequest =
+            aContactInformationCreationRequest()
+            .uprn("uuprn")
+            .addressLine1("updatedaddressLine1")
+            .addressLine2("updatedaddressLine2")
+            .addressLine3("updatedaddressLine3")
+            .country("updatedcountry")
+            .county("updatedcounty")
+            .townCity("updatedtowncity")
+            .postCode("uppostcode")
+            .dxAddress(dx1)
+            .build();
+
+        return updatedContactInfoRequest;
     }
 
     public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
@@ -1751,5 +1823,27 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
+    }
+
+    @SuppressWarnings("unchecked")
+    public Response updateContactInformationsToOrganisation(
+        ContactInformationUpdateRequest
+            contactInformationUpdateRequest,
+        HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+            .body(contactInformationUpdateRequest)
+            .put("/refdata/internal/v1/organisations/contactInformation")
+            .andReturn();
+
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
+
+        log.info("{}:: Update organisation contact information response: {}",
+            loggingComponentName, response.getStatusCode());
+
+        return response;
+
     }
 }
