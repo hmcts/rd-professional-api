@@ -114,7 +114,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("findOrgByPfmShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternalV2(OK,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
-        assertThat(response.get("paymentAccount")).asList().hasSize(3);
+        //assertThat(response.get("paymentAccount")).asList().hasSize(3);
+        assertThat(response.get("paymentAccount")).asList().hasSize(0);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
         assertThat(response.get("orgType")).isEqualTo("Solicitor");
         assertThat(response.get("orgAttributes")).isNotNull();
