@@ -116,7 +116,7 @@ withNightlyPipeline(type, product, component) {
 }
 
 def deleteFunctionalDbData() {
-    withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${FUNC_DATABASE_PASS} -v ${WORKSPACE}/deletescript/:/deletescript") {
+    withDocker('hmctspublic.azurecr.io/imported/jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${FUNC_DATABASE_PASS} -v ${WORKSPACE}/deletescript/:/deletescript") {
         sh "chmod +x /deletescript/delete-functional-data.sh"
         sh "/deletescript/delete-functional-data.sh \
                         ${FUNC_DATABASE_USER} \
