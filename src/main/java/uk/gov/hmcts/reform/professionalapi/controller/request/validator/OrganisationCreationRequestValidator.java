@@ -100,6 +100,60 @@ public class OrganisationCreationRequestValidator {
         return contactInformationValidationResponses;
     }
 
+    public void validateContactInformationRequest(
+        ContactInformationCreationRequest contactInformation, boolean dxAddressRequired,
+        boolean contactInformationUpdate) {
+
+        try {
+            if (!Optional.ofNullable(contactInformation).isPresent()) {
+                throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
+            }
+
+            if (dxAddressRequired) {
+                validateDxAdd(dxAddressRequired,contactInformation);
+            }
+
+            if (contactInformationUpdate) {
+                validateContactInfo(contactInformation);
+            }
+
+            if (dxAddressRequired && contactInformationUpdate) {
+                validateContactInfo(contactInformation);
+                validateDxAdd(dxAddressRequired,contactInformation);
+            }
+
+        } catch (InvalidRequest invalidRequest) {
+            throw new InvalidRequest("Invalid Contact information" + invalidRequest.getMessage());
+        }
+    }
+
+    public void validateDxAdd(boolean dxAddressRequired,
+                              ContactInformationCreationRequest contactInformation) {
+        if (dxAddressRequired) {
+            List<DxAddressCreationRequest> dxAddressList = contactInformation.getDxAddress();
+            if (dxAddressList.isEmpty()) {
+                throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
+            } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
+                dxAddressList.forEach(this::isDxAddressValid);
+            }
+        }
+    }
+
+    public void validateContactInfo(ContactInformationCreationRequest contactInformation) {
+        if (isEmptyValue(contactInformation.getUprn())
+            && isEmptyValue(contactInformation.getAddressLine1())
+            && isEmptyValue(contactInformation.getAddressLine2())
+            && isEmptyValue(contactInformation.getAddressLine3())
+            && isEmptyValue(contactInformation.getCounty())
+            && isEmptyValue(contactInformation.getCountry())
+            && isEmptyValue(contactInformation.getPostCode())
+            && isEmptyValue(contactInformation.getTownCity())) {
+
+            throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
+        }
+    }
+
+
     public void validateContactInformations(
             List<ContactInformationCreationRequest> contactInformationCreationRequests) {
 

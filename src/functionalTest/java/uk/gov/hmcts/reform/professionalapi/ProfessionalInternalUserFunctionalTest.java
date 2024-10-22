@@ -13,9 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
@@ -54,6 +56,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
@@ -781,6 +784,85 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
+    void updateOrganisationNameAndSraShouldReturnSuccess() {
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        String updatedName = "updatedName";
+        String updatedSra = randomAlphabetic(7);
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+
+        assertNotNull(orgResponse.get("name"));
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .name(updatedName).sraId(updatedSra).build();
+
+        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest =
+            new OrganisationNameSraUpdateRequest(updatedName,updatedSra);
+
+        organisationCreationRequest.setSraId(organisationNameSraUpdateRequest.getSraId());
+        organisationCreationRequest.setName(organisationNameSraUpdateRequest.getName());
+
+        professionalApiClient.updatesOrganisationName(organisationCreationRequest,
+            hmctsAdmin,organisationIdentifier, OK);
+
+        JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertThat(response).isNotNull();
+        assertNotNull(orgUpdatedNameResponse.get("name"));
+        assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+        assertNotNull(orgUpdatedNameResponse.get("sraId"));
+        assertThat(orgUpdatedNameResponse.get("sraId").toString()).contains(updatedSra);
+
+        deleteOrganisation(organisationIdentifier);
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrganisationNameOrSra", withFeature = false)
+    void updateOrganisationNameAndSraShouldReturnFailure() {
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        String updatedName = "updatedName";
+        String updatedSra = "updatedSraId";
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+
+        assertNotNull(orgResponse.get("name"));
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .name(updatedName).sraId(updatedSra).build();
+
+        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest =
+            new OrganisationNameSraUpdateRequest(updatedName,updatedSra);
+
+        organisationCreationRequest.setSraId(organisationNameSraUpdateRequest.getSraId());
+        organisationCreationRequest.setName(organisationNameSraUpdateRequest.getName());
+
+        professionalApiClient.updatesOrganisationName(organisationCreationRequest,
+            hmctsAdmin,organisationIdentifier, OK);
+
+        JsonPath orgUpdatedNameResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertThat(response).isNotNull();
+        assertNotNull(orgUpdatedNameResponse.get("name"));
+        assertThat(orgUpdatedNameResponse.get("name").toString()).contains(updatedName);
+        assertNotNull(orgUpdatedNameResponse.get("sraId"));
+        assertThat(orgUpdatedNameResponse.get("sraId").toString()).contains(updatedSra);
+
+        deleteOrganisation(organisationIdentifier);
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+    }
+
+    @Test
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisation();
@@ -1231,4 +1313,267 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .sorted(Comparator.comparing(map -> (String) map.get(key)))
                 .collect(Collectors.toList());
     }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateBothContactInformationAndDxAdressForOrgShouldReturnSuccess() {
+        log.info("updateBothContactInformationAndDxAdressForOrgShouldReturnSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertNotNull(orgResponse);
+        List<HashMap>  existingContactInformationList =  (List) orgResponse.get("contactInformation");
+
+        assertThat(existingContactInformationList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequestList =
+            professionalApiClient.createContactInformationCreationRequests();
+        assertThat(contactInformationCreationRequestList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+        ContactInformationCreationRequest contactInformationCreationRequest =
+            contactInformationCreationRequestList.get(0);
+        //Assuming only one record found
+        HashMap existingContactInfo = existingContactInformationList.get(0);
+
+        assertThat(existingContactInfo.get("addressLine1")).isNotNull();
+        assertThat(existingContactInfo.get("addressLine2")).isNotNull();
+        assertThat(existingContactInfo.get("addressLine3")).isNotNull();
+        assertThat(existingContactInfo.get("uprn")).isNotNull();
+        assertThat(existingContactInfo.get("country")).isNotNull();
+        assertThat(existingContactInfo.get("townCity")).isNotNull();
+        assertThat(existingContactInfo.get("country")).isNotNull();
+        assertThat(existingContactInfo.get("postCode")).isNotNull();
+
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest()
+                    .uprn(contactInformationCreationRequest.getUprn())
+                    .addressLine1(contactInformationCreationRequest.getAddressLine1())
+                    .addressLine2(contactInformationCreationRequest.getAddressLine2())
+                    .addressLine3(contactInformationCreationRequest.getAddressLine3())
+                    .country(contactInformationCreationRequest.getCountry())
+                    .county(contactInformationCreationRequest.getCounty())
+                    .townCity(contactInformationCreationRequest.getTownCity())
+                    .postCode(contactInformationCreationRequest.getPostCode())
+                    .dxAddress(contactInformationCreationRequest.getDxAddress())
+                    .build(),
+                OK,organisationIdentifier,true,true,
+                existingContactInfo.get("addressId").toString());
+
+        assertNotNull(result);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.statusCode()).isEqualTo(200);
+        //clean up
+        deleteOrganisation(organisationIdentifier);
+        log.info("updateBothContactInformationAndDxAdressForOrgShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateOnlyDxAddressDetailsForOrgShouldReturnSuccess() {
+        log.info("updateOnlyDxAddressDetailsForOrgShouldReturnSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertNotNull(orgResponse);
+        List<HashMap>  existingContactInformationList =  (List) orgResponse.get("contactInformation");
+
+        assertThat(existingContactInformationList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequestList =
+            professionalApiClient.createContactInformationRequests();
+        assertThat(contactInformationCreationRequestList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+        ContactInformationCreationRequest contactInformationCreationRequest =
+            contactInformationCreationRequestList.get(0);
+        //Assuming only one record found
+        HashMap existingContactInfo = existingContactInformationList.get(0);
+
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest().addressLine1("addressLine1")
+                .dxAddress(contactInformationCreationRequest
+                    .getDxAddress())
+                    .build(),
+                OK,organisationIdentifier,true,false,
+                existingContactInfo.get("addressId").toString());
+
+        assertNotNull(result);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.statusCode()).isEqualTo(200);
+        //clean up
+        deleteOrganisation(organisationIdentifier);
+
+        log.info("updateOnlyDxAddressDetailsForOrgShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateOnlyContactInformationForOrgShouldReturnSuccess() {
+        log.info("updateOnlyContactInformationForOrgShouldReturnSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertNotNull(orgResponse);
+        List<HashMap>  existingContactInformationList =  (List) orgResponse.get("contactInformation");
+
+        assertThat(existingContactInformationList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequestList =
+            professionalApiClient.createContactInformationCreationRequests();
+        assertThat(contactInformationCreationRequestList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+        ContactInformationCreationRequest contactInformationCreationRequest =
+            contactInformationCreationRequestList.get(0);
+        //Assuming only one record found
+        HashMap existingContactInfo = existingContactInformationList.get(0);
+
+        assertThat(existingContactInfo.get("addressLine1")).isNotNull();
+        assertThat(existingContactInfo.get("addressLine2")).isNotNull();
+        assertThat(existingContactInfo.get("addressLine3")).isNotNull();
+        assertThat(existingContactInfo.get("uprn")).isNotNull();
+        assertThat(existingContactInfo.get("country")).isNotNull();
+        assertThat(existingContactInfo.get("townCity")).isNotNull();
+        assertThat(existingContactInfo.get("country")).isNotNull();
+        assertThat(existingContactInfo.get("postCode")).isNotNull();
+
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest()
+                    .uprn(contactInformationCreationRequest.getUprn())
+                    .addressLine1(contactInformationCreationRequest.getAddressLine1())
+                    .addressLine2(contactInformationCreationRequest.getAddressLine2())
+                    .addressLine3(contactInformationCreationRequest.getAddressLine3())
+                    .country(contactInformationCreationRequest.getCountry())
+                    .county(contactInformationCreationRequest.getCounty())
+                    .townCity(contactInformationCreationRequest.getTownCity())
+                    .postCode(contactInformationCreationRequest.getPostCode())
+                    .build(),
+                OK,organisationIdentifier,false,true,
+                existingContactInfo.get("addressId").toString());
+
+        assertNotNull(result);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.statusCode()).isEqualTo(200);
+        //clean up
+        deleteOrganisation(organisationIdentifier);
+        log.info("updateOnlyContactInformationForOrgShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess() {
+        log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertNotNull(orgResponse);
+        List<HashMap>  existingContactInformationList =  (List) orgResponse.get("contactInformation");
+
+        assertThat(existingContactInformationList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequestList =
+            professionalApiClient.createContactInformationCreationRequests();
+        assertThat(contactInformationCreationRequestList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+        ContactInformationCreationRequest contactInformationCreationRequest =
+            contactInformationCreationRequestList.get(0);
+        //Assuming only one record found
+        HashMap existingContactInfo = existingContactInformationList.get(0);
+
+        assertThat(existingContactInfo.get("addressLine1")).isNotNull();
+        assertThat(existingContactInfo.get("addressLine2")).isNotNull();
+        assertThat(existingContactInfo.get("addressLine3")).isNotNull();
+        assertThat(existingContactInfo.get("uprn")).isNotNull();
+        assertThat(existingContactInfo.get("country")).isNotNull();
+        assertThat(existingContactInfo.get("townCity")).isNotNull();
+        assertThat(existingContactInfo.get("country")).isNotNull();
+        assertThat(existingContactInfo.get("postCode")).isNotNull();
+
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest()
+                    .uprn(contactInformationCreationRequest.getUprn())
+                    .addressLine1(contactInformationCreationRequest.getAddressLine1())
+                    .addressLine2(contactInformationCreationRequest.getAddressLine2())
+                    .addressLine3(contactInformationCreationRequest.getAddressLine3())
+                    .country(contactInformationCreationRequest.getCountry())
+                    .county(contactInformationCreationRequest.getCounty())
+                    .townCity(contactInformationCreationRequest.getTownCity())
+                    .postCode(contactInformationCreationRequest.getPostCode())
+                    .dxAddress(contactInformationCreationRequest.getDxAddress())
+                    .build(),
+                    OK,organisationIdentifier,true,true,
+                    existingContactInfo.get("addressId").toString());
+
+        assertNotNull(result);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.statusCode()).isEqualTo(200);
+        //clean up
+        deleteOrganisation(organisationIdentifier);
+        log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void contactInformationAndDxAddressBothFalseShouldReturnFailure() {
+        log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+
+        assertThat(organisationIdentifier).isNotEmpty();
+        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(
+            organisationIdentifier, hmctsAdmin,OK);
+        assertNotNull(orgResponse);
+        List<HashMap>  existingContactInformationList =  (List) orgResponse.get("contactInformation");
+
+        assertThat(existingContactInformationList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+
+        List<ContactInformationCreationRequest> contactInformationCreationRequestList =
+            professionalApiClient.createContactInformationCreationRequests();
+        assertThat(contactInformationCreationRequestList).isNotEmpty()
+            .hasSizeGreaterThan(0);
+        ContactInformationCreationRequest contactInformationCreationRequest =
+            contactInformationCreationRequestList.get(0);
+        //Assuming only one record found
+        HashMap existingContactInfo = existingContactInformationList.get(0);
+
+        Response result = professionalApiClient.updateContactInformationsToOrganisation(
+            aContactInformationCreationRequest().build(),BAD_REQUEST,organisationIdentifier,false,
+                false,existingContactInfo.get("addressId").toString());
+
+        assertNotNull(result);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.statusCode()).isEqualTo(400);
+        //clean up
+        deleteOrganisation(organisationIdentifier);
+        log.info("updateContactInformationAndDxAddressWithNoChangeInDataShouldReturnSuccess :: END");
+    }
+
+    public void deleteOrganisation(String orgIdentifierResponse) {
+        log.info("deleteActiveOrganisation :: STARTED");
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
+        log.info("deleteActiveOrganisation :: END");
+    }
+
+
 }

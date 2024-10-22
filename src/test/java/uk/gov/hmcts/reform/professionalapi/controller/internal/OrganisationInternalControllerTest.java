@@ -21,20 +21,25 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationStatusValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -58,6 +63,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -70,12 +76,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -87,6 +96,10 @@ class OrganisationInternalControllerTest {
     private PaymentAccountService paymentAccountServiceMock;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
+
+    private ContactInformationCreationRequest contactInformationCreationRequest;
+
+    private OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest;
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
@@ -161,7 +174,11 @@ class OrganisationInternalControllerTest {
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null,"Doctor",null);
-
+        contactInformationCreationRequest = new ContactInformationCreationRequest("uprn1","addressLine1",
+            "addressLine2","addressLine3", "some-country1","some-county1","som1-town-city",
+            "som1-post-code",Arrays.asList(dxAddressCreationRequest()
+            .dxNumber("DX 1234567890").dxExchange("dxExchange").build()));
+        organisationNameSraUpdateRequest = new OrganisationNameSraUpdateRequest("name","sraId");
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -489,6 +506,25 @@ class OrganisationInternalControllerTest {
     }
 
     @Test
+    void testDeleteOrganisationWithStatusActive() {
+
+        final HttpStatus expectedHttpStatus = HttpStatus.NO_CONTENT;
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(organisation, "123456789"))
+            .thenReturn(deleteOrganisationResponse);
+        ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId, "123456789");
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(organisationServiceMock, times(1))
+            .deleteOrganisation(organisation, "123456789");
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
     void testDeleteOrganisationThrows404WhenNoOrgFound() {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
@@ -571,5 +607,83 @@ class OrganisationInternalControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
+
+    @Test
+    void testUpdateOrgNameAndSra() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String updatedName = "NewName";
+        String updatedSra = "NewSRA";
+        organisation.setName(updatedName);
+        organisation.setSraId(updatedSra);
+        organisationNameSraUpdateRequest.setName(updatedName);
+        organisationNameSraUpdateRequest.setSraId(updatedSra);
+
+        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
+        assertThat(organisationNameSraUpdateRequest.getName()).isNotEmpty();
+        assertThat(organisationNameSraUpdateRequest.getSraId()).isNotEmpty();
+
+
+        when(organisationServiceMock.updateOrganisationNameOrSra(organisationNameSraUpdateRequest,
+            organisation.getOrganisationIdentifier())).thenReturn(new OrganisationsDetailResponse(List.of(organisation),
+            false,false,false));
+
+        ResponseEntity<OrganisationsDetailResponse> response = organisationInternalController
+            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest,organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+
+        verify(organisationCreationRequestValidatorMock, times(1))
+            .validateOrganisationIdentifier(any(String.class));
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest, organisation.getOrganisationIdentifier());
+
+    }
+
+
+    @Test
+    void testDeleteProfessionalUserFromOrganisation() {
+        DeleteUserResponse deleteUserResponse = new DeleteUserResponse(
+            STATUS_CODE_204, "The organisation has deleted successfully");
+        List<String> emails =  Arrays.asList("56vyi3p3esq@mailinator.com","7qw1vx4b06p@mailinator.com");
+        UserDeletionRequest userDeletionRequest = new UserDeletionRequest("fname","lname",emails);
+
+        when(organisationServiceMock.deleteUserForOrganisation(emails)).thenReturn(deleteUserResponse);
+
+        ResponseEntity<?> actual = organisationInternalController.deleteUserFromOrganisation(userDeletionRequest);
+
+        verify(organisationServiceMock, times(1)).deleteUserForOrganisation(emails);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCodeValue()).isEqualTo(deleteUserResponse.getStatusCode());
+    }
+
+    @Test
+    void testUpdateOrgContactInformation() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        doNothing().when(organisationCreationRequestValidatorMock)
+        .validateContactInformationRequest(contactInformationCreationRequest,true,true);
+
+        when(organisationServiceMock.updateContactInformationForOrganisation(contactInformationCreationRequest,
+            organisation.getOrganisationIdentifier(),true,true,""))
+            .thenReturn(ResponseEntity.status(HttpStatus.OK).build());
+
+        ResponseEntity<ContactInformationResponse> response = organisationInternalController
+            .updateContactInformationForOrganisation(contactInformationCreationRequest,true,true,"",
+                organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationCreationRequestValidatorMock, times(1))
+            .validateContactInformationRequest(contactInformationCreationRequest,true,true);
+        verify(organisationServiceMock, times(1))
+            .updateContactInformationForOrganisation(contactInformationCreationRequest,
+                organisation.getOrganisationIdentifier(),true,true,"");
+
+    }
+
 
 }

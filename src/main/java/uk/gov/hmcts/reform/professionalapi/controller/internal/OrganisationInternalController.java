@@ -33,15 +33,20 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -53,14 +58,18 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusRe
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEL_ORG_PBA_NOTES_1;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -698,6 +707,128 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @Operation(
+        summary = "Updates an Organisation's name",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        })
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Organisation name has been updated",
+        content = @Content(schema = @Schema(implementation = String.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "If Organisation request sent with null/invalid values for mandatory fields",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "No Organisation found with the given ID",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @PutMapping(
+        value = "/nameSra/{orgId}",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured({"prd-admin"})
+    public ResponseEntity<OrganisationsDetailResponse> updateOrganisationNameOrSra(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationCreationRequest")
+        @Valid @NotNull @RequestBody OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest,
+        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
+
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+
+        if (isBlank(organisationNameSraUpdateRequest.getName())
+            && isBlank(organisationNameSraUpdateRequest.getSraId())) {
+            throw new InvalidRequest("Name or SRA Id is required");
+        }
+
+        OrganisationsDetailResponse organisationsDetailResponse = organisationService
+            .updateOrganisationNameOrSra(organisationNameSraUpdateRequest, orgId);
+
+        ResponseEntity<OrganisationsDetailResponse> resp = ResponseEntity.status(200).body(organisationsDetailResponse);
+        return resp;
+    }
+
+
+    @Operation(
+        summary = "Deletes the provided list of user accounts from the organisation.",
+        description = "**IDAM Roles to access API** : <br> - pui-finance-manager",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+    )
+    @ApiResponse(
+        responseCode = "204",
+        description = "Successfully deleted the list of user accounts from the organisation.",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = DEL_ORG_PBA_NOTES_1,
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized Error : "
+            + "The requested resource is restricted and requires authentication",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: "
+            + "Access denied for either invalid permissions or user is pending",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Resource Not Found Error: The user does not exist",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @DeleteMapping(path = "/users")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Secured({"prd-admin"})
+    public ResponseEntity<DeleteUserResponse> deleteUserFromOrganisation(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "deletePbaRequest")
+        @Valid @NotNull @RequestBody UserDeletionRequest userDeletionRequest) {
+
+        List<String> emails = userDeletionRequest.getEmails();
+
+        var deleteUserResponse =
+            organisationService.deleteUserForOrganisation(emails);
+
+        return ResponseEntity
+            .status(deleteUserResponse.getStatusCode())
+            .body(deleteUserResponse);
+
+    }
+
+    @Operation(
             summary = "Retrieves Organisations by Organisation Profile IDs",
             description = "**Bearer token not required to access API. Only a valid s2s token**",
             security = {
@@ -745,4 +876,68 @@ public class OrganisationInternalController extends SuperController {
                 .status(HttpStatus.OK)
                 .body(response);
     }
+
+
+    @Operation(
+        summary = "Updates contact informations(address details) to organisation",
+        description = "**IDAM Roles to access API** :<br> pui-organisation-manager",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+
+    )
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Updated Contact Information",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "An invalid request has been provided",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized Error : "
+            + "The requested resource is restricted and requires authentication",
+        content = @Content
+    )
+
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @PutMapping(
+        path = "/contactInformation/{orgId}/",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @Secured({"prd-admin"})
+    public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
+        @Valid @NotNull @RequestBody ContactInformationCreationRequest contactInformationCreationRequest,
+        @RequestParam(value = "dxAddressUpdate", required = true) boolean dxAddressUpdate,
+        @RequestParam(value = "contactInformationUpdate", required = true) boolean contactInformationUpdate,
+        @RequestParam("addressid") String addressid,
+        @PathVariable("orgId") @NotBlank  String organisationIdentifier) {
+
+        organisationCreationRequestValidator.validateContactInformationRequest(
+            contactInformationCreationRequest,dxAddressUpdate,contactInformationUpdate);
+
+        return organisationService.updateContactInformationForOrganisation(
+            contactInformationCreationRequest,organisationIdentifier,dxAddressUpdate,
+            contactInformationUpdate,addressid);
+
+    }
 }
+

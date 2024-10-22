@@ -15,9 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.PrdEnumType;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
@@ -26,13 +27,16 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationNameSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -54,6 +58,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -64,6 +70,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -87,10 +95,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -129,6 +139,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Autowired
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
     @Autowired
+    UserAttributeRepository userAttributeRepository;
+    @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
@@ -144,6 +156,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     ProfessionalUserService professionalUserService;
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
+    @Autowired
+    UserAccountMapRepository userAccountMapRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -321,8 +335,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
-    private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
-                                                  ContactInformation contactInformation) {
+    public void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
+                                                 ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {
@@ -816,6 +830,84 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
+
+    @Override
+    @Transactional
+    public DeleteUserResponse deleteUserForOrganisation(List<String> emails) {
+        if (emails.isEmpty()) {
+            throw new InvalidRequest("Please provide both email addresses");
+        }
+        StringBuilder failedIds = new StringBuilder();
+        //DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
+        emails.forEach(email -> {
+            Optional<ProfessionalUser> professionalUser = Optional.ofNullable(professionalUserRepository
+                .findByEmailAddress(RefDataUtil.removeAllSpaces(email)));
+            if (!professionalUser.isEmpty()) {
+                UserAttribute userAttribute = userAttributeRepository
+                    .findByProfessionalUserId(professionalUser.get().getId());
+                if (userAttribute != null && !userAttribute.getPrdEnum().getPrdEnumId().getEnumType()
+                        .contains(PrdEnumType.ADMIN_ROLE.name())
+                    && !userAttribute.getPrdEnum().getPrdEnumId().getEnumType()
+                    .contains(PrdEnumType.SIDAM_ROLE.name())) {
+                    //Delete usres from User Account Map
+                    List<PaymentAccount> paymentAccountsList = professionalUser.get().getOrganisation()
+                        .getPaymentAccounts();
+                    if (!paymentAccountsList.isEmpty()) {
+                        List<UserAccountMap> userAccountMaps = new ArrayList<>();
+                        paymentAccountsList.forEach(paymentAccount ->
+                            userAccountMaps.add(new UserAccountMap(
+                                new UserAccountMapId(professionalUser.get(), paymentAccount))));
+                        if (!CollectionUtils.isEmpty(userAccountMaps)) {
+                            deleteUserAccountMap(userAccountMaps);
+                        }
+                    }
+                    //Delete users from User attribute table
+                    deleteUserAttribute(professionalUser.get());
+                    //Delete usres from professional user table
+                    deleteProfessionalUser(professionalUser.get());
+                    //Users to be deleted from usre profile database
+                    Set<String> userIdsToBeDeleted = new HashSet<>();
+                    userIdsToBeDeleted.add(professionalUser.get().getUserIdentifier());
+                    DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIdsToBeDeleted);
+                    DeleteOrganisationResponse deleteOrganisationResponse = deleteUserProfile(deleteUserRequest);
+                    if (deleteOrganisationResponse == null) {
+                        failedIds.append(professionalUser.get().getUserIdentifier());
+                    }
+                }
+            }
+        });
+        DeleteUserResponse response = null;
+        if (failedIds.isEmpty()) {
+            response =  new DeleteUserResponse(ProfessionalApiConstants.ERROR_CODE_400,
+                ProfessionalApiConstants.ERROR_USER_DELETED_UP  + " " + failedIds);
+        } else {
+            response = new DeleteUserResponse(ProfessionalApiConstants.STATUS_CODE_204,
+                ProfessionalApiConstants.DEL_USER_UP);
+        }
+        return response;
+    }
+
+
+    @Transactional
+    private void deleteUserAccountMap(List<UserAccountMap> userAccountMaps) {
+        userAccountMapRepository.deleteAll(userAccountMaps);
+    }
+
+    @Transactional
+    private void deleteProfessionalUser(ProfessionalUser professionalUser) {
+        professionalUserRepository.delete(professionalUser);
+    }
+
+    @Transactional
+    private void deleteUserAttribute(ProfessionalUser professionalUser) {
+        userAttributeRepository.deleteByProfessionalUserId(professionalUser.getId());
+    }
+
+    @Transactional
+    private DeleteOrganisationResponse deleteUserProfile(DeleteUserProfilesRequest deleteUserRequest) {
+        return RefDataUtil.deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
+    }
+
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
                                                          DeleteOrganisationResponse deleteOrganisationResponse) {
 
@@ -832,16 +924,13 @@ public class OrganisationServiceImpl implements OrganisationService {
                 deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
                 deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
 
-            } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
-                // If user is not active in the up will send the request to delete
+            } else {
+                // user will be deleted even if he is in active state
                 var userIds = new HashSet<String>();
                 userIds.add(user.getUserIdentifier());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
                 deleteOrganisationResponse = RefDataUtil
                         .deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
-            } else {
-                deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
-                deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
             }
         } else {
             deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
@@ -1055,6 +1144,158 @@ public class OrganisationServiceImpl implements OrganisationService {
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
     }
+
+    public void updateContacts(Boolean contactInformationUpdate, Boolean dxAddressUpdate,
+                                ContactInformationCreationRequest contactInformationRequest,
+                                List<ContactInformation> existingContactInformationList,
+                                Organisation organisation) {
+        ContactInformation savedContactInformation = null;
+        //If single address is present and contact info needs updating then update details
+        if (contactInformationUpdate) {
+            savedContactInformation = updateContactInformation(existingContactInformationList.get(0),
+                contactInformationRequest,
+                organisation);
+        }
+        //if both contact info and dx add needs updating
+        if (dxAddressUpdate && contactInformationUpdate) {
+            updateDxAddress(contactInformationRequest,dxAddressUpdate,savedContactInformation);
+        }
+        // if only dxaddress needs updating
+        if (dxAddressUpdate && !contactInformationUpdate) {
+            updateDxAddress(contactInformationRequest,dxAddressUpdate,existingContactInformationList.get(0));
+        }
+        // if both are false no update takes place
+        if (!dxAddressUpdate && !contactInformationUpdate) {
+            throw new InvalidRequest(
+                "dxAddressUpdate and contactInformationUpdate are both false no update took place");
+        }
+    }
+
+
+    private ContactInformation updateContactInformation(ContactInformation existingContactInformation,
+                                                        ContactInformationCreationRequest contactInfoRequest,
+                                                        Organisation organisation
+    ) {
+        existingContactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine1()));
+        existingContactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine2()));
+        existingContactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfoRequest.getAddressLine3()));
+        existingContactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfoRequest.getTownCity()));
+        existingContactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCounty()));
+        existingContactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfoRequest.getCountry()));
+        existingContactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfoRequest.getPostCode()));
+        existingContactInformation.setOrganisation(organisation);
+        existingContactInformation.setLastUpdated(LocalDateTime.now());
+        return contactInformationRepository.save(existingContactInformation);
+    }
+
+    private void updateDxAddress(ContactInformationCreationRequest contactInfoRequest,
+                                 Boolean dxAddressRequired, ContactInformation savedContactInformation) {
+
+        if (dxAddressRequired && contactInfoRequest.getDxAddress().isEmpty()) {
+            throw new ResourceNotFoundException("No Dx Address Information provided in request");
+        } else {
+            addDxAddressToContactInformation(contactInfoRequest.getDxAddress(), savedContactInformation);
+        }
+    }
+
+    public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
+                                                   OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest) {
+        final String attributeKey = "regulators-0";
+        final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+            + "\"organisationRegistrationNumber\":\"" + organisationNameSraUpdateRequest.getSraId() + "\"}";
+
+        existingOrganisation.setSraId(
+            RefDataUtil.removeEmptySpaces(organisationNameSraUpdateRequest.getSraId()));
+        OrgAttribute attribute = new OrgAttribute();
+        attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
+        attribute.setValue(RefDataUtil
+            .removeEmptySpaces(attributeValue));
+        attribute.setOrganisation(existingOrganisation);
+        OrgAttribute savedAttribute = orgAttributeRepository.save(attribute);
+        List<OrgAttribute> attributes = new ArrayList<>();
+        attributes.add(attribute);
+        existingOrganisation.setOrgAttributes(attributes);
+
+        return savedAttribute;
+    }
+
+    @Override
+    @Transactional
+    public OrganisationsDetailResponse updateOrganisationNameOrSra(
+        OrganisationNameSraUpdateRequest organisationNameSraUpdateRequest, String organisationIdentifier) {
+
+        var existingOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        Organisation savedOrganisation = null;
+        if (existingOrganisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+        } else {
+            if (isNotBlank(organisationNameSraUpdateRequest.getName())) {
+                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdateRequest.getName()));
+            }
+            if (isNotBlank(organisationNameSraUpdateRequest.getSraId())) {
+                OrgAttribute savedAttribute = saveOrganisationAttributes(
+                    existingOrganisation,organisationNameSraUpdateRequest);
+                if (savedAttribute == null) {
+                    log.error("{}:: error saving Organisation Attribute::", loggingComponentName);
+                    throw new EmptyResultDataAccessException("Error saving organisation attributes", 1);
+                }
+            }
+            savedOrganisation = organisationRepository.save(existingOrganisation);
+        }
+
+        return new OrganisationsDetailResponse(List.of(savedOrganisation),false,false,false);
+    }
+
+
+
+    @Override
+    public ResponseEntity<ContactInformationResponse> updateContactInformationForOrganisation(
+        ContactInformationCreationRequest contactInformationRequest, String organisationIdentifier,
+        Boolean dxAddressUpdate, Boolean contactInformationUpdate, String addressid) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        if (organisation == null) {
+            throw new ResourceNotFoundException("Organisation does not exist");
+        }
+
+        List<ContactInformation> existingContactInformationList = organisation.getContactInformation();
+
+        if (!existingContactInformationList.isEmpty()) {
+            if (contactInformationRequest != null) {
+                //if single contact information record found for organisation then update the same
+                if (existingContactInformationList.size() == 1) {
+                    updateContacts(contactInformationUpdate,dxAddressUpdate,contactInformationRequest,
+                        existingContactInformationList,organisation);
+                } else {
+                    //if multiple records found then update the one fro which the id is provided
+                    if (addressid.isEmpty()) {
+                        throw new ResourceNotFoundException("Multiple addresses found for organisation . "
+                            + "Please enter specific address id of the contact information to be updated");
+                    } else {
+                        AtomicBoolean idFound = new AtomicBoolean(false);
+                        existingContactInformationList.forEach(existingInfo -> {
+                            if (existingInfo.getId().toString().equalsIgnoreCase(addressid)) {
+                                idFound.set(true);
+                                updateContacts(contactInformationUpdate, dxAddressUpdate, contactInformationRequest,
+                                    existingContactInformationList, organisation);
+                            }
+                        });
+                        if (!idFound.get()) {
+                            throw new ResourceNotFoundException(" Could not find address to update for the "
+                                + "id provided please check and try again");
+                        }
+                    }
+                }
+            } else { // If contact information does not exist in db for the organisation
+                throw new ResourceNotFoundException("No contact information found in request");
+            }
+        } else { // If request is made without contact information details
+            throw new ResourceNotFoundException("No contact information existing for given organisation");
+        }
+        return ResponseEntity.status(200).build();
+    }
+
 
 }
 
