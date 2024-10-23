@@ -175,3 +175,5 @@ springdoc:
     enabled: true
     operationsSorter: method
   writer-with-order-by-keys: true
+
+logging.level.uk.gov.hmcts: DEBUG
