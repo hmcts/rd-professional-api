@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
@@ -49,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -119,6 +121,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest.dxAddressUpdateRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.BLOCKED;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
@@ -135,6 +138,10 @@ class OrganisationServiceImplTest {
 
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final OrgAttributeRepository orgAttributeRepository = mock(OrgAttributeRepository.class);
+
+    private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
+
+    private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
 
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
@@ -205,6 +212,7 @@ class OrganisationServiceImplTest {
 
     private final ProfessionalUserService professionalUserServiceMock
             = mock(ProfessionalUserService.class);
+
 
     @BeforeEach
     void setUp() {
@@ -2718,4 +2726,113 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_updateOrganisationContactInformation() {
+        final List<UpdateOrgResponse> updateOrgNameResponsesList = new ArrayList<>();
+        organisation.setContactInformations(List.of(contactInformation));
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
+        verify(organisationRepository, times(0)).findByOrganisationIdentifier(any(String.class));
+        when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
+        assertNotNull(contactInformationCreationRequest);
+        ContactInformation existingContactInformation = new ContactInformation();
+        existingContactInformation.setAddressLine1(contactInformationCreationRequest.getAddressLine1());
+        existingContactInformation.setTownCity(contactInformationCreationRequest.getTownCity());
+
+        when(contactInformationRepository.save(existingContactInformation)).thenReturn(existingContactInformation);
+        assertNotNull(existingContactInformation);
+        assertThat(existingContactInformation.getAddressLine1())
+            .isEqualTo(contactInformationCreationRequest.getAddressLine1());
+
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
+            getContactInformationData();
+        List<UpdateOrgResponse> updateContactInformationResponse =
+            sut.updateContactInformation(organisation,true,contactInformationUpdateData,true,
+                "",updateOrgNameResponsesList);
+
+        assertThat(updateContactInformationResponse).isNotNull();
+        assertThat(updateContactInformationResponse.get(0).getStatus()).isEqualTo("success");
+        assertThat(updateContactInformationResponse.get(0).getStatusCode()).isEqualTo(200);
+        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase(
+            "dxAddress updated successfully");
+        assertThat(updateContactInformationResponse.get(1).getStatus()).isEqualTo("success");
+        assertThat(updateContactInformationResponse.get(1).getStatusCode()).isEqualTo(200);
+        assertThat(updateContactInformationResponse.get(1).getMessage()).isEqualToIgnoringCase(
+            "contactInformation updated successfully");
+
+    }
+
+    @Test
+    void testUpdateOrgContactInformationEmptyAddressId() {
+
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+
+        var contactInformation1 = new ContactInformation();
+        contactInformation1.setCountry("TestAnotherCountry");
+        contactInformation1.setCreated(LocalDateTime.now());
+        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
+        existingContactInformationList.addAll(List.of(contactInformation1, contactInformation));
+
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
+            getContactInformationData();
+
+        organisation.setContactInformations(existingContactInformationList);
+        final List<UpdateOrgResponse> updateOrgNameResponsesList = new ArrayList<>();
+        assertNotNull(existingContactInformationList);
+        List<UpdateOrgResponse> updateContactInformationResponse =
+            sut.updateContactInformation(organisation,true,contactInformationUpdateData,true,
+                null,updateOrgNameResponsesList);
+        assertThat(updateContactInformationResponse).isNotNull();
+        assertThat(updateContactInformationResponse.size()).isEqualTo(1);
+        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase("Multiple"
+            + " addresses found for organisation . Please enter specific address "
+            + "id of the contact information to be updated");
+    }
+
+    @Test
+    void testUpdateOrgContactInformationWithDxAddressUpdateAndContactInformationUpdateFalse() {
+
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+        contactInformation.setId(UUID.randomUUID());
+
+        var contactInformation1 = new ContactInformation();
+        contactInformation1.setCountry("TestAnotherCountry");
+        contactInformation1.setCreated(LocalDateTime.now());
+        contactInformation1.setId(UUID.randomUUID());
+        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
+        existingContactInformationList.addAll(List.of(contactInformation1, contactInformation));
+
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
+            getContactInformationData();
+
+        organisation.setContactInformations(existingContactInformationList);
+        final List<UpdateOrgResponse> updateOrgNameResponsesList = new ArrayList<>();
+        assertNotNull(existingContactInformationList);
+        List<UpdateOrgResponse> updateContactInformationResponse =
+            sut.updateContactInformation(organisation,true,contactInformationUpdateData,true,
+                "12345",updateOrgNameResponsesList);
+        assertThat(updateContactInformationResponse).isNotNull();
+        assertThat(updateContactInformationResponse.size()).isEqualTo(1);
+        assertThat(updateContactInformationResponse.get(0).getMessage()).isEqualToIgnoringCase("Could "
+            + "not find address to update for the id provided please check and try again");
+    }
+
+
+    public ContactInformationUpdateRequest.ContactInformationUpdateData getContactInformationData() {
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData =
+            new ContactInformationUpdateRequest.ContactInformationUpdateData(
+                organisation.getOrganisationIdentifier(),true,true,"",
+                "uprn1","addressLine1","addressLine2","addressLine3",
+                "som1-town-city","some-county1","some-country1","som1-post-code",
+                Arrays.asList(dxAddressUpdateRequest().dxAddressId("12345678").dxNumber("DX 1234567890")
+                    .dxExchange("dxExchange-1").build()));
+
+        return contactInformationUpdateData;
+    }
+
 }

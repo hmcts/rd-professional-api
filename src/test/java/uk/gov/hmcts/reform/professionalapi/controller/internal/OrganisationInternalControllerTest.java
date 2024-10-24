@@ -21,6 +21,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -38,7 +40,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisatio
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateResponseParent;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -57,7 +62,9 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -76,6 +83,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest.dxAddressUpdateRequest;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -87,6 +96,9 @@ class OrganisationInternalControllerTest {
     private PaymentAccountService paymentAccountServiceMock;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
+
+    private ContactInformationCreationRequest contactInformationCreationRequest;
+
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
@@ -161,7 +173,10 @@ class OrganisationInternalControllerTest {
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null,"Doctor",null);
-
+        contactInformationCreationRequest = new ContactInformationCreationRequest("uprn1","addressLine1",
+            "addressLine2","addressLine3", "some-country1","some-county1","som1-town-city",
+            "som1-post-code",Arrays.asList(dxAddressCreationRequest()
+            .dxNumber("DX 1234567890").dxExchange("dxExchange").build()));
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
@@ -571,5 +586,75 @@ class OrganisationInternalControllerTest {
         verify(organisationServiceMock, times(1))
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
+
+    @Test
+    void testUpdateOrgContactInformation() {
+        Organisation organisation1 = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        Organisation organisation2 = new Organisation("Org-Name-2", OrganisationStatus.ACTIVE, "sra-id-0",
+            "companyN", false, "www.org.com");
+
+        ContactInformationUpdateRequest contactInformationUpdateRequest = new ContactInformationUpdateRequest();
+        List<ContactInformationUpdateRequest.ContactInformationUpdateData> contactInformationUpdateDataList
+            = new ArrayList<>();
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData1 =
+            new ContactInformationUpdateRequest.ContactInformationUpdateData(
+                organisation1.getOrganisationIdentifier(),true,true,"",
+                "uprn1","addressLine1",
+                "addressLine2","addressLine3", "som1-town-city",
+                "some-county1","some-country1","som1-post-code",Arrays.asList(
+                    dxAddressUpdateRequest().dxAddressId("12345678").dxNumber("DX 1234567890")
+                        .dxExchange("dxExchange-1").build()));
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformationUpdateData2 =
+            new ContactInformationUpdateRequest.ContactInformationUpdateData(
+                organisation2.getOrganisationIdentifier(),true,true,"",
+                "uprn2","addressLine2",
+                "addressLine2-2","addressLine3-3", "som2-town-city",
+                "some-county2","some-country2","som2-post-code",Arrays.asList(
+                    dxAddressUpdateRequest().dxAddressId("12345678").dxNumber("DX 2234567890")
+                        .dxExchange("dxExchange-2").build()));
+        contactInformationUpdateDataList.add(contactInformationUpdateData1);
+        contactInformationUpdateDataList.add(contactInformationUpdateData2);
+        contactInformationUpdateRequest.setContactInformationUpdateData(contactInformationUpdateDataList);
+
+        final List<UpdateOrgResponse> updateContactInformationResponsesList = new ArrayList<>();
+        var contactInformation = new ContactInformation();
+        contactInformation.setCountry("TestCountry");
+        contactInformation.setCreated(LocalDateTime.now());
+        contactInformation.setId(UUID.randomUUID());
+
+        var contactInformation1 = new ContactInformation();
+        contactInformation1.setCountry("TestAnotherCountry");
+        contactInformation1.setCreated(LocalDateTime.now());
+        contactInformation1.setId(UUID.randomUUID());
+        ArrayList<ContactInformation> existingContactInformationList = new ArrayList<>();
+        existingContactInformationList.addAll(List.of(contactInformation1, contactInformation));
+
+        organisation.setContactInformations(existingContactInformationList);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+            .thenReturn(organisation);
+        when(orgIdValidatorMock.validateOrganisationId(any(),
+            any(),any())).thenReturn(updateContactInformationResponsesList);
+
+        when(organisationServiceMock.updateContactInformation(any(),any(),any(),
+            any(),any(),any())).thenReturn(updateContactInformationResponsesList);
+
+        UpdateResponseParent updateResponse = new UpdateResponseParent("success",
+            "All contactInformations updated successfully",null);
+        when(organisationServiceMock. generateUpdateResponse(any(),any())).thenReturn(updateResponse);
+
+        UpdateResponseParent response = organisationInternalController
+            .updateContactInformationForOrganisation(contactInformationUpdateRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo("success");
+        assertThat(response.getMessage()).isEqualTo("All contactInformations updated successfully");
+
+        verify(organisationServiceMock, times(2)).getOrganisationByOrgIdentifier(any());
+        verify(organisationServiceMock, times(2))
+            .updateContactInformation(any(),any(),any(),any(),any(),any());
+
+    }
+
 
 }
