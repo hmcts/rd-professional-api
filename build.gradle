@@ -36,7 +36,10 @@ ext {
 
 def versions = [
         lombok          : '1.18.32',
+        gradlePitest    : '1.15.0',
         pitest          : '1.16.1',
+        sonarPitest     : '0.5',
+        junitPitest     : '1.2.1',
         reformLogging   : '6.1.6',
         camel           : '3.8.0',
         pact_version    : '4.1.7',
@@ -265,7 +268,8 @@ jacocoTestReport {
 }
 
 pitest {
-    junit5PluginVersion = '1.2.1'
+    pitestVersion = versions.pitest
+    junit5PluginVersion = versions.junitPitest
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
@@ -483,13 +487,13 @@ dependencies {
 
 
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-    testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.15.0'
-    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '0.16'
+    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
+    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: versions.junitPitest
 
-    testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5', {
+    testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', {
         exclude group: 'junit', module: 'junit'
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    }, version: versions.sonarPitest
 
     testImplementation 'io.github.openfeign:feign-jackson:12.5'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
