@@ -14,13 +14,14 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.63'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.36.0'
+    id 'com.github.ben-manes.versions' version '0.51.0'
     id "info.solidsoft.pitest" version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'org.sonarqube' version '5.0.0.4638'
     id 'org.springframework.boot' version '3.3.4'
     id "org.flywaydb.flyway" version '9.22.3'
     id 'au.com.dius.pact' version '4.1.7'// do not change, otherwise serenity report fails
+    id 'org.owasp.dependencycheck' version '10.0.3'
 }
 
 
@@ -35,7 +36,10 @@ ext {
 
 def versions = [
         lombok          : '1.18.32',
+        gradlePitest    : '1.15.0',
         pitest          : '1.16.1',
+        sonarPitest     : '0.5',
+        junitPitest     : '1.2.1',
         reformLogging   : '6.1.6',
         camel           : '3.8.0',
         pact_version    : '4.1.7',
@@ -264,7 +268,8 @@ jacocoTestReport {
 }
 
 pitest {
-    junit5PluginVersion = '1.0.0'
+    pitestVersion = versions.pitest
+    junit5PluginVersion = versions.junitPitest
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
@@ -351,7 +356,7 @@ dependencies {
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: versions.feign
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: versions.feign
     implementation "io.github.openfeign:feign-httpclient:11.10"
-    implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.0.0'
+    implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
@@ -369,7 +374,7 @@ dependencies {
     implementation 'com.github.hmcts:idam-java-client:2.1.1'
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.40'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.41.2'
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     //Fix for CVE-2021-29425
@@ -398,7 +403,7 @@ dependencies {
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
 
@@ -482,20 +487,20 @@ dependencies {
 
 
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-    testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.15.0'
-    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '0.16'
+    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
+    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: versions.junitPitest
 
-    testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5', {
+    testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', {
         exclude group: 'junit', module: 'junit'
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    }, version: versions.sonarPitest
 
     testImplementation 'io.github.openfeign:feign-jackson:12.5'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.5.4'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.5.4'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.6.0'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.6.0'
 
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
@@ -559,7 +564,7 @@ dependencyManagement {
         }
 
 //        Resolves CVE-2023-4586
-        dependencySet(group: 'io.netty', version: '4.1.113.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.114.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
@@ -616,6 +621,14 @@ configurations.all {
         if (details.requested.group == 'com.google.guava'
                 && details.requested.name == 'guava') {
             details.useVersion "32.1.1-jre"
+        }
+    }
+
+    resolutionStrategy.eachDependency { details ->
+        // Remedy for CVE-2024-22233 - remove once spring-boot transitively uses version >= 6.1.14
+        if (details.requested.group == 'org.springframework'
+                && (details.requested.version == '6.1.12' || details.requested.version == '6.1.13')) {
+            details.useVersion "6.1.14"
         }
     }
 }

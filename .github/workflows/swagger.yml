@@ -1,0 +1,15 @@
+name: Publish Swagger Specs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish-openapi:
+    uses: hmcts/workflow-publish-openapi-spec/.github/workflows/publish-openapi.yml@v1
+    secrets:
+      SWAGGER_PUBLISHER_API_TOKEN: ${{ secrets.SWAGGER_PUBLISHER_API_TOKEN }}
+    with:
+      test_to_run: 'uk.gov.hmcts.reform.professionalapi.docs.SwaggerPublisherTest'
+      java_version: 21
