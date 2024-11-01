@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserDeletionRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -863,6 +865,46 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         professionalApiClient
                 .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
+    }
+
+    public List<String> setUpUsersToDelete() {
+        superUserEmail = generateRandomEmail();
+        invitedUserEmail = generateRandomEmail();
+        organisationCreationRequest = createOrganisationRequest()
+            .superUser(aUserCreationRequest()
+                .firstName("firstName")
+                .lastName("lastName")
+                .email(superUserEmail)
+                .build())
+            .build();
+        intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
+
+        List<String> roles = new ArrayList<>();
+        roles.add(puiCaseManager);
+        roles.add(puiOrgManager);
+        roles.add(puiFinanceManager);
+        idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
+
+        return Arrays.asList(superUserEmail.toLowerCase());
+    }
+
+    @Test
+    @DisplayName("PRD Internal Delete User for Professional and User Profile")
+    void deletUserFromProfessionalAndUserProfileShouldReturnSuccess() {
+
+        log.info("deletUserFromProfessionalAndUserProfileShouldReturnSuccess :: STARTED");
+
+        List<String> emails = setUpUsersToDelete();
+
+        UserDeletionRequest userDeletionRequest = new UserDeletionRequest(emails);
+
+        JsonPath response = professionalApiClient.deleteUserFromOrganisation(userDeletionRequest,OK);
+        Response getUserResponse = professionalApiClient.retrieveUserByIdNotFound(intActiveOrgId);
+        assertThat(getUserResponse).isNull();
+        assertThat(response).isNotNull();
+
+        log.info("deletUserFromProfessionalAndUserProfileShouldReturnSuccess :: END");
+
     }
 
     private static void verifyOrganisationDetails(JsonPath response) {
