@@ -8,7 +8,7 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.apache.camel.model.language.SimpleExpression;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
@@ -30,7 +30,7 @@ import java.util.Optional;
 import javax.sql.DataSource;
 
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.WordUtils.uncapitalize;
+import static org.apache.commons.text.WordUtils.uncapitalize;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.DIRECT_ROUTE;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_FILE_STALE;
