@@ -2,15 +2,15 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -52,12 +52,11 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
-@SerenityTest
+@ExtendWith(SerenityJUnit5Extension.class)
 @SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
 @SuppressWarnings("unchecked")
-
 class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest {
 
     String pumBearerToken;

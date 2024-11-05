@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SerenityTest
+@ExtendWith(SerenityJUnit5Extension.class)
 @SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 
 import static java.lang.System.getenv;
-import static org.apache.commons.lang.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")

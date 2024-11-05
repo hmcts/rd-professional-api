@@ -931,7 +931,7 @@ public class ProfessionalReferenceDataClient {
             throws JsonProcessingException {
         Map<String, Object> errorResponseMap = new HashMap<>();
         String body = (String) responseEntity.getBody();
-        if (org.apache.commons.lang.StringUtils.isNotEmpty(body)) {
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(body)) {
             errorResponseMap.put("response_body", objectMapper.readValue(
                     body, ErrorResponse.class));
         } else {
