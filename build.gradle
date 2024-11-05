@@ -75,13 +75,11 @@ jacocoTestCoverageVerification {
 }
 
 compileJava {
-//    options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
-    options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" //<< "-Werror"
+    options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
 compileTestJava {
-//    options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
-    options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" //<< "-Werror"
+    options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
 tasks.withType(JavaExec).configureEach {
@@ -332,7 +330,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.10'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
-    
+
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: versions.bouncycastle
 
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: versions.feign
