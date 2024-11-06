@@ -520,7 +520,6 @@ public class OrganisationExternalController extends SuperController {
             content = @Content
     )
 
-
     @PostMapping(
             path = "/addresses",
             consumes = APPLICATION_JSON_VALUE,
