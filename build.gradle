@@ -437,7 +437,7 @@ dependencies {
         exclude group: "net.bytebuddy", module: "byte-buddy-agent"
     }
     testImplementation 'com.github.hmcts:rd-commons-lib:0.0.19-beta3'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.4.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.14.2'
 
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
