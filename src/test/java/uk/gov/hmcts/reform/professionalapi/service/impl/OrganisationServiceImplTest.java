@@ -290,7 +290,6 @@ class OrganisationServiceImplTest {
         when(organisationRepositoryImplNullReturnedMock.findByOrganisationIdentifier(any())).thenReturn(null);
         when(organisationMfaStatusRepositoryMock.save(any(OrganisationMfaStatus.class)))
                 .thenReturn(organisationMfaStatus);
-
         when(bulkCustomerDetailsRepositoryMock.save(any(BulkCustomerDetails.class))).thenReturn(bulkCustomerDetails);
     }
 
@@ -2662,6 +2661,14 @@ class OrganisationServiceImplTest {
         String userId = "";
         when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(null);
         assertThrows(InvalidRequest.class, () -> sut.retrieveOrganisationByUserId(userId));
+    }
+
+    @Test
+    void test_deleteDxAddressForOrganisation() {
+        String dxAddress = "dxAddress";
+        UUID randomUUID = UUID.randomUUID();
+        sut.deleteDxAddressForOrganisation(dxAddress, randomUUID);
+        verify(dxAddressRepositoryMock, times(1)).deleteByContactInfoId(dxAddress, randomUUID);
     }
 
     @ParameterizedTest

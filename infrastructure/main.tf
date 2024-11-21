@@ -80,6 +80,7 @@ module "db-professional-ref-data-v16" {
 
 }
 
+
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name         = join("-", [var.component, "POSTGRES-USER"])
   value        = module.db-professional-ref-data-v16.username
@@ -109,3 +110,4 @@ resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
   value        = "5432"
   key_vault_id = data.azurerm_key_vault.rd_key_vault.id
 }
+
