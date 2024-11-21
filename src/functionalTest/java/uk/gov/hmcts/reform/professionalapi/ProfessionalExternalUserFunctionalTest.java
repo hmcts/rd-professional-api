@@ -255,8 +255,14 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                 professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
                         superUserRoles(), firstName, lastName, email));
 
+        UserCreationRequest superUserRequest = UserCreationRequest
+                .aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .build();
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-                .superUser(UserCreationRequest.aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
+                .superUser(superUserRequest)
                 .status("ACTIVE").build();
         createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
