@@ -59,7 +59,7 @@ import java.util.stream.Stream;
 import static net.thucydides.model.reports.ReportService.getDefaultReporters;
 import static net.thucydides.model.steps.TestSourceType.TEST_SOURCE_JUNIT5;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "all"})
 public class CustomTestExecutionListener extends SerenityTestExecutionListener {
 
     private static final List<Class> expectedExceptions = Collections.synchronizedList(new ArrayList<>());
