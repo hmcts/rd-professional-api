@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddr
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -50,7 +51,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatu
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 @ExtendWith(SerenityJUnit5Extension.class)
 @SpringBootTest
@@ -106,7 +106,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
             log.info("Setting up organization...");
             superUserEmail = generateRandomEmail();
             organisationCreationRequest = createOrganisationRequest()
-                    .superUser(aUserCreationRequest()
+                    .superUser(UserCreationRequest.aUserCreationRequest()
                             .firstName(firstName)
                             .lastName(lastName)
                             .email(superUserEmail)
@@ -256,7 +256,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                         superUserRoles(), firstName, lastName, email));
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
+                .superUser(UserCreationRequest.aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
                 .status("ACTIVE").build();
         createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
@@ -344,7 +344,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findOrganisationUsersSorted() {
         String superUserEmail = generateRandomEmail();
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest().firstName(firstName)
+                .superUser(UserCreationRequest.aUserCreationRequest().firstName(firstName)
                         .lastName(lastName).email(superUserEmail).build())
                 .status("ACTIVE").build();
 

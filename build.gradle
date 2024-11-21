@@ -38,7 +38,8 @@ def versions = [
         feign           : '3.8.0',
         bytebuddy       : '1.15.3',
         bouncycastle    : '1.79',
-        postgresql_tc   : '1.20.0'
+        postgresql_tc   : '1.20.0',
+        serenity        : '4.2.6'
 ]
 
 application {
@@ -420,13 +421,15 @@ dependencies {
         exclude group: "org.hamcrest", module: "hamcrest-library"
     }
 
-    testImplementation 'net.serenity-bdd:serenity-rest-assured:4.2.6'
-    testImplementation group: 'net.serenity-bdd', name: 'serenity-junit5', version: '4.2.6'
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-junit5', version: versions.serenity
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
     testImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
     testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
 
     testImplementation ("org.mockito:mockito-core:4.3.1") {
         exclude group: "net.bytebuddy", module: "byte-buddy"
