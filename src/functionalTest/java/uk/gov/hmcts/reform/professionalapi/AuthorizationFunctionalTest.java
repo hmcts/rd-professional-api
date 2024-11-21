@@ -40,7 +40,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.formatDateString;
 
@@ -204,7 +203,7 @@ public class AuthorizationFunctionalTest {
         userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
                 "accessTypeId" + random, false));
         String userEmail = generateRandomEmail();
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+        NewUserCreationRequest userCreationRequest = NewUserCreationRequest.aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
@@ -227,7 +226,7 @@ public class AuthorizationFunctionalTest {
                     .add(new UserAccessType("testJurisdictionId",
                             "testOrganisationProfileId",
                             "testAccessTypeId", true));
-            userCreationRequest = aNewUserCreationRequest()
+            userCreationRequest = NewUserCreationRequest.aNewUserCreationRequest()
                     .firstName(firstName)
                     .lastName(lastName)
                     .email(userEmail)
@@ -235,7 +234,7 @@ public class AuthorizationFunctionalTest {
                     .userAccessTypes(userAccessTypes)
                     .build();
         } else {
-            userCreationRequest = aNewUserCreationRequest()
+            userCreationRequest = NewUserCreationRequest.aNewUserCreationRequest()
                     .firstName(firstName)
                     .lastName(lastName)
                     .email(userEmail)

@@ -12,7 +12,6 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 
 import static java.lang.System.getenv;
-import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 
 public class FeatureToggleConditionExtension implements ExecutionCondition {
@@ -24,43 +23,28 @@ public class FeatureToggleConditionExtension implements ExecutionCondition {
     private static String flagName;
 
     @Override
-    @SuppressWarnings("checkstyle:Indentation")
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
-
-        if (isNotTrue(isInitialized)) {
+        if (!isInitialized) {
             initialize();
         }
 
-        final Optional<AnnotatedElement> element = context.getElement();
+        final Optional<AnnotatedElement> optElement = context.getElement();
+        Optional<ToggleEnable> toggleEnable = findAnnotation(optElement, ToggleEnable.class);
 
-        return element.map(annotatedElement -> {
-                    Optional<ToggleEnable> toggleEnable = findAnnotation(element, ToggleEnable.class);
+        if (toggleEnable.isEmpty()) {
+            return enabled();
+        }
 
-                    return toggleEnable.map(toggle -> {
-                        featureToggleService.mapServiceToFlag();
-                        flagName = featureToggleService.getLaunchDarklyMap().get(toggle.mapKey());
+        ToggleEnable toggle = toggleEnable.get();
 
-                        final boolean isFlagEnabled =
-                                featureToggleService
-                                        .isFlagEnabled("rd_professional_api", flagName);
+        flagName = featureToggleService.getLaunchDarklyMap().get(toggle.mapKey());
+        final boolean isFlagEnabled = featureToggleService.isFlagEnabled("rd_professional_api", flagName);
 
-                        ConditionEvaluationResult evaluationResult = null;
-
-                        if (isFlagEnabled) {
-                            if (isNotTrue(toggle.withFeature())) {
-                                evaluationResult = disabled();
-                            } else {
-                                evaluationResult = enabled();
-                            }
-                        } else {
-                            if (isNotTrue(toggle.withFeature()) || toggle.withFeature()) {
-                                evaluationResult = disabled();
-                            }
-                        }
-                        return evaluationResult;
-                    }).orElse(enabled());
-                }
-        ).orElse(enabled());
+        ConditionEvaluationResult evaluationResult = disabled();
+        if (isFlagEnabled && toggle.withFeature()) {
+            evaluationResult = enabled();
+        }
+        return evaluationResult;
     }
 
     @NotNull
@@ -77,7 +61,6 @@ public class FeatureToggleConditionExtension implements ExecutionCondition {
         return ConditionEvaluationResult.enabled("Feature toggled ON");
     }
 
-    @SuppressWarnings("checkstyle:CommentsIndentation")
     private static void initialize() {
         LDClient ldClient = new LDClient(getenv("LD_SDK_KEY"));
         featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
