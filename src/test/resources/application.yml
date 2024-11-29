@@ -20,3 +20,4 @@ spring:
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
 defaultPageSize: ${DEFAULTPAGESIZE:10}
+
