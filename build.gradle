@@ -378,7 +378,7 @@ dependencies {
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     //Fix for CVE-2021-29425
-    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'commons-io:commons-io:2.18.0'
 
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.18.2'
     runtimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '10.18.2'
