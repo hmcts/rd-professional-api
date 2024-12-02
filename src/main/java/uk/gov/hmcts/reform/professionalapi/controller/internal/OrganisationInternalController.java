@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -49,10 +51,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateResponseParent;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -745,4 +751,91 @@ public class OrganisationInternalController extends SuperController {
                 .status(HttpStatus.OK)
                 .body(response);
     }
+
+
+    @Operation(
+        summary = "Updates contact informations(address details) to organisation",
+        description = "**IDAM Roles to access API** :<br> pui-organisation-manager",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+
+    )
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Updated Contact Information",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "An invalid request has been provided",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized Error : "
+            + "The requested resource is restricted and requires authentication",
+        content = @Content
+    )
+
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+    @PutMapping(
+        path = "/contactInformation",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.OK)
+    @Secured({"prd-admin"})
+    public UpdateResponseParent updateContactInformationForOrganisation(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationUpdateRequest")
+        @Valid @NotNull @RequestBody ContactInformationUpdateRequest contactInformationUpdateRequest
+       ) {
+
+        //check if request list is empty
+        List<ContactInformationUpdateRequest.ContactInformationUpdateData> contactInformationUpdateDataList =
+            contactInformationUpdateRequest.getContactInformationUpdateData();
+
+        if (contactInformationUpdateDataList.isEmpty()) {
+            throw new InvalidRequest("Request is empty");
+        }
+
+        final List<UpdateOrgResponse> updateOrgResponsesList = new ArrayList<>();
+        //iterate over each address/orgid pair and update values
+        contactInformationUpdateDataList.forEach(contactInformationUpdateData -> {
+            String orgId = contactInformationUpdateData.getOrganisationId();
+            if (StringUtils.isEmpty(orgId)) {
+                updateOrgResponsesList.add(new UpdateOrgResponse("","failure",
+                    HttpStatus.BAD_REQUEST.value(),"Organisation id is missing"));
+            } else {
+                var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+                organisationIdentifierValidatorImpl.validateOrganisationId(orgId,
+                    updateOrgResponsesList, existingOrganisation);
+                organisationCreationRequestValidator.validateContactInformationAndDxAddress(
+                    contactInformationUpdateData,updateOrgResponsesList);
+                if (!updateOrgResponsesList.stream().filter(
+                    updateOrg -> orgId.equalsIgnoreCase(updateOrg.getOrganisationId())).findAny().isPresent()) {
+                        organisationService.updateContactInformation(existingOrganisation,
+                            contactInformationUpdateData.isDxAddressUpdate(),contactInformationUpdateData,
+                            contactInformationUpdateData.isContactInformationUpdate(),
+                            contactInformationUpdateData.getAddressid(),updateOrgResponsesList);
+                }
+            }
+        });
+
+        return organisationService.generateUpdateResponse(updateOrgResponsesList,"contactInformations");
+
+    }
 }
+

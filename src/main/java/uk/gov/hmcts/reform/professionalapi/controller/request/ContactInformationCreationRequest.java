@@ -11,11 +11,15 @@ import java.util.List;
 
 @Getter
 @Builder(builderMethodName = "aContactInformationCreationRequest")
+@NotNull(message = "ContactInformationCreationRequest is required")
 public class ContactInformationCreationRequest {
 
     private final String uprn;
 
+    @NotEmpty
+    @NotNull(message = "AddressLine1 is required")
     @NotNull @NotEmpty
+
     private final String addressLine1;
 
     private final String addressLine2;
@@ -31,7 +35,6 @@ public class ContactInformationCreationRequest {
     private final String postCode;
 
     private final List<DxAddressCreationRequest> dxAddress;
-
 
     @JsonCreator
     public ContactInformationCreationRequest(
