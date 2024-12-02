@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
@@ -505,6 +506,21 @@ public class ProfessionalApiClient {
 
         return response.body().jsonPath();
     }
+
+
+    public Map<String, Object> updatesOrganisationAdmin(UserUpdateRequest userUpdateRequest,
+                                                         HttpStatus expectedStatus) {
+        Response response = getMultipleAuthHeadersInternal()
+            .body(userUpdateRequest)
+            .put("/refdata/internal/v1/organisations/updateadmin")
+            .andReturn();
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
+        log.info("{}:: Updating admin user (Internal) response: {}", loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
 
     public Map<String, Object> retrieveOrganisationDetailsBySinceDate(String sinceDate, String page, String pageSize) {
         StringBuilder apiURL = new StringBuilder(INTERNAL_BASE_URL);
@@ -1497,6 +1513,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+
+
     public Map<String, Object> searchOrganisationUsersByUserIdExternal(HttpStatus status,
                                                                        RequestSpecification requestSpecification,
                                                                        String userIdentifier) {
@@ -1579,7 +1597,7 @@ public class ProfessionalApiClient {
             .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
 
-    private RequestSpecification getMultipleAuthHeadersInternal() {
+    public RequestSpecification getMultipleAuthHeadersInternal() {
         return getMultipleAuthHeaders(idamOpenIdClient.getcwdAdminOpenIdToken("prd-admin"));
     }
 

@@ -1323,4 +1323,5 @@ class ProfessionalUserServiceImplTest {
         verify(professionalUserRepository, times(1))
                 .findByUserIdentifier(any());
     }
+
 }

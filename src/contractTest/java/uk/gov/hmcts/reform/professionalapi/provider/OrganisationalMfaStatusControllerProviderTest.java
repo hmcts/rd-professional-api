@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,10 @@ public class OrganisationalMfaStatusControllerProviderTest extends MockMvcProvid
 
     @Autowired
     ProfessionalUserRepository professionalUserRepository;
+
+    @Autowired
+    UserAttributeService userAttributeService;
+
 
     @Override
     void setController() {
