@@ -9,9 +9,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
 
-@ExtendWith(SerenityJUnit5Extension.class)
+@ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
@@ -52,7 +53,6 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     @DisplayName("PRD External Test Scenarios For V2 API")
     @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
         + ".createOrganisationUsingExternalController", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void testExternalUserScenario() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -27,8 +28,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
-import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDateTime;
@@ -59,7 +60,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVI
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
 
-@ExtendWith(SerenityJUnit5Extension.class)
+@ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
@@ -578,7 +579,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = true)
     void updateOrgMfaScenario() {
         setUpTestData();
@@ -606,7 +606,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @DisplayName("Update Organisation's MFA should return 403 when toggled off")
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = false)
     void updateOrgMfaShouldReturn403WhenToggledOff() {
         log.info("updateOrgMFAShouldReturn403 :: STARTED");
@@ -644,7 +643,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void retrieveOrgsByPbaStatusScenario() {
         setUpTestData();
         findOrganisationByPbaStatusShouldBeSuccessWithPbas();
@@ -678,7 +676,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void findOrganisationByPbaStatusShouldReturn403WhenToggledOff() {
         log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: STARTED");
 
@@ -690,7 +687,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnSuccess() {
         log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
         setUpTestData();
@@ -728,7 +724,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnPartialSuccess() {
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
         setUpTestData();
@@ -763,7 +758,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: STARTED");
         List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();

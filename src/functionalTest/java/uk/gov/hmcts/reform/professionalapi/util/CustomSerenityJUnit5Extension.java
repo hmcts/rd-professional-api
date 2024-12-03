@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.launchdarkly.sdk.server.LDClient;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
@@ -12,9 +13,12 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 
 import static java.lang.System.getenv;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 
-public class FeatureToggleConditionExtension implements ExecutionCondition {
+public class CustomSerenityJUnit5Extension extends SerenityJUnit5Extension implements ExecutionCondition {
+
+    private static LDClient ldClient;
 
     private static FeatureToggleServiceImpl featureToggleService;
 
@@ -24,10 +28,9 @@ public class FeatureToggleConditionExtension implements ExecutionCondition {
 
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
-        if (!isInitialized) {
+        if (isNotTrue(isInitialized)) {
             initialize();
         }
-
         final Optional<AnnotatedElement> optElement = context.getElement();
         Optional<ToggleEnable> toggleEnable = findAnnotation(optElement, ToggleEnable.class);
 
@@ -60,6 +63,7 @@ public class FeatureToggleConditionExtension implements ExecutionCondition {
     private ConditionEvaluationResult enabled() {
         return ConditionEvaluationResult.enabled("Feature toggled ON");
     }
+
 
     private static void initialize() {
         LDClient ldClient = new LDClient(getenv("LD_SDK_KEY"));
