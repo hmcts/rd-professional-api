@@ -11,14 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
-import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
@@ -37,7 +38,7 @@ import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.c
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
 
-@ExtendWith(SerenityJUnit5Extension.class)
+@ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
@@ -58,7 +59,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     @Test
     @DisplayName("PRD Internal Test Scenarios For V2 API")
     @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void testInternalUserScenario() {
         setUpTestData();
         createOrganisationScenario();
@@ -370,7 +370,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
         professionalApiClient.createOrganisationV2();

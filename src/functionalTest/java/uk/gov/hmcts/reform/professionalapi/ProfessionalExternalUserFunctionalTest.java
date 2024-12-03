@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -20,7 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 
-@ExtendWith(SerenityJUnit5Extension.class)
+@ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
@@ -660,7 +661,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @DisplayName("MFA Scenarios")
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationMfaStatusController.retrieveMfaStatusByUserId", withFeature = true)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void findMFAScenario() {
@@ -692,7 +692,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
@@ -711,7 +710,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
 
@@ -734,7 +732,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
@@ -753,7 +750,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void addPbaOfExistingOrganisationShouldBeSuccess() {
         log.info("addPaymentAccountsToOrganisation :: STARTED");
 
@@ -787,7 +783,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void testAddContactsInformationsToOrganisationScenariosShouldBeForbiddenWhenLDOff() {
         setUpOrgTestData();
@@ -809,7 +804,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("Add Contact informations to organisations  Test Scenarios")
     @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void testAddContactsInformationsToOrganisationScenariosShouldBeSuccessWhenLDON() {
         setUpOrgTestData();
@@ -868,7 +862,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
@@ -889,7 +882,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void deleteMultipleAddressesOfOrganisationShouldBe404Failure() {
         log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: STARTED");
         setUpOrgTestData();
@@ -909,7 +901,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void deleteMultipleAddressesOfOrganisationShouldBeSuccess() {
         log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: STARTED");
         setUpOrgTestData();
