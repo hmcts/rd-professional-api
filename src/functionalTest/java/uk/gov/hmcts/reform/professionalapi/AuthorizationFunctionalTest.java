@@ -203,14 +203,13 @@ public class AuthorizationFunctionalTest {
         userAccessTypes.add(new UserAccessType("jurisdictionId" + random, "organisationProfileId" + random,
                 "accessTypeId" + random, false));
         String userEmail = generateRandomEmail();
-        NewUserCreationRequest userCreationRequest = NewUserCreationRequest.aNewUserCreationRequest()
+        return NewUserCreationRequest.aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
                 .userAccessTypes(userAccessTypes)
                 .build();
-        return userCreationRequest;
     }
 
     protected NewUserCreationRequest createUserRequest(List<String> userRoles, boolean hasAccessTypes) {
@@ -403,9 +402,9 @@ public class AuthorizationFunctionalTest {
             assertEquals(true, userAccessTypeList.get(0).get("enabled"));
         }
 
-        HashMap userMap = professionalUsersResponses.get(0);
+        HashMap userMap = professionalUsersResponses.getFirst();
         assertThat(userMap).isNotEmpty();
-        validateUserResponse(userMap, searchResponse);
+        validateUserResponse(userMap, searchResponse, expectedStatus);
 
         if (rolesReturned) {
             assertThat(userMap.get("roles")).isNotNull();
@@ -427,7 +426,7 @@ public class AuthorizationFunctionalTest {
 
         HashMap userMap = professionalUsersResponses.get(0);
         assertThat(userMap).isNotEmpty();
-        validateUserResponse(userMap, searchResponse);
+        validateUserResponse(userMap, searchResponse, "ACTIVE");
         assertThat(userAccessTypeList).hasSize(2);
 
         if (rolesReturned) {
@@ -438,7 +437,7 @@ public class AuthorizationFunctionalTest {
         }
     }
 
-    public void validateUserResponse(HashMap userMap, Map<String, Object> searchResponse) {
+    public void validateUserResponse(HashMap userMap, Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
         assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
         assertThat(searchResponse.get("organisationProfileIds")).isNotNull();
@@ -448,7 +447,7 @@ public class AuthorizationFunctionalTest {
         assertThat(userMap.get("lastName")).isNotNull();
         assertThat(userMap.get("email")).isNotNull();
         assertThat(userMap.get("lastUpdated")).isNotNull();
-        assertThat(userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name()));
+        assertThat(userMap.get("idamStatus")).isEqualTo(expectedStatus);
     }
 
     public UserProfileUpdatedData deleteRoleRequest(String role) {
