@@ -11,5 +11,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ToggleEnable {
     String mapKey();
 
-    boolean withFeature();
+    boolean withFeature() default true;
 }

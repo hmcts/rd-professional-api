@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static org.apache.commons.lang.BooleanUtils.isNotTrue;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.DataLoadUtil.isStringArraysEqual;
 
 /**
