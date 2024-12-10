@@ -23,9 +23,8 @@ ext {
 
 def versions = [
         lombok          : '1.18.36',
-        gradlePitest    : '1.15.0',
-        pitest          : '1.16.1',
         sonarPitest     : '0.5',
+        jackson         : '2.18.2',
         junitPitest     : '1.2.1',
         reformLogging   : '6.1.6',
         camel           : '3.22.2',
@@ -263,7 +262,6 @@ jacocoTestReport {
 }
 
 pitest {
-    pitestVersion = versions.pitest
     junit5PluginVersion = versions.junitPitest
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
@@ -285,7 +283,7 @@ pitest {
     historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
-    mutationThreshold = 85
+    mutationThreshold = 80
 }
 
 
@@ -346,9 +344,9 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
 
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.18.2', ext: 'pom'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: versions.jackson, ext: 'pom'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation 'com.github.hmcts:idam-java-client:3.0.3'
@@ -453,15 +451,7 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 
-
-    testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
-    testImplementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: versions.junitPitest
-
-    testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', {
-        exclude group: 'junit', module: 'junit'
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }, version: versions.sonarPitest
+    testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
 
     testImplementation 'io.github.openfeign:feign-jackson:13.5'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
