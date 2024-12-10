@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -931,7 +932,7 @@ public class ProfessionalReferenceDataClient {
             throws JsonProcessingException {
         Map<String, Object> errorResponseMap = new HashMap<>();
         String body = (String) responseEntity.getBody();
-        if (org.apache.commons.lang3.StringUtils.isNotEmpty(body)) {
+        if (StringUtils.isNotEmpty(body)) {
             errorResponseMap.put("response_body", objectMapper.readValue(
                     body, ErrorResponse.class));
         } else {
