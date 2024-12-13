@@ -137,3 +137,21 @@ variable "email_address_key" {
   type        = string
   default     = "db-alert-monitoring-email-address"
 }
+
+variable "cpu_threshold" {
+  default     = 5
+  type        = number
+  description = "Average CPU utilisation threshold"
+}
+
+variable "memory_threshold" {
+  default     = 5
+  type        = number
+  description = "Average memory utilisation threshold"
+}
+
+variable "storage_threshold" {
+  default     = 0.5
+  type        = number
+  description = "Average storage utilisation threshold"
+}
