@@ -54,6 +54,7 @@ def versions = [
         postgresql_tc   : '1.20.0'
 ]
 
+
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
 def jarName = 'rd-professional-api.jar'
 
