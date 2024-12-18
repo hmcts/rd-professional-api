@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.helper;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
@@ -15,8 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -35,7 +33,7 @@ public class OrganisationFixtures {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(randomAlphanumeric(7).concat("@test.com"))
+                        .email(RandomStringUtils.secure().nextAlphanumeric(7).concat("@test.com"))
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
@@ -49,7 +47,7 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
                 .name("  some-  org -name  ")
-                .companyNumber(randomAlphabetic(8))
+                .companyNumber(RandomStringUtils.secure().nextAlphabetic(8))
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname    b    ")
                         .lastName(" some-         lname  ")
@@ -71,7 +69,7 @@ public class OrganisationFixtures {
             .sraId("sra-id")
             .sraRegulated("false")
             .companyUrl("company -url")
-            .companyNumber(randomAlphabetic(8))
+            .companyNumber(RandomStringUtils.secure().nextAlphabetic(8))
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
@@ -107,8 +105,7 @@ public class OrganisationFixtures {
 
         orgAttributeRequests.add(orgAttributeRequest);
 
-        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
-                new OrganisationOtherOrgsCreationRequest("some-org-name",
+        return new OrganisationOtherOrgsCreationRequest("some-org-name",
                         "PENDING",
                         "test",
                         "sra-id",
@@ -138,9 +135,6 @@ public class OrganisationFixtures {
                                         .build()),
                         "Doctor",
                         orgAttributeRequests);
-
-        return organisationOtherOrgsCreationRequest;
-
     }
 
     public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFieldsAreUpdated() {
@@ -157,8 +151,7 @@ public class OrganisationFixtures {
 
         orgAttributeRequests.add(orgAttributeRequest);
 
-        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest =
-                new OrganisationOtherOrgsCreationRequest("some-org-name1",
+        return new OrganisationOtherOrgsCreationRequest("some-org-name1",
                         "ACTIVE",
                         "test",
                         "sra-id1",
@@ -188,9 +181,6 @@ public class OrganisationFixtures {
                                         .build()),
                         "Doctor1",
                         orgAttributeRequests);
-
-        return organisationOtherOrgsCreationRequest;
-
     }
 
     public static OrganisationCreationRequest
@@ -204,7 +194,7 @@ public class OrganisationFixtures {
                 .sraId("sra-id1")
                 .sraRegulated("true")
                 .companyUrl("company-url1")
-                .companyNumber(randomAlphabetic(8))
+                .companyNumber(RandomStringUtils.secure().nextAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                 .firstName("somefname")
@@ -265,10 +255,6 @@ public class OrganisationFixtures {
     }
 
     public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
-        Set<String> paymentAccounts = new HashSet<>();
-        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
-        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
-        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
 
         List<DxAddressCreationRequest> dx1 = new LinkedList<>();
         dx1.add(dxAddressCreationRequest()
@@ -326,7 +312,7 @@ public class OrganisationFixtures {
                 .sraId("sra-id")
                 .sraRegulated("false")
                 .companyUrl("company -url")
-                .companyNumber(randomAlphabetic(8))
+                .companyNumber(RandomStringUtils.secure().nextAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
