@@ -43,6 +43,7 @@ public class HeaderValidationProcessor implements Processor {
 
 
     @Override
+    @SuppressWarnings("deprecation")
     public void process(Exchange exchange) throws Exception {
 
         RouteProperties routeProperties = (RouteProperties) exchange.getIn().getHeader(MappingConstants.ROUTE_DETAILS);

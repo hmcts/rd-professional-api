@@ -34,7 +34,6 @@ def versions = [
         log4j           : '2.23.1',
         reformS2sClient : '5.2.0',
         feign           : '3.8.0',
-        bytebuddy       : '1.15.3',
         bouncycastle    : '1.79',
         postgresql_tc   : '1.20.0',
         serenity        : '4.2.9'
@@ -354,6 +353,7 @@ dependencies {
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.47'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.20.1'
     runtimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '10.18.2'
@@ -452,7 +452,7 @@ dependencies {
 
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
 
-    testImplementation 'io.github.openfeign:feign-jackson:13.5'
+    testImplementation 'io.github.openfeign:feign-jackson:13.3'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
@@ -515,6 +515,19 @@ dependencyManagement {
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
+}
+
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
 }
 
 gradle.startParameter.continueOnFailure = true
