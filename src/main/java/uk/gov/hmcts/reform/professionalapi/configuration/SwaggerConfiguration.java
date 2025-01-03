@@ -1,29 +1,67 @@
 package uk.gov.hmcts.reform.professionalapi.configuration;
 
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.GroupedOpenApi;
-import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.method.HandlerMethod;
-
 
 
 @Configuration
-@SecurityScheme(name = "Authorization", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
-@SecurityScheme(name = "ServiceAuthorization", type = SecuritySchemeType.APIKEY,
-        in = SecuritySchemeIn.HEADER, bearerFormat = "JWT", description = "ServiceAuthorization")
-@SecurityScheme(name = "UserEmail", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
 public class SwaggerConfiguration {
 
+    private static final String DESCRIPTION = "API will help to provide Professional Reference data to clients.";
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    private static final String USER_EMAIL = "UserEmail";
+
     @Bean
-    public GroupedOpenApi internalOrganisationApiV2(OperationCustomizer customGlobalHeaders) {
+    public OpenAPI openApi() {
+        return new OpenAPI()
+            .components(new Components()
+                .addSecuritySchemes(
+                    AUTHORIZATION,
+                    new io.swagger.v3.oas.models.security.SecurityScheme()
+                        .name(AUTHORIZATION)
+                        .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("Valid IDAM user token, (Bearer keyword is "
+                            + "added automatically)")
+                )
+                .addSecuritySchemes(SERVICE_AUTHORIZATION,
+                    new io.swagger.v3.oas.models.security.SecurityScheme()
+                        .in(io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER)
+                        .name(SERVICE_AUTHORIZATION)
+                        .type(SecurityScheme.Type.APIKEY)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("Valid Service-to-Service JWT token for a "
+                            + "whitelisted micro-service")
+                )
+                .addSecuritySchemes(USER_EMAIL,
+                    new io.swagger.v3.oas.models.security.SecurityScheme()
+                        .in(io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER)
+                        .name(USER_EMAIL)
+                        .type(SecurityScheme.Type.APIKEY)
+                )
+            )
+            .info(new Info().title("RD Professional Ref Api service")
+                .description(DESCRIPTION))
+            .externalDocs(new ExternalDocumentation()
+                .description("README")
+                .url("https://github.com/hmcts/rd-professional-api/blob/master/README.md"))
+            .addSecurityItem(new SecurityRequirement().addList(AUTHORIZATION))
+            .addSecurityItem(new SecurityRequirement().addList(SERVICE_AUTHORIZATION))
+            .addSecurityItem(new SecurityRequirement().addList(USER_EMAIL));
+    }
+
+    @Bean
+    public GroupedOpenApi internalOrganisationApiV2() {
         return GroupedOpenApi.builder()
                 .group("V2: Internal API")
                 .pathsToMatch("/refdata/internal/v2/**")
@@ -31,7 +69,7 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi externalOrganisationApiV2(OperationCustomizer customGlobalHeaders) {
+    public GroupedOpenApi externalOrganisationApiV2() {
         return GroupedOpenApi.builder()
                 .group("V2: External API")
                 .pathsToMatch("/refdata/external/v2/**")
@@ -39,7 +77,7 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi publicApi(OperationCustomizer customGlobalHeaders) {
+    public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("rd-professional-api")
                 .pathsToMatch("/**")
@@ -48,32 +86,4 @@ public class SwaggerConfiguration {
     }
 
 
-    @Bean
-    public OperationCustomizer customGlobalHeaders() {
-        return (Operation customOperation, HandlerMethod handlerMethod) -> {
-            Parameter serviceAuthorizationHeader = new Parameter()
-                    .in(ParameterIn.HEADER.toString())
-                    .schema(new StringSchema())
-                    .name("ServiceAuthorization")
-                    .description("Keyword `Bearer` followed "
-                            + "by a service-to-service token for a whitelisted micro-service")
-                    .required(true);
-            Parameter authorizationHeader = new Parameter()
-                    .in(ParameterIn.HEADER.toString())
-                    .schema(new StringSchema())
-                    .name("Authorization")
-                    .description("Authorization token")
-                    .required(true);
-            Parameter userEmail = new Parameter()
-                    .in(ParameterIn.HEADER.toString())
-                    .schema(new StringSchema())
-                    .name("UserEmail")
-                    .description("UserEmail")
-                    .required(false);
-            customOperation.addParametersItem(authorizationHeader);
-            customOperation.addParametersItem(serviceAuthorizationHeader);
-            customOperation.addParametersItem(userEmail);
-            return customOperation;
-        };
-    }
 }
