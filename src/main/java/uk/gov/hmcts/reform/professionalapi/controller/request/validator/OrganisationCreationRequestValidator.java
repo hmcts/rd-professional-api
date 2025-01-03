@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
@@ -336,4 +336,3 @@ public class OrganisationCreationRequestValidator {
 
 
 }
-
