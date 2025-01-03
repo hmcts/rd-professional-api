@@ -40,7 +40,7 @@ def versions = [
         pitest          : '1.16.1',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
-        reformLogging   : '6.1.6',
+        reformLogging   : '6.1.7',
         camel           : '3.8.0',
         pact_version    : '4.1.7',
         launchDarklySdk : '5.10.9',
