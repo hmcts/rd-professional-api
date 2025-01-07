@@ -221,7 +221,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
     }
 
     @Operation(
-        summary = "Updates an Organisation's sraId",
+        summary = "Updates an Organisation's name or sraId",
         description = "**IDAM Roles to access API** : <br> prd-admin",
         security = {
             @SecurityRequirement(name = "ServiceAuthorization"),
@@ -229,7 +229,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
         })
 
     @ApiResponse(
-        responseCode = "200",
+        responseCode = "201",
         description = "Organisation name or sraId has been updated",
         content = @Content(schema = @Schema(implementation = String.class))
     )
