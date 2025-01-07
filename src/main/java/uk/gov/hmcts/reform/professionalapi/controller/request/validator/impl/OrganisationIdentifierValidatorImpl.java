@@ -168,6 +168,10 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation name cannot be empty");
         }
+        if (StringUtils.isEmpty(name.trim())) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Organisation name cannot be empty");
+        }
         //validate request is not empty
         if (name != null && name.length() > 255) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
