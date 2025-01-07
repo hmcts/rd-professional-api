@@ -31,7 +31,7 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 ext {
-    springCloudVersion = '2023.0.3'
+    springCloudVersion = '2023.0.4'
 }
 
 def versions = [
@@ -40,7 +40,7 @@ def versions = [
         pitest          : '1.16.1',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
-        reformLogging   : '6.1.6',
+        reformLogging   : '6.1.7',
         camel           : '3.8.0',
         pact_version    : '4.1.7',
         launchDarklySdk : '5.10.9',
@@ -368,7 +368,7 @@ dependencies {
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.18.0', ext: 'pom'
+    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.18.2', ext: 'pom'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
     implementation 'com.github.hmcts:idam-java-client:2.1.1'
@@ -499,8 +499,8 @@ dependencies {
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.6.0'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.6.0'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.6.2'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.6.2'
 
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
@@ -564,7 +564,7 @@ dependencyManagement {
         }
 
 //        Resolves CVE-2023-4586
-        dependencySet(group: 'io.netty', version: '4.1.114.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.116.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
