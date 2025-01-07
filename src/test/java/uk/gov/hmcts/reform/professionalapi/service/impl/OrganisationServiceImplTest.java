@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -2718,4 +2719,45 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
     }
+
+
+    @Test
+    void test_updateOrganisationNameAndSra() {
+        UUID newSraId = UUID.randomUUID();
+        Organisation organisation = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+
+        organisation.setId(newSraId);
+        organisation.setName("Some orgName");
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
+
+        when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.save(organisation)).thenReturn(organisationMock);
+
+        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(organisation,
+            "Some orgName","Some SraId");
+
+        assertNotNull(response);
+
+        verify(organisationRepository, times(2))
+            .save(organisation);
+        verify(orgAttributeRepository, times(1))
+            .save(any(OrgAttribute.class));
+
+
+    }
+
+    @Test
+    void shouldThrowFieldAndPersistenceValidationExceptionWhenSaveUpdateFails() {
+        when(orgAttributeRepository.save(any(OrgAttribute.class)))
+            .thenThrow(new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Failed to save attributes for organisation sraId"));
+        assertThrows(FieldAndPersistenceValidationException.class, () -> sut.updateOrganisationNameOrSra(organisation,
+            "SomeName","Some SraId"));
+    }
+
 }

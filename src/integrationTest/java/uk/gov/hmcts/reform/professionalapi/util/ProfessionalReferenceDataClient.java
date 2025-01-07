@@ -1044,4 +1044,63 @@ public class ProfessionalReferenceDataClient {
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
     }
+
+    public ResponseEntity<Map> updateOrgNameException(
+        Map<String,String> organisationNameSraUpdate, String role) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH +  "/orgDetails";
+
+        HttpEntity<Map<String,String>> requestEntity = new HttpEntity<>(organisationNameSraUpdate,
+            getMultipleAuthHeaders(role));
+        responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        return responseEntity;
+    }
+
+    public Map<String, Object> updateOrgNameSraId(String id,
+        Map<String,String> organisationNameSraUpdate, String role) {
+
+        ResponseEntity<Map> responseEntity;
+        String uriPath = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH +  "/orgDetails";
+        try {
+            HttpEntity<?> request = new HttpEntity<>(organisationNameSraUpdate,getMultipleAuthHeaders(role, id));
+            responseEntity = restTemplate
+                .exchange(uriPath,
+                    HttpMethod.PUT,
+                    request,
+                    Map.class,
+                    id);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    /*
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH +  "/orgDetails";
+        try {
+            HttpEntity<Map<String,String>> requestEntity = new HttpEntity<>(organisationNameSraUpdate,
+                getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> organisationResponse = new HashMap<>();
+
+        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        organisationResponse.put("response_body", responseEntity.getBody());
+        return organisationResponse;
+    }*/
+
 }

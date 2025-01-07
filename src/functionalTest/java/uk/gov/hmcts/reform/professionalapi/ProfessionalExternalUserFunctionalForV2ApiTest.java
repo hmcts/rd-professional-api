@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 
+import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -14,12 +15,17 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
@@ -202,6 +208,163 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
 
         log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
+    }
+
+    @Test
+    void updateOrganisationNameandSraIdShouldReturnSuccess() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+
+        String updateName = randomAlphabetic(10);
+        String updateSraId = randomAlphabetic(10);
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name",updateName);
+        organisationNameSraUpdate.put("sraId",updateSraId);
+
+        //call endpoint to update name as 'updatedname'
+        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
+
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+
+        final Object orgName = orgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(updateName);
+        final Object sraId = orgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(updateSraId);
+
+        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+
+    }
+
+
+    @Test
+    void updateOrganisationNameOnlyShouldReturnSuccess() {
+        log.info("updateOrganisationNameOnlyShouldReturnSuccess :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+
+        String updateName = randomAlphabetic(10);
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name",updateName);
+
+        //call endpoint to update name
+        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
+
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+
+        final Object orgName = orgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(updateName);
+
+        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        log.info("updateOrganisationNameOnlyShouldReturnSuccess :: END");
+
+    }
+
+    @Test
+    void updateOrganisationShouldReturnFailureIfNoName() {
+        log.info("updateOrganisationShouldReturnFailureIfNoName :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        String updateSraId = randomAlphabetic(10);
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId",updateSraId);
+
+        //call endpoint to update
+        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedResponse.getBody().prettyPrint()).contains("Organisation name cannot be empty");
+
+        log.info("updateOrganisationShouldReturnFailureIfNoName :: END");
+    }
+
+
+    @Test
+    void updateOrganisationNameSraIdShouldReturnFailureIfTooLong() {
+        log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        String updateSraId = randomAlphabetic(250);
+        String updateName = randomAlphabetic(258);
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId",updateSraId);
+        organisationNameSraUpdate.put("name",updateName);
+        //call endpoint to update
+        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedResponse.getBody().prettyPrint())
+            .contains("Organisation name cannot be more than 255 characters");
+
+        log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: END");
+    }
+
+
+
+    @Test
+    void updateOrganisationNameSraIdShouldReturnFailureIfNoOrgId() {
+        log.info("updateOrganisationNameSraIdShouldReturnFailureIfNoOrgId :: STARTED");
+
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+
+        String updateName = randomAlphabetic(10);
+        String updateSraId = randomAlphabetic(10);
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name",updateName);
+        organisationNameSraUpdate.put("sraId",updateSraId);
+
+        //call endpoint to update with no org id does not create token invalid authentication 401
+        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            professionalApiClient.getMultipleAuthHeaders(null));
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
+        log.info("updateOrganisationNameSraIdShouldReturnFailureIfNoOrgId :: END");
+    }
+
+
+    @Test
+    void updateOrganisationSraIdShouldReturnFailureIfUnAuthorised() {
+        log.info("updateOrganisationSraIdShouldReturnFailureIfUnAuthorised :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager));
+
+        String updateName = randomAlphabetic(10);
+        String updateSraId = randomAlphabetic(10);
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name",updateName);
+        organisationNameSraUpdate.put("sraId",updateSraId);
+
+        //call endpoint to update with user manager role not allowed
+        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            professionalApiClient.getMultipleAuthHeaders(puiUserManager));
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
+
+        log.info("updateOrganisationSraIdShouldReturnFailureIfUnAuthorised :: END");
     }
 
 }

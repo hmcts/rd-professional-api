@@ -111,6 +111,8 @@ public class ProfessionalApiConstants {
 
     public static final String PRD_RETRIEVE_EXTERNAL_V2 = "prd-retrieve-organisation-external-v2";
 
+    public static final String PRD_UPDATE_ORGANISATION_EXTERNAL_V2 = "prd-update-organisation-external-v2";
+
     public static final String PRD_CREATE_EXTERNAL_V2 = "prd-create-organisation-external-v2";
 
     public static final String ERROR_MSG_ORG_ADDRESS = "Organisation should have at least one address";

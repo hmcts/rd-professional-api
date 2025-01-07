@@ -16,13 +16,13 @@ import java.util.Set;
 public class OrganisationCreationRequest {
 
     @NotNull
-    private final String name;
+    private String name;
 
     private String status;
 
     private String statusMessage;
 
-    private final String sraId;
+    private String sraId;
 
     private String sraRegulated;
 

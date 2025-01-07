@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -91,6 +92,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -607,6 +609,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         return organisationsDetailResponse;
     }
 
+
     @Override
     public OrganisationResponse updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier,
@@ -879,7 +882,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
                 .stream()
                 .collect(Collectors.groupingBy(
-                        Organisation::getOrganisationIdentifier, LinkedHashMap::new, Collectors.toList()));
+                        Organisation::getOrganisationIdentifier, LinkedHashMap::new, toList()));
 
         var organisationsWithPbaStatusResponses = new ArrayList<OrganisationsWithPbaStatusResponse>();
 
@@ -1054,6 +1057,67 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
+    }
+
+    @Override
+    @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
+    public ResponseEntity<Object> updateOrganisationNameOrSra(
+        Organisation existingOrganisation,String name, String sraId) {
+        Organisation organisationSaved = null;
+        try {
+            OrgAttribute savedAttribute = null;
+            if (!StringUtils.isEmpty(sraId)) {
+                //save sra id in organisation attributes
+                savedAttribute = saveOrganisationAttributes(existingOrganisation, sraId);
+                if (savedAttribute != null) {
+                    existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(sraId));
+                    existingOrganisation.setLastUpdated(LocalDateTime.now());
+                    organisationSaved = organisationRepository.save(existingOrganisation);
+                    if (organisationSaved == null) {
+                        throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                            "Failed to save organisation sraId");
+                    }
+                } else {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Failed to save attributes for organisation sraId");
+                }
+            }
+            if (!StringUtils.isEmpty(name)) {
+                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(name));
+                existingOrganisation.setLastUpdated(LocalDateTime.now());
+                organisationSaved = organisationRepository.save(existingOrganisation);
+                if (organisationSaved == null) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Failed to save organisation name");
+                }
+            }
+        } catch (Exception ex) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Failed to save or update");
+        }
+        return ResponseEntity.status(204).build();
+    }
+
+
+    public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
+                                                   String sraId) {
+        final String attributeKey = "regulators-0";
+        final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+            + "\"organisationRegistrationNumber\":\"" + sraId + "\"}";
+
+        existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(sraId));
+        OrgAttribute attribute = new OrgAttribute();
+        attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
+        attribute.setValue(RefDataUtil
+            .removeEmptySpaces(attributeValue));
+        attribute.setOrganisation(existingOrganisation);
+
+        OrgAttribute savedAttribute = orgAttributeRepository.save(attribute);
+        List<OrgAttribute> attributes = new ArrayList<>();
+        attributes.add(savedAttribute);
+        existingOrganisation.setOrgAttributes(attributes);
+
+        return savedAttribute;
     }
 
 }

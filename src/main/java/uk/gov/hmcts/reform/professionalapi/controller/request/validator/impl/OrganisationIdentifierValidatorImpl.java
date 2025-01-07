@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
@@ -32,6 +34,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LAST_UPDATED_SINCE_TIMESTAMP_FORMAT;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_TWO_ARG_PLACEHOLDER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
 
@@ -158,5 +161,35 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
 
         return true;
+    }
+
+    public void validateNameSraId(String name, String sraId) {
+        if (StringUtils.isEmpty(name)) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Organisation name cannot be empty");
+        }
+        //validate request is not empty
+        if (name != null && name.length() > 255) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Organisation name cannot be more than 255 characters");
+        }
+        if (sraId != null && sraId.length() > 255) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Organisation sraId cannot be more than 255 characters");
+        }
+    }
+
+
+    public void validateOrganisationId(String orgId,Organisation existingOrganisation) {
+
+        if (existingOrganisation == null) {
+            throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
+        } else if (!orgId.matches("^[A-Z0-9]{7}$")) {
+            throw new InvalidRequest(ORG_ID_VALIDATION_ERROR_MESSAGE);
+        } else if (Optional.ofNullable(existingOrganisation).isEmpty()) {
+            throw new InvalidRequest(NO_ORG_FOUND_FOR_GIVEN_ID);
+        } else if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
+            throw new InvalidRequest(ORG_NOT_ACTIVE);
+        }
     }
 }
