@@ -82,5 +82,6 @@ public interface OrganisationService {
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
 
-    ResponseEntity<Object> updateOrganisationAddress(Organisation existingOrganisation, Map<String, String> organisationAddressUpdate);
+    ResponseEntity<Object> updateOrganisationAddress(Organisation existingOrganisation,
+                                                     Map<String, String> organisationAddressUpdate,String userId);
 }

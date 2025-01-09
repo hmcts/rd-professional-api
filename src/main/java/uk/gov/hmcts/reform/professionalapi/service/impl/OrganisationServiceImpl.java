@@ -1061,7 +1061,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
     public ResponseEntity<Object> updateOrganisationAddress(
-        Organisation existingOrganisation, Map<String, String> organisationAddressUpdate) {
+        Organisation existingOrganisation, Map<String, String> organisationAddressUpdate,
+        String userId) {
         try {
             String contactInformationId = organisationAddressUpdate.get("id");
         String uprn = organisationAddressUpdate.get("uprn");

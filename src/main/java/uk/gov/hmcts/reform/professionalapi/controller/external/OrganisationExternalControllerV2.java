@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
@@ -259,7 +260,8 @@ public class OrganisationExternalControllerV2 extends SuperController {
     public ResponseEntity<Object> updateOrganisationAddress(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationAddressUpdate")
         @Parameter(hidden = true) @OrgId String organisationIdentifier,
-        @Validated @NotNull @RequestBody Map<String,String> organisationAddressUpdate) {
+        @Validated @NotNull @RequestBody Map<String,String> organisationAddressUpdate,
+        @Parameter(hidden = true) @UserId String userId) {
 
         //validate that organisation id is not null
         if (StringUtils.isEmpty(organisationIdentifier)) {
@@ -271,7 +273,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
         organisationIdentifierValidatorImpl.validateAddress(organisationAddressUpdate);
 
         //update organisation name and sraid
-        return  organisationService.updateOrganisationAddress(existingOrganisation,organisationAddressUpdate);
+        return  organisationService.updateOrganisationAddress(existingOrganisation,organisationAddressUpdate, userId);
 
     }
 

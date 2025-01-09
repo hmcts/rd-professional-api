@@ -59,7 +59,7 @@ public class AuditDetailsAspect {
         } else {
             System.out.println("****************Method returned: {}"+ result);
         }
-        auditDetails.setUpdatedBy("");
+        auditDetails.setUpdatedBy(args[2].toString());
         auditDetails.setChangeAction(methodName);
         auditDetails.setLastUpdated(LocalDateTime.now());
         Audit savedAuditInformation = auditDetailsRepository.save(auditDetails);
