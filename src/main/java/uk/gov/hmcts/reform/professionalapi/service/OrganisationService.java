@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -81,4 +82,5 @@ public interface OrganisationService {
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
 
+    ResponseEntity<Object> updateOrganisationAddress(Organisation existingOrganisation, Map<String, String> organisationAddressUpdate);
 }

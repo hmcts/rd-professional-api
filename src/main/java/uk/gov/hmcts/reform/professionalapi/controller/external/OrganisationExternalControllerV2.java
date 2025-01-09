@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import java.util.Map;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,12 +10,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
@@ -213,6 +218,61 @@ public class OrganisationExternalControllerV2 extends SuperController {
                 .status(200)
                 .body(new OrganisationPbaResponseV2(organisation,
                         false, true, false,true));
+    }
+
+    @Operation(
+        summary = "Updates an Organisation's name or sraId",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        })
+
+    @ApiResponse(
+        responseCode = "201",
+        description = "Organisation name or sraId has been updated",
+        content = @Content(schema = @Schema(implementation = String.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "An invalid request has been provided",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+    @PutMapping(
+        value = "/contactinformation",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.OK)
+    @ResponseBody
+    @Secured({"prd-admin",  "pui-organisation-manager"})
+    public ResponseEntity<Object> updateOrganisationAddress(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationAddressUpdate")
+        @Parameter(hidden = true) @OrgId String organisationIdentifier,
+        @Validated @NotNull @RequestBody Map<String,String> organisationAddressUpdate) {
+
+        //validate that organisation id is not null
+        if (StringUtils.isEmpty(organisationIdentifier)) {
+            throw new ResourceNotFoundException("Organisation id is missing");
+        }
+        //validate orgid is not invalid and organisation exists for given id
+        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+
+        organisationIdentifierValidatorImpl.validateAddress(organisationAddressUpdate);
+
+        //update organisation name and sraid
+        return  organisationService.updateOrganisationAddress(existingOrganisation,organisationAddressUpdate);
+
     }
 
 }

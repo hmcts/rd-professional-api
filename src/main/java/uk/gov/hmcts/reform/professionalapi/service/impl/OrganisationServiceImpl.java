@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -1055,6 +1056,85 @@ public class OrganisationServiceImpl implements OrganisationService {
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
     }
+
+
+    @Override
+    @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
+    public ResponseEntity<Object> updateOrganisationAddress(
+        Organisation existingOrganisation, Map<String, String> organisationAddressUpdate) {
+        try {
+            String contactInformationId = organisationAddressUpdate.get("id");
+        String uprn = organisationAddressUpdate.get("uprn");
+        String addressLine1 = organisationAddressUpdate.get("addressLine1");
+        String addressLine2 = organisationAddressUpdate.get("addressLine2");
+        String addressLine3 = organisationAddressUpdate.get("addressLine3");
+        String townCity = organisationAddressUpdate.get("townCity");
+        String county = organisationAddressUpdate.get("county");
+        String country = organisationAddressUpdate.get("country");
+        String postCode = organisationAddressUpdate.get("postCode");
+        String dxId = organisationAddressUpdate.get("dxId");
+        String dxNumber = organisationAddressUpdate.get("dxNumber");
+        String dxExchange = organisationAddressUpdate.get("dxExchange");
+      /*  if (existingOrganisation.getContactInformation()
+                .get(Integer.parseInt(contactInformationId)) != null ) {
+                DxAddress existingDxAddress = existingOrganisation.getContactInformation()
+                    .get(Integer.parseInt(contactInformationId)).getDxAddresses().get(Integer.parseInt(dxId));
+            existingDxAddress.setDxNumber(dxNumber);
+            existingDxAddress.setDxExchange(dxExchange);
+            existingDxAddress.setLastUpdated(LocalDateTime.now());
+            DxAddress savedDxAddress = dxAddressRepository.save(existingDxAddress);
+            if (savedDxAddress == null) {
+                throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                    "Failed to save DxAddress Information");
+            }
+        }else {
+                ContactInformation existingContactInformation =
+                existingOrganisation.getContactInformation().get(Integer.parseInt(contactInformationId));
+                if (StringUtils.isNotEmpty(uprn)) {
+                    existingContactInformation.setAddressLine1(
+                        RefDataUtil.removeEmptySpaces(uprn));
+                }
+                if (StringUtils.isNotEmpty(addressLine1)) {
+                    existingContactInformation.setAddressLine1(
+                        RefDataUtil.removeEmptySpaces(addressLine1));
+                }
+                if (StringUtils.isNotEmpty(addressLine2)) {
+                    existingContactInformation.setAddressLine2(
+                        RefDataUtil.removeEmptySpaces(addressLine2));
+                }
+                if (StringUtils.isNotEmpty(addressLine3)) {
+                    existingContactInformation.setAddressLine3(
+                        RefDataUtil.removeEmptySpaces(addressLine3));
+                }
+                if (StringUtils.isNotEmpty(townCity)) {
+                    existingContactInformation.setTownCity(RefDataUtil.removeEmptySpaces(townCity));
+                }
+                if (StringUtils.isNotEmpty(county)) {
+                    existingContactInformation.setCounty(RefDataUtil.removeEmptySpaces(county));
+                }
+                if (StringUtils.isNotEmpty(country)) {
+                    existingContactInformation.setCountry(RefDataUtil.removeEmptySpaces(country));
+                }
+                if (StringUtils.isNotEmpty(postCode)) {
+                    existingContactInformation.setPostCode(RefDataUtil.removeEmptySpaces(postCode));
+                }
+                existingContactInformation.setOrganisation(existingOrganisation);
+                existingContactInformation.setLastUpdated(LocalDateTime.now());
+                ContactInformation savedContactInformation = contactInformationRepository.save(existingContactInformation);
+                if(savedContactInformation == null) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                       "Failed to save contact information");
+               }
+            }*/
+        } catch (Exception ex) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Failed to save or update organisation address");
+        }
+
+        return ResponseEntity.status(204).build();
+    }
+
+
 
 }
 
