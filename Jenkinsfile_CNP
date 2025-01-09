@@ -37,7 +37,7 @@ def vaultOverrides = [
 ]
 
 // Configure branches to sync with master branch
-def branchesToSync = ['demo', 'perftest']
+def branchesToSync = ['demo', 'ithc', 'perftest']
 
 // Var for testcontainers.org
 env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
