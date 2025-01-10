@@ -1081,6 +1081,14 @@ public class OrganisationServiceImpl implements OrganisationService {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Failed to save attributes for organisation sraId");
                 }
+            } else if (StringUtils.isEmpty(sraId)) { //if sra id is empty space or null then delete it from database
+                existingOrganisation.setSraId(null);
+                existingOrganisation.setLastUpdated(LocalDateTime.now());
+                organisationSaved = organisationRepository.save(existingOrganisation);
+                if (organisationSaved == null) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Failed to save organisation sraId");
+                }
             }
             if (!StringUtils.isEmpty(name)) {
                 existingOrganisation.setName(RefDataUtil.removeEmptySpaces(name));
