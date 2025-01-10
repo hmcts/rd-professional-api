@@ -358,27 +358,42 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
     @Test
-    void updateOrganisationNameSraIdShouldReturnFailureIfTooLong() {
+    void updateOrganisationSraIdShouldReturnFailureIfTooLong() {
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: STARTED");
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        String updateSraId = randomAlphabetic(250);
-        String updateName = randomAlphabetic(258);
+        String updateSraId = randomAlphabetic(258);
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",updateSraId);
+        //call endpoint to update
+        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedResponse.getBody().prettyPrint())
+            .contains("Organisation sraId cannot be more than 255 characters");
+
+        log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: END");
+    }
+
+    @Test
+    void updateOrganisationNameShouldReturnFailureIfTooLong() {
+        log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        String updateName = randomAlphabetic(258);
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name",updateName);
         //call endpoint to update
         Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertNotNull(orgUpdatedResponse);
-        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(500);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
         assertThat(orgUpdatedResponse.getBody().prettyPrint())
             .contains("Organisation name cannot be more than 255 characters");
 
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: END");
     }
-
-
 
     @Test
     void updateOrganisationNameSraIdShouldReturnFailureIfNoOrgId() {

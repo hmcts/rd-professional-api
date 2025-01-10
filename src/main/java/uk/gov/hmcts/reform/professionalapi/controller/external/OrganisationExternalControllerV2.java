@@ -275,16 +275,17 @@ public class OrganisationExternalControllerV2 extends SuperController {
                 throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                     "Organisation name cannot be empty");
             }
+            if (name != null && name.length() > 255) {
+                throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                    "Organisation name cannot be more than 255 characters");
+            }
             //update organisation name and sraid
             response = organisationService.updateOrganisationName(existingOrganisation,name);
         }
         if(organisationNameSraUpdate.containsKey("sraId")) {
             sraId = organisationNameSraUpdate.get("sraId");
             //validate request is not empty
-            if (name != null && name.length() > 255) {
-                throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                    "Organisation name cannot be more than 255 characters");
-            }
+
             if (sraId != null && sraId.length() > 255) {
                 throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                     "Organisation sraId cannot be more than 255 characters");
