@@ -269,7 +269,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
         
         String name = null;
         String sraId = null;
-        if(organisationNameSraUpdate.containsKey("name")) {
+        if (organisationNameSraUpdate.containsKey("name")) {
             name = organisationNameSraUpdate.get("name");
             if (StringUtils.isEmpty(name) || StringUtils.isEmpty(name.trim())) {
                 throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
@@ -282,7 +282,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
             //update organisation name and sraid
             response = organisationService.updateOrganisationName(existingOrganisation,name);
         }
-        if(organisationNameSraUpdate.containsKey("sraId")) {
+        if (organisationNameSraUpdate.containsKey("sraId")) {
             sraId = organisationNameSraUpdate.get("sraId");
             //validate request is not empty
 
