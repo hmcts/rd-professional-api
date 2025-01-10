@@ -1061,8 +1061,31 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
-    public ResponseEntity<Object> updateOrganisationNameOrSra(
-        Organisation existingOrganisation,String name, String sraId) {
+    public ResponseEntity<Object> updateOrganisationName(
+        Organisation existingOrganisation,String name) {
+        Organisation organisationSaved = null;
+        try {
+            OrgAttribute savedAttribute = null;
+            if (!StringUtils.isEmpty(name)) {
+                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(name));
+                existingOrganisation.setLastUpdated(LocalDateTime.now());
+                organisationSaved = organisationRepository.save(existingOrganisation);
+                if (organisationSaved == null) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Failed to save organisation name");
+                }
+            }
+        } catch (Exception ex) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Failed to save or update");
+        }
+        return ResponseEntity.status(204).build();
+    }
+
+    @Override
+    @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
+    public ResponseEntity<Object> updateOrganisationSra(
+        Organisation existingOrganisation, String sraId) {
         Organisation organisationSaved = null;
         try {
             OrgAttribute savedAttribute = null;
@@ -1090,22 +1113,13 @@ public class OrganisationServiceImpl implements OrganisationService {
                         "Failed to save organisation sraId");
                 }
             }
-            if (!StringUtils.isEmpty(name)) {
-                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(name));
-                existingOrganisation.setLastUpdated(LocalDateTime.now());
-                organisationSaved = organisationRepository.save(existingOrganisation);
-                if (organisationSaved == null) {
-                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                        "Failed to save organisation name");
-                }
-            }
+
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Failed to save or update");
         }
         return ResponseEntity.status(204).build();
     }
-
 
     public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
                                                    String sraId) {

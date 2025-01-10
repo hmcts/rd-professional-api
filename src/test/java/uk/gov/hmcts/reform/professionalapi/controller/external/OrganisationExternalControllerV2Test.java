@@ -205,9 +205,8 @@ class OrganisationExternalControllerV2Test {
     }
 
     @Test
-    void testUpdateOrgName() {
+    void testUpdateOrgSra() {
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
-        organisationNameSraUpdate.put("name","Some Org Name");
         organisationNameSraUpdate.put("sraId","Some sraId");
 
         String organisationIdentifier = UUID.randomUUID().toString().substring(0, 7);
@@ -215,8 +214,8 @@ class OrganisationExternalControllerV2Test {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
             .thenReturn(organisationMock);
-        when(organisationServiceMock.updateOrganisationNameOrSra(organisationMock,
-            "Some Org Name","Some sraId"))
+        when(organisationServiceMock.updateOrganisationSra(organisationMock,
+            "Some sraId"))
             .thenReturn(responseEntity);
 
         ResponseEntity<Object> response = organisationExternalController.updateOrganisationNameOrSra(
@@ -224,14 +223,43 @@ class OrganisationExternalControllerV2Test {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
 
-        verify(organisationServiceMock, times(1)).updateOrganisationNameOrSra(
-            any(), any(),any());
+        verify(organisationServiceMock, times(1)).updateOrganisationSra(
+            any(), any());
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
 
         verify(organisationIdentifierValidatorImplMock, times(1))
             .validateOrganisationId(organisationIdentifier, organisationMock);
 
     }
+
+    @Test
+    void testUpdateOrgName() {
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name","Some Org Name");
+
+        String organisationIdentifier = UUID.randomUUID().toString().substring(0, 7);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(204).build();
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+            .thenReturn(organisationMock);
+        when(organisationServiceMock.updateOrganisationName(organisationMock,
+            "Some Org Name"))
+            .thenReturn(responseEntity);
+
+        ResponseEntity<Object> response = organisationExternalController.updateOrganisationNameOrSra(
+            organisationIdentifier,organisationNameSraUpdate);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
+
+        verify(organisationServiceMock, times(1)).updateOrganisationName(
+            any(), any());
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
+
+        verify(organisationIdentifierValidatorImplMock, times(1))
+            .validateOrganisationId(organisationIdentifier, organisationMock);
+
+    }
+
 
 
 }

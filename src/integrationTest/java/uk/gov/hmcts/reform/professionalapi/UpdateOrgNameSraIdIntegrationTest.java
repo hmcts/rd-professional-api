@@ -44,22 +44,19 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
-        organisationNameSraUpdate.put("name","New Org Name");
         organisationNameSraUpdate.put("sraId","New sraId");
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
-        //updateName
+
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
-
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
         //retrieve saved org to verify
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
-        final Object name = responseBody.get("name");
+
         final Object sraId = responseBody.get("sraId");
-        assertThat(name).isNotNull().isEqualTo("New Org Name");
         assertThat(sraId).isNotNull().isEqualTo("New sraId");
 
         LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
@@ -68,12 +65,11 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    void update_name_sra_Update_of_an_active_organisation_should_fail_if_name_null() {
+    void update_of_an_active_organisation_should_fail_if_name_null() {
 
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name","");
-        organisationNameSraUpdate.put("sraId","New sraId");
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
@@ -81,14 +77,13 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be empty");
         //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
         final Object name = responseBody.get("name");
-        final Object sraId = responseBody.get("sraId");
         assertThat(name).isNotNull().isEqualTo("some-org-name1");
-        assertThat(sraId).isNotNull().isEqualTo("sra-id1");
+
         deleteCreatedTestOrganisations(orgId);
     }
 
@@ -102,7 +97,6 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name",name);
-        organisationNameSraUpdate.put("sraId","New sraId");
 
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
@@ -113,9 +107,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
         final Object savedName = responseBody.get("name");
-        final Object sraId = responseBody.get("sraId");
         assertThat(savedName).isNotNull().isEqualTo("some-org-name1");
-        assertThat(sraId).isNotNull().isEqualTo("sra-id1");
 
         deleteCreatedTestOrganisations(orgId);
     }
@@ -127,20 +119,17 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         String sraId = RandomStringUtils.randomAlphabetic(256);
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
-        organisationNameSraUpdate.put("name","New name");
         organisationNameSraUpdate.put("sraId",sraId);
 
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation sraId cannot be more than "
             + "255 characters");
         //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
-        final Object savedName = responseBody.get("name");
         final Object savedSraId = responseBody.get("sraId");
-        assertThat(savedName).isNotNull().isEqualTo("some-org-name1");
         assertThat(savedSraId).isNotNull().isEqualTo("sra-id1");
 
         deleteCreatedTestOrganisations(orgId);
@@ -171,12 +160,11 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name","Some Org Name");
-        organisationNameSraUpdate.put("sraId","Some sraId");
 
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,caseworkerCaa);
 
-        assertThat(response.get("http_status")).isEqualTo("401");
+        assertThat(response.get("http_status")).isEqualTo("403");
         assertThat(response.get("response_body")).toString().contains("Access Denied");
         deleteCreatedTestOrganisations(orgId);
     }

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -259,24 +260,44 @@ public class OrganisationExternalControllerV2 extends SuperController {
     public ResponseEntity<Object> updateOrganisationNameOrSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationNameSraUpdate")
         @Parameter(hidden = true) @OrgId String organisationIdentifier,
-        @Validated @NotNull @RequestBody Map<String,String> organisationNameSraUpdate) {
+        @RequestBody Map<String,String> organisationNameSraUpdate) {
 
-        String name = organisationNameSraUpdate.get("name");
-        String sraId = organisationNameSraUpdate.get("sraId");
-
+        ResponseEntity<Object> response = null;
+        //validate orgid is not invalid and organisation exists for given id
+        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validateOrganisationId(organisationIdentifier,existingOrganisation);
+        
+        String name = null;
+        String sraId = null;
+        if(organisationNameSraUpdate.containsKey("name")) {
+            name = organisationNameSraUpdate.get("name");
+            if (StringUtils.isEmpty(name) || StringUtils.isEmpty(name.trim())) {
+                throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                    "Organisation name cannot be empty");
+            }
+            //update organisation name and sraid
+            response = organisationService.updateOrganisationName(existingOrganisation,name);
+        }
+        if(organisationNameSraUpdate.containsKey("sraId")) {
+            sraId = organisationNameSraUpdate.get("sraId");
+            //validate request is not empty
+            if (name != null && name.length() > 255) {
+                throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                    "Organisation name cannot be more than 255 characters");
+            }
+            if (sraId != null && sraId.length() > 255) {
+                throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                    "Organisation sraId cannot be more than 255 characters");
+            }
+            //update organisation sraid
+            response = organisationService.updateOrganisationSra(existingOrganisation,sraId);
+        }
         //validate that organisation id is not null
         if (StringUtils.isEmpty(organisationIdentifier)) {
             throw new ResourceNotFoundException("Organisation id is missing");
         }
-        //validate orgid is not invalid and organisation exists for given id
-        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-        organisationIdentifierValidatorImpl.validateOrganisationId(organisationIdentifier,existingOrganisation);
-
-        organisationIdentifierValidatorImpl.validateNameSraId(name,sraId);
-
-        //update organisation name and sraid
-        return  organisationService.updateOrganisationNameOrSra(existingOrganisation,name,sraId);
-
+        
+        return response;
     }
 
 
