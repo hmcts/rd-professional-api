@@ -18,7 +18,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.sonarqube' version '5.0.0.4638'
-    id 'org.springframework.boot' version '3.3.4'
+    id 'org.springframework.boot' version '3.3.7'
     id "org.flywaydb.flyway" version '9.22.3'
     id 'au.com.dius.pact' version '4.1.7'// do not change, otherwise serenity report fails
     id 'org.owasp.dependencycheck' version '10.0.3'
@@ -621,14 +621,6 @@ configurations.all {
         if (details.requested.group == 'com.google.guava'
                 && details.requested.name == 'guava') {
             details.useVersion "32.1.1-jre"
-        }
-    }
-
-    resolutionStrategy.eachDependency { details ->
-        // Remedy for CVE-2024-22233 - remove once spring-boot transitively uses version >= 6.1.14
-        if (details.requested.group == 'org.springframework'
-                && (details.requested.version == '6.1.12' || details.requested.version == '6.1.13')) {
-            details.useVersion "6.1.14"
         }
     }
 }
