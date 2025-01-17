@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.ProfessionalUserInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
@@ -27,22 +27,22 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 @Configuration
 public class ProfessionalUserInternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     protected OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     protected ClientRegistrationRepository clientRegistrationRepository;
 
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     ServiceAuthFilter serviceAuthFilter;
 
-    @MockBean
+    @MockitoBean
     UserConfiguredAccessRepository userConfiguredAccessRepository;
 
-    @MockBean
+    @MockitoBean
     UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
     @Primary
@@ -58,22 +58,22 @@ public class ProfessionalUserInternalControllerProviderTestConfiguration extends
                 userProfileUpdateRequestValidator);
     }
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeRepository userAttributeRepository;
 
-    @MockBean
+    @MockitoBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeServiceImpl userAttributeService;
 
-    @MockBean
+    @MockitoBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
-    @MockBean
+    @MockitoBean
     PaymentAccountRepository paymentAccountRepository;
 
     @Bean

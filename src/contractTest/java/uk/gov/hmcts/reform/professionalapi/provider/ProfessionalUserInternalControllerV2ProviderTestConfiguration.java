@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.ProfessionalUserInternalControllerV2;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -22,34 +22,34 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 
 @Configuration
 public class ProfessionalUserInternalControllerV2ProviderTestConfiguration extends ProviderTestConfiguration {
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserServiceImpl professionalUserService;
 
-    @MockBean
+    @MockitoBean
     protected OrganisationServiceImpl organisationService;
 
-    @MockBean
+    @MockitoBean
     protected PaymentAccountRepository paymentAccountRepository;
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
-    @MockBean
+    @MockitoBean
     ContactInformationRepository contactInformationRepositoryMock;
 
-    @MockBean
+    @MockitoBean
     UserAttributeRepository userAttributeRepository;
 
-    @MockBean
+    @MockitoBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeServiceImpl userAttributeService;
 
-    @MockBean
+    @MockitoBean
     UserConfiguredAccessRepository userConfiguredAccessRepository;
 
-    @MockBean
+    @MockitoBean
     UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
     @Primary

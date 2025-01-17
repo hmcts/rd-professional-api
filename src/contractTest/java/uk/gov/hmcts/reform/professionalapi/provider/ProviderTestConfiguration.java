@@ -9,11 +9,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
@@ -37,33 +37,33 @@ import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_US
 
 public class ProviderTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     ApplicationConfiguration configuration;
-    @MockBean
+    @MockitoBean
     UserProfileFeignClient userProfileFeignClient;
-    @MockBean
+    @MockitoBean
     EntityManagerFactory emf;
-    @MockBean
+    @MockitoBean
     ProfessionalUserRepository professionalUserRepository;
-    @MockBean
+    @MockitoBean
     UserAccountMapService userAccountMapService;
-    @MockBean
+    @MockitoBean
     protected PrdEnumService prdEnumService;
-    @MockBean
+    @MockitoBean
     protected UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
-    @MockBean
+    @MockitoBean
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
-    @MockBean
+    @MockitoBean
     protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
-    @MockBean
+    @MockitoBean
     protected UsersInOrganisationsByOrganisationIdentifiersRequestValidator usersInOrgValidator;
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
-    @MockBean
+    @MockitoBean
     protected PaymentAccountValidator paymentAccountValidator;
-    @MockBean
+    @MockitoBean
     public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
-    @MockBean
+    @MockitoBean
     public IdamRepository idamRepository;
 
     @Value("${prd.security.roles.hmcts-admin:}")
