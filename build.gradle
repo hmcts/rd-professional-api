@@ -31,7 +31,7 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 ext {
-    springCloudVersion = '2023.0.5'
+    springCloudVersion = '2024.0.0'
 }
 
 def versions = [
@@ -403,7 +403,7 @@ dependencies {
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.7.0'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
 
