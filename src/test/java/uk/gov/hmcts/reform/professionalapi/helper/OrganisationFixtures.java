@@ -376,6 +376,7 @@ public class OrganisationFixtures {
     private static String randomAlphabetic(int count) {
         return RandomStringUtils.secure().nextAlphabetic(count);
     }
+
     private static String randomAlphanumeric(int count) {
         return RandomStringUtils.secure().nextAlphanumeric(count);
     }
