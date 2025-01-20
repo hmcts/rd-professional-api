@@ -4,11 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherO
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -31,6 +35,7 @@ import java.util.regex.Pattern;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DX_ADDRESS_NOT_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
@@ -99,6 +104,51 @@ public class OrganisationCreationRequestValidator {
             validateContactInformation(contactInfo, contactInformationValidationResponses));
         return contactInformationValidationResponses;
     }
+
+    public void validateContactInformationAndDxAddress(
+        ContactInformationUpdateRequest.ContactInformationUpdateData contactInformation,
+        List<UpdateOrgResponse> updateOrgResponsesList) {
+
+        if (contactInformation.isDxAddressUpdate()) {
+            List<DxAddressUpdateRequest> dxAddressList = contactInformation.getDxAddress();
+            if (dxAddressList == null || dxAddressList.size() == 0) {
+                updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                    "failure", HttpStatus.BAD_REQUEST.value(), DX_ADDRESS_NOT_FOUND));
+            } else if (dxAddressList != null && !dxAddressList.isEmpty()) {
+                dxAddressList.forEach(dxAddress -> {
+                    if (StringUtils.isBlank(dxAddress.getDxNumber())
+                        || StringUtils.isBlank(dxAddress.getDxExchange())) {
+                        updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                            "failure", HttpStatus.BAD_REQUEST.value(),
+                            "DX Number or DX Exchange cannot be empty"));
+                    } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 41) {
+                        updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                            "failure",HttpStatus.BAD_REQUEST.value(),
+                            "DX Number (max=13) or DX Exchange (max=40) has invalid length"));
+                    } else if (!dxAddress.getDxNumber().matches("^[a-zA-Z0-9 ]*$")) {
+                        updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                            "failure",HttpStatus.BAD_REQUEST.value(),
+                            "Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain "
+                                .concat("numbers, letters and spaces")));
+                    }
+                });
+            }
+        }
+        if (contactInformation.isContactInformationUpdate()) {
+            if (StringUtils.isBlank(contactInformation.getAddressLine1())) {
+                updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                    "failure",HttpStatus.BAD_REQUEST.value(),
+                    "AddressLine1 cannot be empty"));
+            }
+            if (null != contactInformation.getUprn() && contactInformation.getUprn().length() > 14) {
+                updateOrgResponsesList.add(new UpdateOrgResponse(contactInformation.getOrganisationId(),
+                    "failure",HttpStatus.BAD_REQUEST.value(),
+                    "Uprn must not be greater than 14 characters long"));
+            }
+        }
+
+    }
+
 
     public void validateContactInformations(
             List<ContactInformationCreationRequest> contactInformationCreationRequests) {

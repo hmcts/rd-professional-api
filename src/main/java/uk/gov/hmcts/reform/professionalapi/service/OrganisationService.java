@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateResponseParent;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -31,6 +34,12 @@ public interface OrganisationService {
 
     BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
                                                                                        String idamId);
+
+    List<UpdateOrgResponse> updateContactInformation(Organisation existingOrganisation,Boolean dxAddressUpdate,
+                                                     ContactInformationUpdateRequest.ContactInformationUpdateData
+                                                         contactInformationUpdateData,Boolean
+                                                         contactInformationUpdate, String addressid,
+                                                     List<UpdateOrgResponse> updateOrgResponsesList);
 
     OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
 
@@ -80,5 +89,9 @@ public interface OrganisationService {
     void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier);
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
+
+    UpdateResponseParent generateUpdateResponse(List<UpdateOrgResponse> updateOrgNameResponse,String field);
+
+
 
 }

@@ -21,8 +21,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -42,6 +44,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateResponseParent;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -87,10 +91,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -285,8 +292,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public void addContactInformationToOrganisation(
-            List<ContactInformationCreationRequest> contactInformationCreationRequest,
-            Organisation organisation) {
+        List<ContactInformationCreationRequest> contactInformationCreationRequest,
+        Organisation organisation) {
 
         if (contactInformationCreationRequest != null) {
             contactInformationCreationRequest.forEach(contactInfo -> {
@@ -321,8 +328,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
-    private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
-                                                  ContactInformation contactInformation) {
+    public void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
+                                                 ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {
@@ -330,7 +337,37 @@ public class OrganisationServiceImpl implements OrganisationService {
                         RefDataUtil.removeEmptySpaces(dxAdd.getDxNumber()),
                         RefDataUtil.removeEmptySpaces(dxAdd.getDxExchange()),
                         contactInformation);
+                dxAddress.setLastUpdated(LocalDateTime.now());
                 dxAddresses.add(dxAddress);
+            });
+            dxAddressRepository.saveAll(dxAddresses);
+        }
+    }
+
+    public void updateDxAddressInformation(List<DxAddressUpdateRequest> dxAddressUpdateRequests,
+                                           List<ContactInformation> existingContactInformationList) {
+
+        if (dxAddressUpdateRequests != null) {
+            List<DxAddress> dxAddresses = new ArrayList<>();
+            dxAddressUpdateRequests.forEach(dxAdd -> {
+                existingContactInformationList.forEach(existing -> {
+                    List<DxAddress> existingDxArrdessesList = existing.getDxAddresses();
+                    existingDxArrdessesList.forEach(existingDxAdd -> {
+                        if (existingDxAdd.getId().equals(dxAdd.getDxAddressId())) {
+                            existingDxAdd.setDxNumber(dxAdd.getDxNumber());
+                            existingDxAdd.setDxExchange(dxAdd.getDxExchange());
+                            existingDxAdd.setLastUpdated(LocalDateTime.now());
+                            dxAddresses.add(existingDxAdd);
+                        } else {
+                            DxAddress dxAddress = new DxAddress(
+                                RefDataUtil.removeEmptySpaces(dxAdd.getDxNumber()),
+                                RefDataUtil.removeEmptySpaces(dxAdd.getDxExchange()),
+                                existing);
+                            dxAddress.setLastUpdated(LocalDateTime.now());
+                            dxAddresses.add(dxAddress);
+                        }
+                    });
+                });
             });
             dxAddressRepository.saveAll(dxAddresses);
         }
@@ -1054,6 +1091,139 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
+    }
+
+    @Transactional
+    public void updateContacts(Boolean contactInformationUpdate, Boolean dxAddressUpdate,
+                               ContactInformationUpdateRequest.ContactInformationUpdateData
+                                   contactInformationUpdateData,List<ContactInformation> existingContactInformationList,
+                                Organisation organisation,List<UpdateOrgResponse> updateOrgResponsesList) {
+        // if both are false no update takes place
+        if (!dxAddressUpdate && !contactInformationUpdate) {
+            updateOrgResponsesList.add(new UpdateOrgResponse(contactInformationUpdateData.getOrganisationId(),
+                "failure", HttpStatus.BAD_REQUEST.value(), "dxAddressUpdate and "
+                + "contactInformationUpdate are both false . Cannot update contact information"));
+        } else {
+            if (dxAddressUpdate) {
+                // if only dxaddress needs updating
+                updateDxAddressInformation(contactInformationUpdateData.getDxAddress(),
+                    existingContactInformationList);
+                updateOrgResponsesList.add(new UpdateOrgResponse(contactInformationUpdateData.getOrganisationId(),
+                    "success", HttpStatus.OK.value(), "dxAddress updated successfully"));
+            }
+            if (contactInformationUpdate) {
+                //If single address is present and contact info needs updating then update details
+                updateContactInformation(existingContactInformationList.get(0),
+                    contactInformationUpdateData,organisation);
+                updateOrgResponsesList.add(new UpdateOrgResponse(contactInformationUpdateData.getOrganisationId(),
+                    "success", HttpStatus.OK.value(), "contactInformation updated successfully"));
+            }
+        }
+
+    }
+
+
+    private void updateContactInformation(ContactInformation existingContactInformation,
+                                          ContactInformationUpdateRequest.ContactInformationUpdateData
+                                              contactInformationUpdateData,
+                                                        Organisation organisation
+    ) {
+        if (StringUtils.isNotEmpty(contactInformationUpdateData.getAddressLine1())) {
+            existingContactInformation.setAddressLine1(
+                RefDataUtil.removeEmptySpaces(contactInformationUpdateData.getAddressLine1()));
+        }
+        if (StringUtils.isNotEmpty(contactInformationUpdateData.getAddressLine2())) {
+            existingContactInformation.setAddressLine2(
+                RefDataUtil.removeEmptySpaces(contactInformationUpdateData.getAddressLine2()));
+        }
+        if (StringUtils.isNotEmpty(contactInformationUpdateData.getAddressLine3())) {
+            existingContactInformation.setAddressLine3(
+                RefDataUtil.removeEmptySpaces(contactInformationUpdateData.getAddressLine3()));
+        }
+        if (StringUtils.isNotEmpty(contactInformationUpdateData.getTownCity())) {
+            existingContactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInformationUpdateData
+                .getTownCity()));
+        }
+        if (StringUtils.isNotEmpty(contactInformationUpdateData.getCounty())) {
+            existingContactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInformationUpdateData
+                .getCounty()));
+        }
+        if (StringUtils.isNotEmpty(contactInformationUpdateData.getCountry())) {
+            existingContactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInformationUpdateData
+                .getCountry()));
+        }
+        if (StringUtils.isNotEmpty(contactInformationUpdateData.getPostCode())) {
+            existingContactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInformationUpdateData
+                .getPostCode()));
+        }
+        existingContactInformation.setOrganisation(organisation);
+        existingContactInformation.setLastUpdated(LocalDateTime.now());
+        contactInformationRepository.save(existingContactInformation);
+    }
+
+
+    @Override
+    @Transactional
+    public List<UpdateOrgResponse> updateContactInformation(Organisation existingOrganisation,Boolean dxAddressUpdate,
+                                                           ContactInformationUpdateRequest.ContactInformationUpdateData
+                                                               contactInformationUpdateData,Boolean
+                                                                   contactInformationUpdate, String addressid,
+                                                           List<UpdateOrgResponse> updateOrgResponsesList) {
+
+        List<ContactInformation> existingContactInformationList = existingOrganisation.getContactInformation();
+
+        if (!existingContactInformationList.isEmpty()) {
+            //if single contact information record found for organisation then update the same
+            if (existingContactInformationList.size() == 1) {
+                updateContacts(contactInformationUpdate,dxAddressUpdate,contactInformationUpdateData,
+                    existingContactInformationList,existingOrganisation,updateOrgResponsesList);
+            } else {
+                //if multiple records found then update the one for which the id is provided
+                if (StringUtils.isEmpty(addressid)) {
+                    updateOrgResponsesList.add(new UpdateOrgResponse(contactInformationUpdateData
+                        .getOrganisationId(),"failure", HttpStatus.BAD_REQUEST.value(),
+                        "Multiple addresses found for organisation . Please enter specific address "
+                            + "id of the contact information to be updated"));
+                } else {
+                    AtomicBoolean idFound = new AtomicBoolean(false);
+                    existingContactInformationList.forEach(existingInfo -> {
+                        if (existingInfo.getId().toString().equalsIgnoreCase(addressid)) {
+                            idFound.set(true);
+                            updateContacts(contactInformationUpdate,dxAddressUpdate,contactInformationUpdateData,
+                                existingContactInformationList,existingOrganisation,updateOrgResponsesList);
+                        }
+                    });
+                    if (!idFound.get()) {
+                        updateOrgResponsesList.add(new UpdateOrgResponse(contactInformationUpdateData
+                            .getOrganisationId(),"failure", HttpStatus.BAD_REQUEST.value(),
+                            "Could not find address to update for the id provided please check and "
+                                + "try again"));
+                    }
+                }
+            }
+        } else {
+            updateOrgResponsesList.add(new UpdateOrgResponse(existingOrganisation.getOrganisationIdentifier(),
+                "failure", HttpStatus.BAD_REQUEST.value(), "No contact information existing for given organisation"));
+        }
+        return updateOrgResponsesList;
+    }
+
+    @Override
+    public UpdateResponseParent generateUpdateResponse(List<UpdateOrgResponse> updateOrgResponses,String field) {
+        AtomicReference<String> message = null;
+        boolean result =  updateOrgResponses.stream().anyMatch(updateOrgNameResponse ->
+            updateOrgNameResponse.getStatusCode() != 200);
+        List responseList =  updateOrgResponses.stream().filter(updateOrgNameResponse ->
+            updateOrgNameResponse.getStatusCode() == 400).collect(toList());
+
+        if (updateOrgResponses.size() == responseList.size()) {
+            return new UpdateResponseParent("failure",null,updateOrgResponses);
+        }  else if (result) {
+            return new UpdateResponseParent("partial_success",null,updateOrgResponses);
+        } else {
+            return new UpdateResponseParent("success","All " + field + " updated successfully",
+                null);
+        }
     }
 
 }
