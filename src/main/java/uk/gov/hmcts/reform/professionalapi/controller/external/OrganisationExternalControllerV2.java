@@ -295,7 +295,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
             if (organisationNameSraUpdate.containsKey("sraId")) {
                 sraId = organisationNameSraUpdate.get("sraId");
 
-                if (sraId != null && sraId.length() > 255) {
+                if (sraId != null && sraId.length() > 164) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Organisation sraId cannot be more than 255 characters");
                 }
