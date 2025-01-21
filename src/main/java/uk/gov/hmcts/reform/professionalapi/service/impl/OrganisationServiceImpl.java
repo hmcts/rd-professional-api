@@ -1059,67 +1059,62 @@ public class OrganisationServiceImpl implements OrganisationService {
         return !pageableOrganisations.isLast();
     }
 
-    @Override
-    @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
-    public ResponseEntity<Object> updateOrganisationName(
-        Organisation existingOrganisation,String name) {
-        Organisation organisationSaved = null;
-        try {
-            OrgAttribute savedAttribute = null;
-            if (!StringUtils.isEmpty(name)) {
-                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(name));
-                existingOrganisation.setLastUpdated(LocalDateTime.now());
-                organisationSaved = organisationRepository.save(existingOrganisation);
-                if (organisationSaved == null) {
-                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                        "Failed to save organisation name");
-                }
-            }
-        } catch (Exception ex) {
-            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                "Failed to save or update");
-        }
-        return ResponseEntity.status(204).build();
-    }
 
     @Override
     @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
-    public ResponseEntity<Object> updateOrganisationSra(
-        Organisation existingOrganisation, String sraId) {
+    public ResponseEntity<Object> updateOrganisationNameOrSra(Organisation existingOrganisation,
+                                                          Map<String,String> organisationNameSraUpdate) {
         Organisation organisationSaved = null;
         try {
-            OrgAttribute savedAttribute = null;
-            if (!StringUtils.isEmpty(sraId)) {
-                //save sra id in organisation attributes
-                savedAttribute = saveOrganisationAttributes(existingOrganisation, sraId);
-                if (savedAttribute != null) {
-                    existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(sraId));
+            if (organisationNameSraUpdate.containsKey("name")) {
+                OrgAttribute savedAttribute = null;
+                if (!StringUtils.isEmpty(organisationNameSraUpdate.get("name"))) {
+                    existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
                     organisationSaved = organisationRepository.save(existingOrganisation);
                     if (organisationSaved == null) {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                            "Failed to save organisation sraId");
+                            "Failed to save organisation name");
                     }
-                } else {
-                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                        "Failed to save attributes for organisation sraId");
-                }
-            } else if (StringUtils.isEmpty(sraId)) { //if sra id is empty space or null then delete it from database
-                existingOrganisation.setSraId(null);
-                existingOrganisation.setLastUpdated(LocalDateTime.now());
-                organisationSaved = organisationRepository.save(existingOrganisation);
-                if (organisationSaved == null) {
-                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                        "Failed to save organisation sraId");
                 }
             }
-
+            if (organisationNameSraUpdate.containsKey("sraId")) {
+                OrgAttribute savedSraAttribute = null;
+                if (!StringUtils.isEmpty(organisationNameSraUpdate.get("sraId"))) {
+                    //save sra id in organisation attributes
+                    savedSraAttribute = saveOrganisationAttributes(existingOrganisation,
+                    organisationNameSraUpdate.get("sraId"));
+                    if (savedSraAttribute != null) {
+                        existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(
+                            organisationNameSraUpdate.get("sraId")));
+                        existingOrganisation.setLastUpdated(LocalDateTime.now());
+                        organisationSaved = organisationRepository.save(existingOrganisation);
+                        if (organisationSaved == null) {
+                            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                            "Failed to save organisation sraId");
+                        }
+                    } else {
+                        throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Failed to save attributes for organisation sraId");
+                    }
+                } else if (StringUtils.isEmpty(organisationNameSraUpdate.get("sraId"))) {
+                    //if sra id is empty space or null then delete it from database
+                    existingOrganisation.setSraId(null);
+                    existingOrganisation.setLastUpdated(LocalDateTime.now());
+                    organisationSaved = organisationRepository.save(existingOrganisation);
+                    if (organisationSaved == null) {
+                        throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Failed to save organisation sraId");
+                    }
+                }
+            }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Failed to save or update");
         }
         return ResponseEntity.status(204).build();
     }
+
 
     public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
                                                    String sraId) {

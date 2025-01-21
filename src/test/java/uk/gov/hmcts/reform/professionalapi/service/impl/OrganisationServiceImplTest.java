@@ -93,6 +93,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -2726,6 +2727,8 @@ class OrganisationServiceImplTest {
         UUID newSraId = UUID.randomUUID();
         Organisation organisation = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
             "companyN", false, "www.org.com");
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name","Some orgName");
 
         organisation.setName("Some orgName");
         organisation.setLastUpdated(LocalDateTime.now());
@@ -2733,8 +2736,8 @@ class OrganisationServiceImplTest {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.save(organisation)).thenReturn(organisationMock);
 
-        ResponseEntity<Object> response = sut.updateOrganisationName(organisation,
-            "Some orgName");
+        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(organisation,
+            organisationNameSraUpdate);
         assertNotNull(response);
 
         verify(organisationRepository, times(1))
@@ -2750,7 +2753,8 @@ class OrganisationServiceImplTest {
 
         organisation.setId(newSraId);
         organisation.setLastUpdated(LocalDateTime.now());
-
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId","Some SraId");
         OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
 
         when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
@@ -2758,8 +2762,7 @@ class OrganisationServiceImplTest {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.save(organisation)).thenReturn(organisationMock);
 
-        ResponseEntity<Object> response = sut.updateOrganisationSra(organisation,
-            "Some SraId");
+        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(organisation,organisationNameSraUpdate);
 
         assertNotNull(response);
 
@@ -2773,11 +2776,13 @@ class OrganisationServiceImplTest {
 
     @Test
     void shouldThrowFieldAndPersistenceValidationExceptionWhenSaveUpdateFails() {
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId","Some SraId");
         when(orgAttributeRepository.save(any(OrgAttribute.class)))
             .thenThrow(new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Failed to save attributes for organisation sraId"));
-        assertThrows(FieldAndPersistenceValidationException.class, () -> sut.updateOrganisationSra(organisation,
-            "Some SraId"));
+        assertThrows(FieldAndPersistenceValidationException.class, () -> sut.updateOrganisationNameOrSra(organisation,
+            organisationNameSraUpdate));
     }
 
 }

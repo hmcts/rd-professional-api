@@ -214,8 +214,7 @@ class OrganisationExternalControllerV2Test {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
             .thenReturn(organisationMock);
-        when(organisationServiceMock.updateOrganisationSra(organisationMock,
-            "Some sraId"))
+        when(organisationServiceMock.updateOrganisationNameOrSra(organisationMock,organisationNameSraUpdate))
             .thenReturn(responseEntity);
 
         ResponseEntity<Object> response = organisationExternalController.updateOrganisationNameOrSra(
@@ -223,7 +222,7 @@ class OrganisationExternalControllerV2Test {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
 
-        verify(organisationServiceMock, times(1)).updateOrganisationSra(
+        verify(organisationServiceMock, times(1)).updateOrganisationNameOrSra(
             any(), any());
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
 
@@ -242,8 +241,7 @@ class OrganisationExternalControllerV2Test {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
             .thenReturn(organisationMock);
-        when(organisationServiceMock.updateOrganisationName(organisationMock,
-            "Some Org Name"))
+        when(organisationServiceMock.updateOrganisationNameOrSra(organisationMock,organisationNameSraUpdate))
             .thenReturn(responseEntity);
 
         ResponseEntity<Object> response = organisationExternalController.updateOrganisationNameOrSra(
@@ -251,7 +249,7 @@ class OrganisationExternalControllerV2Test {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
 
-        verify(organisationServiceMock, times(1)).updateOrganisationName(
+        verify(organisationServiceMock, times(1)).updateOrganisationNameOrSra(
             any(), any());
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
 
