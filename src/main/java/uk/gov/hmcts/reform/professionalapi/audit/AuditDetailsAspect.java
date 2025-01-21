@@ -5,13 +5,15 @@ import java.time.LocalDateTime;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.domain.Audit;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.repository.AuditDetailsRepository;
@@ -27,10 +29,9 @@ public class AuditDetailsAspect {
     /**
      * Log details of organisation address update after the service method is executed.
      */
-    @AfterReturning(
-        value = "execution(* uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl.updateOrganisationAddress(..))",
-        returning = "result"
-    )
+
+    @AfterReturning(value = "uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl.updateOrganisationAddress(..)) || " +
+        "execution(* uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl.updateOrganisationDxAddress(..)))")
     public void logAfterUpdate(JoinPoint joinPoint, Object result) {
         Audit auditDetails = new Audit();
         // Extract method name

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -163,11 +164,10 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         return true;
     }
 
-    public void validateAddress(Map<String,String> organisationAddressUpdate) {
-        String uprn = organisationAddressUpdate.get("uprn");
-        String addressLine1 = organisationAddressUpdate.get("addressLine1");
-        String dxNumber = organisationAddressUpdate.get("dxNumber");
-        String dxExchange = organisationAddressUpdate.get("dxExchange");
+    public void validateDxAddress(UpdateContactInformationRequest updateContactInformationRequest) {
+
+        String dxNumber = updateContactInformationRequest.getDxNumber();
+        String dxExchange = updateContactInformationRequest.getDxExchange();
 
         if (StringUtils.isNotEmpty(dxNumber) && StringUtils.isEmpty(dxExchange)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
@@ -191,6 +191,13 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
                 "Invalid Dx Number entered: " + dxNumber + ", it can only contain "
                     .concat("numbers, letters and spaces"));
         }
+
+    }
+
+    public void validateAddress(UpdateContactInformationRequest updateContactInformationRequest) {
+        String uprn = updateContactInformationRequest.getUprn();
+        String addressLine1 = updateContactInformationRequest.getAddressLine1();
+
         if (StringUtils.isNotEmpty(uprn.trim()) && uprn.length() > 14) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Uprn must not be greater than 14 characters long");

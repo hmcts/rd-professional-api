@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -27,8 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -260,7 +263,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
     public ResponseEntity<Object> updateOrganisationAddress(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationAddressUpdate")
         @Parameter(hidden = true) @OrgId String organisationIdentifier,
-        @Validated @NotNull @RequestBody Map<String,String> organisationAddressUpdate,
+        @Valid @NotNull @RequestBody UpdateContactInformationRequest updateContactInformationRequest,
         @Parameter(hidden = true) @UserId String userId) {
 
         //validate that organisation id is not null
@@ -270,10 +273,29 @@ public class OrganisationExternalControllerV2 extends SuperController {
         //validate orgid is not invalid and organisation exists for given id
         var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
 
-        organisationIdentifierValidatorImpl.validateAddress(organisationAddressUpdate);
+        ResponseEntity<Object> response = null;
 
-        //update organisation name and sraid
-        return  organisationService.updateOrganisationAddress(existingOrganisation,organisationAddressUpdate, userId);
+        if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange()) ||
+            StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
+            organisationIdentifierValidatorImpl.validateDxAddress(updateContactInformationRequest);
+        }
+
+        if (StringUtils.isNotEmpty(updateContactInformationRequest.getUprn()) || StringUtils.isNotEmpty(
+            updateContactInformationRequest.getAddressLine1()) || StringUtils.isNotEmpty(
+            updateContactInformationRequest.getAddressLine2()) ||StringUtils.isNotEmpty(
+            updateContactInformationRequest.getAddressLine3()) ||StringUtils.isNotEmpty(
+            updateContactInformationRequest.getTownCity()) || StringUtils.isNotEmpty(
+            updateContactInformationRequest.getCountry()) ||StringUtils.isNotEmpty(
+            updateContactInformationRequest.getCounty()) ||StringUtils.isNotEmpty(
+            updateContactInformationRequest.getPostCode()) ){
+            //validate request
+            organisationIdentifierValidatorImpl.validateAddress(updateContactInformationRequest);
+
+        }
+
+        //update organisation address/dxAddress
+        response = organisationService.updateOrganisationAddress(existingOrganisation,updateContactInformationRequest, userId);
+         return  response;
 
     }
 
