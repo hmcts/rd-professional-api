@@ -11,7 +11,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.63'
+    id 'uk.gov.hmcts.java' version '0.12.64'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.51.0'
