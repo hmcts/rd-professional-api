@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.configuration;
 
+import jakarta.inject.Inject;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -30,7 +33,6 @@ import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 
 import java.util.List;
-import javax.inject.Inject;
 
 @Configuration
 @ConfigurationProperties(prefix = "security")
@@ -51,19 +53,14 @@ public class SecurityConfiguration {
     private  ServiceAuthFilter serviceAuthFilter;
     @Order(2)
     private final SecurityEndpointFilter securityEndpointFilter;
+
+    @Setter
+    @Getter
     List<String> anonymousPaths;
 
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-
-    public List<String> getAnonymousPaths() {
-        return anonymousPaths;
-    }
-
-    public void setAnonymousPaths(List<String> anonymousPaths) {
-        this.anonymousPaths = anonymousPaths;
-    }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

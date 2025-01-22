@@ -2,13 +2,11 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import com.launchdarkly.sdk.LDUser;
 import com.launchdarkly.sdk.server.LDClient;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_CREATE_EXTERNAL_V2;
@@ -34,55 +32,33 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
 
     private final String userName;
 
-    private Map<String, String> launchDarklyMap;
+    /**
+     * Add Map.entry(ControllerName.methodName, FLAG_NAME) to map to apply launch darkly (ld) flag on api.
+     */
+    @SuppressWarnings("checkstyle:linelength")
+    private final Map<String, String> launchDarklyMap = Map.ofEntries(
+        Map.entry("OrganisationMfaStatusController.retrieveMfaStatusByUserId", PRD_MFA_LD_FLAG),
+        Map.entry("OrganisationInternalController.updateOrgMfaStatus", PRD_MFA_LD_FLAG),
+        Map.entry("OrganisationExternalController.deletePaymentAccountsOfOrganisation", RD_PROFESSIONAL_MULTI_PBA_LD_FLAG),
+        Map.entry("OrganisationInternalController.retrieveOrgByPbaStatus", RD_PROFESSIONAL_MULTI_PBA_LD_FLAG),
+        Map.entry("OrganisationExternalController.addPaymentAccountsToOrganisation", RD_PROFESSIONAL_MULTI_PBA_LD_FLAG),
+        Map.entry("OrganisationInternalController.updateAnOrganisationsRegisteredPbas", RD_PROFESSIONAL_MULTI_PBA_LD_FLAG),
+        Map.entry("OrganisationExternalController.addContactInformationsToOrganisation", RD_PROFESSIONAL_MULTIPLE_ADDRESS),
+        Map.entry("OrganisationExternalController.deleteMultipleAddressesOfOrganisation", RD_PROFESSIONAL_MULTIPLE_ADDRESS),
+        Map.entry("OrganisationInternalControllerV2.retrieveOrganisations", PRD_RETRIEVE_INTERNAL_V2),
+        Map.entry("OrganisationInternalControllerV2.createOrganisation", PRD_CREATE_INTERNAL_V2),
+        Map.entry("OrganisationInternalControllerV2.updatesOrganisation", PRD_UPDATE_INTERNAL_V2),
+        Map.entry("OrganisationInternalControllerV2.retrievePaymentAccountBySuperUserEmail", PRD_RETRIEVE_PBA_INTERNAL_V2),
+        Map.entry("OrganisationExternalControllerV2.retrievePaymentAccountByEmail", PRD_RETRIEVE_PBA_EXTERNAL_V2),
+        Map.entry("OrganisationExternalControllerV2.retrieveOrganisationUsingOrgIdentifier", PRD_RETRIEVE_EXTERNAL_V2),
+        Map.entry("OrganisationExternalControllerV2.createOrganisationUsingExternalController", PRD_CREATE_EXTERNAL_V2),
+        Map.entry("BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomer", RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG)
+    );
 
     @Autowired
     public FeatureToggleServiceImpl(LDClient ldClient, @Value("${launchdarkly.sdk.user}") String userName) {
         this.ldClient = ldClient;
         this.userName = userName;
-    }
-
-    /**
-     * add controller.method name, flag name  in map to apply ld flag on api like below
-     * launchDarklyMap.put("OrganisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional",
-     * "prd-aac-get-org-by-status");
-     */
-    @PostConstruct
-    public void mapServiceToFlag() {
-        launchDarklyMap = new HashMap<>();
-        launchDarklyMap.put("OrganisationMfaStatusController.retrieveMfaStatusByUserId",
-                PRD_MFA_LD_FLAG);
-        launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus",
-                PRD_MFA_LD_FLAG);
-        launchDarklyMap.put("OrganisationExternalController.deletePaymentAccountsOfOrganisation",
-                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
-        launchDarklyMap.put("OrganisationInternalController.retrieveOrgByPbaStatus",
-                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
-        launchDarklyMap.put("OrganisationExternalController.addPaymentAccountsToOrganisation",
-                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
-        launchDarklyMap.put("OrganisationInternalController.updateAnOrganisationsRegisteredPbas",
-                RD_PROFESSIONAL_MULTI_PBA_LD_FLAG);
-        launchDarklyMap.put("OrganisationExternalController.addContactInformationsToOrganisation",
-                RD_PROFESSIONAL_MULTIPLE_ADDRESS);
-        launchDarklyMap.put("OrganisationExternalController.deleteMultipleAddressesOfOrganisation",
-                RD_PROFESSIONAL_MULTIPLE_ADDRESS);
-        launchDarklyMap.put("OrganisationInternalControllerV2.retrieveOrganisations",
-            PRD_RETRIEVE_INTERNAL_V2);
-        launchDarklyMap.put("OrganisationInternalControllerV2.createOrganisation",
-            PRD_CREATE_INTERNAL_V2);
-        launchDarklyMap.put("OrganisationInternalControllerV2.updatesOrganisation",
-            PRD_UPDATE_INTERNAL_V2);
-        launchDarklyMap.put("OrganisationInternalControllerV2.retrievePaymentAccountBySuperUserEmail",
-            PRD_RETRIEVE_PBA_INTERNAL_V2);
-        launchDarklyMap.put("OrganisationExternalControllerV2.retrievePaymentAccountByEmail",
-            PRD_RETRIEVE_PBA_EXTERNAL_V2);
-        launchDarklyMap.put("OrganisationExternalControllerV2.retrieveOrganisationUsingOrgIdentifier",
-            PRD_RETRIEVE_EXTERNAL_V2);
-        launchDarklyMap.put("OrganisationExternalControllerV2.createOrganisationUsingExternalController",
-            PRD_CREATE_EXTERNAL_V2);
-        launchDarklyMap.put("BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomer",
-                RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG);
-
     }
 
     @Override

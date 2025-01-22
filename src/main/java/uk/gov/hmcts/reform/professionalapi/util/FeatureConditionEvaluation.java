@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
