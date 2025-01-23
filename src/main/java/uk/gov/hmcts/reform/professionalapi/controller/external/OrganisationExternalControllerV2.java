@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import java.util.Map;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
@@ -275,26 +272,27 @@ public class OrganisationExternalControllerV2 extends SuperController {
 
         ResponseEntity<Object> response = null;
 
-        if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange()) ||
-            StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
+        if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange())
+            || StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
             organisationIdentifierValidatorImpl.validateDxAddress(updateContactInformationRequest);
         }
 
         if (StringUtils.isNotEmpty(updateContactInformationRequest.getUprn()) || StringUtils.isNotEmpty(
             updateContactInformationRequest.getAddressLine1()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getAddressLine2()) ||StringUtils.isNotEmpty(
-            updateContactInformationRequest.getAddressLine3()) ||StringUtils.isNotEmpty(
+            updateContactInformationRequest.getAddressLine2()) || StringUtils.isNotEmpty(
+            updateContactInformationRequest.getAddressLine3()) || StringUtils.isNotEmpty(
             updateContactInformationRequest.getTownCity()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getCountry()) ||StringUtils.isNotEmpty(
-            updateContactInformationRequest.getCounty()) ||StringUtils.isNotEmpty(
-            updateContactInformationRequest.getPostCode()) ){
+            updateContactInformationRequest.getCountry()) || StringUtils.isNotEmpty(
+            updateContactInformationRequest.getCounty()) || StringUtils.isNotEmpty(
+            updateContactInformationRequest.getPostCode())) {
             //validate request
             organisationIdentifierValidatorImpl.validateAddress(updateContactInformationRequest);
 
         }
 
         //update organisation address/dxAddress
-        response = organisationService.updateOrganisationAddress(existingOrganisation,updateContactInformationRequest, userId);
+        response = organisationService.updateOrganisationAddress(existingOrganisation,updateContactInformationRequest,
+            userId);
          return  response;
 
     }

@@ -1,11 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import static jakarta.persistence.GenerationType.AUTO;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +10,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity(name = "audit")
 @NoArgsConstructor

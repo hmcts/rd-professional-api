@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -177,16 +176,16 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation dxNumber canot be empty be empty");
         }
-        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange)) && dxNumber.length() >= 14 ) {
+        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange)) && dxNumber.length() >= 14) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "DX Number (max=13) has invalid length");
         }
-        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange)) && dxExchange.length() >= 40 ) {
+        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange)) && dxExchange.length() >= 40) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "DX Exchange (max=40) has invalid length");
         }
-        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange)) &&
-            dxNumber.matches("^[a-zA-Z0-9 ]*$")) {
+        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange))
+            && dxNumber.matches("^[a-zA-Z0-9 ]*$")) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Invalid Dx Number entered: " + dxNumber + ", it can only contain "
                     .concat("numbers, letters and spaces"));
