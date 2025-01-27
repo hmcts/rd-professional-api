@@ -13,7 +13,7 @@ plugins {
     id "org.flywaydb.flyway" version '9.22.3'
     id 'au.com.dius.pact' version '4.6.16'
     id 'org.owasp.dependencycheck' version '11.1.1'
-    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.8'
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.13'
 }
 
 
@@ -36,7 +36,7 @@ def versions = [
         feign           : '3.8.0',
         bouncycastle    : '1.79',
         postgresql_tc   : '1.20.0',
-        serenity        : '4.2.9'
+        serenity        : '4.2.13'
 ]
 
 application {
@@ -338,7 +338,7 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.8'
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.0'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
 
