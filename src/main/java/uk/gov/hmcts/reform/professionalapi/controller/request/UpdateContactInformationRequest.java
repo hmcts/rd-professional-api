@@ -13,7 +13,22 @@ public class UpdateContactInformationRequest {
 
     private final String uprn;
 
-    @NotNull @NotEmpty
+    @Override
+    public String toString() {
+        return "UpdateContactInformationRequest{" +
+            "uprn='" + uprn + '\'' +
+            ", addressLine1='" + addressLine1 + '\'' +
+            ", addressLine2='" + addressLine2 + '\'' +
+            ", addressLine3='" + addressLine3 + '\'' +
+            ", townCity='" + townCity + '\'' +
+            ", county='" + county + '\'' +
+            ", country='" + country + '\'' +
+            ", postCode='" + postCode + '\'' +
+            ", dxNumber='" + dxNumber + '\'' +
+            ", dxExchange='" + dxExchange + '\'' +
+            '}';
+    }
+
     private final String addressLine1;
 
     private final String addressLine2;
@@ -44,7 +59,7 @@ public class UpdateContactInformationRequest {
             @JsonProperty("country") String country,
             @JsonProperty("postCode") String postCode,
             @JsonProperty("dxNumber") String dxNumber,
-            @JsonProperty("dxNumber") String dxExchange) {
+            @JsonProperty("dxExchange") String dxExchange) {
 
         this.uprn = uprn;
         this.addressLine1 = addressLine1;

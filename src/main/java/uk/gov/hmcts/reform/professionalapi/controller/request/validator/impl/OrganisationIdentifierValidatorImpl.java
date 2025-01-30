@@ -185,7 +185,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
                 "DX Exchange (max=40) has invalid length");
         }
         if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange))
-            && dxNumber.matches("^[a-zA-Z0-9 ]*$")) {
+            && !dxNumber.matches("^[a-zA-Z0-9 ]*$")) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Invalid Dx Number entered: " + dxNumber + ", it can only contain "
                     .concat("numbers, letters and spaces"));

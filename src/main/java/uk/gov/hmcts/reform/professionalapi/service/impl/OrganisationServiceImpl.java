@@ -1139,14 +1139,32 @@ public class OrganisationServiceImpl implements OrganisationService {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                              "Failed to save contact information");
                     }
+                    if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange())
+                        || StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
+                        //if DxAddress information is provided in request then create a new DxAddress
+                        updateOrganisationDxAddress(savedContactInformation,existingOrganisation
+                            .getOrganisationIdentifier(), updateContactInformationRequest, userId);
+
+                    }
                 }
-            }
+            } else {
+                if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange())
+                    || StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
 
-            if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange())
-                || StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
-                //if DxAddress information is provided in request then create a new DxAddress
-                updateOrganisationDxAddress(existingOrganisation,  updateContactInformationRequest, userId);
-
+                    if (!existingOrganisation.getContactInformation().isEmpty()) {
+                        if(existingOrganisation.getContactInformation().get(0) != null) {
+                            List<DxAddress> existingDxAddress = dxAddressRepository.findByContactInformationId(
+                                existingOrganisation.getContactInformation().get(0).getId());
+                            if (!existingDxAddress.isEmpty()) {
+                                deleteDxAddress(existingDxAddress, userId, existingOrganisation
+                                    .getOrganisationIdentifier());
+                            }
+                            //if DxAddress information is provided in request then create a new DxAddress
+                            updateOrganisationDxAddress(existingOrganisation.getContactInformation().get(0),
+                                existingOrganisation.getOrganisationIdentifier(), updateContactInformationRequest, userId);
+                        }
+                    }
+                }
             }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
@@ -1163,28 +1181,26 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
-    public ResponseEntity<Object> updateOrganisationDxAddress(
-        Organisation existingOrganisation, UpdateContactInformationRequest updateContactInformationRequest,
-        String userId) {
+    public ResponseEntity<Object> updateOrganisationDxAddress(ContactInformation contactInformation,
+                                                              String organisationIdentifier,
+                                                              UpdateContactInformationRequest
+        updateContactInformationRequest,String userId) {
         try {
-            List<ContactInformation> existingContactInformation = existingOrganisation.getContactInformation();
-            if (!existingContactInformation.isEmpty()) {
-                List<DxAddress> dxAddress = existingOrganisation.getContactInformation().get(0).getDxAddresses();
-                if (!dxAddress.isEmpty()) {
-                    deleteDxAddress(dxAddress,userId,existingOrganisation.getOrganisationIdentifier());
+            if (contactInformation != null) {
                     DxAddress newDxAddress = new DxAddress(
                         RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxNumber()),
                         RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxExchange()),
-                        existingOrganisation.getContactInformation().get(0));
-
+                        contactInformation);
+                newDxAddress.setLastUpdated(LocalDateTime.now());
+                newDxAddress.setCreated(LocalDateTime.now());
                     DxAddress savedDxAddress = dxAddressRepository.save(newDxAddress);
-                    auditDetails(existingOrganisation.getOrganisationIdentifier(), userId,
+                    auditDetails(organisationIdentifier, userId,
                         "saved new dxAddress", savedDxAddress.toString());
                     if (savedDxAddress == null) {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                             "Failed to save DxAddress Information");
                     }
-                }
+
             }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),

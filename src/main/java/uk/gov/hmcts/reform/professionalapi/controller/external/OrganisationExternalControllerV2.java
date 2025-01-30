@@ -260,7 +260,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
     public ResponseEntity<Object> updateOrganisationAddress(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationAddressUpdate")
         @Parameter(hidden = true) @OrgId String organisationIdentifier,
-        @Valid @NotNull @RequestBody UpdateContactInformationRequest updateContactInformationRequest,
+        @Valid @RequestBody UpdateContactInformationRequest updateContactInformationRequest,
         @Parameter(hidden = true) @UserId String userId) {
 
         //validate that organisation id is not null
