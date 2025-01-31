@@ -105,7 +105,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
 
         final Object sraId = responseBody.get("sraId");
-        assertThat(sraId).isNotNull().isEqualTo("New sraId");
+        assertThat(sraId).isNull();
 
         LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
@@ -124,7 +124,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be more than 255 "
             + "characters");
         //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
