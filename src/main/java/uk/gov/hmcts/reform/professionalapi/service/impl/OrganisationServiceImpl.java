@@ -1065,7 +1065,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public ResponseEntity<Object> updateOrganisationNameOrSra(Organisation existingOrganisation,
                                                           Map<String,String> organisationNameSraUpdate) {
         Organisation organisationSaved = null;
-        String SRA_ID = "sraId";
+        String sraId = "sraId";
         try {
             if (organisationNameSraUpdate.containsKey("name")) {
                 OrgAttribute savedAttribute = null;
@@ -1076,19 +1076,19 @@ public class OrganisationServiceImpl implements OrganisationService {
                     organisationRepository.save(existingOrganisation);
                 }
             }
-            if (organisationNameSraUpdate.containsKey(SRA_ID)) {
+            if (organisationNameSraUpdate.containsKey(sraId)) {
                 OrgAttribute savedSraAttribute = null;
-                if (StringUtils.isNotEmpty(organisationNameSraUpdate.get(SRA_ID))
-                    && StringUtils.isNotBlank(organisationNameSraUpdate.get(SRA_ID))) {
+                if (StringUtils.isNotEmpty(organisationNameSraUpdate.get(sraId))
+                    && StringUtils.isNotBlank(organisationNameSraUpdate.get(sraId))) {
                     //delete the orgattribute for sra id from orgattribute table
                     deleteSraFromOrgAttribute(existingOrganisation);
                     //create new sra id in organisation attributes for the new sra id
                     savedSraAttribute = saveOrganisationAttributes(existingOrganisation,
-                    organisationNameSraUpdate.get(SRA_ID));
+                    organisationNameSraUpdate.get(sraId));
 
                     if (savedSraAttribute != null) {
                         existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(
-                            organisationNameSraUpdate.get(SRA_ID)));
+                            organisationNameSraUpdate.get(sraId)));
                         existingOrganisation.setLastUpdated(LocalDateTime.now());
 
                         //update the organisation table with the new sra id
