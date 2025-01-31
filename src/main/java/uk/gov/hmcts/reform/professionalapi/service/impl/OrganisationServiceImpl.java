@@ -1081,13 +1081,18 @@ public class OrganisationServiceImpl implements OrganisationService {
             if (organisationNameSraUpdate.containsKey("sraId")) {
                 OrgAttribute savedSraAttribute = null;
                 if (!StringUtils.isEmpty(organisationNameSraUpdate.get("sraId"))) {
-                    //save sra id in organisation attributes
+                    //delete the orgattribute for sra id from orgattribute table
+                    deleteSraFromOrgAttribute(existingOrganisation);
+                    //create new sra id in organisation attributes for the new sra id
                     savedSraAttribute = saveOrganisationAttributes(existingOrganisation,
                     organisationNameSraUpdate.get("sraId"));
+
                     if (savedSraAttribute != null) {
                         existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(
                             organisationNameSraUpdate.get("sraId")));
                         existingOrganisation.setLastUpdated(LocalDateTime.now());
+
+                        //update the organisation table with the new sra id
                         organisationSaved = organisationRepository.save(existingOrganisation);
                         if (organisationSaved == null) {
                             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
@@ -1098,7 +1103,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                         "Failed to save attributes for organisation sraId");
                     }
                 } else if (StringUtils.isEmpty(organisationNameSraUpdate.get("sraId"))) {
-                    //if sra id is empty space or null then delete it from database
+                    //if sra id is empty space or null then delete it from organisation table
                     existingOrganisation.setSraId(null);
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
                     organisationSaved = organisationRepository.save(existingOrganisation);
@@ -1106,6 +1111,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Failed to save organisation sraId");
                     }
+                    //if sra id is empty space or null then also delete the respoctive sra from orgattributes table
+                    deleteSraFromOrgAttribute(existingOrganisation);
                 }
             }
         } catch (Exception ex) {
@@ -1118,6 +1125,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
                                                    String sraId) {
+
+
         final String attributeKey = "regulators-0";
         final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
             + "\"organisationRegistrationNumber\":\"" + sraId + "\"}";
@@ -1137,5 +1146,19 @@ public class OrganisationServiceImpl implements OrganisationService {
         return savedAttribute;
     }
 
+
+    private void deleteSraFromOrgAttribute(Organisation existingOrganisation) {
+
+        List<OrgAttribute> orgAttributes = orgAttributeRepository.findByOrganisationId(existingOrganisation.getId());
+        if (!orgAttributes.isEmpty()) {
+            for (OrgAttribute orgAttribute : orgAttributes) {
+                String key = orgAttribute.getKey();
+                String value = orgAttribute.getValue();
+                if (key.equalsIgnoreCase("regulators-0") && value.contains("Solicitor Regulation Authority (SRA)")) {
+                    orgAttributeRepository.deleteById(orgAttribute.getId());
+                }
+            }
+        }
+    }
 }
 

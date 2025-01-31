@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -14,4 +15,6 @@ public interface OrgAttributeRepository extends JpaRepository<OrgAttribute, UUID
     @Modifying
     @Query(value = "delete from dbrefdata.org_attributes org where org.ORGANISATION_ID in (:val)",nativeQuery = true)
     void deleteByOrganistion(UUID val);
+
+    List<OrgAttribute> findByOrganisationId(UUID id);
 }
