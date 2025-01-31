@@ -456,7 +456,7 @@ dependencies {
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.6.2'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.0'
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
