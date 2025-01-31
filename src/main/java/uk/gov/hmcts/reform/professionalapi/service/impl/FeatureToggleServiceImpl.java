@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_RETRIEVE_PBA_EXTERNAL_V2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_RETRIEVE_PBA_INTERNAL_V2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_UPDATE_INTERNAL_V2;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_UPDATE_ORGANISATION_EXTERNAL_V2;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_BULK_CUSTOMER_LD_FLAG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTIPLE_ADDRESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.RD_PROFESSIONAL_MULTI_PBA_LD_FLAG;
