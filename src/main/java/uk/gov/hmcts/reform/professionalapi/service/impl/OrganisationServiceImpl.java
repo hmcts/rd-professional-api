@@ -1074,7 +1074,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
                     organisationSaved = organisationRepository.save(existingOrganisation);
-                    if (organisationSaved == null) {
+                    if (organisationSaved.getId() == null) {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                             "Failed to save organisation name");
                     }
@@ -1097,7 +1097,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                         //update the organisation table with the new sra id
                         organisationSaved = organisationRepository.save(existingOrganisation);
-                        if (organisationSaved == null) {
+                        if (organisationSaved.getId()  == null) {
                             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                             "Failed to save organisation sraId");
                         }
@@ -1110,7 +1110,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     existingOrganisation.setSraId(null);
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
                     organisationSaved = organisationRepository.save(existingOrganisation);
-                    if (organisationSaved == null) {
+                    if (organisationSaved.getId() == null) {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Failed to save organisation sraId");
                     }
