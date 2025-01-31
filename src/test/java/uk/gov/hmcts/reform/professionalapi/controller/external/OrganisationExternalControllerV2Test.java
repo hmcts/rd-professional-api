@@ -227,7 +227,7 @@ class OrganisationExternalControllerV2Test {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateOrganisationId(organisationIdentifier, organisationMock);
+            .validateOrganisationExistsAndActive(organisationIdentifier);
 
     }
 
@@ -254,7 +254,7 @@ class OrganisationExternalControllerV2Test {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateOrganisationId(organisationIdentifier, organisationMock);
+            .validateOrganisationExistsAndActive(organisationIdentifier);
 
     }
 

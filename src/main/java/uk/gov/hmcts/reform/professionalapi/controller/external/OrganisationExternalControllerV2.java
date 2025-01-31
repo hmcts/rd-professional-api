@@ -266,12 +266,12 @@ public class OrganisationExternalControllerV2 extends SuperController {
         if (StringUtils.isEmpty(organisationIdentifier)) {
             throw new ResourceNotFoundException("Organisation id is missing");
         }
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
 
         ResponseEntity<Object> response = null;
         //validate orgid is not invalid and organisation exists for given id
         var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-        organisationIdentifierValidatorImpl.validateOrganisationId(organisationIdentifier,existingOrganisation);
-        
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
         String name = null;
         String sraId = null;
         //if name or sraid both keys not in the map

@@ -32,7 +32,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LAST_UPDATED_SINCE_TIMESTAMP_FORMAT;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LOG_TWO_ARG_PLACEHOLDER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
 
@@ -161,17 +160,4 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         return true;
     }
 
-
-    public void validateOrganisationId(String orgId,Organisation existingOrganisation) {
-
-        if (existingOrganisation == null) {
-            throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
-        } else if (!orgId.matches("^[A-Z0-9]{7}$")) {
-            throw new InvalidRequest(ORG_ID_VALIDATION_ERROR_MESSAGE);
-        } else if (Optional.ofNullable(existingOrganisation).isEmpty()) {
-            throw new InvalidRequest(NO_ORG_FOUND_FOR_GIVEN_ID);
-        } else if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            throw new InvalidRequest(ORG_NOT_ACTIVE);
-        }
-    }
 }
