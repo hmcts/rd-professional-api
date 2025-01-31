@@ -2,7 +2,7 @@ plugins {
     id 'application'
     id 'idea'
     id 'project-report'
-    id 'uk.gov.hmcts.java' version '0.12.63'
+    id 'uk.gov.hmcts.java' version '0.12.64'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.51.0'
@@ -13,7 +13,7 @@ plugins {
     id "org.flywaydb.flyway" version '9.22.3'
     id 'au.com.dius.pact' version '4.6.16'
     id 'org.owasp.dependencycheck' version '11.1.1'
-    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.14'
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.15'
 }
 
 
@@ -36,7 +36,7 @@ def versions = [
         feign           : '3.8.0',
         bouncycastle    : '1.79',
         postgresql_tc   : '1.20.0',
-        serenity        : '4.2.14'
+        serenity        : '4.2.16'
 ]
 
 application {
