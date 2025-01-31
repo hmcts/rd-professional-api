@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -87,7 +87,30 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         deleteCreatedTestOrganisations(orgId);
     }
 
+    @Test
+    void update_sraId_if_sraId_null_or_Empty_should_return_success() {
 
+        //create request to update organisation
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId",null);
+        //create organisation
+        String orgId = getActiveOrganisationId();
+        String userId = getUserId(orgId);
+
+        Map<String, Object> response = professionalReferenceDataClient
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+        assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
+
+        //retrieve saved org to verify
+        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
+
+        final Object sraId = responseBody.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo("New sraId");
+
+        LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+        deleteCreatedTestOrganisations(orgId);
+    }
 
     @Test
     void update_name_should_return_failure_if_length_too_long() {
