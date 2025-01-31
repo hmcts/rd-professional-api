@@ -88,7 +88,55 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    void update_sraId_if_sraId_null_or_Empty_should_return_success() {
+    void update_of_an_active_organisation_should_fail_if_name_Empty() {
+
+        //create request to update organisation
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name","");
+        //create organisation
+        String orgId = getActiveOrganisationId();
+        String userId = getUserId(orgId);
+        //updateName
+        Map<String, Object> response = professionalReferenceDataClient
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("response_body")).toString().contains("Organisation name cannot be empty");
+        //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
+        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
+        final Object name = responseBody.get("name");
+        assertThat(name).isNotNull().isEqualTo("some-org-name1");
+
+        deleteCreatedTestOrganisations(orgId);
+    }
+
+    @Test
+    void update_sraId_if_sraId_Empty_should_return_success() {
+
+        //create request to update organisation
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId","  ");
+        //create organisation
+        String orgId = getActiveOrganisationId();
+        String userId = getUserId(orgId);
+
+        Map<String, Object> response = professionalReferenceDataClient
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+        assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
+
+        //retrieve saved org to verify
+        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
+
+        final Object sraId = responseBody.get("sraId");
+        assertThat(sraId).isNull();
+
+        LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+        deleteCreatedTestOrganisations(orgId);
+    }
+
+    @Test
+    void update_sraId_if_sraId_null_should_return_success() {
 
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
