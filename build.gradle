@@ -452,7 +452,7 @@ dependencies {
 
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
 
-    testImplementation 'io.github.openfeign:feign-jackson:13.3'
+    testImplementation 'io.github.openfeign:feign-jackson:13.5'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
