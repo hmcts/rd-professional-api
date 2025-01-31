@@ -1068,7 +1068,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         try {
             if (organisationNameSraUpdate.containsKey("name")) {
                 OrgAttribute savedAttribute = null;
-                if (!StringUtils.isEmpty(organisationNameSraUpdate.get("name"))) {
+                if (StringUtils.isNotEmpty(organisationNameSraUpdate.get("name")) &&
+                    StringUtils.isNotBlank(organisationNameSraUpdate.get("name"))) {
                     existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
                     organisationSaved = organisationRepository.save(existingOrganisation);
@@ -1080,7 +1081,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
             if (organisationNameSraUpdate.containsKey("sraId")) {
                 OrgAttribute savedSraAttribute = null;
-                if (!StringUtils.isEmpty(organisationNameSraUpdate.get("sraId"))) {
+                if (StringUtils.isNotEmpty(organisationNameSraUpdate.get("sraId")) &&
+                    StringUtils.isNotBlank(organisationNameSraUpdate.get("sraId"))) {
                     //delete the orgattribute for sra id from orgattribute table
                     deleteSraFromOrgAttribute(existingOrganisation);
                     //create new sra id in organisation attributes for the new sra id
@@ -1102,7 +1104,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Failed to save attributes for organisation sraId");
                     }
-                } else if (StringUtils.isEmpty(organisationNameSraUpdate.get("sraId"))) {
+                } else  {
                     //if sra id is empty space or null then delete it from organisation table
                     existingOrganisation.setSraId(null);
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
