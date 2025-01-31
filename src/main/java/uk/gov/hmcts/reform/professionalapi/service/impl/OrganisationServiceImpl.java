@@ -1073,11 +1073,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     && StringUtils.isNotBlank(organisationNameSraUpdate.get("name"))) {
                     existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
-                    organisationSaved = organisationRepository.save(existingOrganisation);
-                    if (organisationSaved.getId() == null) {
-                        throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                            "Failed to save organisation name");
-                    }
+                    organisationRepository.save(existingOrganisation);
                 }
             }
             if (organisationNameSraUpdate.containsKey(SRA_ID)) {
@@ -1096,11 +1092,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                         existingOrganisation.setLastUpdated(LocalDateTime.now());
 
                         //update the organisation table with the new sra id
-                        organisationSaved = organisationRepository.save(existingOrganisation);
-                        if (organisationSaved.getId()  == null) {
-                            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                            "Failed to save organisation sraId");
-                        }
+                        organisationRepository.save(existingOrganisation);
+
                     } else {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Failed to save attributes for organisation sraId");
@@ -1109,11 +1102,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                     //if sra id is empty space or null then delete it from organisation table
                     existingOrganisation.setSraId(null);
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
-                    organisationSaved = organisationRepository.save(existingOrganisation);
-                    if (organisationSaved.getId() == null) {
-                        throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                        "Failed to save organisation sraId");
-                    }
+                    organisationRepository.save(existingOrganisation);
+
                     //if sra id is empty space or null then also delete the respoctive sra from orgattributes table
                     deleteSraFromOrgAttribute(existingOrganisation);
                 }

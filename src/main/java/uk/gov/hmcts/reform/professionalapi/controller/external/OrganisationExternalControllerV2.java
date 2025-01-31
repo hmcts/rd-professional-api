@@ -261,42 +261,42 @@ public class OrganisationExternalControllerV2 extends SuperController {
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationNameSraUpdate")
         @Parameter(hidden = true) @OrgId String organisationIdentifier,
         @RequestBody Map<String,String> organisationNameSraUpdate) {
-        String SRA_ID = "sraId";
-        String NAME = "name";
+
         //validate that organisation id is not null
         if (StringUtils.isEmpty(organisationIdentifier)) {
             throw new ResourceNotFoundException("Organisation id is missing");
         }
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-
+        String sraId = "sraId";
+        String name = "name";
         ResponseEntity<Object> response = null;
         //validate orgid is not invalid and organisation exists for given id
         var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
-        String name = null;
-        String sraId = null;
+        String nameValue = null;
+        String sraIdValue = null;
         //if name or sraid both keys not in the map
-        if ((!organisationNameSraUpdate.containsKey(NAME)) && (!organisationNameSraUpdate.containsKey(SRA_ID))) {
+        if ((!organisationNameSraUpdate.containsKey(name)) && (!organisationNameSraUpdate.containsKey(sraId))) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Request parameters unrecognised");
         } else {
             //if organisation name exists then validate name
-            if (organisationNameSraUpdate.containsKey(NAME)) {
-                name = organisationNameSraUpdate.get(NAME);
-                if (StringUtils.isEmpty(name) || StringUtils.isEmpty(name.trim())) {
+            if (organisationNameSraUpdate.containsKey(name)) {
+                nameValue = organisationNameSraUpdate.get(name);
+                if (StringUtils.isEmpty(nameValue) || StringUtils.isEmpty(nameValue.trim())) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Organisation name cannot be empty");
                 }
-                if (name != null && name.length() > 255) {
+                if (nameValue != null && nameValue.length() > 255) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Organisation name cannot be more than 255 characters");
                 }
 
             } //if organisation sraid exists then validate
-            if (organisationNameSraUpdate.containsKey(SRA_ID)) {
-                sraId = organisationNameSraUpdate.get(SRA_ID);
+            if (organisationNameSraUpdate.containsKey(sraId)) {
+                sraIdValue = organisationNameSraUpdate.get(sraId);
 
-                if (sraId != null && sraId.length() > 164) {
+                if (sraIdValue != null && sraIdValue.length() > 164) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Organisation sraId cannot be more than 255 characters");
                 }
