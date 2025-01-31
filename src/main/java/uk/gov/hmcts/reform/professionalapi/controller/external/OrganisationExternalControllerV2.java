@@ -261,7 +261,8 @@ public class OrganisationExternalControllerV2 extends SuperController {
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationNameSraUpdate")
         @Parameter(hidden = true) @OrgId String organisationIdentifier,
         @RequestBody Map<String,String> organisationNameSraUpdate) {
-
+        String SRA_ID = "sraId";
+        String NAME = "name";
         //validate that organisation id is not null
         if (StringUtils.isEmpty(organisationIdentifier)) {
             throw new ResourceNotFoundException("Organisation id is missing");
@@ -275,13 +276,13 @@ public class OrganisationExternalControllerV2 extends SuperController {
         String name = null;
         String sraId = null;
         //if name or sraid both keys not in the map
-        if ((!organisationNameSraUpdate.containsKey("name")) && (!organisationNameSraUpdate.containsKey("sraId"))) {
+        if ((!organisationNameSraUpdate.containsKey(NAME)) && (!organisationNameSraUpdate.containsKey(SRA_ID))) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Request parameters unrecognised");
         } else {
             //if organisation name exists then validate name
-            if (organisationNameSraUpdate.containsKey("name")) {
-                name = organisationNameSraUpdate.get("name");
+            if (organisationNameSraUpdate.containsKey(NAME)) {
+                name = organisationNameSraUpdate.get(NAME);
                 if (StringUtils.isEmpty(name) || StringUtils.isEmpty(name.trim())) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Organisation name cannot be empty");
@@ -292,8 +293,8 @@ public class OrganisationExternalControllerV2 extends SuperController {
                 }
 
             } //if organisation sraid exists then validate
-            if (organisationNameSraUpdate.containsKey("sraId")) {
-                sraId = organisationNameSraUpdate.get("sraId");
+            if (organisationNameSraUpdate.containsKey(SRA_ID)) {
+                sraId = organisationNameSraUpdate.get(SRA_ID);
 
                 if (sraId != null && sraId.length() > 164) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),

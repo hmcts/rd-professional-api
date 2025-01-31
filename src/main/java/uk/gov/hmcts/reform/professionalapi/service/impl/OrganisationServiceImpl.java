@@ -1065,6 +1065,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public ResponseEntity<Object> updateOrganisationNameOrSra(Organisation existingOrganisation,
                                                           Map<String,String> organisationNameSraUpdate) {
         Organisation organisationSaved = null;
+        String SRA_ID = "sraId";
         try {
             if (organisationNameSraUpdate.containsKey("name")) {
                 OrgAttribute savedAttribute = null;
@@ -1079,19 +1080,19 @@ public class OrganisationServiceImpl implements OrganisationService {
                     }
                 }
             }
-            if (organisationNameSraUpdate.containsKey("sraId")) {
+            if (organisationNameSraUpdate.containsKey(SRA_ID)) {
                 OrgAttribute savedSraAttribute = null;
-                if (StringUtils.isNotEmpty(organisationNameSraUpdate.get("sraId"))
-                    && StringUtils.isNotBlank(organisationNameSraUpdate.get("sraId"))) {
+                if (StringUtils.isNotEmpty(organisationNameSraUpdate.get(SRA_ID))
+                    && StringUtils.isNotBlank(organisationNameSraUpdate.get(SRA_ID))) {
                     //delete the orgattribute for sra id from orgattribute table
                     deleteSraFromOrgAttribute(existingOrganisation);
                     //create new sra id in organisation attributes for the new sra id
                     savedSraAttribute = saveOrganisationAttributes(existingOrganisation,
-                    organisationNameSraUpdate.get("sraId"));
+                    organisationNameSraUpdate.get(SRA_ID));
 
                     if (savedSraAttribute != null) {
                         existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(
-                            organisationNameSraUpdate.get("sraId")));
+                            organisationNameSraUpdate.get(SRA_ID)));
                         existingOrganisation.setLastUpdated(LocalDateTime.now());
 
                         //update the organisation table with the new sra id
