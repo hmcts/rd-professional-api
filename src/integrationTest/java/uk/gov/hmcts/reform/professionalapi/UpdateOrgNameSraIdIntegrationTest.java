@@ -207,6 +207,30 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
+    void update_of_an_active_organisation_should_fail_if_name_and_sra_both_missing_in_request() {
+
+        //create request to update organisation
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+
+        //create organisation
+        String orgId = getActiveOrganisationId();
+        String userId = getUserId(orgId);
+        //updateName
+        Map<String, Object> response = professionalReferenceDataClient
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("response_body")).toString().contains("Request parameters unrecognised");
+        //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
+        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
+        final Object name = responseBody.get("name");
+        assertThat(name).isNotNull().isEqualTo("some-org-name1");
+
+        deleteCreatedTestOrganisations(orgId);
+    }
+
+
+    @Test
     void forbidden_acccess_should_return_failure() {
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
