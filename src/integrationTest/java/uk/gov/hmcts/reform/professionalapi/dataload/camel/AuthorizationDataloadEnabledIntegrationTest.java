@@ -1,16 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.dataload.camel;
 
 import com.launchdarkly.sdk.server.LDClient;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.apache.camel.ProducerTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.LaunchDarklyConfiguration;
 import uk.gov.hmcts.reform.professionalapi.configuration.SecurityConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -25,7 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImp
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.SpringBootIntegrationTest;
 
-@SerenityTest
+@ExtendWith(SerenityJUnit5Extension.class)
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
         "USER_PROFILE_URL:http://127.0.0.1:8091"})
