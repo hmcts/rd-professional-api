@@ -36,7 +36,7 @@ public interface ProfessionalApiGenerator {
     static String generateUniqueAlphanumericId(int lengthOfString) {
         String generatedString = null;
         while (true) {
-            generatedString = RandomStringUtils.randomAlphanumeric(lengthOfString);
+            generatedString = RandomStringUtils.secure().nextAlphanumeric(lengthOfString);
             if (generatedString.matches(ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
                 break;
             }

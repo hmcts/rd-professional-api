@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -93,5 +93,4 @@ class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
         return professionalReferenceDataClient.findMFAByUserID(persistedSuperUser.getUserIdentifier());
     }
-    
 }
