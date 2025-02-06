@@ -55,13 +55,13 @@ public class DxAddress implements Serializable {
 
     @Override
     public String toString() {
-        return "DxAddress{" +
-            "id=" + id +
-            ", dxNumber='" + dxNumber + '\'' +
-            ", dxExchange='" + dxExchange + '\'' +
-            ", contactInformation=" + contactInformation.getId() +
-            ", lastUpdated=" + lastUpdated +
-            ", created=" + created +
-            '}';
+        return "DxAddress{"
+            + "id=" + id
+            + ", dxNumber='" + dxNumber + '\''
+            + ", dxExchange='" + dxExchange + '\''
+            + ", contactInformation=" + contactInformation.getId()
+            + ", lastUpdated=" + lastUpdated
+            + ", created=" + created
+            + '}';
     }
 }

@@ -45,7 +45,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.SuperUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Audit;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
@@ -1147,7 +1146,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     || StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
 
                     if (!existingOrganisation.getContactInformation().isEmpty()) {
-                        if(existingOrganisation.getContactInformation().get(0) != null) {
+                        if (existingOrganisation.getContactInformation().get(0) != null) {
                             List<DxAddress> existingDxAddress = dxAddressRepository.findByContactInformationId(
                                 existingOrganisation.getContactInformation().get(0).getId());
                             if (!existingDxAddress.isEmpty()) {
@@ -1156,7 +1155,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                             }
                             //if DxAddress information is provided in request then create a new DxAddress
                             updateOrganisationDxAddress(existingOrganisation.getContactInformation().get(0),
-                                existingOrganisation.getOrganisationIdentifier(), updateContactInformationRequest, userId);
+                                existingOrganisation.getOrganisationIdentifier(), updateContactInformationRequest,
+                                userId);
                         }
                     }
                 }
@@ -1181,17 +1181,17 @@ public class OrganisationServiceImpl implements OrganisationService {
         updateContactInformationRequest,String userId) {
         try {
             if (contactInformation != null) {
-                    DxAddress newDxAddress = new DxAddress(
-                        RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxNumber()),
-                        RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxExchange()),
-                        contactInformation);
+                DxAddress newDxAddress = new DxAddress(
+                    RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxNumber()),
+                    RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxExchange()),
+                    contactInformation);
                 newDxAddress.setLastUpdated(LocalDateTime.now());
                 newDxAddress.setCreated(LocalDateTime.now());
-                    DxAddress savedDxAddress = dxAddressRepository.save(newDxAddress);
-                    if (savedDxAddress == null) {
-                        throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                            "Failed to save DxAddress Information");
-                    }
+                DxAddress savedDxAddress = dxAddressRepository.save(newDxAddress);
+                if (savedDxAddress == null) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Failed to save DxAddress Information");
+                }
 
             }
         } catch (Exception ex) {

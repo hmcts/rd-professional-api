@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,18 +13,18 @@ public class UpdateContactInformationRequest {
 
     @Override
     public String toString() {
-        return "UpdateContactInformationRequest{" +
-            "uprn='" + uprn + '\'' +
-            ", addressLine1='" + addressLine1 + '\'' +
-            ", addressLine2='" + addressLine2 + '\'' +
-            ", addressLine3='" + addressLine3 + '\'' +
-            ", townCity='" + townCity + '\'' +
-            ", county='" + county + '\'' +
-            ", country='" + country + '\'' +
-            ", postCode='" + postCode + '\'' +
-            ", dxNumber='" + dxNumber + '\'' +
-            ", dxExchange='" + dxExchange + '\'' +
-            '}';
+        return "UpdateContactInformationRequest{"
+            + "uprn='" + uprn + '\''
+            + ", addressLine1='" + addressLine1 + '\''
+            + ", addressLine2='" + addressLine2 + '\''
+            + ", addressLine3='" + addressLine3 + '\''
+            + ", townCity='" + townCity + '\''
+            + ", county='" + county + '\''
+            + ", country='" + country + '\''
+            + ", postCode='" + postCode + '\''
+            + ", dxNumber='" + dxNumber + '\''
+            + ", dxExchange='" + dxExchange + '\''
+            + '}';
     }
 
     private final String addressLine1;
