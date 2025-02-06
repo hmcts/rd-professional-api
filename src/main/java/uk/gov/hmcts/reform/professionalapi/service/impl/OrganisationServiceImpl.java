@@ -1085,9 +1085,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                     ContactInformation existingContactInformation = existingContactInformationList.get(0);
                     //delete the existing address and add new one
                     contactInformationRepository.deleteById(existingContactInformation.getId());
-                    auditDetails(existingOrganisation.getOrganisationIdentifier(), userId,
-                         "deleted existing contact information", existingContactInformation.toString());
-
                     //delete the corresponding dxAddress as well
                     //fetch all dxAdresses and assuming there will be single address delete the first one
                     List<DxAddress> dxAddress = existingOrganisation.getContactInformation().get(0).getDxAddresses();
@@ -1132,8 +1129,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                     contactInformation.setOrganisation(existingOrganisation);
                     contactInformation.setLastUpdated(LocalDateTime.now());
                     ContactInformation savedContactInformation = contactInformationRepository.save(contactInformation);
-                    auditDetails(existingOrganisation.getOrganisationIdentifier(), userId,
-                         "saved new contact information", savedContactInformation.toString());
 
                     if (savedContactInformation == null) {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
@@ -1177,7 +1172,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     public void deleteDxAddress(List<DxAddress> dxAddress,String userId, String orgIdentifier) {
         DxAddress existingDxAddress = dxAddress.get(0);
         dxAddressRepository.delete(existingDxAddress);
-        auditDetails(orgIdentifier, userId,"deleted existing dxAddress", existingDxAddress.toString());
     }
 
     @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
@@ -1194,8 +1188,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                 newDxAddress.setLastUpdated(LocalDateTime.now());
                 newDxAddress.setCreated(LocalDateTime.now());
                     DxAddress savedDxAddress = dxAddressRepository.save(newDxAddress);
-                    auditDetails(organisationIdentifier, userId,
-                        "saved new dxAddress", savedDxAddress.toString());
                     if (savedDxAddress == null) {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                             "Failed to save DxAddress Information");
@@ -1210,16 +1202,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         return ResponseEntity.status(204).build();
     }
 
-
-    public void auditDetails(String orgIdentifier,String userId, String actionCarriedOut, String changeDetails) {
-        Audit auditDetails = new Audit();
-        auditDetails.setOrganisationIdentifier(orgIdentifier);
-        auditDetails.setChangeDetails(changeDetails);
-        auditDetails.setUpdatedBy(userId);
-        auditDetails.setChangeAction(actionCarriedOut);
-        auditDetails.setLastUpdated(LocalDateTime.now());
-        auditDetailsRepository.save(auditDetails);
-    }
 
 
 }
