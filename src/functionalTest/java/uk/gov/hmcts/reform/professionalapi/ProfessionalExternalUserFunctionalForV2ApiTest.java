@@ -433,7 +433,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationNameSraUpdate.put("sraId",updateSraId);
 
         //call endpoint to update with user manager role not allowed
-        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(puiUserManager));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
