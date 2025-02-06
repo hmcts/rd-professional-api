@@ -216,20 +216,29 @@ class OrganisationExternalControllerV2Test {
             .thenReturn(organisationMock);
         when(organisationServiceMock.updateOrganisationNameOrSra(organisationMock,organisationNameSraUpdate))
             .thenReturn(responseEntity);
-
+        String sra = organisationNameSraUpdate.get("sraId");
         ResponseEntity<Object> response = organisationExternalController.updateOrganisationNameOrSra(
             organisationIdentifier,organisationNameSraUpdate);
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
 
         verify(organisationServiceMock, times(1)).updateOrganisationNameOrSra(
-            any(), any());
+            any(),any());
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
 
         verify(organisationIdentifierValidatorImplMock, times(1))
             .validateOrganisationExistsAndActive(organisationIdentifier);
 
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationNameOrSra(eq(organisationMock), eq(organisationNameSraUpdate));
+
+        verify(organisationServiceMock, times(1))
+            .getOrganisationByOrgIdentifier(eq(organisationIdentifier));
+
+        verify(organisationIdentifierValidatorImplMock, times(1))
+            .validateOrganisationExistsAndActive(eq(organisationIdentifier));
     }
+
 
     @Test
     void testUpdateOrgName() {
@@ -256,6 +265,14 @@ class OrganisationExternalControllerV2Test {
         verify(organisationIdentifierValidatorImplMock, times(1))
             .validateOrganisationExistsAndActive(organisationIdentifier);
 
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationNameOrSra(eq(organisationMock), eq(organisationNameSraUpdate));
+
+        verify(organisationServiceMock, times(1))
+            .getOrganisationByOrgIdentifier(eq(organisationIdentifier));
+
+        verify(organisationIdentifierValidatorImplMock, times(1))
+            .validateOrganisationExistsAndActive(eq(organisationIdentifier));
     }
 
 

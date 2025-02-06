@@ -267,31 +267,31 @@ public class OrganisationExternalControllerV2 extends SuperController {
             throw new ResourceNotFoundException("Organisation id is missing");
         }
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
+
         String sraId = "sraId";
         String name = "name";
         ResponseEntity<Object> response = null;
         //validate orgid is not invalid and organisation exists for given id
         var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
+
         String nameValue = null;
         String sraIdValue = null;
         //if name or sraid both keys not in the map
-        if ((!organisationNameSraUpdate.containsKey(name)) && (!organisationNameSraUpdate.containsKey(sraId))) {
+        if (!organisationNameSraUpdate.containsKey(name) && !organisationNameSraUpdate.containsKey(sraId)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Request parameters unrecognised");
         } else {
             //if organisation name exists then validate name
             if (organisationNameSraUpdate.containsKey(name)) {
                 nameValue = organisationNameSraUpdate.get(name);
-                if (StringUtils.isEmpty(nameValue) || StringUtils.isEmpty(nameValue.trim())) {
+                if (nameValue == null || StringUtils.isEmpty(nameValue.trim())) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Organisation name cannot be empty");
-                }
-                if (nameValue != null && nameValue.length() > 255) {
+                } else if (nameValue.length() > 255) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Organisation name cannot be more than 255 characters");
                 }
-
             } //if organisation sraid exists then validate
             if (organisationNameSraUpdate.containsKey(sraId)) {
                 sraIdValue = organisationNameSraUpdate.get(sraId);

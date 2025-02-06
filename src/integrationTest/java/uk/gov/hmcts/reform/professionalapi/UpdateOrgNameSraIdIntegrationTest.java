@@ -79,7 +79,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be empty");
-        //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
+        //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
         final Object name = responseBody.get("name");
         assertThat(name).isNotNull().isEqualTo("some-org-name1");
@@ -102,7 +102,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be empty");
-        //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
+        //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
         final Object name = responseBody.get("name");
         assertThat(name).isNotNull().isEqualTo("some-org-name1");
@@ -175,7 +175,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be more than 255 "
             + "characters");
-        //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
+        //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
         final Object savedName = responseBody.get("name");
         assertThat(savedName).isNotNull().isEqualTo("some-org-name1");
@@ -198,7 +198,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation sraId cannot be more than "
             + "255 characters");
-        //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
+        //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
         final Object savedSraId = responseBody.get("sraId");
         assertThat(savedSraId).isNotNull().isEqualTo("sra-id1");
@@ -221,7 +221,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Request parameters unrecognised");
-        //retrieve saved org to verify that the erntre transaction ios rolled back , sra id is not saved
+        //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
         final Object name = responseBody.get("name");
         assertThat(name).isNotNull().isEqualTo("some-org-name1");

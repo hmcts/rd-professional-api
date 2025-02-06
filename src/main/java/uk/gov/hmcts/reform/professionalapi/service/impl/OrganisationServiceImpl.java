@@ -1104,7 +1104,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
                     organisationRepository.save(existingOrganisation);
 
-                    //if sra id is empty space or null then also delete the respoctive sra from orgattributes table
+                    //if sra id is empty space or null then also delete the respective sra from orgattributes table
                     deleteSraFromOrgAttribute(existingOrganisation);
                 }
             }
@@ -1119,7 +1119,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
                                                    String sraId) {
 
-
         final String attributeKey = "regulators-0";
         final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
             + "\"organisationRegistrationNumber\":\"" + sraId + "\"}";
@@ -1127,8 +1126,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(sraId));
         OrgAttribute attribute = new OrgAttribute();
         attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
-        attribute.setValue(RefDataUtil
-            .removeEmptySpaces(attributeValue));
+        attribute.setValue(RefDataUtil.removeEmptySpaces(attributeValue));
         attribute.setOrganisation(existingOrganisation);
 
         OrgAttribute savedAttribute = orgAttributeRepository.save(attribute);
@@ -1147,7 +1145,9 @@ public class OrganisationServiceImpl implements OrganisationService {
             for (OrgAttribute orgAttribute : orgAttributes) {
                 String key = orgAttribute.getKey();
                 String value = orgAttribute.getValue();
-                if (key.equalsIgnoreCase("regulators-0") && value.contains("Solicitor Regulation Authority (SRA)")) {
+                if ((StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value))
+                    && (key.equalsIgnoreCase("regulators-0")
+                    && value.contains("Solicitor Regulation Authority (SRA)"))) {
                     orgAttributeRepository.deleteById(orgAttribute.getId());
                 }
             }

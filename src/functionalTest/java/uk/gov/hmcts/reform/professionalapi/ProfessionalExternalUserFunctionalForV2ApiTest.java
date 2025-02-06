@@ -224,7 +224,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationNameSraUpdate.put("sraId",updateSraId);
 
         //call endpoint to update name as 'updatedname'
-        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
@@ -238,7 +238,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         final Object sraId = orgResponse.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(updateSraId);
 
-        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
@@ -257,7 +257,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationNameSraUpdate.put("sraId",updateSraId);
 
         //call endpoint to update name as 'updatedname'
-        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
@@ -269,7 +269,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         final Object sraId = orgResponse.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(updateSraId);
 
-        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
@@ -288,7 +288,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationNameSraUpdate.put("name",updateName);
 
         //call endpoint to update name
-        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
@@ -300,7 +300,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         final Object orgName = orgResponse.get("name");
         assertThat(orgName).isNotNull().isEqualTo(updateName);
 
-        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
         log.info("updateOrganisationNameOnlyShouldReturnSuccess :: END");
@@ -338,7 +338,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationNameSraUpdate.put("sraId",updateSraId);
 
         //call endpoint to update
-        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
@@ -350,7 +350,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         final Object orgName = orgResponse.get("sraId");
         assertThat(orgName).isNotNull().isEqualTo(updateSraId);
 
-        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
         log.info("updateOrganisationShouldReturnSuccessIfNoNameAddedInMap :: END");
@@ -366,7 +366,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",updateSraId);
         //call endpoint to update
-        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
@@ -385,7 +385,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name",updateName);
         //call endpoint to update
-        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
@@ -411,7 +411,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationNameSraUpdate.put("sraId",updateSraId);
 
         //call endpoint to update with no org id does not create token invalid authentication 401
-        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(null));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
