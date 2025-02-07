@@ -218,7 +218,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
             userId,updateContactInformationRequest,caseworkerCaa);
 
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("403");
         assertThat(response.get("response_body")).toString().contains("Access Denied");
         deleteCreatedTestOrganisations(orgId);
     }
