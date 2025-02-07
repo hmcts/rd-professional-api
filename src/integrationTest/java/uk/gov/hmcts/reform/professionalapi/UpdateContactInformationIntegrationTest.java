@@ -8,12 +8,10 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -85,7 +83,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("U-postCode");
 
         ArrayList dxAddresses = (ArrayList)contacts.get(0).get("dxAddress");
-        LinkedHashMap dxAddressMap =( LinkedHashMap) dxAddresses.get(0);
+        LinkedHashMap dxAddressMap = ( LinkedHashMap) dxAddresses.get(0);
         assertThat(dxAddressMap.get("dxNumber")).isNotNull().isEqualTo("dxNumberU");
         assertThat(dxAddressMap.get("dxExchange")).isNotNull().isEqualTo("dxExchangeU");
 
