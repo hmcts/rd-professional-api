@@ -272,23 +272,11 @@ public class OrganisationExternalControllerV2 extends SuperController {
 
         ResponseEntity<Object> response = null;
 
-        if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange())
-            || StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
-            organisationIdentifierValidatorImpl.validateDxAddress(updateContactInformationRequest);
-        }
+        //validate contact information
+        organisationIdentifierValidatorImpl.validateAddress(updateContactInformationRequest);
 
-        if (StringUtils.isNotEmpty(updateContactInformationRequest.getUprn()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getAddressLine1()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getAddressLine2()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getAddressLine3()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getTownCity()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getCountry()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getCounty()) || StringUtils.isNotEmpty(
-            updateContactInformationRequest.getPostCode())) {
-            //validate request
-            organisationIdentifierValidatorImpl.validateAddress(updateContactInformationRequest);
-
-        }
+        //validate dxAddress
+        organisationIdentifierValidatorImpl.validateDxAddress(updateContactInformationRequest);
 
         //update organisation address/dxAddress
         response = organisationService.updateOrganisationAddress(existingOrganisation,updateContactInformationRequest,

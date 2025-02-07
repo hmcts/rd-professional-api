@@ -168,23 +168,29 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         String dxNumber = updateContactInformationRequest.getDxNumber();
         String dxExchange = updateContactInformationRequest.getDxExchange();
 
-        if (StringUtils.isNotEmpty(dxNumber) && StringUtils.isEmpty(dxExchange)) {
+        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber)) && StringUtils.isEmpty(dxExchange)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation dxExchange canot be empty be empty");
         }
-        if (StringUtils.isNotEmpty(dxExchange) && StringUtils.isEmpty(dxNumber)) {
+        if ((StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange))
+            && StringUtils.isEmpty(dxNumber)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation dxNumber canot be empty be empty");
         }
-        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange)) && dxNumber.length() >= 14) {
+        if (((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber))
+            && (StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange)))
+            && dxNumber.length() >= 14) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "DX Number (max=13) has invalid length");
         }
-        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange)) && dxExchange.length() >= 40) {
+        if (((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber))
+            && (StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange)))
+            && dxExchange.length() >= 40) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "DX Exchange (max=40) has invalid length");
         }
-        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotEmpty(dxExchange))
+        if (((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber))
+            && (StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange)))
             && !dxNumber.matches("^[a-zA-Z0-9 ]*$")) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Invalid Dx Number entered: " + dxNumber + ", it can only contain "
@@ -197,14 +203,13 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         String uprn = updateContactInformationRequest.getUprn();
         String addressLine1 = updateContactInformationRequest.getAddressLine1();
 
-        if (StringUtils.isNotEmpty(uprn.trim()) && uprn.length() > 14) {
-            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                "Uprn must not be greater than 14 characters long");
-        }
         if (StringUtils.isEmpty(addressLine1)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "AddressLine1 cannot be empty");
         }
-
+        if (StringUtils.isNotEmpty(uprn.trim()) && uprn.length() > 14) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Uprn must not be greater than 14 characters long");
+        }
     }
 }

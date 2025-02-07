@@ -1068,19 +1068,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         Organisation existingOrganisation, UpdateContactInformationRequest updateContactInformationRequest,
         String userId) {
         try {
-            if (StringUtils.isNotEmpty(updateContactInformationRequest.getUprn())
-                 || StringUtils.isNotEmpty(updateContactInformationRequest.getAddressLine1())
-                 || StringUtils.isNotEmpty(updateContactInformationRequest.getAddressLine2())
-                 || StringUtils.isNotEmpty(updateContactInformationRequest.getAddressLine3())
-                 || StringUtils.isNotEmpty(updateContactInformationRequest.getTownCity())
-                 || StringUtils.isNotEmpty(updateContactInformationRequest.getCountry())
-                 || StringUtils.isNotEmpty(updateContactInformationRequest.getCounty())
-                 || StringUtils.isNotEmpty(updateContactInformationRequest.getPostCode())) {
 
                 List<ContactInformation> existingContactInformationList = existingOrganisation.getContactInformation();
                 if (!existingContactInformationList.isEmpty()) {
-                    //fetch all contact information for the organisation , assuming for nowthat there is only one
-                    // address use first one , in future the id of the address to be updated will be passed from UI
+                    //fetch all contact information for the organisation , assuming for now that there is only one
+                    // & use the first one , in future the id of the address to be updated will be passed from UI
                     ContactInformation existingContactInformation = existingContactInformationList.get(0);
                     //delete the existing address and add new one
                     contactInformationRepository.deleteById(existingContactInformation.getId());
@@ -1133,34 +1125,17 @@ public class OrganisationServiceImpl implements OrganisationService {
                         throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                              "Failed to save contact information");
                     }
-                    if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange())
-                        || StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
+                    if ((StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange()) &&
+                        StringUtils.isNotBlank(updateContactInformationRequest.getDxExchange()))
+                        && (StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber()) &&
+                        StringUtils.isNotBlank(updateContactInformationRequest.getDxNumber()))) {
                         //if DxAddress information is provided in request then create a new DxAddress
                         updateOrganisationDxAddress(savedContactInformation,existingOrganisation
                             .getOrganisationIdentifier(), updateContactInformationRequest, userId);
 
                     }
                 }
-            } else {
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange())
-                    || StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())) {
 
-                    if (!existingOrganisation.getContactInformation().isEmpty()) {
-                        if (existingOrganisation.getContactInformation().get(0) != null) {
-                            List<DxAddress> existingDxAddress = dxAddressRepository.findByContactInformationId(
-                                existingOrganisation.getContactInformation().get(0).getId());
-                            if (!existingDxAddress.isEmpty()) {
-                                deleteDxAddress(existingDxAddress, userId, existingOrganisation
-                                    .getOrganisationIdentifier());
-                            }
-                            //if DxAddress information is provided in request then create a new DxAddress
-                            updateOrganisationDxAddress(existingOrganisation.getContactInformation().get(0),
-                                existingOrganisation.getOrganisationIdentifier(), updateContactInformationRequest,
-                                userId);
-                        }
-                    }
-                }
-            }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Failed to save or update organisation address");
