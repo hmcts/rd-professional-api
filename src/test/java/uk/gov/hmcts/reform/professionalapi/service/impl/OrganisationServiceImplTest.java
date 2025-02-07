@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
@@ -134,6 +136,9 @@ class OrganisationServiceImplTest {
     private final LocalDateTime since = LocalDateTime.parse(SINCE_STR, ISO_DATE_TIME_FORMATTER);
 
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
+    private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
+    private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
+
     private final OrgAttributeRepository orgAttributeRepository = mock(OrgAttributeRepository.class);
 
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
@@ -2717,5 +2722,76 @@ class OrganisationServiceImplTest {
         // assert
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+    }
+
+    @Test
+    void test_updateOrganisationAddress() {
+        List<ContactInformation> contactInformations = new ArrayList<>();
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn("uprn");
+        contactInformation.setAddressLine1("addressLine1");
+        Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        contactInformations.add(contactInformation);
+        org.setContactInformations(contactInformations);
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "1addressLine1","1addressLine2","1addressLine3","townCity1",
+                "county1","country1","postCode1","","");
+        String userId = UUID.randomUUID().toString().substring(0, 7);
+
+        ResponseEntity<Object> response = sut.updateOrganisationAddress(org,
+            updateContactInformationRequest,userId);
+        assertNotNull(response);
+        verify(contactInformationRepositoryMock, times(1)).save(any(ContactInformation.class));
+    }
+
+    @Test
+    void test_updateOrganisationAddressWithDxAddress() {
+        List<ContactInformation> contactInformations = new ArrayList<>();
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn("uprn");
+        contactInformation.setAddressLine1("addressLine1");
+        Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        contactInformations.add(contactInformation);
+        org.setContactInformations(contactInformations);
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "1addressLine1","1addressLine2","1addressLine3","townCity1",
+                "county1","country1","postCode1","dxNumber1",
+                "dxExchange1");
+        String userId = UUID.randomUUID().toString().substring(0, 7);
+
+        ResponseEntity<Object> response = sut.updateOrganisationAddress(org,
+            updateContactInformationRequest,userId);
+        assertNotNull(response);
+        verify(contactInformationRepositoryMock, times(1)).save(any(ContactInformation.class));
+        verify(dxAddressRepositoryMock, times(1))
+            .save(any(DxAddress.class));
+    }
+
+    @Test
+    void shouldThrowFieldAndPersistenceValidationExceptionWhenSaveUpdateFails() {
+
+        List<ContactInformation> contactInformations = new ArrayList<>();
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setUprn("uprn");
+        contactInformation.setAddressLine1("addressLine1");
+        Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        contactInformations.add(contactInformation);
+        org.setContactInformations(contactInformations);
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1","1addressLine1",
+                "","","","","","","","");
+        String userId = UUID.randomUUID().toString().substring(0, 7);
+        when(contactInformationRepositoryMock.save(any()))
+            .thenThrow(new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Failed to save or update organisation address"));
+        //ResponseEntity<Object> response = sut.updateOrganisationAddress(org, any(),userId);
+        assertThrows(FieldAndPersistenceValidationException.class, () -> sut.updateOrganisationAddress(org,
+             any(),userId));
+
     }
 }

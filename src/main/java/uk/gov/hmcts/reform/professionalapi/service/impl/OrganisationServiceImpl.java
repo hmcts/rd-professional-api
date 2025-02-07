@@ -1072,16 +1072,16 @@ public class OrganisationServiceImpl implements OrganisationService {
             if (!existingContactInformationList.isEmpty()) {
                 //fetch all contact information for the organisation , assuming for now that there is only one
                 // & use the first one , in future the id of the address to be updated will be passed from UI
-                ContactInformation existingContactInformation = existingContactInformationList.get(0);
-                //delete the existing address and add new one
-                contactInformationRepository.deleteById(existingContactInformation.getId());
-                //delete the corresponding dxAddress as well
-                //fetch all dxAdresses and assuming there will be single address delete the first one
-                List<DxAddress> dxAddress = existingOrganisation.getContactInformation().get(0).getDxAddresses();
-                if (!dxAddress.isEmpty()) {
-                    deleteDxAddress(dxAddress,userId,existingOrganisation.getOrganisationIdentifier());
-                }
-
+                existingContactInformationList.forEach(contact -> {
+                    //delete all existing contact information
+                    contactInformationRepository.deleteById(contact.getId());
+                    //delete the corresponding dxAddress as well
+                    //fetch all dxAdresses and assuming there will be single address delete the first one
+                    List<DxAddress> dxAddressList = contact.getDxAddresses();
+                    if (!dxAddressList.isEmpty()) {
+                        deleteDxAddress(dxAddressList);
+                    }
+                });
                 //creating contact information with the new information
                 ContactInformation contactInformation = new ContactInformation();
                 if (StringUtils.isNotEmpty(updateContactInformationRequest.getUprn())) {
@@ -1141,9 +1141,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         return ResponseEntity.status(204).build();
     }
 
-    public void deleteDxAddress(List<DxAddress> dxAddress,String userId, String orgIdentifier) {
-        DxAddress existingDxAddress = dxAddress.get(0);
-        dxAddressRepository.delete(existingDxAddress);
+    public void deleteDxAddress(List<DxAddress> dxAddressList) {
+        dxAddressList.forEach(dxAddress -> {
+            dxAddressRepository.delete(dxAddress);
+        });
     }
 
     @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })

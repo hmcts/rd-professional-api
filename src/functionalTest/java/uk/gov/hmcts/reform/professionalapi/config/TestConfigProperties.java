@@ -11,19 +11,19 @@ import uk.gov.hmcts.reform.lib.config.TestConfig;
 @Configuration
 public class TestConfigProperties implements TestConfig {
 
-    @Value("${oauth2-client-secret}")
+    @Value("a20c3cf7-1fb4-4bcf-89ec-963c05a13f71")
     public String clientSecret;
 
     @Value("${test.user.password}")
     public String testUserPassword;
 
-    @Value("${idam.api.url}")
+    @Value("https://idam-api.aat.platform.hmcts.net")
     public String idamApiUrl;
 
     @Value("${idam.auth.redirectUrl}")
     public String oauthRedirectUrl;
 
-    @Value("${idam.auth.clientId:xuiwebapp}")
+    @Value("${idam.auth.clientId:rd-professional-api}")
     public String clientId;
 
     @Value("${scope-name}")

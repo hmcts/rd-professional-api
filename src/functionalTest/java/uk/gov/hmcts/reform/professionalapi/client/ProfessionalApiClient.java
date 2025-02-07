@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
@@ -1751,5 +1752,16 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
+    }
+
+    public Response updateContactInformationDetails(UpdateContactInformationRequest updateContactInformationRequest,
+                                                    RequestSpecification requestSpecification) {
+
+        Response response = requestSpecification
+            .body(updateContactInformationRequest)
+            .put("/refdata/external/v2/organisations/contactinformation")
+            .andReturn();
+
+        return response;
     }
 }
