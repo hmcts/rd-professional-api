@@ -25,7 +25,7 @@ def versions = [
         lombok          : '1.18.36',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
-        reformLogging   : '6.1.7',
+        reformLogging   : '6.1.8',
         camel           : '3.22.2',
         pact_version    : '4.6.16',
         launchDarklySdk : '5.10.9',
