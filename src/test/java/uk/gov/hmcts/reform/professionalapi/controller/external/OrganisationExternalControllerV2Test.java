@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
@@ -48,6 +49,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -271,5 +273,15 @@ class OrganisationExternalControllerV2Test {
 
     }
 
-
+    @Test
+    void testUpdateContactInformationWithoutOrgId() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "addressLine1","addressLine2","addressLine3","townCity",
+                "county","country","postCode","dxAddress","dxExchange");
+        String userId = UUID.randomUUID().toString().substring(0, 7);
+        assertThrows(ResourceNotFoundException.class,
+            () -> organisationExternalController.updateOrganisationAddress(
+                null,updateContactInformationRequest,userId));
+    }
 }
