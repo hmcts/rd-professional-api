@@ -2,7 +2,7 @@ plugins {
     id 'application'
     id 'idea'
     id 'project-report'
-    id 'uk.gov.hmcts.java' version '0.12.64'
+    id 'uk.gov.hmcts.java' version '0.12.65'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.51.0'
@@ -25,7 +25,7 @@ def versions = [
         lombok          : '1.18.36',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
-        reformLogging   : '6.1.7',
+        reformLogging   : '6.1.8',
         camel           : '3.22.2',
         pact_version    : '4.6.16',
         launchDarklySdk : '5.10.9',
@@ -390,7 +390,7 @@ dependencies {
     implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.2.0'
     implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.2.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.2.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.9.0'
 
     implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.9.0'
     //Added below dependencies for shedlock
