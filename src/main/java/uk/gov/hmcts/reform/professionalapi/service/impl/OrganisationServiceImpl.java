@@ -1074,7 +1074,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                     existingOrganisation);
                 ContactInformation savedContactInformation = contactInformationRepository.save(newContactInformation);
 
-                if (savedContactInformation == null) {
+                if (!isContactInformationValid(savedContactInformation)) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,
                         "Failed to save contact information");
                 }
@@ -1089,6 +1089,11 @@ public class OrganisationServiceImpl implements OrganisationService {
                 "Failed to save or update organisation address");
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    private boolean isContactInformationValid(ContactInformation contactInformation) {
+        return contactInformation != null && StringUtils.isNotEmpty(contactInformation.getAddressLine1())
+            && StringUtils.isNotEmpty(contactInformation.getPostCode());
     }
 
     private void deleteExistingContactInformation(List<ContactInformation> contactInformationList) {
@@ -1135,12 +1140,10 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
     public void deleteDxAddress(List<DxAddress> dxAddressList) {
-        dxAddressList.forEach(dxAddress -> {
-            dxAddressRepository.delete(dxAddress);
-        });
+        dxAddressList.forEach(dxAddress -> dxAddressRepository.delete(dxAddress));
     }
 
-    @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
+
     public ResponseEntity<Object> updateOrganisationDxAddress(ContactInformation contactInformation,
                                                               UpdateContactInformationRequest
         updateContactInformationRequest) {
