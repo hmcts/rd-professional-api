@@ -2747,12 +2747,12 @@ class OrganisationServiceImplTest {
     @Test
     void test_updateOrganisationAddressWithDxAddress() {
         List<ContactInformation> contactInformations = new ArrayList<>();
-        ContactInformation contactInformation = new ContactInformation();
-        contactInformation.setUprn("uprn");
-        contactInformation.setAddressLine1("addressLine1");
+        ContactInformation newContactInformation = new ContactInformation();
+        newContactInformation.setUprn("uprn");
+        newContactInformation.setAddressLine1("addressLine1");
         Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
             "companyN", false, "www.org.com");
-        contactInformations.add(contactInformation);
+        contactInformations.add(newContactInformation);
         org.setContactInformations(contactInformations);
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
@@ -2760,9 +2760,7 @@ class OrganisationServiceImplTest {
                 "county1","country1","postCode1","dxNumber1",
                 "dxExchange1");
         String userId = UUID.randomUUID().toString().substring(0, 7);
-
-        ResponseEntity<Object> response = sut.updateOrganisationAddress(org,
-            updateContactInformationRequest,userId);
+        ResponseEntity<Object> response = sut.updateOrganisationAddress(org,updateContactInformationRequest,userId);
         assertNotNull(response);
         verify(contactInformationRepositoryMock, times(1)).save(any(ContactInformation.class));
         verify(dxAddressRepositoryMock, times(1))
@@ -2773,19 +2771,23 @@ class OrganisationServiceImplTest {
     void shouldThrowFieldAndPersistenceValidationExceptionWhenSaveUpdateFails() {
 
         List<ContactInformation> contactInformations = new ArrayList<>();
-        ContactInformation contactInformation = new ContactInformation();
-        contactInformation.setUprn("uprn");
-        contactInformation.setAddressLine1("addressLine1");
+        ContactInformation newContactInformation = new ContactInformation();
+        newContactInformation.setUprn("uprn");
+        newContactInformation.setAddressLine1("addressLine1");
         Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
             "companyN", false, "www.org.com");
-        contactInformations.add(contactInformation);
+        contactInformations.add(newContactInformation);
         org.setContactInformations(contactInformations);
         String userId = UUID.randomUUID().toString().substring(0, 7);
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "1addressLine1","1addressLine2","1addressLine3","townCity1",
+                "county1","country1","postCode1","dxNumber1",
+                "dxExchange1");
         when(contactInformationRepositoryMock.save(any()))
             .thenThrow(new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Failed to save or update organisation address"));
-        assertThrows(FieldAndPersistenceValidationException.class, () -> sut.updateOrganisationAddress(org,
-             any(),userId));
-
+        assertThrows(FieldAndPersistenceValidationException.class,
+                () -> sut.updateOrganisationAddress(org, updateContactInformationRequest, userId));
     }
 }

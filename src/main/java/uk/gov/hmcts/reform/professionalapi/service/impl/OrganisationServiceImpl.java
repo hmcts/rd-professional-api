@@ -1082,7 +1082,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 }
                 //if DxAddress information is provided in request then create a new DxAddress
                 if (isDxAddressProvided(updateContactInformationRequest)) {
-                    updateOrganisationDxAddress(savedContactInformation,updateContactInformationRequest);
+                    updateOrganisationDxAddress(savedContactInformation,
+                        updateContactInformationRequest);
                 }
             }
         } catch (Exception ex) {
