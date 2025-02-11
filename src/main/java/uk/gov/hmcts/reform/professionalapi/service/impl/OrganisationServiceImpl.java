@@ -57,7 +57,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
-import uk.gov.hmcts.reform.professionalapi.repository.AuditDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
@@ -148,11 +147,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     ProfessionalUserService professionalUserService;
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
-    @Autowired
-    AuditDetailsRepository auditDetailsRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
+
 
     @Override
     @Transactional
@@ -1072,9 +1070,9 @@ public class OrganisationServiceImpl implements OrganisationService {
             List<ContactInformation> existingContactInformationList = existingOrganisation.getContactInformation();
             if (!existingContactInformationList.isEmpty()) {
                 deleteExistingContactInformation(existingContactInformationList);
-                ContactInformation contactInformation = createNewContactInformation(updateContactInformationRequest,
+                ContactInformation newContactInformation = createNewContactInformation(updateContactInformationRequest,
                     existingOrganisation);
-                ContactInformation savedContactInformation = contactInformationRepository.save(contactInformation);
+                ContactInformation savedContactInformation = contactInformationRepository.save(newContactInformation);
 
                 if (savedContactInformation == null) {
                     throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,
