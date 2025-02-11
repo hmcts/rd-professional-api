@@ -136,8 +136,6 @@ class OrganisationServiceImplTest {
     private final LocalDateTime since = LocalDateTime.parse(SINCE_STR, ISO_DATE_TIME_FORMATTER);
 
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
-    private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
-    private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
 
     private final OrgAttributeRepository orgAttributeRepository = mock(OrgAttributeRepository.class);
 
@@ -2727,12 +2725,12 @@ class OrganisationServiceImplTest {
     @Test
     void test_updateOrganisationAddress() {
         List<ContactInformation> contactInformations = new ArrayList<>();
-        ContactInformation contactInformation = new ContactInformation();
-        contactInformation.setUprn("uprn");
-        contactInformation.setAddressLine1("addressLine1");
+        ContactInformation newContactInformation = new ContactInformation();
+        newContactInformation.setUprn("uprn");
+        newContactInformation.setAddressLine1("addressLine1");
         Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
             "companyN", false, "www.org.com");
-        contactInformations.add(contactInformation);
+        contactInformations.add(newContactInformation);
         org.setContactInformations(contactInformations);
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
@@ -2782,14 +2780,10 @@ class OrganisationServiceImplTest {
             "companyN", false, "www.org.com");
         contactInformations.add(contactInformation);
         org.setContactInformations(contactInformations);
-        UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN1","1addressLine1",
-                "","","","","","","","");
         String userId = UUID.randomUUID().toString().substring(0, 7);
         when(contactInformationRepositoryMock.save(any()))
             .thenThrow(new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Failed to save or update organisation address"));
-        //ResponseEntity<Object> response = sut.updateOrganisationAddress(org, any(),userId);
         assertThrows(FieldAndPersistenceValidationException.class, () -> sut.updateOrganisationAddress(org,
              any(),userId));
 

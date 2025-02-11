@@ -90,6 +90,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1070,76 +1071,69 @@ public class OrganisationServiceImpl implements OrganisationService {
         try {
             List<ContactInformation> existingContactInformationList = existingOrganisation.getContactInformation();
             if (!existingContactInformationList.isEmpty()) {
-                //fetch all contact information for the organisation , assuming for now that there is only one
-                // & use the first one , in future the id of the address to be updated will be passed from UI
-                existingContactInformationList.forEach(contact -> {
-                    //delete all existing contact information
-                    contactInformationRepository.deleteById(contact.getId());
-                    //delete the corresponding dxAddress as well
-                    //fetch all dxAdresses and assuming there will be single address delete the first one
-                    List<DxAddress> dxAddressList = contact.getDxAddresses();
-                    if (!dxAddressList.isEmpty()) {
-                        deleteDxAddress(dxAddressList);
-                    }
-                });
-                //creating contact information with the new information
-                ContactInformation contactInformation = new ContactInformation();
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getUprn())) {
-                    contactInformation.setUprn(
-                            RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getUprn()));
-                }
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getAddressLine1())) {
-                    contactInformation.setAddressLine1(
-                        RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getAddressLine1()));
-                }
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getAddressLine2())) {
-                    contactInformation.setAddressLine2(
-                        RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getAddressLine2()));
-                }
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getAddressLine3())) {
-                    contactInformation.setAddressLine3(
-                        RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getAddressLine3()));
-                }
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getTownCity())) {
-                    contactInformation.setTownCity(RefDataUtil.removeEmptySpaces(
-                        updateContactInformationRequest.getTownCity()));
-                }
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getCounty())) {
-                    contactInformation.setCounty(RefDataUtil.removeEmptySpaces(
-                        updateContactInformationRequest.getCounty()));
-                }
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getCountry())) {
-                    contactInformation.setCountry(RefDataUtil.removeEmptySpaces(
-                        updateContactInformationRequest.getCountry()));
-                }
-                if (StringUtils.isNotEmpty(updateContactInformationRequest.getPostCode())) {
-                    contactInformation.setPostCode(RefDataUtil.removeEmptySpaces(
-                        updateContactInformationRequest.getPostCode()));
-                }
-                contactInformation.setOrganisation(existingOrganisation);
-                contactInformation.setLastUpdated(LocalDateTime.now());
+                deleteExistingContactInformation(existingContactInformationList);
+                ContactInformation contactInformation = createNewContactInformation(updateContactInformationRequest,
+                    existingOrganisation);
                 ContactInformation savedContactInformation = contactInformationRepository.save(contactInformation);
 
                 if (savedContactInformation == null) {
-                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                    throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,
                         "Failed to save contact information");
                 }
-                if ((StringUtils.isNotEmpty(updateContactInformationRequest.getDxExchange())
-                    && StringUtils.isNotBlank(updateContactInformationRequest.getDxExchange()))
-                    && (StringUtils.isNotEmpty(updateContactInformationRequest.getDxNumber())
-                    && StringUtils.isNotBlank(updateContactInformationRequest.getDxNumber()))) {
-                    //if DxAddress information is provided in request then create a new DxAddress
-                    updateOrganisationDxAddress(savedContactInformation,existingOrganisation
-                        .getOrganisationIdentifier(), updateContactInformationRequest, userId);
-
+                //if DxAddress information is provided in request then create a new DxAddress
+                if (isDxAddressProvided(updateContactInformationRequest)) {
+                    updateOrganisationDxAddress(savedContactInformation,updateContactInformationRequest);
                 }
             }
         } catch (Exception ex) {
-            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+            throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,
                 "Failed to save or update organisation address");
         }
-        return ResponseEntity.status(204).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    private void deleteExistingContactInformation(List<ContactInformation> contactInformationList) {
+        //fetch all contact information for the organisation , assuming for now that there is only one
+        // & use the first one , in future the id of the address to be updated will be passed from UI
+        contactInformationList.forEach(contact -> {
+            //delete all existing contact information
+            contactInformationRepository.deleteById(contact.getId());
+            //delete the corresponding dxAddress as well
+            //fetch all dxAdresses and assuming there will be single address delete the first one
+            deleteDxAddress(contact.getDxAddresses());
+        });
+    }
+
+    private ContactInformation createNewContactInformation(UpdateContactInformationRequest request,
+                                                           Organisation organisation) {
+        //creating contact information with the new information
+        ContactInformation contactInformation = new ContactInformation();
+        Map<Consumer<String>, String> fieldMappings = Map.of(
+            contactInformation::setUprn, request.getUprn(),
+            contactInformation::setAddressLine1, request.getAddressLine1(),
+            contactInformation::setAddressLine2, request.getAddressLine2(),
+            contactInformation::setAddressLine3, request.getAddressLine3(),
+            contactInformation::setTownCity, request.getTownCity(),
+            contactInformation::setCounty, request.getCounty(),
+            contactInformation::setCountry, request.getCountry(),
+            contactInformation::setPostCode, request.getPostCode()
+        );
+
+        fieldMappings.forEach((setter, value) -> {
+            if (StringUtils.isNotEmpty(value)) {
+                setter.accept(RefDataUtil.removeEmptySpaces(value));
+            }
+        });
+
+        contactInformation.setOrganisation(organisation);
+        contactInformation.setLastUpdated(LocalDateTime.now());
+        return contactInformation;
+    }
+
+    private boolean isDxAddressProvided(UpdateContactInformationRequest request) {
+        return StringUtils.isNotBlank(request.getDxExchange()) && StringUtils.isNotBlank(request.getDxNumber());
+    }
+
 
     public void deleteDxAddress(List<DxAddress> dxAddressList) {
         dxAddressList.forEach(dxAddress -> {
@@ -1149,9 +1143,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
     public ResponseEntity<Object> updateOrganisationDxAddress(ContactInformation contactInformation,
-                                                              String organisationIdentifier,
                                                               UpdateContactInformationRequest
-        updateContactInformationRequest,String userId) {
+        updateContactInformationRequest) {
         try {
             if (contactInformation != null) {
                 DxAddress newDxAddress = new DxAddress(
@@ -1165,13 +1158,11 @@ public class OrganisationServiceImpl implements OrganisationService {
                     throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                         "Failed to save DxAddress Information");
                 }
-
             }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
             "Failed to save or update organisation address");
         }
-
         return ResponseEntity.status(204).build();
     }
 

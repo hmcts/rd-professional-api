@@ -219,22 +219,21 @@ class OrganisationExternalControllerV2Test {
             .thenReturn(organisationMock);
         when(organisationServiceMock.updateOrganisationAddress(organisationMock,updateContactInformationRequest,userId))
             .thenReturn(responseEntity);
-        ResponseEntity<Object> response = organisationExternalController.updateOrganisationAddress(
+        ResponseEntity<Object> updatedOrganisationResponse = organisationExternalController.updateOrganisationAddress(
             organisationIdentifier,updateContactInformationRequest,userId);
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
+        assertThat(updatedOrganisationResponse).isNotNull();
+        assertThat(updatedOrganisationResponse.getStatusCode()).hasToString("204 NO_CONTENT");
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationAddress(organisationMock, updateContactInformationRequest, userId);
 
         verify(organisationServiceMock, times(1))
-            .updateOrganisationAddress(eq(organisationMock), eq(updateContactInformationRequest), eq(userId));
-
-        verify(organisationServiceMock, times(1))
-            .getOrganisationByOrgIdentifier(eq(organisationIdentifier));
+            .getOrganisationByOrgIdentifier(organisationIdentifier);
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateAddress(eq(updateContactInformationRequest));
+            .validateAddress(updateContactInformationRequest);
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateDxAddress(eq(updateContactInformationRequest));
+            .validateDxAddress(updateContactInformationRequest);
 
     }
 
@@ -254,22 +253,21 @@ class OrganisationExternalControllerV2Test {
             .thenReturn(organisationMock);
         when(organisationServiceMock.updateOrganisationAddress(organisationMock,updateContactInformationRequest,userId))
             .thenReturn(responseEntity);
-        ResponseEntity<Object> response = organisationExternalController.updateOrganisationAddress(
+        ResponseEntity<Object> updatedAddressResponse = organisationExternalController.updateOrganisationAddress(
             organisationIdentifier,updateContactInformationRequest,userId);
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
+        assertThat(updatedAddressResponse).isNotNull();
+        assertThat(updatedAddressResponse.getStatusCode()).hasToString("204 NO_CONTENT");
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationAddress(organisationMock, updateContactInformationRequest, userId);
 
         verify(organisationServiceMock, times(1))
-            .updateOrganisationAddress(eq(organisationMock), eq(updateContactInformationRequest), eq(userId));
-
-        verify(organisationServiceMock, times(1))
-            .getOrganisationByOrgIdentifier(eq(organisationIdentifier));
+            .getOrganisationByOrgIdentifier(organisationIdentifier);
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateAddress(eq(updateContactInformationRequest));
+            .validateAddress(updateContactInformationRequest);
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateDxAddress(eq(updateContactInformationRequest));
+            .validateDxAddress(updateContactInformationRequest);
 
     }
 
