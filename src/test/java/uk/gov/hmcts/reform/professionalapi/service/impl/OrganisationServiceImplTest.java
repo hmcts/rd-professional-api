@@ -2737,7 +2737,7 @@ class OrganisationServiceImplTest {
                 "1addressLine1","1addressLine2","1addressLine3","townCity1",
                 "county1","country1","postCode1","","");
         String userId = UUID.randomUUID().toString().substring(0, 7);
-
+        when(contactInformationRepositoryMock.save(any())).thenReturn(newContactInformation);
         ResponseEntity<Object> response = sut.updateOrganisationAddress(org,
             updateContactInformationRequest,userId);
         assertNotNull(response);
@@ -2760,6 +2760,7 @@ class OrganisationServiceImplTest {
                 "county1","country1","postCode1","dxNumber1",
                 "dxExchange1");
         String userId = UUID.randomUUID().toString().substring(0, 7);
+        when(contactInformationRepositoryMock.save(any())).thenReturn(newContactInformation);
         ResponseEntity<Object> response = sut.updateOrganisationAddress(org,updateContactInformationRequest,userId);
         assertNotNull(response);
         verify(contactInformationRepositoryMock, times(1)).save(any(ContactInformation.class));

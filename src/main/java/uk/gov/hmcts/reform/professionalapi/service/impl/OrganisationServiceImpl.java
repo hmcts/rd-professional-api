@@ -1092,8 +1092,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private boolean isContactInformationValid(ContactInformation contactInformation) {
-        return contactInformation != null && StringUtils.isNotEmpty(contactInformation.getAddressLine1())
-            && StringUtils.isNotEmpty(contactInformation.getPostCode());
+        return contactInformation != null && StringUtils.isNotEmpty(contactInformation.getAddressLine1());
     }
 
     private void deleteExistingContactInformation(List<ContactInformation> contactInformationList) {
