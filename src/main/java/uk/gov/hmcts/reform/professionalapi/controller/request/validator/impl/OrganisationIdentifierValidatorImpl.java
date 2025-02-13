@@ -168,12 +168,13 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         String dxNumber = updateContactInformationRequest.getDxNumber();
         String dxExchange = updateContactInformationRequest.getDxExchange();
 
-        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber)) && StringUtils.isEmpty(dxExchange)) {
+        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber)) &&
+            (StringUtils.isEmpty(dxExchange) || StringUtils.isBlank(dxExchange))) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation dxExchange canot be empty be empty");
         }
         if ((StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange))
-            && StringUtils.isEmpty(dxNumber)) {
+            && (StringUtils.isEmpty(dxNumber) || StringUtils.isBlank(dxNumber))) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation dxNumber canot be empty be empty");
         }
@@ -203,7 +204,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         String uprn = updateContactInformationRequest.getUprn();
         String addressLine1 = updateContactInformationRequest.getAddressLine1();
 
-        if (StringUtils.isEmpty(addressLine1)) {
+        if (StringUtils.isEmpty(addressLine1) || StringUtils.isBlank(addressLine1)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "AddressLine1 cannot be empty");
         }
