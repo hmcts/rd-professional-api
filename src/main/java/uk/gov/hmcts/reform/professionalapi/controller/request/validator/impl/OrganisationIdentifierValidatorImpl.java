@@ -168,8 +168,8 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         String dxNumber = updateContactInformationRequest.getDxNumber();
         String dxExchange = updateContactInformationRequest.getDxExchange();
 
-        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber)) &&
-            (StringUtils.isEmpty(dxExchange) || StringUtils.isBlank(dxExchange))) {
+        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber))
+            && (StringUtils.isEmpty(dxExchange) || StringUtils.isBlank(dxExchange))) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation dxExchange canot be empty be empty");
         }
