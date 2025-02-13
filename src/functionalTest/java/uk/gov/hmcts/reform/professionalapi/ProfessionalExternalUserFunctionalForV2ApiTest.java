@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
@@ -10,16 +11,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
 
 @ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
@@ -61,7 +67,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         + ".createOrganisationUsingExternalController", withFeature = true)
     void testExternalUserScenario() {
         setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager,
+            caseworker, systemUser));
         retrieveOrganisationPbaScenarios();
         findOrganisationScenarios();
     }
@@ -105,6 +112,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         if (roles.contains(systemUser)) {
             systemUserBearerToken = inviteUser(systemUser);
         }
+
     }
 
 
@@ -221,7 +229,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
-                "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
                 "","");
 
         //call endpoint to update contactInformation
@@ -242,7 +250,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(contacts.get(0).get("townCity")).isNotNull().isEqualTo("updatedtownCity");
         assertThat(contacts.get(0).get("country")).isNotNull().isEqualTo("updatedcountry");
         assertThat(contacts.get(0).get("county")).isNotNull().isEqualTo("updatedcounty");
-        assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("updatedpostCode");
+        assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("RG48TS");
 
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
@@ -251,29 +259,50 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     }
 
-    @Test
-    void updateContactInformationShouldReturnSuccessForPrdAdmin() {
 
-        setUpOrgTestData();
-        setUpUserBearerTokens(List.of(systemUser));
+    @Test
+    public void updateContactInformationShouldReturnSuccessForPrdAdmin() {
         log.info("updateContactInformationShouldReturnSuccessForPrdAdmin :: STARTED");
+        setUpOrgTestData();
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+            professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                superUserRoles(), firstName, lastName, email));
+
+        UserCreationRequest superUserRequest = UserCreationRequest
+            .aUserCreationRequest()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .superUser(superUserRequest)
+            .status("ACTIVE").build();
+        String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+            systemUser);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
+
+        Map<String, Object> newUserResponse = professionalApiClient
+            .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
 
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
-                "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
                 "","");
-
         //call endpoint to update contactInformation
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
-            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+            updateContactInformationRequest, superUserToken);
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
 
-
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
-
         ArrayList<LinkedHashMap<String, Object>> contacts
             = (ArrayList<LinkedHashMap<String, Object>>)orgResponse.get("contactInformation");
         assertThat(contacts.get(0).get("addressLine1")).isNotNull().isEqualTo("updatedaddressLine1");
@@ -283,13 +312,12 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(contacts.get(0).get("townCity")).isNotNull().isEqualTo("updatedtownCity");
         assertThat(contacts.get(0).get("country")).isNotNull().isEqualTo("updatedcountry");
         assertThat(contacts.get(0).get("county")).isNotNull().isEqualTo("updatedcounty");
-        assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("updatedpostCode");
+        assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("RG48TS");
 
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
         log.info("updateContactInformationShouldReturnSuccessForPrdAdmin :: END");
-
     }
 
     @Test
@@ -302,7 +330,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
-                "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
                 "dxUpdatedNum","dxUpdatedExchange");
 
         //call endpoint to update contactInformation
@@ -324,9 +352,12 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(contacts.get(0).get("townCity")).isNotNull().isEqualTo("updatedtownCity");
         assertThat(contacts.get(0).get("country")).isNotNull().isEqualTo("updatedcountry");
         assertThat(contacts.get(0).get("county")).isNotNull().isEqualTo("updatedcounty");
-        assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("updatedpostCode");
-        assertThat(contacts.get(0).get("dxNumber")).isNotNull().isEqualTo("dxUpdatedNum");
-        assertThat(contacts.get(0).get("dxExchange")).isNotNull().isEqualTo("dxUpdatedExchange");
+        assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("RG48TS");
+
+        ArrayList dxAddresses = (ArrayList)contacts.get(0).get("dxAddress");
+        LinkedHashMap dxAddressMap = ( LinkedHashMap) dxAddresses.get(0);
+        assertThat(dxAddressMap.get("dxNumber")).isNotNull().isEqualTo("dxUpdatedNum");
+        assertThat(dxAddressMap.get("dxExchange")).isNotNull().isEqualTo("dxUpdatedExchange");
 
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
