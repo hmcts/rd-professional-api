@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
@@ -179,20 +178,19 @@ class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    void testValidateDxExchangeEmpty(){
+    void testValidateDxExchangeEmpty() {
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
                 "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
                 "dx1","");
-
-    assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
+        assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
             .validateDxAddress(updateContactInformationRequest));
 
     }
 
     @Test
-    void testValidateDxExchangeNull(){
+    void testValidateDxExchangeNull() {
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
@@ -205,7 +203,7 @@ class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    void testValidateDxNumberNull(){
+    void testValidateDxNumberNull() {
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
@@ -218,7 +216,7 @@ class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    void testValidateDxNumberMoreThan14(){
+    void testValidateDxNumberMoreThan14() {
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
@@ -231,7 +229,7 @@ class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    void testValidateDxExchangeMoreThan40(){
+    void testValidateDxExchangeMoreThan40() {
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
@@ -245,7 +243,7 @@ class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    void testValidateDxNumberInvalid(){
+    void testValidateDxNumberInvalid() {
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
