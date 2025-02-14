@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationMfaStatusController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
@@ -22,16 +22,16 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImp
 @TestConfiguration
 public class OrganisationalExternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockBean
+    @MockitoBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
-    @MockBean
+    @MockitoBean
     protected OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     OrgAttributeRepository orgAttributeRepository;
 
     @Bean
@@ -54,13 +54,13 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
         return new OrganisationMfaStatusController();
     }
 
-    @MockBean
+    @MockitoBean
     protected JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    @MockBean
+    @MockitoBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
     @Bean
@@ -69,9 +69,9 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
         return new MfaStatusServiceImpl();
     }
 
-    @MockBean
+    @MockitoBean
     protected PaymentAccountRepository paymentAccountRepository;
 
-    @MockBean
+    @MockitoBean
     ContactInformationRepository contactInformationRepositoryMock;
 }
