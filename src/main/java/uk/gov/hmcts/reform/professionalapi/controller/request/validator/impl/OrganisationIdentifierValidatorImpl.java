@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -158,5 +161,56 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
 
         return true;
+    }
+
+    public void validateDxAddress(UpdateContactInformationRequest updateContactInformationRequest) {
+
+        String dxNumber = updateContactInformationRequest.getDxNumber();
+        String dxExchange = updateContactInformationRequest.getDxExchange();
+
+        if ((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber))
+            && (StringUtils.isEmpty(dxExchange) || StringUtils.isBlank(dxExchange))) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Organisation dxExchange canot be empty be empty");
+        }
+        if ((StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange))
+            && (StringUtils.isEmpty(dxNumber) || StringUtils.isBlank(dxNumber))) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Organisation dxNumber canot be empty be empty");
+        }
+        if (((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber))
+            && (StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange)))
+            && dxNumber.length() >= 14) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "DX Number (max=13) has invalid length");
+        }
+        if (((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber))
+            && (StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange)))
+            && dxExchange.length() >= 40) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "DX Exchange (max=40) has invalid length");
+        }
+        if (((StringUtils.isNotEmpty(dxNumber) && StringUtils.isNotBlank(dxNumber))
+            && (StringUtils.isNotEmpty(dxExchange) && StringUtils.isNotBlank(dxExchange)))
+            && !dxNumber.matches("^[a-zA-Z0-9 ]*$")) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Invalid Dx Number entered: " + dxNumber + ", it can only contain "
+                    .concat("numbers, letters and spaces"));
+        }
+
+    }
+
+    public void validateAddress(UpdateContactInformationRequest updateContactInformationRequest) {
+        String uprn = updateContactInformationRequest.getUprn();
+        String addressLine1 = updateContactInformationRequest.getAddressLine1();
+
+        if (StringUtils.isEmpty(addressLine1) || StringUtils.isBlank(addressLine1)) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "AddressLine1 cannot be empty");
+        }
+        if (StringUtils.isNotEmpty(uprn) && uprn.length() > 14) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Uprn must not be greater than 14 characters long");
+        }
     }
 }
