@@ -2,7 +2,7 @@ plugins {
     id 'application'
     id 'idea'
     id 'project-report'
-    id 'uk.gov.hmcts.java' version '0.12.64'
+    id 'uk.gov.hmcts.java' version '0.12.65'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.51.0'
@@ -25,7 +25,7 @@ def versions = [
         lombok          : '1.18.36',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
-        reformLogging   : '6.1.7',
+        reformLogging   : '6.1.8',
         camel           : '3.22.2',
         pact_version    : '4.6.16',
         launchDarklySdk : '5.10.9',
@@ -34,7 +34,7 @@ def versions = [
         log4j           : '2.23.1',
         reformS2sClient : '5.3.0',
         feign           : '3.8.0',
-        bouncycastle    : '1.79',
+        bouncycastle    : '1.80',
         postgresql_tc   : '1.20.0',
         serenity        : '4.2.16'
 ]
@@ -352,7 +352,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.20.1'
@@ -387,12 +387,12 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '3.10'
     implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
     implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.2.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.10.0'
     implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.2.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.2.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.10.0'
 
-    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.9.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.10.0'
     //Added below dependencies for shedlock
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.2.0'
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.2.0'
