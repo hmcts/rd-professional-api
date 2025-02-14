@@ -226,16 +226,16 @@ class OrganisationExternalControllerV2Test {
         assertThat(updatedOrganisationResponse).isNotNull();
         assertThat(updatedOrganisationResponse.getStatusCode()).hasToString("204 NO_CONTENT");
         verify(organisationServiceMock, times(1))
-            .updateOrganisationAddress(organisationMock, updateContactInformationRequest, userId);
+            .updateOrganisationAddress(eq(organisationMock), eq(updateContactInformationRequest), eq(userId));
 
         verify(organisationServiceMock, times(1))
-            .getOrganisationByOrgIdentifier(organisationIdentifier);
+            .getOrganisationByOrgIdentifier(eq(organisationIdentifier));
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateAddress(updateContactInformationRequest);
+            .validateAddress(eq(updateContactInformationRequest));
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateDxAddress(updateContactInformationRequest);
+            .validateDxAddress(eq(updateContactInformationRequest));
 
     }
 
@@ -260,16 +260,16 @@ class OrganisationExternalControllerV2Test {
         assertThat(updatedAddressResponse).isNotNull();
         assertThat(updatedAddressResponse.getStatusCode()).hasToString("204 NO_CONTENT");
         verify(organisationServiceMock, times(1))
-            .updateOrganisationAddress(organisationMock, updateContactInformationRequest, userId);
+            .updateOrganisationAddress(eq(organisationMock), eq(updateContactInformationRequest), eq(userId));
 
         verify(organisationServiceMock, times(1))
-            .getOrganisationByOrgIdentifier(organisationIdentifier);
+            .getOrganisationByOrgIdentifier(eq(organisationIdentifier));
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateAddress(updateContactInformationRequest);
+            .validateAddress(eq(updateContactInformationRequest));
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateDxAddress(updateContactInformationRequest);
+            .validateDxAddress(eq(updateContactInformationRequest));
 
     }
 
