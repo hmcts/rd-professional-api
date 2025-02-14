@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
@@ -10,15 +11,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
 import static wiremock.org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
@@ -61,7 +67,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         + ".createOrganisationUsingExternalController", withFeature = true)
     void testExternalUserScenario() {
         setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker,
+            systemUser));
         retrieveOrganisationPbaScenarios();
         findOrganisationScenarios();
     }
@@ -210,6 +217,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
     }
 
+
     @Test
     void updateOrganisationNameSraShouldReturnSuccess() {
         setUpOrgTestData();
@@ -245,6 +253,65 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     }
 
+
+    @Test
+    void updateOrganisationNameSraShouldReturnSuccessForAdmin() {
+        log.info("updateContactInformationShouldReturnSuccessForPrdAdmin :: STARTED");
+        setUpOrgTestData();
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+            professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                superUserRoles(), firstName, lastName, email));
+
+        UserCreationRequest superUserRequest = UserCreationRequest
+            .aUserCreationRequest()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .superUser(superUserRequest)
+            .status("ACTIVE").build();
+        final String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+            systemUser);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
+
+        Map<String, Object> newUserResponse = professionalApiClient
+            .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+
+        String updateName = randomAlphabetic(10);
+        String updateSraId = randomAlphabetic(10);
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name",updateName);
+        organisationNameSraUpdate.put("sraId",updateSraId);
+
+        //call endpoint to update contactInformation
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            superUserToken);
+
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
+
+        assertThat(orgResponse).isNotNull();
+        final Object orgName = orgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(updateName);
+        final Object sraId = orgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(updateSraId);
+
+        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+
+    }
+
     @Test
     void updateOrganisationSraShouldReturnSuccess() {
         setUpOrgTestData();
@@ -252,6 +319,9 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
 
         String updateSraId = randomAlphabetic(10);
+        //retrieve saved organisation by id
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
 
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",updateSraId);
@@ -268,6 +338,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         final Object sraId = orgResponse.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(updateSraId);
+        final Object orgName = orgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(existingOrgResponse.get("name"));
 
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
@@ -275,6 +347,69 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
 
     }
+
+    @Test
+    void updateOrganisationSraShouldReturnSuccessForAdmin() {
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+        setUpOrgTestData();
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+            professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                superUserRoles(), firstName, lastName, email));
+
+        UserCreationRequest superUserRequest = UserCreationRequest
+            .aUserCreationRequest()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .superUser(superUserRequest)
+            .status("ACTIVE").build();
+        String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+            systemUser);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
+
+        Map<String, Object> newUserResponse = professionalApiClient
+            .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+
+        //call endpoint to update name as 'updatedname'
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier,
+            hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
+        String updateSraId = randomAlphabetic(10);
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId",updateSraId);
+
+        //call endpoint to update name as 'updatedname'
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            superUserToken);
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
+
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+
+        final Object sraId = orgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(updateSraId);
+        final Object orgName = orgResponse.get("name");
+        final Object existingname = existingOrgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(existingname);
+
+        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+
+    }
+
 
     @Test
     void updateOrganisationNameOnlyShouldReturnSuccess() {
@@ -308,6 +443,68 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
     @Test
+    void updateOrganisationNameOnlyShouldReturnSuccessForAdmin() {
+        log.info("updateOrganisationNameOnlyShouldReturnSuccessForAdmin :: STARTED");
+        setUpOrgTestData();
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+            professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                superUserRoles(), firstName, lastName, email));
+
+        UserCreationRequest superUserRequest = UserCreationRequest
+            .aUserCreationRequest()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .superUser(superUserRequest)
+            .status("ACTIVE").build();
+        String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+            systemUser);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
+
+        Map<String, Object> newUserResponse = professionalApiClient
+            .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+
+        //call endpoint to update name as 'updatedname'
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier,
+            hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
+        String updateName = randomAlphabetic(10);
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name",updateName);
+
+        //call endpoint to update name
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            superUserToken);
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
+
+        //retrieve saved organisation by id
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+
+        final Object orgName = orgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(updateName);
+        final Object sraId = orgResponse.get("sraId");
+        final Object existinsraId = existingOrgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existinsraId);
+
+        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        log.info("updateOrganisationNameOnlyShouldReturnSuccessForAdmin :: END");
+
+    }
+
+
+    @Test
     void updateOrganisationShouldReturnFailureIfNoNameValueInMapButKeyExists() {
         log.info("updateOrganisationShouldReturnFailureIfNoNameValueInMapButKeyExists :: STARTED");
         setUpOrgTestData();
@@ -328,32 +525,46 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
     @Test
-    void updateOrganisationShouldReturnSuccessIfNoNameAddedInMap() {
-        log.info("updateOrganisationShouldReturnSuccessIfNoNameAddedInMap :: STARTED");
+    void updateOrganisationShouldReturnFailureIfNoNameValueInMapButKeyExistsForAdmin() {
+        log.info("updateOrganisationShouldReturnFailureIfNoNameValueInMapButKeyExists :: STARTED");
         setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiOrgManager));
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+            professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                superUserRoles(), firstName, lastName, email));
+
+        UserCreationRequest superUserRequest = UserCreationRequest
+            .aUserCreationRequest()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .superUser(superUserRequest)
+            .status("ACTIVE").build();
+        createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+            systemUser);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
+
+        Map<String, Object> newUserResponse = professionalApiClient
+            .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+
         String updateSraId = randomAlphabetic(10);
 
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",updateSraId);
-
+        organisationNameSraUpdate.put("name","");
         //call endpoint to update
-        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
-            professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        Response orgUpdatedResponse =  professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            superUserToken);
         assertNotNull(orgUpdatedResponse);
-        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedResponse.getBody().prettyPrint()).contains("Organisation name cannot be empty");
 
-        //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
-        assertThat(orgResponse).isNotNull();
-
-        final Object orgName = orgResponse.get("sraId");
-        assertThat(orgName).isNotNull().isEqualTo(updateSraId);
-
-        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
-        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
-
-        log.info("updateOrganisationShouldReturnSuccessIfNoNameAddedInMap :: END");
+        log.info("updateOrganisationShouldReturnFailureIfNoNameValueInMapButKeyExists :: END");
     }
 
 
@@ -377,6 +588,65 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
     @Test
+    void updateOrganisationSraIdShouldReturnFailureIfTooLongForAdmin() {
+        log.info("updateOrganisationSraIdShouldReturnFailureIfTooLongForAdmin :: STARTED");
+        setUpOrgTestData();
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+            professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                superUserRoles(), firstName, lastName, email));
+
+        UserCreationRequest superUserRequest = UserCreationRequest
+            .aUserCreationRequest()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .superUser(superUserRequest)
+            .status("ACTIVE").build();
+        String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+            systemUser);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
+
+        Map<String, Object> newUserResponse = professionalApiClient
+            .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+
+        //call endpoint to update name as 'updatedname'
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier,
+            hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
+        String updateSraId = randomAlphabetic(258);
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId",updateSraId);
+        //call endpoint to update
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            superUserToken);
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedResponse.getBody().prettyPrint())
+            .contains("Organisation sraId cannot be more than 255 characters");
+
+        //retrieve organisation by id after update to show nothing was saved
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+
+        final Object orgName = orgResponse.get("name");
+        final Object existingname = existingOrgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(existingname);
+        final Object sraId = orgResponse.get("sraId");
+        final Object existingsraId = existingOrgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+
+        log.info("updateOrganisationSraIdShouldReturnFailureIfTooLongForAdmin :: END");
+    }
+
+
+    @Test
     void updateOrganisationNameShouldReturnFailureIfTooLong() {
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: STARTED");
         setUpOrgTestData();
@@ -395,14 +665,71 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: END");
     }
 
+
     @Test
-    void updateOrganisationNameSraIdShouldReturnFailureIfNoOrgId() {
-        log.info("updateOrganisationNameSraIdShouldReturnFailureIfNoOrgId :: STARTED");
+    void updateOrganisationNameShouldReturnFailureIfTooLongForAdmin() {
+        log.info("updateOrganisationNameShouldReturnFailureIfTooLongForAdmin :: STARTED");
+        setUpOrgTestData();
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+            professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                superUserRoles(), firstName, lastName, email));
+
+        UserCreationRequest superUserRequest = UserCreationRequest
+            .aUserCreationRequest()
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+            .superUser(superUserRequest)
+            .status("ACTIVE").build();
+        String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+            systemUser);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
+
+        Map<String, Object> newUserResponse = professionalApiClient
+            .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+
+        //call endpoint to update name as 'updatedname'
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier,
+            hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
+        String updateName = randomAlphabetic(258);
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name",updateName);
+        //call endpoint to update
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            superUserToken);
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedResponse.getBody().prettyPrint())
+            .contains("Organisation name cannot be more than 255 characters");
+
+        //call endpoint to show name and sra id were nto changed
+        var orgResponseAfterUpdate = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier,
+            hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
+        final Object orgName = orgResponseAfterUpdate.get("name");
+        final Object existingname = existingOrgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(existingname);
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        final Object existingsraId = existingOrgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+        log.info("updateOrganisationNameShouldReturnFailureIfTooLongForAdmin :: END");
+    }
+
+
+    @Test
+    void updateOrganisationNameSraIdShouldReturnFailureIfNoOrgIdForAnyRole() {
+        log.info("updateOrganisationNameSraIdShouldReturnFailureIfNoOrgIdForAnyRole :: STARTED");
 
         setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
-
         String updateName = randomAlphabetic(10);
         String updateSraId = randomAlphabetic(10);
 
@@ -415,12 +742,12 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             professionalApiClient.getMultipleAuthHeaders(null));
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
-        log.info("updateOrganisationNameSraIdShouldReturnFailureIfNoOrgId :: END");
+        log.info("updateOrganisationNameSraIdShouldReturnFailureIfNoOrgIdForAnyRole :: END");
     }
 
 
     @Test
-    void updateOrganisationSraIdShouldReturnFailureIfUnAuthorised() {
+    void updateOrganisationSraIdShouldReturnFailureIfUnAuthorisedRole() {
         log.info("updateOrganisationSraIdShouldReturnFailureIfUnAuthorised :: STARTED");
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager));
@@ -440,5 +767,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         log.info("updateOrganisationSraIdShouldReturnFailureIfUnAuthorised :: END");
     }
+
+
 
 }

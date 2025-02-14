@@ -23,16 +23,26 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
+
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
+        //fetch org After update
+        Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
+
         //retrieve saved org to verify
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
         final Object name = responseBody.get("name");
         assertThat(name).isNotNull().isEqualTo("New Org Name");
+
+        final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
 
         LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
@@ -49,15 +59,24 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
 
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
+        //update sraid
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
+        //fetch org After update
+        Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
 
         //retrieve saved org to verify
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
 
         final Object sraId = responseBody.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo("New sraId");
+
+        final Object existingname = orgResponseBeforeUpdate.get("name");
+        final Object name = orgResponseAfterUpdate.get("name");
+        assertThat(name).isNotNull().isEqualTo(existingname);
 
         LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
@@ -69,20 +88,28 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
-        organisationNameSraUpdate.put("name","");
+        organisationNameSraUpdate.put("name",null);
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+        //fetch org After update
+        Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be empty");
         //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
-        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
-        final Object name = responseBody.get("name");
-        assertThat(name).isNotNull().isEqualTo("some-org-name1");
+        final Object existingname = orgResponseBeforeUpdate.get("name");
+        final Object name = orgResponseAfterUpdate.get("name");
+        assertThat(name).isNotNull().isEqualTo(existingname);
+
+        final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
 
         deleteCreatedTestOrganisations(orgId);
     }
@@ -96,16 +123,23 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
-
+        //fetch org After update
+        Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be empty");
         //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
-        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
-        final Object name = responseBody.get("name");
-        assertThat(name).isNotNull().isEqualTo("some-org-name1");
+        final Object existingname = orgResponseBeforeUpdate.get("name");
+        final Object name = orgResponseAfterUpdate.get("name");
+        assertThat(name).isNotNull().isEqualTo(existingname);
+
+        final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
 
         deleteCreatedTestOrganisations(orgId);
     }
@@ -120,17 +154,25 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
 
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
+
+        //UpdateSraId
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
-        //retrieve saved org to verify
-        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
+        //fetch org After update
+        Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
 
-        final Object sraId = responseBody.get("sraId");
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
         assertThat(sraId).isNull();
 
-        LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
+        final Object existingname = orgResponseBeforeUpdate.get("name");
+        final Object name = orgResponseAfterUpdate.get("name");
+        assertThat(name).isNotNull().isEqualTo(existingname);
+
+        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponseAfterUpdate.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
         deleteCreatedTestOrganisations(orgId);
     }
@@ -145,17 +187,24 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
 
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
+
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
-        //retrieve saved org to verify
-        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
+        //fetch org After update
+        Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
 
-        final Object sraId = responseBody.get("sraId");
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
         assertThat(sraId).isNull();
 
-        LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
+        final Object existingname = orgResponseBeforeUpdate.get("name");
+        final Object name = orgResponseAfterUpdate.get("name");
+        assertThat(name).isNotNull().isEqualTo(existingname);
+
+        LocalDateTime updatedDate =  LocalDateTime.parse(orgResponseAfterUpdate.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
         deleteCreatedTestOrganisations(orgId);
     }
@@ -169,16 +218,22 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name",name);
 
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
+
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
-
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be more than 255 "
             + "characters");
         //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
-        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
-        final Object savedName = responseBody.get("name");
+        Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
+        final Object savedName = orgResponseAfterUpdate.get("name");
         assertThat(savedName).isNotNull().isEqualTo("some-org-name1");
+
+        final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
 
         deleteCreatedTestOrganisations(orgId);
     }
@@ -192,16 +247,24 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",sraId);
 
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
+
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation sraId cannot be more than "
             + "255 characters");
+
         //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
-        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
-        final Object savedSraId = responseBody.get("sraId");
+        Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
+        final Object savedSraId = orgResponseAfterUpdate.get("sraId");
         assertThat(savedSraId).isNotNull().isEqualTo("sra-id1");
+
+        final Object existingname = orgResponseBeforeUpdate.get("name");
+        final Object name = orgResponseAfterUpdate.get("name");
+        assertThat(name).isNotNull().isEqualTo(existingname);
 
         deleteCreatedTestOrganisations(orgId);
     }
@@ -215,6 +278,9 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
+
         //updateName
         Map<String, Object> response = professionalReferenceDataClient
             .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
@@ -222,9 +288,15 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Request parameters unrecognised");
         //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
-        Map<String,Object> responseBody = retrievedSavedOrg(orgId);
-        final Object name = responseBody.get("name");
+        Map<String,Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
+        final Object name = orgResponseAfterUpdate.get("name");
+        final Object existingname = orgResponseBeforeUpdate.get("name");
         assertThat(name).isNotNull().isEqualTo("some-org-name1");
+        assertThat(name).isNotNull().isEqualTo(existingname);
+
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
 
         deleteCreatedTestOrganisations(orgId);
     }
