@@ -443,7 +443,7 @@ dependencies {
     // tests on version 2 fails on flyway migrations, something like "incorrect syntax"
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
 
-    testImplementation group: 'org.wiremock', name: 'wiremock', version: '3.10.0'
+    testImplementation group: 'org.wiremock', name: 'wiremock', version: '3.12.0'
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'junit', module: 'junit'
