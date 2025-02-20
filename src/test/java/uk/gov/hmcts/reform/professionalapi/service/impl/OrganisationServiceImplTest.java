@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -92,6 +93,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -2718,4 +2720,69 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
     }
+
+
+    @Test
+    void test_updateOrganisationName() {
+        UUID newSraId = UUID.randomUUID();
+        Organisation organisation = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("name","Some orgName");
+
+        organisation.setName("Some orgName");
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.save(organisation)).thenReturn(organisationMock);
+
+        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(organisation,
+            organisationNameSraUpdate);
+        assertNotNull(response);
+
+        verify(organisationRepository, times(1))
+            .save(organisation);
+
+    }
+
+    @Test
+    void test_updateOrganisationSra() {
+        UUID newSraId = UUID.randomUUID();
+        Organisation organisation = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+
+        organisation.setId(newSraId);
+        organisation.setLastUpdated(LocalDateTime.now());
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId","Some SraId");
+        OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
+
+        when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.save(organisation)).thenReturn(organisationMock);
+
+        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(organisation,organisationNameSraUpdate);
+
+        assertNotNull(response);
+
+        verify(organisationRepository, times(1))
+            .save(organisation);
+        verify(orgAttributeRepository, times(1))
+            .save(any(OrgAttribute.class));
+
+
+    }
+
+    @Test
+    void shouldThrowFieldAndPersistenceValidationExceptionWhenSaveUpdateFails() {
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId","Some SraId");
+        when(orgAttributeRepository.save(any(OrgAttribute.class)))
+            .thenThrow(new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Failed to save attributes for organisation sraId"));
+        assertThrows(FieldAndPersistenceValidationException.class, () -> sut.updateOrganisationNameOrSra(organisation,
+            organisationNameSraUpdate));
+    }
+
 }

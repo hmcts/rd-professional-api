@@ -1752,4 +1752,16 @@ public class ProfessionalApiClient {
         log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
     }
+
+    public Response updatesOrganisationDetails(Map<String,String> organisationNameSraUpdate,
+                                               RequestSpecification requestSpecification) {
+
+        Response response = requestSpecification
+            .body(organisationNameSraUpdate)
+            .put("/refdata/external/v2/organisations/orgDetails")
+            .andReturn();
+
+        return response;
+    }
+
 }
