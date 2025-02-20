@@ -394,8 +394,8 @@ dependencies {
 
     implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.10.0'
     //Added below dependencies for shedlock
-    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.2.0'
-    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.2.0'
+    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.16.0'
+    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.16.0'
 
 
     implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.7'
