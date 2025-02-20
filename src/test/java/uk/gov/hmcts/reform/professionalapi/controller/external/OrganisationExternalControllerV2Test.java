@@ -222,13 +222,6 @@ class OrganisationExternalControllerV2Test {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
 
-        verify(organisationServiceMock, times(1)).updateOrganisationNameOrSra(
-            any(),any());
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
-
-        verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateOrganisationExistsAndActive(organisationIdentifier);
-
         verify(organisationServiceMock, times(1))
             .updateOrganisationNameOrSra(eq(organisationMock), eq(organisationNameSraUpdate));
 
@@ -257,13 +250,6 @@ class OrganisationExternalControllerV2Test {
             organisationIdentifier,organisationNameSraUpdate);
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
-
-        verify(organisationServiceMock, times(1)).updateOrganisationNameOrSra(
-            any(), any());
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(any());
-
-        verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateOrganisationExistsAndActive(organisationIdentifier);
 
         verify(organisationServiceMock, times(1))
             .updateOrganisationNameOrSra(eq(organisationMock), eq(organisationNameSraUpdate));
