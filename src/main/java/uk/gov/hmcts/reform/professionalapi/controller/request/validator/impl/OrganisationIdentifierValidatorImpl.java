@@ -170,7 +170,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
         if (StringUtils.isNotBlank(dxNumber) && StringUtils.isBlank(dxExchange)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                "Organisation dxExchange canot be empty be empty");
+                "Organisation dxExchange cannot be empty be empty");
         }
         if (StringUtils.isNotBlank(dxExchange) && StringUtils.isBlank(dxNumber)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
