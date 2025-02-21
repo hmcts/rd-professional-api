@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -158,5 +161,51 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
 
         return true;
+    }
+
+    public void validateDxAddress(UpdateContactInformationRequest updateContactInformationRequest) {
+
+        String dxNumber = updateContactInformationRequest.getDxNumber();
+        String dxExchange = updateContactInformationRequest.getDxExchange();
+
+        if (StringUtils.isNotBlank(dxNumber) && StringUtils.isBlank(dxExchange)) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Organisation dxExchange cannot be empty be empty");
+        }
+        if (StringUtils.isNotBlank(dxExchange) && StringUtils.isBlank(dxNumber)) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Organisation dxNumber cannot be empty be empty");
+        }
+        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange))
+            && dxNumber.length() >= 14) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+            String.format("DX Number (max=13) has invalid length : %s",dxNumber.length()));
+        }
+        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange))
+            && dxExchange.length() >= 40) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+            String.format("DX Exchange (max=40) has invalid length : %s",dxExchange.length()));
+        }
+        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange))
+            && !dxNumber.matches("^[a-zA-Z0-9 ]+$")) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                String.format("Invalid Dx Number entered: %s, it can only contain numbers, letters, and spaces",
+                    dxNumber));
+        }
+
+    }
+
+    public void validateAddress(UpdateContactInformationRequest updateContactInformationRequest) {
+        String uprn = updateContactInformationRequest.getUprn();
+        String addressLine1 = updateContactInformationRequest.getAddressLine1();
+
+        if (StringUtils.isBlank(addressLine1)) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "AddressLine1 cannot be empty");
+        }
+        if (StringUtils.isNotBlank(uprn) && uprn.length() > 14) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                String.format("Uprn must not be greater than 14 characters long : %s",uprn.length()));
+        }
     }
 }
