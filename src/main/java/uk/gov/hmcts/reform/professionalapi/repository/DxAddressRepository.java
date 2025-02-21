@@ -14,6 +14,6 @@ public interface DxAddressRepository extends JpaRepository<DxAddress, UUID> {
 
     @Query(value = "SELECT * FROM  dbrefdata.dx_address dx WHERE dx.contact_information_id = :contactInformationId",
         nativeQuery = true)
-    List<DxAddress>  findByContactInformationId(@Param("contactInformationId")UUID contactInformationId);
+    List<DxAddress> findByContactInformationId(@Param("contactInformationId")UUID contactInformationId);
 
 }

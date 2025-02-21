@@ -89,7 +89,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1085,7 +1084,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 }
             }
         } catch (Exception ex) {
-            throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,
+            throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,ex,
                 "Failed to save or update organisation address");
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -1107,27 +1106,20 @@ public class OrganisationServiceImpl implements OrganisationService {
         });
     }
 
-    private ContactInformation createNewContactInformation(UpdateContactInformationRequest request,
+    private ContactInformation createNewContactInformation(UpdateContactInformationRequest contactInfo,
                                                            Organisation organisation) {
         //creating contact information with the new information
         ContactInformation contactInformation = new ContactInformation();
-        Map<Consumer<String>, String> fieldMappings = Map.of(
-            contactInformation::setUprn, request.getUprn(),
-            contactInformation::setAddressLine1, request.getAddressLine1(),
-            contactInformation::setAddressLine2, request.getAddressLine2(),
-            contactInformation::setAddressLine3, request.getAddressLine3(),
-            contactInformation::setTownCity, request.getTownCity(),
-            contactInformation::setCounty, request.getCounty(),
-            contactInformation::setCountry, request.getCountry(),
-            contactInformation::setPostCode, request.getPostCode()
-        );
-
-        fieldMappings.forEach((setter, value) -> {
-            if (StringUtils.isNotEmpty(value)) {
-                setter.accept(RefDataUtil.removeEmptySpaces(value));
-            }
-        });
-
+        if (!StringUtils.isBlank(contactInfo.getUprn())) {
+            contactInformation.setUprn(RefDataUtil.removeEmptySpaces(contactInfo.getUprn()));
+        }
+        contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
+        contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
+        contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
+        contactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
+        contactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
+        contactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
+        contactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
         contactInformation.setOrganisation(organisation);
         contactInformation.setLastUpdated(LocalDateTime.now());
         return contactInformation;
@@ -1161,7 +1153,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 }
             }
         } catch (Exception ex) {
-            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),ex,
             "Failed to save or update organisation address");
         }
         return ResponseEntity.status(204).build();
