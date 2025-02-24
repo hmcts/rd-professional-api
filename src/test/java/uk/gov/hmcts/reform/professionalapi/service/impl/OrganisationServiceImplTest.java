@@ -2739,8 +2739,7 @@ class  OrganisationServiceImplTest {
                 "");
         String userId = UUID.randomUUID().toString().substring(0, 7);
         when(contactInformationRepositoryMock.save(any())).thenReturn(newContactInformation);
-        ResponseEntity<Object> response = sut.updateOrganisationAddress(org,
-            updateContactInformationRequest,userId);
+        ResponseEntity<Object> response = sut.updateOrganisationAddress(org, updateContactInformationRequest, userId);
         assertNotNull(response);
         verify(contactInformationRepositoryMock, times(1)).save(any(ContactInformation.class));
     }
