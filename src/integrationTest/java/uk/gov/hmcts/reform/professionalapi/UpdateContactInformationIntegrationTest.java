@@ -136,7 +136,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    void update_cpntactInfo_dxAddress_dxNum_null_failure() {
+    void update_contactInfo_dxAddress_when_dxNum_empty_failure() {
         //create request to update organisation
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
@@ -152,12 +152,12 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
-            .contains("Organisation dxExchange canot be empty be empty");
+            .contains("dxExchange cannot be empty be empty");
         deleteCreatedTestOrganisations(orgId);
     }
 
     @Test
-    void update_cpntactInfo_dxAddress_dxExchange_null_failure() {
+    void update_contactInfo_dxAddress_when_dxExchange_empty_failure() {
         //create request to update organisation
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
@@ -173,7 +173,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
-            .contains("Organisation dxNumber canot be empty be empty");
+            .contains("dxNumber cannot be empty be empty");
         deleteCreatedTestOrganisations(orgId);
     }
 
