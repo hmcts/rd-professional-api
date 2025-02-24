@@ -152,7 +152,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
-            .contains("Organisation dxExchange cannot be empty or null");
+            .contains("Organisation dxExchange cannot be null or empty");
         deleteCreatedTestOrganisations(orgId);
     }
 
@@ -173,7 +173,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
-            .contains("Organisation dxNumber cannot be empty or null");
+            .contains("Organisation dxNumber cannot be null or empty");
         deleteCreatedTestOrganisations(orgId);
     }
 
