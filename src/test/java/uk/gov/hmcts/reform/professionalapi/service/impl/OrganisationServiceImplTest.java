@@ -130,7 +130,7 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-class OrganisationServiceImplTest {
+class  OrganisationServiceImplTest {
 
     private static final String SINCE_STR = "2019-08-16T15:00:41";
     private final LocalDateTime since = LocalDateTime.parse(SINCE_STR, ISO_DATE_TIME_FORMATTER);
@@ -2734,8 +2734,9 @@ class OrganisationServiceImplTest {
         org.setContactInformations(contactInformations);
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
-                "1addressLine1","1addressLine2","1addressLine3","townCity1",
-                "county1","country1","postCode1","","");
+                 "1addressLine1", "1addressLine2", "1addressLine3",
+                "townCity1", "county1", "country1", "postCode1","",
+                "");
         String userId = UUID.randomUUID().toString().substring(0, 7);
         when(contactInformationRepositoryMock.save(any())).thenReturn(newContactInformation);
         ResponseEntity<Object> response = sut.updateOrganisationAddress(org,
@@ -2756,16 +2757,15 @@ class OrganisationServiceImplTest {
         org.setContactInformations(contactInformations);
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
-                "1addressLine1","1addressLine2","1addressLine3","townCity1",
-                "county1","country1","postCode1","dxNumber1",
-                "dxExchange1");
+                 "1addressLine1", "1addressLine2", "1addressLine3",
+                "townCity1", "county1","country1","postCode1",
+                "dxNumber1", "dxExchange1");
         String userId = UUID.randomUUID().toString().substring(0, 7);
         when(contactInformationRepositoryMock.save(any())).thenReturn(newContactInformation);
-        ResponseEntity<Object> response = sut.updateOrganisationAddress(org,updateContactInformationRequest,userId);
+        ResponseEntity<Object> response = sut.updateOrganisationAddress(org, updateContactInformationRequest, userId);
         assertNotNull(response);
         verify(contactInformationRepositoryMock, times(1)).save(any(ContactInformation.class));
-        verify(dxAddressRepositoryMock, times(1))
-            .save(any(DxAddress.class));
+        verify(dxAddressRepositoryMock, times(1)).save(any(DxAddress.class));
     }
 
     @Test
@@ -2781,9 +2781,9 @@ class OrganisationServiceImplTest {
         org.setContactInformations(contactInformations);
         String userId = UUID.randomUUID().toString().substring(0, 7);
         UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN1",
-                "1addressLine1","1addressLine2","1addressLine3","townCity1",
-                "county1","country1","postCode1","dxNumber1",
+            new UpdateContactInformationRequest("UPRN1", "1addressLine1",
+                "1addressLine2", "1addressLine3", "townCity1",
+                 "county1", "country1", "postCode1", "dxNumber1",
                 "dxExchange1");
         when(contactInformationRepositoryMock.save(any()))
             .thenThrow(new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),

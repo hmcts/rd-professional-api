@@ -170,21 +170,19 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
         if (StringUtils.isNotBlank(dxNumber) && StringUtils.isBlank(dxExchange)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                "Organisation dxExchange cannot be empty be empty");
+                "Organisation dxExchange cannot be null or empty");
         }
         if (StringUtils.isNotBlank(dxExchange) && StringUtils.isBlank(dxNumber)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                "Organisation dxNumber cannot be empty be empty");
+                "Organisation dxNumber cannot be null or empty");
         }
-        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange))
-            && dxNumber.length() >= 14) {
+        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange)) && dxNumber.length() >= 14) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-            String.format("DX Number (max=13) has invalid length : %s",dxNumber.length()));
+                String.format("DX Number (max=13) has invalid length : %s",dxNumber.length()));
         }
-        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange))
-            && dxExchange.length() >= 40) {
+        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange)) && dxExchange.length() >= 40) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-            String.format("DX Exchange (max=40) has invalid length : %s",dxExchange.length()));
+                String.format("DX Exchange (max=40) has invalid length : %s",dxExchange.length()));
         }
         if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange))
             && !dxNumber.matches("^[a-zA-Z0-9 ]+$")) {
@@ -205,7 +203,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
         if (StringUtils.isNotBlank(uprn) && uprn.length() > 14) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                String.format("Uprn must not be greater than 14 characters long : %s",uprn.length()));
+                String.format("Uprn must not be greater than 14 characters long found: %s",uprn.length()));
         }
     }
 }
