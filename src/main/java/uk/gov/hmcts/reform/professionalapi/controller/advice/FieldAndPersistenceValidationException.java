@@ -11,8 +11,8 @@ public class FieldAndPersistenceValidationException extends RuntimeException {
         this.httpStatus = httpStatus;
     }
 
-    public FieldAndPersistenceValidationException(HttpStatus httpStatus, Exception exception) {
-        super(exception.getMessage(), exception);
+    public FieldAndPersistenceValidationException(HttpStatus httpStatus, Exception exception, String errorMessage) {
+        super(errorMessage, exception);
         this.httpStatus = httpStatus;
     }
 
