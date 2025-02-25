@@ -864,7 +864,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
 
-    public String setUpDataForPrdAdmin(String email, RequestSpecification prdAdminToken){
+    public String setUpDataForPrdAdmin(String email, RequestSpecification prdAdminToken) {
         UserCreationRequest superUserRequest = UserCreationRequest
             .aUserCreationRequest()
             .firstName("firstName")
@@ -890,8 +890,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("updateContactInformationShouldReturnSuccessForPrdAdmin :: STARTED");
 
         String email = generateRandomEmail();
-        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders
-            (idamOpenIdClient.getExternalOpenIdToken(
+        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders(
+            idamOpenIdClient.getExternalOpenIdToken(
                 "prd-admin", "firstName", "lastName", email));
 
         String organisationIdentifier = setUpDataForPrdAdmin(email,prdAdminToken);
@@ -904,7 +904,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         organisationNameSraUpdate.put("sraId",updateSraId);
 
         //call endpoint to update contactInformation
-        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,prdAdminToken);
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(
+            organisationNameSraUpdate,prdAdminToken);
 
         //retrieve saved organisation by id
         var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
@@ -931,8 +932,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
         String email = generateRandomEmail();
-        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders
-            (idamOpenIdClient.getExternalOpenIdToken(
+        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders(
+            idamOpenIdClient.getExternalOpenIdToken(
                 "prd-admin", "firstName", "lastName", email));
 
         String organisationIdentifier = setUpDataForPrdAdmin(email,prdAdminToken);
@@ -976,8 +977,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void updateOrganisationNameOnlyShouldReturnSuccessForAdmin() {
         log.info("updateOrganisationNameOnlyShouldReturnSuccessForAdmin :: STARTED");
         String email = generateRandomEmail();
-        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders
-            (idamOpenIdClient.getExternalOpenIdToken(
+        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders(
+            idamOpenIdClient.getExternalOpenIdToken(
                 "prd-admin", "firstName", "lastName", email));
 
         String organisationIdentifier = setUpDataForPrdAdmin(email,prdAdminToken);
@@ -1020,8 +1021,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void updateOrganisationShouldReturnFailureIfNoNameValueInMapButKeyExistsForAdmin() {
         log.info("updateOrganisationShouldReturnFailureIfNoNameValueInMapButKeyExists :: STARTED");
         String email = generateRandomEmail();
-        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders
-            (idamOpenIdClient.getExternalOpenIdToken(
+        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders(
+            idamOpenIdClient.getExternalOpenIdToken(
                 "prd-admin", "firstName", "lastName", email));
 
         String organisationIdentifier = setUpDataForPrdAdmin(email,prdAdminToken);
@@ -1045,8 +1046,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void updateOrganisationSraIdShouldReturnFailureIfTooLongForAdmin() {
         log.info("updateOrganisationSraIdShouldReturnFailureIfTooLongForAdmin :: STARTED");
         String email = generateRandomEmail();
-        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders
-            (idamOpenIdClient.getExternalOpenIdToken(
+        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders(
+            idamOpenIdClient.getExternalOpenIdToken(
                 "prd-admin", "firstName", "lastName", email));
 
         String organisationIdentifier = setUpDataForPrdAdmin(email,prdAdminToken);
@@ -1085,8 +1086,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     void updateOrganisationNameShouldReturnFailureIfTooLongForAdmin() {
         log.info("updateOrganisationNameShouldReturnFailureIfTooLongForAdmin :: STARTED");
         String email = generateRandomEmail();
-        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders
-            (idamOpenIdClient.getExternalOpenIdToken(
+        RequestSpecification prdAdminToken = professionalApiClient.getMultipleAuthHeaders(
+            idamOpenIdClient.getExternalOpenIdToken(
                 "prd-admin", "firstName", "lastName", email));
 
         String organisationIdentifier = setUpDataForPrdAdmin(email,prdAdminToken);
