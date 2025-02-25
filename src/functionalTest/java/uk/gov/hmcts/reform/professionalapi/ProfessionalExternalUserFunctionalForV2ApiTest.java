@@ -293,6 +293,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
 
+        //call endpoint to retrieve existing name for verification
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
         String updateName = randomAlphabetic(10);
 
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
@@ -310,6 +314,9 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         final Object orgName = orgResponse.get("name");
         assertThat(orgName).isNotNull().isEqualTo(updateName);
+        final Object sraId = orgResponse.get("sraId");
+        final Object existinsraId = existingOrgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existinsraId);
 
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
@@ -347,6 +354,11 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: STARTED");
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
+
+        //retrieve existing org details
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
         String updateSraId = randomAlphabetic(258);
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",updateSraId);
@@ -358,6 +370,18 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedResponse.getBody().prettyPrint())
             .contains("Organisation sraId cannot be more than 255 characters");
 
+
+        //retrieve organisation by id after update to show nothing was saved
+        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(orgResponse).isNotNull();
+
+        final Object orgName = orgResponse.get("name");
+        final Object existingname = existingOrgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(existingname);
+        final Object sraId = orgResponse.get("sraId");
+        final Object existingsraId = existingOrgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: END");
     }
 
@@ -367,6 +391,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: STARTED");
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
+        //retrieve existing org details
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
         String updateName = randomAlphabetic(258);
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name",updateName);
@@ -377,6 +405,18 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
         assertThat(orgUpdatedResponse.getBody().prettyPrint())
             .contains("Organisation name cannot be more than 255 characters");
+
+
+        //call endpoint to show name and sra id were nto changed
+        var orgResponseAfterUpdate = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(existingOrgResponse).isNotNull();
+
+        final Object orgName = orgResponseAfterUpdate.get("name");
+        final Object existingname = existingOrgResponse.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(existingname);
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        final Object existingsraId = existingOrgResponse.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
 
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: END");
     }
