@@ -1085,7 +1085,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST, ex,
-                "Failed to save or update organisation address");
+                "Failed to save or update organisation address :"+ex.getMessage());
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -1154,7 +1154,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400), ex,
-                "Failed to save or update organisation address");
+                "Failed to save or update organisation address :"+ex.getMessage());
         }
         return ResponseEntity.status(204).build();
     }
