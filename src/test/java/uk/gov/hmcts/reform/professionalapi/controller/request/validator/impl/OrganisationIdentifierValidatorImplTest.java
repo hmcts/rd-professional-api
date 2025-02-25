@@ -221,7 +221,7 @@ class OrganisationIdentifierValidatorImplTest {
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
                 "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
-                "UPRNLengthOfOver14CharactersTest","dxExchng");
+                "UPRNLengthIs-15","dxExchng");
 
         assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
             .validateDxAddress(updateContactInformationRequest));
@@ -234,7 +234,7 @@ class OrganisationIdentifierValidatorImplTest {
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
                 "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
-                "123434","dxExchngLengthOfDxExchgangeIsOver40CharactersLong");
+                "123434","dxExchngLengthOfDxExchgangeIsOver41Charac");
 
         assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
             .validateDxAddress(updateContactInformationRequest));
