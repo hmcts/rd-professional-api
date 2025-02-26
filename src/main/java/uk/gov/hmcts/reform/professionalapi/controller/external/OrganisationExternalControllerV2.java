@@ -256,7 +256,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
     )
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
-    @Secured({"prd-admin",  "pui-organisation-manager"})
+    @Secured({"pui-organisation-manager"})
     public ResponseEntity<Object> updateOrganisationNameOrSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationNameSraUpdate")
         @Parameter(hidden = true) @OrgId String organisationIdentifier,
