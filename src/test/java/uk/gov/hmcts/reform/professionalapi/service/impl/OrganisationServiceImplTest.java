@@ -2724,35 +2724,34 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_updateOrganisationName() {
-        UUID newSraId = UUID.randomUUID();
-        Organisation organisation = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+        Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
             "companyN", false, "www.org.com");
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name","Some orgName");
 
-        organisation.setName("Some orgName");
-        organisation.setLastUpdated(LocalDateTime.now());
+        org.setName("Some orgName");
+        org.setLastUpdated(LocalDateTime.now());
 
         Organisation organisationMock = mock(Organisation.class);
-        when(organisationRepository.save(organisation)).thenReturn(organisationMock);
+        when(organisationRepository.save(org)).thenReturn(organisationMock);
 
-        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(organisation,
+        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(org,
             organisationNameSraUpdate);
         assertNotNull(response);
 
         verify(organisationRepository, times(1))
-            .save(organisation);
+            .save(org);
 
     }
 
     @Test
     void test_updateOrganisationSra() {
         UUID newSraId = UUID.randomUUID();
-        Organisation organisation = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+        Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
             "companyN", false, "www.org.com");
 
-        organisation.setId(newSraId);
-        organisation.setLastUpdated(LocalDateTime.now());
+        org.setId(newSraId);
+        org.setLastUpdated(LocalDateTime.now());
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId","Some SraId");
         OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
@@ -2760,9 +2759,9 @@ class OrganisationServiceImplTest {
         when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
 
         Organisation organisationMock = mock(Organisation.class);
-        when(organisationRepository.save(organisation)).thenReturn(organisationMock);
+        when(organisationRepository.save(org)).thenReturn(organisationMock);
 
-        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(organisation,organisationNameSraUpdate);
+        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(org,organisationNameSraUpdate);
 
         assertNotNull(response);
 

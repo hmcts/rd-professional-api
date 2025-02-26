@@ -1064,11 +1064,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
     public ResponseEntity<Object> updateOrganisationNameOrSra(Organisation existingOrganisation,
                                                           Map<String,String> organisationNameSraUpdate) {
-        Organisation organisationSaved = null;
+
         String sraId = "sraId";
         try {
             if (organisationNameSraUpdate.containsKey("name")) {
-                OrgAttribute savedAttribute = null;
                 if (StringUtils.isNotEmpty(organisationNameSraUpdate.get("name"))
                     && StringUtils.isNotBlank(organisationNameSraUpdate.get("name"))) {
                     existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));

@@ -217,19 +217,19 @@ class OrganisationExternalControllerV2Test {
         when(organisationServiceMock.updateOrganisationNameOrSra(organisationMock,organisationNameSraUpdate))
             .thenReturn(responseEntity);
         String sra = organisationNameSraUpdate.get("sraId");
-        ResponseEntity<Object> response = organisationExternalController.updateOrganisationNameOrSra(
+        ResponseEntity<Object> updatedResponse = organisationExternalController.updateOrganisationNameOrSra(
             organisationIdentifier,organisationNameSraUpdate);
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
+        assertThat(updatedResponse).isNotNull();
+        assertThat(updatedResponse.getStatusCode()).hasToString("204 NO_CONTENT");
 
         verify(organisationServiceMock, times(1))
-            .updateOrganisationNameOrSra(eq(organisationMock), eq(organisationNameSraUpdate));
+            .updateOrganisationNameOrSra(organisationMock, organisationNameSraUpdate);
 
         verify(organisationServiceMock, times(1))
-            .getOrganisationByOrgIdentifier(eq(organisationIdentifier));
+            .getOrganisationByOrgIdentifier(organisationIdentifier);
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateOrganisationExistsAndActive(eq(organisationIdentifier));
+            .validateOrganisationExistsAndActive(organisationIdentifier);
     }
 
 
@@ -246,19 +246,19 @@ class OrganisationExternalControllerV2Test {
         when(organisationServiceMock.updateOrganisationNameOrSra(organisationMock,organisationNameSraUpdate))
             .thenReturn(responseEntity);
 
-        ResponseEntity<Object> response = organisationExternalController.updateOrganisationNameOrSra(
+        ResponseEntity<Object> updateResponse = organisationExternalController.updateOrganisationNameOrSra(
             organisationIdentifier,organisationNameSraUpdate);
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode().toString()).isEqualTo("204 NO_CONTENT");
+        assertThat(updateResponse).isNotNull();
+        assertThat(updateResponse.getStatusCode()).hasToString("204 NO_CONTENT");
 
         verify(organisationServiceMock, times(1))
-            .updateOrganisationNameOrSra(eq(organisationMock), eq(organisationNameSraUpdate));
+            .updateOrganisationNameOrSra(organisationMock, organisationNameSraUpdate);
 
         verify(organisationServiceMock, times(1))
-            .getOrganisationByOrgIdentifier(eq(organisationIdentifier));
+            .getOrganisationByOrgIdentifier(organisationIdentifier);
 
         verify(organisationIdentifierValidatorImplMock, times(1))
-            .validateOrganisationExistsAndActive(eq(organisationIdentifier));
+            .validateOrganisationExistsAndActive(organisationIdentifier);
     }
 
 
