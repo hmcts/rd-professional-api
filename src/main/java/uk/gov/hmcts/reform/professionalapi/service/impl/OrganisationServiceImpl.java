@@ -1067,13 +1067,11 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         String sraId = "sraId";
         try {
-            if (organisationNameSraUpdate.containsKey("name")) {
-                if (StringUtils.isNotEmpty(organisationNameSraUpdate.get("name"))
-                    && StringUtils.isNotBlank(organisationNameSraUpdate.get("name"))) {
+            if (organisationNameSraUpdate.containsKey("name")
+                && StringUtils.isNotBlank(organisationNameSraUpdate.get("name"))) {
                     existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));
                     existingOrganisation.setLastUpdated(LocalDateTime.now());
                     organisationRepository.save(existingOrganisation);
-                }
             }
             if (organisationNameSraUpdate.containsKey(sraId)) {
                 OrgAttribute savedSraAttribute = null;
@@ -1108,8 +1106,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 }
             }
         } catch (Exception ex) {
-            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                "Failed to save or update");
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400), ex,
+                "Failed to save or update :" + ex.getMessage());
         }
         return ResponseEntity.status(204).build();
     }

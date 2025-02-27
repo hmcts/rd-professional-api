@@ -2770,6 +2770,43 @@ class OrganisationServiceImplTest {
         verify(orgAttributeRepository, times(1))
             .save(any(OrgAttribute.class));
 
+    }
+
+    @Test
+    void test_updateOrganisationSraWhenSraIdEmpty() {
+        UUID newSraId = UUID.randomUUID();
+        Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        OrgAttribute orgAttribute = new OrgAttribute();
+        orgAttribute.setKey("regulators-0");
+        orgAttribute.setValue("{regulatorType:Solicitor Regulation Authority (SRA), organisationRegistrationNumber: " +
+            "1234567}");
+        orgAttribute.setOrganisation(org);
+        org.addAttribute(orgAttribute);
+        org.setId(newSraId);
+        org.setLastUpdated(LocalDateTime.now());
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId"," ");
+
+        List<OrgAttribute> orgAttributes = new ArrayList<>();
+        orgAttributes.add(orgAttribute);
+        OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
+
+        when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.save(org)).thenReturn(organisationMock);
+        when(orgAttributeRepository.findByOrganisationId(any())).thenReturn(orgAttributes);
+        ResponseEntity<Object> response = sut.updateOrganisationNameOrSra(org,organisationNameSraUpdate);
+
+        assertNotNull(response);
+
+        verify(organisationRepository, times(1))
+            .save(org);
+        verify(orgAttributeRepository, times(1))
+            .findByOrganisationId(any());
+        verify(orgAttributeRepository, times(1))
+            .deleteById(any());
 
     }
 
