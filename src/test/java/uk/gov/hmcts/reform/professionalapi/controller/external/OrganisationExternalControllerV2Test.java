@@ -216,7 +216,6 @@ class OrganisationExternalControllerV2Test {
             .thenReturn(organisationMock);
         when(organisationServiceMock.updateOrganisationNameOrSra(organisationMock,organisationNameSraUpdate))
             .thenReturn(responseEntity);
-        String sra = organisationNameSraUpdate.get("sraId");
         ResponseEntity<Object> updatedResponse = organisationExternalController.updateOrganisationNameOrSra(
             organisationIdentifier,organisationNameSraUpdate);
         assertThat(updatedResponse).isNotNull();

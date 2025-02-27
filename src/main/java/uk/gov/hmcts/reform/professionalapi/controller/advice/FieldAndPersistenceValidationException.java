@@ -6,7 +6,6 @@ public class FieldAndPersistenceValidationException extends RuntimeException {
 
     private final HttpStatus httpStatus;
 
-
     public FieldAndPersistenceValidationException(HttpStatus httpStatus, String errorMessage) {
         super(errorMessage);
         this.httpStatus = httpStatus;
