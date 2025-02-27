@@ -2766,7 +2766,7 @@ class OrganisationServiceImplTest {
         assertNotNull(response);
 
         verify(organisationRepository, times(1))
-            .save(organisation);
+            .save(org);
         verify(orgAttributeRepository, times(1))
             .save(any(OrgAttribute.class));
 
