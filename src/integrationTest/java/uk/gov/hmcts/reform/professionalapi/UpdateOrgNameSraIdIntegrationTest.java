@@ -28,7 +28,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
 
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
@@ -63,7 +63,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
         //update sraid
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
         //fetch org After update
         Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
@@ -96,7 +96,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
         //fetch org After update
         Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
 
@@ -127,7 +127,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
         //fetch org After update
         Map<String, Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
         assertThat(response.get("http_status")).isEqualTo("400");
@@ -159,7 +159,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         //UpdateSraId
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
         //fetch org After update
@@ -191,7 +191,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
 
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
         //fetch org After update
@@ -222,7 +222,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
 
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation name cannot be more than 255 "
             + "characters");
@@ -251,7 +251,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
 
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Organisation sraId cannot be more than "
@@ -283,7 +283,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         //updateName
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId(userId,organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Request parameters unrecognised");
@@ -310,7 +310,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         organisationNameSraUpdate.put("sraId","Some sraId");
 
         Map<String, Object> response = professionalReferenceDataClient
-            .updateOrgNameSraId("abcdfefee",organisationNameSraUpdate,hmctsAdmin);
+            .updateOrgNameSraId("abcdfefee",organisationNameSraUpdate,puiOrgManager);
 
         assertThat(response.get("http_status")).isEqualTo("403");
         assertThat(response.get("response_body")).toString().contains("Access Denied");
