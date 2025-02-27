@@ -2774,15 +2774,16 @@ class OrganisationServiceImplTest {
 
     @Test
     void test_updateOrganisationSraWhenSraIdEmpty() {
-        UUID newSraId = UUID.randomUUID();
+
         Organisation org = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
             "companyN", false, "www.org.com");
         OrgAttribute orgAttribute = new OrgAttribute();
         orgAttribute.setKey("regulators-0");
-        orgAttribute.setValue("{regulatorType:Solicitor Regulation Authority (SRA), organisationRegistrationNumber: " +
-            "1234567}");
+        orgAttribute.setValue("{regulatorType:Solicitor Regulation Authority (SRA), organisationRegistrationNumber: "
+            + "1234567}");
         orgAttribute.setOrganisation(org);
         org.addAttribute(orgAttribute);
+        UUID newSraId = UUID.randomUUID();
         org.setId(newSraId);
         org.setLastUpdated(LocalDateTime.now());
         Map<String,String> organisationNameSraUpdate = new HashMap<>();

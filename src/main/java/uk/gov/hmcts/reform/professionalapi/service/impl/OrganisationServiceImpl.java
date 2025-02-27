@@ -1069,9 +1069,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         try {
             if (organisationNameSraUpdate.containsKey("name")
                 && StringUtils.isNotBlank(organisationNameSraUpdate.get("name"))) {
-                    existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));
-                    existingOrganisation.setLastUpdated(LocalDateTime.now());
-                    organisationRepository.save(existingOrganisation);
+                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));
+                existingOrganisation.setLastUpdated(LocalDateTime.now());
+                organisationRepository.save(existingOrganisation);
             }
             if (organisationNameSraUpdate.containsKey(sraId)) {
                 OrgAttribute savedSraAttribute = null;
