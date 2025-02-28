@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
@@ -73,6 +74,14 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
             organisationOtherOrgsCreationRequest.getSuperUser().setEmail(superUserEmail);
 
+            List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+            OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+            orgAttributeRequest.setKey("regulators-0");
+            orgAttributeRequest.setValue("{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+                + "\"organisationRegistrationNumber\":\"" + randomAlphabetic(10) + "\"}");
+
+            orgAttributeRequests.add(orgAttributeRequest);
+            organisationOtherOrgsCreationRequest.setOrgAttributes(orgAttributeRequests);
 
             organisationOtherOrgsCreationRequest.setStatus("ACTIVE");
             extActiveOrgId = createAndActivateOrganisationWithGivenRequestV2(organisationOtherOrgsCreationRequest,
@@ -224,6 +233,11 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationNameSraUpdate.put("name",updateName);
         organisationNameSraUpdate.put("sraId",updateSraId);
 
+        //retrieve saved organisation by id
+        var orgResponseBeforeUpdate = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin,
+            OK);
+        assertThat(orgResponseBeforeUpdate).isNotNull();
+
         //call endpoint to update name as 'updatedname'
         Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
             professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
@@ -245,7 +259,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
         List<HashMap> saveOrgAtributes = (List<HashMap>) orgResponse.get("orgAttributes");
-        HashMap orgAttribSaved = saveOrgAtributes.get(1);
+        HashMap orgAttribSaved = saveOrgAtributes.get(0);
         String key = (String)orgAttribSaved.get("key");
         String value = (String)orgAttribSaved.get("value");
 
@@ -292,7 +306,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
         List<HashMap> saveOrgAtributes = (List<HashMap>) orgResponse.get("orgAttributes");
-        HashMap orgAttribSaved = saveOrgAtributes.get(1);
+        HashMap orgAttribSaved = saveOrgAtributes.get(0);
         String key = (String)orgAttribSaved.get("key");
         String value = (String)orgAttribSaved.get("value");
 
@@ -305,6 +319,56 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
 
+    @Test
+    void updateOrganisationSraShouldReturnSuccessIfSraIdEmpty() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        log.info("updateOrganisationNameShouldReturnSuccess :: STARTED");
+
+        String updateSraId = "  ";
+        //retrieve saved organisation by id
+        var orgBeforeUpdate = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(orgBeforeUpdate).isNotNull();
+
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("sraId",updateSraId);
+
+        //call endpoint to update name as 'updatedname'
+        Response orgUpdatedResponse = professionalApiClient.updatesOrganisationDetails(organisationNameSraUpdate,
+            professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
+
+        //retrieve saved organisation by id
+        var orgResponseAfterUpdate = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin,
+            OK);
+        assertThat(orgResponseAfterUpdate).isNotNull();
+
+        // when empty or null SRA id will be updated as null
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        assertThat(sraId).isNull();
+        //name will not be changed
+        final Object orgName = orgResponseAfterUpdate.get("name");
+        assertThat(orgName).isNotNull().isEqualTo(orgBeforeUpdate.get("name"));
+
+        LocalDateTime updatedDate = LocalDateTime.parse(orgResponseAfterUpdate.get("lastUpdated").toString());
+        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        //to check that initially there was one SRAID attribute in the attributes table
+        List<HashMap> existingAtributesBeforeUpdate = (List<HashMap>) orgBeforeUpdate.get("orgAttributes");
+        HashMap orgAttribBeforeSave = existingAtributesBeforeUpdate.get(0);
+        String key = (String)orgAttribBeforeSave.get("key");
+        String value = (String)orgAttribBeforeSave.get("value");
+        assertThat(key).isEqualTo("regulators-0");
+        assertThat(value).contains("\"regulatorType\":\"Solicitor Regulation Authority (SRA)\"");
+
+        // after update when SRA id null or empty the record is deleted
+        List<HashMap> attributesAfterUpdate = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+        assertThat(attributesAfterUpdate).hasSize(0);
+
+        log.info("updateOrganisationNameShouldReturnSuccess :: END");
+
+    }
 
     @Test
     void updateOrganisationNameOnlyShouldReturnSuccess() {
