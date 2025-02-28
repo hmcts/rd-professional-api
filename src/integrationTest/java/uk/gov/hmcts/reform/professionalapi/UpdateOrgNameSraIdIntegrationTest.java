@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,15 +47,23 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //No attributes were saved
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
         deleteCreatedTestOrganisations(orgId);
     }
 
     @Test
     void update_sraId_of_an_active_organisation_should_return_success() {
 
+        String newSraId = "New sraId";
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
-        organisationNameSraUpdate.put("sraId","New sraId");
+        organisationNameSraUpdate.put("sraId",newSraId);
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
@@ -72,7 +81,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         Map<String,Object> responseBody = retrievedSavedOrg(orgId);
 
         final Object sraId = responseBody.get("sraId");
-        assertThat(sraId).isNotNull().isEqualTo("New sraId");
+        assertThat(sraId).isNotNull().isEqualTo(newSraId);
 
         final Object existingname = orgResponseBeforeUpdate.get("name");
         final Object name = orgResponseAfterUpdate.get("name");
@@ -80,6 +89,23 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         LocalDateTime updatedDate =  LocalDateTime.parse(responseBody.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        // attributes were saved in attrib table
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(1);
+
+        List<HashMap> saveOrgAtributes = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+        HashMap orgAttribSaved = saveOrgAtributes.get(0);
+        String key = (String)orgAttribSaved.get("key");
+        String value = (String)orgAttribSaved.get("value");
+
+        assertThat(key).isEqualTo("regulators-0");
+        assertThat(value).isEqualTo("{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+            + "\"organisationRegistrationNumber\":\"" + newSraId + "\"}");
+
         deleteCreatedTestOrganisations(orgId);
     }
 
@@ -111,6 +137,13 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         final Object sraId = orgResponseAfterUpdate.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(existingsraId);
 
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //No attributes were saved
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
+
         deleteCreatedTestOrganisations(orgId);
     }
 
@@ -140,6 +173,13 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
         final Object sraId = orgResponseAfterUpdate.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //No attributes were saved
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
 
         deleteCreatedTestOrganisations(orgId);
     }
@@ -174,6 +214,14 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         LocalDateTime updatedDate =  LocalDateTime.parse(orgResponseAfterUpdate.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //When sra id is empty or null no error shown but no attribute entry made either
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
+
         deleteCreatedTestOrganisations(orgId);
     }
 
@@ -206,6 +254,14 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
 
         LocalDateTime updatedDate =  LocalDateTime.parse(orgResponseAfterUpdate.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //When sra id is empty or null no error shown but no attribute entry made either
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
+
         deleteCreatedTestOrganisations(orgId);
     }
 
@@ -234,6 +290,13 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
         final Object sraId = orgResponseAfterUpdate.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //no entry made into attribute table
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
 
         deleteCreatedTestOrganisations(orgId);
     }
@@ -266,6 +329,13 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         final Object name = orgResponseAfterUpdate.get("name");
         assertThat(name).isNotNull().isEqualTo(existingname);
 
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //no entry made in org attributes table
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
+
         deleteCreatedTestOrganisations(orgId);
     }
 
@@ -297,6 +367,13 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         final Object sraId = orgResponseAfterUpdate.get("sraId");
         final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //no entry in org attributes table
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
 
         deleteCreatedTestOrganisations(orgId);
     }
@@ -351,7 +428,9 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
     }
 
     public Map<String,Object> retrievedSavedOrg(String orgId) {
-        return  professionalReferenceDataClient.retrieveSingleOrganisation(orgId, hmctsAdmin);
+        return professionalReferenceDataClient
+            .retrieveSingleOrganisationForV2Api(orgId,
+                hmctsAdmin);
     }
 
     public void deleteCreatedTestOrganisations(String orgId) {

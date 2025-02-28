@@ -61,8 +61,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         + ".createOrganisationUsingExternalController", withFeature = true)
     void testExternalUserScenario() {
         setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker,
-            systemUser));
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
         retrieveOrganisationPbaScenarios();
         findOrganisationScenarios();
     }
@@ -232,8 +231,9 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
 
         //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        var orgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
+
 
         final Object orgName = orgResponse.get("name");
         assertThat(orgName).isNotNull().isEqualTo(updateName);
@@ -242,6 +242,16 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+
+        List<HashMap> saveOrgAtributes = (List<HashMap>) orgResponse.get("orgAttributes");
+        HashMap orgAttribSaved = saveOrgAtributes.get(1);
+        String key = (String)orgAttribSaved.get("key");
+        String value = (String)orgAttribSaved.get("value");
+
+        assertThat(key).isEqualTo("regulators-0");
+        assertThat(value).isEqualTo("{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+            + "\"organisationRegistrationNumber\":\"" + updateSraId + "\"}");
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
 
@@ -270,7 +280,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
 
         //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        var orgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
 
         final Object sraId = orgResponse.get("sraId");
@@ -280,6 +290,15 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        List<HashMap> saveOrgAtributes = (List<HashMap>) orgResponse.get("orgAttributes");
+        HashMap orgAttribSaved = saveOrgAtributes.get(1);
+        String key = (String)orgAttribSaved.get("key");
+        String value = (String)orgAttribSaved.get("value");
+
+        assertThat(key).isEqualTo("regulators-0");
+        assertThat(value).isEqualTo("{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+            + "\"organisationRegistrationNumber\":\"" + updateSraId + "\"}");
 
         log.info("updateOrganisationNameShouldReturnSuccess :: END");
 
@@ -294,7 +313,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         setUpUserBearerTokens(List.of(puiOrgManager));
 
         //call endpoint to retrieve existing name for verification
-        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin,
+            OK);
         assertThat(existingOrgResponse).isNotNull();
 
         String updateName = randomAlphabetic(10);
@@ -309,7 +329,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
 
         //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        var orgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
 
         final Object orgName = orgResponse.get("name");
@@ -321,11 +341,23 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
+        List<HashMap> saveOrgAtributes = (List<HashMap>) orgResponse.get("orgAttributes");
+        HashMap orgAttribSaved = saveOrgAtributes.get(0);
+        String key = (String)orgAttribSaved.get("key");
+        String value = (String)orgAttribSaved.get("value");
+
+        List<HashMap> existingOrgAtributes = (List<HashMap>) existingOrgResponse.get("orgAttributes");
+        HashMap orgAttribOriginal = existingOrgAtributes.get(0);
+        String keyBefore = (String)orgAttribOriginal.get("key");
+        String valueBefore = (String)orgAttribOriginal.get("value");
+
+        //attribute table not updated
+        assertThat(key).isEqualTo(keyBefore);
+        assertThat(value).isEqualTo(valueBefore);
+
         log.info("updateOrganisationNameOnlyShouldReturnSuccess :: END");
 
     }
-
-
 
 
     @Test
@@ -356,10 +388,11 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         setUpUserBearerTokens(List.of(puiOrgManager));
 
         //retrieve existing org details
-        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin,
+            OK);
         assertThat(existingOrgResponse).isNotNull();
 
-        String updateSraId = randomAlphabetic(258);
+        String updateSraId = randomAlphabetic(256);
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",updateSraId);
         //call endpoint to update
@@ -368,11 +401,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
         assertThat(orgUpdatedResponse.getBody().prettyPrint())
-            .contains("Organisation sraId cannot be more than 255 characters");
-
+            .contains("Organisation sraId cannot be more than 164 characters is returned");
 
         //retrieve organisation by id after update to show nothing was saved
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        var orgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
 
         final Object orgName = orgResponse.get("name");
@@ -381,6 +413,20 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         final Object sraId = orgResponse.get("sraId");
         final Object existingsraId = existingOrgResponse.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+
+        List<HashMap> saveOrgAtributes = (List<HashMap>) orgResponse.get("orgAttributes");
+        HashMap orgAttribSaved = saveOrgAtributes.get(0);
+        String key = (String)orgAttribSaved.get("key");
+        String value = (String)orgAttribSaved.get("value");
+
+        List<HashMap> existingOrgAtributes = (List<HashMap>) existingOrgResponse.get("orgAttributes");
+        HashMap orgAttribOriginal = existingOrgAtributes.get(0);
+        String keyBefore = (String)orgAttribOriginal.get("key");
+        String valueBefore = (String)orgAttribOriginal.get("value");
+
+        //assert no change in value
+        assertThat(key).isEqualTo(keyBefore);
+        assertThat(value).isEqualTo(valueBefore);
 
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: END");
     }
@@ -392,10 +438,11 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
         //retrieve existing org details
-        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        var existingOrgResponse = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin,
+            OK);
         assertThat(existingOrgResponse).isNotNull();
 
-        String updateName = randomAlphabetic(258);
+        String updateName = randomAlphabetic(256);
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("name",updateName);
         //call endpoint to update
@@ -408,7 +455,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
         //call endpoint to show name and sra id were nto changed
-        var orgResponseAfterUpdate = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        var orgResponseAfterUpdate = professionalApiClient.retrieveOrganisationDetailsForV2(extActiveOrgId, hmctsAdmin,
+            OK);
         assertThat(existingOrgResponse).isNotNull();
 
         final Object orgName = orgResponseAfterUpdate.get("name");
@@ -417,6 +465,20 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         final Object sraId = orgResponseAfterUpdate.get("sraId");
         final Object existingsraId = existingOrgResponse.get("sraId");
         assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+
+        List<HashMap> saveOrgAtributes = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+        HashMap orgAttribSaved = saveOrgAtributes.get(0);
+        String key = (String)orgAttribSaved.get("key");
+        String value = (String)orgAttribSaved.get("value");
+
+        List<HashMap> existingOrgAtributes = (List<HashMap>) existingOrgResponse.get("orgAttributes");
+        HashMap orgAttribOriginal = existingOrgAtributes.get(0);
+        String keyBefore = (String)orgAttribOriginal.get("key");
+        String valueBefore = (String)orgAttribOriginal.get("value");
+
+        //assert no change in value
+        assertThat(key).isEqualTo(keyBefore);
+        assertThat(value).isEqualTo(valueBefore);
 
         log.info("updateOrganisationNameSraIdShouldReturnFailureIfTooLong :: END");
     }
