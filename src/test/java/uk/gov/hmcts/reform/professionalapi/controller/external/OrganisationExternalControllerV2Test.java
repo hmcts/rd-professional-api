@@ -217,7 +217,7 @@ class OrganisationExternalControllerV2Test {
         when(organisationServiceMock.updateOrganisationNameOrSra(organisationMock,organisationNameSraUpdate))
             .thenReturn(responseEntity);
         ResponseEntity<Object> updatedResponse = organisationExternalController.updateOrganisationNameOrSra(
-            organisationIdentifier,organisationNameSraUpdate);
+            organisationNameSraUpdate,organisationIdentifier);
         assertThat(updatedResponse).isNotNull();
         assertThat(updatedResponse.getStatusCode()).hasToString("204 NO_CONTENT");
 
@@ -246,7 +246,7 @@ class OrganisationExternalControllerV2Test {
             .thenReturn(responseEntity);
 
         ResponseEntity<Object> updateResponse = organisationExternalController.updateOrganisationNameOrSra(
-            organisationIdentifier,organisationNameSraUpdate);
+            organisationNameSraUpdate,organisationIdentifier);
         assertThat(updateResponse).isNotNull();
         assertThat(updateResponse.getStatusCode()).hasToString("204 NO_CONTENT");
 

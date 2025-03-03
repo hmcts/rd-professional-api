@@ -265,8 +265,8 @@ public class OrganisationExternalControllerV2 extends SuperController {
                     name = "ValidRequest",
                     value = "{ \"name\": \"New Org Name\", \"sraId\": \"SRA12345\" }"
                 )))
-        @Parameter(hidden = true) @OrgId String organisationIdentifier,
-        @RequestBody Map<String,String> organisationNameSraUpdate) {
+        @org.springframework.web.bind.annotation.RequestBody Map<String,String> organisationNameSraUpdate,
+        @Parameter(hidden = true) @OrgId String organisationIdentifier) {
 
         //validate that organisation id is not null
         if (StringUtils.isEmpty(organisationIdentifier)) {
