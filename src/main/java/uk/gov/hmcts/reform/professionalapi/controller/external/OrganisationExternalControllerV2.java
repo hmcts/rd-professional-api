@@ -261,10 +261,18 @@ public class OrganisationExternalControllerV2 extends SuperController {
     public ResponseEntity<Object> updateOrganisationNameOrSra(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationNameSraUpdate",
             content = @Content(mediaType = "application/json",
-                examples = @ExampleObject(
-                    name = "ValidRequest",
-                    value = "{ \"name\": \"New Org Name\", \"sraId\": \"SRA12345\" }"
-                )))
+                examples = {
+                    @ExampleObject(
+                        value = "{ \"name\": \"New Org Name\", \"sraId\": \"SRA12345\" }"
+                    ),
+                    @ExampleObject(
+                        value = "{ { \"name\": \"New Org Name\"} }"
+                    ),
+                    @ExampleObject(
+                        value = "{ {  \"sraId\": \"SRA12345\" } }"
+                    )
+                }
+        ))
         @org.springframework.web.bind.annotation.RequestBody Map<String,String> organisationNameSraUpdate,
         @Parameter(hidden = true) @OrgId String organisationIdentifier) {
 
