@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -258,7 +259,12 @@ public class OrganisationExternalControllerV2 extends SuperController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<Object> updateOrganisationNameOrSra(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationNameSraUpdate")
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationNameSraUpdate",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(
+                    name = "ValidRequest",
+                    value = "{ \"name\": \"New Org Name\", \"sraId\": \"SRA12345\" }"
+                )))
         @Parameter(hidden = true) @OrgId String organisationIdentifier,
         @RequestBody Map<String,String> organisationNameSraUpdate) {
 
