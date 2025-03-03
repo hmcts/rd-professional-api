@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 
 import java.util.Map;
+import java.util.Set;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -276,7 +277,16 @@ public class OrganisationExternalControllerV2 extends SuperController {
 
         String nameValue = null;
         String sraIdValue = null;
-        //if name or sraid both keys not in the map
+
+        // Check if the map contains any other keys besides "name" and "sraId"
+        Set<String> allowedKeys = Set.of(name, sraId);
+        for (String key : organisationNameSraUpdate.keySet()) {
+            if (!allowedKeys.contains(key)) {
+                throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,
+                    "Request parameters unrecognised: " + key);
+            }
+        }
+        //if name or sraid both keys not in the map throw error
         if (!organisationNameSraUpdate.containsKey(name) && !organisationNameSraUpdate.containsKey(sraId)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Request parameters unrecognised");

@@ -305,7 +305,7 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
     void update_sraId_should_return_failure_if_length_too_long() {
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
-        String sraId = RandomStringUtils.randomAlphabetic(256);
+        String sraId = RandomStringUtils.randomAlphabetic(165);
         //create request to update organisation
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",sraId);
@@ -378,6 +378,46 @@ class UpdateOrgNameSraIdIntegrationTest extends AuthorizationEnabledIntegrationT
         deleteCreatedTestOrganisations(orgId);
     }
 
+    @Test
+    void update_of_an_active_organisation_should_fail_if_unrecognised_param_in_request() {
+
+        //create request to update organisation
+        Map<String,String> organisationNameSraUpdate = new HashMap<>();
+        organisationNameSraUpdate.put("address","New Org Name");
+        organisationNameSraUpdate.put("sraId","New SraId");
+
+        //create organisation
+        String orgId = getActiveOrganisationId();
+        String userId = getUserId(orgId);
+        //fetchOrgBefore Update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
+
+        //updateName
+        Map<String, Object> response = professionalReferenceDataClient
+            .updateOrgNameSraId(userId,organisationNameSraUpdate,puiOrgManager);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("response_body")).toString().contains("Request parameters unrecognised");
+        //retrieve saved org to verify that the entire transaction is rolled back , sra id is not saved
+        Map<String,Object> orgResponseAfterUpdate = retrievedSavedOrg(orgId);
+        final Object name = orgResponseAfterUpdate.get("name");
+        final Object existingname = orgResponseBeforeUpdate.get("name");
+        assertThat(name).isNotNull().isEqualTo("some-org-name1");
+        assertThat(name).isNotNull().isEqualTo(existingname);
+
+        final Object sraId = orgResponseAfterUpdate.get("sraId");
+        final Object existingsraId = orgResponseBeforeUpdate.get("sraId");
+        assertThat(sraId).isNotNull().isEqualTo(existingsraId);
+
+        List<HashMap> saveOrgAtributesBefore = (List<HashMap>) orgResponseBeforeUpdate.get("orgAttributes");
+        List<HashMap> saveOrgAtributesAfter = (List<HashMap>) orgResponseAfterUpdate.get("orgAttributes");
+
+        //no entry in org attributes table
+        assertThat(saveOrgAtributesBefore).hasSize(0);
+        assertThat(saveOrgAtributesAfter).hasSize(0);
+
+        deleteCreatedTestOrganisations(orgId);
+    }
 
     @Test
     void forbidden_acccess_should_return_failure() {

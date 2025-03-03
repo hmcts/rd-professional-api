@@ -456,7 +456,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             OK);
         assertThat(existingOrgResponse).isNotNull();
 
-        String updateSraId = randomAlphabetic(256);
+        String updateSraId = randomAlphabetic(165);
         Map<String,String> organisationNameSraUpdate = new HashMap<>();
         organisationNameSraUpdate.put("sraId",updateSraId);
         //call endpoint to update
