@@ -1079,8 +1079,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 }
                 //if DxAddress information is provided in request then create a new DxAddress
                 if (isDxAddressProvided(updateContactInformationRequest)) {
-                    updateOrganisationDxAddress(savedContactInformation,
-                        updateContactInformationRequest);
+                    updateOrganisationDxAddress(savedContactInformation,updateContactInformationRequest);
                 }
             }
         } catch (Exception ex) {
@@ -1146,15 +1145,11 @@ public class OrganisationServiceImpl implements OrganisationService {
                     contactInformation);
                 newDxAddress.setLastUpdated(LocalDateTime.now());
                 newDxAddress.setCreated(LocalDateTime.now());
-                DxAddress savedDxAddress = dxAddressRepository.save(newDxAddress);
-                if (savedDxAddress == null) {
-                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
-                        "Failed to save DxAddress Information");
-                }
+                dxAddressRepository.save(newDxAddress);
             }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400), ex,
-                "Failed to save or update organisation address :" + ex.getMessage());
+                "Failed to save DxAddress Information :" + ex.getMessage());
         }
         return ResponseEntity.status(204).build();
     }
