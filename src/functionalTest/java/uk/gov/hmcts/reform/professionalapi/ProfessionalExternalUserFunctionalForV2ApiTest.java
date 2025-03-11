@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
+import static wiremock.org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
 @ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
@@ -219,12 +222,23 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
 
+
     @Test
     void updateContactInformationShouldReturnSuccessForOrgManager() {
 
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
         log.info("updateContactInformationShouldReturnSuccessForOrgManager :: STARTED");
+
+        //retrieve saved organisation by id
+        var orgResponseBeforeUpdate = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(orgResponseBeforeUpdate).isNotNull();
+
+        ArrayList<LinkedHashMap<String, Object>> contactInfoBefore
+            = (ArrayList<LinkedHashMap<String, Object>>)orgResponseBeforeUpdate.get("contactInformation");
+        ArrayList dxAddressesBefore = (ArrayList)contactInfoBefore.get(0).get("dxAddress");
+        LinkedHashMap dxAddressMapBefore = ( LinkedHashMap) dxAddressesBefore.get(0);
+
 
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
@@ -235,7 +249,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         //call endpoint to update contactInformation
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
-        assertNotNull(orgUpdatedResponse);
+        Assertions.assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
 
         //retrieve saved organisation by id
@@ -243,6 +257,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgResponse).isNotNull();
         ArrayList<LinkedHashMap<String, Object>> contacts
             = (ArrayList<LinkedHashMap<String, Object>>)orgResponse.get("contactInformation");
+        ArrayList dxAddresses = (ArrayList)contacts.get(0).get("dxAddress");
+        LinkedHashMap dxAddressMap = ( LinkedHashMap) dxAddresses.get(0);
         assertThat(contacts.get(0).get("addressLine1")).isNotNull().isEqualTo("updatedaddressLine1");
         assertThat(contacts.get(0).get("addressLine2")).isNotNull().isEqualTo("updatedaddressLine2");
         assertThat(contacts.get(0).get("addressLine3")).isNotNull().isEqualTo("updatedaddressLine3");
@@ -254,71 +270,16 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
+
+        assertThat(dxAddressMapBefore.get("dxNumber")).isNotNull().isEqualTo(dxAddressMap.get("dxNumber"));
+        assertThat(dxAddressMapBefore.get("dxExchange")).isNotNull().isEqualTo(dxAddressMap.get("dxExchange"));
 
         log.info("updateContactInformationShouldReturnSuccessForOrgManager :: END");
 
     }
 
 
-    @Test
-    public void updateContactInformationShouldReturnSuccessForPrdAdmin() {
-        log.info("updateContactInformationShouldReturnSuccessForPrdAdmin :: STARTED");
-        setUpOrgTestData();
-        String email = generateRandomEmail();
-        RequestSpecification superUserToken =
-            professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
-                superUserRoles(), firstName, lastName, email));
 
-        UserCreationRequest superUserRequest = UserCreationRequest
-            .aUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(email)
-            .build();
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-            .superUser(superUserRequest)
-            .status("ACTIVE").build();
-        String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
-            systemUser);
-
-        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
-
-        Map<String, Object> newUserResponse = professionalApiClient
-            .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
-
-        UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN1",
-                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
-                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
-                "","");
-        //call endpoint to update contactInformation
-        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
-            updateContactInformationRequest, superUserToken);
-        //retrieve saved organisation by id
-        var orgResponse = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
-
-        assertNotNull(orgUpdatedResponse);
-        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
-
-        assertThat(orgResponse).isNotNull();
-        ArrayList<LinkedHashMap<String, Object>> contacts
-            = (ArrayList<LinkedHashMap<String, Object>>)orgResponse.get("contactInformation");
-        assertThat(contacts.get(0).get("addressLine1")).isNotNull().isEqualTo("updatedaddressLine1");
-        assertThat(contacts.get(0).get("addressLine2")).isNotNull().isEqualTo("updatedaddressLine2");
-        assertThat(contacts.get(0).get("addressLine3")).isNotNull().isEqualTo("updatedaddressLine3");
-        assertThat(contacts.get(0).get("uprn")).isNotNull().isEqualTo("UPRN1");
-        assertThat(contacts.get(0).get("townCity")).isNotNull().isEqualTo("updatedtownCity");
-        assertThat(contacts.get(0).get("country")).isNotNull().isEqualTo("updatedcountry");
-        assertThat(contacts.get(0).get("county")).isNotNull().isEqualTo("updatedcounty");
-        assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("RG48TS");
-
-        LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
-        assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
-
-        log.info("updateContactInformationShouldReturnSuccessForPrdAdmin :: END");
-    }
 
     @Test
     void updateContactInformationWithDxAddressShouldReturnSuccess() {
@@ -336,15 +297,15 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         //call endpoint to update contactInformation
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
-        assertNotNull(orgUpdatedResponse);
+        Assertions.assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(204);
 
         //retrieve saved organisation by id
         var orgResponse = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
         assertThat(orgResponse).isNotNull();
-
         ArrayList<LinkedHashMap<String, Object>> contacts
             = (ArrayList<LinkedHashMap<String, Object>>)orgResponse.get("contactInformation");
+
         assertThat(contacts.get(0).get("addressLine1")).isNotNull().isEqualTo("updatedaddressLine1");
         assertThat(contacts.get(0).get("addressLine2")).isNotNull().isEqualTo("updatedaddressLine2");
         assertThat(contacts.get(0).get("addressLine3")).isNotNull().isEqualTo("updatedaddressLine3");
@@ -368,14 +329,14 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
     @Test
-    void updateContactInformationFailureUprnLengthIncorrect() {
+    void updateContactInformationFailureUprnLengthIs15() {
 
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateContactInformationFailureUprnLengthIncorrect :: STARTED");
+        log.info("updateContactInformationFailureUprnLengthIs15 :: STARTED");
 
         UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN1234567891234567898",
+            new UpdateContactInformationRequest("UPRN12345678910",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
                 "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
                 "dxUpdatedNum","dxUpdatedExchange");
@@ -383,9 +344,9 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         //call endpoint to update contactInformation
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
-        assertNotNull(orgUpdatedResponse);
+        Assertions.assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
-        log.info("updateContactInformationFailureUprnLengthIncorrect :: END");
+        log.info("updateContactInformationFailureUprnLengthIs15 :: END");
 
     }
 
@@ -404,7 +365,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         //call endpoint to update contactInformation
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
-        assertNotNull(orgUpdatedResponse);
+        Assertions.assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
         log.info("updateContactInformationFailureAddressLine1Missing :: END");
 
@@ -412,10 +373,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
 
     @Test
-    void updateContactInfoFailureDxNumberNull() {
+    void updateContactInfoFailureDxNumberEmpty() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateContactInfoFailureDxNumberNull :: STARTED");
+        log.info("updateContactInfoFailureDxNumberEmpty :: STARTED");
 
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1234567891234567898",
@@ -426,17 +387,17 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         //call endpoint to update contactInformation
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
-        assertNotNull(orgUpdatedResponse);
+        Assertions.assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
-        log.info("updateContactInfoFailureDxNumberNull :: END");
+        log.info("updateContactInfoFailureDxNumberEmpty :: END");
 
     }
 
     @Test
-    void updateContactInfoFailureDxAddressNull() {
+    void updateContactInfoFailureDxAddressEmpty() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateContactInfoFailureDxAddressNull :: STARTED");
+        log.info("updateContactInfoFailureDxAddressEmpty :: STARTED");
 
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1234567891234567898",
@@ -447,10 +408,52 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         //call endpoint to update contactInformation
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
-        assertNotNull(orgUpdatedResponse);
+        Assertions.assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
-        log.info("updateContactInfoFailureDxAddressNull :: END");
+        log.info("updateContactInfoFailureDxAddressEmpty :: END");
 
+    }
+
+    @Test
+    void updateContactInfoFailureIfUnAuthorisedRole() {
+        log.info("updateContactInfoFailureIfUnAuthorisedRole :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager));
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "dxUpdatedNum","dxUpdatedExchange");
+
+
+        //call endpoint to update with user manager role not allowed
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(puiUserManager));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
+
+        log.info("updateContactInfoFailureIfUnAuthorisedRole :: END");
+    }
+
+
+    @Test
+    void updateContactInfoFailureIfNoOrgId() {
+        log.info("updateContactInfoFailureIfNoOrgId :: STARTED");
+
+        setUpOrgTestData();
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "dxUpdatedNum","dxUpdatedExchange");
+
+        //call endpoint to update with no org id does not create token invalid authentication 401
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(null));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
+        log.info("updateContactInfoFailureIfNoOrgId :: END");
     }
 
 

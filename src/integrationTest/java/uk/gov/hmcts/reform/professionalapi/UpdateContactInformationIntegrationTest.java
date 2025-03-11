@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createOrgRequestContactInfo;
 
 class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -27,6 +27,10 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
+
+        //fetch org After update
+        Map<String, Object> orgResponseBeforeUpdate = retrievedSavedOrg(orgId);
+
         //updateName
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
             userId,updateContactInformationRequest,hmctsAdmin);
@@ -45,6 +49,16 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         assertThat(contacts.get(0).get("country")).isNotNull().isEqualTo("U-country");
         assertThat(contacts.get(0).get("county")).isNotNull().isEqualTo("U-county");
         assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("U-postCode");
+
+        ArrayList<LinkedHashMap<String, Object>> contactsBeforeUpdate
+            = (ArrayList<LinkedHashMap<String, Object>>)orgResponseBeforeUpdate.get("contactInformation");
+        ArrayList dxAddressesBeforeUpdate = (ArrayList)contactsBeforeUpdate.get(0).get("dxAddress");
+        LinkedHashMap dxAddressMapBeforeUpdate = ( LinkedHashMap) dxAddressesBeforeUpdate.get(0);
+        //dxaddress before update
+        assertThat(dxAddressMapBeforeUpdate.get("dxNumber")).isNotNull().isEqualTo("DX 3456789012");
+        assertThat(dxAddressMapBeforeUpdate.get("dxExchange")).isNotNull().isEqualTo("dxExchange3");
+        //dx address after update is removed
+        assertThat(contacts.get(0).get("dxAddress")).toString().isEmpty();
 
         LocalDateTime updatedDate = LocalDateTime.parse(responseBody.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
@@ -115,10 +129,10 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    void update_of_contact_information_should_fail_if_uprn_invalid_lenght() {
+    void update_of_contact_information_should_fail_if_uprn_length_15() {
         //create request to update organisation
         UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN16868678678678678678678678678678678678678678768678678678678",
+            new UpdateContactInformationRequest("UPRN16868678678",
                 "U-addressline1","U-addressLine2","U-addressLine3",
                 "U-townCity","U-county","U-country","U-postCode",
                 "","");
@@ -222,7 +236,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
     }
 
     private String getActiveOrganisationId() {
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        OrganisationCreationRequest organisationCreationRequest = createOrgRequestContactInfo().build();
         String organisationIdentifier = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest);
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 

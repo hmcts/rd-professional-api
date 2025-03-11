@@ -165,8 +165,8 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void validateDxAddress(UpdateContactInformationRequest updateContactInformationRequest) {
 
-        String dxNumber = updateContactInformationRequest.getDxNumber();
-        String dxExchange = updateContactInformationRequest.getDxExchange();
+        String dxNumber = updateContactInformationRequest.getDxNumber().trim();
+        String dxExchange = updateContactInformationRequest.getDxExchange().trim();
 
         if (StringUtils.isNotBlank(dxNumber) && StringUtils.isBlank(dxExchange)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
@@ -197,11 +197,11 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         String uprn = updateContactInformationRequest.getUprn();
         String addressLine1 = updateContactInformationRequest.getAddressLine1();
 
-        if (StringUtils.isBlank(addressLine1)) {
+        if (StringUtils.isBlank(addressLine1.trim())) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "AddressLine1 cannot be empty");
         }
-        if (StringUtils.isNotBlank(uprn) && uprn.length() > 14) {
+        if (uprn != null && uprn.length() > 14) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 String.format("Uprn must not be greater than 14 characters long found: %s",uprn.length()));
         }

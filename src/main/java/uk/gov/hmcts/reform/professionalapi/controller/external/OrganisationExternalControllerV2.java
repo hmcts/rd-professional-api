@@ -230,8 +230,8 @@ public class OrganisationExternalControllerV2 extends SuperController {
         })
 
     @ApiResponse(
-        responseCode = "201",
-        description = "Organisation name or sraId has been updated",
+        responseCode = "204",
+        description = "Organisation address has been updated",
         content = @Content(schema = @Schema(implementation = String.class))
     )
     @ApiResponse(

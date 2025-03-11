@@ -2790,4 +2790,6 @@ class  OrganisationServiceImplTest {
         assertThrows(FieldAndPersistenceValidationException.class,
                 () -> sut.updateOrganisationAddress(org, updateContactInformationRequest, userId));
     }
+
+
 }
