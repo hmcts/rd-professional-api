@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
@@ -12,33 +11,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
-import static wiremock.org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
 @ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
