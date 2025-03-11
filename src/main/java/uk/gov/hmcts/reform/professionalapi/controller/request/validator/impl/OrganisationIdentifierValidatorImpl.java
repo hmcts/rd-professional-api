@@ -201,7 +201,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "AddressLine1 cannot be empty");
         }
-        if (uprn != null && uprn.length() > 14) {
+        if (StringUtils.isNotBlank(uprn) && uprn.length() > 14) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 String.format("Uprn must not be greater than 14 characters long found: %s",uprn.length()));
         }
