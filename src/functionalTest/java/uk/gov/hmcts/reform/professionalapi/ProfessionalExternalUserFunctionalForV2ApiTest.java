@@ -242,8 +242,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgResponse).isNotNull();
         ArrayList<LinkedHashMap<String, Object>> contacts
             = (ArrayList<LinkedHashMap<String, Object>>)orgResponse.get("contactInformation");
-        ArrayList dxAddresses = (ArrayList)contacts.get(0).get("dxAddress");
-        LinkedHashMap dxAddressMap = ( LinkedHashMap) dxAddresses.get(0);
+
         assertThat(contacts.get(0).get("addressLine1")).isNotNull().isEqualTo("updatedaddressLine1");
         assertThat(contacts.get(0).get("addressLine2")).isNotNull().isEqualTo("updatedaddressLine2");
         assertThat(contacts.get(0).get("addressLine3")).isNotNull().isEqualTo("updatedaddressLine3");
@@ -253,6 +252,9 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(contacts.get(0).get("county")).isNotNull().isEqualTo("updatedcounty");
         assertThat(contacts.get(0).get("postCode")).isNotNull().isEqualTo("RG48TS");
 
+        //dx address after update is removed
+        assertThat(contacts.get(0).get("dxAddress")).toString().isEmpty();
+
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
@@ -260,8 +262,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             = (ArrayList<LinkedHashMap<String, Object>>)orgResponseBeforeUpdate.get("contactInformation");
         ArrayList dxAddressesBefore = (ArrayList)contactInfoBefore.get(0).get("dxAddress");
         LinkedHashMap dxAddressMapBefore = ( LinkedHashMap) dxAddressesBefore.get(0);
-        assertThat(dxAddressMapBefore.get("dxNumber")).isNotNull().isEqualTo(dxAddressMap.get("dxNumber"));
-        assertThat(dxAddressMapBefore.get("dxExchange")).isNotNull().isEqualTo(dxAddressMap.get("dxExchange"));
+        assertThat(dxAddressMapBefore.get("dxNumber")).isNotNull().isEqualTo("DX 1234567890");
+        assertThat(dxAddressMapBefore.get("dxExchange")).isNotNull().isEqualTo("dxExchange");
 
         log.info("updateContactInformationShouldReturnSuccessForOrgManager :: END");
 
