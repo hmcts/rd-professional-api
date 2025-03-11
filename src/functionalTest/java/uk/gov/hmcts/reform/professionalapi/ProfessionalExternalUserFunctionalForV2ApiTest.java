@@ -225,12 +225,6 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         var orgResponseBeforeUpdate = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
         assertThat(orgResponseBeforeUpdate).isNotNull();
 
-        ArrayList<LinkedHashMap<String, Object>> contactInfoBefore
-            = (ArrayList<LinkedHashMap<String, Object>>)orgResponseBeforeUpdate.get("contactInformation");
-        ArrayList dxAddressesBefore = (ArrayList)contactInfoBefore.get(0).get("dxAddress");
-        LinkedHashMap dxAddressMapBefore = ( LinkedHashMap) dxAddressesBefore.get(0);
-
-
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
@@ -262,6 +256,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
         assertThat(updatedDate.toLocalDate()).isEqualTo(LocalDate.now());
 
+        ArrayList<LinkedHashMap<String, Object>> contactInfoBefore
+            = (ArrayList<LinkedHashMap<String, Object>>)orgResponseBeforeUpdate.get("contactInformation");
+        ArrayList dxAddressesBefore = (ArrayList)contactInfoBefore.get(0).get("dxAddress");
+        LinkedHashMap dxAddressMapBefore = ( LinkedHashMap) dxAddressesBefore.get(0);
         assertThat(dxAddressMapBefore.get("dxNumber")).isNotNull().isEqualTo(dxAddressMap.get("dxNumber"));
         assertThat(dxAddressMapBefore.get("dxExchange")).isNotNull().isEqualTo(dxAddressMap.get("dxExchange"));
 
