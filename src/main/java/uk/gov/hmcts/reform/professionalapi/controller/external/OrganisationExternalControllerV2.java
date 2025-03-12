@@ -223,7 +223,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
 
     @Operation(
         summary = "Updates an Organisation's name or sraId",
-        description = "**IDAM Roles to access API** : <br> prd-admin",
+        description = "**IDAM Roles to access API** : <br> pui-organisation-manager",
         security = {
             @SecurityRequirement(name = "ServiceAuthorization"),
             @SecurityRequirement(name = "Authorization")
