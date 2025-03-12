@@ -33,7 +33,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
 
         //updateName
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
-            userId,updateContactInformationRequest,hmctsAdmin);
+            userId,updateContactInformationRequest,puiOrgManager);
 
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
@@ -79,7 +79,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         String userId = getUserId(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
-            userId,updateContactInformationRequest,hmctsAdmin);
+            userId,updateContactInformationRequest,puiOrgManager);
 
         assertThat(response.get("http_status")).isEqualTo("204 NO_CONTENT");
 
@@ -120,7 +120,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         String userId = getUserId(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
-            userId,updateContactInformationRequest,hmctsAdmin);
+            userId,updateContactInformationRequest,puiOrgManager);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
@@ -141,7 +141,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         String userId = getUserId(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
-            userId,updateContactInformationRequest,hmctsAdmin);
+            userId,updateContactInformationRequest,puiOrgManager);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
@@ -162,7 +162,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         String userId = getUserId(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
-            userId,updateContactInformationRequest,hmctsAdmin);
+            userId,updateContactInformationRequest,puiOrgManager);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
@@ -183,7 +183,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         String userId = getUserId(orgId);
         //updateName
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
-            userId,updateContactInformationRequest,hmctsAdmin);
+            userId,updateContactInformationRequest,puiOrgManager);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
@@ -206,7 +206,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
 
         //updateName
         Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
-            "sdfgsgdf",updateContactInformationRequest,hmctsAdmin);
+            "sdfgsgdf",updateContactInformationRequest,puiOrgManager);
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).toString().contains("Access Denied");
