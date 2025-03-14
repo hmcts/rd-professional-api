@@ -336,7 +336,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         Assertions.assertNotNull(orgUpdatedResponse);
+
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("Uprn must not be greater than 14 characters long found: 15");
         log.info("updateContactInformationFailureUprnLengthIs15 :: END");
 
     }
@@ -357,6 +360,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("AddressLine1 cannot be empty");
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
         log.info("updateContactInformationFailureAddressLine1Missing :: END");
 
@@ -379,16 +384,19 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("Uprn must not be greater than 14 characters long found: "
+            + "UPRN1234567891234567898".length());
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
         log.info("updateContactInfoFailureDxNumberEmpty :: END");
 
     }
 
     @Test
-    void updateContactInfoFailureDxAddressEmpty() {
+    void updateContactInfoAndDxAddressWhenUprnLength15Failure() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateContactInfoFailureDxAddressEmpty :: STARTED");
+        log.info("updateContactInfoAndDxAddressWhenUprnLength15Failure :: STARTED");
 
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1234567891234567898",
@@ -400,8 +408,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("Uprn must not be greater than 14 characters long found: 23");
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
-        log.info("updateContactInfoFailureDxAddressEmpty :: END");
+        log.info("updateContactInfoAndDxAddressWhenUprnLength15Failure :: END");
 
     }
 
@@ -422,6 +432,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(puiUserManager));
         Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody().prettyPeek()).toString()
+            .contains("errorMessage : An error occurred while attempting to decode the Jwt: Malformed token");
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
 
         log.info("updateContactInfoFailureIfUnAuthorisedRole :: END");
@@ -443,9 +455,81 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(null));
         Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody().prettyPeek()).toString()
+            .contains("errorMessage : An error occurred while attempting to decode the Jwt: Malformed token");
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
         log.info("updateContactInfoFailureIfNoOrgId :: END");
     }
 
+
+    @Test
+    void updateDxAddressWhenDxNumberLength14Failure() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        log.info("updateDxAddressWhenDxNumberLength15Failure :: STARTED");
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN123",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
+                "dxNumUpdated12","dxExchange");
+
+        //call endpoint to update contactInformation
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("DX Number (max=13) has invalid length : 14");
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        log.info("updateDxAddressWhenDxNumberLength15Failure :: END");
+
+    }
+
+    @Test
+    void updateDxAddressWhenDxExchangeLength41Failure() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        log.info("updateDxAddressWhenDxExchangeLength41Failure :: STARTED");
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN123",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
+                "dxNumUpdated","dxExchange1234567894561230123654789654123");
+
+        //call endpoint to update contactInformation
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("DX Exchange (max=40) has invalid length : 41");
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        log.info("updateDxAddressWhenDxExchangeLength41Failure :: END");
+
+    }
+
+    @Test
+    void updateDxAddressWhenInvalidDxNumberInvalidFormatFailure() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        log.info("updateDxAddressWhenInvalidDxNumberFormatFailure :: STARTED");
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN123",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
+                "dxNum@Updated","dxExchange");
+
+        //call endpoint to update contactInformation
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("Invalid Dx Number entered: dxNum@Updated, "
+            + "it can only contain numbers, letters, and spaces");
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        log.info("updateDxAddressWhenInvalidDxNumberFormatFailure :: END");
+
+    }
 
 }

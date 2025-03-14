@@ -114,7 +114,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
             new UpdateContactInformationRequest("UPRN1",
                 "","U-addressLine2","U-addressLine3",
                 "U-townCity","U-county","U-country","U-postCode",
-                "","");
+                "dxNumber","dxExchange");
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
@@ -135,7 +135,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
             new UpdateContactInformationRequest("UPRN16868678678",
                 "U-addressline1","U-addressLine2","U-addressLine3",
                 "U-townCity","U-county","U-country","U-postCode",
-                "","");
+                "dxNumber","dxExchange");
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
@@ -150,7 +150,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    void update_contactInfo_dxAddress_when_dxNum_empty_failure() {
+    void update_contactInfo_dxAddress_when_dxExchange_empty_failure() {
         //create request to update organisation
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
@@ -171,7 +171,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    void update_contactInfo_dxAddress_when_dxExchange_empty_failure() {
+    void update_contactInfo_dxAddress_when_dxNumber_empty_failure() {
         //create request to update organisation
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN1",
@@ -191,6 +191,69 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
         deleteCreatedTestOrganisations(orgId);
     }
 
+    @Test
+    void update_dxAddress_when_dxNumber_length_14() {
+        //create request to update organisation
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "U-addressline1","U-addressLine2","U-addressLine3",
+                "U-townCity","U-county","U-country","U-postCode",
+                "dxNumber123456","dxExchange");
+        //create organisation
+        String orgId = getActiveOrganisationId();
+        String userId = getUserId(orgId);
+        //updateName
+        Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
+            userId,updateContactInformationRequest,puiOrgManager);
+
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+            .contains("DX Number (max=13) has invalid length : 14");
+        deleteCreatedTestOrganisations(orgId);
+    }
+
+    @Test
+    void update_dxAddress_when_dxExchange_length_41() {
+        //create request to update organisation
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "U-addressline1","U-addressLine2","U-addressLine3",
+                "U-townCity","U-county","U-country","U-postCode",
+                "dxNumber","dxExchange1234567891234567891234567891234");
+        //create organisation
+        String orgId = getActiveOrganisationId();
+        String userId = getUserId(orgId);
+        //updateName
+        Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
+            userId,updateContactInformationRequest,puiOrgManager);
+
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+            .contains("DX Exchange (max=40) has invalid length : 41");
+        deleteCreatedTestOrganisations(orgId);
+    }
+
+    @Test
+    void update_dxAddress_when_dxNumber_Invalid_Format() {
+        //create request to update organisation
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "U-addressline1","U-addressLine2","U-addressLine3",
+                "U-townCity","U-county","U-country","U-postCode",
+                "dx@Number","dxExchange");
+        //create organisation
+        String orgId = getActiveOrganisationId();
+        String userId = getUserId(orgId);
+        //updateName
+        Map<String, Object> response = professionalReferenceDataClient.updateContactInformation(
+            userId,updateContactInformationRequest,puiOrgManager);
+
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+            .contains("Invalid Dx Number entered: dx@Number, "
+                + "it can only contain numbers, letters, and spaces");
+        deleteCreatedTestOrganisations(orgId);
+    }
 
 
     @Test
@@ -200,7 +263,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
             new UpdateContactInformationRequest("UPRN1",
                 "U-addressline1","U-addressLine2","U-addressLine3",
                 "U-townCity","U-county","U-country","U-postCode",
-                "","dxExchangeU");
+                "dxNumber","dxExchangeU");
         //create organisation
         String orgId = getActiveOrganisationId();
 
@@ -222,7 +285,7 @@ class UpdateContactInformationIntegrationTest extends AuthorizationEnabledIntegr
             new UpdateContactInformationRequest("UPRN1",
                 "U-addressline1","U-addressLine2","U-addressLine3",
                 "U-townCity","U-county","U-country","U-postCode",
-                "","dxExchangeU");
+                "dxNumber","dxExchangeU");
         //create organisation
         String orgId = getActiveOrganisationId();
         String userId = getUserId(orgId);
