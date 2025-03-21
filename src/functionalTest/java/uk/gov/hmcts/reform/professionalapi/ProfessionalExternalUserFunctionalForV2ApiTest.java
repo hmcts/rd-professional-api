@@ -375,7 +375,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("updateContactInfoFailureDxNumberEmpty :: STARTED");
 
         UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN1234567891234567898",
+            new UpdateContactInformationRequest("UPRN12",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
                 "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
                 "","dxUpdatedExchange");
@@ -385,33 +385,32 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         Assertions.assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.getBody()
-            .prettyPrint()).contains("Uprn must not be greater than 14 characters long found: "
-            + "UPRN1234567891234567898".length());
+            .prettyPrint()).contains("Organisation dxNumber cannot be null or empty");
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
         log.info("updateContactInfoFailureDxNumberEmpty :: END");
 
     }
 
     @Test
-    void updateContactInfoAndDxAddressWhenUprnLength15Failure() {
+    void updateContactInfoAndDxAddressWhenUprnLengthMoreThan14Failure() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateContactInfoAndDxAddressWhenUprnLength15Failure :: STARTED");
+        log.info("updateContactInfoAndDxAddressWhenUprnLengthMoreThan14Failure :: STARTED");
 
         UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN1234567891234567898",
+            new UpdateContactInformationRequest("UPRN12345678912",
                 "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
                 "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
-                "dxNumUpdated","");
+                "dxNumUpdated","dxExchange");
 
         //call endpoint to update contactInformation
         Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
             updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         Assertions.assertNotNull(orgUpdatedResponse);
         assertThat(orgUpdatedResponse.getBody()
-            .prettyPrint()).contains("Uprn must not be greater than 14 characters long found: 23");
+            .prettyPrint()).contains("Uprn must not be greater than 14 characters long found: 15");
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
-        log.info("updateContactInfoAndDxAddressWhenUprnLength15Failure :: END");
+        log.info("updateContactInfoAndDxAddressWhenUprnLengthMoreThan14Failure :: END");
 
     }
 
