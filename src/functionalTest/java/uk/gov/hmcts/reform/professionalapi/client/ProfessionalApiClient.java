@@ -1615,6 +1615,16 @@ public class ProfessionalApiClient {
             .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }
 
+    public RequestSpecification getInvalidBearerToken(String userToken) {
+        return SerenityRest.with()
+            .relaxedHTTPSValidation()
+            .baseUri(professionalApiUrl)
+            .header("Content-Type", APPLICATION_JSON_VALUE)
+            .header("Accepts", APPLICATION_JSON_VALUE)
+            .header(SERVICE_HEADER, "Bearer " + s2sToken)
+            .header(AUTHORIZATION_HEADER, "Bearer " + userToken + "RTERT$£%£$%£$%£$");
+    }
+
     public RequestSpecification getUserEmailAsHeaderWithExisting(String userToken, String email) {
         return SerenityRest.with()
                 .relaxedHTTPSValidation()

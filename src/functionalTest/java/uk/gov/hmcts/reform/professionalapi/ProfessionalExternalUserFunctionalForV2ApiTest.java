@@ -414,52 +414,6 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     }
 
-    @Test
-    void updateContactInfoFailureIfUnAuthorisedRole() {
-        log.info("updateContactInfoFailureIfUnAuthorisedRole :: STARTED");
-        setUpOrgTestData();
-        setUpUserBearerTokens(List.of(puiUserManager));
-
-        UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN1",
-                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
-                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
-                "dxUpdatedNum","dxUpdatedExchange");
-
-
-        //call endpoint to update with user manager role not allowed
-        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
-            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(puiUserManager));
-        Assertions.assertNotNull(orgUpdatedResponse);
-        assertThat(orgUpdatedResponse.getBody().prettyPeek()).toString()
-            .contains("errorMessage : An error occurred while attempting to decode the Jwt: Malformed token");
-        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
-
-        log.info("updateContactInfoFailureIfUnAuthorisedRole :: END");
-    }
-
-
-    @Test
-    void updateContactInfoFailureIfNoOrgId() {
-        log.info("updateContactInfoFailureIfNoOrgId :: STARTED");
-
-        setUpOrgTestData();
-        UpdateContactInformationRequest updateContactInformationRequest =
-            new UpdateContactInformationRequest("UPRN1",
-                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
-                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
-                "dxUpdatedNum","dxUpdatedExchange");
-
-        //call endpoint to update with no org id does not create token invalid authentication 401
-        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
-            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(null));
-        Assertions.assertNotNull(orgUpdatedResponse);
-        assertThat(orgUpdatedResponse.getBody().prettyPeek()).toString()
-            .contains("errorMessage : An error occurred while attempting to decode the Jwt: Malformed token");
-        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
-        log.info("updateContactInfoFailureIfNoOrgId :: END");
-    }
-
 
     @Test
     void updateDxAddressWhenDxNumberLength14Failure() {
@@ -530,5 +484,75 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("updateDxAddressWhenInvalidDxNumberFormatFailure :: END");
 
     }
+
+    @Test
+    void updateContactInfoFailureIfInvalidToken() {
+        log.info("updateContactInfoFailureIfInvalidToken :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiFinanceManager));
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "dxUpdatedNum","dxUpdatedExchange");
+
+        //call endpoint to update with user manager role not allowed
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getInvalidBearerToken(puiFinanceManager));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(401);
+
+        log.info("updateContactInfoFailureIfInvalidToken :: END");
+    }
+
+    @Test
+    void updateContactInfoFailureIfUnAuthorisedRole() {
+        log.info("updateContactInfoFailureIfUnAuthorisedRole :: STARTED");
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager));
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "dxUpdatedNum","dxUpdatedExchange");
+
+        //call endpoint to update with user manager role not allowed
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(403);
+        assertThat(orgUpdatedResponse.getBody().prettyPrint()).contains("\"errorMessage\": \"9 : Access Denied\",\n"
+            + "    \"errorDescription\": \"Access Denied\",");
+
+        log.info("updateContactInfoFailureIfUnAuthorisedRole :: END");
+    }
+
+
+    @Test
+    void updateContactInfoFailureIfNoOrgId() {
+        log.info("updateContactInfoFailureIfNoOrgId :: STARTED");
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "dxUpdatedNum","dxUpdatedExchange");
+
+        //Create randon usertoken with role puiOrgManager and with no organisation
+        String pomBearerTk = idamOpenIdClient.getExternalOpenIdToken("puiOrgManager",
+            "firstName", "lastName", generateRandomEmail());
+
+        //call endpoint to update with no org id does not create token invalid authentication 401
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerTk));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(403);
+        assertThat(orgUpdatedResponse.getBody().prettyPrint()).contains("errorMessage\": \"9 : Access Denied",
+            "errorDescription\": \"403 Forbidden");
+        log.info("updateContactInfoFailureIfNoOrgId :: END");
+    }
+
 
 }
