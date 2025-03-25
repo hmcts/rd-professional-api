@@ -392,10 +392,10 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
     @Test
-    void updateContactInfoAndDxAddressWhenUprnLengthMoreThan14Failure() {
+    void updateContactInfoWhenUprnLengthMoreThan14Failure() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateContactInfoAndDxAddressWhenUprnLengthMoreThan14Failure :: STARTED");
+        log.info("updateContactInfoWhenUprnLengthMoreThan14Failure :: STARTED");
 
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN12345678912",
@@ -410,7 +410,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedResponse.getBody()
             .prettyPrint()).contains("Uprn must not be greater than 14 characters long found: 15");
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
-        log.info("updateContactInfoAndDxAddressWhenUprnLengthMoreThan14Failure :: END");
+        log.info("updateContactInfoWhenUprnLengthMoreThan14Failure :: END");
 
     }
 
