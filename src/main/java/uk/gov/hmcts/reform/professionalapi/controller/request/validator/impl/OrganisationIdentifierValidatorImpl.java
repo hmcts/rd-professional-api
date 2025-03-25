@@ -197,7 +197,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         String uprn = updateContactInformationRequest.getUprn();
         String addressLine1 = updateContactInformationRequest.getAddressLine1();
 
-        if (StringUtils.isBlank(addressLine1.trim())) {
+        if (StringUtils.isBlank(addressLine1)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "AddressLine1 cannot be empty");
         }
