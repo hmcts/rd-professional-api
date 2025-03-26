@@ -28,6 +28,7 @@ import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MANDATORY_PARAMETER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_PAGE_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_SINCE_TIMESTAMP;
@@ -194,10 +195,25 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     public void validateAddress(UpdateContactInformationRequest updateContactInformationRequest) {
+
+        Optional<UpdateContactInformationRequest> contactInfoOptional =
+            Optional.ofNullable(updateContactInformationRequest);
+        if (!contactInfoOptional.isPresent()) {
+            throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
+        } else if (isEmptyValue(updateContactInformationRequest.getAddressLine2())
+            || isEmptyValue(updateContactInformationRequest.getAddressLine3())
+            || isEmptyValue(updateContactInformationRequest.getCountry())
+            || isEmptyValue(updateContactInformationRequest.getPostCode())
+            || isEmptyValue(updateContactInformationRequest.getTownCity())) {
+
+            throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
+        }
+
         String uprn = updateContactInformationRequest.getUprn();
         String addressLine1 = updateContactInformationRequest.getAddressLine1();
 
-        if (StringUtils.isBlank(addressLine1)) {
+        if (isEmptyValue(addressLine1)
+            || StringUtils.isBlank(addressLine1)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "AddressLine1 cannot be empty");
         }
@@ -205,5 +221,9 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 String.format("Uprn must not be greater than 14 characters long found: %s",uprn.length()));
         }
+    }
+
+    public boolean isEmptyValue(String value) {
+        return value != null && value.trim().isEmpty();
     }
 }

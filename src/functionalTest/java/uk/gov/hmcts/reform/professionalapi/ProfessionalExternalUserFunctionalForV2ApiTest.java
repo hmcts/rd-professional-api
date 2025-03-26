@@ -276,10 +276,8 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     }
 
-
-    static Stream<Arguments> provideNullAndEmptyValues() {
+    static Stream<Arguments> provideEmptyValues() {
         return Stream.of(
-            Arguments.of(null, null, null, null, null, null, null),  // All null
             Arguments.of("", "", "", "", "", "", ""),                // All empty
             Arguments.of(" ", " ", " ", " ", " ", " ", " "),         // All whitespace
             Arguments.of(null, "", " ", "ValidCity", null, "UK", ""), // Mixed values
@@ -288,7 +286,46 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
     @ParameterizedTest
-    @MethodSource("provideNullAndEmptyValues")
+    @MethodSource("provideEmptyValues")
+    void updateContactInformationFailureForEmptyParameters(String uprn, String addressLine2,
+                                                                                      String addressLine3,
+                                                                                      String townCity, String county,
+                                                                                      String country, String postcode) {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        log.info("updateContactInformationFailureForEmptyParameters :: STARTED");
+
+        //retrieve saved organisation by id
+        var orgResponseBeforeUpdate = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
+        assertThat(orgResponseBeforeUpdate).isNotNull();
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest(uprn, "updatedaddressLine1",addressLine2,addressLine3,
+                townCity,county,country,postcode,"","");
+
+        //call endpoint to update contactInformation
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("Empty contactInformation value");
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+
+        log.info("updateContactInformationFailureForEmptyParameters :: END");
+
+    }
+
+
+
+
+    static Stream<Arguments> provideNullValues() {
+        return Stream.of(
+            Arguments.of(null, null, null, null, null, null, null)  // All null
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNullValues")
     void updateContactInformationShouldReturnSuccessIfPassedParamValuesAreNullOrEmpty(String uprn, String addressLine2,
                                                                       String addressLine3,
                                                                       String townCity, String county,
@@ -409,6 +446,9 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("updateContactInformationFailureAddressLine1Missing :: END");
 
     }
+
+
+
 
     @ParameterizedTest
     @NullSource
