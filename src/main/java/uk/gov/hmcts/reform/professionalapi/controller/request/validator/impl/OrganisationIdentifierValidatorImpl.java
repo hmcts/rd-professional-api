@@ -165,8 +165,8 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void validateDxAddress(UpdateContactInformationRequest updateContactInformationRequest) {
 
-        String dxNumber = updateContactInformationRequest.getDxNumber().trim();
-        String dxExchange = updateContactInformationRequest.getDxExchange().trim();
+        String dxNumber = updateContactInformationRequest.getDxNumber();
+        String dxExchange = updateContactInformationRequest.getDxExchange();
 
         if (StringUtils.isNotBlank(dxNumber) && StringUtils.isBlank(dxExchange)) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
