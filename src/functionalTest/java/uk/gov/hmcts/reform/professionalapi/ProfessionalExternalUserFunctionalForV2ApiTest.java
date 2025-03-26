@@ -476,6 +476,33 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     }
 
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    @ValueSource(strings = { "  " })
+    void updateContactInfoFailureDxExchangeEmpty(String input) {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiOrgManager));
+        log.info("updateContactInfoFailureDxExchangeEmpty :: STARTED");
+
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN12",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","updatedpostCode",
+                "dxUpdatedNumber",input);
+
+        //call endpoint to update contactInformation
+        Response orgUpdatedResponse = professionalApiClient.updateContactInformationDetails(
+            updateContactInformationRequest,professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
+        Assertions.assertNotNull(orgUpdatedResponse);
+        assertThat(orgUpdatedResponse.getBody()
+            .prettyPrint()).contains("Organisation dxExchange cannot be null or empty");
+        assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
+        log.info("updateContactInfoFailureDxExchangeEmpty :: END");
+
+    }
+
+
     @Test
     void updateContactInfoWhenUprnLengthMoreThan14Failure() {
         setUpOrgTestData();
