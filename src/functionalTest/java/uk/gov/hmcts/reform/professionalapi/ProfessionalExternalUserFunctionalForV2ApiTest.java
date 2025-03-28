@@ -326,14 +326,14 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @ParameterizedTest
     @MethodSource("provideNullValues")
-    void updateContactInformationShouldReturnSuccessIfPassedParamValuesAreNullOrEmpty(String uprn, String addressLine2,
+    void updateContactInformationShouldReturnSuccessIfPassedParamValuesAreNull(String uprn, String addressLine2,
                                                                       String addressLine3,
                                                                       String townCity, String county,
                                                                       String country, String postcode) {
 
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateContactInformationShouldReturnSuccessIfPassedParamValuesAreNullOrEmpty :: STARTED");
+        log.info("updateContactInformationShouldReturnSuccessIfPassedParamValuesAreNull :: STARTED");
 
         //retrieve saved organisation by id
         var orgResponseBeforeUpdate = professionalApiClient.retrieveOrganisationDetails(extActiveOrgId, hmctsAdmin, OK);
@@ -368,7 +368,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(dxAddressMapBefore.get("dxNumber")).isNotNull().isEqualTo("DX 1234567890");
         assertThat(dxAddressMapBefore.get("dxExchange")).isNotNull().isEqualTo("dxExchange");
 
-        log.info("updateContactInformationShouldReturnSuccessIfPassedParamValuesAreNullOrEmpty :: END");
+        log.info("updateContactInformationShouldReturnSuccessIfPassedParamValuesAreNull :: END");
 
     }
 
