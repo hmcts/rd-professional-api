@@ -177,11 +177,11 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation dxNumber cannot be null or empty");
         }
-        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange)) && dxNumber.length() >= 13) {
+        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange)) && dxNumber.length() >= 14) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 String.format("DX Number (max=13) has invalid length : %s",dxNumber.length()));
         }
-        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange)) && dxExchange.length() >= 40) {
+        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange)) && dxExchange.length() >= 41) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 String.format("DX Exchange (max=40) has invalid length : %s",dxExchange.length()));
         }
