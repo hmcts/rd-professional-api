@@ -254,7 +254,7 @@ public class OrganisationExternalControllerV2 extends SuperController {
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(value = HttpStatus.OK)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<Object> updateOrganisationAddress(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationAddressUpdate")
