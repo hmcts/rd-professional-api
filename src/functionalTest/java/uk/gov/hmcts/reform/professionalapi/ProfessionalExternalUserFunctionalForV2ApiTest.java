@@ -531,7 +531,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     void updateDxAddressWhenDxNumberLength14Failure() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiOrgManager));
-        log.info("updateDxAddressWhenDxNumberLength15Failure :: STARTED");
+        log.info("updateDxAddressWhenDxNumberLength14Failure :: STARTED");
 
         UpdateContactInformationRequest updateContactInformationRequest =
             new UpdateContactInformationRequest("UPRN123",
@@ -546,7 +546,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(orgUpdatedResponse.getBody()
             .prettyPrint()).contains("DX Number (max=13) has invalid length : 14");
         assertThat(orgUpdatedResponse.statusCode()).isEqualTo(400);
-        log.info("updateDxAddressWhenDxNumberLength15Failure :: END");
+        log.info("updateDxAddressWhenDxNumberLength14Failure :: END");
 
     }
 

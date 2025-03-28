@@ -177,7 +177,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 "Organisation dxNumber cannot be null or empty");
         }
-        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange)) && dxNumber.length() >= 14) {
+        if ((StringUtils.isNotBlank(dxNumber) && StringUtils.isNotBlank(dxExchange)) && dxNumber.length() >= 13) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
                 String.format("DX Number (max=13) has invalid length : %s",dxNumber.length()));
         }
@@ -204,7 +204,8 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             || isEmptyValue(updateContactInformationRequest.getAddressLine3())
             || isEmptyValue(updateContactInformationRequest.getCountry())
             || isEmptyValue(updateContactInformationRequest.getPostCode())
-            || isEmptyValue(updateContactInformationRequest.getTownCity())) {
+            || isEmptyValue(updateContactInformationRequest.getTownCity())
+            || isEmptyValue(updateContactInformationRequest.getCounty())) {
 
             throw new InvalidRequest(ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION);
         }
