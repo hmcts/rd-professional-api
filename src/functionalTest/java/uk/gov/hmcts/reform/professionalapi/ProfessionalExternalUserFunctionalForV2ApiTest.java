@@ -356,6 +356,14 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             = (ArrayList<LinkedHashMap<String, Object>>)orgResponse.get("contactInformation");
 
         assertThat(contacts.get(0).get("addressLine1")).isNotNull().isEqualTo("updatedaddressLine1");
+        //assert that the rest of the values are null
+        assertThat(contacts.get(0).get("addressLine2")).isNull();
+        assertThat(contacts.get(0).get("addressLine3")).isNull();
+        assertThat(contacts.get(0).get("uprn")).isNull();
+        assertThat(contacts.get(0).get("town")).isNull();
+        assertThat(contacts.get(0).get("county")).isNull();
+        assertThat(contacts.get(0).get("country")).isNull();
+
         //dx address after update is removed
         assertThat(contacts.get(0).get("dxAddress")).toString().isEmpty();
         LocalDateTime updatedDate = LocalDateTime.parse(orgResponse.get("lastUpdated").toString());
