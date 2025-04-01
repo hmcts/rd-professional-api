@@ -1135,13 +1135,13 @@ public class OrganisationServiceImpl implements OrganisationService {
                                                               UpdateContactInformationRequest
         updateContactInformationRequest) {
         try {
-                DxAddress newDxAddress = new DxAddress(
-                    RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxNumber()),
-                    RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxExchange()),
-                    contactInformation);
-                newDxAddress.setLastUpdated(LocalDateTime.now());
-                newDxAddress.setCreated(LocalDateTime.now());
-                dxAddressRepository.save(newDxAddress);
+            DxAddress newDxAddress = new DxAddress(
+                RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxNumber()),
+                RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxExchange()),
+                contactInformation);
+            newDxAddress.setLastUpdated(LocalDateTime.now());
+            newDxAddress.setCreated(LocalDateTime.now());
+            dxAddressRepository.save(newDxAddress);
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400), ex,
                 "Failed to save DxAddress Information :" + ex.getMessage());
