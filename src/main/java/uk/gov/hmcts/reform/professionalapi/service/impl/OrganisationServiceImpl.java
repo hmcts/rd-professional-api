@@ -1094,13 +1094,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void deleteExistingContactInformation(List<ContactInformation> contactInformationList) {
-        //fetch all contact information for the organisation , assuming for now that there is only one
-        // & use the first one , in future the id of the address to be updated will be passed from UI
         contactInformationList.forEach(contact -> {
             //delete all existing contact information
             contactInformationRepository.deleteById(contact.getId());
             //delete the corresponding dxAddress as well
-            //fetch all dxAdresses and assuming there will be single address delete the first one
             deleteDxAddress(contact.getDxAddresses());
         });
     }
@@ -1138,7 +1135,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                                                               UpdateContactInformationRequest
         updateContactInformationRequest) {
         try {
-            if (contactInformation != null) {
                 DxAddress newDxAddress = new DxAddress(
                     RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxNumber()),
                     RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxExchange()),
@@ -1146,7 +1142,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                 newDxAddress.setLastUpdated(LocalDateTime.now());
                 newDxAddress.setCreated(LocalDateTime.now());
                 dxAddressRepository.save(newDxAddress);
-            }
         } catch (Exception ex) {
             throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400), ex,
                 "Failed to save DxAddress Information :" + ex.getMessage());

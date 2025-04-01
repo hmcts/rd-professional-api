@@ -130,7 +130,7 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-class  OrganisationServiceImplTest {
+class OrganisationServiceImplTest {
 
     private static final String SINCE_STR = "2019-08-16T15:00:41";
     private final LocalDateTime since = LocalDateTime.parse(SINCE_STR, ISO_DATE_TIME_FORMATTER);
