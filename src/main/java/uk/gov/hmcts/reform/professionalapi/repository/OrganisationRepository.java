@@ -29,17 +29,16 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     List<Organisation> findByStatus(OrganisationStatus status);
 
-    List<Organisation> findByStatusIn(List<OrganisationStatus> statuses);
-
-    List<Organisation> findByStatusInAndLastUpdatedGreaterThanEqual(List<OrganisationStatus> statuses,
-                                                                    LocalDateTime since);
-
-    // Fetch organisations by statuses with eager joins
     @EntityGraph(value = "Organisation.alljoins")
     Page<Organisation> findByStatus(OrganisationStatus status, Pageable pageable);
 
+    List<Organisation> findByStatusIn(List<OrganisationStatus> statuses);
+
     @EntityGraph(value = "Organisation.alljoins")
     Page<Organisation> findByStatusIn(List<OrganisationStatus> statuses, Pageable pageable);
+
+    List<Organisation> findByStatusInAndLastUpdatedGreaterThanEqual(List<OrganisationStatus> statuses,
+                                                                    LocalDateTime since);
 
     @EntityGraph(value = "Organisation.alljoins")
     Page<Organisation> findByStatusInAndLastUpdatedGreaterThanEqual(List<OrganisationStatus> statuses,
@@ -53,11 +52,11 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     // Fetch organisations filtered by orgType(s) and optionally legacy V1 Orgs
     @EntityGraph(value = "Organisation.alljoins")
-    @Query("SELECT o FROM Organisation o " +
-           "WHERE (:orgTypes IS NULL OR o.orgType IN :orgTypes) " +
-           "OR (:includeV1Orgs = TRUE AND o.orgType IS NULL) " +
-           "AND (:searchAfter IS NULL OR o.id > :searchAfter) " +
-           "ORDER BY o.id ASC")
+    @Query("SELECT o FROM Organisation o " 
+           + "WHERE (:orgTypes IS NULL OR o.orgType IN :orgTypes) " 
+           + "OR (:includeV1Orgs = TRUE AND o.orgType IS NULL) " 
+           + "AND (:searchAfter IS NULL OR o.id > :searchAfter) " 
+           + "ORDER BY o.id ASC")
     Page<Organisation> findByOrgTypeIn(@Param("orgTypes") List<String> orgTypes,
                                        @Param("searchAfter") UUID searchAfter,
                                        @Param("includeV1Orgs") boolean includeV1Orgs,
@@ -65,8 +64,8 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     // Custom query for PBA status filtering using JPQL
     @EntityGraph(value = "Organisation.alljoins")
-    @Query("SELECT DISTINCT o FROM Organisation o " +
-           "JOIN o.paymentAccounts pba " +
-           "WHERE pba.pbaStatus = :pbaStatus")
+    @Query("SELECT DISTINCT o FROM Organisation o " 
+        + "JOIN o.paymentAccounts pba " 
+        + "WHERE pba.pbaStatus = :pbaStatus")
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
 }

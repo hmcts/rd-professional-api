@@ -30,7 +30,7 @@ class OrganisationMinimalInfoResponseTest {
         contactInformation.setUprn("");
         when(organisationMock.getName()).thenReturn(name);
         when(organisationMock.getOrganisationIdentifier()).thenReturn(organisationIdentifier);
-        when(organisationMock.getContactInformation()).thenReturn(contactInformations);
+        when(organisationMock.getContactInformations()).thenReturn(contactInformations);
     }
 
     @Test

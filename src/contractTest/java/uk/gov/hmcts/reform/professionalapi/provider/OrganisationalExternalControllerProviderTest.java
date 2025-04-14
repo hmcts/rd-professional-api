@@ -236,7 +236,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         contactInformation02.setAddressLine1("addressLine2");
         contactInformation02.setId(UUID.randomUUID());
 
-        when(organisationMock.getContactInformation()).thenReturn(
+        when(organisationMock.getContactInformations()).thenReturn(
                 Arrays.asList(contactInformation01, contactInformation02));
         doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
         doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any());

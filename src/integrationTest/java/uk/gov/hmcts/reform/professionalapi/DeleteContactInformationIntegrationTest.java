@@ -178,8 +178,8 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
                                 puiOrgManager,
                                 userId);
         Organisation organisationAfterDeletion = organisationRepository.findByOrganisationIdentifier(orgId);
-        assertThat(organisationAfterDeletion.getContactInformation().size()).isEqualTo(3);
-        assertThat(organisationAfterDeletion.getContactInformation().stream()
+        assertThat(organisationAfterDeletion.getContactInformations().size()).isEqualTo(3);
+        assertThat(organisationAfterDeletion.getContactInformations().stream()
                 .allMatch(ci -> addressIdList.contains(ci.getId().toString()))).isTrue();
         assertThat(addressResponse).isNotNull();
         assertThat(addressResponse).containsEntry("http_status", "400");
@@ -210,8 +210,8 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
                                 puiOrgManager,
                                 userId);
         Organisation organisationAfterDeletion = organisationRepository.findByOrganisationIdentifier(orgId);
-        assertThat(organisationAfterDeletion.getContactInformation().size()).isEqualTo(2);
-        assertThat(organisationAfterDeletion.getContactInformation().stream()
+        assertThat(organisationAfterDeletion.getContactInformations().size()).isEqualTo(2);
+        assertThat(organisationAfterDeletion.getContactInformations().stream()
                 .noneMatch(ci -> addressIdString.equals(ci.getId().toString()))).isTrue();
         assertThat(addressResponse).isNotNull();
         assertThat(addressResponse).containsEntry("http_status", "204 NO_CONTENT");
@@ -249,8 +249,8 @@ public class DeleteContactInformationIntegrationTest extends AuthorizationEnable
                                 userId);
 
         Organisation organisationAfterDeletion = organisationRepository.findByOrganisationIdentifier(orgId);
-        assertThat(organisationAfterDeletion.getContactInformation().size()).isEqualTo(1);
-        assertThat(organisationAfterDeletion.getContactInformation().stream()
+        assertThat(organisationAfterDeletion.getContactInformations().size()).isEqualTo(1);
+        assertThat(organisationAfterDeletion.getContactInformations().stream()
                 .noneMatch(ci -> addressIdList.contains(ci.getId().toString()))).isTrue();
         assertThat(addressResponse).isNotNull();
         assertThat(addressResponse).containsEntry("http_status", "204 NO_CONTENT");

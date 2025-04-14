@@ -108,7 +108,7 @@ class OrganisationTest {
         Organisation organisation = new Organisation();
         organisation.addContactInformation(contactInformation);
 
-        assertThat(organisation.getContactInformation()).containsExactly(contactInformation);
+        assertThat(organisation.getContactInformations()).containsExactly(contactInformation);
         assertThat(organisation.getContactInformations()).isNotEmpty();
     }
 
