@@ -1,20 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.NamedAttributeNode;
-import jakarta.persistence.NamedEntityGraph;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,17 +23,20 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @Entity
-@NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraph(
-        name = "Organisation.alljoins",
-        attributeNodes = {
-                @NamedAttributeNode(value = "users"),
-        }
+    name = "Organisation.alljoins",
+    attributeNodes = {
+        @NamedAttributeNode("users"),
+        @NamedAttributeNode("paymentAccounts"),
+        @NamedAttributeNode("contactInformations"),
+        @NamedAttributeNode("orgAttributes"),
+        @NamedAttributeNode("bulkCustomerDetails")
+    }
 )
-@SuppressWarnings("checkstyle:Indentation")
 public class Organisation implements Serializable {
 
     @Id
@@ -64,70 +54,52 @@ public class Organisation implements Serializable {
     private List<SuperUser> users = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = PaymentAccount.class, mappedBy = "organisation")
+    @OneToMany(mappedBy = "organisation")
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
+    @OneToMany(mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation", optional = false, fetch = FetchType.LAZY)
     private OrganisationMfaStatus organisationMfaStatus;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = BulkCustomerDetails.class, mappedBy = "organisation")
-    private List<BulkCustomerDetails> bulkCustomerDetails;
+    @OneToMany(mappedBy = "organisation")
+    private List<BulkCustomerDetails> bulkCustomerDetails = new ArrayList<>();
 
-    @OneToMany(targetEntity = OrgAttribute.class, mappedBy = "organisation")
+    @OneToMany(mappedBy = "organisation")
     private List<OrgAttribute> orgAttributes = new ArrayList<>();
 
-    @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
 
-    @Column(name = "STATUS_MESSAGE")
     private String statusMessage;
 
     @LastModifiedDate
-    @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
 
-    @Column(name = "ORG_TYPE")
     private String orgType;
 
     @CreatedDate
-    @Column(name = "CREATED")
     private LocalDateTime created;
 
-    @Column(name = "SRA_ID")
     @Size(max = 255)
     private String sraId;
 
-    @Column(name = "SRA_REGULATED")
     private Boolean sraRegulated;
 
-    @Column(name = "COMPANY_NUMBER")
     private String companyNumber;
 
-    @Column(name = "COMPANY_URL")
     @Size(max = 512)
     private String companyUrl;
 
-    @Column(name = "ORGANISATION_IDENTIFIER")
     private String organisationIdentifier;
 
-    @Column(name = "date_approved")
     private LocalDateTime dateApproved;
 
-
-    public Organisation(
-            String name,
-            OrganisationStatus status,
-            String sraId,
-            String companyNumber,
-            Boolean sraRegulated,
-            String companyUrl) {
-
+    public Organisation(String name, OrganisationStatus status, String sraId,
+                        String companyNumber, Boolean sraRegulated, String companyUrl) {
         this.name = name;
         this.status = status;
         this.sraId = sraId;
@@ -137,80 +109,23 @@ public class Organisation implements Serializable {
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
+    public boolean isOrganisationStatusActive() {
+        return OrganisationStatus.ACTIVE == this.status;
+    }
+
     public void addProfessionalUser(SuperUser superUser) {
-        users.add(superUser);
+        this.users.add(superUser);
     }
 
     public void addPaymentAccount(PaymentAccount paymentAccount) {
-        paymentAccounts.add(paymentAccount);
+        this.paymentAccounts.add(paymentAccount);
     }
 
     public void addContactInformation(ContactInformation contactInformation) {
-        contactInformations.add(contactInformation);
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getOrgType() {
-        return orgType;
-    }
-
-    public List<OrgAttribute> getOrgAttributes() {
-        return orgAttributes;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<SuperUser> getUsers() {
-        return users;
-    }
-
-    public List<PaymentAccount> getPaymentAccounts() {
-        return paymentAccounts;
-    }
-
-    public List<ContactInformation> getContactInformation() {
-        return contactInformations;
-    }
-
-    public OrganisationStatus getStatus() {
-        return status;
-    }
-
-    public String getSraId() {
-        return sraId;
-    }
-
-    public String getCompanyNumber() {
-        return companyNumber;
-    }
-
-    public Boolean getSraRegulated() {
-        return sraRegulated;
-    }
-
-    public String getCompanyUrl() {
-        return companyUrl;
-    }
-
-    public String getOrganisationIdentifier() {
-        return organisationIdentifier;
-    }
-
-    public void setOrganisationIdentifier(String organisationIdentifier) {
-        this.organisationIdentifier = organisationIdentifier;
-    }
-
-    public boolean isOrganisationStatusActive() {
-        return OrganisationStatus.ACTIVE == getStatus();
+        this.contactInformations.add(contactInformation);
     }
 
     public void addAttribute(OrgAttribute orgAttribute) {
-        orgAttributes.add(orgAttribute);
+        this.orgAttributes.add(orgAttribute);
     }
-
 }
