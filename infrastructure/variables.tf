@@ -108,7 +108,7 @@ variable "pgsql_server_configuration" {
   default = [
     {
       name  = "azure.extensions"
-      value = "PLPGSQL,PG_STAT_STATEMENTS,PG_BUFFERCACHE"
+      value = "PG_STAT_STATEMENTS,PG_BUFFERCACHE"
     },
     {
       name  = "backslash_quote"
