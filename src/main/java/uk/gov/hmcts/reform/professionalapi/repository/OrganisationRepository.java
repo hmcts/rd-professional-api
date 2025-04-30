@@ -45,6 +45,7 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     List<Organisation> findByStatus(OrganisationStatus status);
 
     @EntityGraph(value = "Organisation.alljoins")
+    @Query("SELECT o FROM Organisation o WHERE o.status IN :statuses ORDER BY LOWER(o.name)")
     Page<Organisation> findByStatus(OrganisationStatus status, Pageable pageable);
 
     List<Organisation> findByStatusIn(List<OrganisationStatus> statuses);
