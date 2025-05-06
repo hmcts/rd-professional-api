@@ -585,6 +585,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         updateOrgMfaShouldBeSuccess();
     }
 
+
     public void updateOrgMfaShouldBeSuccess() {
         log.info("updateOrgMFAShouldBeSuccess :: STARTED");
 
@@ -857,6 +858,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         professionalApiClient
                 .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
     }
+
 
     private static void verifyOrganisationDetails(JsonPath response) {
 

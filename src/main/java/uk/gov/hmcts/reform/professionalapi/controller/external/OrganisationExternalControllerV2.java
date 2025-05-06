@@ -3,17 +3,20 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,10 +25,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+
+import java.util.Map;
+import java.util.Set;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -214,5 +222,110 @@ public class OrganisationExternalControllerV2 extends SuperController {
                 .body(new OrganisationPbaResponseV2(organisation,
                         false, true, false,true));
     }
+
+    @Operation(
+        summary = "Updates an Organisation's name or sraId",
+        description = "**IDAM Roles to access API** : <br> pui-organisation-manager",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        })
+
+    @ApiResponse(
+        responseCode = "204",
+        description = "Organisation name or sraId has been updated",
+        content = @Content(schema = @Schema(implementation = String.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "An invalid request has been provided",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+    @PutMapping(
+        value = "/orgDetails",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Secured({"pui-organisation-manager"})
+    public ResponseEntity<Object> updateOrganisationNameOrSra(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationNameSraUpdate",
+            content = @Content(mediaType = "application/json",
+                examples = {
+                    @ExampleObject(name = "Update Name and Sra both", value = "{ \"name\": \"New Org Name\","
+                        + " \"sraId\": \"SRA12345\" }"),
+                    @ExampleObject(name = "Update Name ", value = "{  \"name\": \"New Org Name\" }"),
+                    @ExampleObject(name = "Update SraId ", value = "{   \"sraId\": \"SRA12345\" }")
+                }
+        ))
+        @org.springframework.web.bind.annotation.RequestBody Map<String,String> organisationNameSraUpdate,
+        @Parameter(hidden = true) @OrgId String organisationIdentifier) {
+
+        //validate that organisation id is not null
+        if (StringUtils.isEmpty(organisationIdentifier)) {
+            throw new ResourceNotFoundException("Organisation id is missing");
+        }
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
+
+        String sraId = "sraId";
+        String name = "name";
+        ResponseEntity<Object> response = null;
+        //validate orgid is not invalid and organisation exists for given id
+        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+
+        String nameValue = null;
+        String sraIdValue = null;
+
+        // Check if the map contains any other keys besides "name" and "sraId"
+        Set<String> allowedKeys = Set.of(name, sraId);
+        for (String key : organisationNameSraUpdate.keySet()) {
+            if (!allowedKeys.contains(key)) {
+                throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,
+                    "Request parameters unrecognised: " + key);
+            }
+        }
+        //if name or sraid both keys not in the map throw error
+        if (!organisationNameSraUpdate.containsKey(name) && !organisationNameSraUpdate.containsKey(sraId)) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                "Request parameters unrecognised");
+        } else {
+            //if organisation name exists then validate name
+            if (organisationNameSraUpdate.containsKey(name)) {
+                nameValue = organisationNameSraUpdate.get(name);
+                if (nameValue == null || StringUtils.isEmpty(nameValue.trim())) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Organisation name cannot be empty");
+                } else if (nameValue.length() > 255) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Organisation name cannot be more than 255 characters");
+                }
+            } //if organisation sraid exists then validate
+            if (organisationNameSraUpdate.containsKey(sraId)) {
+                sraIdValue = organisationNameSraUpdate.get(sraId);
+
+                if (sraIdValue != null && sraIdValue.length() > 164) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Organisation sraId cannot be more than 164 characters is returned");
+                }
+            }
+            //update organisation sraid
+            response = organisationService.updateOrganisationNameOrSra(existingOrganisation, organisationNameSraUpdate);
+        }
+        return response;
+    }
+
+
+
 
 }

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -91,6 +92,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
@@ -607,6 +609,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         return organisationsDetailResponse;
     }
 
+
     @Override
     public OrganisationResponse updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier,
@@ -879,7 +882,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
                 .stream()
                 .collect(Collectors.groupingBy(
-                        Organisation::getOrganisationIdentifier, LinkedHashMap::new, Collectors.toList()));
+                        Organisation::getOrganisationIdentifier, LinkedHashMap::new, toList()));
 
         var organisationsWithPbaStatusResponses = new ArrayList<OrganisationsWithPbaStatusResponse>();
 
@@ -1056,5 +1059,96 @@ public class OrganisationServiceImpl implements OrganisationService {
         return !pageableOrganisations.isLast();
     }
 
+
+    @Override
+    @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
+    public ResponseEntity<Object> updateOrganisationNameOrSra(Organisation existingOrganisation,
+                                                          Map<String,String> organisationNameSraUpdate) {
+
+        String sraId = "sraId";
+        try {
+            if (organisationNameSraUpdate.containsKey("name")
+                && StringUtils.isNotBlank(organisationNameSraUpdate.get("name"))) {
+                existingOrganisation.setName(RefDataUtil.removeEmptySpaces(organisationNameSraUpdate.get("name")));
+                existingOrganisation.setLastUpdated(LocalDateTime.now());
+                organisationRepository.save(existingOrganisation);
+            }
+            if (organisationNameSraUpdate.containsKey(sraId)) {
+                OrgAttribute savedSraAttribute = null;
+                if (StringUtils.isNotEmpty(organisationNameSraUpdate.get(sraId))
+                    && StringUtils.isNotBlank(organisationNameSraUpdate.get(sraId))) {
+                    //delete the orgattribute for sra id from orgattribute table
+                    deleteSraFromOrgAttribute(existingOrganisation);
+                    //create new sra id in organisation attributes for the new sra id
+                    savedSraAttribute = saveOrganisationAttributes(existingOrganisation,
+                    organisationNameSraUpdate.get(sraId));
+
+                    if (savedSraAttribute != null) {
+                        existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(
+                            organisationNameSraUpdate.get(sraId)));
+                        existingOrganisation.setLastUpdated(LocalDateTime.now());
+
+                        //update the organisation table with the new sra id
+                        organisationRepository.save(existingOrganisation);
+
+                    } else {
+                        throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400),
+                        "Failed to save attributes for organisation sraId");
+                    }
+                } else  {
+                    //if sra id is empty space or null then delete it from organisation table
+                    existingOrganisation.setSraId(null);
+                    existingOrganisation.setLastUpdated(LocalDateTime.now());
+                    organisationRepository.save(existingOrganisation);
+
+                    //if sra id is empty space or null then also delete the respective sra from orgattributes table
+                    deleteSraFromOrgAttribute(existingOrganisation);
+                }
+            }
+        } catch (Exception ex) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400), ex,
+                "Failed to save or update :" + ex.getMessage());
+        }
+        return ResponseEntity.status(204).build();
+    }
+
+
+    public OrgAttribute saveOrganisationAttributes(Organisation existingOrganisation,
+                                                   String sraId) {
+
+        final String attributeKey = "regulators-0";
+        final String attributeValue = "{\"regulatorType\":\"Solicitor Regulation Authority (SRA)\","
+            + "\"organisationRegistrationNumber\":\"" + sraId + "\"}";
+
+        existingOrganisation.setSraId(RefDataUtil.removeEmptySpaces(sraId));
+        OrgAttribute attribute = new OrgAttribute();
+        attribute.setKey(RefDataUtil.removeEmptySpaces(attributeKey));
+        attribute.setValue(RefDataUtil.removeEmptySpaces(attributeValue));
+        attribute.setOrganisation(existingOrganisation);
+
+        OrgAttribute savedAttribute = orgAttributeRepository.save(attribute);
+        List<OrgAttribute> attributes = new ArrayList<>();
+        attributes.add(savedAttribute);
+        existingOrganisation.setOrgAttributes(attributes);
+
+        return savedAttribute;
+    }
+
+
+    private void deleteSraFromOrgAttribute(Organisation existingOrganisation) {
+
+        List<OrgAttribute> orgAttributes = orgAttributeRepository.findByOrganisationId(existingOrganisation.getId());
+        if (!orgAttributes.isEmpty()) {
+            for (OrgAttribute orgAttribute : orgAttributes) {
+                String key = orgAttribute.getKey();
+                String value = orgAttribute.getValue();
+                if ((StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value))
+                    && (key.equalsIgnoreCase("regulators-0")
+                    && value.contains("Solicitor Regulation Authority (SRA)"))) {
+                    orgAttributeRepository.deleteById(orgAttribute.getId());
+                }
+            }
+        }
+    }
 }
 
