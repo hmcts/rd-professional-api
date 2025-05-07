@@ -68,4 +68,13 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     @Query(FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2 + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4)
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
+
+    @EntityGraph(value = "Organisation.alljoins")
+    Organisation findByOrganisationIdentifierWithUsers(String organisationIdentifier);
+
+    @EntityGraph(attributePaths = {"users", "paymentAccounts", "contactInformation"})
+    Organisation findByIdWithDetails(UUID id);
+
+    @EntityGraph(attributePaths = {"users"})
+    List<Organisation> findByStatusWithUsers(OrganisationStatus status);
 }
