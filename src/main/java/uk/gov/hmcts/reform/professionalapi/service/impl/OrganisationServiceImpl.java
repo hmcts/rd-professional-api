@@ -504,8 +504,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
         }
-        if (!organisation.getContactInformation().isEmpty()
-                && organisation.getContactInformation().size() > 1) {
+        if (!organisation.getContactInformations().isEmpty()
+                && organisation.getContactInformations().size() > 1) {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
@@ -681,8 +681,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
         }
-        if (!organisation.getContactInformation().isEmpty()
-                && organisation.getContactInformation().size() > 1) {
+        if (!organisation.getContactInformations().isEmpty()
+                && organisation.getContactInformations().size() > 1) {
             sortContactInfoByCreatedDateAsc(organisation);
         }
 
@@ -1006,7 +1006,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void sortContactInfoByCreatedDateAsc(Organisation organisation) {
-        var sortedContactInfoByCreatedDate = organisation.getContactInformation()
+        var sortedContactInfoByCreatedDate = organisation.getContactInformations()
                 .stream()
                 .sorted(Comparator.comparing(ContactInformation::getCreated))
                 .toList();

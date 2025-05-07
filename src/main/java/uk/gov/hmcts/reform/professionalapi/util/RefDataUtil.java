@@ -606,15 +606,15 @@ public class RefDataUtil {
             Organisation organisation, Set<String> addressIds) {
         if (isNull(organisation)) {
             throw new ResourceNotFoundException(ERROR_MSG_ORG_NOT_EXIST);
-        } else if ((CollectionUtils.isEmpty(organisation.getContactInformation()))
-                || (organisation.getContactInformation().size() <= addressIds.size())) {
+        } else if ((CollectionUtils.isEmpty(organisation.getContactInformations()))
+                || (organisation.getContactInformations().size() <= addressIds.size())) {
             throw new InvalidRequest(ERROR_MSG_ORG_ADDRESS);
         }
     }
 
     public static void matchAddressIdsWithOrgContactInformationIds(Organisation organisation, Set<String> addressIds) {
         var invalidAddIdsSet = addressIds.stream()
-                .filter(addressId -> organisation.getContactInformation().stream()
+                .filter(addressId -> organisation.getContactInformations().stream()
                         .noneMatch(contactInformation -> contactInformation.getId().toString().equals(addressId)))
                 .collect(Collectors.toSet());
 

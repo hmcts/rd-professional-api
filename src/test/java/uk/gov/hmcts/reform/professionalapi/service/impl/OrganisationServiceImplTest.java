@@ -903,7 +903,7 @@ class OrganisationServiceImplTest {
                 .retrieveOrganisationForV2Api(organisationIdentifier, false);
 
         assertThat(organisationEntityResponse).isNotNull();
-        assertThat(organisation.getContactInformation()).hasSize(2);
+        assertThat(organisation.getContactInformations()).hasSize(2);
         verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(any(String.class));
     }
@@ -2552,7 +2552,7 @@ class OrganisationServiceImplTest {
         assertEquals("TestCountry", organisationEntityResponse.getContactInformation().get(0).getCountry());
         assertEquals("TestAnotherCountry",
                 organisationEntityResponse.getContactInformation().get(1).getCountry());
-        assertThat(organisation.getContactInformation()).hasSize(2);
+        assertThat(organisation.getContactInformations()).hasSize(2);
     }
 
 
