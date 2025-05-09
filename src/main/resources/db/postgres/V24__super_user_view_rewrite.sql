@@ -9,7 +9,10 @@ SELECT pu.id,
        pu.user_identifier,
        pu.deleted
 FROM dbrefdata.professional_user pu
-JOIN dbrefdata.user_attribute ua
-  ON pu.id = ua.professional_user_id
-WHERE ua.prd_enum_code = 4
-  AND ua.prd_enum_type = 'ADMIN_ROLE';
+WHERE EXISTS (
+    SELECT 1
+    FROM dbrefdata.user_attribute ua
+    WHERE ua.professional_user_id = pu.id
+      AND ua.prd_enum_code = 4
+      AND ua.prd_enum_type = 'ADMIN_ROLE'
+);
