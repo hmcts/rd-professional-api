@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
@@ -23,40 +23,40 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 @Configuration
 public class OrganisationalInternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockBean
+    @MockitoBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
-    @MockBean
+    @MockitoBean
     protected PaymentAccountService paymentAccountService;
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
-    @MockBean
+    @MockitoBean
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
-    @MockBean
+    @MockitoBean
     PaymentAccountRepository paymentAccountRepository;
 
-    @MockBean
+    @MockitoBean
     OrgAttributeRepository orgAttributeRepository;
 
-    @MockBean
+    @MockitoBean
     DxAddressRepository dxAddressRepository;
 
-    @MockBean
+    @MockitoBean
     ContactInformationRepository contactInformationRepository;
 
-    @MockBean
+    @MockitoBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeService userAttributeService;
 
-    @MockBean
+    @MockitoBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
     @Bean
