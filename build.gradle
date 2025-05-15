@@ -314,7 +314,7 @@ project.tasks['sonarqube'].group = "Verification"
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
 }
 
 dependencies {
@@ -435,7 +435,7 @@ dependencies {
         exclude group: "net.bytebuddy", module: "byte-buddy"
         exclude group: "net.bytebuddy", module: "byte-buddy-agent"
     }
-    testImplementation 'com.github.hmcts:rd-commons-lib:0.1.0'
+    testImplementation 'com.github.hmcts:rd-commons-lib:0.1.1'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.15.2'
 
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
