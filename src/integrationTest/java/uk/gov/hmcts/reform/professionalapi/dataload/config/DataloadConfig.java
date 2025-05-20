@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.dataload.processor.ExceptionProcessor;
 import uk.gov.hmcts.reform.professionalapi.dataload.processor.FileReadProcessor;
 import uk.gov.hmcts.reform.professionalapi.dataload.processor.HeaderValidationProcessor;
