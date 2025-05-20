@@ -6,6 +6,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.Exchange;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,14 +24,14 @@ import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants
 public class DataloadConfig {
 
 
-    @MockitoBean
+    @MockBean
     BlobStorageCredentials blobStorageCredentials;
 
-    @MockitoBean
+    @MockBean
     @Qualifier("credsreg")
     StorageCredentials storageCredentials;
 
-    @MockitoBean
+    @MockBean
     @Qualifier("credscloudStorageAccount")
     CloudStorageAccount cloudStorageAccount;
 

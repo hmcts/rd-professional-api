@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,7 +21,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -86,13 +86,14 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleU
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings({"deprecation", "removal"})
 @SpringBootTest
 class RefDataUtilTest {
 
-    @MockitoBean
+    @MockBean
     private BlobStorageCredentials blobStorageCredentials;
 
-    @MockitoBean
+    @MockBean
     CloudStorageAccount cloudStorageAccount;
 
     private PaymentAccount paymentAccount;
