@@ -30,7 +30,7 @@ public class OrganisationMinimalInfoResponse {
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
 
         if (Boolean.TRUE.equals(isAddressRequired)) {
-            this.contactInformation = organisation.getContactInformation()
+            this.contactInformation = organisation.getContactInformations()
                     .stream()
                     .map(ContactInformationResponse::new)
                     .toList();
