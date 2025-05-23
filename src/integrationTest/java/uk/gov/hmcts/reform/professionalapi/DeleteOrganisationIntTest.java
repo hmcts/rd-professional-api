@@ -118,7 +118,7 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgIdentifier);
         List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-         users.get(0).setOrganisation(organisation);
+        users.get(0).setOrganisation(organisation);
 
         Map<String, Object> deleteResponse =
             professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
