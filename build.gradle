@@ -454,6 +454,7 @@ dependencies {
 
     testImplementation 'io.github.openfeign:feign-jackson:13.5'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
+    testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.0'
