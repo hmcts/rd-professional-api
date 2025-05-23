@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
@@ -21,42 +21,43 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @Configuration
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalInternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockitoBean
+    @MockBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockitoBean
+    @MockBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
-    @MockitoBean
+    @MockBean
     protected PaymentAccountService paymentAccountService;
 
-    @MockitoBean
+    @MockBean
     OrganisationRepository organisationRepository;
 
-    @MockitoBean
+    @MockBean
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
-    @MockitoBean
+    @MockBean
     PaymentAccountRepository paymentAccountRepository;
 
-    @MockitoBean
+    @MockBean
     OrgAttributeRepository orgAttributeRepository;
 
-    @MockitoBean
+    @MockBean
     DxAddressRepository dxAddressRepository;
 
-    @MockitoBean
+    @MockBean
     ContactInformationRepository contactInformationRepository;
 
-    @MockitoBean
+    @MockBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockitoBean
+    @MockBean
     UserAttributeService userAttributeService;
 
-    @MockitoBean
+    @MockBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
     @Bean

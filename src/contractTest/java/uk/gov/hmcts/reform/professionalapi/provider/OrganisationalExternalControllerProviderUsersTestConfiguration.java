@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
@@ -27,46 +27,47 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 @Configuration
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalExternalControllerProviderUsersTestConfiguration extends ProviderTestConfiguration {
 
-    @MockitoBean
+    @MockBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockitoBean
+    @MockBean
     protected ClientRegistrationRepository clientRegistrationRepository;
 
-    @MockitoBean
+    @MockBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
-    @MockitoBean
+    @MockBean
     UserConfiguredAccessRepository userConfiguredAccessRepository;
 
-    @MockitoBean
+    @MockBean
     FeatureToggleService featureToggleService;
 
-    @MockitoBean
+    @MockBean
     ServiceAuthFilter serviceAuthFilter;
 
-    @MockitoBean
+    @MockBean
     OrganisationRepository organisationRepository;
 
-    @MockitoBean
+    @MockBean
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
-    @MockitoBean
+    @MockBean
     PaymentAccountRepository paymentAccountRepository;
-    @MockitoBean
+    @MockBean
     DxAddressRepository dxAddressRepository;
-    @MockitoBean
+    @MockBean
     ContactInformationRepository contactInformationRepository;
-    @MockitoBean
+    @MockBean
     PrdEnumRepository prdEnumRepository;
-    @MockitoBean
+    @MockBean
     UserAttributeService userAttributeService;
-    @MockitoBean
+    @MockBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
-    @MockitoBean
+    @MockBean
     OrgAttributeRepository orgAttributeRepository;
 
     @Bean

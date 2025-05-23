@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationMfaStatusController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
@@ -20,18 +20,19 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 @TestConfiguration
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalExternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockitoBean
+    @MockBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockitoBean
+    @MockBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
-    @MockitoBean
+    @MockBean
     protected OrganisationService organisationService;
 
-    @MockitoBean
+    @MockBean
     OrgAttributeRepository orgAttributeRepository;
 
     @Bean
@@ -54,13 +55,13 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
         return new OrganisationMfaStatusController();
     }
 
-    @MockitoBean
+    @MockBean
     protected JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    @MockitoBean
+    @MockBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
-    @MockitoBean
+    @MockBean
     OrganisationRepository organisationRepository;
 
     @Bean
@@ -69,9 +70,9 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
         return new MfaStatusServiceImpl();
     }
 
-    @MockitoBean
+    @MockBean
     protected PaymentAccountRepository paymentAccountRepository;
 
-    @MockitoBean
+    @MockBean
     ContactInformationRepository contactInformationRepositoryMock;
 }

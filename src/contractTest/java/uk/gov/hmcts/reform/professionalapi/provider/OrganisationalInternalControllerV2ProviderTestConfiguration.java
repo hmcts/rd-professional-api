@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalControllerV2;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
@@ -19,38 +19,39 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 
 @Configuration
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalInternalControllerV2ProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockitoBean
+    @MockBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockitoBean
+    @MockBean
     OrganisationRepository organisationRepository;
 
 
-    @MockitoBean
+    @MockBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
 
-    @MockitoBean
+    @MockBean
     PaymentAccountRepository paymentAccountRepository;
 
-    @MockitoBean
+    @MockBean
     OrgAttributeRepository orgAttributeRepository;
 
-    @MockitoBean
+    @MockBean
     DxAddressRepository dxAddressRepository;
 
-    @MockitoBean
+    @MockBean
     ContactInformationRepository contactInformationRepository;
 
-    @MockitoBean
+    @MockBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockitoBean
+    @MockBean
     UserAttributeService userAttributeService;
 
-    @MockitoBean
+    @MockBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
 

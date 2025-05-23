@@ -8,8 +8,8 @@ import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalControllerV2;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalInternalV2")
 @Import(OrganisationalInternalControllerV2ProviderTestConfiguration.class)
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProviderTest {
 
 
@@ -62,11 +63,11 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
 
-    @MockitoBean
+    @MockBean
     PaymentAccountService paymentAccountService;
 
 
-    @MockitoBean
+    @MockBean
     OrganisationServiceImpl organisationService;
 
 
@@ -75,10 +76,10 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     public static final String COMPANY_NUMBER = "companyN";
     public static final String COMPANY_URL = "www.org.com";
 
-    @MockitoBean
+    @MockBean
     OrganisationResponse  organisationResponse;
 
-    @MockitoBean
+    @MockBean
     OrganisationOtherOrgsCreationRequest  organisationOtherOrgsCreationRequest;
 
     @Override

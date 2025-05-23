@@ -11,9 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.BulkCustomerDetailsInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
@@ -33,6 +33,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @Provider("referenceData_bulkCustomerDetails")
 @ContextConfiguration(classes = {BulkCustomerDetailsInternalController.class})
 @Import(BulkCustomerDetailsProviderTestConfiguration.class)
+@SuppressWarnings({"deprecation", "removal"})
 public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
 
     public static final String ORG_NAME = "Org-Name";
@@ -45,10 +46,10 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
     @Autowired
     BulkCustomerDetailsInternalController bulkCustomerDetailsInternalController;
 
-    @MockitoBean
+    @MockBean
     OrganisationServiceImpl organisationService;
 
-    @MockitoBean
+    @MockBean
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
 
