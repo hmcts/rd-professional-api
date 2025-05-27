@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -1044,5 +1045,41 @@ public class ProfessionalReferenceDataClient {
         }
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
+    }
+
+    public ResponseEntity<Map> updateContactInformationException(
+        UpdateContactInformationRequest updateContactInformationRequest, String role) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH + "/contactinformation";
+
+        HttpEntity<UpdateContactInformationRequest> requestEntity = new HttpEntity<>(updateContactInformationRequest,
+            getMultipleAuthHeaders(role));
+        responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        return responseEntity;
+    }
+
+    public Map<String, Object> updateContactInformation(String id,UpdateContactInformationRequest
+        updateContactInformationRequest, String role) {
+
+        ResponseEntity<Map> responseEntity;
+        String uriPath = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH + "/contactinformation";
+        try {
+            HttpEntity<?> request = new HttpEntity<>(updateContactInformationRequest,getMultipleAuthHeaders(role, id));
+            responseEntity = restTemplate
+                .exchange(uriPath,
+                    HttpMethod.PUT,
+                    request,
+                    Map.class,
+                    id);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
     }
 }
