@@ -225,7 +225,7 @@ task runProviderPactVerification(type: Test) {
 }
 
 task fortifyScan(type: JavaExec) {
-    main("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
+    mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
     // This is a temporary fix to prevent the nightly build from failing if the Fortify scan detects issues
@@ -314,7 +314,7 @@ project.tasks['sonarqube'].group = "Verification"
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
+    maven { url = 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
 }
 
 dependencies {
