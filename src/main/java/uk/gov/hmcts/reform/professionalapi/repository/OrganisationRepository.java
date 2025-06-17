@@ -45,6 +45,7 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     List<Organisation> findByStatus(OrganisationStatus status);
 
     @EntityGraph(value = "Organisation.alljoins")
+    @Query("SELECT o FROM Organisation o WHERE o.status IN :statuses ORDER BY LOWER(o.name)")
     Page<Organisation> findByStatus(OrganisationStatus status, Pageable pageable);
 
     List<Organisation> findByStatusIn(List<OrganisationStatus> statuses);
@@ -67,4 +68,13 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     @Query(FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2 + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4)
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
+
+    @EntityGraph(value = "Organisation.alljoins")
+    Organisation findByOrganisationIdentifierWithUsers(String organisationIdentifier);
+
+    @EntityGraph(attributePaths = {"users", "paymentAccounts", "contactInformation"})
+    Organisation findByIdWithDetails(UUID id);
+
+    @EntityGraph(attributePaths = {"users"})
+    List<Organisation> findByStatusWithUsers(OrganisationStatus status);
 }
