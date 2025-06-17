@@ -40,7 +40,7 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
+        assertThat(persistedOrganisation.getContactInformations().size()).isEqualTo(1);
 
     }
 
@@ -257,8 +257,8 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
-        assertThat(persistedOrganisation.getContactInformation().get(0).getDxAddresses().size()).isEqualTo(0);
+        assertThat(persistedOrganisation.getContactInformations().size()).isEqualTo(1);
+        assertThat(persistedOrganisation.getContactInformations().get(0).getDxAddresses().size()).isEqualTo(0);
     }
 
     @Test
@@ -442,7 +442,7 @@ class CreateOrgWithContactInformationDxAddress extends AuthorizationEnabledInteg
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(3);
+        assertThat(persistedOrganisation.getContactInformations().size()).isEqualTo(3);
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
         assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id");
         assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url");
