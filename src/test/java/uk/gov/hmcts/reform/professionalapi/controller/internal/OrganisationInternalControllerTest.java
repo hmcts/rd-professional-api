@@ -109,6 +109,9 @@ class OrganisationInternalControllerTest {
     private List<PrdEnum> prdEnumList;
 
     private ProfessionalUser professionalUser;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
+
+
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private DeleteOrganisationResponse deleteOrganisationResponse;
@@ -572,4 +575,43 @@ class OrganisationInternalControllerTest {
                 .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
 
+
+    @Test
+    void testDeletePaymentAccounts() {
+        PbaRequest deletePbaRequest = new PbaRequest();
+        var accountsToDelete = new HashSet<String>();
+        accountsToDelete.add("PBA1234567");
+        deletePbaRequest.setPaymentAccounts(accountsToDelete);
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(new PaymentAccount());
+        organisation.setPaymentAccounts(paymentAccounts);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisationInternalController
+                .deletePaymentAccountsForOrganisation(deletePbaRequest, orgId, userId);
+
+        verify(professionalUserServiceMock, times(1))
+                .checkUserStatusIsActiveByUserId(anyString());
+        verify(orgIdValidatorMock, times(1))
+                .validateOrganisationIsActive(any(Organisation.class), any(HttpStatus.class));
+        verify(paymentAccountServiceMock, times(1))
+                .deletePaymentsOfOrganisation(any(PbaRequest.class), any(Organisation.class));
+
+    }
+
+
+    @Test
+    void test_deletePaymentAccounts_NoPaymentAccountsPassed() {
+        PbaRequest deletePbaRequest = new PbaRequest();
+        var accountsToDelete = new HashSet<String>();
+        deletePbaRequest.setPaymentAccounts(accountsToDelete);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        assertThrows(InvalidRequest.class,() ->
+                organisationInternalController
+                        .deletePaymentAccountsForOrganisation(deletePbaRequest, orgId, userId));
+
+    }
 }
