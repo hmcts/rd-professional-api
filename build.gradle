@@ -94,7 +94,6 @@ tasks.withType(Test) {
 }
 
 sourceSets {
-
     integrationTest {
         java {
             compileClasspath += main.output + test.output
@@ -165,7 +164,6 @@ configurations {
 
 check.dependsOn jacocoTestCoverageVerification
 
-
 pmd {
     toolVersion = '7.10.0'
     ignoreFailures = true
@@ -210,7 +208,6 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 project.ext {
     pactVersion = getCheckedOutGitCommitHash()
 }
-
 
 task runProviderPactVerification(type: Test) {
     description = 'Runs the provider Pact tests'
@@ -283,7 +280,6 @@ pitest {
     timestampedReports = false
     mutationThreshold = 80
 }
-
 
 project.tasks['pitest'].group = "Verification"
 
@@ -363,16 +359,13 @@ dependencies {
 
     implementation group: 'jakarta.el', name: 'jakarta.el-api', version: '6.0.1'
 
-
     implementation (group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk) {
         exclude group: 'com.google.guava', module: 'guava'
     }
 
-
     testImplementation group: 'org.apache.camel', name: 'camel-test', version: versions.camel
     testImplementation group: 'org.apache.camel', name: 'camel-test-spring-junit5', version: versions.camel
     testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
-
 
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-rc-1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.12.1'
@@ -396,7 +389,6 @@ dependencies {
     //Added below dependencies for shedlock
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.16.0'
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.16.0'
-
 
     implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.7'
     implementation group: 'org.json', name: 'json', version: '20240303'
