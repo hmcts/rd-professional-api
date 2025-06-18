@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalInternalV2")
 @Import(OrganisationalInternalControllerV2ProviderTestConfiguration.class)
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProviderTest {
 
 

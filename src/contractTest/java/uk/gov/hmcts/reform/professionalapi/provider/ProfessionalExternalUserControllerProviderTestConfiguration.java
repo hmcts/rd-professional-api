@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceI
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
 @Configuration
+@SuppressWarnings({"deprecation", "removal"})
 public class ProfessionalExternalUserControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
     @MockBean
