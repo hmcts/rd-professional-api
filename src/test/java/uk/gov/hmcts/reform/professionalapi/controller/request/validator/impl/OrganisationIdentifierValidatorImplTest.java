@@ -6,8 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -173,6 +175,83 @@ class OrganisationIdentifierValidatorImplTest {
         assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl.validateSince("bad format"));
         organisationIdentifierValidatorImpl.validateSince(null);
         organisationIdentifierValidatorImpl.validateSince("2023-12-05T14:49:53");
+    }
+
+    @Test
+    void testValidateDxExchangeEmpty() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "dx1","");
+        assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
+            .validateDxAddress(updateContactInformationRequest));
+
+    }
+
+    @Test
+    void testValidateDxExchangeNull() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "dx1","   ");
+
+        assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
+            .validateDxAddress(updateContactInformationRequest));
+
+    }
+
+    @Test
+    void testValidateDxNumberNull() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "  ","dxExchng");
+
+        assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
+            .validateDxAddress(updateContactInformationRequest));
+
+    }
+
+    @Test
+    void testValidateDxNumberMoreThan14() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "UPRNLengthIs-15","dxExchng");
+
+        assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
+            .validateDxAddress(updateContactInformationRequest));
+
+    }
+
+    @Test
+    void testValidateDxExchangeMoreThan40() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "123434","dxExchngLengthOfDxExchgangeIsOver41Charac");
+
+        assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
+            .validateDxAddress(updateContactInformationRequest));
+
+    }
+
+    @Test
+    void testValidateDxNumberInvalid() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "updatedaddressLine1","updatedaddressLine2","updatedaddressLine3",
+                "updatedtownCity","updatedcounty","updatedcountry","RG48TS",
+                "34  ^&*^&*%!@£$$%^&**&^%$£@!±+ ±?<>","dxExchng");
+
+        assertThrows(FieldAndPersistenceValidationException.class,() -> organisationIdentifierValidatorImpl
+            .validateDxAddress(updateContactInformationRequest));
+
     }
 
 }
