@@ -307,6 +307,7 @@ class OrganisationCreationRequestValidatorTest {
                 organisationCreationRequestValidator.requestContactInformation(contactList));
     }
 
+    //test includes email with extension 63 characters long passes test
     @Test
     void test_should_validate_valid_email_and_should_not_throw_exception() {
 
@@ -324,6 +325,7 @@ class OrganisationCreationRequestValidatorTest {
 
     }
 
+    //test includes email with extension 64 characters long fails test
     @Test
     void test_should_validate_valid_email_and_should_throw_exception() {
         String[] validEmails = new String[]{
