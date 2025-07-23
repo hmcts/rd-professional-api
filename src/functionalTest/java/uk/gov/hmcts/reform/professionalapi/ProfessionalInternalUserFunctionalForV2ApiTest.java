@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -91,8 +90,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     @Test
     @DisplayName("PRD Internal Test Scenarios")
     void testCreateOrganisationWithLongDomainInEmailScenario() {
-        String email = "foo@mail.b%s";
-        String userEmail = String.format(email, randomAlphanumeric(62));
+        String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
         organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
         organisationOtherOrgsCreationRequest.getSuperUser().setEmail(userEmail);
         Map<String, Object> organisationCreationResponse = professionalApiClient

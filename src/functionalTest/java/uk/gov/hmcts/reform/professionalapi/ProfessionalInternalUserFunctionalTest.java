@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -95,8 +94,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD Internal Test Scenarios")
     void testCreateOrganisationWithLongDomainInEmailScenario() {
-        String email = "foo@mail.b%s";
-        String userEmail = String.format(email, randomAlphanumeric(62));
+        String email = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
         organisationCreationRequest = createOrganisationRequest()
             .superUser(UserCreationRequest.aUserCreationRequest()
                 .firstName("firstName")
