@@ -15,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
@@ -84,6 +86,21 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
+    }
+
+
+    @Test
+    @DisplayName("PRD Internal Test Scenarios")
+    void testCreateOrganisationWithLongDomainInEmailScenario() {
+        String email = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
+        String userEmail = String.format(email, randomAlphanumeric(10));
+        organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
+        organisationOtherOrgsCreationRequest.getSuperUser().setEmail(userEmail);
+        Map<String, Object> organisationCreationResponse = professionalApiClient
+            .createOrganisation(organisationOtherOrgsCreationRequest);
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+
     }
 
     public void createOrganisationScenario() {
