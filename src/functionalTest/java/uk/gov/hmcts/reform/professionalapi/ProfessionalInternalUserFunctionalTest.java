@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -94,13 +95,19 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD Internal Test Scenarios")
     void testCreateOrganisationWithLongDomainInEmailScenario() {
-        String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
-        organisationCreationRequest = createOrganisationRequest().build();
-        organisationCreationRequest.getSuperUser().setEmail(userEmail);
-        Map<String, Object> organisationCreationResponse = professionalApiClient
-            .createOrganisation(organisationCreationRequest);
-        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        String email = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
+        String userEmail = String.format(email, randomAlphanumeric(62));
+        organisationCreationRequest = createOrganisationRequest()
+            .superUser(UserCreationRequest.aUserCreationRequest()
+                .firstName("firstName")
+                .lastName("lastName")
+                .email(userEmail)
+                .build())
+            .build();
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
+
     }
 
 
