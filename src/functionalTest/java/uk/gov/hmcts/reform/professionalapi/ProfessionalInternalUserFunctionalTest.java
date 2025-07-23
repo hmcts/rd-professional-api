@@ -95,8 +95,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD Internal Test Scenarios")
     void testCreateOrganisationWithLongDomainInEmailScenario() {
-        String email = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
-        String userEmail = String.format(email, randomAlphanumeric(10));
+        String email = "foo@mail.b%s";
+        String userEmail = String.format(email, randomAlphanumeric(62));
         organisationCreationRequest = createOrganisationRequest()
             .superUser(UserCreationRequest.aUserCreationRequest()
                 .firstName("firstName")
