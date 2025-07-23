@@ -99,7 +99,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             .superUser(UserCreationRequest.aUserCreationRequest()
                 .firstName("firstName")
                 .lastName("lastName")
-                .email(userEmail)
+                .email(email)
                 .build())
             .build();
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
