@@ -578,7 +578,21 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(rolesSize).containsAll(rolesToValidate);
     }
 
-
+    @Test
+    @DisplayName("PRD Internal Test Scenarios")
+    void testCreateOrganisationWithLongDomainInEmailScenario() {
+        String email = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
+        OrganisationCreationRequest orgCreationRequest = createOrganisationRequest()
+            .superUser(UserCreationRequest.aUserCreationRequest()
+                .firstName("firstName")
+                .lastName("lastName")
+                .email(email)
+                .build())
+            .build();
+        Map<String, Object> response = professionalApiClient.createOrganisation(orgCreationRequest);
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+    }
 
 
     @Test
