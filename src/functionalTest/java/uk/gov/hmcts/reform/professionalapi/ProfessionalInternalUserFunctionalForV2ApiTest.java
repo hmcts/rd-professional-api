@@ -87,19 +87,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
 
-    @Test
-    @DisplayName("PRD Internal Test Scenarios")
-    void testCreateOrganisationWithLongDomainInEmailScenario() {
-        String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
-        organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
-        organisationOtherOrgsCreationRequest.getSuperUser().setEmail(userEmail);
-        Map<String, Object> organisationCreationResponse = professionalApiClient
-            .createOrganisation(organisationOtherOrgsCreationRequest);
-        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
-        assertThat(organisationIdentifier).isNotEmpty();
-
-    }
-
     public void createOrganisationScenario() {
         createOrganisationWithoutS2STokenShouldReturnAuthorised();
     }
@@ -540,6 +527,17 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                         .isEqualTo("SOLICITOR_PROFILE");
             }
         });
+    }
+
+    @Test
+    @DisplayName("PRD Internal Test Scenarios")
+    void testCreateOrganisationWithLongDomainInEmailScenario() {
+        String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
+        organisationOtherOrgsCreationRequest.getSuperUser().setEmail(userEmail);
+        Map<String, Object> organisationCreationResponse = professionalApiClient
+            .createOrganisation(organisationOtherOrgsCreationRequest);
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
     }
 
 }
