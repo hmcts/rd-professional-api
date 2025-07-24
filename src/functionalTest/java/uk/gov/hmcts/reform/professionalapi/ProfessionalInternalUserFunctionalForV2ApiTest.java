@@ -86,7 +86,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
     }
 
-
     public void createOrganisationScenario() {
         createOrganisationWithoutS2STokenShouldReturnAuthorised();
     }
@@ -528,7 +527,5 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             }
         });
     }
-
-
 
 }
