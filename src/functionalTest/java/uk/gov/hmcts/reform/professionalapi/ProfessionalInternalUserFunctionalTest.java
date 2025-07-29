@@ -94,8 +94,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD Internal CreateUser with long email")
     void testInternalUserScenarioWithlongEmail() {
-        setUpTestData();
-
+        //setUpTestData();
         //String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
         String userEmail = generateRandomEmail();
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
