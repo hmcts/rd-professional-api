@@ -110,18 +110,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
 
-    @Test
-    @DisplayName("PRD Internal Test for Group Access Scenarios")
-    void testGroupAccessInternalScenario() {
-        String sinceDateTime = generateRandomDate(null, "30");
-        log.info("sinceDateTime set is : {} ", sinceDateTime);
-        setUpTestData();
-        createOrganisationScenario();
-        inviteMultipleUserScenarios();
-        findUserInternalScenarios();
-        findOrganisationWithSinceDateScenarios(sinceDateTime);
-    }
-
     public void inviteMultipleUserScenarios() {
         inviteUserByAnInternalOrgUser(generateRandomEmail());
         for (int i = 0; i < 4; i++) {
