@@ -92,14 +92,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
 
-
-
     @Test
     @DisplayName("PRD Internal CreateUser with long email")
     void testInternalUserScenarioWithlongEmail() {
         setUpTestData();
         String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
-
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
             hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
@@ -121,7 +118,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findUserInternalScenarios();
         findOrganisationWithSinceDateScenarios(sinceDateTime);
     }
-
 
     public void inviteMultipleUserScenarios() {
         inviteUserByAnInternalOrgUser(generateRandomEmail());
@@ -177,10 +173,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
 
     }
-
-
-
-
 
     public void createOrganisationScenario() {
         createOrganisationWithoutS2STokenShouldReturnAuthorised();
@@ -601,8 +593,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(rolesSize.size()).isEqualTo(rolesToValidate.size());
         assertThat(rolesSize).containsAll(rolesToValidate);
     }
-
-
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = true)
