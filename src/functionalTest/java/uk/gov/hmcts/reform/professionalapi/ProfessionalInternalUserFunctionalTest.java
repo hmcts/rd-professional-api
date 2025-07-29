@@ -92,36 +92,24 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         updateOrgStatusScenarios();
     }
 
+
     @Test
     @DisplayName("PRD Internal CreateUser with long email")
     void testInternalUserScenarioWithlongEmail() {
-        //setUpTestData();
+        setUpTestData();
+
         //String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
         String userEmail = generateRandomEmail();
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        userRoles.add("pui-case-manager");
-        userRoles.add("organisation-admin");
-        userRoles.add("caseworker");
-
-        NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
-            .firstName("myName")
-            .lastName("myLastName")
-            .email(userEmail)
-            .roles(userRoles)
-            .resendInvite(true)
-            .build();
-
-        //NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        //newUserCreationRequest.setEmail(userEmail);
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-            hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
+            hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
         invitedUserId = (String) newUserResponse.get("userIdentifier");
         log.info("inviteUserByInternalUser :: END");
 
     }
+
 
     @Test
     @DisplayName("PRD Internal Test for Group Access Scenarios")
