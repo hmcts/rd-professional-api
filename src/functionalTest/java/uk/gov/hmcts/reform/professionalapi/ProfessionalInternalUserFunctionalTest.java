@@ -92,8 +92,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
 
-
-
     @Test
     @DisplayName("PRD Internal CreateUser with long email")
     void testInternalUserScenarioWithlongEmail() {
@@ -151,7 +149,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("inviteUserByAnInternalOrgUser :: STARTED");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-            hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
         invitedUserId = (String) newUserResponse.get("userIdentifier");
@@ -163,12 +161,12 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         superUserEmail = generateRandomEmail();
         invitedUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
-            .superUser(UserCreationRequest.aUserCreationRequest()
-                .firstName("firstName")
-                .lastName("lastName")
-                .email(superUserEmail)
-                .build())
-            .build();
+                .superUser(UserCreationRequest.aUserCreationRequest()
+                        .firstName("firstName")
+                        .lastName("lastName")
+                        .email(superUserEmail)
+                        .build())
+                .build();
         intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
 
         List<String> roles = new ArrayList<>();
@@ -178,10 +176,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
 
     }
-
-
-
-
 
     public void createOrganisationScenario() {
         createOrganisationWithoutS2STokenShouldReturnAuthorised();
@@ -237,7 +231,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
         Response response = professionalApiClient.createOrganisationWithoutS2SToken(
-            OrganisationCreationRequest.anOrganisationCreationRequest().build());
+                OrganisationCreationRequest.anOrganisationCreationRequest().build());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
@@ -245,7 +239,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("inviteUserByInternalUser :: STARTED");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(invitedUserEmail);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-            hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
         invitedUserId = (String) newUserResponse.get("userIdentifier");
@@ -260,7 +254,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         roles.add("unknown");
         newUserCreationRequest.setRoles(roles);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-            hmctsAdmin, newUserCreationRequest, NOT_FOUND);
+                hmctsAdmin, newUserCreationRequest, NOT_FOUND);
         log.info("inviteUserWithInvalidRolesShouldReturnNotFound :: END");
         assertThat(newUserResponse).isNotNull();
     }
@@ -270,7 +264,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(existingUserCreationRequest.getEmail());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-            hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
         log.info("inviteUserWithDuplicateUserShouldReturnConflict :: END");
     }
@@ -278,15 +272,15 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findUsersByInternalUserWithRolesShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithRolesShouldReturnSuccess :: STARTED");
         validateRetrievedUsers(professionalApiClient
-            .searchUsersByOrganisation(intActiveOrgId, hmctsAdmin, "True",
-                OK, ""), "any", true);
+                .searchUsersByOrganisation(intActiveOrgId, hmctsAdmin, "True",
+                        OK, ""), "any", true);
         log.info("findUsersByInternalUserWithRolesShouldReturnSuccess :: END");
     }
 
     public void findByUserIdOrAndSinceDate(String sinceDate, String userId) {
         log.info("findByUserIdOrAndSinceDate :: STARTED");
         Map<String, Object> testResults = professionalApiClient
-            .retrieveUsersBySinceDateOrAndUserId(sinceDate, userId);
+                .retrieveUsersBySinceDateOrAndUserId(sinceDate, userId);
         if ((userId != null && sinceDate != null) || (userId == null && sinceDate == null)) {
             assertThat(testResults.get("errorDescription")).isEqualTo("001 missing/invalid parameter");
         } else {
@@ -301,7 +295,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findBySinceDatePageSizeOrAndSearchAfter :: STARTED");
 
         Map<String, Object> testResults = professionalApiClient
-            .retrieveUsersBySinceDatePageSizeOrAndSearchAfter(sinceDate, pageSize, searchAfter);
+                .retrieveUsersBySinceDatePageSizeOrAndSearchAfter(sinceDate, pageSize, searchAfter);
         List<HashMap> users = (List<HashMap>) testResults.get("users");
         lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
 
@@ -310,7 +304,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             validateRetrievedUsersDetails(testResults, pageSize, sinceDate);
         } else if (searchAfter != null && pageSize == null) {
             assertThat(testResults.get("errorDescription"))
-                .isEqualTo("002 missing/invalid page information");
+                    .isEqualTo("002 missing/invalid page information");
         }
         log.info("findBySinceDatePageSizeOrAndSearchAfter :: END");
     }
@@ -318,27 +312,27 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findByUserIdInvalidS2SToken(String userId) {
         log.info("findByUserIdWithInvalidS2SToken :: STARTED");
         professionalApiClient
-            .retrieveUserByUnAuthorizedS2sToken(userId);
+                .retrieveUserByUnAuthorizedS2sToken(userId);
     }
 
     public void findByUserIdNotFound(String userId) {
         log.info("findByUserIdWithInvalidS2SToken :: STARTED");
         professionalApiClient
-            .retrieveUserByIdNotFound(userId);
+                .retrieveUserByIdNotFound(userId);
     }
 
     public void findUsersByInternalUserWithoutRolesShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithoutRolesShouldReturnSuccess :: STARTED");
         validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(intActiveOrgId, hmctsAdmin,
-            "False", OK, "false"), "any", false);
+                "False", OK, "false"), "any", false);
         log.info("findUsersByInternalUserWithoutRolesShouldReturnSuccess :: END");
     }
 
     public void findUsersByInternalUserWithPaginationShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithPaginationShouldReturnSuccess :: STARTED");
         Map<String, Object> searchResponse = professionalApiClient
-            .searchUsersByOrganisationWithPagination(intActiveOrgId, hmctsAdmin, "False",
-                OK, "0", "1");
+                .searchUsersByOrganisationWithPagination(intActiveOrgId, hmctsAdmin, "False",
+                        OK, "0", "1");
 
         validateRetrievedUsers(searchResponse, "any", true);
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
@@ -346,8 +340,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(professionalUsersResponses.size()).isEqualTo(1);
 
         Map<String, Object> searchResponse2 = professionalApiClient
-            .searchUsersByOrganisationWithPagination(intActiveOrgId, hmctsAdmin, "False",
-                OK, "1", "1");
+                .searchUsersByOrganisationWithPagination(intActiveOrgId, hmctsAdmin, "False",
+                        OK, "1", "1");
 
         validateRetrievedUsers(searchResponse2, "any", true);
         List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
@@ -358,7 +352,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findOrganisationByIdByInternalUserShouldBeSuccess() {
         log.info("findOrganisationByIdByInternalUserShouldBeSuccess :: STARTED");
         var response = professionalApiClient.retrieveOrganisationDetails(
-            intActiveOrgId, hmctsAdmin, OK);
+                intActiveOrgId, hmctsAdmin, OK);
         assertThat(response).isNotNull();
         verifyOrganisationDetails(response);
         log.info("findOrganisationByIdByInternalUserShouldBeSuccess :: END");
@@ -367,16 +361,16 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findOrganisationByUserIdByInternalUserShouldBeSuccess() {
         log.info("findOrganisationByUserIdByInternalUserShouldBeSuccess :: STARTED");
         var usersByOrganisationResponse =
-            professionalApiClient.searchUsersByOrganisation(intActiveOrgId, hmctsAdmin,
-                "False", OK, "false");
+                professionalApiClient.searchUsersByOrganisation(intActiveOrgId, hmctsAdmin,
+                        "False", OK, "false");
         assertThat(usersByOrganisationResponse)
-            .isNotNull()
-            .hasSizeGreaterThanOrEqualTo(1);
+                .isNotNull()
+                .hasSizeGreaterThanOrEqualTo(1);
 
         var users = (List<Map<String, Object>>) usersByOrganisationResponse.get("users");
         var userId = (String) users.get(0).get("userIdentifier");
         var response = professionalApiClient.retrieveOrganisationByUserId(
-            userId, OK);
+                userId, OK);
 
         verifyOrganisationDetails(response);
 
@@ -395,7 +389,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findActiveOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findActiveOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
-            .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name(), hmctsAdmin);
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name(), hmctsAdmin);
         assertThat(response.size()).isPositive();
         log.info("findActiveOrganisationsByInternalUserShouldBeSuccess :: END");
     }
@@ -403,7 +397,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findPendingOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
-            .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isPositive();
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
@@ -412,7 +406,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
-            .retrieveOrganisationDetailsByStatus("ACTIVE,PENDING", hmctsAdmin);
+                .retrieveOrganisationDetailsByStatus("ACTIVE,PENDING", hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
@@ -428,9 +422,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String statusMessage = "Company in review";
 
         professionalApiClient
-            .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+                .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
         Map<String, Object> orgresponse = professionalApiClient
-            .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
+                .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
 
 
         assertThat(orgresponse.get("organisations")).isNotNull();
@@ -444,7 +438,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
-            superUserEmail.toLowerCase(), hmctsAdmin);
+                superUserEmail.toLowerCase(), hmctsAdmin);
         validatePbaResponse(orgResponse);
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: END");
     }
@@ -458,7 +452,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> orgResponse = professionalApiClient
-            .retrievePaymentAccountsByEmailFromHeader(superUserEmail.toLowerCase(), hmctsAdmin);
+                .retrievePaymentAccountsByEmailFromHeader(superUserEmail.toLowerCase(), hmctsAdmin);
         validatePbaResponse(orgResponse);
         log.info("findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess :: END");
     }
@@ -471,8 +465,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         roles.add(role1);
         userProfileUpdatedData.setRolesAdd(roles);
         Map<String, Object> modifiedUserResponse = professionalApiClient
-            .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, intActiveOrgId,
-                invitedUserId);
+                .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, intActiveOrgId,
+                        invitedUserId);
         assertThat(modifiedUserResponse).isNotNull().hasSize(3);
         assertThat(((Map) modifiedUserResponse.get("roleAdditionResponse")).get("idamStatusCode")).isEqualTo("201");
         List<String> rolesToValidate = new ArrayList<>();
@@ -493,11 +487,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         roles.add(role1);
         userProfileUpdatedData.setRolesDelete(roles);
         Map<String, Object> modifiedUserResponse = professionalApiClient
-            .modifyUserToExistingUserForPrdAdmin(
-                HttpStatus.OK, userProfileUpdatedData, intActiveOrgId, invitedUserId);
+                .modifyUserToExistingUserForPrdAdmin(
+                        HttpStatus.OK, userProfileUpdatedData, intActiveOrgId, invitedUserId);
         assertThat(modifiedUserResponse).isNotNull().hasSize(3);
         assertThat(((Map) ((List) modifiedUserResponse.get("roleDeletionResponse")).get(0)).get("idamStatusCode"))
-            .isEqualTo("204");
+                .isEqualTo("204");
         List<String> rolesToValidate = new ArrayList<>();
         rolesToValidate.add(puiUserManager);
         rolesToValidate.add(puiOrgManager);
@@ -511,9 +505,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void reinviteActiveUserShouldReturnBadRequest() {
         log.info("reinviteActiveUserShouldReturnBadRequest :: STARTED");
         NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient
-            .createReInviteUserRequest(invitedUserEmail);
+                .createReInviteUserRequest(invitedUserEmail);
         Map<String, Object> reinviteUserResponse = professionalApiClient
-            .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, reInviteUserCreationRequest, BAD_REQUEST);
+                .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, reInviteUserCreationRequest, BAD_REQUEST);
         assertThat((String) reinviteUserResponse.get("errorDescription")).contains("User is not in PENDING state");
         log.info("reinviteActiveUserShouldReturnBadRequest :: END");
     }
@@ -521,13 +515,13 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void reinviteUserWithinOneHourShouldReturnConflict() {
         log.info("reinviteUserWithinOneHourShouldReturnConflict :: STARTED");
         NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient
-            .createReInviteUserRequest(superUserEmail);
+                .createReInviteUserRequest(superUserEmail);
         Map<String, Object> reinviteUserResponse = professionalApiClient
-            .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, reInviteUserCreationRequest,
-                TOO_MANY_REQUESTS);
+                .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, reInviteUserCreationRequest,
+                        TOO_MANY_REQUESTS);
         assertThat((String) reinviteUserResponse.get("errorDescription"))
-            .contains(String.format("The request was last made less than %s minutes ago. Please try after some"
-                + " time", resendInterval));
+                .contains(String.format("The request was last made less than %s minutes ago. Please try after some"
+                        + " time", resendInterval));
         log.info("reinviteUserWithinOneHourShouldReturnConflict :: END");
     }
 
@@ -535,10 +529,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("reinviteSuperUserWithinOneHourShouldReturnTooManyRequest :: STARTED");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createReInviteUserRequest(superUserEmail);
         Map<String, Object> reinviteUserResponse = professionalApiClient
-            .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, newUserCreationRequest, TOO_MANY_REQUESTS);
+                .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, newUserCreationRequest, TOO_MANY_REQUESTS);
         assertThat((String) reinviteUserResponse.get("errorDescription"))
-            .contains(String.format("The request was last made less than %s minutes ago. Please try after "
-                + "some time", resendInterval));
+                .contains(String.format("The request was last made less than %s minutes ago. Please try after "
+                        + "some time", resendInterval));
         log.info("reinviteSuperUserWithinOneHourShouldReturnTooManyRequest :: END");
     }
 
@@ -554,14 +548,14 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         PbaRequest pbaEditRequest = new PbaRequest();
         pbaEditRequest.setPaymentAccounts(paymentAccountsEdit);
         Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(
-            pbaEditRequest, intActiveOrgId, hmctsAdmin);
+                pbaEditRequest, intActiveOrgId, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();
 
         JsonPath response = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
         assertThat(response).isNotNull();
         assertThat(response.getList("paymentAccount")).contains(oldPba.toUpperCase())
-            .contains(pba1.toUpperCase())
-            .contains(pba2.toUpperCase());
+                .contains(pba1.toUpperCase())
+                .contains(pba2.toUpperCase());
         log.info("editPaymentAccountsShouldReturnSuccess :: END");
     }
 
@@ -594,7 +588,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void validateRoles(List<String> rolesToValidate) {
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(
-            intActiveOrgId, hmctsAdmin, HttpStatus.OK);
+                intActiveOrgId, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses1 = (List<Map>) searchResponse.get("users");
         Map professionalUsersResponse1 = getActiveUser(professionalUsersResponses1);
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
@@ -602,8 +596,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(rolesSize.size()).isEqualTo(rolesToValidate.size());
         assertThat(rolesSize).containsAll(rolesToValidate);
     }
-
-
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = true)
@@ -616,7 +608,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("updateOrgMFAShouldBeSuccess :: STARTED");
 
         Map<String, Object> searchResponse = professionalApiClient
-            .searchOrganisationUsersByStatusInternal(intActiveOrgId, hmctsAdmin, OK);
+                .searchOrganisationUsersByStatusInternal(intActiveOrgId, hmctsAdmin, OK);
         List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
         String superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
 
@@ -679,15 +671,15 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findOrganisationByPbaStatusShouldBeSuccess :: STARTED");
 
         var orgsResponse = (List<OrganisationsWithPbaStatusResponse>)
-            professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
+                professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
 
         assertNotNull(orgsResponse);
         assertThat(orgsResponse.size()).isPositive();
         assertThat(orgsResponse.stream()
-            .filter(p -> p.getPbaNumbers().stream()
-                .anyMatch(r -> r.getStatusMessage() == null || !r.getStatusMessage()
-                    .equals(PBA_STATUS_MESSAGE_ACCEPTED))))
-            .allSatisfy(org -> org.getStatus().isActive());
+                .filter(p -> p.getPbaNumbers().stream()
+                        .anyMatch(r -> r.getStatusMessage() == null || !r.getStatusMessage()
+                                .equals(PBA_STATUS_MESSAGE_ACCEPTED))))
+                .allSatisfy(org -> org.getStatus().isActive());
         assertThat(orgsResponse.stream().filter(o -> o.getSuperUser() != null)).hasSizeGreaterThan(0);
 
         var pbaByStatusResponses = new ArrayList<FetchPbaByStatusResponse>();
@@ -719,7 +711,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpTestData();
 
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
-            superUserEmail.toLowerCase(), hmctsAdmin);
+                superUserEmail.toLowerCase(), hmctsAdmin);
 
         List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
 
@@ -733,16 +725,16 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         updatePbaRequest.setPbaRequestList(pbaRequestList);
 
         Map<String, Object> updatePbaResponse =
-            professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
+                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNull();
 
         Map<String, Object> orgResponse1 = professionalApiClient.retrievePaymentAccountsByEmail(
-            superUserEmail.toLowerCase(), hmctsAdmin);
+                superUserEmail.toLowerCase(), hmctsAdmin);
 
         List<String> updatedPbaList =
-            (List) ((Map) orgResponse1.get("organisationEntityResponse")).get("paymentAccount");
+                (List) ((Map) orgResponse1.get("organisationEntityResponse")).get("paymentAccount");
 
         assertThat(updatedPbaList).doesNotContain(orgPba);
 
@@ -756,7 +748,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpTestData();
 
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
-            superUserEmail.toLowerCase(), hmctsAdmin);
+                superUserEmail.toLowerCase(), hmctsAdmin);
         List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
 
         List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
@@ -770,7 +762,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         updatePbaRequest.setPbaRequestList(pbaRequestList);
 
         Map<String, Object> updatePbaResponse =
-            professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
+                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNotNull();
@@ -778,7 +770,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         List pbaResponses = (List) updatePbaResponse.get("pbaUpdateStatusResponses");
         assertThat(pbaResponses.size()).isEqualTo(2);
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
-            .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
+                .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
 
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: END");
     }
@@ -873,7 +865,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String statusMessage = "Company in review";
 
         professionalApiClient
-            .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+                .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
 
         JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
         assertEquals(REVIEW.toString(), orgResponse.get("status"));
@@ -882,76 +874,76 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, NO_CONTENT);
 
         professionalApiClient
-            .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
+                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
     }
 
     private static void verifyOrganisationDetails(JsonPath response) {
 
         String companyUrl = response.get("companyUrl");
         assertThat(companyUrl)
-            .isNotNull()
-            .endsWith("-prd-func-test-company-url");
+                .isNotNull()
+                .endsWith("-prd-func-test-company-url");
 
         String organisationIdentifier = response.get("organisationIdentifier");
         assertThat(organisationIdentifier)
-            .isNotNull();
+                .isNotNull();
 
         Map<String, String> superUser = response.get("superUser");
         assertThat(superUser)
-            .isNotNull();
+                .isNotNull();
 
         String firstName = superUser.get("firstName");
         assertThat(firstName)
-            .isNotNull()
-            .isEqualTo("firstName");
+                .isNotNull()
+                .isEqualTo("firstName");
 
         String lastName = superUser.get("lastName");
         assertThat(lastName)
-            .isNotNull()
-            .endsWith("lastName");
+                .isNotNull()
+                .endsWith("lastName");
 
         String email = superUser.get("email");
         assertThat(email)
-            .isNotNull()
-            .endsWith("@prdfunctestuser.com");
+                .isNotNull()
+                .endsWith("@prdfunctestuser.com");
 
         String sraId = response.get("sraId");
         assertThat(sraId)
-            .isNotNull()
-            .endsWith("-prd-func-test-sra-id");
+                .isNotNull()
+                .endsWith("-prd-func-test-sra-id");
 
         String companyNumber = response.get("companyNumber");
         assertThat(companyNumber)
-            .isNotNull()
-            .endsWith("com");
+                .isNotNull()
+                .endsWith("com");
 
         String dateReceived = response.get("dateReceived");
         assertThat(dateReceived)
-            .isNotNull();
+                .isNotNull();
 
         String dateApproved = response.get("dateApproved");
         assertThat(dateApproved)
-            .isNotNull();
+                .isNotNull();
 
         String name = response.get("name");
         assertThat(name)
-            .isNotNull()
-            .endsWith("-prd-func-test-name");
+                .isNotNull()
+                .endsWith("-prd-func-test-name");
 
         Boolean sraRegulated = response.get("sraRegulated");
         assertThat(sraRegulated)
-            .isNotNull()
-            .isEqualTo(false);
+                .isNotNull()
+                .isEqualTo(false);
 
         String status = response.get("status");
         assertThat(status)
-            .isNotNull()
-            .isEqualTo("ACTIVE");
+                .isNotNull()
+                .isEqualTo("ACTIVE");
 
         List<String> pendingPaymentAccount = response.getList("pendingPaymentAccount");
         assertThat(pendingPaymentAccount)
-            .isNotNull()
-            .isEmpty();
+                .isNotNull()
+                .isEmpty();
 
         verifyContactInformationDetails(response);
     }
@@ -965,7 +957,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                                                                    String pageSize) {
         log.info("findOrganisationBySinceDateInternalShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.retrieveOrganisationDetailsBySinceDate(
-            sinceDate, page, pageSize);
+                sinceDate, page, pageSize);
         assertThat(response).isNotNull();
         verifyOrganisationDetailsBySinceDate(response, pageSize, sinceDate);
         log.info("findOrganisationBySinceDateInternalShouldBeSuccess :: END");
@@ -977,25 +969,25 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         List<HashMap> organisations = (List<HashMap>) response.get("organisations");
 
         assertThat(organisations)
-            .isNotNull()
-            .isNotEmpty();
+                .isNotNull()
+                .isNotEmpty();
 
         if (pageSize != null) {
             assertThat(organisations)
-                .hasSize(Integer.parseInt(pageSize));
+                    .hasSize(Integer.parseInt(pageSize));
         }
         assertThat(response.get("moreAvailable"))
-            .isNotNull();
+                .isNotNull();
 
         LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
 
         organisations.forEach(org -> {
 
             assertThat(org.get("organisationIdentifier"))
-                .isNotNull();
+                    .isNotNull();
 
             assertThat(org.get("lastUpdated"))
-                .isNotNull();
+                    .isNotNull();
 
             String dateString = (String) org.get("lastUpdated");
             String formattedDateString = DateUtils.formatDateString(dateString);
@@ -1007,11 +999,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             if (organisationProfileIds != null) {
 
                 assertThat(organisationProfileIds)
-                    .isNotEmpty()
-                    .hasSizeGreaterThan(0);
+                        .isNotEmpty()
+                        .hasSizeGreaterThan(0);
 
                 assertThat(organisationProfileIds.get(0))
-                    .isEqualTo("SOLICITOR_PROFILE");
+                        .isEqualTo("SOLICITOR_PROFILE");
             }
         });
     }
@@ -1022,25 +1014,25 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         List<HashMap> organisations = (List<HashMap>) response.get("organisations");
 
         assertThat(organisations)
-            .isNotNull()
-            .isNotEmpty();
+                .isNotNull()
+                .isNotEmpty();
 
         if (pageSize != null) {
             assertThat(organisations)
-                .hasSize(Integer.parseInt(pageSize));
+                    .hasSize(Integer.parseInt(pageSize));
         }
         assertThat(response.get("moreAvailable"))
-            .isNotNull();
+                .isNotNull();
 
         LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
 
         organisations.forEach(org -> {
 
             assertThat(org.get("organisationIdentifier"))
-                .isNotNull();
+                    .isNotNull();
 
             assertThat(org.get("lastUpdated"))
-                .isNotNull();
+                    .isNotNull();
 
             String dateString = (String) org.get("lastUpdated");
             String formattedDateString = DateUtils.formatDateString(dateString);
@@ -1049,11 +1041,11 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
             List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
             assertThat(organisationProfileIds)
-                .isNotEmpty()
-                .hasSizeGreaterThan(0);
+                    .isNotEmpty()
+                    .hasSizeGreaterThan(0);
 
             assertThat(organisationProfileIds.get(0))
-                .isEqualTo("SOLICITOR_PROFILE");
+                    .isEqualTo("SOLICITOR_PROFILE");
         });
     }
 
@@ -1062,8 +1054,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         List<Map<String, Object>> contactInformation = response.getList("contactInformation");
         assertThat(contactInformation)
-            .isNotNull()
-            .hasSize(2);
+                .isNotNull()
+                .hasSize(2);
 
         contactInformation = sortByValue(contactInformation, "addressLine1");
 
@@ -1072,61 +1064,61 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         String firstAddressUprn = (String) contactInformation1.get("uprn");
         assertThat(firstAddressUprn)
-            .isNotNull()
-            .isEqualTo("uprn");
+                .isNotNull()
+                .isEqualTo("uprn");
 
         String firstAddressCountry = (String) contactInformation1.get("country");
         assertThat(firstAddressCountry)
-            .isNotNull()
-            .isEqualTo("some-country");
+                .isNotNull()
+                .isEqualTo("some-country");
 
         String firstAddressCreated = (String) contactInformation1.get("created");
         assertThat(firstAddressCreated)
-            .isNotNull();
+                .isNotNull();
 
         String firstAddressTownCity = (String) contactInformation1.get("townCity");
         assertThat(firstAddressTownCity)
-            .isNotNull()
-            .isEqualTo("some-town-city");
+                .isNotNull()
+                .isEqualTo("some-town-city");
 
         String firstAddressCounty = (String) contactInformation1.get("county");
         assertThat(firstAddressCounty)
-            .isNotNull()
-            .isEqualTo("some-county");
+                .isNotNull()
+                .isEqualTo("some-county");
 
         String firstAddressAddressLine1 = (String) contactInformation1.get("addressLine1");
         assertThat(firstAddressAddressLine1)
-            .isNotNull()
-            .isEqualTo("addLine1");
+                .isNotNull()
+                .isEqualTo("addLine1");
 
         assertThat(firstAddressCountry)
-            .isNotNull()
-            .isEqualTo("some-country");
+                .isNotNull()
+                .isEqualTo("some-country");
 
         String firstAddressAddressLine2 = (String) contactInformation1.get("addressLine2");
         assertThat(firstAddressAddressLine2)
-            .isNotNull()
-            .isEqualTo("addLine2");
+                .isNotNull()
+                .isEqualTo("addLine2");
 
         String firstAddressPostCode1 = (String) contactInformation1.get("postCode");
         assertThat(firstAddressPostCode1)
-            .isNotNull()
-            .isEqualTo("some-post-code");
+                .isNotNull()
+                .isEqualTo("some-post-code");
 
         String firstAddressAddressLine3 = (String) contactInformation1.get("addressLine3");
         assertThat(firstAddressAddressLine3)
-            .isNotNull()
-            .isEqualTo("addLine3");
+                .isNotNull()
+                .isEqualTo("addLine3");
 
         String firstAddressAddressId = (String) contactInformation1.get("addressId");
         assertThat(firstAddressAddressId)
-            .isNotNull();
+                .isNotNull();
 
         List<Map<String, Object>> firstAddressDxAddress =
-            (List<Map<String, Object>>) contactInformation1.get("dxAddress");
+                (List<Map<String, Object>>) contactInformation1.get("dxAddress");
         assertThat(firstAddressDxAddress)
-            .isNotNull()
-            .hasSize(2);
+                .isNotNull()
+                .hasSize(2);
 
         firstAddressDxAddress = sortByValue(firstAddressDxAddress, "dxNumber");
 
@@ -1135,77 +1127,77 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         Object firstAddressDxNumber1 = firstAddressDxAddress1.get("dxNumber");
         assertThat(firstAddressDxNumber1)
-            .isNotNull()
-            .isEqualTo("DX 123452222");
+                .isNotNull()
+                .isEqualTo("DX 123452222");
 
         Object firstAddressDxExchange1 = firstAddressDxAddress1.get("dxExchange");
         assertThat(firstAddressDxExchange1)
-            .isNotNull()
-            .isEqualTo("dxExchange");
+                .isNotNull()
+                .isEqualTo("dxExchange");
 
         Object firstAddressDxNumber2 = firstAddressDxAddress2.get("dxNumber");
         assertThat(firstAddressDxNumber2)
-            .isNotNull()
-            .isEqualTo("DX 123456333");
+                .isNotNull()
+                .isEqualTo("DX 123456333");
 
         Object firstAddressDxExchange2 = firstAddressDxAddress2.get("dxExchange");
         assertThat(firstAddressDxExchange2)
-            .isNotNull()
-            .isEqualTo("dxExchange");
+                .isNotNull()
+                .isEqualTo("dxExchange");
 
         String secondAddressUprn = (String) contactInformation2.get("uprn");
         assertThat(secondAddressUprn)
-            .isNotNull()
-            .isEqualTo("uprn1");
+                .isNotNull()
+                .isEqualTo("uprn1");
 
         String secondAddressCountry = (String) contactInformation2.get("country");
         assertThat(secondAddressCountry)
-            .isNotNull()
-            .isEqualTo("some-country");
+                .isNotNull()
+                .isEqualTo("some-country");
 
         String secondAddressCreated = (String) contactInformation2.get("created");
         assertThat(secondAddressCreated)
-            .isNotNull();
+                .isNotNull();
 
         String secondAddressTownCity = (String) contactInformation2.get("townCity");
         assertThat(secondAddressTownCity)
-            .isNotNull()
-            .isEqualTo("some-town-city");
+                .isNotNull()
+                .isEqualTo("some-town-city");
 
         String secondAddressCounty = (String) contactInformation2.get("county");
         assertThat(secondAddressCounty)
-            .isNotNull()
-            .isEqualTo("some-county");
+                .isNotNull()
+                .isEqualTo("some-county");
 
         String secondAddressAddressLine1 = (String) contactInformation2.get("addressLine1");
         assertThat(secondAddressAddressLine1)
-            .isNotNull()
-            .isEqualTo("addressLine1");
+                .isNotNull()
+                .isEqualTo("addressLine1");
 
         String secondAddressAddressLine2 = (String) contactInformation2.get("addressLine2");
         assertThat(secondAddressAddressLine2)
-            .isNotNull()
-            .isEqualTo("addressLine2");
+                .isNotNull()
+                .isEqualTo("addressLine2");
 
         String secondAddressPostCode = (String) contactInformation2.get("postCode");
         assertThat(secondAddressPostCode)
-            .isNotNull()
-            .isEqualTo("some-post-code");
+                .isNotNull()
+                .isEqualTo("some-post-code");
 
         String secondAddressAddressLine3 = (String) contactInformation2.get("addressLine3");
         assertThat(secondAddressAddressLine3)
-            .isNotNull()
-            .isEqualTo("addressLine3");
+                .isNotNull()
+                .isEqualTo("addressLine3");
 
         String secondAddressAddressId = (String) contactInformation2.get("addressId");
         assertThat(secondAddressAddressId)
-            .isNotNull();
+                .isNotNull();
 
         List<Map<String, Object>> secondAddressDxAddress =
-            (List<Map<String, Object>>) contactInformation2.get("dxAddress");
+                (List<Map<String, Object>>) contactInformation2.get("dxAddress");
         assertThat(secondAddressDxAddress)
-            .isNotNull()
-            .hasSize(3);
+                .isNotNull()
+                .hasSize(3);
 
         secondAddressDxAddress = sortByValue(secondAddressDxAddress, "dxNumber");
 
@@ -1215,40 +1207,40 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         Object secondAddressDxNumber1 = secondAddressDxAddress1.get("dxNumber");
         assertThat(secondAddressDxNumber1)
-            .isNotNull()
-            .isEqualTo("DX 123456777");
+                .isNotNull()
+                .isEqualTo("DX 123456777");
 
         Object secondAddressDxExchange1 = secondAddressDxAddress1.get("dxExchange");
         assertThat(secondAddressDxExchange1)
-            .isNotNull()
-            .isEqualTo("dxExchange");
+                .isNotNull()
+                .isEqualTo("dxExchange");
 
         Object secondAddressDxNumber2 = secondAddressDxAddress2.get("dxNumber");
         assertThat(secondAddressDxNumber2)
-            .isNotNull()
-            .isEqualTo("DX 123456788");
+                .isNotNull()
+                .isEqualTo("DX 123456788");
 
         Object secondAddressDxExchange2 = secondAddressDxAddress2.get("dxExchange");
         assertThat(secondAddressDxExchange2)
-            .isNotNull()
-            .isEqualTo("dxExchange");
+                .isNotNull()
+                .isEqualTo("dxExchange");
 
         Object secondAddressDxNumber3 = secondAddressDxAddress3.get("dxNumber");
         assertThat(secondAddressDxNumber3)
-            .isNotNull()
-            .isEqualTo("DX 1234567890");
+                .isNotNull()
+                .isEqualTo("DX 1234567890");
 
         Object secondAddressDxExchange3 = secondAddressDxAddress3.get("dxExchange");
         assertThat(secondAddressDxExchange3)
-            .isNotNull()
-            .isEqualTo("dxExchange");
+                .isNotNull()
+                .isEqualTo("dxExchange");
     }
 
     private static List<Map<String, Object>> sortByValue(final List<Map<String, Object>> maps,
                                                          final String key) {
         return maps
-            .stream()
-            .sorted(Comparator.comparing(map -> (String) map.get(key)))
-            .collect(Collectors.toList());
+                .stream()
+                .sorted(Comparator.comparing(map -> (String) map.get(key)))
+                .collect(Collectors.toList());
     }
 }
