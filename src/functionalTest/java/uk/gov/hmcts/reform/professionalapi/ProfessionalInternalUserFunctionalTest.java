@@ -92,6 +92,23 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @DisplayName("PRD Internal CreateUser with long email")
+    void testInternalUserScenarioWithlongEmail() {
+        setUpTestData();
+
+        //String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
+        String userEmail = generateRandomEmail();
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
+            hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        invitedUserId = (String) newUserResponse.get("userIdentifier");
+        log.info("inviteUserByInternalUser :: END");
+
+    }
+
+    @Test
     @DisplayName("PRD Internal Test for Group Access Scenarios")
     void testGroupAccessInternalScenario() {
         String sinceDateTime = generateRandomDate(null, "30");
@@ -159,23 +176,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
 
-    @Test
-    @DisplayName("PRD Internal CreateUser with long email")
-    void testInternalUserScenarioWithlongEmail() {
-        createOrganisationScenario();
-        //String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
-        String userEmail = generateRandomEmail();
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
-        //newUserCreationRequest.setEmail(userEmail);
-        //newUserCreationRequest.setResendInvite(true);
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-            hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
-        assertThat(newUserResponse).isNotNull();
-        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
-        invitedUserId = (String) newUserResponse.get("userIdentifier");
-        log.info("inviteUserByInternalUser :: END");
 
-    }
 
 
     public void createOrganisationScenario() {
