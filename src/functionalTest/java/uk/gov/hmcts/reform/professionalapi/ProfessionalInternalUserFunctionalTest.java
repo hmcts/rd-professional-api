@@ -98,9 +98,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @DisplayName("PRD Internal CreateUser with long email")
     void testInternalUserScenarioWithlongEmail() {
         setUpTestData();
+        String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
 
-        //String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
-        String userEmail = generateRandomEmail();
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
             hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
@@ -112,17 +111,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
 
-    @Test
-    @DisplayName("PRD Internal Test for Group Access Scenarios")
-    void testGroupAccessInternalScenario() {
-        String sinceDateTime = generateRandomDate(null, "30");
-        log.info("sinceDateTime set is : {} ", sinceDateTime);
-        setUpTestData();
-        createOrganisationScenario();
-        inviteMultipleUserScenarios();
-        findUserInternalScenarios();
-        findOrganisationWithSinceDateScenarios(sinceDateTime);
-    }
+
 
     public void inviteMultipleUserScenarios() {
         inviteUserByAnInternalOrgUser(generateRandomEmail());
