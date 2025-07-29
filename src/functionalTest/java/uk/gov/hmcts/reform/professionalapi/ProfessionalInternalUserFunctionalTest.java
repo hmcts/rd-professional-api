@@ -168,6 +168,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         String userEmail = generateRandomEmail();
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(userEmail);
+        newUserCreationRequest.setResendInvite(true);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
             hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
         assertThat(newUserResponse).isNotNull();
