@@ -158,8 +158,15 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     }
 
-
-
+    
+    @Test
+    @DisplayName("PRD Internal CreateUser with long email")
+    void testInternalUserScenarioWithlongEmail() {
+        setUpTestData();
+        createOrganisationScenario();
+        inviteUserScenarios();
+    }
+    
 
     public void createOrganisationScenario() {
         createOrganisationWithoutS2STokenShouldReturnAuthorised();
