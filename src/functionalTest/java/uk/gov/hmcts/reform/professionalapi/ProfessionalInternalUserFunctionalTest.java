@@ -96,11 +96,24 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @DisplayName("PRD Internal CreateUser with long email")
     void testInternalCreateUserWithlongEmail() {
         log.info("testInternalCreateUserWithlongEmail set is ::: STARTED");
-        setUpTestData();
+        OrganisationCreationRequest orgRequest = createOrganisationRequest()
+            .superUser(UserCreationRequest.aUserCreationRequest()
+                .firstName("fName")
+                .lastName("lName")
+                .email(generateRandomEmail())
+                .build())
+            .build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(orgRequest);
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        OrganisationCreationRequest orgNewRequest = createOrganisationRequest().status("ACTIVE").build();
+        professionalApiClient.updateOrganisation(orgNewRequest, hmctsAdmin, organisationIdentifier, OK);
+
         String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
             hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
@@ -178,6 +191,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
 
     }
+
 
     public void createOrganisationScenario() {
         createOrganisationWithoutS2STokenShouldReturnAuthorised();
