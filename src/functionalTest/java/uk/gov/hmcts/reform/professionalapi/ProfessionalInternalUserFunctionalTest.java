@@ -95,7 +95,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("PRD Internal CreateUser with long email")
     void testInternalCreateUserWithlongEmail() {
-        log.info("testInternalCreateUserWithlongEmail set is ::: STARTED");
+        log.info("testInternalCreateUserWithlongEmail  ::: STARTED");
         OrganisationCreationRequest orgRequest = createOrganisationRequest()
             .superUser(UserCreationRequest.aUserCreationRequest()
                 .firstName("fName")
@@ -115,9 +115,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
             hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
         invitedUserId = (String) newUserResponse.get("userIdentifier");
+        assertThat(newUserResponse).isNotNull();
+        assertThat(invitedUserId).isNotNull();
         log.info("testInternalCreateUserWithlongEmail :: END");
 
     }
