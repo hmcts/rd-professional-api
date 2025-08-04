@@ -110,7 +110,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationCreationRequest orgNewRequest = createOrganisationRequest().status("ACTIVE").build();
         professionalApiClient.updateOrganisation(orgNewRequest, hmctsAdmin, organisationIdentifier, OK);
 
-        String userEmail = "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY";
+        String userEmail = "foo1@mail.bananarepublicfsZZEDdfdffdSDRFGTYOOOOOOOOkloiuytrewqasdfghjkLIU";
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
