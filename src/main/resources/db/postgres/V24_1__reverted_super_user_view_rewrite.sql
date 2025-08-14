@@ -1,1 +1,1 @@
-drop if exists dbrefdata.super_user_view;
+drop view if exists dbrefdata.super_user_view;
