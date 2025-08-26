@@ -16,10 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_1;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_2;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_3;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIND_BY_PBA_STATUS_4;
+
 
 @Repository
 public interface OrganisationRepository extends JpaRepository<Organisation, UUID> {
@@ -29,9 +26,9 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     Organisation findByOrganisationIdentifier(String id);
 
     @Query(value = "SELECT * FROM dbrefdata.organisation o WHERE "
-            + "((COALESCE(:orgTypes) IS NULL OR o.org_type IN (:orgTypes)) "
+            + "((:orgTypes IS NULL OR CARDINALITY(:orgTypes) = 0 OR o.org_type = ANY(CAST(:orgTypes AS text[]))) "
             + "OR (:includeV1Orgs = TRUE AND o.org_type IS NULL)) "
-            + "AND (COALESCE(:searchAfter) IS NULL OR o.id > :searchAfter) "
+            + "AND (:searchAfter IS NULL OR o.id > :searchAfter) "
             + "ORDER BY o.id ASC", nativeQuery = true)
     Page<Organisation> findByOrgTypeIn(@Param("orgTypes") List<String> orgTypes,
                                        @Param("searchAfter") UUID searchAfter,
@@ -65,6 +62,7 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findByLastUpdatedGreaterThanEqual(LocalDateTime since);
 
-    @Query(FIND_BY_PBA_STATUS_1 + FIND_BY_PBA_STATUS_2 + FIND_BY_PBA_STATUS_3 + FIND_BY_PBA_STATUS_4)
+    @Query("SELECT DISTINCT o FROM Organisation o JOIN FETCH o.paymentAccounts p "
+            + "WHERE p.pbaStatus = :pbaStatus ORDER BY p.created ASC")
     List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
 }
