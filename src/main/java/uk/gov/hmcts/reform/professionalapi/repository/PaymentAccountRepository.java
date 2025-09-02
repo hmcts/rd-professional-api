@@ -22,6 +22,6 @@ public interface PaymentAccountRepository extends JpaRepository<PaymentAccount, 
     List<PaymentAccount> findByPbaNumberIn(Set<String> pbaNumbers);
 
     @Modifying
-    @Query("DELETE FROM PaymentAccount p WHERE UPPER(p.pbaNumber) = UPPER(:pbaNumber)")
-    void deleteByPbaNumberUpperCase(@Param("pbaNumber") String pbaNumber);
+    @Query("DELETE FROM PaymentAccount p WHERE UPPER(p.pbaNumber) IN :pbaNumbers")
+    void deleteByPbaNumberUpperCase(@Param("pbaNumbers") List<String> pbaNumbers);
 }
