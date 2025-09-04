@@ -343,7 +343,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.18.2', ext: 'pom'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
-    implementation 'com.github.hmcts:idam-java-client:3.0.3'
+    implementation 'com.github.hmcts:idam-java-client:3.0.4'
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
