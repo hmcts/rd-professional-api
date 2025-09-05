@@ -38,7 +38,6 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -188,7 +187,7 @@ class PaymentAccountServiceImplTest {
     void testDeletePaymentAccountsFromOrganisationTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.deletePaymentsOfOrganisation(pbaDeleteRequest, organisation);
-        verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
+        verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anyList());
     }
 
     @Test

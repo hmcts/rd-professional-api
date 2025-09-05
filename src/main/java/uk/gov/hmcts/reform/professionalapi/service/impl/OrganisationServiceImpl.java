@@ -250,9 +250,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public void deletePaymentsOfOrganisation(Set<String> paymentAccounts, Organisation organisation) {
-        final Set<String> paymentAccountsUpper = paymentAccounts.stream()
+        final List<String> paymentAccountsUpper = paymentAccounts.stream()
                 .map(String::toUpperCase)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         paymentAccountRepository.deleteByPbaNumberUpperCase(paymentAccountsUpper);
     }

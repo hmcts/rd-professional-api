@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -164,7 +165,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         when(organisationMock.getPaymentAccounts()).thenReturn(List.of(paymentAccount));
 
         when(paymentAccountRepositoryMock.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
-        doNothing().when(paymentAccountRepositoryMock).deleteByPbaNumberUpperCase(anySet());
+        doNothing().when(paymentAccountRepositoryMock).deleteByPbaNumberUpperCase(anyList());
     }
 
     private ProfessionalUser getProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
