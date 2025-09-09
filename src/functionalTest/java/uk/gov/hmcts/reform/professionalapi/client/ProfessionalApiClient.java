@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -1313,6 +1314,21 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(expectedStatus.value());
+    }
+
+    public Response updatesOrganisationSra(OrganisationSraUpdateRequest organisationSraUpdateRequest,
+                                            String role,
+                                            HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+            .body(organisationSraUpdateRequest)
+            .put("/refdata/internal/v2/organisations/sra")
+            .andReturn();
+
+        log.info("{}:: Update organisation Sra id  response: {}",
+            loggingComponentName, response.getStatusCode());
+
+        return response;
     }
 
     public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {
