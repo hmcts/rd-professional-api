@@ -71,18 +71,13 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         Organisation organisation = null;
         List<PaymentAccount> paymentAccountsEntity;
 
-        if (null != user) {
-            if (user.getOrganisation() != null && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
-                paymentAccountsEntity = RefDataUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
-                user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
-                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(),
-                        userProfileFeignClient, false));
-                organisation = user.getOrganisation();
-            } else {
-                log.info("User found but either has no organisation or organisation is not active: {}", email);
-            }
-        } else {
-            log.info("No user found with email: {}", email);
+        if (null != user && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
+
+            paymentAccountsEntity = RefDataUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
+            user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
+            user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(),
+                    userProfileFeignClient, false));
+            organisation = user.getOrganisation();
         }
         return organisation;
     }
