@@ -35,8 +35,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     @Query(value = """
        SELECT pu.* FROM dbrefdata.professional_user pu
        INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
-       WHERE (:organisationIdentifiers IS NULL OR CARDINALITY(:organisationIdentifiers) = 0
-       OR organisation.organisation_identifier = ANY(CAST(:organisationIdentifiers AS text[])))
+       WHERE (:organisationIdentifiers IS NULL OR organisation.organisation_identifier IN (:organisationIdentifiers))
        ORDER BY pu.organisation_id, pu.id
         """, nativeQuery = true)
     Page<ProfessionalUser> findUsersInOrganisations(
@@ -45,8 +44,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     @Query(value = """
        SELECT pu.* FROM dbrefdata.professional_user pu
        INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
-       WHERE (:organisationIdentifiers IS NULL OR CARDINALITY(:organisationIdentifiers) = 0
-       OR organisation.organisation_identifier = ANY(CAST(:organisationIdentifiers AS text[])))
+       WHERE (:organisationIdentifiers IS NULL OR organisation.organisation_identifier IN (:organisationIdentifiers))
        AND (
            (organisation.Id = :searchAfterOrgId AND pu.Id > :searchAfterUserId)
            OR (organisation.Id > :searchAfterOrgId)
