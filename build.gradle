@@ -355,7 +355,7 @@ dependencies {
     runtimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '10.22.0'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
 
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.0-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
 
     implementation group: 'jakarta.el', name: 'jakarta.el-api', version: '6.0.1'
 
@@ -449,7 +449,7 @@ dependencies {
     testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.0'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.4'
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
