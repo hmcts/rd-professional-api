@@ -26,7 +26,7 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     Organisation findByOrganisationIdentifier(String id);
 
     @Query(value = "SELECT * FROM dbrefdata.organisation o WHERE "
-            + "((:orgTypes IS NULL OR CARDINALITY(:orgTypes) = 0 OR o.org_type = ANY(CAST(:orgTypes AS text[]))) "
+            + "((:orgTypes IS NULL OR o.org_type IN (:orgTypes)) "
             + "OR (:includeV1Orgs = TRUE AND o.org_type IS NULL)) "
             + "AND (:searchAfter IS NULL OR o.id > :searchAfter) "
             + "ORDER BY o.id ASC", nativeQuery = true)
