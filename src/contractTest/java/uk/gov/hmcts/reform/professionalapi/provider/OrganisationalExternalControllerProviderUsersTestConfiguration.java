@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 @Configuration
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalExternalControllerProviderUsersTestConfiguration extends ProviderTestConfiguration {
 
     @MockBean
