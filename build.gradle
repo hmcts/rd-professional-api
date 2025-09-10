@@ -380,7 +380,7 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '3.10'
     implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
     implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.10.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.14.0'
     implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.2.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.10.0'
