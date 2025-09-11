@@ -22,7 +22,7 @@ ext {
 }
 
 def versions = [
-        lombok          : '1.18.36',
+        lombok          : '1.18.40',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
         reformLogging   : '6.1.9',
@@ -353,7 +353,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.22.0'
     runtimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '10.22.0'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
 
     implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
 
@@ -380,7 +380,7 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '3.10'
     implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
     implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.10.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.14.0'
     implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.2.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.10.0'
