@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 
 @Configuration
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalInternalControllerV2ProviderTestConfiguration extends ProviderTestConfiguration {
 
     @MockBean

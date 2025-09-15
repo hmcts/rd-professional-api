@@ -5,7 +5,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
@@ -105,9 +108,18 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
     void returns_204_when_delete_active_organisation_with_one_pending_user_profile() {
 
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
-        String orgIdentifier = createAndActivateOrganisation();
+        String orgIdentifier = createOrganisationRequest();
         getUserProfileByEmailWireMock(HttpStatus.resolve(200));
         deleteUserProfileMock(HttpStatus.resolve(204));
+
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
+            .status("ACTIVE").build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, "hmctsAdmin", orgIdentifier);
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgIdentifier);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        users.get(0).setOrganisation(organisation);
+
         Map<String, Object> deleteResponse =
             professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
         assertThat(deleteResponse.get("http_status")).isEqualTo(204);

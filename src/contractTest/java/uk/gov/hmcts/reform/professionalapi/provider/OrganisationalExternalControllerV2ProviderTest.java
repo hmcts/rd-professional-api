@@ -49,6 +49,7 @@ import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalExternalPbasV2")
 @Import(OrganisationalExternalControllerV2ProviderTestConfiguration.class)
+@SuppressWarnings({"deprecation", "removal"})
 public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProviderTest {
 
     public static final String A_CLAIM = "aClaim";

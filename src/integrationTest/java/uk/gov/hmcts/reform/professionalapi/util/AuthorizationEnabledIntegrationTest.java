@@ -16,13 +16,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -177,10 +177,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String USER_ACCESS_TYPES = "userAccessTypes";
     public static final String APPLICATION_JSON = "application/json";
 
-    @MockBean
+    @MockitoBean
     protected FeatureToggleServiceImpl featureToggleService;
 
-    @MockBean
+    @MockitoBean
     protected JwtDecoder jwtDecoder;
 
     @BeforeEach

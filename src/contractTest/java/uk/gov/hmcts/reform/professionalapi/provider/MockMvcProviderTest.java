@@ -7,6 +7,7 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.BaseProviderTest;
 
 @TestPropertySource(locations = "/application-contract.yaml")
+@SuppressWarnings({"deprecation", "removal"})
 public abstract class MockMvcProviderTest extends BaseProviderTest {
 
     MockMvcTestTarget testTarget = new MockMvcTestTarget();

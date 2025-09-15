@@ -8,10 +8,10 @@ import org.apache.camel.ProducerTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.configuration.LaunchDarklyConfiguration;
 import uk.gov.hmcts.reform.professionalapi.configuration.SecurityConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -38,29 +38,29 @@ public abstract class AuthorizationDataloadEnabledIntegrationTest extends Spring
     @Autowired
     ProfessionalApiJobScheduler professionalApiJobScheduler;
 
-    @MockBean
+    @MockitoBean
     protected FeatureToggleServiceImpl featureToggleService;
 
-    @MockBean
+    @MockitoBean
     protected OrganisationServiceImpl organisationServiceImpls;
 
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserServiceImpl professionalUserServiceimpl;
 
-    @MockBean
+    @MockitoBean
     protected PaymentAccountServiceImpl paymentAccountServiceImpl;
 
-    @MockBean
+    @MockitoBean
     protected UserProfileFeignClient userProfileFeignClient;
 
-    @MockBean
+    @MockitoBean
     protected SecurityConfiguration securityConfiguration;
 
 
-    @MockBean
+    @MockitoBean
     LaunchDarklyConfiguration launchDarklyConfiguration;
 
-    @MockBean
+    @MockitoBean
     LDClient ldClient;
 
     @Value("${prdEnumRoleType}")
