@@ -5,6 +5,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.65'
     id 'jacoco'
     id 'pmd'
+    id 'checkstyle'
     id 'com.github.ben-manes.versions' version '0.52.0'
     id "info.solidsoft.pitest" version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.7'
@@ -13,7 +14,7 @@ plugins {
     id "org.flywaydb.flyway" version '9.22.3'
     id 'au.com.dius.pact' version '4.6.17'
     id 'org.owasp.dependencycheck' version '11.1.1'
-    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.16'
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.34'
 }
 
 
@@ -36,7 +37,7 @@ def versions = [
         feign           : '3.8.0',
         bouncycastle    : '1.80',
         postgresql_tc   : '1.20.0',
-        serenity        : '4.2.16'
+        serenity        : '4.2.34'
 ]
 
 application {
@@ -165,7 +166,7 @@ configurations {
 check.dependsOn jacocoTestCoverageVerification
 
 pmd {
-    toolVersion = '7.10.0'
+    toolVersion = '7.16.0'
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.functionalTest, sourceSets.smokeTest]
     reportsDir = file("$project.buildDir/reports/pmd")
@@ -173,6 +174,10 @@ pmd {
             'category/java/errorprone.xml',
             'category/java/bestpractices.xml'
     ]
+}
+
+checkstyle {
+  toolVersion = '11.0.1'
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
