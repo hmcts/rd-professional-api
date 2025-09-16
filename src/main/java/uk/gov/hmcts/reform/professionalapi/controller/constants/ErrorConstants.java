@@ -25,7 +25,9 @@ public enum ErrorConstants {
 
     ACCESS_EXCEPTION("9 : Access Denied"),
 
-    CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception");
+    CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception"),
+
+    FIELD_PERSISTENCE_EXCEPTION("11 : Error occurred while saving/updating:");
 
     private final String errorMessage;
 
