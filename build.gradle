@@ -377,7 +377,7 @@ dependencies {
     implementation group: 'org.apache.camel', name: 'camel-csv', version: versions.camel
     implementation group: 'org.apache.camel', name: 'camel-sql', version: versions.camel
     implementation group: 'org.apache.camel', name: 'camel-spring-batch', version: versions.camel
-    implementation group: 'com.opencsv', name: 'opencsv', version: '3.10'
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.12.0'
     implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
     implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
     implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.14.0'
