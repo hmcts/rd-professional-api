@@ -36,7 +36,7 @@ def versions = [
         reformS2sClient : '5.3.3',
         feign           : '3.8.0',
         bouncycastle    : '1.80',
-        postgresql_tc   : '1.20.0',
+        tc_postgresql   : '1.20.5',
         serenity        : '4.2.34'
 ]
 
@@ -438,7 +438,10 @@ dependencies {
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     // tests on version 2 fails on flyway migrations, something like "incorrect syntax"
-    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    //testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.tc_postgresql
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.tc_postgresql
+    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.tc_postgresql
 
     testImplementation group: 'org.wiremock', name: 'wiremock', version: '3.13.1'
 
