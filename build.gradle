@@ -27,7 +27,7 @@ def versions = [
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
         reformLogging   : '6.1.9',
-        camel           : '3.22.2',
+        camel           : '3.22.4',
         pact_version    : '4.6.17',
         launchDarklySdk : '5.10.9',
         junit           : '5.11.4',
@@ -384,9 +384,9 @@ dependencies {
     implementation group: 'org.apache.camel', name: 'camel-spring-batch', version: versions.camel
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.12.0'
     implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
-    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
+    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.22.4'
     implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.14.0'
-    implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.2.0'
+    implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.14.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.14.0'
 
