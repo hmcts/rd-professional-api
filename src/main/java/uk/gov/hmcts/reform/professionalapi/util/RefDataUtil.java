@@ -345,8 +345,6 @@ public class RefDataUtil {
 
     public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page<?> page,
                                                                          ResponseEntity<Object> responseEntity) {
-        HttpHeaders headers = new HttpHeaders();
-
         final StringBuilder pageInformation = new StringBuilder();
         pageInformation.append("totalElements = " + page.getTotalElements());
         pageInformation.append(",");
@@ -358,6 +356,7 @@ public class RefDataUtil {
         pageInformation.append(",");
         pageInformation.append("sortedBy = " + pageable.getSort());
 
+        HttpHeaders headers = new HttpHeaders();
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());
         } else {
@@ -625,3 +624,4 @@ public class RefDataUtil {
     }
 
 }
+
