@@ -2,7 +2,7 @@ plugins {
     id 'application'
     id 'idea'
     id 'project-report'
-    id 'uk.gov.hmcts.java' version '0.12.65'
+    id 'uk.gov.hmcts.java' version '0.12.67'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.52.0'
