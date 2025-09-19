@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
@@ -144,13 +145,18 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             );
         }
 
-        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+        //filter out users who have user identifier as null DTSRD-4960
+        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
+            .filter(pu -> pu.getUserIdentifier() != null)
+            .collect(Collectors.toList());
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsersFiltered.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
                 .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-                null, professionalUsers, userConfiguredAccesses
+                null, professionalUsersFiltered, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -173,13 +179,19 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
 
-        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+        //filter out users who have user identifier as null DTSRD-4960
+        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
+            .filter(pu -> pu.getUserIdentifier() != null)
+            .collect(Collectors.toList());
+
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsersFiltered.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
                 .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-                professionalUsersPage, professionalUsers, userConfiguredAccesses
+                professionalUsersPage, professionalUsersFiltered, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -187,6 +199,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
+
         List<UserConfiguredAccess> userConfiguredAccesses;
 
         if (professionalUser != null) {
