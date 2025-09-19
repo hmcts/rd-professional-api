@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -51,7 +52,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import static org.codehaus.plexus.util.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
@@ -144,13 +147,18 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             );
         }
 
-        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+        //filter out users who have user identifier as null DTSRD-4960
+        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
+            .filter(pu -> isNotBlank(pu.getUserIdentifier()))
+            .collect(Collectors.toList());
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsersFiltered.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
                 .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-                null, professionalUsers, userConfiguredAccesses
+                null, professionalUsersFiltered, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -173,13 +181,26 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
 
-        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+        //filter out users who have user identifier as null DTSRD-4960
+        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
+            .filter(pu -> isNotBlank(pu.getUserIdentifier()))
+            .collect(Collectors.toList());
+
+        // Now wrapping filtered list into a new Page to replace professionalUsersPage
+        Page<ProfessionalUser> filteredUsersPage = new PageImpl<>(
+            professionalUsersFiltered,
+            pageable,
+            /* new total = professionalUsersFiltered.size() */
+            professionalUsersFiltered.size()
+        );
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsersFiltered.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
                 .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-                professionalUsersPage, professionalUsers, userConfiguredAccesses
+            filteredUsersPage, professionalUsersFiltered, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -187,6 +208,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
+
         List<UserConfiguredAccess> userConfiguredAccesses;
 
         if (professionalUser != null) {
