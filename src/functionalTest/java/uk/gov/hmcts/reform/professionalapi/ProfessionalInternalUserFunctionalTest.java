@@ -118,7 +118,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findByUserIdOrAndSinceDate(sinceDateTime, invitedUserId);
         findByUserIdOrAndSinceDate(null, null);
 
-        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "3", null);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "2", null);
         findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "1", lastRecordIdInPage);
         findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, null, lastRecordIdInPage);
 
