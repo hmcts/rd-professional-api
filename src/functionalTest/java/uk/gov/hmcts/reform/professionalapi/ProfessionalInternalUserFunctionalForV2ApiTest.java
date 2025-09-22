@@ -489,13 +489,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("findOrganisationBySinceDateInternalV2ShouldBeSuccess :: END");
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "sinceDateTime, null, null"
-
-    })
-    public void findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess(String sinceDateTime, String page,
-                                                                     String pageSize) {
+    @Test
+    public void findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess() {
         String sinceDate = generateRandomDate(null, "30");
         organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
         organisationOtherOrgsCreationRequest.getSuperUser().setEmail(generateRandomEmail());
@@ -509,12 +504,12 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         UsersInOrganisationsByOrganisationIdentifiersResponse response =
             professionalApiClient.findUsersInOrganisationShouldBeSuccess(request,
-                pageSize, null, null);
+                null, null, null);
 
-        assertThat(response.getOrganisationInfo().get(0).getUsers().get(0).getUserIdentifier()).isNotNull();
+        assertThat(response.getOrganisationInfo().get(0).getUsers().get(0).getUserIdentifier()).isNull();
         Map<String, Object> noUsersFetched = professionalApiClient.retrieveOrganisationDetailsBySinceDateV2(
-            sinceDate, page, pageSize);
-        assertThat(response).isNull();
+            sinceDate, null, null);
+        assertThat(noUsersFetched).isNull();
 
         log.info("findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess :: END");
     }
