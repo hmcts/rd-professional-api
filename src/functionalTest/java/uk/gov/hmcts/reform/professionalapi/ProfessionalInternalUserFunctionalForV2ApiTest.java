@@ -9,8 +9,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -491,12 +489,12 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     public void findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess() {
-        String sinceDate = generateRandomDate(null, "05");
+
         organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
         organisationOtherOrgsCreationRequest.getSuperUser().setEmail(generateRandomEmail());
 
-        Map<String, Object> newOrgResponse = professionalApiClient.createOrganisationV2
-            (organisationOtherOrgsCreationRequest);
+        Map<String, Object> newOrgResponse = professionalApiClient.createOrganisationV2(
+            organisationOtherOrgsCreationRequest);
         String organisationIdentifier = (String) newOrgResponse.get("organisationIdentifier");
 
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
@@ -506,12 +504,14 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         UsersInOrganisationsByOrganisationIdentifiersResponse response =
             professionalApiClient.findUsersInOrganisationShouldBeSuccess(request,
                 null, null, null);
-
+        String sinceDate = generateRandomDate(null, "05");
         assertThat(response.getOrganisationInfo().get(0).getUsers().get(0).getUserIdentifier()).isNull();
-        Map<String, Object> userResponse = professionalApiClient.retrieveUsersBySinceDateOrAndUserId
-            (sinceDate,null);
-        List<HashMap> users = (List<HashMap>) userResponse.get("users");
+        Map<String, Object> userResponse = professionalApiClient.retrieveUsersBySinceDateOrAndUserId(
+            sinceDate,null);
+
+        List<HashMap<String, Object>> users = (List<HashMap<String, Object>>) userResponse.get("users");
         assertThat(users).hasSize(0);
+
         log.info("findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess :: END");
     }
 
