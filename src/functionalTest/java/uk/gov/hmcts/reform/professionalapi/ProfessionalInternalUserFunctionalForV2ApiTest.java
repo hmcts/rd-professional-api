@@ -9,6 +9,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -76,6 +78,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
         organisationOtherOrgsCreationRequest.getSuperUser().setEmail(superUserEmail);
 
+
         intActiveOrgId = createAndUpdateOrganisationToActiveForV2(hmctsAdmin, organisationOtherOrgsCreationRequest);
         orgIdentifiersList.add(intActiveOrgId);
 
@@ -128,6 +131,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         findUsersInOrganisationUnAuthorized("1");
         findUsersInOrgWithPageSizeAndOrSearchAfter(null, null, null);
+
     }
 
     public void inviteMultipleUserScenarios() {
@@ -484,6 +488,37 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         verifyOrganisationDetailsBySinceDateV2(response, pageSize, sinceDate);
         log.info("findOrganisationBySinceDateInternalV2ShouldBeSuccess :: END");
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "sinceDateTime, null, null"
+
+    })
+    public void findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess(String sinceDateTime, String page,
+                                                                     String pageSize) {
+        String sinceDate = generateRandomDate(null, "30");
+        organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
+        organisationOtherOrgsCreationRequest.getSuperUser().setEmail(generateRandomEmail());
+
+        Map<String, Object> newOrgResponse = professionalApiClient.createOrganisationV2(organisationOtherOrgsCreationRequest);
+        String organisationIdentifier = (String) newOrgResponse.get("organisationIdentifier");
+
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+            new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(List.of(organisationIdentifier));
+
+        UsersInOrganisationsByOrganisationIdentifiersResponse response =
+            professionalApiClient.findUsersInOrganisationShouldBeSuccess(request,
+                pageSize, null, null);
+
+        assertThat(response.getOrganisationInfo().get(0).getUsers().get(0).getUserIdentifier()).isNotNull();
+        Map<String, Object> noUsersFetched = professionalApiClient.retrieveOrganisationDetailsBySinceDateV2(
+            sinceDate, page, pageSize);
+        assertThat(response).isNull();
+
+        log.info("findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess :: END");
+    }
+
 
     private void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response, String pageSize,
                                                         String sinceDate) {
