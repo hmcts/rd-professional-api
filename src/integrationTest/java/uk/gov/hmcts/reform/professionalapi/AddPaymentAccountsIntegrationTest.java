@@ -64,6 +64,7 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 .containsAll(paymentAccountsToAdd);
     }
 
+    
     @Test
     @SuppressWarnings("unchecked")
     void test_all_PaymentAccounts_Success_ShouldReturn_201_and_retrieve_pbas_external() {
