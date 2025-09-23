@@ -1277,8 +1277,8 @@ class ProfessionalUserServiceImplTest {
         GetRefreshUsersResponse res = (GetRefreshUsersResponse)responseEntity.getBody();
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(res.getUsers().size()).isNotNull();
-        assertThat(res.getUsers().size()).isEqualTo(1);
+        assertThat(res.getUsers()).isNotNull();
+        assertThat(res.getUsers()).hasSize(1);
         assertThat(res.getUsers().get(0).getUserIdentifier()).isEqualTo("12345");
         verify(professionalUserRepository, times(1))
             .findByLastUpdatedGreaterThanEqual(any());
@@ -1290,10 +1290,10 @@ class ProfessionalUserServiceImplTest {
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = mock(Page.class);
 
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+        ProfessionalUser profUser = new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation);
-        professionalUser.setCreated(LocalDateTime.now());
-        professionalUserList.add(professionalUser);
+        profUser.setCreated(LocalDateTime.now());
+        professionalUserList.add(profUser);
 
         when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any(), any()))
                 .thenReturn(professionalUserPage);

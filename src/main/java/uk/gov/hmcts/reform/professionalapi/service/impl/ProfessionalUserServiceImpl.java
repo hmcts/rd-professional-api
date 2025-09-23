@@ -150,7 +150,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         //filter out users who have user identifier as null DTSRD-4960
         List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
             .filter(pu -> isNotBlank(pu.getUserIdentifier()))
-            .collect(Collectors.toList());
+            .toList();
 
         List<UserConfiguredAccess> userConfiguredAccesses = professionalUsersFiltered.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
@@ -184,7 +184,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         //filter out users who have user identifier as null DTSRD-4960
         List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
             .filter(pu -> isNotBlank(pu.getUserIdentifier()))
-            .collect(Collectors.toList());
+            .toList();
 
         // Now wrapping filtered list into a new Page to replace professionalUsersPage
         Page<ProfessionalUser> filteredUsersPage = new PageImpl<>(
