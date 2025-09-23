@@ -510,7 +510,35 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             sinceDate,null);
 
         List<HashMap<String, Object>> users = (List<HashMap<String, Object>>) userResponse.get("users");
-        assertThat(users).hasSize(0);
+
+        assertThat(users).isNotNull();
+        // Then: assert that none of the user maps have user_identifier null or empty
+        for (HashMap<String, Object> user : users) {
+            // check the key exists, or at least treat missing as failure or null
+            assertThat(user).containsKey("user_identifier");
+            Object uiObj = user.get("user_identifier");
+            assertThat(uiObj)
+                .as("user_identifier should not be null for user: %s", user)
+                .isInstanceOf(String.class);
+
+            String userId = (String) uiObj;
+            assertThat(userId)
+                .as("user_identifier should not be empty for user: %s", user)
+                .isNotEmpty();
+        }
+
+
+        // Extract all user_identifiers
+        assertThat(users)
+            .extracting(user -> user.get("user_identifier"))
+            .allSatisfy(uiObj -> {
+                assertThat(uiObj)
+                    .as("user_identifier is missing or wrong type")
+                    .isInstanceOf(String.class);
+                assertThat((String) uiObj)
+                    .as("user_identifier is empty")
+                    .isNotEmpty();
+            });
 
         log.info("findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess :: END");
     }
