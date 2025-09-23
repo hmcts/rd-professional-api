@@ -76,7 +76,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
         organisationOtherOrgsCreationRequest.getSuperUser().setEmail(superUserEmail);
 
-
         intActiveOrgId = createAndUpdateOrganisationToActiveForV2(hmctsAdmin, organisationOtherOrgsCreationRequest);
         orgIdentifiersList.add(intActiveOrgId);
 
@@ -129,7 +128,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         findUsersInOrganisationUnAuthorized("1");
         findUsersInOrgWithPageSizeAndOrSearchAfter(null, null, null);
-
     }
 
     public void inviteMultipleUserScenarios() {
@@ -516,17 +514,11 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         for (HashMap<String, Object> user : users) {
             // check the key exists, or at least treat missing as failure or null
             assertThat(user).containsKey("user_identifier");
-            Object uiObj = user.get("user_identifier");
-            assertThat(uiObj)
-                .as("user_identifier should not be null for user: %s", user)
-                .isInstanceOf(String.class);
-
-            String userId = (String) uiObj;
+            String userId = (String) user.get("user_identifier");
             assertThat(userId)
                 .as("user_identifier should not be empty for user: %s", user)
                 .isNotEmpty();
         }
-
 
         // Extract all user_identifiers
         assertThat(users)
@@ -542,7 +534,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         log.info("findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess :: END");
     }
-
 
     private void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response, String pageSize,
                                                         String sinceDate) {
