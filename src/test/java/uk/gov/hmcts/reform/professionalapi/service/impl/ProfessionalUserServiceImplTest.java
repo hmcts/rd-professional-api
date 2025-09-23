@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -1247,6 +1248,40 @@ class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByLastUpdatedGreaterThanEqual(any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_fetchUsersForRefresh_WithNullIdentfiers() {
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+            "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUser.setUserIdentifier(null);
+        professionalUserList.add(professionalUser);
+
+        ProfessionalUser professionalUser1 = new ProfessionalUser("fName1", "lName1",
+            "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUser.setUserIdentifier("12345");
+        professionalUserList.add(professionalUser1);
+
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any()))
+            .thenReturn(professionalUserList);
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<Object> responseEntity = professionalUserService.fetchUsersForRefresh(since, null, null, null);
+        GetRefreshUsersResponse res = (GetRefreshUsersResponse)responseEntity.getBody();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(res.getUsers().size()).isNotNull();
+        assertThat(res.getUsers().size()).isEqualTo(1);
+        assertThat(res.getUsers().get(0).getUserIdentifier()).isEqualTo("12345");
+        verify(professionalUserRepository, times(1))
+            .findByLastUpdatedGreaterThanEqual(any());
     }
 
     @Test

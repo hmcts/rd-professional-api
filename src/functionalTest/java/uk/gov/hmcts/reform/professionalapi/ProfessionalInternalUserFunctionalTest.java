@@ -275,6 +275,28 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void findBySinceDatePageSizeOrAndSearchAfter(String sinceDate, String pageSize, String searchAfter) {
         log.info("findBySinceDatePageSizeOrAndSearchAfter :: STARTED");
 
+        //Adding 2 more users to the test one with user id null and other will user id set to validate
+        // filtered records scenario
+        OrganisationCreationRequest  organisationCreationRequest1 = createOrganisationRequest()
+            .superUser(UserCreationRequest.aUserCreationRequest()
+                .firstName("firstName1")
+                .lastName("lastName1")
+                .email(generateRandomEmail())
+                .build())
+            .build();
+        Map<String, Object> newOrgResponse = professionalApiClient.createOrganisation(
+            organisationCreationRequest1);
+        OrganisationCreationRequest organisationCreationRequest2  = createOrganisationRequest()
+            .superUser(UserCreationRequest.aUserCreationRequest()
+                .firstName("firstName2")
+                .lastName("lastNam2")
+                .email(generateRandomEmail())
+                .build())
+            .build();
+
+        intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest2);
+
+
         Map<String, Object> testResults = professionalApiClient
                 .retrieveUsersBySinceDatePageSizeOrAndSearchAfter(sinceDate, pageSize, searchAfter);
         List<HashMap> users = (List<HashMap>) testResults.get("users");
