@@ -286,25 +286,14 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             .build();
         Map<String, Object> newOrgResponse = professionalApiClient.createOrganisation(
             organisationCreationRequest1);
-        OrganisationCreationRequest organisationCreationRequest2  = createOrganisationRequest()
-            .superUser(UserCreationRequest.aUserCreationRequest()
-                .firstName("firstName2")
-                .lastName("lastNam2")
-                .email(generateRandomEmail())
-                .build())
-            .build();
+        String organisationIdentifier = (String) newOrgResponse.get("organisationIdentifier");
 
-        String intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest2);
-
-        OrganisationCreationRequest organisationCreationRequest3  = createOrganisationRequest()
-            .superUser(UserCreationRequest.aUserCreationRequest()
-                .firstName("firstName3")
-                .lastName("lastNam3")
-                .email(generateRandomEmail())
-                .build())
-            .build();
-
-        String intActiveOrgId3 = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest3);
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
+            hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        NewUserCreationRequest newUserCreationRequest1 = professionalApiClient.createNewUserRequest(email);
+        Map<String, Object> newUserResponse1 = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
+            hmctsAdmin, newUserCreationRequest1, HttpStatus.CREATED);
 
         Map<String, Object> testResults = professionalApiClient
                 .retrieveUsersBySinceDatePageSizeOrAndSearchAfter(sinceDate, pageSize, searchAfter);
