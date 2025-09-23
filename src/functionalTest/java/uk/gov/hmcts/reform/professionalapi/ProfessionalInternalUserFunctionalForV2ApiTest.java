@@ -513,8 +513,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         // Then: assert that none of the user maps have user_identifier null or empty
         for (HashMap<String, Object> user : users) {
             // check the key exists, or at least treat missing as failure or null
-            assertThat(user).containsKey("user_identifier");
-            String userId = (String) user.get("user_identifier");
+            assertThat(user).containsKey("userIdentifier");
+            String userId = (String) user.get("userIdentifier");
             assertThat(userId)
                 .as("user_identifier should not be empty for user: %s", user)
                 .isNotEmpty();
