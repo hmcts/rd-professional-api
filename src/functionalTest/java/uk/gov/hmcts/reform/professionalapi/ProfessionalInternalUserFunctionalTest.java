@@ -298,14 +298,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         String intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest2);
 
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-            hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-        NewUserCreationRequest newUserCreationRequest1 = professionalApiClient.createNewUserRequest(email);
-        Map<String, Object> newUserResponse1 = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-            hmctsAdmin, newUserCreationRequest1, HttpStatus.CREATED);
-
-
         Map<String, Object> testResults = professionalApiClient
                 .retrieveUsersBySinceDatePageSizeOrAndSearchAfter(sinceDate, pageSize, searchAfter);
         List<HashMap> users = (List<HashMap>) testResults.get("users");

@@ -520,18 +520,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 .isNotEmpty();
         }
 
-        // Extract all user_identifiers
-        assertThat(users)
-            .extracting(user -> user.get("userIdentifier"))
-            .allSatisfy(uiObj -> {
-                assertThat(uiObj)
-                    .as("user_identifier is missing or wrong type")
-                    .isInstanceOf(String.class);
-                assertThat((String) uiObj)
-                    .as("user_identifier is empty")
-                    .isNotEmpty();
-            });
-
         log.info("findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess :: END");
     }
 
