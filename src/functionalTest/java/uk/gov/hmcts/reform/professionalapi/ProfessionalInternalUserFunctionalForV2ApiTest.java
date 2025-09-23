@@ -522,7 +522,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         // Extract all user_identifiers
         assertThat(users)
-            .extracting(user -> user.get("user_identifier"))
+            .extracting(user -> user.get("userIdentifier"))
             .allSatisfy(uiObj -> {
                 assertThat(uiObj)
                     .as("user_identifier is missing or wrong type")
