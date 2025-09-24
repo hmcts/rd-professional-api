@@ -487,7 +487,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     public void findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess() {
-
         organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
         organisationOtherOrgsCreationRequest.getSuperUser().setEmail(generateRandomEmail());
 
@@ -510,9 +509,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         List<HashMap<String, Object>> users = (List<HashMap<String, Object>>) userResponse.get("users");
 
         assertThat(users).isNotNull();
-        // Then: assert that none of the user maps have user_identifier null or empty
         for (HashMap<String, Object> user : users) {
-            // check the key exists, or at least treat missing as failure or null
             assertThat(user).containsKey("userIdentifier");
             String userId = (String) user.get("userIdentifier");
             assertThat(userId)
