@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -169,23 +170,36 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         if (searchAfter == null) {
             professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
-                    formattedSince, pageable
+                formattedSince, pageable
             );
         } else {
             professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
-                    formattedSince, searchAfter, pageable
+                formattedSince, searchAfter, pageable
             );
         }
 
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
 
-        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
-                .map(ProfessionalUser::getUserConfiguredAccesses)
-                .flatMap(Collection::stream)
-                .toList();
+        //filter out users who have user identifier as null DTSRD-4960
+        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
+            .filter(pu -> isNotBlank(pu.getUserIdentifier()))
+            .toList();
+
+        // Now wrapping filtered list into a new Page to replace professionalUsersPage
+        Page<ProfessionalUser> filteredUsersPage = new PageImpl<>(
+            professionalUsersFiltered,
+            pageable,
+            /* new total = professionalUsersFiltered.size() */
+            professionalUsersFiltered.size()
+        );
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsersFiltered.stream()
+            .map(ProfessionalUser::getUserConfiguredAccesses)
+            .flatMap(Collection::stream)
+            .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-                professionalUsersPage, professionalUsers, userConfiguredAccesses
+            filteredUsersPage, professionalUsersFiltered, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);

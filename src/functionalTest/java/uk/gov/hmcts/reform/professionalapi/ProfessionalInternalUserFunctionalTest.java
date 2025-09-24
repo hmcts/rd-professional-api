@@ -103,21 +103,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findOrganisationWithSinceDateScenarios(sinceDateTime);
     }
 
-
-    public void createPendingOrganisation() {
-        OrganisationCreationRequest  organisationCreationRequest1 = createOrganisationRequest()
-            .superUser(UserCreationRequest.aUserCreationRequest()
-                .firstName("firstName1")
-                .lastName("lastName1")
-                .email(generateRandomEmail())
-                .build())
-            .build();
-        Map<String, Object> newOrgResponse = professionalApiClient.createOrganisation(
-            organisationCreationRequest1);
-        String organisationIdentifier = (String) newOrgResponse.get("organisationIdentifier");
-
-    }
-
     public void inviteMultipleUserScenarios() {
         inviteUserByAnInternalOrgUser(generateRandomEmail());
         for (int i = 0; i < 4; i++) {
@@ -133,7 +118,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findByUserIdOrAndSinceDate(sinceDateTime, invitedUserId);
         findByUserIdOrAndSinceDate(null, null);
 
-        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "3", null);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "2", null);
         findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "1", lastRecordIdInPage);
         findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, null, lastRecordIdInPage);
 
