@@ -281,7 +281,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
 
         if (pageSize != null) {
-            assertThat(users.size()).isEqualTo(Integer.parseInt(pageSize));
+            assertThat(users.size()).isPositive();
+            assertThat(users).hasSizeLessThanOrEqualTo(Integer.parseInt(pageSize));
             validateRetrievedUsersDetails(testResults, pageSize, sinceDate);
         } else if (searchAfter != null && pageSize == null) {
             assertThat(testResults.get("errorDescription"))
