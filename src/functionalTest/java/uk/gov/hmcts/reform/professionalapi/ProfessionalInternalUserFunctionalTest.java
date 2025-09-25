@@ -282,7 +282,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         if (pageSize != null) {
             assertThat(users.size()).isPositive();
-            assertThat(users).hasSizeLessThanOrEqualTo(Integer.parseInt(pageSize));
+            assertThat(users.size()).isLessThanOrEqualTo(Integer.parseInt(pageSize));
             validateRetrievedUsersDetails(testResults, pageSize, sinceDate);
         } else if (searchAfter != null && pageSize == null) {
             assertThat(testResults.get("errorDescription"))
