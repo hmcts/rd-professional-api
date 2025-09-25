@@ -23,11 +23,11 @@ ext {
 }
 
 def versions = [
-        lombok          : '1.18.40',
+        lombok          : '1.18.42',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
         reformLogging   : '6.1.9',
-        camel           : '3.22.2',
+        camel           : '3.22.4',
         pact_version    : '4.6.17',
         launchDarklySdk : '5.10.9',
         junit           : '5.11.4',
@@ -351,7 +351,7 @@ dependencies {
     implementation 'com.github.hmcts:idam-java-client:3.0.4'
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.4.2'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
@@ -384,9 +384,9 @@ dependencies {
     implementation group: 'org.apache.camel', name: 'camel-spring-batch', version: versions.camel
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.12.0'
     implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
-    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
+    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.22.4'
     implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.14.0'
-    implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.2.0'
+    implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.14.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.14.0'
 
