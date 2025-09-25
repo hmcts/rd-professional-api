@@ -465,7 +465,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         typedResponse = convertJsonToResponse(json,
                 UsersInOrganisationsByOrganisationIdentifiersResponse.class);
 
-        assertTrue(typedResponse.isMoreAvailable());
+        assertFalse(typedResponse.isMoreAvailable());
         assertThat(typedResponse.getOrganisationInfo()).hasSize(2);
         assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(1);
         assertThat(typedResponse.getOrganisationInfo().get(1).getUsers()).hasSize(1);
@@ -560,7 +560,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         typedResponse = convertJsonToResponse(json,
                 UsersInOrganisationsByOrganisationIdentifiersResponse.class);
 
-        assertTrue(typedResponse.isMoreAvailable());
+        assertFalse(typedResponse.isMoreAvailable());
         assertThat(typedResponse.getOrganisationInfo()).hasSize(1);
         assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(1);
         assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
