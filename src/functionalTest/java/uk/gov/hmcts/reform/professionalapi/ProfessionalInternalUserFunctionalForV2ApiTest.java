@@ -498,7 +498,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest1 = createOrganisationRequestForV2();
         organisationOtherOrgsCreationRequest1.getSuperUser().setEmail(generateRandomEmail());
 
-       String intActiveOrgId = createAndUpdateOrganisationToActiveForV2(hmctsAdmin, organisationOtherOrgsCreationRequest1);
+        String intActiveOrgId = createAndUpdateOrganisationToActiveForV2(hmctsAdmin,
+            organisationOtherOrgsCreationRequest1);
 
 
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
