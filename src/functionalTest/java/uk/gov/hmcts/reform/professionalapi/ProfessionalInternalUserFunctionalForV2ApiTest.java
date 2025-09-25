@@ -494,14 +494,22 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             organisationOtherOrgsCreationRequest);
         String organisationIdentifier = (String) newOrgResponse.get("organisationIdentifier");
 
+
+        OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest1 = createOrganisationRequestForV2();
+        organisationOtherOrgsCreationRequest1.getSuperUser().setEmail(generateRandomEmail());
+
+       String intActiveOrgId = createAndUpdateOrganisationToActiveForV2(hmctsAdmin, organisationOtherOrgsCreationRequest1);
+
+
         UsersInOrganisationsByOrganisationIdentifiersRequest request =
             new UsersInOrganisationsByOrganisationIdentifiersRequest();
-        request.setOrganisationIdentifiers(List.of(organisationIdentifier));
+        request.setOrganisationIdentifiers(List.of(organisationIdentifier,intActiveOrgId));
 
         UsersInOrganisationsByOrganisationIdentifiersResponse response =
             professionalApiClient.findUsersInOrganisationShouldBeSuccess(request,
                 null, null, null);
         String sinceDate = generateRandomDate(null, "05");
+
         assertThat(response.getOrganisationInfo().get(0).getUsers().get(0).getUserIdentifier()).isNull();
         Map<String, Object> userResponse = professionalApiClient.retrieveUsersBySinceDateOrAndUserId(
             sinceDate,null);
