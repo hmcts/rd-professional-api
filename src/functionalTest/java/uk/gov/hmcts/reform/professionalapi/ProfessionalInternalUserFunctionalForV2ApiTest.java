@@ -503,7 +503,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 null, null, null);
         String sinceDate = generateRandomDate(null, "05");
 
-        assertThat(response.getOrganisationInfo()).isNull();
+        assertThat(response.getOrganisationInfo()).isEmpty();
         Map<String, Object> userResponse = professionalApiClient.retrieveUsersBySinceDateOrAndUserId(
             sinceDate,null);
 
