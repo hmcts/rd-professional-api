@@ -201,6 +201,41 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
+
+    @Override
+    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
+        List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
+        UUID searchAfterOrganisation) {
+
+        Pageable pageableObject = PageRequest.of(0, pageSize);
+        Page<ProfessionalUser> users;
+        if (searchAfterOrganisation == null && searchAfterUser == null) {
+            users = professionalUserRepository
+                .findUsersInOrganisations(
+                    organisationIdentifiers, pageableObject);
+        } else {
+            users = professionalUserRepository
+                .findUsersInOrganisationsSearchAfter(
+                    organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+        }
+
+        List<ProfessionalUser> professionalUsers = users.getContent();
+
+        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
+            .filter(pu -> isNotBlank(pu.getUserIdentifier()))
+            .toList();
+
+        Page<ProfessionalUser> filteredUsersPage = new PageImpl<>(
+            professionalUsersFiltered,
+            pageableObject,
+            professionalUsersFiltered.size()
+        );
+
+        return new UsersInOrganisationsByOrganisationIdentifiersResponse(professionalUsersFiltered,
+            !filteredUsersPage.isLast());
+    }
+
+
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
         List<UserConfiguredAccess> userConfiguredAccesses;
@@ -353,25 +388,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
     }
 
-    @Override
-    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
-            List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
-            UUID searchAfterOrganisation) {
-
-        Pageable pageableObject = PageRequest.of(0, pageSize);
-        Page<ProfessionalUser> users;
-        if (searchAfterOrganisation == null && searchAfterUser == null) {
-            users = professionalUserRepository
-                    .findUsersInOrganisations(
-                            organisationIdentifiers, pageableObject);
-        } else {
-            users = professionalUserRepository
-                    .findUsersInOrganisationsSearchAfter(
-                            organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
-        }
-
-        return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
-    }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
 
