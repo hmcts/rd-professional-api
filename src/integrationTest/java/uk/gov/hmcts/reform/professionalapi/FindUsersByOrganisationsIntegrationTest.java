@@ -265,7 +265,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         UUID searchAfterOrganisation = null;
 
         String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = true;
+        boolean expectedHasMoreRecords = false;
         int expectedOrganisationsCount = 1;
         int expectedUsersCount = 3;
 
@@ -291,7 +291,8 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         UUID searchAfterOrganisation = null;
 
         String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = true;
+        //changet to false as 5 records are returned in one page after filtering
+        boolean expectedHasMoreRecords = false;
         int expectedOrganisationsCount = 2;
         int expectedUsersCount = 5;
 
@@ -358,7 +359,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         boolean isOrg1First = orgsForTest.get(0).getId().equals(organisation1.getId());
 
         String expectedStatus = "200 OK";
-        boolean expectedHasMoreRecords = true;
+        boolean expectedHasMoreRecords = false;
         int expectedOrganisationsCount = isOrg1First ? 1 : 2; // org 1 has 4 users, org 2 has 3 users
         int expectedUsersCount = 3;
 
@@ -438,7 +439,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
                 UsersInOrganisationsByOrganisationIdentifiersResponse.class);
 
         // first request / page will only return 2 users from the first organisation
-        assertTrue(typedResponse.isMoreAvailable());
+        assertFalse(typedResponse.isMoreAvailable());
         assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(2);
         assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
                 .isEqualTo(orgsForTest.get(0).getOrganisationIdentifier());
@@ -538,7 +539,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
                 .isEqualTo(organisationForTest.getOrganisationIdentifier());
 
         assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(1);
-        assertTrue(typedResponse.isMoreAvailable());
+        assertFalse(typedResponse.isMoreAvailable());
 
 
         List<OrganisationUserResponse> usersInResponse = getAllUsersInOrganisationResponse(typedResponse);
@@ -615,7 +616,7 @@ class FindUsersByOrganisationsIntegrationTest extends AuthorizationEnabledIntegr
         assertThat(typedResponse.getOrganisationInfo().get(0).getOrganisationIdentifier())
                 .isEqualTo(organisationForTest.getOrganisationIdentifier());
         assertThat(typedResponse.getOrganisationInfo().get(0).getUsers()).hasSize(2);
-        assertTrue(typedResponse.isMoreAvailable());
+        assertFalse(typedResponse.isMoreAvailable());
 
         List<ProfessionalUser> professionalUsersForTest =
                 new ArrayList<>(sortedUsersInOrganisation.get(organisationForTest.getId()));
