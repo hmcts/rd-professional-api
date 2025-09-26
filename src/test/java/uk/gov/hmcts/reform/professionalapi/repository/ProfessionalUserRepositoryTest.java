@@ -80,8 +80,8 @@ class ProfessionalUserRepositoryTest extends BaseRepository {
 
         Pageable pageable = createPageableObject(0, 10, Sort.by(Sort.DEFAULT_DIRECTION, "id"));
 
-        Page<ProfessionalUser> profUserPage = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
-                dateTime, pageable);
+        Page<ProfessionalUser> profUserPage = professionalUserRepository
+            .findByLastUpdatedGreaterThanEqualAndUserIdIsNotNull(dateTime, pageable);
 
         List<ProfessionalUser> profUser = profUserPage.getContent();
 

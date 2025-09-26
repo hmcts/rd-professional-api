@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -168,34 +167,26 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         Page<ProfessionalUser> professionalUsersPage;
 
         if (searchAfter == null) {
-            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
+            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndUserIdIsNotNull(
                 formattedSince, pageable
             );
         } else {
-            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
+            professionalUsersPage = professionalUserRepository
+                .findByLastUpdatedGreaterThanEqualAndIdGreaterThanAndUserIdIsNotNull(
                 formattedSince, searchAfter, pageable
             );
         }
 
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
 
-        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
-            .filter(pu -> isNotBlank(pu.getUserIdentifier()))
-            .toList();
 
-        Page<ProfessionalUser> filteredUsersPage = new PageImpl<>(
-            professionalUsersFiltered,
-            pageable,
-            professionalUsersFiltered.size()
-        );
-
-        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsersFiltered.stream()
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
             .map(ProfessionalUser::getUserConfiguredAccesses)
             .flatMap(Collection::stream)
             .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-            filteredUsersPage, professionalUsersFiltered, userConfiguredAccesses
+            professionalUsersPage, professionalUsers, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -219,20 +210,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                     organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
         }
 
-        List<ProfessionalUser> professionalUsers = users.getContent();
-
-        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
-            .filter(pu -> isNotBlank(pu.getUserIdentifier()))
-            .toList();
-
-        Page<ProfessionalUser> filteredUsersPage = new PageImpl<>(
-            professionalUsersFiltered,
-            pageableObject,
-            professionalUsersFiltered.size()
-        );
-
-        return new UsersInOrganisationsByOrganisationIdentifiersResponse(professionalUsersFiltered,
-            !filteredUsersPage.isLast());
+        return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
     }
 
 
