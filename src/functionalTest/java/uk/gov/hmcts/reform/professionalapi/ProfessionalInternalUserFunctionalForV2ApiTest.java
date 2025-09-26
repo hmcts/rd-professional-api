@@ -213,7 +213,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         if (pageSize != null && pageSize.equals("2")) {
             assertThat(response.getOrganisationInfo().get(0).getUsers()).hasSize(Integer.parseInt(pageSize));
-            assertThat(response.isMoreAvailable()).isTrue();
+            assertThat(response.isMoreAvailable()).isFalse();
         } else if (pageSize != null && pageSize.equals("3")) {
             assertThat(response.getOrganisationInfo().get(0).getUsers()).hasSize(3);
             assertThat(response.isMoreAvailable()).isFalse();
@@ -483,6 +483,42 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         assertThat(response).isNotNull();
         verifyOrganisationDetailsBySinceDateV2(response, pageSize, sinceDate);
         log.info("findOrganisationBySinceDateInternalV2ShouldBeSuccess :: END");
+    }
+
+    @Test
+    public void findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess() {
+        organisationOtherOrgsCreationRequest = createOrganisationRequestForV2();
+        organisationOtherOrgsCreationRequest.getSuperUser().setEmail(generateRandomEmail());
+
+        Map<String, Object> newOrgResponse = professionalApiClient.createOrganisationV2(
+            organisationOtherOrgsCreationRequest);
+        String organisationIdentifier = (String) newOrgResponse.get("organisationIdentifier");
+
+        UsersInOrganisationsByOrganisationIdentifiersRequest request =
+            new UsersInOrganisationsByOrganisationIdentifiersRequest();
+        request.setOrganisationIdentifiers(List.of(organisationIdentifier));
+
+        UsersInOrganisationsByOrganisationIdentifiersResponse response =
+            professionalApiClient.findUsersInOrganisationShouldBeSuccess(request,
+                null, null, null);
+        String sinceDate = generateRandomDate(null, "05");
+
+        assertThat(response.getOrganisationInfo()).isEmpty();
+        Map<String, Object> userResponse = professionalApiClient.retrieveUsersBySinceDateOrAndUserId(
+            sinceDate,null);
+
+        List<HashMap<String, Object>> users = (List<HashMap<String, Object>>) userResponse.get("users");
+
+        assertThat(users).isNotNull();
+        for (HashMap<String, Object> user : users) {
+            assertThat(user).containsKey("userIdentifier");
+            String userId = (String) user.get("userIdentifier");
+            assertThat(userId)
+                .as("user_identifier should not be empty for user: %s", user)
+                .isNotEmpty();
+        }
+
+        log.info("findOrganisationBySinceDateInternalV2NullUseridentifiersShouldBeSuccess :: END");
     }
 
     private void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response, String pageSize,

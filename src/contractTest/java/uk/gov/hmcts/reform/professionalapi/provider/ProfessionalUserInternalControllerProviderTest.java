@@ -49,7 +49,7 @@ public class ProfessionalUserInternalControllerProviderTest extends WebMvcProvid
 
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        when(professionalUserRepositoryMock.findByLastUpdatedGreaterThanEqual(
+        when(professionalUserRepositoryMock.findByLastUpdatedGreaterThanEqualAndUserIdIsNotNull(
                 any(LocalDateTime.class), any(Pageable.class))
         ).thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));
@@ -62,7 +62,7 @@ public class ProfessionalUserInternalControllerProviderTest extends WebMvcProvid
 
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        when(professionalUserRepositoryMock.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
+        when(professionalUserRepositoryMock.findByLastUpdatedGreaterThanEqualAndIdGreaterThanAndUserIdIsNotNull(
                 any(LocalDateTime.class), any(UUID.class), any(Pageable.class))
         ).thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(List.of(professionalUser));

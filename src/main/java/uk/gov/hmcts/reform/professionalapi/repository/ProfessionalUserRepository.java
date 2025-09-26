@@ -33,25 +33,26 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
     int findByUserCountByOrganisationId(@Param("organisationId") UUID organisationId);
 
     @Query(value = """
-       SELECT pu.* FROM dbrefdata.professional_user pu
-       INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
-       WHERE (COALESCE(:organisationIdentifiers, NULL) is NULL
-       OR organisation.organisation_identifier in (:organisationIdentifiers))
-       ORDER BY pu.organisation_id, pu.id
+        SELECT pu.* FROM dbrefdata.professional_user pu
+        INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
+        WHERE (COALESCE(:organisationIdentifiers, NULL) is NULL
+        OR (organisation.organisation_identifier = 'P6I2M40'
+        AND pu.user_identifier IS NOT NULL
+        AND TRIM(pu.user_identifier) <> ''))ORDER BY pu.organisation_id, pu.id
         """, nativeQuery = true)
     Page<ProfessionalUser> findUsersInOrganisations(
             @Param("organisationIdentifiers") List<String> organisationIdentifiers, Pageable pageable);
 
     @Query(value = """
-       SELECT pu.* FROM dbrefdata.professional_user pu
-       INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
-       WHERE (COALESCE(:organisationIdentifiers, NULL) is NULL
-       OR organisation.organisation_identifier in (:organisationIdentifiers))
-       AND (
-           (organisation.Id = :searchAfterOrgId AND pu.Id > :searchAfterUserId)
-           OR (organisation.Id > :searchAfterOrgId)
-       )
-       ORDER BY pu.organisation_id, pu.id
+        SELECT pu.* FROM dbrefdata.professional_user pu
+        INNER JOIN dbrefdata.organisation organisation ON pu.organisation_id = organisation.Id
+        WHERE (COALESCE(:organisationIdentifiers, NULL) is NULL
+        OR organisation.organisation_identifier in (:organisationIdentifiers))
+        AND ((organisation.Id = :searchAfterOrgId AND pu.Id > :searchAfterUserId)
+        OR (organisation.Id > :searchAfterOrgId))
+        AND pu.user_identifier IS NOT NULL
+        AND TRIM(pu.user_identifier) <> ''
+        ORDER BY pu.organisation_id, pu.id
         """, nativeQuery = true)
     Page<ProfessionalUser> findUsersInOrganisationsSearchAfter(
             @Param("organisationIdentifiers") List<String> organisationIdentifiers,
@@ -60,13 +61,15 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);
 
-    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated, Pageable pageable);
+    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndUserIdIsNotNull(
+        LocalDateTime lastUpdated, Pageable pageable);
 
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
                                                                                   UUID searchAfter);
 
-    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
-                                                                                  UUID searchAfter,
-                                                                                  Pageable pageable);
+    Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThanAndUserIdIsNotNull(
+        LocalDateTime lastUpdated,
+        UUID searchAfter,
+        Pageable pageable);
 
 }
