@@ -150,9 +150,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     public UpdatePbaStatusResponse updatePaymentAccountsStatusForAnOrganisation(
             List<PbaUpdateRequest> pbaRequestList, String orgId) {
-
         var pbasFromRequest = new HashSet<String>();
-        List<PaymentAccount> pbasFromDb = new ArrayList<>();
 
         //Get PBAs from request
         pbaRequestList.forEach(pba -> pbasFromRequest.add(pba.getPbaNumber()));
@@ -167,6 +165,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         //Remove any null references caused by any null PBA values that may be present in request
         pbasFromRequest.remove(null);
 
+        List<PaymentAccount> pbasFromDb = new ArrayList<>();
         //get PBAs from DB and remove invalid PBAs & PBAs that don't exist in DB from PBAs to update
         if (isNotEmpty(pbasFromRequest)) {
             pbasFromDb = paymentAccountRepository.findByPbaNumberIn(pbasFromRequest);
@@ -313,3 +312,4 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         return pba.getStatusMessage() == null ? "" : pba.getStatusMessage();
     }
 }
+

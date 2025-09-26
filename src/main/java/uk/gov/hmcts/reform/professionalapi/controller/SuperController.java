@@ -345,7 +345,6 @@ public abstract class SuperController {
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
-        Boolean  isOrgApprovalRequest = false;
         if (isBlank(organisationCreationRequest.getStatus())) {
             throw new InvalidRequest("Mandatory field status is missing");
         }
@@ -366,6 +365,7 @@ public abstract class SuperController {
 
         var superUser = existingOrganisation.getUsers().get(0);
         var professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
+        Boolean  isOrgApprovalRequest = false;
         if ((existingOrganisation.getStatus().isPending() || existingOrganisation.getStatus().isReview())
                 && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
