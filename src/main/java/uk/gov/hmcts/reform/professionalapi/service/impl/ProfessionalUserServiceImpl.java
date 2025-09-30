@@ -167,12 +167,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         Page<ProfessionalUser> professionalUsersPage;
 
         if (searchAfter == null) {
-            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndUserIdIsNotNull(
+            professionalUsersPage = professionalUserRepository
+                .findByLastUpdatedGreaterThanEqualAndUserIdentifierIsNotEmpty(
                 formattedSince, pageable
             );
         } else {
             professionalUsersPage = professionalUserRepository
-                .findByLastUpdatedGreaterThanEqualAndIdGreaterThanAndUserIdIsNotNull(
+                .findByLastUpdatedGreaterThanEqualAndIdGreaterThanAndUserIdentifierIsNotEmpty(
                 formattedSince, searchAfter, pageable
             );
         }

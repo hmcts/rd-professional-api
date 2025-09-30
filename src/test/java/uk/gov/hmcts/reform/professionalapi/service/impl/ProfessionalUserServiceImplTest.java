@@ -1295,7 +1295,7 @@ class ProfessionalUserServiceImplTest {
         profUser.setCreated(LocalDateTime.now());
         professionalUserList.add(profUser);
 
-        when(professionalUserRepository.findByLastUpdatedGreaterThanEqualAndUserIdIsNotNull(any(), any()))
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqualAndUserIdentifierIsNotEmpty(any(), any()))
                 .thenReturn(professionalUserPage);
 
         when(professionalUserPage.getContent()).thenReturn(professionalUserList);
@@ -1310,7 +1310,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(professionalUserRepository, times(1))
-                .findByLastUpdatedGreaterThanEqualAndUserIdIsNotNull(any(), any());
+                .findByLastUpdatedGreaterThanEqualAndUserIdentifierIsNotEmpty(any(), any());
     }
 
     @Test
