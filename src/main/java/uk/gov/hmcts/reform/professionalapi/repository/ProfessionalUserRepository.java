@@ -121,7 +121,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
           AND pu.id > :searchAfter
           AND pu.user_identifier IS NOT NULL
           AND pu.user_identifier <> ''
-        ORDER BY puu.id ASC
+        ORDER BY pu.id ASC
         """,
         countQuery = """
         SELECT COUNT(*) FROM dbrefdata.professional_user pu
