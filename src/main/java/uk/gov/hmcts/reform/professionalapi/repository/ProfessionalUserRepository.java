@@ -38,7 +38,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
         WHERE (COALESCE(:organisationIdentifiers, NULL) is NULL
         OR (organisation.organisation_identifier in (:organisationIdentifiers))
         AND pu.user_identifier IS NOT NULL
-        AND TRIM(pu.user_identifier) <> '')ORDER BY pu.organisation_id, pu.id
+        AND TRIM(pu.user_identifier) <> '') ORDER BY pu.organisation_id, pu.id
 
         """,countQuery = """
     SELECT COUNT(*) 

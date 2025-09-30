@@ -198,7 +198,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
         List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
         UUID searchAfterOrganisation) {
-
         Pageable pageableObject = PageRequest.of(0, pageSize);
         Page<ProfessionalUser> users;
         if (searchAfterOrganisation == null && searchAfterUser == null) {
@@ -210,7 +209,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 .findUsersInOrganisationsSearchAfter(
                     organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
         }
-
         return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
     }
 
