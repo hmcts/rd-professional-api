@@ -213,7 +213,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         if (pageSize != null && pageSize.equals("2")) {
             assertThat(response.getOrganisationInfo().get(0).getUsers()).hasSize(Integer.parseInt(pageSize));
-            assertThat(response.isMoreAvailable()).isFalse();
+            assertThat(response.isMoreAvailable()).isTrue();
         } else if (pageSize != null && pageSize.equals("3")) {
             assertThat(response.getOrganisationInfo().get(0).getUsers()).hasSize(3);
             assertThat(response.isMoreAvailable()).isFalse();
