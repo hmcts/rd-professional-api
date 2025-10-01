@@ -49,19 +49,19 @@ import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.formatDateStrin
 @Slf4j
 public class AuthorizationFunctionalTest {
 
-    @Value("http://rpe-service-auth-provider-aat.service.core-compute-aat.internal")
+    @Value("${s2s-url}")
     protected String s2sUrl;
 
-    @Value("rd_professional_api")
+    @Value("${s2s-name}")
     protected String s2sName;
 
-    @Value("Y2ROIZ3PW4WRHVQZ")
+    @Value("${s2s-secret}")
     protected String s2sSecret;
 
-    @Value("http://localhost:8068")
+    @Value("${targetInstance}")
     protected String professionalApiUrl;
 
-    @Value("prd-admin")
+    @Value("${prd.security.roles.hmcts-admin}")
     protected String hmctsAdmin;
 
     @Value("${prd.security.roles.caseworker-civil-admin}")
