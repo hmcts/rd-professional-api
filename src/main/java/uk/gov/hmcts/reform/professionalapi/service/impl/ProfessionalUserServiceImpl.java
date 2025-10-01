@@ -193,7 +193,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
-
     @Override
     public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
         List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
@@ -211,7 +210,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
         return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
     }
-
 
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(userId);
