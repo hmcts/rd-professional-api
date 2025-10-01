@@ -49,19 +49,19 @@ import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.formatDateStrin
 @Slf4j
 public class AuthorizationFunctionalTest {
 
-    @Value("${s2s-url}")
+    @Value("http://rpe-service-auth-provider-aat.service.core-compute-aat.internal")
     protected String s2sUrl;
 
-    @Value("${s2s-name}")
+    @Value("rd_professional_api")
     protected String s2sName;
 
-    @Value("${s2s-secret}")
+    @Value("Y2ROIZ3PW4WRHVQZ")
     protected String s2sSecret;
 
-    @Value("${targetInstance}")
+    @Value("http://localhost:8068")
     protected String professionalApiUrl;
 
-    @Value("${prd.security.roles.hmcts-admin}")
+    @Value("prd-admin")
     protected String hmctsAdmin;
 
     @Value("${prd.security.roles.caseworker-civil-admin}")
@@ -554,6 +554,9 @@ public class AuthorizationFunctionalTest {
 
         for (Map user : professionalUsersResponses) {
             HashMap<String, String> orgInfo = (HashMap<String, String>) user.get("organisationInfo");
+            //assert organisation status
+            assertThat(orgInfo.get("status")).isEqualToIgnoringCase("ACTIVE");
+
             assertThat(orgInfo).isNotNull();
             String userStatus = orgInfo.get("status");
             assertThat(userStatus).isNotNull();
