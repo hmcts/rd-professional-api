@@ -87,6 +87,16 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
         Pageable pageable);
 
 
+    @Query(
+        value = """
+        SELECT pu.* FROM dbrefdata.professional_user pu
+        WHERE pu.last_updated >= :lastUpdated
+          AND pu.user_identifier IS NOT NULL
+          AND TRIM(pu.user_identifier) <> ''
+        ORDER BY pu.id
+        """,
+        nativeQuery = true
+    )
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqual(LocalDateTime lastUpdated);
 
 
@@ -109,6 +119,17 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
         @Param("lastUpdated") LocalDateTime lastUpdated,
         Pageable pageable);
 
+
+    @Query(
+        value = """
+        SELECT pu.* FROM dbrefdata.professional_user pu
+        WHERE pu.last_updated >= :lastUpdated
+          AND pu.id > :searchAfter
+          AND pu.user_identifier IS NOT NULL
+          AND TRIM(pu.user_identifier) <> ''
+        ORDER BY pu.id ASC
+        """,nativeQuery = true
+    )
     List<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThan(LocalDateTime lastUpdated,
                                                                                   UUID searchAfter);
 
@@ -120,7 +141,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
         WHERE pu.last_updated >= :lastUpdated
           AND pu.id > :searchAfter
           AND pu.user_identifier IS NOT NULL
-          AND pu.user_identifier <> ''
+          AND TRIM(pu.user_identifier) <> ''
         ORDER BY pu.id ASC
         """,
         countQuery = """
@@ -128,7 +149,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
         WHERE pu.last_updated >= :lastUpdated
           AND pu.id > :searchAfter
           AND pu.user_identifier IS NOT NULL
-          AND pu.user_identifier <> ''
+          AND TRIM(pu.user_identifier) <> ''
         """, nativeQuery = true
     )
     Page<ProfessionalUser> findByLastUpdatedGreaterThanEqualAndIdGreaterThanAndUserIdentifierIsNotEmpty(
