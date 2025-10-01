@@ -200,12 +200,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         Pageable pageableObject = PageRequest.of(0, pageSize);
         Page<ProfessionalUser> users;
         if (searchAfterOrganisation == null && searchAfterUser == null) {
-            users = professionalUserRepository
-                .findUsersInOrganisations(
-                    organisationIdentifiers, pageableObject);
+            users = professionalUserRepository.findUsersInOrganisations(organisationIdentifiers, pageableObject);
         } else {
-            users = professionalUserRepository
-                .findUsersInOrganisationsSearchAfter(
+            users = professionalUserRepository.findUsersInOrganisationsSearchAfter(
                     organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
         }
         return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
@@ -220,11 +217,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         } else {
             throw new ResourceNotFoundException("User does not exist");
         }
-
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
                 null, List.of(professionalUser), userConfiguredAccesses
         );
-
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
