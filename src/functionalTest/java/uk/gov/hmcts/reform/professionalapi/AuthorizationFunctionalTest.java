@@ -560,9 +560,7 @@ public class AuthorizationFunctionalTest {
             assertThat(orgInfo).isNotNull();
             String userStatus = orgInfo.get("status");
             assertThat(userStatus).isNotNull();
-            if (userStatus.equalsIgnoreCase(IdamStatus.ACTIVE.name())) {
-                assertThat(user.get("userIdentifier")).isNotNull();
-            }
+            assertThat(user.get("userIdentifier")).isNotNull();
             assertThat(user.get("lastUpdated")).isNotNull();
             String lastUpdated = (String) user.get("lastUpdated");
             lastUpdated = formatDateString(lastUpdated);
