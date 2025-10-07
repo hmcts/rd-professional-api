@@ -390,7 +390,7 @@ dependencies {
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.14.0'
 
-    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.10.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.14.1'
     //Added below dependencies for shedlock
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.16.0'
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.16.0'
