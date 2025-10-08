@@ -360,4 +360,23 @@ public class OrganisationFixtures {
                                 .build()
                 ));
     }
+
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrgRequestContactInfo() {
+
+        return anOrganisationCreationRequest()
+            .name("some-org-name")
+            .status("ACTIVE")
+            .superUser(aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email(RandomStringUtils.secure().nextAlphanumeric(7).concat("@test.com"))
+                .build())
+            .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .uprn("uprn")
+                .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                    .dxNumber("DX 3456789012")
+                    .dxExchange("dxExchange3").build()))
+                .build()));
+    }
 }

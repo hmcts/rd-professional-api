@@ -22,6 +22,7 @@ import static jakarta.persistence.GenerationType.AUTO;
 @NoArgsConstructor
 @Getter
 @Setter
+
 public class DxAddress implements Serializable {
 
     @Id
@@ -50,5 +51,17 @@ public class DxAddress implements Serializable {
         this.dxNumber = dxNumber;
         this.dxExchange = dxExchange;
         this.contactInformation = contactInformation;
+    }
+
+    @Override
+    public String toString() {
+        return "DxAddress{"
+            + "id=" + id
+            + ", dxNumber='" + dxNumber + '\''
+            + ", dxExchange='" + dxExchange + '\''
+            + ", contactInformation=" + contactInformation.getId()
+            + ", lastUpdated=" + lastUpdated
+            + ", created=" + created
+            + '}';
     }
 }

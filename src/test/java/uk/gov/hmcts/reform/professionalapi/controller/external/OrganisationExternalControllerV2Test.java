@@ -15,9 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
@@ -47,6 +49,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -202,4 +205,83 @@ class OrganisationExternalControllerV2Test {
                 .retrieveOrganisationForV2Api(eq(id), any(boolean.class));
     }
 
+
+    @Test
+    void testUpdateContactInformationOnly() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "addressLine1","addressLine2","addressLine3","townCity",
+                "county","country","postCode","","");
+
+        String organisationIdentifier = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString().substring(0, 7);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(204).build();
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+            .thenReturn(organisationMock);
+        when(organisationServiceMock.updateOrganisationAddress(organisationMock,updateContactInformationRequest,userId))
+            .thenReturn(responseEntity);
+        ResponseEntity<Object> updatedOrganisationResponse = organisationExternalController.updateOrganisationAddress(
+            organisationIdentifier,updateContactInformationRequest,userId);
+        assertThat(updatedOrganisationResponse).isNotNull();
+        assertThat(updatedOrganisationResponse.getStatusCode()).hasToString("204 NO_CONTENT");
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationAddress(organisationMock, updateContactInformationRequest, userId);
+
+        verify(organisationServiceMock, times(1))
+            .getOrganisationByOrgIdentifier(organisationIdentifier);
+
+        verify(organisationIdentifierValidatorImplMock, times(1))
+            .validateAddress(updateContactInformationRequest);
+
+        verify(organisationIdentifierValidatorImplMock, times(1))
+            .validateDxAddress(updateContactInformationRequest);
+
+    }
+
+
+    @Test
+    void testUpdateContactInformationWithDxAddress() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "addressLine1","addressLine2","addressLine3","townCity",
+                "county","country","postCode","dxAddress","dxExchange");
+
+        String organisationIdentifier = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString().substring(0, 7);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(204).build();
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+            .thenReturn(organisationMock);
+        when(organisationServiceMock.updateOrganisationAddress(organisationMock,updateContactInformationRequest,userId))
+            .thenReturn(responseEntity);
+        ResponseEntity<Object> updatedAddressResponse = organisationExternalController.updateOrganisationAddress(
+            organisationIdentifier,updateContactInformationRequest,userId);
+        assertThat(updatedAddressResponse).isNotNull();
+        assertThat(updatedAddressResponse.getStatusCode()).hasToString("204 NO_CONTENT");
+        verify(organisationServiceMock, times(1))
+            .updateOrganisationAddress(organisationMock, updateContactInformationRequest, userId);
+
+        verify(organisationServiceMock, times(1))
+            .getOrganisationByOrgIdentifier(organisationIdentifier);
+
+        verify(organisationIdentifierValidatorImplMock, times(1))
+            .validateAddress(updateContactInformationRequest);
+
+        verify(organisationIdentifierValidatorImplMock, times(1))
+            .validateDxAddress(updateContactInformationRequest);
+
+    }
+
+    @Test
+    void testUpdateContactInformationWithoutOrgId() {
+        UpdateContactInformationRequest updateContactInformationRequest =
+            new UpdateContactInformationRequest("UPRN1",
+                "addressLine1","addressLine2","addressLine3","townCity",
+                "county","country","postCode","dxAddress","dxExchange");
+        String userId = UUID.randomUUID().toString().substring(0, 7);
+        assertThrows(ResourceNotFoundException.class,
+            () -> organisationExternalController.updateOrganisationAddress(
+                null,updateContactInformationRequest,userId));
+    }
 }
