@@ -554,12 +554,13 @@ public class AuthorizationFunctionalTest {
 
         for (Map user : professionalUsersResponses) {
             HashMap<String, String> orgInfo = (HashMap<String, String>) user.get("organisationInfo");
+            //assert organisation status
+            assertThat(orgInfo.get("status")).isEqualToIgnoringCase("ACTIVE");
+
             assertThat(orgInfo).isNotNull();
             String userStatus = orgInfo.get("status");
             assertThat(userStatus).isNotNull();
-            if (userStatus.equalsIgnoreCase(IdamStatus.ACTIVE.name())) {
-                assertThat(user.get("userIdentifier")).isNotNull();
-            }
+            assertThat(user.get("userIdentifier")).isNotNull();
             assertThat(user.get("lastUpdated")).isNotNull();
             String lastUpdated = (String) user.get("lastUpdated");
             lastUpdated = formatDateString(lastUpdated);
