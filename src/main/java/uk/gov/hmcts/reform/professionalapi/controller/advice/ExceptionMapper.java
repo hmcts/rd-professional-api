@@ -70,12 +70,6 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
     }
 
-    @ExceptionHandler(FieldAndPersistenceValidationException.class)
-    public ResponseEntity<Object> handleFieldAndPersistenceValidationException(
-        FieldAndPersistenceValidationException ex) {
-        return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getMessage());
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> annotationDrivenValidationError(
             MethodArgumentNotValidException ex) {
