@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.FieldAndPersistenceValidationException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
@@ -147,6 +149,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
+
 
     @Override
     @Transactional
@@ -1056,5 +1059,98 @@ public class OrganisationServiceImpl implements OrganisationService {
         return !pageableOrganisations.isLast();
     }
 
+
+    @Override
+    @Transactional(rollbackFor = { FieldAndPersistenceValidationException.class })
+    public ResponseEntity<Object> updateOrganisationAddress(
+        Organisation existingOrganisation, UpdateContactInformationRequest updateContactInformationRequest,
+        String userId) {
+        try {
+            List<ContactInformation> existingContactInformationList = existingOrganisation.getContactInformation();
+            if (!existingContactInformationList.isEmpty()) {
+                deleteExistingContactInformation(existingContactInformationList);
+                ContactInformation newContactInformation = createNewContactInformation(updateContactInformationRequest,
+                    existingOrganisation);
+                ContactInformation savedContactInformation = contactInformationRepository.save(newContactInformation);
+
+                if (!isContactInformationValid(savedContactInformation)) {
+                    throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST,
+                        "Failed to save contact information");
+                }
+                //if DxAddress information is provided in request then create a new DxAddress
+                if (isDxAddressProvided(updateContactInformationRequest)) {
+                    updateOrganisationDxAddress(savedContactInformation,updateContactInformationRequest);
+                }
+            }
+        } catch (Exception ex) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.BAD_REQUEST, ex,
+                "Failed to save or update organisation address :" + ex.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    private boolean isContactInformationValid(ContactInformation contactInformation) {
+        return contactInformation != null && StringUtils.isNotEmpty(contactInformation.getAddressLine1());
+    }
+
+    private void deleteExistingContactInformation(List<ContactInformation> contactInformationList) {
+        contactInformationList.forEach(contact -> {
+            //delete all existing contact information
+            contactInformationRepository.deleteById(contact.getId());
+            //delete the corresponding dxAddress as well
+            deleteDxAddress(contact.getDxAddresses());
+        });
+    }
+
+    private ContactInformation createNewContactInformation(UpdateContactInformationRequest contactInfo,
+                                                           Organisation organisation) {
+        //creating contact information with the new information
+        ContactInformation contactInformation = new ContactInformation();
+        if (!StringUtils.isBlank(contactInfo.getUprn())) {
+            contactInformation.setUprn(RefDataUtil.removeEmptySpaces(contactInfo.getUprn()));
+        }
+        contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
+        contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
+        contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
+        contactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
+        contactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
+        contactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
+        contactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
+        contactInformation.setOrganisation(organisation);
+        contactInformation.setLastUpdated(LocalDateTime.now());
+        return contactInformation;
+    }
+
+    private boolean isDxAddressProvided(UpdateContactInformationRequest request) {
+        return StringUtils.isNotBlank(request.getDxExchange()) && StringUtils.isNotBlank(request.getDxNumber());
+    }
+
+
+    public void deleteDxAddress(List<DxAddress> dxAddressList) {
+        dxAddressList.forEach(dxAddress -> dxAddressRepository.delete(dxAddress));
+    }
+
+
+    public ResponseEntity<Object> updateOrganisationDxAddress(ContactInformation contactInformation,
+                                                              UpdateContactInformationRequest
+        updateContactInformationRequest) {
+        try {
+            DxAddress newDxAddress = new DxAddress(
+                RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxNumber()),
+                RefDataUtil.removeEmptySpaces(updateContactInformationRequest.getDxExchange()),
+                contactInformation);
+            newDxAddress.setLastUpdated(LocalDateTime.now());
+            newDxAddress.setCreated(LocalDateTime.now());
+            dxAddressRepository.save(newDxAddress);
+        } catch (Exception ex) {
+            throw new FieldAndPersistenceValidationException(HttpStatus.valueOf(400), ex,
+                "Failed to save DxAddress Information :" + ex.getMessage());
+        }
+        return ResponseEntity.status(204).build();
+    }
+
+
+
 }
+
 
