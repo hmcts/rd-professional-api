@@ -92,22 +92,6 @@ public class ContactInformation implements Serializable {
         return dxAddresses;
     }
 
-    @Override
-    public String toString() {
-        return "ContactInformation{"
-            + "uprn='" + uprn + '\''
-            + ", id=" + id
-            + ", addressLine1='" + addressLine1 + '\''
-            + ", addressLine2='" + addressLine2 + '\''
-            + ", addressLine3='" + addressLine3 + '\''
-            + ", townCity='" + townCity + '\''
-            + ", county='" + county + '\''
-            + ", country='" + country + '\''
-            + ", postCode='" + postCode + '\''
-            + ", organisation=" + organisation
-            + ", lastUpdated=" + lastUpdated
-            + ", created=" + created
-            + ", dxAddresses=" + dxAddresses
-            + '}';
-    }
+
+
 }

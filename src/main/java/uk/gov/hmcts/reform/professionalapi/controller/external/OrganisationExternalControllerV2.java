@@ -6,17 +6,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,11 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
-import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -219,71 +213,6 @@ public class OrganisationExternalControllerV2 extends SuperController {
                 .status(200)
                 .body(new OrganisationPbaResponseV2(organisation,
                         false, true, false,true));
-    }
-
-    @Operation(
-        summary = "Updates an Organisation's name or sraId",
-        description = "**IDAM Roles to access API** : <br> pui-organisation-manager",
-        security = {
-            @SecurityRequirement(name = "ServiceAuthorization"),
-            @SecurityRequirement(name = "Authorization")
-        })
-
-    @ApiResponse(
-        responseCode = "204",
-        description = "Organisation address has been updated",
-        content = @Content(schema = @Schema(implementation = String.class))
-    )
-    @ApiResponse(
-        responseCode = "400",
-        description = "An invalid request has been provided",
-        content = @Content
-    )
-    @ApiResponse(
-        responseCode = "403",
-        description = "Forbidden Error: Access denied",
-        content = @Content
-    )
-    @ApiResponse(
-        responseCode = "500",
-        description = "Internal Server Error",
-        content = @Content
-    )
-    @PutMapping(
-        value = "/contactinformation",
-        consumes = APPLICATION_JSON_VALUE,
-        produces = APPLICATION_JSON_VALUE
-    )
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @Secured({"pui-organisation-manager"})
-    public ResponseEntity<Object> updateOrganisationAddress(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationAddressUpdate")
-        @io.swagger.v3.oas.annotations.Parameter(hidden = true)
-        @OrgId String organisationIdentifier,
-        @Valid @RequestBody UpdateContactInformationRequest updateContactInformationRequest,
-        @io.swagger.v3.oas.annotations.Parameter(hidden = true)
-        @UserId String userId) {
-
-        //validate that organisation id is not null
-        if (StringUtils.isEmpty(organisationIdentifier)) {
-            throw new ResourceNotFoundException("Organisation id is missing");
-        }
-        //validate orgid is not invalid and organisation exists for given id
-        var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-
-        ResponseEntity<Object> response = null;
-
-        //validate contact information
-        organisationIdentifierValidatorImpl.validateAddress(updateContactInformationRequest);
-
-        //validate dxAddress
-        organisationIdentifierValidatorImpl.validateDxAddress(updateContactInformationRequest);
-
-        //update organisation address/dxAddress
-        response = organisationService.updateOrganisationAddress(existingOrganisation, updateContactInformationRequest,
-            userId);
-         return  response;
-
     }
 
 }
