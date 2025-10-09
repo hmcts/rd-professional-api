@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProf
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateContactInformationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
@@ -1615,16 +1614,6 @@ public class ProfessionalApiClient {
             .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }
 
-    public RequestSpecification getInvalidBearerToken(String userToken) {
-        return SerenityRest.with()
-            .relaxedHTTPSValidation()
-            .baseUri(professionalApiUrl)
-            .header("Content-Type", APPLICATION_JSON_VALUE)
-            .header("Accepts", APPLICATION_JSON_VALUE)
-            .header(SERVICE_HEADER, "Bearer " + s2sToken)
-            .header(AUTHORIZATION_HEADER, "Bearer " + userToken + "RTERT$£%£$%£$%£$");
-    }
-
     public RequestSpecification getUserEmailAsHeaderWithExisting(String userToken, String email) {
         return SerenityRest.with()
                 .relaxedHTTPSValidation()
@@ -1762,16 +1751,5 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Delete Multiple Addresses of an organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
-    }
-
-    public Response updateContactInformationDetails(UpdateContactInformationRequest updateContactInformationRequest,
-                                                    RequestSpecification requestSpecification) {
-
-        Response response = requestSpecification
-            .body(updateContactInformationRequest)
-            .put("/refdata/external/v2/organisations/contactinformation")
-            .andReturn();
-
-        return response;
     }
 }
