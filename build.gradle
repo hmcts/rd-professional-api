@@ -396,7 +396,7 @@ dependencies {
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.16.0'
 
     implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.7'
-    implementation group: 'org.json', name: 'json', version: '20240303'
+    implementation group: 'org.json', name: 'json', version: '20250517'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
