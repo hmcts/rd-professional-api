@@ -333,7 +333,7 @@ dependencies {
 
     implementation group: 'io.github.openfeign.form', name: 'feign-form', version: versions.feign
     implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: versions.feign
-    implementation "io.github.openfeign:feign-httpclient:13.5"
+    implementation "io.github.openfeign:feign-httpclient:13.6"
     implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
@@ -449,7 +449,7 @@ dependencies {
 
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
 
-    testImplementation 'io.github.openfeign:feign-jackson:13.5'
+    testImplementation 'io.github.openfeign:feign-jackson:13.6'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
     testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 
