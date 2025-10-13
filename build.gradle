@@ -177,7 +177,7 @@ pmd {
 }
 
 checkstyle {
-  toolVersion = '12.0.0'
+  toolVersion = '12.0.1'
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
