@@ -485,6 +485,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("findOrganisationBySinceDateInternalV2ShouldBeSuccess :: END");
     }
 
+
     private void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response, String pageSize,
                                                         String sinceDate) {
         List<HashMap> organisations = (List<HashMap>) response.get("organisations");
