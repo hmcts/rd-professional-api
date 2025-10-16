@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import net.serenitybdd.rest.SerenityRest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,8 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.lib.client.response.S2sClient;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
@@ -29,7 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.Map;
@@ -38,7 +39,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@SerenityTest
+@ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource({"classpath:application.yaml","classpath:application-functional-bulkcustomer.yaml"})
 public class BulkCivilApiFunctionalTest {
@@ -209,7 +210,7 @@ public class BulkCivilApiFunctionalTest {
         Map<String, Object> bulkOrganisationResponse = retrieveOrganisationForBulkCustomerDetails(bulkCustomerRequest,
                 HttpStatus.FORBIDDEN, "pui-user-manager");
         assertThat(bulkOrganisationResponse.get("errorDescription").toString())
-                .contains("Access is denied");
+                .contains("Access Denied");
 
 
     }
@@ -274,7 +275,6 @@ public class BulkCivilApiFunctionalTest {
     @Test
     @ToggleEnable(mapKey = "BulkCustomerDetailsInternalController.retrieveOrganisationDetailsForBulkCustomer",
             withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void retrieveBulkCustomerDetailsWithLaunchDarklyFlagOff() {
         BulkCustomerRequest bulkCustomerRequest = new BulkCustomerRequest();
         bulkCustomerRequest.setBulkCustomerId("bulkCustomerId");
@@ -289,7 +289,7 @@ public class BulkCivilApiFunctionalTest {
                                                                           HttpStatus status, String role) {
         Response response = getMultipleAuthHeadersInternal(role)
                 .body(request)
-                .post("/refdata/internal/v1/bulkCustomer/")
+                .post("/refdata/internal/v1/bulkCustomer")
                 .andReturn();
 
         response.then()

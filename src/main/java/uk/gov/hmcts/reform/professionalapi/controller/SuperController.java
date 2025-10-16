@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import feign.FeignException;
 import feign.Response;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -64,11 +65,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -345,7 +345,6 @@ public abstract class SuperController {
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
-        Boolean  isOrgApprovalRequest = false;
         if (isBlank(organisationCreationRequest.getStatus())) {
             throw new InvalidRequest("Mandatory field status is missing");
         }
@@ -366,6 +365,7 @@ public abstract class SuperController {
 
         var superUser = existingOrganisation.getUsers().get(0);
         var professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
+        Boolean  isOrgApprovalRequest = false;
         if ((existingOrganisation.getStatus().isPending() || existingOrganisation.getStatus().isReview())
                 && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {

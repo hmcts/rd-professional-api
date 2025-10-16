@@ -39,3 +39,4 @@ java:
     enabled: true
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
+    

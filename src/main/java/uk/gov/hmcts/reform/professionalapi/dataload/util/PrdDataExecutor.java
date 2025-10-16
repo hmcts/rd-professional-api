@@ -8,7 +8,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.dataload.service.AuditServiceImpl;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.FAILURE;
 import static uk.gov.hmcts.reform.professionalapi.dataload.util.MappingConstants.IS_READY_TO_AUDIT;

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -767,7 +768,7 @@ class ProfessionalUserServiceImplTest {
         ResponseEntity<NewUserResponse> newResponse = professionalUserService
                 .findUserStatusByEmailAddress(professionalUser.getEmailAddress());
 
-        assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
+        assertThat(newResponse.getStatusCode().value()).isEqualTo(404);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
@@ -1251,16 +1252,50 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void test_fetchUsersForRefresh_WithNullIdentfiers() {
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+            "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUser.setUserIdentifier(null);
+        professionalUserList.add(professionalUser);
+
+        ProfessionalUser professionalUser1 = new ProfessionalUser("fName1", "lName1",
+            "some@email.com", organisation);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUser.setUserIdentifier("12345");
+        professionalUserList.add(professionalUser1);
+
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any()))
+            .thenReturn(professionalUserList);
+
+        LocalDateTime currentDateTime = LocalDateTime.of(2023,12,6,13,36,25);
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+
+        ResponseEntity<Object> responseEntity = professionalUserService.fetchUsersForRefresh(since, null, null, null);
+        GetRefreshUsersResponse res = (GetRefreshUsersResponse)responseEntity.getBody();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(res.getUsers()).isNotNull();
+        assertThat(res.getUsers()).hasSize(1);
+        assertThat(res.getUsers().get(0).getUserIdentifier()).isEqualTo("12345");
+        verify(professionalUserRepository, times(1))
+            .findByLastUpdatedGreaterThanEqual(any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void test_fetchUsersForRefreshPageable() {
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = mock(Page.class);
 
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+        ProfessionalUser profUser = new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation);
-        professionalUser.setCreated(LocalDateTime.now());
-        professionalUserList.add(professionalUser);
+        profUser.setCreated(LocalDateTime.now());
+        professionalUserList.add(profUser);
 
-        when(professionalUserRepository.findByLastUpdatedGreaterThanEqual(any(), any()))
+        when(professionalUserRepository.findByLastUpdatedGreaterThanEqualAndUserIdentifierIsNotEmpty(any(), any()))
                 .thenReturn(professionalUserPage);
 
         when(professionalUserPage.getContent()).thenReturn(professionalUserList);
@@ -1275,7 +1310,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(professionalUserRepository, times(1))
-                .findByLastUpdatedGreaterThanEqual(any(), any());
+                .findByLastUpdatedGreaterThanEqualAndUserIdentifierIsNotEmpty(any(), any());
     }
 
     @Test

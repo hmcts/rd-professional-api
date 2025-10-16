@@ -53,7 +53,7 @@ spring:
     caffeine:
       spec: maximumSize=50,expireAfterWrite=1m
 
-### database configuration
+  ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5428}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
@@ -98,7 +98,6 @@ security:
     - "/loggers/**"
     - "/swagger-ui.html"
     - "/swagger-resources/**"
-    - "/v3/api-docs"
     - "/v3/**"
     - "/swagger-ui/**"
     - "/webjars/springfox-swagger-ui/**"
@@ -170,3 +169,9 @@ azure:
     account-key: ${ACCOUNT_KEY:ACCOUNT_KEY}
     container-name: ${CONTAINER_NAME:CONTAINER_NAME}
     blob-url-suffix: ${BLOB_URL_SUFFIX:BLOB_URL_SUFFIX}
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    operationsSorter: method
+  writer-with-order-by-keys: true

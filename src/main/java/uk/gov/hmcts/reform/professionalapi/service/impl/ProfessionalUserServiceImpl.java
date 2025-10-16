@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import feign.FeignException;
 import feign.Response;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -50,8 +51,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.transaction.Transactional;
 
+import static org.codehaus.plexus.util.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
@@ -144,13 +145,17 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             );
         }
 
-        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
+        List<ProfessionalUser> professionalUsersFiltered = professionalUsers.stream()
+            .filter(pu -> isNotBlank(pu.getUserIdentifier()))
+            .toList();
+
+        List<UserConfiguredAccess> userConfiguredAccesses = professionalUsersFiltered.stream()
                 .map(ProfessionalUser::getUserConfiguredAccesses)
                 .flatMap(Collection::stream)
                 .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-                null, professionalUsers, userConfiguredAccesses
+                null, professionalUsersFiltered, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -162,27 +167,45 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         Page<ProfessionalUser> professionalUsersPage;
 
         if (searchAfter == null) {
-            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqual(
-                    formattedSince, pageable
+            professionalUsersPage = professionalUserRepository
+                .findByLastUpdatedGreaterThanEqualAndUserIdentifierIsNotEmpty(
+                formattedSince, pageable
             );
         } else {
-            professionalUsersPage = professionalUserRepository.findByLastUpdatedGreaterThanEqualAndIdGreaterThan(
-                    formattedSince, searchAfter, pageable
+            professionalUsersPage = professionalUserRepository
+                .findByLastUpdatedGreaterThanEqualAndIdGreaterThanAndUserIdentifierIsNotEmpty(
+                formattedSince, searchAfter, pageable
             );
         }
 
         List<ProfessionalUser> professionalUsers = professionalUsersPage.getContent();
 
+
         List<UserConfiguredAccess> userConfiguredAccesses = professionalUsers.stream()
-                .map(ProfessionalUser::getUserConfiguredAccesses)
-                .flatMap(Collection::stream)
-                .toList();
+            .map(ProfessionalUser::getUserConfiguredAccesses)
+            .flatMap(Collection::stream)
+            .toList();
 
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
-                professionalUsersPage, professionalUsers, userConfiguredAccesses
+            professionalUsersPage, professionalUsers, userConfiguredAccesses
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @Override
+    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
+        List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
+        UUID searchAfterOrganisation) {
+        Pageable pageableObject = PageRequest.of(0, pageSize);
+        Page<ProfessionalUser> users;
+        if (searchAfterOrganisation == null && searchAfterUser == null) {
+            users = professionalUserRepository.findUsersInOrganisations(organisationIdentifiers, pageableObject);
+        } else {
+            users = professionalUserRepository.findUsersInOrganisationsSearchAfter(
+                    organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
+        }
+        return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
     }
 
     public ResponseEntity<Object> findSingleRefreshUser(String userId) {
@@ -194,11 +217,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         } else {
             throw new ResourceNotFoundException("User does not exist");
         }
-
         GetRefreshUsersResponse res = RefDataUtil.buildGetRefreshUsersResponse(
                 null, List.of(professionalUser), userConfiguredAccesses
         );
-
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
@@ -337,25 +358,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
     }
 
-    @Override
-    public UsersInOrganisationsByOrganisationIdentifiersResponse retrieveUsersByOrganisationIdentifiersWithPageable(
-            List<String> organisationIdentifiers, Integer pageSize, UUID searchAfterUser,
-            UUID searchAfterOrganisation) {
-
-        Pageable pageableObject = PageRequest.of(0, pageSize);
-        Page<ProfessionalUser> users;
-        if (searchAfterOrganisation == null && searchAfterUser == null) {
-            users = professionalUserRepository
-                    .findUsersInOrganisations(
-                            organisationIdentifiers, pageableObject);
-        } else {
-            users = professionalUserRepository
-                    .findUsersInOrganisationsSearchAfter(
-                            organisationIdentifiers, searchAfterOrganisation, searchAfterUser, pageableObject);
-        }
-
-        return new UsersInOrganisationsByOrganisationIdentifiersResponse(users.getContent(), !users.isLast());
-    }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
 
