@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -17,7 +18,7 @@ import java.util.Set;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SerenityTest
+@ExtendWith(SerenityJUnit5Extension.class)
 @Slf4j
 class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
 

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +32,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -150,9 +150,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     public UpdatePbaStatusResponse updatePaymentAccountsStatusForAnOrganisation(
             List<PbaUpdateRequest> pbaRequestList, String orgId) {
-
         var pbasFromRequest = new HashSet<String>();
-        List<PaymentAccount> pbasFromDb = new ArrayList<>();
 
         //Get PBAs from request
         pbaRequestList.forEach(pba -> pbasFromRequest.add(pba.getPbaNumber()));
@@ -167,6 +165,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         //Remove any null references caused by any null PBA values that may be present in request
         pbasFromRequest.remove(null);
 
+        List<PaymentAccount> pbasFromDb = new ArrayList<>();
         //get PBAs from DB and remove invalid PBAs & PBAs that don't exist in DB from PBAs to update
         if (isNotEmpty(pbasFromRequest)) {
             pbasFromDb = paymentAccountRepository.findByPbaNumberIn(pbasFromRequest);
@@ -313,3 +312,4 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         return pba.getStatusMessage() == null ? "" : pba.getStatusMessage();
     }
 }
+

@@ -7,10 +7,12 @@ import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -76,7 +77,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.getUserIdAnd
 import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwksResponse;
 
 @Configuration
-@SerenityTest
+@ExtendWith(SerenityJUnit5Extension.class)
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
         "USER_PROFILE_URL:http://127.0.0.1:8091"})
@@ -167,7 +168,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String ACTIVE = "ACTIVE";
     protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE =
             "User status must be Active to perform this operation";
-    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access Denied";
     protected static final String USER_IDENTIFIER = "userIdentifier";
     protected static final String ORG_IDENTIFIER = "organisationIdentifier";
     protected static final String ORG_INFO = "organisationInfo";
@@ -180,11 +181,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected FeatureToggleServiceImpl featureToggleService;
 
     @MockBean
-    public static JwtDecoder jwtDecoder;
+    protected JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
+        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration, jwtDecoder);
         when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
     }
 
@@ -292,7 +293,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         orgAttributeRepository.deleteAll();
         bulkCustomerDetailsRepository.deleteAll();
         organisationRepository.deleteAll();
-        JwtDecoderMockBuilder.resetJwtDecoder();
     }
 
     protected String settingUpOrganisation(String role) {
