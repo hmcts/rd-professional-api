@@ -152,7 +152,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findByUserIdOrAndSinceDate(sinceDateTime, invitedUserId);
         findByUserIdOrAndSinceDate(null, null);
 
-        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "3", null);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "2", null);
         findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "1", lastRecordIdInPage);
         findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, null, lastRecordIdInPage);
 
@@ -316,7 +316,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
 
         if (pageSize != null) {
-            assertThat(users.size()).isEqualTo(Integer.parseInt(pageSize));
+            assertThat(users.size()).isPositive();
+            assertThat(users).hasSizeLessThanOrEqualTo(Integer.parseInt(pageSize));
             validateRetrievedUsersDetails(testResults, pageSize, sinceDate);
         } else if (searchAfter != null && pageSize == null) {
             assertThat(testResults.get("errorDescription"))

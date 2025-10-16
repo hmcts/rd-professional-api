@@ -2,41 +2,42 @@ plugins {
     id 'application'
     id 'idea'
     id 'project-report'
-    id 'uk.gov.hmcts.java' version '0.12.65'
+    id 'uk.gov.hmcts.java' version '0.12.67'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.52.0'
+    id 'checkstyle'
+    id 'com.github.ben-manes.versions' version '0.53.0'
     id "info.solidsoft.pitest" version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.sonarqube' version '6.0.1.5171'
+    id 'org.sonarqube' version '6.3.1.5724'
     id 'org.springframework.boot' version '3.3.7'
     id "org.flywaydb.flyway" version '9.22.3'
     id 'au.com.dius.pact' version '4.6.17'
-    id 'org.owasp.dependencycheck' version '11.1.1'
-    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.16'
+    id 'org.owasp.dependencycheck' version '12.1.6'
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.34'
 }
 
 
 ext {
-    springCloudVersion = '2023.0.5'
+    springCloudVersion = '2023.0.6'
 }
 
 def versions = [
-        lombok          : '1.18.36',
+        lombok          : '1.18.42',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
-        reformLogging   : '6.1.8',
-        camel           : '3.22.2',
+        reformLogging   : '6.1.9',
+        camel           : '3.22.4',
         pact_version    : '4.6.17',
         launchDarklySdk : '5.10.9',
         junit           : '5.11.4',
         junitPlatform   : '1.11.4',
-        log4j           : '2.24.3',
-        reformS2sClient : '5.3.0',
+        log4j           : '2.25.2',
+        reformS2sClient : '5.3.3',
         feign           : '3.8.0',
-        bouncycastle    : '1.80',
+        bouncycastle    : '1.82',
         postgresql_tc   : '1.20.0',
-        serenity        : '4.2.16'
+        serenity        : '4.2.34'
 ]
 
 application {
@@ -165,7 +166,7 @@ configurations {
 check.dependsOn jacocoTestCoverageVerification
 
 pmd {
-    toolVersion = '7.10.0'
+    toolVersion = '7.17.0'
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.functionalTest, sourceSets.smokeTest]
     reportsDir = file("$project.buildDir/reports/pmd")
@@ -173,6 +174,10 @@ pmd {
             'category/java/errorprone.xml',
             'category/java/bestpractices.xml'
     ]
+}
+
+checkstyle {
+  toolVersion = '12.0.1'
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
@@ -244,7 +249,7 @@ pact {
 }
 
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.14"
 }
 
 jacocoTestReport {
@@ -321,7 +326,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.11'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.12'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
 
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: versions.bouncycastle
@@ -334,28 +339,28 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.0'
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.2'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.18.2', ext: 'pom'
+    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.20.0', ext: 'pom'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
-    implementation 'com.github.hmcts:idam-java-client:3.0.3'
+    implementation 'com.github.hmcts:idam-java-client:3.0.4'
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.19.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.20.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.22.0'
     runtimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '10.22.0'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.8'
 
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.0-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'
 
     implementation group: 'jakarta.el', name: 'jakarta.el-api', version: '6.0.1'
 
@@ -368,7 +373,7 @@ dependencies {
     testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
 
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-rc-1'
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.12.1'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
@@ -377,21 +382,21 @@ dependencies {
     implementation group: 'org.apache.camel', name: 'camel-csv', version: versions.camel
     implementation group: 'org.apache.camel', name: 'camel-sql', version: versions.camel
     implementation group: 'org.apache.camel', name: 'camel-spring-batch', version: versions.camel
-    implementation group: 'com.opencsv', name: 'opencsv', version: '3.10'
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.12.0'
     implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
-    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.4.1'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.10.0'
-    implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.2.0'
+    implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.22.4'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.14.0'
+    implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.14.0'
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.10.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.14.0'
 
-    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.10.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.14.1'
     //Added below dependencies for shedlock
-    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '5.16.0'
-    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '5.16.0'
+    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '6.10.0'
+    implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '6.10.0'
 
     implementation group: 'com.nimbusds', name: 'lang-tag', version: '1.7'
-    implementation group: 'org.json', name: 'json', version: '20240303'
+    implementation group: 'org.json', name: 'json', version: '20250517'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -427,15 +432,15 @@ dependencies {
         exclude group: "net.bytebuddy", module: "byte-buddy"
         exclude group: "net.bytebuddy", module: "byte-buddy-agent"
     }
-    testImplementation 'com.github.hmcts:rd-commons-lib:0.1.1'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.15.2'
+    testImplementation 'com.github.hmcts:rd-commons-lib:0.1.2'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.20.0'
 
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     // tests on version 2 fails on flyway migrations, something like "incorrect syntax"
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
 
-    testImplementation group: 'org.wiremock', name: 'wiremock', version: '3.12.0'
+    testImplementation group: 'org.wiremock', name: 'wiremock', version: '3.13.1'
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'junit', module: 'junit'
@@ -446,10 +451,10 @@ dependencies {
 
     testImplementation 'io.github.openfeign:feign-jackson:13.5'
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
-    testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
+    testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.0'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.5'
 
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version

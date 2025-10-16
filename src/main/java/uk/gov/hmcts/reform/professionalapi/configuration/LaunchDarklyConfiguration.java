@@ -13,9 +13,12 @@ public class LaunchDarklyConfiguration implements WebMvcConfigurer {
     private FeatureConditionEvaluation featureConditionEvaluation;
 
     /**
-     * add here entry in registry and api endpoint path pattern like below
-     * registry.addInterceptor(featureConditionEvaluation)
-     * addPathPatterns("/refdata/external/v1/organisations/status/**");
+     * Add here entry in registry and api endpoint path pattern like below.
+     * <pre>
+     * {@code registry.addInterceptor(featureConditionEvaluation)
+     *     addPathPatterns("/refdata/external/v1/organisations/status/**");
+     * }
+     * </pre>
      * @param registry registry
      */
     @Override
