@@ -9,7 +9,7 @@ on:
 jobs:
   combine-prs:
     name: "Combine Renovate Pull Requests"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: hmcts/am-github-actions/combine-prs@master
         name: "Combine Renovate Pull Requests"
