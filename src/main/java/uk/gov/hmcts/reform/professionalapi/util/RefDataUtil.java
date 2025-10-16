@@ -171,8 +171,7 @@ public class RefDataUtil {
             if (response.status() > 300) {
                 String errorMessage = nonNull(responseResponseEntity.getBody())
                         ? ((ErrorResponse)responseResponseEntity.getBody()).getErrorMessage() : ERROR_MESSAGE_UP_FAILED;
-                throw new ExternalApiException(responseResponseEntity.getStatusCode(), errorMessage);
-
+                throw new ExternalApiException((HttpStatus)responseResponseEntity.getStatusCode(), errorMessage);
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
         } catch (FeignException ex) {
@@ -346,8 +345,6 @@ public class RefDataUtil {
 
     public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page<?> page,
                                                                          ResponseEntity<Object> responseEntity) {
-        HttpHeaders headers = new HttpHeaders();
-
         final StringBuilder pageInformation = new StringBuilder();
         pageInformation.append("totalElements = " + page.getTotalElements());
         pageInformation.append(",");
@@ -359,6 +356,7 @@ public class RefDataUtil {
         pageInformation.append(",");
         pageInformation.append("sortedBy = " + pageable.getSort());
 
+        HttpHeaders headers = new HttpHeaders();
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());
         } else {
@@ -626,3 +624,4 @@ public class RefDataUtil {
     }
 
 }
+
