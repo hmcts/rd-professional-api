@@ -1,3 +1,9 @@
+buildscript {
+  dependencies {
+    classpath "org.flywaydb:flyway-database-postgresql:11.14.1"
+  }
+}
+
 plugins {
     id 'application'
     id 'idea'
