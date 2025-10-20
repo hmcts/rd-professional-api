@@ -359,7 +359,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.19.0'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.14.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.20.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.14.1'
