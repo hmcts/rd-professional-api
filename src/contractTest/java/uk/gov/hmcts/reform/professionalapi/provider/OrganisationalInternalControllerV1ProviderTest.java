@@ -39,7 +39,7 @@ public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProvi
         testTarget.setControllers(organisationInternalController);
     }
 
-    @State("organisation exists for given Id")
+    @State("Organisation exists for given Id")
     public void toRetrieveOrganisationByUserId()  {
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(
