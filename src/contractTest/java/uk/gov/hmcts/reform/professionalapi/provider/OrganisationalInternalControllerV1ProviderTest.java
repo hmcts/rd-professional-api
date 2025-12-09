@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -42,7 +43,7 @@ public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProvi
         testTarget.setMessageConverters(httpMessageConverter);
     }
 
-    @State("Organisation exists for given Id")
+    @State("organisation exists for given Id")
     public void toRetrieveOrganisationByUserId()  {
         ProfessionalUser professionalUser = setUpProfessionalUser();
         when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(professionalUser);
@@ -74,6 +75,7 @@ public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProvi
         organisation.addProfessionalUser(superUser);
 
         ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setId(UUID.fromString("98b33d54-2a0b-4da0-8b8c-5215b0fc114b"));
         contactInformation.setAddressLine1("Ministry Of Justice");
         contactInformation.setAddressLine2("Seventh Floor 102 Petty France");
         contactInformation.setTownCity("London");
