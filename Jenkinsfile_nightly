@@ -74,7 +74,8 @@ withNightlyPipeline(type, product, component) {
 
     enableMutationTest()
     enableFullFunctionalTest()
-    enableSecurityScan()
+    // DTSRD-5510 Temp disabling of Security Scan (Zap) in Nightly
+    //enableSecurityScan()
     enableFortifyScan()
 
     afterAlways('fullFunctionalTest') {
