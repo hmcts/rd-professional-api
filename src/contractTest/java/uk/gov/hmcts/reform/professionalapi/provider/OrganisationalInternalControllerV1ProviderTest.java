@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalDetailsInternal")
@@ -45,11 +44,43 @@ public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProvi
 
     @State("organisation exists for given Id")
     public void toRetrieveOrganisationByUserId()  {
+        ProfessionalUser pcsApiProfessionalUser = setUpPcsProfessionalUser();
         ProfessionalUser professionalUser = setUpProfessionalUser();
-        when(professionalUserRepositoryMock.findByUserIdentifier(anyString())).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier("someId")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier("4d318f91-5591-44e3-870b-ad5616f65627"))
+                .thenReturn(pcsApiProfessionalUser);
     }
 
     private ProfessionalUser setUpProfessionalUser() {
+        Organisation organisation = new Organisation();
+        organisation.setCompanyNumber("companyNumber");
+        organisation.setCompanyUrl("companyUrl");
+        organisation.setName("theKCompany");
+        organisation.setOrganisationIdentifier("BJMSDFDS80808");
+        organisation.setSraId("sraId");
+        organisation.setSraRegulated(true);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setAddressLine1("addressLine1");
+        contactInformation.setAddressLine2("addressLine2");
+        contactInformation.setCountry("UK");
+        contactInformation.setPostCode("SM12SX");
+        organisation.addContactInformation(contactInformation);
+
+        SuperUser superUser = new SuperUser();
+        superUser.setEmailAddress("email");
+        superUser.setFirstName("firstName");
+        superUser.setLastName("lastName");
+        organisation.addProfessionalUser(superUser);
+
+        ProfessionalUser pu = new ProfessionalUser();
+        pu.setOrganisation(organisation);
+        return pu;
+    }
+
+
+    private ProfessionalUser setUpPcsProfessionalUser() {
         Organisation organisation = new Organisation();
         organisation.setName("Possession Claims Solicitor Org");
         organisation.setCreated(LocalDateTime.parse("2025-09-11T13:46:54.42977"));
