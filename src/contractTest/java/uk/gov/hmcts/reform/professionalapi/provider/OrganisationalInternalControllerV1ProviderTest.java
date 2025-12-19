@@ -42,7 +42,7 @@ public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProvi
         testTarget.setMessageConverters(httpMessageConverter);
     }
 
-    @State("organisation exists for given Id")
+    @State("Organisation exists for given Id")
     public void toRetrieveOrganisationByUserId()  {
         ProfessionalUser pcsApiProfessionalUser = setUpPcsProfessionalUser();
         ProfessionalUser professionalUser = setUpProfessionalUser();
