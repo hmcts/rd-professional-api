@@ -6,6 +6,13 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "rd"
 def component = "professional-api"
+
+def baseServiceName = "${product}-${component}".toLowerCase()
+
+// Align preview AKS deployments with the per-PR DNS convention expected by the platform pipeline.
+if (env.CHANGE_ID) {
+    env.SERVICE_FQDN = "${baseServiceName}-pr-${env.CHANGE_ID}.preview.platform.hmcts.net"
+}
 /* The below Key Vault secrets will be used for functional and smoke tests */
 def secrets = [
         's2s-${env}': [
