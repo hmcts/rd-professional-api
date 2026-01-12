@@ -1390,8 +1390,10 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
-                .get("/refdata/internal/v2/organisations?status=" + status)
-                .andReturn();
+            .queryParam("status", status)
+            .when()
+            .get("/refdata/internal/v2/organisations")
+            .andReturn();
         log.debug("{}:: Retrieve organisation response by status: {}", loggingComponentName, response.getStatusCode());
         response.then()
                 .assertThat()
