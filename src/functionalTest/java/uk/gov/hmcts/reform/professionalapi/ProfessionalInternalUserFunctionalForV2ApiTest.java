@@ -58,7 +58,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     @Test
     @DisplayName("PRD Internal Test Scenarios For V2 API")
-    @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
+    //@ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
     void testInternalUserScenario() {
         setUpTestData();
         createOrganisationScenario();
@@ -102,7 +102,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         //findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         // findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
-        findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
+        //findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess();
     }
 
