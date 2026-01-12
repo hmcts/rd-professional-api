@@ -1397,16 +1397,6 @@ public class ProfessionalApiClient {
             .andReturn();
         log.debug("{}:: Retrieve organisation response by status: {}", loggingComponentName, response.getStatusCode());
 
-        given()
-            .log().all()  // logs headers, url, params
-            .headers((Map<String, ?>) getMultipleAuthHeadersInternal())
-            .queryParam("status", status)
-            .when()
-            .get("/refdata/internal/v2/organisations")
-            .then()
-            .log().all()  // logs response
-            .assertThat().statusCode(OK.value());
-
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
