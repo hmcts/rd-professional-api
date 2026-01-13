@@ -102,7 +102,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
-        //findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
+        findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess();
     }
 
