@@ -100,7 +100,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     public void findOrganisationScenarios() {
         findOrganisationByIdByInternalUserShouldBeSuccess();
         findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
-        //findActiveOrganisationsByInternalUserShouldBeSuccess();
+        findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
         //findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess();
