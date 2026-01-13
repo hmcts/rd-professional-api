@@ -1390,7 +1390,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
             .body("")
-            .get("/refdata/internal/v2/organisations?since=2026-01-10T00:00:00&status=Pending")
+            .get("/refdata/internal/v2/organisations?since=2026-01-10T00:00:00&status=" + status)
             .andReturn();
         log.debug("{}:: Retrieve organisation response by status: {}", loggingComponentName, response.getStatusCode());
 
