@@ -620,7 +620,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveAllOrganisationsV2(String role) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
-                .get("/refdata/internal/v2/organisations")
+                .get("/refdata/internal/v2/organisations?since=2026-01-10T00:00:00")
                 .andReturn();
 
 
@@ -1392,7 +1392,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
             .body("")
-            .get("/refdata/internal/v1/organisations?status=" + status)
+            .get("/refdata/internal/v1/organisations?since=2026-01-10T00:00:00&status=" + status)
             .andReturn();
         log.debug("{}:: Retrieve organisation response by status: {}", loggingComponentName, response.getStatusCode());
         response.then()
@@ -1405,10 +1405,8 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveOrganisationDetailsByStatusV2(String status, String role) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .body("")
-            .queryParam("status", status)
-            .when()
-            .get("/refdata/internal/v2/organisations")
+            .body("")
+            .get("/refdata/internal/v2/organisations?since=2026-01-10T00:00:00&status=" + status)
             .andReturn();
         log.debug("{}:: Retrieve organisation response by status: {}", loggingComponentName, response.getStatusCode());
 
