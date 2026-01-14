@@ -697,6 +697,7 @@ public class OrganisationInternalController extends SuperController {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
 
+
     @Operation(
             summary = "Retrieves Organisations by Organisation Profile IDs",
             description = "**Bearer token not required to access API. Only a valid s2s token**",
@@ -740,9 +741,9 @@ public class OrganisationInternalController extends SuperController {
 
         MultipleOrganisationsResponse response = organisationService.retrieveOrganisationsByProfileIdsWithPageable(
                         organisationByProfileIdsRequest.getOrganisationProfileIds(), pageSize, searchAfter);
-
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
     }
+
 }
