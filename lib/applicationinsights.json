@@ -2,5 +2,22 @@
   "connectionString": "${file:/mnt/secrets/rd/app-insights-connection-string}",
   "role": {
     "name": "Professional Reference Data API"
+  },
+  "preview": {
+    "sampling": {
+      "overrides": [
+        {
+          "telemetryType": "request",
+          "attributes": [
+            {
+              "key": "http.url",
+              "value": "https?://[^/]+/health.*",
+              "matchType": "regexp"
+            }
+          ],
+          "percentage": 1
+        }
+      ]
+    }
   }
 }
