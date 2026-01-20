@@ -1,5 +1,3 @@
--- Indexes to optimize high-traffic refdata queries
-
 CREATE INDEX IF NOT EXISTS idx_organisation_status_last_updated_id
     ON dbrefdata.organisation (status, last_updated, id);
 
