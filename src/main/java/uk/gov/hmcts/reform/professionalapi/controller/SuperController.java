@@ -421,8 +421,10 @@ public abstract class SuperController {
             String status, boolean address) {
 
         isInputOrganisationStatusValid(status, allowedOrganisationStatus);
-
-        var organisations = organisationService.getOrganisationByStatus(ACTIVE);
+        var orgStatus = valueOf(status.toUpperCase());
+        var organisations = address
+            ? organisationService.getOrganisationByStatusWithContactInformations(orgStatus)
+            : organisationService.getOrganisationByStatus(orgStatus);
 
         if (isEmpty(organisations)) {
             throw new ResourceNotFoundException("No Organisations found");

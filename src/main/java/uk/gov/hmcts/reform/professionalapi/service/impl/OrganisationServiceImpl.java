@@ -861,6 +861,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         return organisationRepository.findByStatus(status);
     }
 
+    public List<Organisation> getOrganisationByStatusWithContactInformations(OrganisationStatus status) {
+        return organisationRepository.findByStatusWithContactInformations(status);
+    }
+
     public List<Organisation> getOrganisationByStatus(OrganisationStatus status, Pageable pageable) {
         if (pageable != null) {
             return organisationRepository.findByStatus(status, pageable).getContent();
