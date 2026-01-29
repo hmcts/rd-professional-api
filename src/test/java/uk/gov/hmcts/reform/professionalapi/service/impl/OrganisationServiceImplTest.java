@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
@@ -49,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgSraResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -97,6 +99,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -180,6 +183,8 @@ class OrganisationServiceImplTest {
     private DxAddressCreationRequest dxAddressRequest;
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
+
+    private OrganisationSraUpdateRequest organisationSraUpdateRequest;
 
     private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
@@ -1930,6 +1935,41 @@ class OrganisationServiceImplTest {
         verify(paymentAccountMock, times(1)).setPbaStatus(pbaStatusMock);
         verify(paymentAccountMock, times(1)).setStatusMessage("statusMessage");
     }
+
+
+    @Test
+    void test_updateOrganisationSra() {
+        String newSraId = randomAlphabetic(7);
+        Organisation organisation1 = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData1 =
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(
+                organisation1.getOrganisationIdentifier(),newSraId);
+        final List<UpdateOrgSraResponse> updateOrgNameResponsesList = new ArrayList<>();
+        organisation1.setName(RefDataUtil.removeEmptySpaces(organisationSraUpdateData1.getSraId()));
+        organisation1.setLastUpdated(LocalDateTime.now());
+
+        OrgAttribute orgAttributeMock = mock(OrgAttribute.class);
+
+        when(orgAttributeRepository.save(any(OrgAttribute.class))).thenReturn(orgAttributeMock);
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.save(organisation1)).thenReturn(organisationMock);
+
+        List<UpdateOrgSraResponse> updateNameResponse = sut.updateOrganisationSra(organisation1,
+            organisationSraUpdateData1,updateOrgNameResponsesList);
+
+        assertNotNull(updateNameResponse);
+
+        verify(organisationRepository, times(1))
+            .save(organisation1);
+        verify(orgAttributeRepository, times(1))
+            .save(any(OrgAttribute.class));
+
+
+    }
+
+
 
     @Test
     void test_AllAttributesAddedToSuperUser() {
