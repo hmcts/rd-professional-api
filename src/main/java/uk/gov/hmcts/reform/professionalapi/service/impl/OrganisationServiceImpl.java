@@ -868,6 +868,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         return organisationRepository.findByStatus(status);
     }
 
+    public List<Organisation> getOrganisationByStatusWithContactInformations(OrganisationStatus status) {
+        return organisationRepository.findByStatusWithContactInformations(status);
+    }
+
     public ResponseEntity<Object> getOrganisationsByPbaStatus(String pbaStatus) {
 
         if (Stream.of(PbaStatus.values()).noneMatch(status -> status.name().equalsIgnoreCase(pbaStatus))) {
