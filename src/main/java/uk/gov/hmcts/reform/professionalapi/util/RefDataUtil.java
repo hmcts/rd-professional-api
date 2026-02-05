@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -88,11 +87,7 @@ public class RefDataUtil {
 
 
     public static List<String> getOrganisationProfileIds(Organisation organisation) {
-
-    return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType())
-            .stream()
-            .toList();
-
+        return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType()).stream().toList();
     }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
