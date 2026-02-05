@@ -2,16 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 public enum ProfileOrgTypeUtility {
 
-    private final String orgType;
-    private final String description;
-    private final Set<String> profileIds;
-
-    ProfileOrgTypeUtility(String orgType, String description, String... profileIds) {
-        this.orgType = orgType;
-        this.description = description;
-        this.profileIds = Set.of(profileIds);
-    }
-
     GOVT("GOVT","Government Organisation",
                  "GOVERNMENT_ORGANISATION_PROFILE"),
 
@@ -137,6 +127,17 @@ public enum ProfileOrgTypeUtility {
 
     GOVT_IBCA("GOVT-IBCA","Government Organisation IBCA",
                       "GOVT_IBCA_PROFILE","GOVERNMENT_ORGANISATION_PROFILE");
+
+
+    private final String orgType;
+    private final String description;
+    private final Set<String> profileIds;
+
+    ProfileOrgTypeUtility(String orgType, String description, String... profileIds) {
+        this.orgType = orgType;
+        this.description = description;
+        this.profileIds = Set.of(profileIds);
+    }
 
     public String getOrgType() {
         return orgType;
