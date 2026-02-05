@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+
 public enum ProfileOrgTypeUtility {
 
     GOVT("GOVT","Government Organisation",
@@ -147,33 +155,38 @@ public enum ProfileOrgTypeUtility {
         return profileIds;
     }
 
-    private static final Map<String, OrgType> BY_ORG_TYPE =
+    private static final Map<String, ProfileOrgTypeUtility> BY_ORG_TYPE =
             Arrays.stream(values())
-                    .collect(Collectors.toMap(OrgType::getOrgType, o -> o));
+                    .collect(Collectors.toMap(ProfileOrgTypeUtility::getOrgType, o -> o));
 
-    private static final Map<String, Set<OrgType>> BY_PROFILE_ID =
+    private static final Map<String, Set<ProfileOrgTypeUtility>> BY_PROFILE_ID =
             Arrays.stream(values())
-                    .flatMap(o -> o.profileIds.stream()
-                            .map(p -> Map.entry(p, o)))
+                    .flatMap(o -> o.profileIds.stream().map(p -> Map.entry(p, o)))
                     .collect(Collectors.groupingBy(
                             Map.Entry::getKey,
                             Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
                     ));
 
-    public static Optional<OrgType> fromOrgType(String orgType) {
+    public static Optional<ProfileOrgTypeUtility> fromOrgType(String orgType) {
         return Optional.ofNullable(BY_ORG_TYPE.get(orgType));
     }
 
     public static Set<String> toProfileIds(String orgType) {
+        if (orgType == null) {
+            return Set.of();
+        }
         return fromOrgType(orgType)
-                .map(OrgType::getProfileIds)
+                .map(ProfileOrgTypeUtility::getProfileIds)
                 .orElse(Set.of());
     }
 
     public static Set<String> toOrgTypes(String profileId) {
+        if (profileId == null) {
+            return Set.of();
+        }
         return BY_PROFILE_ID.getOrDefault(profileId, Set.of())
                 .stream()
-                .map(OrgType::getOrgType)
+                .map(ProfileOrgTypeUtility::getOrgType)
                 .collect(Collectors.toSet());
     }
 }
