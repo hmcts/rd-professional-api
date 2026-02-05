@@ -562,7 +562,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return organisationProfileIds.stream()
                 .filter(Objects::nonNull)
-                .flatMap(profileId -> OrgType.toOrgTypes(profileId).stream())
+                .flatMap(profileId -> ProfileOrgTypeUtility.toOrgTypes(profileId).stream())
                 .distinct()
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
     }
