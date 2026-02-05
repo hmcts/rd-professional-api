@@ -86,20 +86,12 @@ public class RefDataUtil {
 
     public static final String DEFAULT_ORG_PROFILE_ID = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
 
-    private static final Map<String, Set<OrgType>> BY_PROFILE_ID =
-            Arrays.stream(values())
-                    .flatMap(o -> o.profileIds.stream()
-                            .map(p -> Map.entry(p, o)))
-                    .collect(Collectors.groupingBy(
-                            Map.Entry::getKey,
-                            Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
-                    ));
 
-        public static List<String> getOrganisationProfileIds(Organisation organisation) {
+    public static List<String> getOrganisationProfileIds(Organisation organisation) {
 
-        return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType())
-                .stream()
-                .toList();
+    return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType())
+            .stream()
+            .toList();
 
     }
 
