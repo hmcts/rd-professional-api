@@ -78,6 +78,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -555,14 +557,14 @@ public class OrganisationServiceImpl implements OrganisationService {
                         OrganisationTypeConstants.BARRISTER, OrganisationTypeConstants.OGD_OTHER_ORG));
 
         if (organisationProfileIds == null || organisationProfileIds.isEmpty()) {
-            return List.of();
+            return new ArrayList<>();
         }
 
         return organisationProfileIds.stream()
                 .filter(Objects::nonNull)
                 .flatMap(profileId -> OrgType.toOrgTypes(profileId).stream())
                 .distinct()
-                .toList();
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
     }
 
     @Override
