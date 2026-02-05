@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.DEFAULT_ORG_PROFILE_ID;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.ORG_TYPE_TO_ORG_PROFILE_IDS;
+import static uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
 
 public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
@@ -118,9 +118,18 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     }
 
     private List<String> getOrganisationProfileIds(Organisation organisation) {
-        if (organisation.getOrgType() == null) {
+        if (organisation == null || organisation.getOrgType() == null) {
             return Arrays.asList(DEFAULT_ORG_PROFILE_ID);
         }
-        return ORG_TYPE_TO_ORG_PROFILE_IDS.get(organisation.getOrgType());
+
+        // enum returns Set<String>; convert to List<String>
+        var profileIds = ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType());
+
+        // fallback for unknown orgType (old map would return null)
+        if (profileIds == null || profileIds.isEmpty()) {
+            return Arrays.asList(DEFAULT_ORG_PROFILE_ID);
+        }
+
+        return profileIds.stream().toList();
     }
 }

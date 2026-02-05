@@ -85,33 +85,6 @@ public class RefDataUtil {
 
 
     public static final String DEFAULT_ORG_PROFILE_ID = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
-    //TODO NBP needs to move to utility class for conversion
-    /*public static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
-            new SimpleEntry<>(OrganisationTypeConstants.SOLICITOR_ORG,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.PROBATE_PRACTITIONER,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OTHER_ORG,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.BARRISTER,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_DWP_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_DWP_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_HO_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_HO_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_OTHER_ORG, List.of(
-                    OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_HMRC_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_HMRC_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_CICA_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_CICA_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_CYMRU_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_ENGLAND_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND))
-    );*/
 
     private static final Map<String, Set<OrgType>> BY_PROFILE_ID =
             Arrays.stream(values())
@@ -122,7 +95,7 @@ public class RefDataUtil {
                             Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
                     ));
 
-    public static List<String> getOrganisationProfileIds(Organisation organisation) {
+        public static List<String> getOrganisationProfileIds(Organisation organisation) {
 
         return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType())
                 .stream()
