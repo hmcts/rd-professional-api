@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.DEFAULT_ORG_PROFILE_ID;
-import static uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
 
 public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
