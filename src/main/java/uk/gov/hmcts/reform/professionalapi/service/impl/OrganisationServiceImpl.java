@@ -72,6 +72,7 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+import uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -528,6 +529,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private static ArrayList<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
+        //TODO NBP need to move to utility class
         Map<String, List<String>> profileIdToOrgTypeMap = new HashMap<>();
         profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_DWP_PROFILE,
                 Collections.singletonList(OrganisationTypeConstants.OGD_DWP_ORG));
@@ -552,15 +554,15 @@ public class OrganisationServiceImpl implements OrganisationService {
                         OrganisationTypeConstants.PROBATE_PRACTITIONER, OrganisationTypeConstants.OTHER_ORG,
                         OrganisationTypeConstants.BARRISTER, OrganisationTypeConstants.OGD_OTHER_ORG));
 
-        ArrayList<String> orgTypes = new ArrayList<>();
-        for (String profileId : organisationProfileIds) {
-            if (profileIdToOrgTypeMap.containsKey(profileId)) {
-                orgTypes.addAll(profileIdToOrgTypeMap.get(profileId));
-            } else {
-                orgTypes.addAll(profileIdToOrgTypeMap.get(OrganisationProfileIdConstants.SOLICITOR_PROFILE));
-            }
+        if (organisationProfileIds == null || organisationProfileIds.isEmpty()) {
+            return List.of();
         }
-        return orgTypes;
+
+        return organisationProfileIds.stream()
+                .filter(Objects::nonNull)
+                .flatMap(profileId -> OrgType.toOrgTypes(profileId).stream())
+                .distinct()
+                .toList();
     }
 
     @Override

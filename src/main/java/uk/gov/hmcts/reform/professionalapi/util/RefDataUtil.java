@@ -85,7 +85,8 @@ public class RefDataUtil {
 
 
     public static final String DEFAULT_ORG_PROFILE_ID = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
-    public static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
+    //TODO NBP needs to move to utility class for conversion
+    /*public static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
             new SimpleEntry<>(OrganisationTypeConstants.SOLICITOR_ORG,
                     List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
             new SimpleEntry<>(OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
@@ -110,13 +111,23 @@ public class RefDataUtil {
                     List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU)),
             new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_ENGLAND_ORG,
                     List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND))
-    );
+    );*/
+
+    private static final Map<String, Set<OrgType>> BY_PROFILE_ID =
+            Arrays.stream(values())
+                    .flatMap(o -> o.profileIds.stream()
+                            .map(p -> Map.entry(p, o)))
+                    .collect(Collectors.groupingBy(
+                            Map.Entry::getKey,
+                            Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
+                    ));
 
     public static List<String> getOrganisationProfileIds(Organisation organisation) {
-        if (organisation.getOrgType() == null) {
-            return of(DEFAULT_ORG_PROFILE_ID);
-        }
-        return ORG_TYPE_TO_ORG_PROFILE_IDS.get(organisation.getOrgType());
+
+        return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType())
+                .stream()
+                .toList();
+
     }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
