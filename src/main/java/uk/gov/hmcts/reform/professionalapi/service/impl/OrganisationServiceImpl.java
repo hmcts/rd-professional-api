@@ -74,7 +74,7 @@ import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
