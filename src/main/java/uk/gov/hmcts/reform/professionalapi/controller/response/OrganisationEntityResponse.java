@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.DEFAULT_ORG_PROFILE_ID;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,13 +20,6 @@ import java.util.List;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
-import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.DEFAULT_ORG_PROFILE_ID;
 
 public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
