@@ -1,4 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
@@ -18,7 +19,6 @@ import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
-
 
 public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
