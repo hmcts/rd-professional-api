@@ -69,7 +69,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
@@ -77,13 +76,10 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -529,41 +525,17 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
     }
 
-    private static ArrayList<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
-        //TODO NBP need to move to utility class
-        Map<String, List<String>> profileIdToOrgTypeMap = new HashMap<>();
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_DWP_PROFILE,
-                Collections.singletonList(OrganisationTypeConstants.OGD_DWP_ORG));
+    private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
 
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_HO_PROFILE,
-                Collections.singletonList(OrganisationTypeConstants.OGD_HO_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_HMRC_PROFILE,
-                Collections.singletonList(OrganisationTypeConstants.OGD_HMRC_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CICA_PROFILE,
-                Collections.singletonList(OrganisationTypeConstants.OGD_CICA_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU,
-                Collections.singletonList(OrganisationTypeConstants.OGD_CAFCASS_CYMRU_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND,
-                Collections.singletonList(OrganisationTypeConstants.OGD_CAFCASS_ENGLAND_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.SOLICITOR_PROFILE,
-                Arrays.asList(OrganisationTypeConstants.SOLICITOR_ORG, OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
-                        OrganisationTypeConstants.PROBATE_PRACTITIONER, OrganisationTypeConstants.OTHER_ORG,
-                        OrganisationTypeConstants.BARRISTER, OrganisationTypeConstants.OGD_OTHER_ORG));
-
-        if (organisationProfileIds == null || organisationProfileIds.isEmpty()) {
-            return new ArrayList<>();
+        if (isEmpty(organisationProfileIds)) {
+            return List.of();
         }
 
         return organisationProfileIds.stream()
                 .filter(Objects::nonNull)
                 .flatMap(profileId -> ProfileOrgTypeUtility.toOrgTypes(profileId).stream())
                 .distinct()
-                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+                .toList();
     }
 
     @Override

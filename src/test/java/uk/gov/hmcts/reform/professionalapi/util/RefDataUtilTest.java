@@ -86,7 +86,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleU
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
+@SpringBootTest(classes=RefDataUtil.class)
 class RefDataUtilTest {
 
     @MockBean
@@ -473,7 +473,6 @@ class RefDataUtilTest {
     void test_shouldCreatePageableObjectWithDefaultPageSize() {
         Integer page = 0;
         Sort sort = mock(Sort.class);
-
         Pageable pageable = RefDataUtil.createPageableObject(page, null, sort);
 
         assertThat(pageable).isNotNull();

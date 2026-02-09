@@ -1,15 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import java.util.Arrays;
+import org.springframework.stereotype.Component;
+
+import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+@Component
+public class ProfileOrgTypeUtility {
 
-public enum ProfileOrgTypeUtility {
+    private ProfileOrgTypeUtility() {
+    }
 
-    GOVT("GOVT","Government Organisation",
+    /*GOVT("GOVT","Government Organisation",
                  "GOVERNMENT_ORGANISATION_PROFILE"),
 
     OTHER("OTHER","Other",
@@ -135,57 +138,50 @@ public enum ProfileOrgTypeUtility {
     GOVT_IBCA("GOVT-IBCA","Government Organisation IBCA",
                       "GOVT_IBCA_PROFILE","GOVERNMENT_ORGANISATION_PROFILE");
 
+     */
 
-    private final String orgType;
-    private final String description;
-    private final Set<String> profileIds;
+    private static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
+            new SimpleEntry<>(OrganisationTypeConstants.SOLICITOR_ORG,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.PROBATE_PRACTITIONER,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OTHER_ORG,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.BARRISTER,
+                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_DWP_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_DWP_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_HO_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_HO_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_OTHER_ORG, List.of(
+                    OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_HMRC_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_HMRC_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_CICA_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_CICA_PROFILE)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_CYMRU_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU)),
+            new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_ENGLAND_ORG,
+                    List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND))
+    );
 
-    ProfileOrgTypeUtility(String orgType, String description, String... profileIds) {
-        this.orgType = orgType;
-        this.description = description;
-        this.profileIds = Set.of(profileIds);
-    }
-
-    public String getOrgType() {
-        return orgType;
-    }
-
-    public Set<String> getProfileIds() {
-        return profileIds;
-    }
-
-    private static final Map<String, ProfileOrgTypeUtility> BY_ORG_TYPE =
-            Arrays.stream(values())
-                    .collect(Collectors.toMap(ProfileOrgTypeUtility::getOrgType, o -> o));
-
-    private static final Map<String, Set<ProfileOrgTypeUtility>> BY_PROFILE_ID =
-            Arrays.stream(values())
-                    .flatMap(o -> o.profileIds.stream().map(p -> Map.entry(p, o)))
-                    .collect(Collectors.groupingBy(
-                            Map.Entry::getKey,
-                            Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
-                    ));
-
-    public static Optional<ProfileOrgTypeUtility> fromOrgType(String orgType) {
-        return Optional.ofNullable(BY_ORG_TYPE.get(orgType));
-    }
-
-    public static Set<String> toProfileIds(String orgType) {
+    public static List<String> toProfileIds(String orgType) {
         if (orgType == null) {
-            return Set.of();
+            return List.of();
         }
-        return fromOrgType(orgType)
-                .map(ProfileOrgTypeUtility::getProfileIds)
-                .orElse(Set.of());
+        return ORG_TYPE_TO_ORG_PROFILE_IDS.getOrDefault(orgType, List.of());
     }
 
-    public static Set<String> toOrgTypes(String profileId) {
+    public static List<String> toOrgTypes(String profileId) {
         if (profileId == null) {
-            return Set.of();
+            return List.of();
         }
-        return BY_PROFILE_ID.getOrDefault(profileId, Set.of())
+        return ORG_TYPE_TO_ORG_PROFILE_IDS.entrySet()
                 .stream()
-                .map(ProfileOrgTypeUtility::getOrgType)
-                .collect(Collectors.toSet());
+                .filter(e -> e.getValue() != null && e.getValue().contains(profileId))
+                .map(Map.Entry::getKey)
+                .toList();
     }
 }

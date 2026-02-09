@@ -6,11 +6,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
@@ -18,7 +16,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.DEFAULT_ORG_PROFILE_ID;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getOrganisationProfileIds;
 
 
 
@@ -116,22 +114,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         this.dateApproved = organisation.getDateApproved();
         this.lastUpdated = organisation.getLastUpdated();
         this.organisationProfileIds = getOrganisationProfileIds(organisation);
-
     }
 
-    private List<String> getOrganisationProfileIds(Organisation organisation) {
-        if (organisation == null || organisation.getOrgType() == null) {
-            return Arrays.asList(DEFAULT_ORG_PROFILE_ID);
-        }
 
-        // enum returns Set<String>; convert to List<String>
-        var profileIds = ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType());
-
-        // fallback for unknown orgType (old map would return null)
-        if (profileIds == null || profileIds.isEmpty()) {
-            return Arrays.asList(DEFAULT_ORG_PROFILE_ID);
-        }
-
-        return profileIds.stream().toList();
-    }
 }

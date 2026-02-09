@@ -75,6 +75,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 public class RefDataUtil {
 
     private RefDataUtil() {
+
     }
 
     private static int defaultPageSize;
@@ -86,7 +87,15 @@ public class RefDataUtil {
 
 
     public static List<String> getOrganisationProfileIds(Organisation organisation) {
-        return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType()).stream().toList();
+        if (organisation == null) {
+            return List.of();
+        }
+
+        if (organisation.getOrgType() == null) {
+            return List.of(DEFAULT_ORG_PROFILE_ID);
+        }
+
+        return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType());
     }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
