@@ -86,7 +86,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleU
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest(classes=RefDataUtil.class)
+@SpringBootTest(classes = RefDataUtil.class)
 class RefDataUtilTest {
 
     @MockBean
