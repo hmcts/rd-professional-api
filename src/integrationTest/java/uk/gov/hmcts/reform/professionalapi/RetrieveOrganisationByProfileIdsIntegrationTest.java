@@ -32,7 +32,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
     private final String solicitorOrgType =  OrganisationTypeConstants.SOLICITOR_ORG;
     private final String solicitorProfileId = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
-    private final String ogdHoOrgType = OrganisationTypeConstants.OGD_HO_ORG;
+    private final String govtHoOrgType = OrganisationTypeConstants.GOVT_HO_ORG;
 
     @Autowired
     private OrganisationRepository organisationRepository;
@@ -51,11 +51,11 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         professionalReferenceDataClient.createOrganisationV2(request2);
 
         OrganisationOtherOrgsCreationRequest request3 = this.createUniqueOrganisationRequest("TestOG1", "SRA125",
-                "PBA1234563", "super-email3@gmail.com", ogdHoOrgType);
+                "PBA1234563", "super-email3@gmail.com", govtHoOrgType);
         professionalReferenceDataClient.createOrganisationV2(request3);
 
         OrganisationOtherOrgsCreationRequest request4 = this.createUniqueOrganisationRequest("TestOG2", "SRA126",
-                "PBA1234564", "super-email4@gmail.com", ogdHoOrgType);
+                "PBA1234564", "super-email4@gmail.com", govtHoOrgType);
         professionalReferenceDataClient.createOrganisationV2(request4);
 
         // this creates an organisation with no org type

@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -170,7 +171,7 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     void test_findUsersByOrganisation_with_userIdentifier() throws Exception {
-        organisation.setOrgType("Solicitor");
+        organisation.setOrgType("SOLICITOR");
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -228,7 +229,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(professionalUsersEntityResponse1.getOrganisationStatus())
                 .isEqualTo(organisation.getStatus().name());
         assertThat(professionalUsersEntityResponse1.getOrganisationProfileIds())
-                .contains("SOLICITOR_PROFILE");
+                .contains(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
         assertThat(professionalUsersEntityResponse1.getUsers()).hasSize(2);
         professionalUsersEntityResponse1.getUsers().forEach(userProfile -> {
             assertThat(userProfile.getIdamStatus()).isEqualToIgnoringCase("active");
@@ -536,7 +537,7 @@ class ProfessionalUserServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
-        organisation.setOrgType("Government Organisation-DWP");
+        organisation.setOrgType("GOVT_DWP");
 
         Pageable pageableMock = mock(Pageable.class);
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
@@ -581,7 +582,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationStatus())
                 .isEqualTo(organisation.getStatus().name());
         assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationProfileIds())
-                .contains("OGD_DWP_PROFILE");
+                .contains(OrganisationProfileIdConstants.GOVT_DWP_PROFILE);
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
