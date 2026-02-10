@@ -79,6 +79,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.GOVT_DWP_ORG;
 import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 
 @ExtendWith(MockitoExtension.class)
@@ -538,7 +539,7 @@ class ProfessionalUserServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
-        organisation.setOrgType("GOVT_DWP");
+        organisation.setOrgType(GOVT_DWP_ORG);
 
         Pageable pageableMock = mock(Pageable.class);
         List<ProfessionalUser> professionalUserList = new ArrayList<>();

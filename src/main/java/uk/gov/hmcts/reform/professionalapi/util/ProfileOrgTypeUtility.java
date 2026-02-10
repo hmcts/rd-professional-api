@@ -51,7 +51,7 @@ public class ProfileOrgTypeUtility {
                             OrganisationProfileIdConstants.GOVERNMENT_ORGANISATION_PROFILE)),
 
             new SimpleEntry<>(OrganisationTypeConstants.OTHER_ACCOUNT,
-                    List.of(OrganisationProfileIdConstants.OTHER_ACCOM_PROFILE,
+                    List.of(OrganisationProfileIdConstants.OTHER_ACCOUNT_PROFILE,
                             OrganisationProfileIdConstants.ORGANISATION_PROFILE)),
 
             new SimpleEntry<>(OrganisationTypeConstants.OTHER_PUBDEF,
