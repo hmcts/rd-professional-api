@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisati
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
-import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.time.LocalDateTime;
