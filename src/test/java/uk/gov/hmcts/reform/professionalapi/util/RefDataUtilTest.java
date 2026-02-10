@@ -137,7 +137,7 @@ class RefDataUtilTest {
         assertThat(organisationProfileIds).hasSize(1);
         assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
 
-        organisation.setOrgType("Solicitor");
+        organisation.setOrgType("SOLICITOR");
         organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
         assertThat(organisationProfileIds).hasSize(1);
         assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
