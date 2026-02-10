@@ -48,6 +48,18 @@ public class OrganisationCreationRequestValidator {
 
     private static String loggingComponentName;
 
+    // Constructor injection. Spring will auto-wire List<RequestValidator> with all matching beans.
+    public OrganisationCreationRequestValidator(
+            List<RequestValidator> validators,
+            @Value("${logging.component.name:OrganisationCreationRequestValidator}") String loggingComponentName) {
+        this.validators = validators == null ? List.of() : List.copyOf(validators);
+        OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
+    }
+
+    // If you have methods that rely on the loggingComponentName statically:
+    public static String getLoggingComponentName() {
+        return loggingComponentName;
+    }
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -326,13 +338,6 @@ public class OrganisationCreationRequestValidator {
             log.error(loggingComponentName + ERROR_MESSAGE_INVALID_STATUS_PASSED);
             throw new ResourceNotFoundException(ERROR_MESSAGE_INVALID_STATUS_PASSED);
         }
-    }
-
-    public OrganisationCreationRequestValidator(
-            List<RequestValidator> validators, @Value("${logging.component.name:OrganisationCreationRequestValidator}")
-            String loggingComponentName) {
-        this.validators = validators;
-        this.loggingComponentName = loggingComponentName;
     }
 
 }
