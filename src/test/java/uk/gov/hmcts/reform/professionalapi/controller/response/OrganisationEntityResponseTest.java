@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationEntityResponseTest {
@@ -26,13 +28,13 @@ class OrganisationEntityResponseTest {
     void test_OrganisationEntityResponseWithProfileId() {
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
-        organisation.setOrgType("SOLICITOR");
+        organisation.setOrgType(SOLICITOR_ORG);
 
         OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(organisation,
                 false, false, true);
 
         assertThat(organisationEntityResponse).isNotNull();
-        assertThat(organisationEntityResponse.organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+        assertThat(organisationEntityResponse.organisationProfileIds.get(0)).isEqualTo(SOLICITOR_PROFILE);
     }
 
     @Test

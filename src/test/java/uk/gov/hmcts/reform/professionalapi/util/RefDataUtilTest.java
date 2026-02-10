@@ -82,6 +82,10 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_IDS_DOES_NOT_MATCH;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.GOVT_HMRC_PROFILE;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.GOVT_HO_ORG;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
@@ -135,17 +139,17 @@ class RefDataUtilTest {
         organisation.setOrgType(null);
         List<String> organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
         assertThat(organisationProfileIds).hasSize(1);
-        assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+        assertThat(organisationProfileIds.get(0)).isEqualTo(SOLICITOR_PROFILE);
 
-        organisation.setOrgType("SOLICITOR");
+        organisation.setOrgType(SOLICITOR_ORG);
         organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
         assertThat(organisationProfileIds).hasSize(1);
-        assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+        assertThat(organisationProfileIds.get(0)).isEqualTo(SOLICITOR_PROFILE);
 
-        organisation.setOrgType("Government Organisation-HMRC");
+        organisation.setOrgType(GOVT_HO_ORG);
         organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
         assertThat(organisationProfileIds).hasSize(1);
-        assertThat(organisationProfileIds.get(0)).isEqualTo("OGD_HMRC_PROFILE");
+        assertThat(organisationProfileIds.get(0)).isEqualTo(GOVT_HMRC_PROFILE);
     }
 
 

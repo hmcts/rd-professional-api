@@ -37,6 +37,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
 
 @ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
@@ -392,11 +393,11 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess :: STARTED");
 
         OrganisationByProfileIdsRequest request = new OrganisationByProfileIdsRequest();
-        request.getOrganisationProfileIds().add(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
+        request.getOrganisationProfileIds().add(SOLICITOR_PROFILE);
         Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
                 pageSize, null);
 
-        verifyOrganisationsByProfileIdResponse(response, OrganisationProfileIdConstants.SOLICITOR_PROFILE, pageSize);
+        verifyOrganisationsByProfileIdResponse(response, SOLICITOR_PROFILE, pageSize);
         log.info("findOrganisationWithSolicitorProfileAndPageSizeShouldBeSuccess :: END");
     }
 
@@ -408,7 +409,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
                 pageSize, searchAfter);
 
-        verifyOrganisationsByProfileIdResponse(response, OrganisationProfileIdConstants.SOLICITOR_PROFILE, pageSize);
+        verifyOrganisationsByProfileIdResponse(response, SOLICITOR_PROFILE, pageSize);
         log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: END");
     }
 
@@ -524,7 +525,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                         .hasSizeGreaterThan(0);
 
                 assertThat(organisationProfileIds.get(0))
-                        .isEqualTo("SOLICITOR_PROFILE");
+                        .isEqualTo(SOLICITOR_PROFILE);
             }
         });
     }
