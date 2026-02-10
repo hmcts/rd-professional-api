@@ -328,11 +328,11 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
-    @Value("${loggingComponentName}")
-    public static void setLoggingComponentName(String loggingComponentName) {
-        OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
+    public OrganisationCreationRequestValidator(
+            List<RequestValidator> validators, @Value("${logging.component.name:OrganisationCreationRequestValidator}")
+            String loggingComponentName) {
+        this.validators = validators;
+        this.loggingComponentName = loggingComponentName;
     }
-
-
 
 }
