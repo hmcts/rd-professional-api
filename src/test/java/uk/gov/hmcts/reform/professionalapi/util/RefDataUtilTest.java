@@ -84,8 +84,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.GOVT_HMRC_PROFILE;
 import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
-import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.GOVT_HO_ORG;
-import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.*;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
@@ -146,7 +145,7 @@ class RefDataUtilTest {
         assertThat(organisationProfileIds).hasSize(1);
         assertThat(organisationProfileIds.get(0)).isEqualTo(SOLICITOR_PROFILE);
 
-        organisation.setOrgType(GOVT_HO_ORG);
+        organisation.setOrgType(GOVT_HMRC_ORG);
         organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
         assertThat(organisationProfileIds).hasSize(1);
         assertThat(organisationProfileIds.get(0)).isEqualTo(GOVT_HMRC_PROFILE);
