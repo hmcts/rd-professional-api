@@ -9,17 +9,19 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-class ProfileOrgTypeUtilityTest {
+public class ProfileOrgTypeUtilityTest {
 
     /* ------------------------------------------------------------------
      * orgType -> profileIds (FULL MATRIX)
      * ------------------------------------------------------------------ */
-    static Stream<Arguments> orgTypeToProfileIds() {
+    public static Stream<Arguments> orgTypeToProfileIds() {
         return Stream.of(
                 Arguments.of(
                         OrganisationTypeConstants.GOVT,
@@ -341,28 +343,35 @@ class ProfileOrgTypeUtilityTest {
     /* ------------------------------------------------------------------
      * profileId -> orgTypes (reverse mapping validation)
      * ------------------------------------------------------------------ */
-    static Stream<Arguments> profileIdToOrgTypeContainment() {
-        return orgTypeToProfileIds()
-                .flatMap(a -> {
-                    String orgType = (String) a.get()[0];
-                    @SuppressWarnings("unchecked")
-                    List<String> profiles = (List<String>) a.get()[1];
+    @SuppressWarnings("unchecked")
+    static Stream<Arguments> profileIdToOrgTypes() {
+        List<String> profiles = orgTypeToProfileIds()
+                .flatMap(a -> ((List<String>) a.get()[1]).stream())
+                .distinct().toList();
 
-                    return profiles.stream()
-                            .map(profile -> Arguments.of(profile, orgType));
-                });
+        return profiles.stream()
+                .map(profile -> Arguments.of(profile, orgTypeToProfileIds()
+                                    .filter(b -> ((
+                                            List<String>)b.get()[1]).contains(profile))
+                                    .map(c -> c.get()[0])
+                                    .toList())
+                );
     }
 
     @ParameterizedTest(name = "toOrgTypes({0}) contains {1}")
-    @MethodSource("profileIdToOrgTypeContainment")
-    void toOrgTypesShouldContainsExpectedOrgType(String profileId, String expectedOrgType) {
+    @MethodSource("profileIdToOrgTypes")
+    void toOrgTypesShouldContainsExpectedOrgType(String profileId, List<String> expectedOrgTypes) {
         List<String> actual = ProfileOrgTypeUtility.toOrgTypes(profileId);
 
         assertNotNull(actual);
-        assertTrue(
-                actual.contains(expectedOrgType),
-                () -> "Expected orgType " + expectedOrgType + " for profileId " + profileId
+        assertThat(actual).hasSize(expectedOrgTypes.size());
+
+        assertAll("Expected Orgtype should be present",
+                expectedOrgTypes.stream()
+                        .map(expectedOrgType -> () ->
+                                assertThat(actual).contains(expectedOrgType))
         );
+
     }
 
     /* ------------------------------------------------------------------

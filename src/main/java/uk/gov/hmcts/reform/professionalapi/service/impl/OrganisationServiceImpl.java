@@ -76,6 +76,7 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -518,11 +519,15 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
         boolean includeV1Orgs = orgTypes.contains(OrganisationTypeConstants.SOLICITOR_ORG);
 
-        Pageable pageableObject = PageRequest.of(0, pageSize);
-        Page<Organisation> organisations = organisationRepository
-                .findByOrgTypeIn(orgTypes, searchAfter, includeV1Orgs, pageableObject);
-
-        return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
+        // if organisationProfileIds specified but no org types found: then return empty response: i.e. not found
+        if (isNotEmpty(organisationProfileIds) && isEmpty(orgTypes)) {
+            return new MultipleOrganisationsResponse(Collections.emptyList(), false);
+        } else { // run search
+            Pageable pageableObject = PageRequest.of(0, pageSize);
+            Page<Organisation> organisations = organisationRepository
+                    .findByOrgTypeIn(orgTypes, searchAfter, includeV1Orgs, pageableObject);
+            return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
+        }
     }
 
     private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -30,9 +34,10 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    private final String solicitorOrgType =  OrganisationTypeConstants.SOLICITOR_ORG;
-    private final String solicitorProfileId = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
-    private final String govtHoOrgType = OrganisationTypeConstants.GOVT_HO_ORG;
+    private static final String solicitorOrgType =  OrganisationTypeConstants.SOLICITOR_ORG;
+    private static final String solicitorProfileId = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+    private static final String organisationProfileId = OrganisationProfileIdConstants.ORGANISATION_PROFILE;
+    private static final String govtHoOrgType = OrganisationTypeConstants.GOVT_HO_ORG;
 
     @Autowired
     private OrganisationRepository organisationRepository;
@@ -88,18 +93,31 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
                 true);
     }
 
+    /* ------------------------------------------------------------------
+     * profileId -> orgTypes (reverse mapping validation)
+     * ------------------------------------------------------------------ */
+    static Stream<Arguments> newMethod() {
+        return Stream.of(
+                Arguments.of(solicitorProfileId, 3), // 2 solicitor orgs and 1 v1 org
+                Arguments.of(organisationProfileId, 4), // 2 solicitor orgs and 1 baristor and 1 v1 org
+                Arguments.of(OrganisationProfileIdConstants.GOVT_HO_PROFILE, 2) //2 HO Govt Org
+        );
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @Test
-    void when_profile_ids_provided_should_return_matching_organisations_and_status_200() {
+    @ParameterizedTest()
+    @MethodSource("newMethod")
+    void when_profile_ids_provided_should_return_matching_org_and_status_200(String orgProfileID,
+                                                                             int expectedOrganisationsCount) {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
+        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(orgProfileID));
         Integer pageSize = null;
         UUID searchAfter = null;
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 4; // 2 solicitor orgs and 1 barrister org and 1 v1 org
+        //int expectedOrganisationsCount = 3; // 2 solicitor orgs and 1 v1 org
 
         // act
         Map<String, Object> response =
@@ -113,13 +131,13 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
 
         boolean allMatch = organisationInfoMapList.stream()
-                .allMatch(org -> ((List<String>) org.get("organisationProfileIds")).contains(solicitorProfileId));
+                .allMatch(org -> ((List<String>) org.get("organisationProfileIds")).contains(orgProfileID));
         assertThat(allMatch).isTrue();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
-    void when_non_matching_profile_ids_provided_should_return_default_solicitor_organisations_and_status_200() {
+    void when_non_matching_profile_ids_provided_should_return_no_organisations_and_status_200() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
         organisationByProfileIdsRequest.setOrganisationProfileIds(List.of("A"));
@@ -128,7 +146,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        int expectedOrganisationsCount = 4; // 2 solicitor orgs and 1 barrister org and 1 v1 org
+        int expectedOrganisationsCount = 0;
 
         // act
         Map<String, Object> response =
@@ -138,12 +156,6 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         // assert
         assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
                 null);
-
-        List<LinkedHashMap> organisationInfoMapList = (List<LinkedHashMap>) response.get("organisationInfo");
-
-        boolean allMatch = organisationInfoMapList.stream()
-                .allMatch(org -> ((List<String>) org.get("organisationProfileIds")).contains(solicitorProfileId));
-        assertThat(allMatch).isTrue();
     }
 
     @Test

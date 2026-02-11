@@ -83,7 +83,7 @@ public class RefDataUtil {
     private static String loggingComponentName;
 
 
-    public static final String DEFAULT_ORG_PROFILE_ID = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+    private static final String DEFAULT_ORG_TYPE = OrganisationTypeConstants.SOLICITOR_ORG;
 
 
     public static List<String> getOrganisationProfileIds(Organisation organisation) {
@@ -92,7 +92,7 @@ public class RefDataUtil {
         }
 
         if (organisation.getOrgType() == null) {
-            return List.of(DEFAULT_ORG_PROFILE_ID);
+            return ProfileOrgTypeUtility.toProfileIds(DEFAULT_ORG_TYPE);
         }
 
         return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType());
