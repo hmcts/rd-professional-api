@@ -437,7 +437,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
             List<String> organisationProfileIdList = (List<String>) org.get("organisationProfileIds");
             assertThat(organisationProfileIdList).isNotEmpty();
-            assertThat((organisationProfileIdList)).hasSize(1);
+            assertThat((organisationProfileIdList)).hasSize(2);
             assertThat(organisationProfileIdList.contains(expectedProfileId));
         });
 
