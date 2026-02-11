@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import feign.FeignException;
+import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -34,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
@@ -47,6 +52,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrgAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
@@ -55,6 +61,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
@@ -91,8 +98,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -109,6 +119,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 
 @Service
 @Slf4j
@@ -1054,6 +1065,50 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private boolean getMoreAvailable(Page<Organisation> pageableOrganisations) {
         return !pageableOrganisations.isLast();
+    }
+
+    @Transactional
+    public ResponseEntity<Object>  updateIdamId(String existingUserIdentifier, String newUserIdentifier) {
+        try (Response response = userProfileFeignClient.getUserProfileById(existingUserIdentifier)) {
+
+            ResponseEntity<Object> modifiedUserResponse;
+            Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+            ResponseEntity<Object> responseResponseEntity = toResponseEntity(response, clazz);
+            if (response.status() > 300) {
+                String errorMessage = nonNull(responseResponseEntity.getBody())
+                    ? ((ErrorResponse)requireNonNull(responseResponseEntity.getBody())).getErrorMessage()
+                    : ERROR_MESSAGE_UP_FAILED;
+                throw new ExternalApiException(responseResponseEntity.getStatusCode(), errorMessage);
+            }
+
+            GetUserProfileResponse existingUserProfile =
+                (GetUserProfileResponse) requireNonNull(responseResponseEntity.getBody());
+
+            UserProfileUpdatedData userProfileUpdatedData = UserProfileUpdatedData.builder()
+                .idamId(newUserIdentifier)
+                .idamStatus(existingUserProfile.getIdamStatus().name())
+                .build();
+
+            Response userResponse = userProfileFeignClient
+                .modifyUserRoles(userProfileUpdatedData, existingUserIdentifier," ");
+
+            if (userResponse != null && userResponse.status() > 300) {
+                modifiedUserResponse = toResponseEntity(userResponse, ErrorResponse.class);
+            } else {
+                Optional<ProfessionalUser> professionalUser = Optional
+                    .ofNullable(professionalUserService.findProfessionalUserByUserIdentifier(existingUserIdentifier));
+                if (professionalUser.isPresent()) {
+                    professionalUser.get().setUserIdentifier(newUserIdentifier);
+                    professionalUserRepository.save(professionalUser.get());
+                } else {
+                    throw new EmptyResultDataAccessException(PROFESSIONAL_USER_404_MESSAGE, 1);
+                }
+                modifiedUserResponse = toResponseEntity(userResponse, ModifyUserRolesResponse.class);
+            }
+            return modifiedUserResponse;
+        } catch (FeignException ex) {
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
+        }
     }
 
 }
