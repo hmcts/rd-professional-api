@@ -91,6 +91,39 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         updateOrgStatusScenarios();
     }
 
+
+    @Test
+    @DisplayName("PRD Internal CreateUser with long email")
+    void testInternalCreateUserWithlongEmail() {
+        log.info("testInternalCreateUserWithlongEmail  ::: STARTED");
+        OrganisationCreationRequest orgRequest = createOrganisationRequest()
+            .superUser(UserCreationRequest.aUserCreationRequest()
+                .firstName("fName")
+                .lastName("lName")
+                .email(generateRandomEmail())
+                .build())
+            .build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(orgRequest);
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        OrganisationCreationRequest orgNewRequest = createOrganisationRequest().status("ACTIVE").build();
+        professionalApiClient.updateOrganisation(orgNewRequest, hmctsAdmin, organisationIdentifier, OK);
+
+        String userEmail = "foo1@mail." + randomAlphabetic(63);
+
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(userEmail);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
+            hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        invitedUserId = (String) newUserResponse.get("userIdentifier");
+        assertThat(newUserResponse).isNotNull();
+        assertThat(invitedUserId).isNotNull();
+        log.info("testInternalCreateUserWithlongEmail :: END");
+
+    }
+
+
+
     @Test
     @DisplayName("PRD Internal Test for Group Access Scenarios")
     void testGroupAccessInternalScenario() {
@@ -102,6 +135,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findUserInternalScenarios();
         findOrganisationWithSinceDateScenarios(sinceDateTime);
     }
+
 
     public void inviteMultipleUserScenarios() {
         inviteUserByAnInternalOrgUser(generateRandomEmail());
@@ -157,6 +191,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
 
     }
+
 
     public void createOrganisationScenario() {
         createOrganisationWithoutS2STokenShouldReturnAuthorised();
