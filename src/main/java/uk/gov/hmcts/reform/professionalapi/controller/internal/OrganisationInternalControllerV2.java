@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +29,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgSraResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateSraResponse;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
@@ -240,4 +248,84 @@ public class OrganisationInternalControllerV2 extends SuperController {
 
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }
+
+
+    @Operation(
+        summary = "Updates an Organisation's sraId",
+        description = "**IDAM Roles to access API** : <br> prd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        })
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Organisation sraId has been updated",
+        content = @Content(schema = @Schema(implementation = String.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "If Organisation request sent with null/invalid values for mandatory fields",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "No Organisation found with the given ID",
+        content = @Content
+    )
+    @PutMapping(
+        value = "/sra",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.OK)
+    @ResponseBody
+    @Secured({"prd-admin"})
+    public UpdateSraResponse updateOrganisationSra(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "organisationSraUpdateRequest")
+        @Validated @NotNull @RequestBody OrganisationSraUpdateRequest organisationSraUpdateRequest) {
+
+        //check if request list is empty
+        List<OrganisationSraUpdateRequest.OrganisationSraUpdateData> organisationSraUpdateDataList =
+            organisationSraUpdateRequest.getOrganisationSraUpdateDataList();
+
+        if (organisationSraUpdateDataList.isEmpty()) {
+            throw new InvalidRequest("Request is empty");
+        }
+
+        final List<UpdateOrgSraResponse> updateOrgSraResponsesList = new ArrayList<>();
+
+        //iterate over each name/orgid pair and update values
+        organisationSraUpdateDataList.forEach(organisationSraUpdateData -> {
+            String orgId = organisationSraUpdateData.getOrganisationId();
+            String sraId = organisationSraUpdateData.getSraId();
+            if (StringUtils.isEmpty(orgId)) {
+                updateOrgSraResponsesList.add(new UpdateOrgSraResponse("","failure",
+                    HttpStatus.BAD_REQUEST.value(),"Organisation id is missing"));
+            } else {
+                var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+                organisationIdentifierValidatorImpl.validateOrganisationId(orgId,
+                    updateOrgSraResponsesList, existingOrganisation);
+                if (!updateOrgSraResponsesList.stream().filter(
+                    updateOrg -> orgId.equalsIgnoreCase(updateOrg.getOrganisationId())).findAny().isPresent()) {
+                    if (StringUtils.isEmpty(sraId)) {
+                        updateOrgSraResponsesList.add(new UpdateOrgSraResponse(orgId,"failure",
+                            HttpStatus.BAD_REQUEST.value(),"Organisation sraId is missing"));
+                    } else {
+                        organisationService.updateOrganisationSra(existingOrganisation,
+                            organisationSraUpdateData, updateOrgSraResponsesList);
+                    }
+                }
+            }
+        });
+
+        return organisationService.generateUpdateSraResponse(updateOrgSraResponsesList);
+
+    }
+
 }

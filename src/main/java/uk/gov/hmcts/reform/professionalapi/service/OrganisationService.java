@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgSraResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateSraResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -46,8 +49,9 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
+
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
-                                            String organisationIdentifier,Boolean isOrgApprovalRequest);
+                                            String organisationIdentifier, Boolean isOrgApprovalRequest);
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
@@ -80,5 +84,12 @@ public interface OrganisationService {
     void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier);
 
     ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
+
+
+    UpdateSraResponse generateUpdateSraResponse(List<UpdateOrgSraResponse> updateOrgNameResponse);
+
+    List<UpdateOrgSraResponse> updateOrganisationSra(
+        Organisation existingOrganisation, OrganisationSraUpdateRequest.OrganisationSraUpdateData
+        organisationNameUpdateData,List<UpdateOrgSraResponse> updateOrgNameResponsesList);
 
 }
