@@ -77,6 +77,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
@@ -112,12 +113,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_400;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.BLOCKED;
@@ -139,6 +142,7 @@ class OrganisationServiceImplTest {
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
+    private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock
             = mock(ContactInformationRepository.class);
     private final BulkCustomerDetailsRepository bulkCustomerDetailsRepositoryMock =
@@ -2091,7 +2095,7 @@ class OrganisationServiceImplTest {
 
 
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
+        deleteOrganisationResponse.setStatusCode(ERROR_CODE_400);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
         ObjectMapper mapperOne = new ObjectMapper();
         String deleteBody = mapperOne.writeValueAsString(newUserResponse);
@@ -2101,33 +2105,31 @@ class OrganisationServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(400).build());
+                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
         Organisation organisation = getDeleteOrganisation(ACTIVE);
 
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
-        assertThat(deleteOrganisationResponse.getMessage())
-                .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
-        verify(organisationRepository, times(0)).deleteById(any());
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
+        verify(organisationRepository, times(1)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
-        verify(orgAttributeRepository, times(0)).deleteByOrganistion(any());
-        verify(bulkCustomerDetailsRepositoryMock, times(0)).deleteByOrganistion(any());
+        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
+        verify(orgAttributeRepository, times(1)).deleteByOrganistion(any());
+        verify(bulkCustomerDetailsRepositoryMock, times(1)).deleteByOrganistion(any());
 
     }
 
     @Test
-    void testDeleteActiveOrganisationWithMultiUsersGives400WithMessage() {
+    void testDeleteActiveOrganisationWithMultiUsersGivesSuccessMessage() {
 
         Organisation organisation = getDeleteOrganisation(ACTIVE);
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(2);
         deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(STATUS_CODE_204);
         assertThat(deleteOrganisationResponse.getMessage())
                 .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
         verify(organisationRepository, times(0)).deleteById(any());
@@ -2718,4 +2720,5 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo()).isNullOrEmpty();
     }
+
 }
