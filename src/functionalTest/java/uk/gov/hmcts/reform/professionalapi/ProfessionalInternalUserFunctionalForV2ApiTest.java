@@ -408,6 +408,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
                 pageSize, searchAfter);
         log.info("NBP NBP" + response.toString());
+        log.info("NBP NBP" + pageSize);
         verifyOrganisationsByProfileIdResponse(response, SOLICITOR_PROFILE, pageSize);
         log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: END");
     }
