@@ -2667,12 +2667,11 @@ class OrganisationServiceImplTest {
     @ParameterizedTest
     @ValueSource(strings = {
         OrganisationProfileIdConstants.SOLICITOR_PROFILE,
-        OrganisationProfileIdConstants.OGD_HO_PROFILE,
-        OrganisationProfileIdConstants.OGD_DWP_PROFILE,
-        OrganisationProfileIdConstants.OGD_HMRC_PROFILE,
-        OrganisationProfileIdConstants.OGD_CICA_PROFILE,
-        OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU,
-        OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND
+        OrganisationProfileIdConstants.GOVT_HO_PROFILE,
+        OrganisationProfileIdConstants.GOVT_DWP_PROFILE,
+        OrganisationProfileIdConstants.GOVT_HMRC_PROFILE,
+        OrganisationProfileIdConstants.GOVT_CICA_PROFILE,
+        OrganisationProfileIdConstants.GOVT_CAFCASS_CYMRU_PROFILE
     })
     @SuppressWarnings("unchecked")
     void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter(String profileId) {

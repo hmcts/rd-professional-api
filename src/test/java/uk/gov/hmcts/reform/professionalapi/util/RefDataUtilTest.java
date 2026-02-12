@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -63,6 +65,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -82,11 +85,17 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_IDS_DOES_NOT_MATCH;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ORG_NOT_EXIST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.GOVERNMENT_ORGANISATION_PROFILE;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.GOVT_HMRC_PROFILE;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.ORGANISATION_PROFILE;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.GOVT_HMRC_ORG;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = RefDataUtil.class)
 class RefDataUtilTest {
 
     @MockBean
@@ -134,18 +143,38 @@ class RefDataUtilTest {
     void test_getOrganisationProfileIds() {
         organisation.setOrgType(null);
         List<String> organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
-        assertThat(organisationProfileIds).hasSize(1);
-        assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
+        assertThat(organisationProfileIds).hasSize(2);
+        assertThat(organisationProfileIds).contains(SOLICITOR_PROFILE);
+        assertThat(organisationProfileIds).contains(ORGANISATION_PROFILE);
 
-        organisation.setOrgType("Solicitor");
-        organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
-        assertThat(organisationProfileIds).hasSize(1);
-        assertThat(organisationProfileIds.get(0)).isEqualTo("SOLICITOR_PROFILE");
 
-        organisation.setOrgType("Government Organisation-HMRC");
+        organisation.setOrgType(SOLICITOR_ORG);
         organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
-        assertThat(organisationProfileIds).hasSize(1);
-        assertThat(organisationProfileIds.get(0)).isEqualTo("OGD_HMRC_PROFILE");
+        assertThat(organisationProfileIds).hasSize(2);
+        assertThat(organisationProfileIds).contains(SOLICITOR_PROFILE);
+        assertThat(organisationProfileIds).contains(ORGANISATION_PROFILE);
+
+        organisation.setOrgType(GOVT_HMRC_ORG);
+        organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
+        assertThat(organisationProfileIds).hasSize(2);
+        assertThat(organisationProfileIds).contains(GOVT_HMRC_PROFILE);
+        assertThat(organisationProfileIds).contains(GOVERNMENT_ORGANISATION_PROFILE);
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtilityTest#orgTypeToProfileIds")
+    void test_getOrganisationProfileIds(String orgType, List<String> expectedProfileIds) {
+        organisation.setOrgType(orgType);
+        List<String> organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
+        assertThat(organisationProfileIds).hasSize(expectedProfileIds.size());
+
+        assertAll("Expected Profile should be present",
+                expectedProfileIds.stream()
+                        .map(expectedProfileId -> () ->
+                                assertThat(organisationProfileIds).contains(expectedProfileId))
+        );
+
     }
 
 
@@ -473,7 +502,6 @@ class RefDataUtilTest {
     void test_shouldCreatePageableObjectWithDefaultPageSize() {
         Integer page = 0;
         Sort sort = mock(Sort.class);
-
         Pageable pageable = RefDataUtil.createPageableObject(page, null, sort);
 
         assertThat(pageable).isNotNull();

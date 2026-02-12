@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVI
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
 
 @Slf4j
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -233,11 +234,11 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(((List<HashMap>) orgResponse3.get("organisations")).get(1).get("lastUpdated")).isNotNull();
         assertThat(((List<HashMap>) orgResponse3.get("organisations")).get(2).get("lastUpdated")).isNotNull();
         assertThat(((ArrayList)((List<HashMap>) orgResponse3.get("organisations")).get(0)
-                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
+                .get("organisationProfileIds")).get(0)).isEqualTo(SOLICITOR_PROFILE);
         assertThat(((ArrayList)((List<HashMap>) orgResponse3.get("organisations")).get(1)
-                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
+                .get("organisationProfileIds")).get(0)).isEqualTo(SOLICITOR_PROFILE);
         assertThat(((ArrayList)((List<HashMap>) orgResponse3.get("organisations")).get(2)
-                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
+                .get("organisationProfileIds")).get(0)).isEqualTo(SOLICITOR_PROFILE);
     }
 
     @Test
@@ -674,7 +675,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(1);
         assertThat(((List<HashMap>) orgResponse.get("organisations")).get(0).get("lastUpdated")).isNotNull();
         assertThat(((ArrayList)((List<HashMap>) orgResponse.get("organisations")).get(0)
-                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
+                .get("organisationProfileIds")).get(0)).isEqualTo(SOLICITOR_PROFILE);
         assertThat(orgResponse.get("http_status").toString()).contains("OK");
     }
 
@@ -1122,7 +1123,7 @@ class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(1);
         assertThat(((List<HashMap>) orgResponse.get("organisations")).get(0).get("lastUpdated")).isNotNull();
         assertThat(((ArrayList)((List<HashMap>) orgResponse.get("organisations")).get(0)
-                .get("organisationProfileIds")).get(0)).isEqualTo("SOLICITOR_PROFILE");
+                .get("organisationProfileIds")).get(0)).isEqualTo(SOLICITOR_PROFILE);
 
         Map<String, Object> organisationActive = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
 

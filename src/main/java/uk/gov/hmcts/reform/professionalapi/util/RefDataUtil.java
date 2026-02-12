@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserConfiguredAccess;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -55,7 +54,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.util.List.of;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -77,6 +75,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 public class RefDataUtil {
 
     private RefDataUtil() {
+
     }
 
     private static int defaultPageSize;
@@ -84,39 +83,19 @@ public class RefDataUtil {
     private static String loggingComponentName;
 
 
-    public static final String DEFAULT_ORG_PROFILE_ID = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
-    public static final Map<String, List<String>> ORG_TYPE_TO_ORG_PROFILE_IDS = Map.ofEntries(
-            new SimpleEntry<>(OrganisationTypeConstants.SOLICITOR_ORG,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.PROBATE_PRACTITIONER,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OTHER_ORG,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.BARRISTER,
-                    List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_DWP_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_DWP_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_HO_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_HO_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_OTHER_ORG, List.of(
-                    OrganisationProfileIdConstants.SOLICITOR_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_HMRC_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_HMRC_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_CICA_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_CICA_PROFILE)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_CYMRU_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU)),
-            new SimpleEntry<>(OrganisationTypeConstants.OGD_CAFCASS_ENGLAND_ORG,
-                    List.of(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND))
-    );
+    private static final String DEFAULT_ORG_TYPE = OrganisationTypeConstants.SOLICITOR_ORG;
+
 
     public static List<String> getOrganisationProfileIds(Organisation organisation) {
-        if (organisation.getOrgType() == null) {
-            return of(DEFAULT_ORG_PROFILE_ID);
+        if (organisation == null) {
+            return List.of();
         }
-        return ORG_TYPE_TO_ORG_PROFILE_IDS.get(organisation.getOrgType());
+
+        if (organisation.getOrgType() == null) {
+            return ProfileOrgTypeUtility.toProfileIds(DEFAULT_ORG_TYPE);
+        }
+
+        return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType());
     }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
