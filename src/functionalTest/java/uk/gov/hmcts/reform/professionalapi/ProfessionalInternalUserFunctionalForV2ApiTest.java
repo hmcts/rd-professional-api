@@ -407,7 +407,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         request.getOrganisationProfileIds().add("UNKNOWN");
         Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
                 pageSize, searchAfter);
-
+        log.info(response.toString());
         verifyOrganisationsByProfileIdResponse(response, SOLICITOR_PROFILE, pageSize);
         log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: END");
     }
