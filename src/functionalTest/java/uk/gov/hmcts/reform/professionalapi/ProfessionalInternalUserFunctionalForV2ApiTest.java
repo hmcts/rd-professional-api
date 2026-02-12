@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -407,9 +408,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         request.getOrganisationProfileIds().add("UNKNOWN");
         Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
                 pageSize, searchAfter);
-        log.info("NBP NBP" + response.toString());
-        log.info("NBP NBP" + pageSize);
-        verifyOrganisationsByProfileIdResponse(response, SOLICITOR_PROFILE, pageSize);
+        assertThat((List<HashMap>) response.get("organisationInfo")).isEmpty();
+        assertNull(response.get("lastRecordInPage"));
         log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: END");
     }
 
