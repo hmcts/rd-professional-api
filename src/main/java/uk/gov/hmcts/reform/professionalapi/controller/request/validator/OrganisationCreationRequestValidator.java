@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -49,20 +48,10 @@ public class OrganisationCreationRequestValidator {
 
     private static String loggingComponentName;
 
-    // Constructor injection. Spring will auto-wire List<RequestValidator> with all matching beans.
-    @Autowired
-    public OrganisationCreationRequestValidator(
-            List<RequestValidator> validators,
-            @Value("${logging.component.name:OrganisationCreationRequestValidator}") String loggingComponentName) {
-        this.validators = validators == null ? List.of() : List.copyOf(validators);
-        OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
-    }
 
-    // If you have methods that rely on the loggingComponentName statically:
-    public static String getLoggingComponentName() {
-        return loggingComponentName;
+    public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
+        this.validators = validators;
     }
-
 
     public static void validateEmail(String email) {
         if (email != null && !email.matches(EMAIL_REGEX)) {
@@ -338,5 +327,12 @@ public class OrganisationCreationRequestValidator {
             throw new ResourceNotFoundException(ERROR_MESSAGE_INVALID_STATUS_PASSED);
         }
     }
+
+    @Value("${loggingComponentName}")
+    public static void setLoggingComponentName(String loggingComponentName) {
+        OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
+    }
+
+
 
 }

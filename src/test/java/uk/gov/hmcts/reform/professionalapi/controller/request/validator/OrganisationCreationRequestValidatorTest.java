@@ -67,10 +67,7 @@ class OrganisationCreationRequestValidatorTest {
 
     @BeforeEach
     void setup() {
-        organisationCreationRequestValidator = new OrganisationCreationRequestValidator(
-                asList(validator1, validator2),
-                "OrganisationCreationRequestValidator"   // test value
-        );
+        organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
         userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
                 .email("test@email.com").build();
         organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
