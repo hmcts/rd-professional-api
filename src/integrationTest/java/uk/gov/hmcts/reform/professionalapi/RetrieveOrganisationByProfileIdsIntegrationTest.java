@@ -96,7 +96,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     /* ------------------------------------------------------------------
      * profileId -> orgTypes (reverse mapping validation)
      * ------------------------------------------------------------------ */
-    static Stream<Arguments> newMethod() {
+    static Stream<Arguments> profileIdToOrgCount() {
         return Stream.of(
                 Arguments.of(solicitorProfileId, 3), // 2 solicitor orgs and 1 v1 org
                 Arguments.of(organisationProfileId, 4), // 2 solicitor orgs and 1 baristor and 1 v1 org
@@ -106,7 +106,7 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @ParameterizedTest()
-    @MethodSource("newMethod")
+    @MethodSource("profileIdToOrgCount")
     void when_profile_ids_provided_should_return_matching_org_and_status_200(String orgProfileID,
                                                                              int expectedOrganisationsCount) {
         // arrange
@@ -117,7 +117,6 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
 
         String expectedStatus = "200 OK";
         boolean expectedHasMoreRecords = false;
-        //int expectedOrganisationsCount = 3; // 2 solicitor orgs and 1 v1 org
 
         // act
         Map<String, Object> response =

@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequestForV2;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 
 @ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
@@ -116,7 +117,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgType")).isEqualTo("SOLICITOR");
+        assertThat(response.get("orgType")).isEqualTo(SOLICITOR_ORG);
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPfmShouldBeSuccess :: END");
         responseValidate(response);
@@ -128,7 +129,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         assertThat(response.get("pendingPaymentAccount")).asList().hasSize(0);
-        assertThat(response.get("orgType")).isEqualTo("SOLICITOR");
+        assertThat(response.get("orgType")).isEqualTo(SOLICITOR_ORG);
         assertThat(response.get("orgAttributes")).isNotNull();
         log.info("findOrgByPomShouldBeSuccess :: END");
     }

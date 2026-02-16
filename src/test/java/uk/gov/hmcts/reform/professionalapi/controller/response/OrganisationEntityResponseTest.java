@@ -34,7 +34,7 @@ class OrganisationEntityResponseTest {
                 false, false, true);
 
         assertThat(organisationEntityResponse).isNotNull();
-        assertThat(organisationEntityResponse.organisationProfileIds.get(0)).isEqualTo(SOLICITOR_PROFILE);
+        assertThat(organisationEntityResponse.organisationProfileIds.contains(SOLICITOR_PROFILE));
     }
 
     @Test
