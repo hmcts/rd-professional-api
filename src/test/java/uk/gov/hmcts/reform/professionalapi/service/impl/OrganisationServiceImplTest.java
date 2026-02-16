@@ -2727,18 +2727,21 @@ class OrganisationServiceImplTest {
     @Test
     void shouldRetrieveOrganisationsWithEmptyProfileIdList() {
         // arrange
-        List<String> profileIds = new ArrayList<>();
-        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+
 
         organisation.setStatus(ACTIVE);
         organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
         when(orgPage.isLast()).thenReturn(false);
+
+        List<String> profileIds = new ArrayList<>();
 
         // act
         MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1,
