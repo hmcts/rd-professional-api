@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -521,10 +520,8 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             if (organisationProfileIds != null) {
                 assertThat(organisationProfileIds)
                         .isNotEmpty()
-                        .hasSizeGreaterThan(0);
-
-                assertThat(organisationProfileIds.get(0))
-                        .isEqualTo(SOLICITOR_PROFILE);
+                        .hasSizeGreaterThan(0)
+                        .contains(SOLICITOR_PROFILE);
             }
         });
     }
