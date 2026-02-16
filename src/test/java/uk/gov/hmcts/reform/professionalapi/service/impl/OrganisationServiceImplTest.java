@@ -2680,7 +2680,6 @@ class OrganisationServiceImplTest {
         profileIds.add(profileId);
         profileIds.add("made up profile id");
         Integer pageSize = 1;
-        UUID searchAfter = null;
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
@@ -2688,8 +2687,7 @@ class OrganisationServiceImplTest {
         when(orgPage.isLast()).thenReturn(true);
 
         // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
-                searchAfter);
+        sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize, null);
 
         // assert
         verify(organisationRepository).findByOrgTypeIn(orgTypesCaptor.capture(), isNull(), anyBoolean(), any());
@@ -2705,13 +2703,10 @@ class OrganisationServiceImplTest {
     @Test
     void shouldSkipSearchByOrgTypeWhenProfileIdNotRecognised() {
         // arrange
-        List<String> profileIds = new ArrayList<>();
-        profileIds.add("made up profile id");
-        Integer pageSize = 1;
-        UUID searchAfter = null;
+        List<String> profileIds = List.of("made up profile id");
+
         // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
-                searchAfter);
+        sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1, null);
         // assert
         verify(organisationRepository, never()).findByOrgTypeIn(any(), any(), anyBoolean(), any());
     }
@@ -2721,8 +2716,7 @@ class OrganisationServiceImplTest {
     void shouldRetrieveOrganisationsWithEmptyProfileIdList() {
         // arrange
         List<String> profileIds = new ArrayList<>();
-        Integer pageSize = 1;
-        UUID searchAfter = null;
+
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
@@ -2730,8 +2724,7 @@ class OrganisationServiceImplTest {
         when(orgPage.isLast()).thenReturn(false);
 
         // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
-                searchAfter);
+        sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1, null);
 
         // assert
         assertThat(result).isNotNull();
