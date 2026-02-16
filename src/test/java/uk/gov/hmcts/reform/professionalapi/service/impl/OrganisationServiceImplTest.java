@@ -2716,7 +2716,7 @@ class OrganisationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getOrganisationInfo())
                 .isNotNull()
-                .hasSize(0);
+                .isEmpty();
         assertThat(result.isMoreAvailable())
                 .isFalse();
 
@@ -2727,18 +2727,16 @@ class OrganisationServiceImplTest {
     @Test
     void shouldRetrieveOrganisationsWithEmptyProfileIdList() {
         // arrange
+        Organisation org = new Organisation();
+        org.setStatus(ACTIVE);
+        org.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
 
-
-
-        organisation.setStatus(ACTIVE);
-        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
-
-        List<Organisation> organisations = new ArrayList<>();
-        organisations.add(organisation);
+        List<Organisation> orgsList = new ArrayList<>();
+        orgsList.add(org);
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
-        when(orgPage.getContent()).thenReturn(organisations);
+        when(orgPage.getContent()).thenReturn(orgsList);
         when(orgPage.isLast()).thenReturn(false);
 
         List<String> profileIds = new ArrayList<>();
