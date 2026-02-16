@@ -83,6 +83,8 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
@@ -2679,7 +2681,6 @@ class OrganisationServiceImplTest {
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
         profileIds.add("made up profile id");
-        Integer pageSize = 1;
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
@@ -2687,9 +2688,12 @@ class OrganisationServiceImplTest {
         when(orgPage.isLast()).thenReturn(true);
 
         // act
-        sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize, null);
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1,
+                null);
 
         // assert
+        assertThat(result).isNotNull();
+
         verify(organisationRepository).findByOrgTypeIn(orgTypesCaptor.capture(), isNull(), anyBoolean(), any());
         List<String> orgTypes = orgTypesCaptor.getValue();
         assertEquals(expectedOrgTypes.size(), orgTypes.size());
@@ -2706,8 +2710,16 @@ class OrganisationServiceImplTest {
         List<String> profileIds = List.of("made up profile id");
 
         // act
-        sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1, null);
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1, null);
+
         // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo())
+                .isNotNull()
+                .hasSize(0);
+        assertThat(result.isMoreAvailable())
+                .isFalse();
+
         verify(organisationRepository, never()).findByOrgTypeIn(any(), any(), anyBoolean(), any());
     }
 
@@ -2716,18 +2728,30 @@ class OrganisationServiceImplTest {
     void shouldRetrieveOrganisationsWithEmptyProfileIdList() {
         // arrange
         List<String> profileIds = new ArrayList<>();
-
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        organisation.setStatus(ACTIVE);
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
         when(orgPage.getContent()).thenReturn(organisations);
         when(orgPage.isLast()).thenReturn(false);
 
         // act
-        sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1, null);
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1,
+                null);
 
         // assert
         assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+        assertThat(result.getOrganisationInfo())
+                .isNotNull()
+                .hasSize(1);
+
+        assertThat(result.getOrganisationInfo().get(0).getOrganisationProfileIds())
+                .isNotNull()
+                .contains(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
     }
 }
