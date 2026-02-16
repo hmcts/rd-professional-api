@@ -103,6 +103,8 @@ public class ProfileOrgTypeUtilityTest {
                                 OrganisationProfileIdConstants.GOVERNMENT_ORGANISATION_PROFILE
                         )
                 ),
+
+                // OTHER variants
                 Arguments.of(
                         OrganisationTypeConstants.OTHER_ACCOUNT,
                         List.of(
@@ -344,7 +346,7 @@ public class ProfileOrgTypeUtilityTest {
      * profileId -> orgTypes (reverse mapping validation)
      * ------------------------------------------------------------------ */
     @SuppressWarnings("unchecked")
-    static Stream<Arguments> profileIdToOrgTypes() {
+    public static Stream<Arguments> profileIdToOrgTypes() {
         List<String> profiles = orgTypeToProfileIds()
                 .flatMap(a -> ((List<String>) a.get()[1]).stream())
                 .distinct().toList();

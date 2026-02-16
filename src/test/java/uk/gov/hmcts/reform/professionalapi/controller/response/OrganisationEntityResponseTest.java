@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
 import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 
@@ -34,7 +35,7 @@ class OrganisationEntityResponseTest {
                 false, false, true);
 
         assertThat(organisationEntityResponse).isNotNull();
-        assertThat(organisationEntityResponse.organisationProfileIds.contains(SOLICITOR_PROFILE));
+        assertTrue(organisationEntityResponse.organisationProfileIds.contains(SOLICITOR_PROFILE));
     }
 
     @Test

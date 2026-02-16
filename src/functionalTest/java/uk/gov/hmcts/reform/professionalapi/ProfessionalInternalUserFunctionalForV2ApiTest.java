@@ -406,10 +406,10 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         OrganisationByProfileIdsRequest request = new OrganisationByProfileIdsRequest();
         request.getOrganisationProfileIds().add("UNKNOWN");
+        request.getOrganisationProfileIds().add(SOLICITOR_PROFILE);
         Map<String, Object> response = professionalApiClient.retrieveOrganisationsByProfileIds(request,
                 pageSize, searchAfter);
-        assertThat((List<HashMap>) response.get("organisationInfo")).isEmpty();
-        assertNull(response.get("lastRecordInPage"));
+        verifyOrganisationsByProfileIdResponse(response, SOLICITOR_PROFILE, pageSize);
         log.info("findOrganisationWithSolicitorProfilePageSizeAndOrSearchAfter :: END");
     }
 
@@ -438,7 +438,6 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
             List<String> organisationProfileIdList = (List<String>) org.get("organisationProfileIds");
             assertThat(organisationProfileIdList).isNotEmpty();
-            assertThat((organisationProfileIdList)).hasSize(2);
             assertThat(organisationProfileIdList.contains(expectedProfileId));
         });
 

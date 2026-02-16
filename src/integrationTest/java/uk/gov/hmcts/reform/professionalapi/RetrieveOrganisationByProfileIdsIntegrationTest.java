@@ -34,11 +34,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    private static final String solicitorOrgType =  OrganisationTypeConstants.SOLICITOR_ORG;
-    private static final String solicitorProfileId = OrganisationProfileIdConstants.SOLICITOR_PROFILE;
-    private static final String organisationProfileId = OrganisationProfileIdConstants.ORGANISATION_PROFILE;
-    private static final String govtHoOrgType = OrganisationTypeConstants.GOVT_HO_ORG;
-
     @Autowired
     private OrganisationRepository organisationRepository;
     private String organisationV1Identifier;
@@ -48,19 +43,20 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         organisationRepository.deleteAll();
 
         OrganisationOtherOrgsCreationRequest request1 = this.createUniqueOrganisationRequest("TstSO1", "SRA123",
-                "PBA1234561", "super-email1@gmail.com", solicitorOrgType);
+                "PBA1234561", "super-email1@gmail.com",
+                OrganisationTypeConstants.SOLICITOR_ORG);
         professionalReferenceDataClient.createOrganisationV2(request1);
 
         OrganisationOtherOrgsCreationRequest request2 = this.createUniqueOrganisationRequest("TstSO2", "SRA124",
-                "PBA1234562", "super-email2@gmail.com", solicitorOrgType);
+                "PBA1234562", "super-email2@gmail.com", OrganisationTypeConstants.SOLICITOR_ORG);
         professionalReferenceDataClient.createOrganisationV2(request2);
 
         OrganisationOtherOrgsCreationRequest request3 = this.createUniqueOrganisationRequest("TestOG1", "SRA125",
-                "PBA1234563", "super-email3@gmail.com", govtHoOrgType);
+                "PBA1234563", "super-email3@gmail.com", OrganisationTypeConstants.GOVT_HO_ORG);
         professionalReferenceDataClient.createOrganisationV2(request3);
 
         OrganisationOtherOrgsCreationRequest request4 = this.createUniqueOrganisationRequest("TestOG2", "SRA126",
-                "PBA1234564", "super-email4@gmail.com", govtHoOrgType);
+                "PBA1234564", "super-email4@gmail.com", OrganisationTypeConstants.GOVT_HO_ORG);
         professionalReferenceDataClient.createOrganisationV2(request4);
 
         // this creates an organisation with no org type
@@ -98,9 +94,15 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
      * ------------------------------------------------------------------ */
     static Stream<Arguments> profileIdToOrgCount() {
         return Stream.of(
-                Arguments.of(solicitorProfileId, 3), // 2 solicitor orgs and 1 v1 org
-                Arguments.of(organisationProfileId, 4), // 2 solicitor orgs and 1 baristor and 1 v1 org
-                Arguments.of(OrganisationProfileIdConstants.GOVT_HO_PROFILE, 2) //2 HO Govt Org
+                Arguments.of(
+                    OrganisationProfileIdConstants.SOLICITOR_PROFILE,
+                    3), // 2 solicitor orgs and 1 v1 org
+                Arguments.of(
+                    OrganisationProfileIdConstants.ORGANISATION_PROFILE,
+                    4), // 2 solicitor orgs and 1 baristor and 1 v1 org
+                Arguments.of(
+                    OrganisationProfileIdConstants.GOVT_HO_PROFILE,
+                    2) //2 HO Govt Org
         );
     }
 
@@ -134,6 +136,31 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
         assertThat(allMatch).isTrue();
     }
 
+    @Test
+    void when_multiple_profile_ids_provided_should_return_matching_org_and_status_200() {
+        // arrange
+        OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
+        organisationByProfileIdsRequest.setOrganisationProfileIds(
+                List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE,
+                        OrganisationProfileIdConstants.BARR_PROFILE));
+        Integer pageSize = null;
+        UUID searchAfter = null;
+
+        String expectedStatus = "200 OK";
+        boolean expectedHasMoreRecords = false;
+        int expectedOrganisationsCount = 4;// 2 solicitor orgs and 1 baristor and 1 v1 org
+
+        // act
+        Map<String, Object> response =
+                professionalReferenceDataClient.retrieveOrganisationsByProfileIds(organisationByProfileIdsRequest,
+                        pageSize, searchAfter);
+
+        // assert
+        assertSuccessfulResponse(response, expectedOrganisationsCount, expectedStatus, expectedHasMoreRecords,
+                null);
+
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     void when_non_matching_profile_ids_provided_should_return_no_organisations_and_status_200() {
@@ -161,7 +188,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     void when_profile_ids_and_page_size_is_provided_should_matching_organisations_as_page_and_status_200() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
+        organisationByProfileIdsRequest.setOrganisationProfileIds(
+                List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE));
         Integer pageSize = 1;
         UUID searchAfter = null;
         int expectedOrganisationsCount = 1;
@@ -183,7 +211,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     void when_search_after_is_given_should_return_matching_organisations_after_search_after_and_status_200() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
+        organisationByProfileIdsRequest.setOrganisationProfileIds(
+                List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE));
         Integer pageSize = 1;
         UUID searchAfter = null;
 
@@ -258,7 +287,8 @@ class RetrieveOrganisationByProfileIdsIntegrationTest extends AuthorizationEnabl
     void when_an_invalid_page_size_is_provided_should_return_status_400_and_error_messages() {
         // arrange
         OrganisationByProfileIdsRequest organisationByProfileIdsRequest = new OrganisationByProfileIdsRequest();
-        organisationByProfileIdsRequest.setOrganisationProfileIds(List.of(solicitorProfileId));
+        organisationByProfileIdsRequest.setOrganisationProfileIds(
+                List.of(OrganisationProfileIdConstants.SOLICITOR_PROFILE));
         Integer pageSize = -1;
         UUID searchAfter = null;
 

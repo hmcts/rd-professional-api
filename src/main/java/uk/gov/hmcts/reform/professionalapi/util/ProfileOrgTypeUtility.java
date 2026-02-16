@@ -173,20 +173,22 @@ public class ProfileOrgTypeUtility {
     );
 
     public static List<String> toProfileIds(String orgType) {
-        if (orgType == null) {
-            return List.of();
+        List<String> orgProfiles = List.of();
+        if (orgType != null) {
+            orgProfiles = ORG_TYPE_TO_ORG_PROFILE_IDS.getOrDefault(orgType, List.of());
         }
-        return ORG_TYPE_TO_ORG_PROFILE_IDS.getOrDefault(orgType, List.of());
+        return orgProfiles;
     }
 
     public static List<String> toOrgTypes(String profileId) {
-        if (profileId == null) {
-            return List.of();
+        List<String> orgTypes = List.of();
+        if (profileId != null) {
+            orgTypes = ORG_TYPE_TO_ORG_PROFILE_IDS.entrySet()
+                    .stream()
+                    .filter(e -> e.getValue() != null && e.getValue().contains(profileId))
+                    .map(Map.Entry::getKey)
+                    .toList();
         }
-        return ORG_TYPE_TO_ORG_PROFILE_IDS.entrySet()
-                .stream()
-                .filter(e -> e.getValue() != null && e.getValue().contains(profileId))
-                .map(Map.Entry::getKey)
-                .toList();
+        return orgTypes;
     }
 }

@@ -143,22 +143,24 @@ class RefDataUtilTest {
     void test_getOrganisationProfileIds() {
         organisation.setOrgType(null);
         List<String> organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
-        assertThat(organisationProfileIds).hasSize(2);
-        assertThat(organisationProfileIds).contains(SOLICITOR_PROFILE);
-        assertThat(organisationProfileIds).contains(ORGANISATION_PROFILE);
-
+        assertThat(organisationProfileIds)
+            .hasSize(2)
+            .contains(SOLICITOR_PROFILE)
+            .contains(ORGANISATION_PROFILE);
 
         organisation.setOrgType(SOLICITOR_ORG);
         organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
-        assertThat(organisationProfileIds).hasSize(2);
-        assertThat(organisationProfileIds).contains(SOLICITOR_PROFILE);
-        assertThat(organisationProfileIds).contains(ORGANISATION_PROFILE);
+        assertThat(organisationProfileIds)
+            .hasSize(2)
+            .contains(SOLICITOR_PROFILE)
+            .contains(ORGANISATION_PROFILE);
 
         organisation.setOrgType(GOVT_HMRC_ORG);
         organisationProfileIds = RefDataUtil.getOrganisationProfileIds(organisation);
-        assertThat(organisationProfileIds).hasSize(2);
-        assertThat(organisationProfileIds).contains(GOVT_HMRC_PROFILE);
-        assertThat(organisationProfileIds).contains(GOVERNMENT_ORGANISATION_PROFILE);
+        assertThat(organisationProfileIds)
+            .hasSize(2)
+            .contains(GOVT_HMRC_PROFILE)
+            .contains(GOVERNMENT_ORGANISATION_PROFILE);
 
     }
 

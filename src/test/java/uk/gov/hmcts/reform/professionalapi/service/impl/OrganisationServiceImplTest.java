@@ -11,7 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -98,6 +101,7 @@ import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -109,6 +113,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -129,6 +134,9 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationServiceImplTest {
+
+    @Captor
+    private ArgumentCaptor<List<String>> orgTypesCaptor;
 
     private static final String SINCE_STR = "2019-08-16T15:00:41";
     private final LocalDateTime since = LocalDateTime.parse(SINCE_STR, ISO_DATE_TIME_FORMATTER);
@@ -2665,16 +2673,10 @@ class OrganisationServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        OrganisationProfileIdConstants.SOLICITOR_PROFILE,
-        OrganisationProfileIdConstants.GOVT_HO_PROFILE,
-        OrganisationProfileIdConstants.GOVT_DWP_PROFILE,
-        OrganisationProfileIdConstants.GOVT_HMRC_PROFILE,
-        OrganisationProfileIdConstants.GOVT_CICA_PROFILE,
-        OrganisationProfileIdConstants.GOVT_CAFCASS_CYMRU_PROFILE
-    })
+    @MethodSource("uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtilityTest#profileIdToOrgTypes")
     @SuppressWarnings("unchecked")
-    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter(String profileId) {
+    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter(String profileId,
+                                                                             List<String> expectedOrgTypes) {
         // arrange
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
@@ -2692,8 +2694,28 @@ class OrganisationServiceImplTest {
                 searchAfter);
 
         // assert
-        assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+        verify(organisationRepository).findByOrgTypeIn(orgTypesCaptor.capture(), isNull(), anyBoolean(), any());
+        List<String> orgTypes = orgTypesCaptor.getValue();
+        assertEquals(expectedOrgTypes.size(), orgTypes.size());
+        assertAll("Expected OrgType should be present",
+                expectedOrgTypes.stream()
+                        .map(expectedOrgType -> () ->
+                                assertThat(orgTypes).contains(expectedOrgType))
+        );
+    }
+
+    @Test
+    void shouldSkipSearchByOrgTypeWhenProfileIdNotRecognised() {
+        // arrange
+        List<String> profileIds = new ArrayList<>();
+        profileIds.add("made up profile id");
+        Integer pageSize = 1;
+        UUID searchAfter = null;
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
+                searchAfter);
+        // assert
+        verify(organisationRepository, never()).findByOrgTypeIn(any(), any(), anyBoolean(), any());
     }
 
     @SuppressWarnings("unchecked")
