@@ -90,7 +90,7 @@ public class RefDataUtil {
 
         List<String> orgProfileIds = List.of();
 
-        if ( organisation != null) {
+        if (organisation != null) {
             if (organisation.getOrgType() == null) {
                 orgProfileIds = ProfileOrgTypeUtility.toProfileIds(DEFAULT_ORG_TYPE);
             } else {
