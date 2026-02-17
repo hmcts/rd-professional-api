@@ -516,31 +516,32 @@ public class OrganisationServiceImpl implements OrganisationService {
             List<String> organisationProfileIds,
             Integer pageSize,
             UUID searchAfter) {
+        MultipleOrganisationsResponse response;
         List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
         boolean includeV1Orgs = orgTypes.contains(OrganisationTypeConstants.SOLICITOR_ORG);
 
         // if organisationProfileIds specified but no org types found: then return empty response: i.e. not found
         if (isNotEmpty(organisationProfileIds) && isEmpty(orgTypes)) {
-            return new MultipleOrganisationsResponse(Collections.emptyList(), false);
+            response = new MultipleOrganisationsResponse(Collections.emptyList(), false);
         } else { // run search
             Pageable pageableObject = PageRequest.of(0, pageSize);
             Page<Organisation> organisations = organisationRepository
                     .findByOrgTypeIn(orgTypes, searchAfter, includeV1Orgs, pageableObject);
-            return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
+            response = new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
         }
+        return response;
     }
 
     private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
-
-        if (isEmpty(organisationProfileIds)) {
-            return List.of();
+        List<String> convertedProfildIds = List.of();
+        if (isNotEmpty(organisationProfileIds)) {
+            convertedProfildIds = organisationProfileIds.stream()
+                    .filter(Objects::nonNull)
+                    .flatMap(profileId -> ProfileOrgTypeUtility.toOrgTypes(profileId).stream())
+                    .distinct()
+                    .toList();
         }
-
-        return organisationProfileIds.stream()
-                .filter(Objects::nonNull)
-                .flatMap(profileId -> ProfileOrgTypeUtility.toOrgTypes(profileId).stream())
-                .distinct()
-                .toList();
+        return convertedProfildIds;
     }
 
     @Override

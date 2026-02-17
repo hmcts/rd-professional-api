@@ -87,15 +87,17 @@ public class RefDataUtil {
 
 
     public static List<String> getOrganisationProfileIds(Organisation organisation) {
-        if (organisation == null) {
-            return List.of();
-        }
 
-        if (organisation.getOrgType() == null) {
-            return ProfileOrgTypeUtility.toProfileIds(DEFAULT_ORG_TYPE);
-        }
+        List<String> orgProfileIds = List.of();
 
-        return ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType());
+        if ( organisation != null) {
+            if (organisation.getOrgType() == null) {
+                orgProfileIds = ProfileOrgTypeUtility.toProfileIds(DEFAULT_ORG_TYPE);
+            } else {
+                orgProfileIds = ProfileOrgTypeUtility.toProfileIds(organisation.getOrgType());
+            }
+        }
+        return orgProfileIds;
     }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
