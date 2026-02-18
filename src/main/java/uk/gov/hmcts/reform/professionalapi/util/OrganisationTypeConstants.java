@@ -8,12 +8,12 @@ public final class OrganisationTypeConstants {
     public static final String LOCAL_AUTHORITY_ORG = "LOCALAUTH";
     public static final String PROBATE_PRACTITIONER = "PROBPRAC";
 
-    public static final String GOVT_DWP_ORG = "GOVT_DWP";
+    public static final String GOVT_DWP_ORG = "GOVT-DWP";
     public static final String GOVT_HO_ORG = "GOVT-HO";
     public static final String GOVT_HMRC_ORG = "GOVT-HMRC";
     public static final String GOVT_CICA_ORG = "GOVT-CICA";
     public static final String GOVT_CAFCASS_CYMRU_ORG = "GOVT-CAFCASS-CYMRU";
-    public static final String GOVT_IBCA = "GOVT_IBCA";
+    public static final String GOVT_IBCA = "GOVT-IBCA";
 
     public static final String OTHER_ACCOUNT = "OTHER-ACCOUNT";
     public static final String OTHER_PUBDEF = "OTHER-PUBDEF";
