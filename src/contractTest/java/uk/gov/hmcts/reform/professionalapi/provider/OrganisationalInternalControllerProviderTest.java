@@ -140,6 +140,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     }
 
     //retrieveOrganisationsWithPagination
+    @SuppressWarnings("unchecked")
     @State("An organisation exists with pagination")
     public void setUpOrganisationWithPagination() {
 
@@ -153,6 +154,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
 
     //retrieveOrganisationsWithStatusAndPagination
+    @SuppressWarnings("unchecked")
     @State("An active organisation exists for given status and with pagination")
     public void setUpOrganisationWithStatusAndPagination() {
 
@@ -165,6 +167,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 .getContent()).thenReturn(List.of(organisation));
     }
 
+    @SuppressWarnings("unchecked")
     @State("Active organisations exists for a logged in user")
     public void setActiveOrganisationsForLoggedInUser() throws IOException {
 
@@ -192,6 +195,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
     }
 
+    @SuppressWarnings("unchecked")
     @State("Active organisations exists for a logged in user using lastUpdatedSince")
     public void setActiveOrganisationsForLoggedInUserUsingLastUpdatedSince() throws IOException {
 
@@ -226,6 +230,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
     }
 
+    @SuppressWarnings("unchecked")
     @State("User invited to Organisation")
     public void setUpUserForInviteToOrganisation() throws IOException {
 
@@ -238,7 +243,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(professionalUserService
                 .findProfessionalUserByEmailAddress(anyString())).thenReturn(pu);
 
-        when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(List.of("role"));
+        when(prdEnumService.getPrdEnumByEnumType(anyString())).thenReturn(List.of("role"));
 
         UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
 
@@ -250,6 +255,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                         .status(201).build());
     }
 
+    @SuppressWarnings("unchecked")
     @State("An Organisation exists for update")
     public void setUpOrganisationForUpdate() {
 
@@ -282,6 +288,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     }
 
     //MFA put api test
+    @SuppressWarnings("unchecked")
     @State("An Organisation exists with MFA")
     public void setUpOrganisationForMfaUpdate() {
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(getOrgWithMfaStatus());

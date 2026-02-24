@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
 
 @ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
@@ -1031,7 +1032,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                         .hasSizeGreaterThan(0);
 
                 assertThat(organisationProfileIds.get(0))
-                        .isEqualTo("SOLICITOR_PROFILE");
+                        .isEqualTo(SOLICITOR_PROFILE);
             }
         });
     }
@@ -1073,7 +1074,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                     .hasSizeGreaterThan(0);
 
             assertThat(organisationProfileIds.get(0))
-                    .isEqualTo("SOLICITOR_PROFILE");
+                    .isEqualTo(SOLICITOR_PROFILE);
         });
     }
 
