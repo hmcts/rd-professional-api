@@ -84,83 +84,25 @@ withPipeline(type, product, component) {
     // Sync demo and perftest with master branch
     syncBranchesWithMaster(branchesToSync)
 
-    afterAlways('sonarscan') {
+    afterFailure('test') {
 
         publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/test",
-            reportFiles          : "index.html",
-            reportName           : "Unit Tests Report"
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/tests/test",
+                reportFiles          : "index.html",
+                reportName           : "Unit Tests Report"
         ]
 
         publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/integration",
-            reportFiles          : "index.html",
-            reportName           : "Integration Test Report"
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/tests/integration",
+                reportFiles          : "index.html",
+                reportName           : "Integration Test Report"
         ]
-    }
-
-    afterAlways('smoketest:preview') {
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/smoke",
-            reportFiles          : "index.html",
-            reportName           : "Smoke Test Report"
-        ]
-    }
-
-    afterAlways('smoketest:aat') {
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/smoke",
-            reportFiles          : "index.html",
-            reportName           : "Smoke Test Report"
-        ]
-   }
-
-    afterAlways('functionalTest:aat') {
-       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-       publishHTML target: [
-           allowMissing         : true,
-           alwaysLinkToLastBuild: true,
-           keepAll              : true,
-           reportDir            : "target/site/serenity/",
-           reportFiles          : "index.html",
-           reportName           : "Functional Tests Report"
-       ]
-   }
-
-    afterAlways('functionalTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "target/site/serenity/",
-            reportFiles          : "index.html",
-            reportName           : "Functional Tests Report"
-        ]
-    }
-
-    afterAlways('pact-provider-verification') {
-        publishHTML target: [
-                     allowMissing         : true,
-                     alwaysLinkToLastBuild: true,
-                     keepAll              : true,
-                    reportDir            : "build/reports/tests/runProviderPactVerification",
-                    reportFiles          : "index.html",
-                    reportName           : "Contract Tests Report"
-                ]
-                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 
     afterAlways('sonarscan') {

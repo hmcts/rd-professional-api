@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATI
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID2;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
@@ -236,7 +237,7 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         organisation.setSraRegulated(true);
         organisation.setCompanyUrl("companyUrl");
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
-        organisation.setOrgType("Solicitor");
+        organisation.setOrgType(SOLICITOR_ORG);
 
         ProfessionalUser profile1 = PactUtils.getProfessionalUser(organisation, 1);
         profile1.setUserConfiguredAccesses(List.of(PactUtils.getUserConfiguredAccess(profile1, 1),
