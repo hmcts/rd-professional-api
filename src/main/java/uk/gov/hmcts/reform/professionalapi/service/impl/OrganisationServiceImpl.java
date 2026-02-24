@@ -72,8 +72,8 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
+import uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtility;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.time.LocalDateTime;
@@ -81,11 +81,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -524,50 +523,32 @@ public class OrganisationServiceImpl implements OrganisationService {
             List<String> organisationProfileIds,
             Integer pageSize,
             UUID searchAfter) {
+        MultipleOrganisationsResponse response;
         List<String> orgTypes = convertProfileIdsToOrgTypes(organisationProfileIds);
         boolean includeV1Orgs = orgTypes.contains(OrganisationTypeConstants.SOLICITOR_ORG);
 
-        Pageable pageableObject = PageRequest.of(0, pageSize);
-        Page<Organisation> organisations = organisationRepository
-                .findByOrgTypeIn(orgTypes, searchAfter, includeV1Orgs, pageableObject);
-
-        return new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
+        // if organisationProfileIds specified but no org types found: then return empty response: i.e. not found
+        if (isNotEmpty(organisationProfileIds) && isEmpty(orgTypes)) {
+            response = new MultipleOrganisationsResponse(Collections.emptyList(), false);
+        } else { // run search
+            Pageable pageableObject = PageRequest.of(0, pageSize);
+            Page<Organisation> organisations = organisationRepository
+                    .findByOrgTypeIn(orgTypes, searchAfter, includeV1Orgs, pageableObject);
+            response = new MultipleOrganisationsResponse(organisations.getContent(), !organisations.isLast());
+        }
+        return response;
     }
 
-    private static ArrayList<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
-        Map<String, List<String>> profileIdToOrgTypeMap = new HashMap<>();
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_DWP_PROFILE,
-                Collections.singletonList(OrganisationTypeConstants.OGD_DWP_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_HO_PROFILE,
-                Collections.singletonList(OrganisationTypeConstants.OGD_HO_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_HMRC_PROFILE,
-                Collections.singletonList(OrganisationTypeConstants.OGD_HMRC_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CICA_PROFILE,
-                Collections.singletonList(OrganisationTypeConstants.OGD_CICA_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU,
-                Collections.singletonList(OrganisationTypeConstants.OGD_CAFCASS_CYMRU_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND,
-                Collections.singletonList(OrganisationTypeConstants.OGD_CAFCASS_ENGLAND_ORG));
-
-        profileIdToOrgTypeMap.put(OrganisationProfileIdConstants.SOLICITOR_PROFILE,
-                Arrays.asList(OrganisationTypeConstants.SOLICITOR_ORG, OrganisationTypeConstants.LOCAL_AUTHORITY_ORG,
-                        OrganisationTypeConstants.PROBATE_PRACTITIONER, OrganisationTypeConstants.OTHER_ORG,
-                        OrganisationTypeConstants.BARRISTER, OrganisationTypeConstants.OGD_OTHER_ORG));
-
-        ArrayList<String> orgTypes = new ArrayList<>();
-        for (String profileId : organisationProfileIds) {
-            if (profileIdToOrgTypeMap.containsKey(profileId)) {
-                orgTypes.addAll(profileIdToOrgTypeMap.get(profileId));
-            } else {
-                orgTypes.addAll(profileIdToOrgTypeMap.get(OrganisationProfileIdConstants.SOLICITOR_PROFILE));
-            }
+    private static List<String> convertProfileIdsToOrgTypes(List<String> organisationProfileIds) {
+        List<String> convertedProfildIds = List.of();
+        if (isNotEmpty(organisationProfileIds)) {
+            convertedProfildIds = organisationProfileIds.stream()
+                    .filter(Objects::nonNull)
+                    .flatMap(profileId -> ProfileOrgTypeUtility.toOrgTypes(profileId).stream())
+                    .distinct()
+                    .toList();
         }
-        return orgTypes;
+        return convertedProfildIds;
     }
 
     @Override

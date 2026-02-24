@@ -11,7 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -84,6 +86,7 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 import java.nio.charset.Charset;
@@ -101,6 +104,7 @@ import java.util.UUID;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -112,6 +116,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -132,6 +137,9 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationServiceImplTest {
+
+    @Captor
+    private ArgumentCaptor<List<String>> orgTypesCaptor;
 
     private static final String SINCE_STR = "2019-08-16T15:00:41";
     private final LocalDateTime since = LocalDateTime.parse(SINCE_STR, ISO_DATE_TIME_FORMATTER);
@@ -2705,23 +2713,14 @@ class OrganisationServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        OrganisationProfileIdConstants.SOLICITOR_PROFILE,
-        OrganisationProfileIdConstants.OGD_HO_PROFILE,
-        OrganisationProfileIdConstants.OGD_DWP_PROFILE,
-        OrganisationProfileIdConstants.OGD_HMRC_PROFILE,
-        OrganisationProfileIdConstants.OGD_CICA_PROFILE,
-        OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_CYMRU,
-        OrganisationProfileIdConstants.OGD_CAFCASS_PROFILE_ENGLAND
-    })
+    @MethodSource("uk.gov.hmcts.reform.professionalapi.util.ProfileOrgTypeUtilityTest#profileIdToOrgTypes")
     @SuppressWarnings("unchecked")
-    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter(String profileId) {
+    void shouldRetrieveOrganisationsByProfileIdsWithPagingAndNullSearchAfter(String profileId,
+                                                                             List<String> expectedOrgTypes) {
         // arrange
         List<String> profileIds = new ArrayList<>();
         profileIds.add(profileId);
         profileIds.add("made up profile id");
-        Integer pageSize = 1;
-        UUID searchAfter = null;
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
@@ -2729,33 +2728,71 @@ class OrganisationServiceImplTest {
         when(orgPage.isLast()).thenReturn(true);
 
         // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
-                searchAfter);
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1,
+                null);
 
         // assert
         assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+
+        verify(organisationRepository).findByOrgTypeIn(orgTypesCaptor.capture(), isNull(), anyBoolean(), any());
+        List<String> orgTypes = orgTypesCaptor.getValue();
+        assertEquals(expectedOrgTypes.size(), orgTypes.size());
+        assertAll("Expected OrgType should be present",
+                expectedOrgTypes.stream()
+                        .map(expectedOrgType -> () ->
+                                assertThat(orgTypes).contains(expectedOrgType))
+        );
+    }
+
+    @Test
+    void shouldSkipSearchByOrgTypeWhenProfileIdNotRecognised() {
+        // arrange
+        List<String> profileIds = List.of("made up profile id");
+
+        // act
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1, null);
+
+        // assert
+        assertThat(result).isNotNull();
+        assertThat(result.getOrganisationInfo())
+                .isNotNull()
+                .isEmpty();
+        assertThat(result.isMoreAvailable())
+                .isFalse();
+
+        verify(organisationRepository, never()).findByOrgTypeIn(any(), any(), anyBoolean(), any());
     }
 
     @SuppressWarnings("unchecked")
     @Test
     void shouldRetrieveOrganisationsWithEmptyProfileIdList() {
         // arrange
-        List<String> profileIds = new ArrayList<>();
-        Integer pageSize = 1;
-        UUID searchAfter = null;
+        Organisation org = new Organisation();
+        org.setStatus(ACTIVE);
+        org.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
+
+        List<Organisation> orgsList = new ArrayList<>();
+        orgsList.add(org);
         Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
 
         when(organisationRepository.findByOrgTypeIn(anyList(), isNull(), anyBoolean(), any())).thenReturn(orgPage);
-        when(orgPage.getContent()).thenReturn(organisations);
+        when(orgPage.getContent()).thenReturn(orgsList);
         when(orgPage.isLast()).thenReturn(false);
 
+        List<String> profileIds = new ArrayList<>();
+
         // act
-        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, pageSize,
-                searchAfter);
+        MultipleOrganisationsResponse result = sut.retrieveOrganisationsByProfileIdsWithPageable(profileIds, 1,
+                null);
 
         // assert
         assertThat(result).isNotNull();
-        assertThat(result.getOrganisationInfo()).isNullOrEmpty();
+        assertThat(result.getOrganisationInfo())
+                .isNotNull()
+                .hasSize(1);
+
+        assertThat(result.getOrganisationInfo().get(0).getOrganisationProfileIds())
+                .isNotNull()
+                .contains(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
     }
 }
