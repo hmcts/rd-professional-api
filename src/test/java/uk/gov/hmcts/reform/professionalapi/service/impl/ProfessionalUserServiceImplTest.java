@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -78,6 +79,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.GOVT_DWP_ORG;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserServiceImplTest {
@@ -170,7 +173,7 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     void test_findUsersByOrganisation_with_userIdentifier() throws Exception {
-        organisation.setOrgType("Solicitor");
+        organisation.setOrgType(SOLICITOR_ORG);
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
                 "some@email.com", organisation));
@@ -228,7 +231,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(professionalUsersEntityResponse1.getOrganisationStatus())
                 .isEqualTo(organisation.getStatus().name());
         assertThat(professionalUsersEntityResponse1.getOrganisationProfileIds())
-                .contains("SOLICITOR_PROFILE");
+                .contains(OrganisationProfileIdConstants.SOLICITOR_PROFILE);
         assertThat(professionalUsersEntityResponse1.getUsers()).hasSize(2);
         professionalUsersEntityResponse1.getUsers().forEach(userProfile -> {
             assertThat(userProfile.getIdamStatus()).isEqualToIgnoringCase("active");
@@ -536,7 +539,7 @@ class ProfessionalUserServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void test_shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
-        organisation.setOrgType("Government Organisation-DWP");
+        organisation.setOrgType(GOVT_DWP_ORG);
 
         Pageable pageableMock = mock(Pageable.class);
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
@@ -581,7 +584,7 @@ class ProfessionalUserServiceImplTest {
         assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationStatus())
                 .isEqualTo(organisation.getStatus().name());
         assertThat(professionalUsersEntityResponseWithoutRoles.getOrganisationProfileIds())
-                .contains("OGD_DWP_PROFILE");
+                .contains(OrganisationProfileIdConstants.GOVT_DWP_PROFILE);
 
         verify(professionalUserRepository, times(1))
                 .findByOrganisation(organisation, pageableMock);
