@@ -49,7 +49,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_MISMATCH;
 
 @ExtendWith(MockitoExtension.class)
@@ -394,13 +400,14 @@ class ProfessionalExternalUserControllerTest {
         String origin = "EXUI";
 
         when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(anyString()))
-                .thenReturn(professionalUser);
+            .thenReturn(professionalUser);
 
-        doThrow(new AccessDeniedException(ORGANISATION_MISMATCH)).when(profExtUsrReqValidator).validateOrganisationMatch(anyString(), any(ProfessionalUser.class));
+        doThrow(new AccessDeniedException(ORGANISATION_MISMATCH))
+            .when(profExtUsrReqValidator).validateOrganisationMatch(anyString(), any(ProfessionalUser.class));
 
         assertThrows(AccessDeniedException.class, () ->
-                professionalExternalUserController.modifyUserConfiguredAccessAndRolesForExistingUserOfExternalOrganisation(
-                        userProfileUpdatedData, orgId, userId, origin));
+            professionalExternalUserController.modifyUserConfiguredAccessAndRolesForExistingUserOfExternalOrganisation(
+                    userProfileUpdatedData, orgId, userId, origin));
     }
 
 }
