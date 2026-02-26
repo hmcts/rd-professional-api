@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,12 +49,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_MISMATCH;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -386,6 +383,24 @@ class ProfessionalExternalUserControllerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getBody()).isNotNull();
+    }
+
+    @Test
+    void test_modifyRolesForExistingUserOfExternalOrganisationThrowsOnMismatch() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
+                "lastName", IdamStatus.ACTIVE.name(), null, null, null);
+        String orgId = "org123";
+        String userId = "1234567891";
+        String origin = "EXUI";
+
+        when(professionalUserServiceMock.findProfessionalUserByUserIdentifier(anyString()))
+                .thenReturn(professionalUser);
+
+        doThrow(new AccessDeniedException(ORGANISATION_MISMATCH)).when(profExtUsrReqValidator).validateOrganisationMatch(anyString(), any(ProfessionalUser.class));
+
+        assertThrows(AccessDeniedException.class, () ->
+                professionalExternalUserController.modifyUserConfiguredAccessAndRolesForExistingUserOfExternalOrganisation(
+                        userProfileUpdatedData, orgId, userId, origin));
     }
 
 }
