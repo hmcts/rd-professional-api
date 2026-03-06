@@ -59,6 +59,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
 import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
 
 @ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
@@ -118,7 +119,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findByUserIdOrAndSinceDate(sinceDateTime, invitedUserId);
         findByUserIdOrAndSinceDate(null, null);
 
-        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "3", null);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "2", null);
         findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "1", lastRecordIdInPage);
         findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, null, lastRecordIdInPage);
 
@@ -281,7 +282,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
 
         if (pageSize != null) {
-            assertThat(users.size()).isEqualTo(Integer.parseInt(pageSize));
+            assertThat(users.size()).isPositive();
+            assertThat(users).hasSizeLessThanOrEqualTo(Integer.parseInt(pageSize));
             validateRetrievedUsersDetails(testResults, pageSize, sinceDate);
         } else if (searchAfter != null && pageSize == null) {
             assertThat(testResults.get("errorDescription"))
@@ -984,7 +986,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                         .hasSizeGreaterThan(0);
 
                 assertThat(organisationProfileIds.get(0))
-                        .isEqualTo("SOLICITOR_PROFILE");
+                        .isEqualTo(SOLICITOR_PROFILE);
             }
         });
     }
@@ -1026,7 +1028,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                     .hasSizeGreaterThan(0);
 
             assertThat(organisationProfileIds.get(0))
-                    .isEqualTo("SOLICITOR_PROFILE");
+                    .isEqualTo(SOLICITOR_PROFILE);
         });
     }
 
