@@ -60,9 +60,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -242,7 +244,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         data.put("email","dummy@email.com");
         data.put("idamStatus",IdamStatus.ACTIVE);
 
-        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
+        userProfileService.stubFor(get(urlPathEqualTo("/v1/userprofile"))
+                .withQueryParam("userId", matching(".*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", APPLICATION_JSON)
                         .withStatus(200)
@@ -817,7 +820,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             returnHttpStaus = 500;
         }
 
-        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile"))
+        userProfileService.stubFor(get(urlPathEqualTo("/v1/userprofile"))
+                .withHeader("UserEmail", matching(".*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody(body)
