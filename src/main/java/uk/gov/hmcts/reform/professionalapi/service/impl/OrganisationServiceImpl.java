@@ -769,14 +769,16 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String prdAdminUserId) {
+        Organisation managedOrganisation = organisationRepository.findById(organisation.getId())
+                .orElseThrow(() -> new EmptyResultDataAccessException(ONE));
         var deleteOrganisationResponse = new DeleteOrganisationResponse();
-        switch (organisation.getStatus()) {
+        switch (managedOrganisation.getStatus()) {
             case PENDING,REVIEW:
                 return deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId);
             case ACTIVE:
-                deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
+                deleteOrganisationResponse = deleteUserProfile(managedOrganisation, deleteOrganisationResponse);
                 return deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
-                        ? deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId)
+                        ? deleteOrganisationEntity(managedOrganisation, deleteOrganisationResponse, prdAdminUserId)
                         : deleteOrganisationResponse;
             default:
                 throw new EmptyResultDataAccessException(ONE);
@@ -1038,4 +1040,3 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 }
-
