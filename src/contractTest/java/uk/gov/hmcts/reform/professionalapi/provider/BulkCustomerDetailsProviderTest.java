@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
@@ -11,9 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.BulkCustomerDetailsInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
@@ -28,7 +27,6 @@ import java.util.UUID;
 import static java.util.Objects.nonNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.when;
-
 
 @Provider("referenceData_bulkCustomerDetails")
 @ContextConfiguration(classes = {BulkCustomerDetailsInternalController.class})
@@ -45,10 +43,10 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
     @Autowired
     BulkCustomerDetailsInternalController bulkCustomerDetailsInternalController;
 
-    @MockBean
+    @MockitoBean
     OrganisationServiceImpl organisationService;
 
-    @MockBean
+    @MockitoBean
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
 
@@ -114,5 +112,4 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
         return bulkCustomerDetails;
     }
 }
-
 

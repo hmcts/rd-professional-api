@@ -8,12 +8,12 @@ import feign.Request;
 import feign.Response;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalControllerV2;
@@ -64,12 +64,12 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
     OrganisationExternalControllerV2 organisationExternalControllerV2;
 
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
-    @MockBean
+    @MockitoBean
     Authentication authentication;
-    @MockBean
+    @MockitoBean
     SecurityContext securityContext;
     @Autowired
     OrganisationServiceImpl organisationServiceImpl;
