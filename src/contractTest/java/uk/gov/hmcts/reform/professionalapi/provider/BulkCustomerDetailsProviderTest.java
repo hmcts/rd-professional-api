@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.BulkCustomerDetailsInternalController;
@@ -29,8 +28,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @Provider("referenceData_bulkCustomerDetails")
-@ContextConfiguration(classes = {BulkCustomerDetailsInternalController.class})
-@Import(BulkCustomerDetailsProviderTestConfiguration.class)
+@ContextConfiguration(classes = {BulkCustomerDetailsInternalController.class,
+        BulkCustomerDetailsProviderTestConfiguration.class})
 public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
 
     public static final String ORG_NAME = "Org-Name";
