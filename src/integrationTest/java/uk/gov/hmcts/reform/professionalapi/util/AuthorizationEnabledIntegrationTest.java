@@ -191,6 +191,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @BeforeEach
     public void setupIdamStubs() throws Exception {
+        s2sService.resetAll();
+        sidamService.resetAll();
+        mockHttpServerForOidc.resetAll();
 
         LinkedHashMap<String,Object> data = new LinkedHashMap<>();
         data.put("id","%s");
@@ -230,6 +233,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @BeforeEach
     public void userProfileGetUserWireMock() throws Exception {
+        userProfileService.resetAll();
 
         HashMap<Object,Object> data = new HashMap<>();
         data.put("userIdentifier", UUID.randomUUID().toString());
