@@ -74,7 +74,7 @@ public class BulkCustomerDetailsProviderTestConfiguration extends ProviderTestCo
 
     @Bean
     @Primary
-    protected OrganisationServiceImpl organisationService() {
+    public OrganisationServiceImpl organisationService() {
         return new OrganisationServiceImpl();
     }
 

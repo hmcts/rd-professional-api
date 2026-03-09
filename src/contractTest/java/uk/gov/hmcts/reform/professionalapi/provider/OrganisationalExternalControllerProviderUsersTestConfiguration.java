@@ -71,7 +71,7 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
 
     @Bean
     @Primary
-    protected OrganisationServiceImpl organisationService() {
+    public OrganisationServiceImpl organisationService() {
         return new OrganisationServiceImpl();
     }
 

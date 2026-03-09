@@ -66,7 +66,7 @@ public class OrganisationalInternalControllerV1ProviderTestConfiguration extends
 
     @Bean
     @Primary
-    protected OrganisationServiceImpl organisationService() {
+    public OrganisationServiceImpl organisationService() {
         return new OrganisationServiceImpl();
     }
 
