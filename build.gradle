@@ -42,7 +42,7 @@ def versions = [
         reformS2sClient : '5.3.3',
         feign           : '3.8.0',
         bouncycastle    : '1.82',
-        postgresql_tc   : '1.20.0',
+        postgresql_tc   : '1.21.4',
         serenity        : '4.2.34'
 ]
 
