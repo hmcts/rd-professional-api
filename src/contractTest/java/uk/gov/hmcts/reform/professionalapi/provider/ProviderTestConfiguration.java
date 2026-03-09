@@ -11,6 +11,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -39,6 +40,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_U
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 
+@TestConfiguration
 public class ProviderTestConfiguration {
 
     @MockitoBean
@@ -151,6 +153,13 @@ public class ProviderTestConfiguration {
     @ConditionalOnMissingBean(ProfessionalUserService.class)
     public ProfessionalUserService professionalUserService() {
         return Mockito.mock(ProfessionalUserService.class);
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(ProfessionalUserRepository.class)
+    public ProfessionalUserRepository professionalUserRepositoryBean() {
+        return Mockito.mock(ProfessionalUserRepository.class);
     }
 
     @Bean
