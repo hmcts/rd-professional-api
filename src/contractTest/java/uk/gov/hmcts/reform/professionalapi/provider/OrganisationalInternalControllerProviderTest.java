@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
 
 @Provider("referenceData_organisationalInternal")
-@ContextConfiguration(classes = OrganisationalInternalControllerProviderTestConfiguration.class)
+@Import(OrganisationalInternalControllerProviderTestConfiguration.class)
 public class OrganisationalInternalControllerProviderTest extends MockMvcProviderTest {
 
     @Autowired

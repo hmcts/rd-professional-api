@@ -4,7 +4,7 @@ import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationMfaStatusController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWith
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getProfessionalUser;
 
 @Provider("referenceData_organisation_mfa")
-@ContextConfiguration(classes = OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
 @IgnoreNoPactsToVerify
 public class OrganisationalMfaStatusControllerProviderTest extends MockMvcProviderTest {
 

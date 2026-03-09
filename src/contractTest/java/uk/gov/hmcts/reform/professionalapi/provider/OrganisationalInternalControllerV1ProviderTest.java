@@ -4,7 +4,7 @@ import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -22,7 +22,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalDetailsInternal")
-@ContextConfiguration(classes = OrganisationalInternalControllerV1ProviderTestConfiguration.class)
+@Import(OrganisationalInternalControllerV1ProviderTestConfiguration.class)
 public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProviderTest {
 
     @Autowired

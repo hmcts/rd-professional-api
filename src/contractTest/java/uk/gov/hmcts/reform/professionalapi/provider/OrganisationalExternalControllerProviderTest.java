@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalExternalPbas")
-@ContextConfiguration(classes = OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
 public class OrganisationalExternalControllerProviderTest extends MockMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";

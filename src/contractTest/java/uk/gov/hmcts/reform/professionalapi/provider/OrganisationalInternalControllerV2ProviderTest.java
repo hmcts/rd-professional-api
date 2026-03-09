@@ -8,7 +8,7 @@ import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalControllerV2;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalInternalV2")
-@ContextConfiguration(classes = OrganisationalInternalControllerV2ProviderTestConfiguration.class)
+@Import(OrganisationalInternalControllerV2ProviderTestConfiguration.class)
 public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProviderTest {
 
 

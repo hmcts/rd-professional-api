@@ -12,7 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalExternalPbasV2")
-@ContextConfiguration(classes = OrganisationalExternalControllerV2ProviderTestConfiguration.class)
+@Import(OrganisationalExternalControllerV2ProviderTestConfiguration.class)
 public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProviderTest {
 
     public static final String A_CLAIM = "aClaim";
