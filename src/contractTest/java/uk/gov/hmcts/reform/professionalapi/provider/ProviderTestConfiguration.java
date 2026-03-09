@@ -157,6 +157,13 @@ public class ProviderTestConfiguration {
 
     @Bean
     @Primary
+    @ConditionalOnMissingBean(PrdEnumService.class)
+    public PrdEnumService prdEnumServiceBean() {
+        return Mockito.mock(PrdEnumService.class);
+    }
+
+    @Bean
+    @Primary
     @ConditionalOnMissingBean(ProfessionalUserRepository.class)
     public ProfessionalUserRepository professionalUserRepositoryBean() {
         return Mockito.mock(ProfessionalUserRepository.class);
