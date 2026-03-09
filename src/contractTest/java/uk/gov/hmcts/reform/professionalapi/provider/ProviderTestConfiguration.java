@@ -8,7 +8,9 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import jakarta.persistence.EntityManagerFactory;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Use
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -140,6 +143,13 @@ public class ProviderTestConfiguration {
     @Bean()
     public MappingJackson2HttpMessageConverter newJsonConvert() {
         return new MappingJackson2HttpMessageConverter(new ObjectMapper());
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(ProfessionalUserService.class)
+    public ProfessionalUserService professionalUserService() {
+        return Mockito.mock(ProfessionalUserService.class);
     }
 
 }
