@@ -185,6 +185,13 @@ public class ProviderTestConfiguration {
 
     @Bean
     @Primary
+    @ConditionalOnMissingBean(ProfessionalUserReqValidator.class)
+    public ProfessionalUserReqValidator professionalUserReqValidatorBean() {
+        return Mockito.mock(ProfessionalUserReqValidator.class);
+    }
+
+    @Bean
+    @Primary
     @ConditionalOnMissingBean(ProfessionalUserRepository.class)
     public ProfessionalUserRepository professionalUserRepositoryBean() {
         return Mockito.mock(ProfessionalUserRepository.class);
