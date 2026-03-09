@@ -178,6 +178,13 @@ public class ProviderTestConfiguration {
 
     @Bean
     @Primary
+    @ConditionalOnMissingBean(OrganisationIdentifierValidatorImpl.class)
+    public OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplBean() {
+        return Mockito.mock(OrganisationIdentifierValidatorImpl.class);
+    }
+
+    @Bean
+    @Primary
     @ConditionalOnMissingBean(ProfessionalUserRepository.class)
     public ProfessionalUserRepository professionalUserRepositoryBean() {
         return Mockito.mock(ProfessionalUserRepository.class);
