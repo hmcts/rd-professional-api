@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -14,10 +15,10 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @TestConfiguration
 public class OrganisationalInternalControllerV1ProviderTestConfiguration extends ProviderTestConfiguration {
@@ -66,8 +67,8 @@ public class OrganisationalInternalControllerV1ProviderTestConfiguration extends
 
     @Bean
     @Primary
-    public OrganisationServiceImpl organisationService() {
-        return new OrganisationServiceImpl();
+    public OrganisationService organisationService() {
+        return Mockito.mock(OrganisationService.class);
     }
 
 }
