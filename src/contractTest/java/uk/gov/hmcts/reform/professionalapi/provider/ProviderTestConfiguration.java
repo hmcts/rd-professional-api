@@ -237,7 +237,7 @@ public class ProviderTestConfiguration {
     @Primary
     @ConditionalOnMissingBean(UsersInOrganisationsByOrganisationIdentifiersRequestValidator.class)
     public UsersInOrganisationsByOrganisationIdentifiersRequestValidator
-    usersInOrganisationsByOrganisationIdentifiersRequestValidator() {
+        usersInOrganisationsByOrganisationIdentifiersRequestValidator() {
         return Mockito.mock(UsersInOrganisationsByOrganisationIdentifiersRequestValidator.class);
     }
 
