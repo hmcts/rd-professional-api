@@ -241,4 +241,26 @@ public class ProviderTestConfiguration {
         return Mockito.mock(UsersInOrganisationsByOrganisationIdentifiersRequestValidator.class);
     }
 
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(UserProfileFeignClient.class)
+    public UserProfileFeignClient userProfileFeignClient() {
+        return Mockito.mock(UserProfileFeignClient.class);
+    }
+
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(IdamRepository.class)
+    public IdamRepository idamRepository() {
+        return Mockito.mock(IdamRepository.class);
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(EntityManagerFactory.class)
+    public EntityManagerFactory em() {
+        return Mockito.mock(EntityManagerFactory.class);
+    }
+
 }
