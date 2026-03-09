@@ -54,7 +54,7 @@ public class ProfessionalUserInternalControllerV2ProviderTestConfiguration exten
 
     @Primary
     @Bean
-    protected ProfessionalUserService professionalUserService() {
+    public ProfessionalUserService professionalUserService() {
         return new ProfessionalUserServiceImpl(organisationRepository,
                 professionalUserRepository,
                 userAttributeRepository,
