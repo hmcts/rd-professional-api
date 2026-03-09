@@ -5,6 +5,7 @@ import au.com.dius.pact.provider.junitsupport.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserCon
 @Provider("referenceData_professionalInternalUsersV2")
 @WebMvcTest({ProfessionalUserInternalControllerV2.class})
 @AutoConfigureMockMvc(addFilters = false)
+@Import(ProviderTestConfiguration.class)
 @ContextConfiguration(classes = {ProfessionalUserInternalControllerV2ProviderTestConfiguration.class, WebConfig.class})
 public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProviderTest {
 

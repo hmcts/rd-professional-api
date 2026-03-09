@@ -43,7 +43,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalInternalV2")
-@Import(OrganisationalInternalControllerV2ProviderTestConfiguration.class)
+@Import({OrganisationalInternalControllerV2ProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProviderTest {
 
 

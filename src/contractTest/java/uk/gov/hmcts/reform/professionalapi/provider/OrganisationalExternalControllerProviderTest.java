@@ -53,7 +53,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalExternalPbas")
-@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import({OrganisationalExternalControllerProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalExternalControllerProviderTest extends MockMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";

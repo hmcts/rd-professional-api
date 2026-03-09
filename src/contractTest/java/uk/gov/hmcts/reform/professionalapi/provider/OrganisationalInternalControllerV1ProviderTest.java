@@ -22,7 +22,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalDetailsInternal")
-@Import(OrganisationalInternalControllerV1ProviderTestConfiguration.class)
+@Import({OrganisationalInternalControllerV1ProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProviderTest {
 
     @Autowired

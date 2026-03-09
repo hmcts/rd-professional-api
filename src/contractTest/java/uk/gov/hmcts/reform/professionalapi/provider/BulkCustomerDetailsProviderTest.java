@@ -30,7 +30,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 @Provider("referenceData_bulkCustomerDetails")
 @ContextConfiguration(classes = {BulkCustomerDetailsInternalController.class})
-@Import(BulkCustomerDetailsProviderTestConfiguration.class)
+@Import({BulkCustomerDetailsProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
 
     public static final String ORG_NAME = "Org-Name";

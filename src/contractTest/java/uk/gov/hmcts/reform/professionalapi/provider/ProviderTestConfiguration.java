@@ -8,9 +8,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import jakarta.persistence.EntityManagerFactory;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -29,12 +27,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Org
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
-import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
-import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -148,135 +142,6 @@ public class ProviderTestConfiguration {
     @Bean()
     public MappingJackson2HttpMessageConverter newJsonConvert() {
         return new MappingJackson2HttpMessageConverter(new ObjectMapper());
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(ProfessionalUserService.class)
-    public ProfessionalUserService professionalUserService() {
-        return Mockito.mock(ProfessionalUserService.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(PrdEnumService.class)
-    public PrdEnumService prdEnumServiceBean() {
-        return Mockito.mock(PrdEnumService.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(UpdateOrganisationRequestValidator.class)
-    public UpdateOrganisationRequestValidator updateOrganisationRequestValidatorBean() {
-        return Mockito.mock(UpdateOrganisationRequestValidator.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(OrganisationCreationRequestValidator.class)
-    public OrganisationCreationRequestValidator organisationCreationRequestValidatorBean() {
-        return Mockito.mock(OrganisationCreationRequestValidator.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(OrganisationIdentifierValidatorImpl.class)
-    public OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplBean() {
-        return Mockito.mock(OrganisationIdentifierValidatorImpl.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(ProfessionalUserReqValidator.class)
-    public ProfessionalUserReqValidator professionalUserReqValidatorBean() {
-        return Mockito.mock(ProfessionalUserReqValidator.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(PaymentAccountValidator.class)
-    public PaymentAccountValidator paymentAccountValidatorBean() {
-        return Mockito.mock(PaymentAccountValidator.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(ProfessionalUserRepository.class)
-    public ProfessionalUserRepository professionalUserRepositoryBean() {
-        return Mockito.mock(ProfessionalUserRepository.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(OrganisationRepository.class)
-    public OrganisationRepository organisationRepositoryBean() {
-        return Mockito.mock(OrganisationRepository.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(UserConfiguredAccessRepository.class)
-    public UserConfiguredAccessRepository userConfiguredAccessRepositoryBean() {
-        return Mockito.mock(UserConfiguredAccessRepository.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(OrganisationService.class)
-    public OrganisationService organisationService() {
-        return Mockito.mock(OrganisationService.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(OrganisationCreationRequestValidator.class)
-    public OrganisationCreationRequestValidator organisationCreationRequestValidator() {
-        return Mockito.mock(OrganisationCreationRequestValidator.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(UserAccountMapService.class)
-    public UserAccountMapService userAccountMapService() {
-        return Mockito.mock(UserAccountMapService.class);
-    }
-
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(OrganisationByProfileIdsRequestValidator.class)
-    public OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator() {
-        return Mockito.mock(OrganisationByProfileIdsRequestValidator.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(UsersInOrganisationsByOrganisationIdentifiersRequestValidator.class)
-    public UsersInOrganisationsByOrganisationIdentifiersRequestValidator
-        usersInOrganisationsByOrganisationIdentifiersRequestValidator() {
-        return Mockito.mock(UsersInOrganisationsByOrganisationIdentifiersRequestValidator.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(UserProfileFeignClient.class)
-    public UserProfileFeignClient userProfileFeignClient() {
-        return Mockito.mock(UserProfileFeignClient.class);
-    }
-
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(IdamRepository.class)
-    public IdamRepository idamRepository() {
-        return Mockito.mock(IdamRepository.class);
-    }
-
-    @Bean
-    @Primary
-    @ConditionalOnMissingBean(EntityManagerFactory.class)
-    public EntityManagerFactory em() {
-        return Mockito.mock(EntityManagerFactory.class);
     }
 
 }

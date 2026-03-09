@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
 
 @Provider("referenceData_organisationalInternal")
-@Import(OrganisationalInternalControllerProviderTestConfiguration.class)
+@Import({OrganisationalInternalControllerProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalInternalControllerProviderTest extends MockMvcProviderTest {
 
     @Autowired
