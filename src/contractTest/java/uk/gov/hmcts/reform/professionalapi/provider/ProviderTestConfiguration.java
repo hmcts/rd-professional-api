@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Use
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -210,6 +211,13 @@ public class ProviderTestConfiguration {
     @ConditionalOnMissingBean(OrganisationRepository.class)
     public OrganisationRepository organisationRepositoryBean() {
         return Mockito.mock(OrganisationRepository.class);
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(UserConfiguredAccessRepository.class)
+    public UserConfiguredAccessRepository userConfiguredAccessRepositoryBean() {
+        return Mockito.mock(UserConfiguredAccessRepository.class);
     }
 
     @Bean
