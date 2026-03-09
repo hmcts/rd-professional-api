@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 @Configuration
 public class OrganisationalExternalControllerProviderUsersTestConfiguration extends ProviderTestConfiguration {
@@ -79,9 +78,7 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
-        return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
-            emf, professionalUserRepository, organisationService(),
-            userAccountMapService, paymentAccountRepository);
+        return Mockito.mock(PaymentAccountService.class);
     }
 
     @Bean

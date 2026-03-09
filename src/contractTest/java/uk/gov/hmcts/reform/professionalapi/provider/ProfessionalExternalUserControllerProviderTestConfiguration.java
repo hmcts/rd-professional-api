@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
@@ -79,9 +79,7 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
-        return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
-            emf, professionalUserRepository, organisationService,
-            userAccountMapService, paymentAccountRepository);
+        return Mockito.mock(PaymentAccountService.class);
     }
 
     @Bean
