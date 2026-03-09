@@ -192,6 +192,13 @@ public class ProviderTestConfiguration {
 
     @Bean
     @Primary
+    @ConditionalOnMissingBean(PaymentAccountValidator.class)
+    public PaymentAccountValidator paymentAccountValidatorBean() {
+        return Mockito.mock(PaymentAccountValidator.class);
+    }
+
+    @Bean
+    @Primary
     @ConditionalOnMissingBean(ProfessionalUserRepository.class)
     public ProfessionalUserRepository professionalUserRepositoryBean() {
         return Mockito.mock(ProfessionalUserRepository.class);
