@@ -211,4 +211,34 @@ public class ProviderTestConfiguration {
         return Mockito.mock(OrganisationService.class);
     }
 
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(OrganisationCreationRequestValidator.class)
+    public OrganisationCreationRequestValidator organisationCreationRequestValidator() {
+        return Mockito.mock(OrganisationCreationRequestValidator.class);
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(UserAccountMapService.class)
+    public UserAccountMapService userAccountMapService() {
+        return Mockito.mock(UserAccountMapService.class);
+    }
+
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(OrganisationByProfileIdsRequestValidator.class)
+    public OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator() {
+        return Mockito.mock(OrganisationByProfileIdsRequestValidator.class);
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(UsersInOrganisationsByOrganisationIdentifiersRequestValidator.class)
+    public UsersInOrganisationsByOrganisationIdentifiersRequestValidator
+    usersInOrganisationsByOrganisationIdentifiersRequestValidator() {
+        return Mockito.mock(UsersInOrganisationsByOrganisationIdentifiersRequestValidator.class);
+    }
+
 }
