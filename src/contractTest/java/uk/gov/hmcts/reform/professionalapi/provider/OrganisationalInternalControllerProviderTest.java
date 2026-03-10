@@ -422,7 +422,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationForDelete() {
         Organisation organisation = getOrganisation();
         when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
-        when(organisationService.deleteOrganisation(any(Organisation.class), anyString()))
+        when(organisationService.deleteOrganisation(any(Organisation.class), any()))
             .thenReturn(new DeleteOrganisationResponse(204, "Success"));
     }
 
@@ -433,6 +433,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
             List.of(organisation), true, true, true);
         response.setTotalRecords(1);
         when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationService.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
     }
 
     //PACT test to delete user profile as part of ticket RDCC-7097

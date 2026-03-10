@@ -30,6 +30,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -44,6 +46,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.io.IOException;
@@ -55,6 +58,7 @@ import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -88,6 +92,9 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     OrganisationRepository organisationRepository;
 
     @Autowired
+    OrganisationService organisationService;
+
+    @Autowired
     UserConfiguredAccessRepository userConfiguredAccessRepository;
 
     @Autowired
@@ -113,10 +120,14 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @State({"a request to register an organisation"})
     public void toRegisterNewOrganisation() throws IOException {
+        organisation = PactUtils.getOrganisation();
 
         when(organisationRepository.save(any(Organisation.class))).thenAnswer(i -> i.getArguments()[0]);
 
         when(professionalUserRepositoryMock.save(any(ProfessionalUser.class))).then((i -> i.getArguments()[0]));
+
+        when(organisationService.createOrganisationFrom(any()))
+                .thenReturn(new OrganisationResponse(organisation));
     }
 
     @State({"Organisation exists that can invite new users"})
@@ -141,6 +152,9 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                 .thenReturn(professionalUser);
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
+                .thenReturn(organisation);
+
+        when(organisationService.getOrganisationByOrgIdentifier("someOrganisationIdentifier"))
                 .thenReturn(organisation);
 
 
@@ -171,6 +185,9 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
                 .thenReturn(organisation);
 
+        when(organisationService.getOrganisationByOrgIdentifier("someOrganisationIdentifier"))
+                .thenReturn(organisation);
+
 
         Set<UserAccessType> userAccessTypes = PactUtils.getUserAccessTypes();
         verify(professionalUserServiceMock).saveAllUserAccessTypes(professionalUser, userAccessTypes);
@@ -181,6 +198,7 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
     @State({"Organisation with Id exists"})
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
         mockSecurityContext();
+        ProfessionalUser professionalUser = setUpProfessionalUser();
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
@@ -192,11 +210,13 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
                         .request(mock(Request.class))
                         .body(body, Charset.defaultCharset()).status(200).build());
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(
-                setUpProfessionalUser());
+        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
                 .thenReturn(organisation);
+
+        when(organisationService.retrieveOrganisation(anyString(), anyBoolean()))
+                .thenReturn(new OrganisationEntityResponse(organisation, true, true, true));
 
     }
 
@@ -217,12 +237,15 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
 
     @State({"Organisations exists with status of Active"})
     public void toRetrieveActiveOrganisations() throws IOException {
+        organisation = PactUtils.getOrganisation();
 
         ProfessionalUser professionalUser = setUpProfessionalUser();
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
         when(organisationRepository.findByStatus(ACTIVE)).thenReturn(asList(organisation));
+
+        when(organisationService.getOrganisationByStatus(ACTIVE)).thenReturn(asList(organisation));
 
     }
 
