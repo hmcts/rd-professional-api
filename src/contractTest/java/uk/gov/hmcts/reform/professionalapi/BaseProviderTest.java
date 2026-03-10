@@ -20,7 +20,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Org
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
@@ -75,6 +77,10 @@ public abstract class BaseProviderTest {
     OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     @MockitoBean
     IdamRepository idamRepository;
+    @MockitoBean
+    OrgAttributeRepository orgAttributeRepository;
+    @MockitoBean
+    PaymentAccountRepository paymentAccountRepository;
     @MockitoBean
     UserConfiguredAccessRepository userConfiguredAccessRepository;
     @MockitoBean
