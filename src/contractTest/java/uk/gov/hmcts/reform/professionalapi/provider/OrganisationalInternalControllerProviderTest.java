@@ -201,6 +201,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         response.setTotalRecords(1);
         when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
         when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationServiceMock.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
+        when(organisationService.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
