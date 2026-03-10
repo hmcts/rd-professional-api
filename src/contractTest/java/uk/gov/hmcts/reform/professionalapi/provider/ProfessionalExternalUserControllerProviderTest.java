@@ -239,6 +239,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
 
+        when(professionalUserServiceMock.modifyUserConfiguredAccessAndRoles(any(), anyString(), any()))
+                .thenReturn(ResponseEntity.ok(modifyUserRolesResponse));
+
         return professionalUser;
     }
 
@@ -361,6 +364,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+
+        when(professionalUserServiceMock.modifyUserConfiguredAccessAndRoles(any(), anyString(), any()))
+                .thenReturn(ResponseEntity.ok(modifyUserRolesResponse));
 
         List<UserConfiguredAccess> allUserConfiguredAccess = PactUtils.getUserConfiguredAccesses(professionalUser);
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))

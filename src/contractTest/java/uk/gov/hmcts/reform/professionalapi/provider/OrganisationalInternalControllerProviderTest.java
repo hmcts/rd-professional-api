@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -95,6 +96,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     PrdEnumService prdEnumService;
 
     @Autowired
+    OrganisationService organisationServiceMock;
+
+    @Autowired
     OrganisationInternalController organisationInternalController;
 
     @Autowired
@@ -132,8 +136,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         Organisation organisation = getOrganisation();
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
-        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
-        when(organisationService.deleteOrganisation(any(Organisation.class), anyString()))
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(any(Organisation.class), anyString()))
             .thenReturn(new DeleteOrganisationResponse(204, "Success"));
 
     }
@@ -145,7 +149,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         Organisation organisation = getOrganisation();
         organisation.setPaymentAccounts(emptyList());
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
-        when(organisationService.retrieveOrganisation(anyString(), anyBoolean()))
+        when(organisationServiceMock.retrieveOrganisation(anyString(), anyBoolean()))
             .thenReturn(new OrganisationEntityResponse(organisation, true, true, true));
 
     }
@@ -192,7 +196,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         OrganisationsDetailResponse response = new OrganisationsDetailResponse(
             List.of(organisation), true, true, true);
         response.setTotalRecords(1);
-        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -279,7 +283,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
-        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
         Organisation updatedOrganisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
@@ -307,7 +311,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
-        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
         when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
@@ -332,7 +336,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         paymentAccount.setOrganisation(organisation);
 
         doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
-        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(paymentAccountRepository.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
         when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
@@ -421,8 +425,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @State("Receiving a request to DELETE active Users for the Organisation")
     public void setUpOrganisationForDelete() {
         Organisation organisation = getOrganisation();
-        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
-        when(organisationService.deleteOrganisation(any(Organisation.class), any()))
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(any(Organisation.class), any()))
             .thenReturn(new DeleteOrganisationResponse(204, "Success"));
     }
 
@@ -432,8 +436,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         OrganisationsDetailResponse response = new OrganisationsDetailResponse(
             List.of(organisation), true, true, true);
         response.setTotalRecords(1);
-        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
-        when(organisationService.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
+        when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationServiceMock.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
     }
 
     //PACT test to delete user profile as part of ticket RDCC-7097
