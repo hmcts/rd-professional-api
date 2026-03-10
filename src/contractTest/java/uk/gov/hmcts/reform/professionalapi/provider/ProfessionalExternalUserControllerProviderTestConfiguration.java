@@ -8,12 +8,15 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UserProfileUpdateRequestValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
@@ -47,7 +50,8 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
 
     @Primary
     @Bean
-    public ProfessionalUserService professionalUserService() {
+    public ProfessionalUserService professionalUserService(ProfessionalUserRepository professionalUserRepository,
+                                                           UserProfileFeignClient userProfileFeignClient) {
         return new ProfessionalUserServiceImpl(organisationRepository,
                 professionalUserRepository,
                 userAttributeRepository,
@@ -96,7 +100,7 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
 
     @Bean
     @Primary
-    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter() {
+    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
         return new PactJwtGrantedAuthoritiesConverter(idamRepository);
     }
 
