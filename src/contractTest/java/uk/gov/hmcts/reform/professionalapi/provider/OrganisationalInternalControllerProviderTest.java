@@ -428,6 +428,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationServiceMock.deleteOrganisation(any(Organisation.class), any()))
             .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationService.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
     }
 
     @State("On receiving get Organisations")
@@ -438,6 +441,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         response.setTotalRecords(1);
         when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
         when(organisationServiceMock.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
+        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationService.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
     }
 
     //PACT test to delete user profile as part of ticket RDCC-7097
