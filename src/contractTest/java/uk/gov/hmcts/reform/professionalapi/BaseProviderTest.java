@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOr
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -79,6 +81,10 @@ public abstract class BaseProviderTest {
     IdamRepository idamRepository;
     @MockitoBean
     OrgAttributeRepository orgAttributeRepository;
+    @MockitoBean
+    ContactInformationRepository contactInformationRepository;
+    @MockitoBean
+    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
     @MockitoBean
     PaymentAccountRepository paymentAccountRepository;
     @MockitoBean

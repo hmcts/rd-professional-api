@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
@@ -63,9 +62,6 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
     @Autowired
     OrganisationExternalControllerV2 organisationExternalControllerV2;
 
-
-    @MockitoBean
-    OrganisationRepository organisationRepository;
 
     @MockitoBean
     Authentication authentication;
