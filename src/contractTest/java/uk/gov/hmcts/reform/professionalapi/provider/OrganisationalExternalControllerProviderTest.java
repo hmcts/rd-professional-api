@@ -134,7 +134,9 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
         Organisation organisation = professionalUser.getOrganisation();
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
-        organisation.setPaymentAccounts(List.of(new PaymentAccount("paymentAccountA1")));
+        PaymentAccount paymentAccount = new PaymentAccount("paymentAccountA1");
+        paymentAccount.setPbaStatus(PbaStatus.ACCEPTED);
+        organisation.setPaymentAccounts(List.of(paymentAccount));
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);

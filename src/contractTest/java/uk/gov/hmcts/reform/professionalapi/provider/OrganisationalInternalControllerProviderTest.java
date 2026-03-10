@@ -20,8 +20,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInter
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
@@ -406,6 +408,23 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationWithStatusForGivenPbaStatus() {
         Organisation organisation = getOrganisationWithPbaStatus();
         when(organisationRepository.findByPbaStatus(any())).thenReturn(List.of(organisation));
+    }
+
+    @State("Receiving a request to DELETE active Users for the Organisation")
+    public void setUpOrganisationForDelete() {
+        Organisation organisation = getOrganisation();
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationService.deleteOrganisation(any(Organisation.class), anyString()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+    }
+
+    @State("On receiving get Organisations")
+    public void setUpOrganisationsForGet() {
+        Organisation organisation = getOrganisation();
+        OrganisationsDetailResponse response = new OrganisationsDetailResponse(
+            List.of(organisation), true, true, true);
+        response.setTotalRecords(1);
+        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
     }
 
     //PACT test to delete user profile as part of ticket RDCC-7097
