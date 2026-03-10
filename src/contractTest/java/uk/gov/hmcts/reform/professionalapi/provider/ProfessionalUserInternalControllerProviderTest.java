@@ -3,6 +3,10 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -28,6 +32,11 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserCon
 @Provider("referenceData_professionalInternalUsers")
 @WebMvcTest({ProfessionalUserInternalController.class})
 @AutoConfigureMockMvc(addFilters = false)
+@ImportAutoConfiguration(exclude = {
+    DataSourceAutoConfiguration.class,
+    HibernateJpaAutoConfiguration.class,
+    JpaRepositoriesAutoConfiguration.class
+})
 @Import({ProviderTestConfiguration.class, ProfessionalUserInternalControllerProviderTestConfiguration.class,
     WebConfig.class})
 public class ProfessionalUserInternalControllerProviderTest extends WebMvcProviderTest {
