@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
@@ -67,8 +66,8 @@ import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
 @AutoConfigureMockMvc(addFilters = false)
-@Import(ProviderTestConfiguration.class)
-@ContextConfiguration(classes = {ProfessionalExternalUserControllerProviderTestConfiguration.class, WebConfig.class})
+@Import({ProviderTestConfiguration.class, ProfessionalExternalUserControllerProviderTestConfiguration.class,
+    WebConfig.class})
 public class ProfessionalExternalUserControllerProviderTest extends WebMvcProviderTest {
 
     @Autowired

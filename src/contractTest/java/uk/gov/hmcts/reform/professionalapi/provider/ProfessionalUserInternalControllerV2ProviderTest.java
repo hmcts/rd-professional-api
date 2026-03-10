@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.ProfessionalUserInternalControllerV2;
@@ -31,8 +30,8 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserCon
 @Provider("referenceData_professionalInternalUsersV2")
 @WebMvcTest({ProfessionalUserInternalControllerV2.class})
 @AutoConfigureMockMvc(addFilters = false)
-@Import(ProviderTestConfiguration.class)
-@ContextConfiguration(classes = {ProfessionalUserInternalControllerV2ProviderTestConfiguration.class, WebConfig.class})
+@Import({ProviderTestConfiguration.class, ProfessionalUserInternalControllerV2ProviderTestConfiguration.class,
+    WebConfig.class})
 public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProviderTest {
 
     @Autowired

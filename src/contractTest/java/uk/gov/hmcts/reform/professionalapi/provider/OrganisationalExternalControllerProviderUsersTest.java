@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
@@ -61,8 +60,8 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 @Provider("referenceData_organisationalExternalUsers")
 @WebMvcTest({OrganisationExternalController.class})
 @AutoConfigureMockMvc(addFilters = false)
-@Import(ProviderTestConfiguration.class)
-@ContextConfiguration(classes = {OrganisationalExternalControllerProviderUsersTestConfiguration.class, WebConfig.class})
+@Import({ProviderTestConfiguration.class, OrganisationalExternalControllerProviderUsersTestConfiguration.class,
+    WebConfig.class})
 public class OrganisationalExternalControllerProviderUsersTest extends WebMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
