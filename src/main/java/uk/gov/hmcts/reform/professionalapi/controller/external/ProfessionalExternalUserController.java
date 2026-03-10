@@ -183,6 +183,9 @@ public class ProfessionalExternalUserController extends SuperController {
             @PathVariable("userId") String userId,
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") String origin
     ) {
+        // Validate target user belongs to caller's organization
+        ProfessionalUser targetUser = professionalUserService.findProfessionalUserByUserIdentifier(userId);
+        profExtUsrReqValidator.validateOrganisationMatch(orgId, targetUser);
 
         return professionalUserService
                 .modifyUserConfiguredAccessAndRoles(userProfileUpdatedData, userId, Optional.of(origin));
