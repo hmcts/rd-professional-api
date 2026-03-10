@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Org
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
@@ -48,6 +49,8 @@ public class ProviderTestConfiguration {
     EntityManagerFactory emf;
     @MockitoBean
     ProfessionalUserRepository professionalUserRepository;
+    @MockitoBean
+    OrganisationService organisationService;
     @MockitoBean
     ProfessionalUserService professionalUserService;
     @MockitoBean
