@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PrdDataloadSchedulerJobRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdSchedularAuditRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
@@ -97,6 +98,8 @@ public abstract class BaseProviderTest {
     protected PaymentAccountRepository paymentAccountRepository;
     @MockitoBean
     protected PrdSchedularAuditRepository prdSchedularAuditRepository;
+    @MockitoBean
+    protected PrdDataloadSchedulerJobRepository prdDataloadSchedulerJobRepository;
     @MockitoBean
     protected UserAccountMapRepository userAccountMapRepository;
     @MockitoBean
