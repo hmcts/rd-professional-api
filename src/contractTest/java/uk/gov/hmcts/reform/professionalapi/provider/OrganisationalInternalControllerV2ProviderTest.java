@@ -26,8 +26,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -62,12 +62,12 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
 
-    @MockitoBean
+    @Autowired
     PaymentAccountService paymentAccountService;
 
 
-    @MockitoBean
-    OrganisationServiceImpl organisationService;
+    @Autowired
+    OrganisationService organisationService;
 
 
     public static final String ORG_NAME = "Org-Name";

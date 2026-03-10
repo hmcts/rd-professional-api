@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @TestConfiguration
 public class OrganisationalExternalControllerV2ProviderTestConfiguration extends ProviderTestConfiguration {
@@ -27,9 +26,6 @@ public class OrganisationalExternalControllerV2ProviderTestConfiguration extends
 
     @MockitoBean
     OrgAttributeRepository orgAttributeRepository;
-
-    @MockitoBean
-    protected OrganisationServiceImpl organisationService;
 
 
     @Bean

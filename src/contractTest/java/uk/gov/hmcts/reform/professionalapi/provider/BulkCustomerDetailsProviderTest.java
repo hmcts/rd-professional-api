@@ -11,14 +11,13 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.BulkCustomerDetailsInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.util.UUID;
 
@@ -41,8 +40,8 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
     @Autowired
     BulkCustomerDetailsInternalController bulkCustomerDetailsInternalController;
 
-    @MockitoBean
-    OrganisationServiceImpl organisationService;
+    @Autowired
+    OrganisationService organisationService;
 
 
 

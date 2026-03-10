@@ -8,6 +8,7 @@ import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
@@ -34,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @ExtendWith(SpringExtension.class)
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
@@ -51,12 +51,12 @@ public abstract class BaseProviderTest {
     protected UserProfileFeignClient userProfileFeignClient;
     @MockitoBean
     protected EntityManagerFactory emf;
+    @MockitoBean(name = "jpaMappingContext")
+    protected JpaMetamodelMappingContext jpaMetamodelMappingContext;
     @MockitoBean
     protected ProfessionalUserRepository professionalUserRepository;
     @MockitoBean
     protected OrganisationService organisationService;
-    @MockitoBean
-    protected OrganisationServiceImpl organisationServiceImpl;
     @MockitoBean
     protected MfaStatusService mfaStatusService;
     @MockitoBean

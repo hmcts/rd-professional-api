@@ -21,8 +21,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -53,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.util.Collections.emptyList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -135,7 +138,10 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationForGivenId() {
 
         Organisation organisation = getOrganisation();
+        organisation.setPaymentAccounts(emptyList());
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+        when(organisationService.retrieveOrganisation(anyString(), anyBoolean()))
+            .thenReturn(new OrganisationEntityResponse(organisation, true, true, true));
 
     }
 
@@ -307,6 +313,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(paymentAccountRepository.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
         when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
+        when(paymentAccountService.updatePaymentAccountsStatusForAnOrganisation(anyList(), anyString()))
+            .thenReturn(new UpdatePbaStatusResponse(null, emptyList(),
+                org.springframework.http.HttpStatus.ACCEPTED.value()));
     }
 
     @SuppressWarnings("unchecked")

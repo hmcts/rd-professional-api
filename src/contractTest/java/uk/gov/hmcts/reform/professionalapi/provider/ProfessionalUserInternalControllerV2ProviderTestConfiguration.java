@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessReposi
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
@@ -26,9 +25,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 public class ProfessionalUserInternalControllerV2ProviderTestConfiguration extends ProviderTestConfiguration {
     @MockitoBean
     protected ProfessionalUserServiceImpl professionalUserService;
-
-    @MockitoBean
-    protected OrganisationServiceImpl organisationService;
 
     @MockitoBean
     protected PaymentAccountRepository paymentAccountRepository;

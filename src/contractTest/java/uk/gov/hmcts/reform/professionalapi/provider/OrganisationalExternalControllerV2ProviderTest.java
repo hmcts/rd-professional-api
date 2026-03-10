@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -68,7 +68,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
     @MockitoBean
     SecurityContext securityContext;
     @Autowired
-    OrganisationServiceImpl organisationServiceImpl;
+    OrganisationService organisationService;
     @Autowired
     UserProfileFeignClient userProfileFeignClientMock;
     @Autowired
@@ -164,7 +164,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
 
         Organisation org = getCreateOrganisationResponse();
         OrganisationResponse response = new OrganisationResponse(org);
-        when(organisationServiceImpl.createOrganisationFrom(any())).thenReturn(response);
+        when(organisationService.createOrganisationFrom(any())).thenReturn(response);
 
 
     }
@@ -181,7 +181,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
             true,
             true);
 
-        when(organisationServiceImpl.retrieveOrganisationForV2Api(any(), anyBoolean()))
+        when(organisationService.retrieveOrganisationForV2Api(any(), anyBoolean()))
             .thenReturn(organisationEntityResponseV2);
 
     }
