@@ -7,7 +7,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -15,6 +17,12 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
@@ -98,6 +106,42 @@ public class ProviderTestConfiguration {
     @Bean()
     public MappingJackson2HttpMessageConverter newJsonConvert() {
         return new MappingJackson2HttpMessageConverter(new ObjectMapper());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public FeatureToggleService featureToggleService() {
+        return Mockito.mock(FeatureToggleService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PaymentAccountService paymentAccountService() {
+        return Mockito.mock(PaymentAccountService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OrganisationService organisationService() {
+        return Mockito.mock(OrganisationService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProfessionalUserService professionalUserService() {
+        return Mockito.mock(ProfessionalUserService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public IdamRepository idamRepository() {
+        return Mockito.mock(IdamRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
+        return new PactJwtGrantedAuthoritiesConverter(idamRepository);
     }
 
 }
