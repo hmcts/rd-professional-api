@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrgan
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 import java.util.UUID;
@@ -45,8 +44,6 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
     @MockitoBean
     OrganisationServiceImpl organisationService;
 
-    @MockitoBean
-    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
 
     @Override

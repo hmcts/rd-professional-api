@@ -28,11 +28,13 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
+import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @ExtendWith(SpringExtension.class)
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
@@ -44,53 +46,57 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 public abstract class BaseProviderTest {
 
     @MockitoBean
-    ApplicationConfiguration configuration;
+    protected ApplicationConfiguration configuration;
     @MockitoBean
-    UserProfileFeignClient userProfileFeignClient;
+    protected UserProfileFeignClient userProfileFeignClient;
     @MockitoBean
-    EntityManagerFactory emf;
+    protected EntityManagerFactory emf;
     @MockitoBean
-    ProfessionalUserRepository professionalUserRepository;
+    protected ProfessionalUserRepository professionalUserRepository;
     @MockitoBean
-    OrganisationService organisationService;
+    protected OrganisationService organisationService;
     @MockitoBean
-    ProfessionalUserService professionalUserService;
+    protected OrganisationServiceImpl organisationServiceImpl;
     @MockitoBean
-    FeatureToggleService featureToggleService;
+    protected MfaStatusService mfaStatusService;
     @MockitoBean
-    PaymentAccountService paymentAccountService;
+    protected ProfessionalUserService professionalUserService;
     @MockitoBean
-    UserAccountMapService userAccountMapService;
+    protected FeatureToggleService featureToggleService;
     @MockitoBean
-    PrdEnumService prdEnumService;
+    protected PaymentAccountService paymentAccountService;
     @MockitoBean
-    UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
+    protected UserAccountMapService userAccountMapService;
     @MockitoBean
-    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    protected PrdEnumService prdEnumService;
     @MockitoBean
-    OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
+    protected UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     @MockitoBean
-    UsersInOrganisationsByOrganisationIdentifiersRequestValidator usersInOrgValidator;
+    protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @MockitoBean
-    ProfessionalUserReqValidator profExtUsrReqValidator;
+    protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
     @MockitoBean
-    PaymentAccountValidator paymentAccountValidator;
+    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidator usersInOrgValidator;
     @MockitoBean
-    OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
+    protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @MockitoBean
-    IdamRepository idamRepository;
+    protected PaymentAccountValidator paymentAccountValidator;
     @MockitoBean
-    OrgAttributeRepository orgAttributeRepository;
+    protected OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     @MockitoBean
-    ContactInformationRepository contactInformationRepository;
+    protected IdamRepository idamRepository;
     @MockitoBean
-    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
+    protected OrgAttributeRepository orgAttributeRepository;
     @MockitoBean
-    PaymentAccountRepository paymentAccountRepository;
+    protected ContactInformationRepository contactInformationRepository;
     @MockitoBean
-    UserConfiguredAccessRepository userConfiguredAccessRepository;
+    protected BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
     @MockitoBean
-    OrganisationRepository organisationRepository;
+    protected PaymentAccountRepository paymentAccountRepository;
+    @MockitoBean
+    protected UserConfiguredAccessRepository userConfiguredAccessRepository;
+    @MockitoBean
+    protected OrganisationRepository organisationRepository;
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
