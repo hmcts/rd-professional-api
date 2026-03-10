@@ -4,8 +4,10 @@ import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -14,6 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -34,6 +37,9 @@ public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProvi
     @Autowired
     MappingJackson2HttpMessageConverter httpMessageConverter;
 
+    @Autowired
+    OrganisationService organisationService;
+
     private Organisation organisation;
 
     @Override
@@ -49,6 +55,12 @@ public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProvi
         when(professionalUserRepositoryMock.findByUserIdentifier("someId")).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByUserIdentifier("4d318f91-5591-44e3-870b-ad5616f65627"))
                 .thenReturn(pcsApiProfessionalUser);
+        when(organisationService.retrieveOrganisationByUserId("someId"))
+                .thenReturn(ResponseEntity.ok(new OrganisationEntityResponse(
+                        professionalUser.getOrganisation(), true, true, true)));
+        when(organisationService.retrieveOrganisationByUserId("4d318f91-5591-44e3-870b-ad5616f65627"))
+                .thenReturn(ResponseEntity.ok(new OrganisationEntityResponse(
+                        pcsApiProfessionalUser.getOrganisation(), true, true, true)));
     }
 
     private ProfessionalUser setUpProfessionalUser() {

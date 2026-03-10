@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepos
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -69,6 +70,9 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
 
     @MockitoBean
     OrgAttributeRepository orgAttributeRepository;
+
+    @MockitoBean
+    UserAccountMapRepository userAccountMapRepository;
 
     @Bean
     @Primary

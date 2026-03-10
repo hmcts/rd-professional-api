@@ -263,19 +263,30 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @SuppressWarnings("unchecked")
     @State("An Organisation exists for update")
-    public void setUpOrganisationForUpdate() {
+    public void setUpOrganisationForUpdate() throws JsonProcessingException {
 
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+
         Organisation updatedOrganisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
-
-        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.save(any())).thenReturn(updatedOrganisation);
 
+        ProfessionalUser professionalUser = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+        when(professionalUserService.findProfessionalUserById(any())).thenReturn(professionalUser);
+
+        UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(201).build());
     }
 
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -286,6 +297,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
         when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),

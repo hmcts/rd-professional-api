@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
@@ -67,6 +68,9 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
 
     @MockitoBean
     UserAttributeRepository userAttributeRepository;
+
+    @MockitoBean
+    UserAccountMapRepository userAccountMapRepository;
 
     @MockitoBean
     PrdEnumRepository prdEnumRepository;
