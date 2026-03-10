@@ -49,8 +49,8 @@ public abstract class BaseProviderTest {
     protected ApplicationConfiguration configuration;
     @MockitoBean
     protected UserProfileFeignClient userProfileFeignClient;
-    @MockitoBean
-    protected EntityManagerFactory emf;
+    @MockitoBean(name = "entityManagerFactory")
+    protected EntityManagerFactory entityManagerFactory;
     @MockitoBean(name = "jpaMappingContext")
     protected JpaMetamodelMappingContext jpaMetamodelMappingContext;
     @MockitoBean

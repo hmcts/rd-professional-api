@@ -58,6 +58,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
     private static final String USER_JWT = "Bearer 8gf364fg367f67";
+    public static final String PBA_NUMBER = "PBA1234567";
 
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
@@ -131,6 +132,9 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         String companyUrl = "companyUrl";
 
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
+        Organisation organisation = professionalUser.getOrganisation();
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+        organisation.setPaymentAccounts(List.of(new PaymentAccount(PBA_NUMBER)));
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
@@ -147,6 +151,8 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
                 .thenReturn(UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).build());
 
         when(professionalUserRepositoryMock.findByEmailAddress(ORGANISATION_EMAIL)).thenReturn(professionalUser);
+        when(paymentAccountService.findPaymentAccountsByEmail(ORGANISATION_EMAIL.toLowerCase()))
+            .thenReturn(organisation);
 
     }
 
