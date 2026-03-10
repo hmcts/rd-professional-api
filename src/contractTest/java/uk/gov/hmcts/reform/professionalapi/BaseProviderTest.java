@@ -23,7 +23,9 @@ import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
+import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
@@ -49,6 +51,10 @@ public abstract class BaseProviderTest {
     OrganisationService organisationService;
     @MockitoBean
     ProfessionalUserService professionalUserService;
+    @MockitoBean
+    FeatureToggleService featureToggleService;
+    @MockitoBean
+    PaymentAccountService paymentAccountService;
     @MockitoBean
     UserAccountMapService userAccountMapService;
     @MockitoBean
