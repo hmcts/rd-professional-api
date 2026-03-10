@@ -339,10 +339,18 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
     }
 
     @Test
-    void retrieve_pending_users_only_for_an_organisation_with_pui_caa_role_should_return_403() {
+    void retrieve_pending_users_only_for_an_organisation_with_pui_caa_role_should_return_400() {
         String id = createOrganisationRequest();
         Map<String, Object> response = professionalReferenceDataClient
                 .findAllUsersForOrganisationByStatus("false", "PENDING", puiCaa, id);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    void retrieve_pending_users_only_for_an_organisation_with_invalid_role_should_return_403() {
+        String id = createOrganisationRequest();
+        Map<String, Object> response = professionalReferenceDataClient
+                .findAllUsersForOrganisationByStatus("false", "PENDING", "InvalidRole", id);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
