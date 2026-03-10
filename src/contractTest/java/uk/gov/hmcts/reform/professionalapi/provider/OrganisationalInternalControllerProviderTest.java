@@ -137,7 +137,10 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         Organisation organisation = getOrganisation();
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
-        when(organisationServiceMock.deleteOrganisation(any(Organisation.class), anyString()))
+        when(organisationServiceMock.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationService.deleteOrganisation(any(Organisation.class), any()))
             .thenReturn(new DeleteOrganisationResponse(204, "Success"));
 
     }
@@ -197,6 +200,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
             List.of(organisation), true, true, true);
         response.setTotalRecords(1);
         when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
