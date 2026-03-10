@@ -9,7 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -27,7 +27,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.Org
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -38,7 +40,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_U
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 
-@TestConfiguration
 public class ProviderTestConfiguration {
 
     @MockitoBean
@@ -73,6 +74,10 @@ public class ProviderTestConfiguration {
     public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     @MockitoBean
     public IdamRepository idamRepository;
+    @MockitoBean
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
+    @MockitoBean
+    OrganisationRepository organisationRepository;
 
     @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;
