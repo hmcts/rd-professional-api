@@ -589,6 +589,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    @Transactional
     public OrganisationResponse updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier,
             Boolean isOrgApprovalRequest) {
@@ -617,7 +618,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         //Update Organisation service done
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
+            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), savedOrganisation);
         }
 
 
@@ -626,7 +627,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
         }
 
-        return new OrganisationResponse(organisation);
+        return new OrganisationResponse(savedOrganisation);
     }
 
     @Override
