@@ -24,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -111,10 +110,8 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -163,7 +160,6 @@ class OrganisationServiceImplTest {
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
     private final OrganisationMfaStatusRepository organisationMfaStatusRepositoryMock
             = mock(OrganisationMfaStatusRepository.class);
-    private final JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null,
             "PENDING", null, null, null);
@@ -235,7 +231,6 @@ class OrganisationServiceImplTest {
         sut.setPaymentAccountValidator(paymentAccountValidator);
         sut.setOrganisationMfaStatusRepository(organisationMfaStatusRepositoryMock);
         sut.setBulkCustomerDetailsRepository(bulkCustomerDetailsRepositoryMock);
-        sut.setJdbcTemplate(jdbcTemplateMock);
 
         paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
@@ -305,7 +300,6 @@ class OrganisationServiceImplTest {
                 .thenReturn(organisationMfaStatus);
 
         when(bulkCustomerDetailsRepositoryMock.save(any(BulkCustomerDetails.class))).thenReturn(bulkCustomerDetails);
-        when(jdbcTemplateMock.update(anyString(), any(Object[].class))).thenReturn(1);
     }
 
     @Test
@@ -2243,30 +2237,24 @@ class OrganisationServiceImplTest {
     }
 
     @Test
-    void testDeletePendingOrganisationFallsBackOnTransientOrganisationException() {
-        Organisation organisation = getDeleteOrganisation(OrganisationStatus.PENDING);
-        RuntimeException root = new RuntimeException(
-                "persistent instance references an unsaved transient instance of '"
-                        + Organisation.class.getName()
-                        + "' (save the transient instance before flushing)");
-        RuntimeException wrapper = new RuntimeException("wrapper", root);
-        doThrow(wrapper).when(organisationRepository).deleteById(any());
-
-        DeleteOrganisationResponse response = sut.deleteOrganisation(organisation, "123456789");
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(ProfessionalApiConstants.STATUS_CODE_204);
-        verify(jdbcTemplateMock, atLeastOnce()).update(anyString(), any(Object[].class));
+    void testDeleteOrganisationThrowsWhenNullOrganisation() {
+        assertThrows(EmptyResultDataAccessException.class, () -> sut.deleteOrganisation(null, "123456789"));
     }
 
     @Test
-    void testDeletePendingOrganisationRethrowsOnOtherExceptions() {
+    void testDeleteOrganisationThrowsWhenOrgNotFoundByIdentifier() {
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.PENDING);
-        RuntimeException ex = new RuntimeException("boom");
-        doThrow(ex).when(organisationRepository).deleteById(any());
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
 
-        assertThrows(RuntimeException.class, () -> sut.deleteOrganisation(organisation, "123456789"));
-        verify(jdbcTemplateMock, never()).update(anyString(), any(Object[].class));
+        assertThrows(EmptyResultDataAccessException.class, () -> sut.deleteOrganisation(organisation, "123456789"));
+    }
+
+    @Test
+    void testDeleteOrganisationThrowsWhenStatusIsUnsupported() {
+        Organisation organisation = getDeleteOrganisation(OrganisationStatus.BLOCKED);
+
+        assertThrows(EmptyResultDataAccessException.class, () -> sut.deleteOrganisation(organisation, "123456789"));
+        verify(organisationRepository, never()).deleteById(any());
     }
 
     private Organisation getDeleteOrganisation(OrganisationStatus status) {
