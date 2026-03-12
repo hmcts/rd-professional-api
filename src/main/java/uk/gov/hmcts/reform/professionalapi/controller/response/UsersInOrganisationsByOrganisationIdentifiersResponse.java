@@ -42,7 +42,6 @@ public class UsersInOrganisationsByOrganisationIdentifiersResponse {
             List<ProfessionalUser> users = new ArrayList<>();
             for (ProfessionalUser professionalUser : professionalUsers) {
                 if (professionalUser.getOrganisation().getId().equals(organisation.getId())) {
-                    professionalUser.setLastUpdated(LocalDateTime.now());
                     users.add(professionalUser);
                 }
             }
