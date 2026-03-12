@@ -333,6 +333,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ProfessionalUser persistUser(ProfessionalUser updatedProfessionalUser) {
+        if (updatedProfessionalUser != null) {
+            updatedProfessionalUser.setLastUpdated(LocalDateTime.now());
+        }
         return professionalUserRepository.save(updatedProfessionalUser);
     }
 
@@ -355,7 +358,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         checkUserStatusIsActiveByUserId(userId);
         modifyUserConfiguredAccess(userProfileUpdatedData, userId);
 
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        ResponseEntity<Object> response = modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        return response;
     }
 
 
@@ -402,7 +406,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        ResponseEntity<Object> response = modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        touchProfessionalUserByUserId(userId);
+        return response;
     }
 
     private void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,
@@ -428,6 +434,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
             }
         }
+        touchProfessionalUser(professionalUser);
     }
 
     public void saveAllUserAccessTypes(ProfessionalUser professionalUser, Set<UserAccessType> userAccessTypes) {
@@ -456,5 +463,16 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return uca;
     }
 
+    private void touchProfessionalUserByUserId(String userId) {
+        touchProfessionalUser(findProfessionalUserByUserIdentifier(userId));
+    }
+
+    private void touchProfessionalUser(ProfessionalUser professionalUser) {
+        if (professionalUser == null) {
+            return;
+        }
+        professionalUser.setLastUpdated(LocalDateTime.now());
+        professionalUserRepository.save(professionalUser);
+    }
 
 }
