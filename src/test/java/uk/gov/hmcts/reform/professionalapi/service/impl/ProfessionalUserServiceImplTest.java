@@ -956,6 +956,34 @@ class ProfessionalUserServiceImplTest {
     }
 
     @Test
+    void test_modifyRolesForUser_updatesLastUpdated() {
+        String userId = UUID.randomUUID().toString();
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData))
+                .thenReturn(userProfileUpdatedData);
+
+        Response response = Response.builder()
+                .request(mock(Request.class))
+                .body("{}", Charset.defaultCharset())
+                .status(200)
+                .build();
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
+
+        ProfessionalUser professionalUserEntity = new ProfessionalUser("some-fname",
+                "some-lname", "some-email", organisation);
+        professionalUserEntity.setUserIdentifier(userId);
+        when(professionalUserRepository.findByUserIdentifier(userId)).thenReturn(professionalUserEntity);
+
+        ResponseEntity<Object> actualData = professionalUserService.modifyRolesForUser(userProfileUpdatedData,
+                userId, Optional.of("EXUI"));
+
+        assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(professionalUserEntity.getLastUpdated()).isNotNull();
+        verify(professionalUserRepository, times(1)).save(professionalUserEntity);
+    }
+
+    @Test
     void test_modifyRolesAndUserConfiguredAccessForAddedAccessType() throws JsonProcessingException {
         UUID uuid = UUID.randomUUID();
         String uuidStr = uuid.toString();
@@ -1001,6 +1029,46 @@ class ProfessionalUserServiceImplTest {
 
         verify(userConfiguredAccessRepository, times(1)).deleteAll(optUca);
         verify(userConfiguredAccessRepository, times(1)).saveAll(any());
+    }
+
+    @Test
+    void test_modifyUserConfiguredAccess_updatesLastUpdated() throws JsonProcessingException {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier(uuidStr);
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        Response response = mock(Response.class);
+        when(response.status()).thenReturn(200);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
+
+        ProfessionalUser professionalUserEntity = new ProfessionalUser("some-fname",
+                "some-lname", "some-email", organisation);
+        professionalUserEntity.setId(uuid);
+        professionalUserEntity.setUserIdentifier(uuidStr);
+
+        when(professionalUserRepository.findByUserIdentifier(uuidStr)).thenReturn(professionalUserEntity);
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        Set<UserAccessType> userAccessTypes = new HashSet<>();
+        userAccessTypes.add(new UserAccessType());
+        userProfileUpdatedData.setUserAccessTypes(userAccessTypes);
+
+        when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(uuid))
+                .thenReturn(List.of());
+
+        professionalUserService.modifyUserConfiguredAccessAndRoles(userProfileUpdatedData, uuidStr,
+                Optional.of("EXUI"));
+
+        assertThat(professionalUserEntity.getLastUpdated()).isNotNull();
+        verify(professionalUserRepository, times(1)).save(professionalUserEntity);
     }
 
     @Test
