@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.internal.util.Pair;
 import org.hibernate.exception.ConstraintViolationException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,7 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -143,6 +149,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     ProfessionalUserService professionalUserService;
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+    @Autowired
+    PlatformTransactionManager platformTransactionManager;
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -799,14 +811,103 @@ public class OrganisationServiceImpl implements OrganisationService {
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
                                                                 DeleteOrganisationResponse deleteOrganisationResponse,
                                                                 String prdAdminUserId) {
-        bulkCustomerDetailsRepository.deleteByOrganistion(organisation.getOrganisationIdentifier());
-        orgAttributeRepository.deleteByOrganistion(organisation.getId());
-        organisationRepository.deleteById(organisation.getId());
+        try {
+            runInRequiresNew(() -> {
+                bulkCustomerDetailsRepository.deleteByOrganistion(organisation.getOrganisationIdentifier());
+                orgAttributeRepository.deleteByOrganistion(organisation.getId());
+                organisationRepository.deleteById(organisation.getId());
+            });
+        } catch (RuntimeException ex) {
+            if (!isTransientOrganisationReference(ex)) {
+                throw ex;
+            }
+            log.warn("{}:: transient Organisation reference detected; falling back to direct deletes",
+                    loggingComponentName, ex);
+            if (entityManager != null) {
+                entityManager.clear();
+            }
+            runInRequiresNew(() -> forceDeleteOrganisation(organisation));
+        }
         deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
         log.info(loggingComponentName, organisation.getOrganisationIdentifier()
                 + "::organisation deleted by::prdadmin::" + prdAdminUserId);
         return deleteOrganisationResponse;
+    }
+
+    private void forceDeleteOrganisation(Organisation organisation) {
+        UUID organisationId = organisation.getId();
+        String organisationIdentifier = organisation.getOrganisationIdentifier();
+
+        jdbcTemplate.update("""
+                delete from dbrefdata.user_configured_access
+                where professional_user_id in (
+                    select id from dbrefdata.professional_user where organisation_id = ?
+                )
+                """, organisationId);
+        jdbcTemplate.update("""
+                delete from dbrefdata.user_attribute
+                where professional_user_id in (
+                    select id from dbrefdata.professional_user where organisation_id = ?
+                )
+                """, organisationId);
+        jdbcTemplate.update("""
+                delete from dbrefdata.user_account_map
+                where professional_user_id in (
+                    select id from dbrefdata.professional_user where organisation_id = ?
+                ) or payment_account_id in (
+                    select id from dbrefdata.payment_account where organisation_id = ?
+                )
+                """, organisationId, organisationId);
+        jdbcTemplate.update("""
+                delete from dbrefdata.user_address_map
+                where professional_user_id in (
+                    select id from dbrefdata.professional_user where organisation_id = ?
+                ) or contact_address_id in (
+                    select id from dbrefdata.contact_information where organisation_id = ?
+                )
+                """, organisationId, organisationId);
+        jdbcTemplate.update("""
+                delete from dbrefdata.dx_address
+                where contact_information_id in (
+                    select id from dbrefdata.contact_information where organisation_id = ?
+                )
+                """, organisationId);
+        jdbcTemplate.update("delete from dbrefdata.contact_information where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.payment_account where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.professional_user where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.org_attributes where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.organisation_mfa_status where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.domain where organisation_id = ?", organisationId);
+        if (organisationIdentifier != null) {
+            jdbcTemplate.update("delete from dbrefdata.bulk_customer_details where organisation_id = ?",
+                    organisationIdentifier);
+        }
+        jdbcTemplate.update("delete from dbrefdata.organisation where id = ?", organisationId);
+    }
+
+    private static boolean isTransientOrganisationReference(RuntimeException ex) {
+        Throwable current = ex;
+        while (current != null) {
+            String message = current.getMessage();
+            if (message != null
+                    && message.contains("persistent instance references an unsaved transient instance of")
+                    && message.contains(Organisation.class.getName())) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    private void runInRequiresNew(Runnable action) {
+        if (platformTransactionManager == null) {
+            action.run();
+            return;
+        }
+        TransactionTemplate template = new TransactionTemplate(platformTransactionManager);
+        template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        template.executeWithoutResult(status -> action.run());
     }
 
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
