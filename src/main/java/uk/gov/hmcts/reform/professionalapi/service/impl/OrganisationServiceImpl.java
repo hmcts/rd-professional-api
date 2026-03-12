@@ -773,12 +773,13 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String prdAdminUserId) {
-        Organisation managedOrganisation = organisation;
         if (organisation == null) {
             throw new EmptyResultDataAccessException(ONE);
         }
-        if (organisation.getId() != null) {
-            managedOrganisation = organisationRepository.findById(organisation.getId()).orElse(organisation);
+        Organisation managedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(organisation.getOrganisationIdentifier());
+        if (managedOrganisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
         }
         var deleteOrganisationResponse = new DeleteOrganisationResponse();
         switch (managedOrganisation.getStatus()) {
