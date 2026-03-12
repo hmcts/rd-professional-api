@@ -185,12 +185,16 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void addAttributeToOrganisation(List<OrgAttributeRequest> orgAttributes, Organisation organisation) {
         if (orgAttributes != null) {
+            Organisation managedOrganisation = organisation;
+            if (organisation != null && organisation.getId() != null) {
+                managedOrganisation = organisationRepository.getReferenceById(organisation.getId());
+            }
             List<OrgAttribute> attributes = new ArrayList<>();
             orgAttributes.forEach(attReq -> {
                 OrgAttribute attribute = new OrgAttribute();
                 attribute.setKey(RefDataUtil.removeEmptySpaces(attReq.getKey()));
                 attribute.setValue(RefDataUtil.removeEmptySpaces(attReq.getValue()));
-                attribute.setOrganisation(organisation);
+                attribute.setOrganisation(managedOrganisation);
                 attributes.add(attribute);
             });
             organisation.setOrgAttributes(orgAttributeRepository.saveAll(attributes));
