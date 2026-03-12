@@ -213,6 +213,8 @@ public class OrganisationalExternalControllerProviderUsersTest extends WebMvcPro
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any()))
                 .thenReturn(professionalUser);
         when(organisationRepository.findByStatus(ACTIVE)).thenReturn(asList(organisation));
+        when(organisationRepository.findByStatusWithContactInformations(ACTIVE))
+                .thenReturn(asList(organisation));
 
     }
 
