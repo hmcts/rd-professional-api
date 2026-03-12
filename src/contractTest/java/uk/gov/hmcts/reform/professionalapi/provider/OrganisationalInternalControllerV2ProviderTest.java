@@ -8,8 +8,8 @@ import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalControllerV2;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
@@ -26,8 +26,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalInternalV2")
-@Import(OrganisationalInternalControllerV2ProviderTestConfiguration.class)
+@Import({OrganisationalInternalControllerV2ProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProviderTest {
 
 
@@ -62,12 +62,12 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
 
-    @MockBean
+    @Autowired
     PaymentAccountService paymentAccountService;
 
 
-    @MockBean
-    OrganisationServiceImpl organisationService;
+    @Autowired
+    OrganisationService organisationService;
 
 
     public static final String ORG_NAME = "Org-Name";
@@ -75,10 +75,10 @@ public class OrganisationalInternalControllerV2ProviderTest extends MockMvcProvi
     public static final String COMPANY_NUMBER = "companyN";
     public static final String COMPANY_URL = "www.org.com";
 
-    @MockBean
+    @MockitoBean
     OrganisationResponse  organisationResponse;
 
-    @MockBean
+    @MockitoBean
     OrganisationOtherOrgsCreationRequest  organisationOtherOrgsCreationRequest;
 
     @Override
