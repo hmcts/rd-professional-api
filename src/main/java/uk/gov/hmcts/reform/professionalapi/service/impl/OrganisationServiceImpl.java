@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.internal.util.Pair;
 import org.hibernate.exception.ConstraintViolationException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,8 +19,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -837,7 +837,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private void forceDeleteOrganisation(Organisation organisation) {
         UUID organisationId = organisation.getId();
-        String organisationIdentifier = organisation.getOrganisationIdentifier();
 
         jdbcTemplate.update("""
                 delete from dbrefdata.user_configured_access
@@ -879,6 +878,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         jdbcTemplate.update("delete from dbrefdata.org_attributes where organisation_id = ?", organisationId);
         jdbcTemplate.update("delete from dbrefdata.organisation_mfa_status where organisation_id = ?", organisationId);
         jdbcTemplate.update("delete from dbrefdata.domain where organisation_id = ?", organisationId);
+        String organisationIdentifier = organisation.getOrganisationIdentifier();
         if (organisationIdentifier != null) {
             jdbcTemplate.update("delete from dbrefdata.bulk_customer_details where organisation_id = ?",
                     organisationIdentifier);
