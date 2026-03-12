@@ -783,7 +783,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         var deleteOrganisationResponse = new DeleteOrganisationResponse();
         switch (managedOrganisation.getStatus()) {
             case PENDING,REVIEW:
-                return deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId);
+                return deleteOrganisationEntity(managedOrganisation, deleteOrganisationResponse, prdAdminUserId);
             case ACTIVE:
                 deleteOrganisationResponse = deleteUserProfile(managedOrganisation, deleteOrganisationResponse);
                 return deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
