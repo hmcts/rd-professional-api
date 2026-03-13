@@ -333,9 +333,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ProfessionalUser persistUser(ProfessionalUser updatedProfessionalUser) {
-        if (updatedProfessionalUser != null) {
-            updatedProfessionalUser.setLastUpdated(LocalDateTime.now());
-        }
         return professionalUserRepository.save(updatedProfessionalUser);
     }
 
@@ -406,9 +403,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
-        ResponseEntity<Object> response = modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
-        touchProfessionalUserByUserId(userId);
-        return response;
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
     }
 
     private void modifyUserConfiguredAccess(UserProfileUpdatedData userProfileUpdatedData,

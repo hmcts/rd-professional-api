@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -13,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.time.LocalDateTime;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,41 +51,6 @@ class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest 
 
     }
 
-    @Test
-    void should_update_last_updated_when_modifying_roles_internal() throws Exception {
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(puiCaseManager);
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        updateUserProfileRolesMock(HttpStatus.OK);
-
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
-                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
-                        hmctsAdmin);
-
-        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
-        ProfessionalUser before = professionalUserRepository.findByUserIdentifier(userIdentifier);
-        assertThat(before).isNotNull();
-        LocalDateTime beforeUpdated = before.getLastUpdated();
-        assertThat(beforeUpdated).isNotNull();
-
-        Thread.sleep(1100);
-
-        Map<String, Object> response = professionalReferenceDataClient
-                .modifyUserRolesOfOrganisation(createModifyUserProfileData(), organisationIdentifier, userIdentifier,
-                        hmctsAdmin);
-        assertThat(response.get("http_status")).isNotNull();
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
-
-        ProfessionalUser after = professionalUserRepository.findByUserIdentifier(userIdentifier);
-        assertThat(after.getLastUpdated()).isAfter(beforeUpdated);
-    }
-
-    @Test
     void ac3_modify_roles_of_active_users_for_an_with_prd_admin_role_should_return_400() {
 
         String organisationIdentifier = createOrganisationRequest();

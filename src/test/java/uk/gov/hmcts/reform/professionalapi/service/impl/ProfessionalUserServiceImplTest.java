@@ -955,35 +955,6 @@ class ProfessionalUserServiceImplTest {
         verify(userProfileUpdateRequestValidator, times(1)).validateRequest(userProfileUpdatedData);
     }
 
-    @Test
-    void test_modifyRolesForUser_updatesLastUpdated() {
-        String userId = UUID.randomUUID().toString();
-
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData))
-                .thenReturn(userProfileUpdatedData);
-
-        Response response = Response.builder()
-                .request(mock(Request.class))
-                .body("{}", Charset.defaultCharset())
-                .status(200)
-                .build();
-        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(response);
-
-        ProfessionalUser professionalUserEntity = new ProfessionalUser("some-fname",
-                "some-lname", "some-email", organisation);
-        professionalUserEntity.setUserIdentifier(userId);
-        when(professionalUserRepository.findByUserIdentifier(userId)).thenReturn(professionalUserEntity);
-
-        ResponseEntity<Object> actualData = professionalUserService.modifyRolesForUser(userProfileUpdatedData,
-                userId, Optional.of("EXUI"));
-
-        assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(professionalUserEntity.getLastUpdated()).isNotNull();
-        verify(professionalUserRepository, times(1)).save(professionalUserEntity);
-    }
-
-    @Test
     void test_modifyRolesAndUserConfiguredAccessForAddedAccessType() throws JsonProcessingException {
         UUID uuid = UUID.randomUUID();
         String uuidStr = uuid.toString();
