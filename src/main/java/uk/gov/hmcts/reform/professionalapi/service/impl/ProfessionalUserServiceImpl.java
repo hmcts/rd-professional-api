@@ -458,10 +458,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return uca;
     }
 
-    private void touchProfessionalUserByUserId(String userId) {
-        touchProfessionalUser(findProfessionalUserByUserIdentifier(userId));
-    }
-
     private void touchProfessionalUser(ProfessionalUser professionalUser) {
         if (professionalUser == null) {
             return;

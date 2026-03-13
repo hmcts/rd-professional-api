@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UsersInOrganisationsByOrganisationIdentifiersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -923,6 +924,74 @@ class ProfessionalUserServiceImplTest {
 
         assertThat(response).isNotNull();
         verify(professionalUser, times(1)).getUserIdentifier();
+    }
+
+    @Test
+    void test_retrieveUsersByOrganisationIdentifiersWithPageable_withoutSearchAfter() {
+        List<String> organisationIdentifiers = List.of("org-1");
+        Page<ProfessionalUser> usersPage = mock(Page.class);
+
+        Organisation organisation = new Organisation();
+        organisation.setId(UUID.randomUUID());
+        ProfessionalUser user = new ProfessionalUser("fName", "lName", "email@org.com", organisation);
+        user.setId(UUID.randomUUID());
+
+        when(usersPage.getContent()).thenReturn(List.of(user));
+        when(usersPage.isLast()).thenReturn(false);
+        when(professionalUserRepository.findUsersInOrganisations(any(), any())).thenReturn(usersPage);
+
+        UsersInOrganisationsByOrganisationIdentifiersResponse response =
+                professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(
+                        organisationIdentifiers, 10, null, null);
+
+        assertThat(response.isMoreAvailable()).isTrue();
+        assertThat(response.getLastOrgInPage()).isEqualTo(organisation.getId());
+        assertThat(response.getLastUserInPage()).isEqualTo(user.getId());
+        verify(professionalUserRepository, times(1)).findUsersInOrganisations(any(), any());
+    }
+
+    @Test
+    void test_retrieveUsersByOrganisationIdentifiersWithPageable_withSearchAfter() {
+        List<String> organisationIdentifiers = List.of("org-1");
+        Page<ProfessionalUser> usersPage = mock(Page.class);
+
+        when(usersPage.getContent()).thenReturn(List.of());
+        when(usersPage.isLast()).thenReturn(true);
+        when(professionalUserRepository.findUsersInOrganisationsSearchAfter(any(), any(), any(), any()))
+                .thenReturn(usersPage);
+
+        UsersInOrganisationsByOrganisationIdentifiersResponse response =
+                professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(
+                        organisationIdentifiers, 10, UUID.randomUUID(), UUID.randomUUID());
+
+        assertThat(response.isMoreAvailable()).isFalse();
+        verify(professionalUserRepository, times(1))
+                .findUsersInOrganisationsSearchAfter(any(), any(), any(), any());
+    }
+
+    @Test
+    void test_findSingleRefreshUser_notFound() {
+        when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(null);
+
+        Throwable thrown = catchThrowable(() -> professionalUserService
+                .fetchUsersForRefresh(null, userIdentifier, null, null));
+
+        assertThat(thrown)
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("User does not exist");
+    }
+
+    @Test
+    void test_findProfessionalUserByEmailAddress_stripsSpaces() {
+        String emailWithSpaces = "a b@c.com";
+        String emailWithoutSpaces = "ab@c.com";
+
+        when(professionalUserRepository.findByEmailAddress(emailWithoutSpaces)).thenReturn(professionalUser);
+
+        ProfessionalUser result = professionalUserService.findProfessionalUserByEmailAddress(emailWithSpaces);
+
+        assertThat(result).isEqualTo(professionalUser);
+        verify(professionalUserRepository, times(1)).findByEmailAddress(emailWithoutSpaces);
     }
 
     @Test
