@@ -44,7 +44,6 @@ class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledInte
     void should_update_last_updated_when_modifying_user_configured_access_external() throws Exception {
         updateUserProfileRolesMock(HttpStatus.OK);
         String email = randomAlphabetic(5) + "@email.com";
-        UserProfileUpdatedData userProfileUpdatedData = createModifyUserConfiguredAccessData(email, 1);
         String userIdentifier = settingUpOrganisation(puiUserManager);
 
         ProfessionalUser before = professionalUserRepository.findByUserIdentifier(userIdentifier);
@@ -54,6 +53,7 @@ class ModifyUserConfiguredAccessIntegrationTest extends AuthorizationEnabledInte
 
         Thread.sleep(1100);
 
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserConfiguredAccessData(email, 1);
         Map<String, Object> response = professionalReferenceDataClient
                 .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isNotNull();
