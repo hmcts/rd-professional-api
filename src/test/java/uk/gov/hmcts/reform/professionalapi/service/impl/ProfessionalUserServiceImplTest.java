@@ -930,6 +930,7 @@ class ProfessionalUserServiceImplTest {
     @Test
     void test_retrieveUsersByOrganisationIdentifiersWithPageable_withoutSearchAfter() {
         List<String> organisationIdentifiers = List.of("org-1");
+        @SuppressWarnings("unchecked")
         Page<ProfessionalUser> usersPage = mock(Page.class);
 
         Organisation organisation = new Organisation();
@@ -954,6 +955,7 @@ class ProfessionalUserServiceImplTest {
     @Test
     void test_retrieveUsersByOrganisationIdentifiersWithPageable_withSearchAfter() {
         List<String> organisationIdentifiers = List.of("org-1");
+        @SuppressWarnings("unchecked")
         Page<ProfessionalUser> usersPage = mock(Page.class);
 
         when(usersPage.getContent()).thenReturn(List.of());
