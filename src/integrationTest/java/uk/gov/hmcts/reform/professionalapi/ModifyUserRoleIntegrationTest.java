@@ -51,6 +51,7 @@ class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest 
 
     }
 
+    @Test
     void ac3_modify_roles_of_active_users_for_an_with_prd_admin_role_should_return_400() {
 
         String organisationIdentifier = createOrganisationRequest();
