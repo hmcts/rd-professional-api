@@ -929,12 +929,12 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     void test_retrieveUsersByOrganisationIdentifiersWithPageable_withoutSearchAfter() {
-        List<String> organisationIdentifiers = List.of("org-1");
         @SuppressWarnings("unchecked")
         Page<ProfessionalUser> usersPage = mock(Page.class);
 
         Organisation organisation = new Organisation();
         organisation.setId(UUID.randomUUID());
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         ProfessionalUser user = new ProfessionalUser("fName", "lName", "email@org.com", organisation);
         user.setId(UUID.randomUUID());
 
@@ -942,6 +942,7 @@ class ProfessionalUserServiceImplTest {
         when(usersPage.isLast()).thenReturn(false);
         when(professionalUserRepository.findUsersInOrganisations(any(), any())).thenReturn(usersPage);
 
+        List<String> organisationIdentifiers = List.of("org-1");
         UsersInOrganisationsByOrganisationIdentifiersResponse response =
                 professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(
                         organisationIdentifiers, 10, null, null);
@@ -954,7 +955,6 @@ class ProfessionalUserServiceImplTest {
 
     @Test
     void test_retrieveUsersByOrganisationIdentifiersWithPageable_withSearchAfter() {
-        List<String> organisationIdentifiers = List.of("org-1");
         @SuppressWarnings("unchecked")
         Page<ProfessionalUser> usersPage = mock(Page.class);
 
@@ -963,6 +963,7 @@ class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findUsersInOrganisationsSearchAfter(any(), any(), any(), any()))
                 .thenReturn(usersPage);
 
+        List<String> organisationIdentifiers = List.of("org-1");
         UsersInOrganisationsByOrganisationIdentifiersResponse response =
                 professionalUserService.retrieveUsersByOrganisationIdentifiersWithPageable(
                         organisationIdentifiers, 10, UUID.randomUUID(), UUID.randomUUID());
