@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -992,6 +993,27 @@ class ProfessionalUserServiceImplTest {
 
         assertThat(result).isEqualTo(professionalUser);
         verify(professionalUserRepository, times(1)).findByEmailAddress(emailWithoutSpaces);
+    }
+
+    @Test
+    void test_touchProfessionalUserByUserId_updatesLastUpdated() {
+        String userId = UUID.randomUUID().toString();
+        ProfessionalUser professionalUserEntity = new ProfessionalUser("fName", "lName",
+                "email@org.com", organisation);
+
+        when(professionalUserRepository.findByUserIdentifier(userId)).thenReturn(professionalUserEntity);
+
+        ReflectionTestUtils.invokeMethod(professionalUserService, "touchProfessionalUserByUserId", userId);
+
+        assertThat(professionalUserEntity.getLastUpdated()).isNotNull();
+        verify(professionalUserRepository, times(1)).save(professionalUserEntity);
+    }
+
+    @Test
+    void test_touchProfessionalUser_noopWhenNull() {
+        ReflectionTestUtils.invokeMethod(professionalUserService, "touchProfessionalUser", (ProfessionalUser) null);
+
+        verify(professionalUserRepository, times(0)).save(any());
     }
 
     @Test
