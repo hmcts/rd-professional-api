@@ -1046,6 +1046,7 @@ class ProfessionalUserServiceImplTest {
         verify(userProfileUpdateRequestValidator, times(1)).validateRequest(userProfileUpdatedData);
     }
 
+    @Test
     void test_modifyRolesAndUserConfiguredAccessForAddedAccessType() throws JsonProcessingException {
         UUID uuid = UUID.randomUUID();
         String uuidStr = uuid.toString();
