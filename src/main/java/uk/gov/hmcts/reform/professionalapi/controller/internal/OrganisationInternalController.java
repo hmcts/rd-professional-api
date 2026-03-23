@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserIdentifierRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
@@ -56,8 +57,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
@@ -697,6 +700,73 @@ public class OrganisationInternalController extends SuperController {
         return organisationService.retrieveOrganisationByUserId(userId);
     }
 
+
+    @Operation(
+        summary = "Updates idam id for a user in an organisation",
+        description = "**IDAM Roles to access API** :<br> prd-admin ",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+
+    )
+
+    @ApiResponse(
+        responseCode = "200",
+        description = "Updated idam id for a user in the organisation",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "An invalid request has been provided",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized Error : "
+            + "The requested resource is restricted and requires authentication",
+        content = @Content
+    )
+
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden Error: Access denied",
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content
+    )
+
+
+    @PutMapping(
+        path = "/userIdam",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured({"prd-admin"})
+    public ResponseEntity<Object> updateUserIdamForOrganisation(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contactInformationCreationRequests")
+        @Valid @NotNull @RequestBody ProfessionalUserIdentifierRequest professionalUserIdentifierRequest) {
+
+        log.info("{}:: Received request to update idam id for an user in an "
+            + "organisation ::", loggingComponentName);
+
+        if (!Optional.ofNullable(professionalUserIdentifierRequest).isPresent()) {
+            throw new InvalidRequest(ERROR_MSG_REQUEST_IS_EMPTY);
+        } else if (isBlank(professionalUserIdentifierRequest.getExistingIdamId())
+            || isBlank(professionalUserIdentifierRequest.getNewIdamId())
+        ) {
+            throw new InvalidRequest("Please enter existing and New Idam ids / User identifiers");
+        }
+        return organisationService.updateIdamId(professionalUserIdentifierRequest.getExistingIdamId(),
+            professionalUserIdentifierRequest.getNewIdamId());
+    }
+
+
     @Operation(
             summary = "Retrieves Organisations by Organisation Profile IDs",
             description = "**Bearer token not required to access API. Only a valid s2s token**",
@@ -745,4 +815,5 @@ public class OrganisationInternalController extends SuperController {
                 .status(HttpStatus.OK)
                 .body(response);
     }
+
 }
