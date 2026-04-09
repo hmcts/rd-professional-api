@@ -15,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -98,10 +98,10 @@ import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInG
 @SpringBootTest(classes = RefDataUtil.class)
 class RefDataUtilTest {
 
-    @MockBean
+    @MockitoBean
     private BlobStorageCredentials blobStorageCredentials;
 
-    @MockBean
+    @MockitoBean
     CloudStorageAccount cloudStorageAccount;
 
     private PaymentAccount paymentAccount;

@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -14,48 +15,48 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @TestConfiguration
 public class OrganisationalInternalControllerV1ProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockBean
+    @MockitoBean
     protected PaymentAccountService paymentAccountService;
 
-    @MockBean
+    @MockitoBean
     MfaStatusService mfaStatusService;
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
-    @MockBean
+    @MockitoBean
     BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
-    @MockBean
+    @MockitoBean
     PaymentAccountRepository paymentAccountRepository;
 
-    @MockBean
+    @MockitoBean
     OrgAttributeRepository orgAttributeRepository;
 
-    @MockBean
+    @MockitoBean
     DxAddressRepository dxAddressRepository;
 
-    @MockBean
+    @MockitoBean
     ContactInformationRepository contactInformationRepository;
 
-    @MockBean
+    @MockitoBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeService userAttributeService;
 
-    @MockBean
+    @MockitoBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
     @Bean
@@ -66,8 +67,8 @@ public class OrganisationalInternalControllerV1ProviderTestConfiguration extends
 
     @Bean
     @Primary
-    protected OrganisationServiceImpl organisationService() {
-        return new OrganisationServiceImpl();
+    public OrganisationService organisationService() {
+        return Mockito.mock(OrganisationService.class);
     }
 
 }
