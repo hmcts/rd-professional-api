@@ -53,11 +53,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalExternalPbas")
-@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import({OrganisationalExternalControllerProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalExternalControllerProviderTest extends MockMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
     private static final String USER_JWT = "Bearer 8gf364fg367f67";
+    public static final String PBA_NUMBER = "PBA1234567";
 
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
@@ -131,6 +132,11 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         String companyUrl = "companyUrl";
 
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
+        Organisation organisation = professionalUser.getOrganisation();
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+        PaymentAccount paymentAccount = new PaymentAccount("paymentAccountA1");
+        paymentAccount.setPbaStatus(PbaStatus.ACCEPTED);
+        organisation.setPaymentAccounts(List.of(paymentAccount));
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
@@ -147,6 +153,8 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
                 .thenReturn(UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).build());
 
         when(professionalUserRepositoryMock.findByEmailAddress(ORGANISATION_EMAIL)).thenReturn(professionalUser);
+        when(paymentAccountService.findPaymentAccountsByEmail(ORGANISATION_EMAIL.toLowerCase()))
+            .thenReturn(organisation);
 
     }
 
