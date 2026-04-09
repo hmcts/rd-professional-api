@@ -7,64 +7,30 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import jakarta.persistence.EntityManagerFactory;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
-import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationByProfileIdsRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UsersInOrganisationsByOrganisationIdentifiersRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
-import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
+import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 
+@TestConfiguration
 public class ProviderTestConfiguration {
-
-    @MockBean
-    ApplicationConfiguration configuration;
-    @MockBean
-    UserProfileFeignClient userProfileFeignClient;
-    @MockBean
-    EntityManagerFactory emf;
-    @MockBean
-    ProfessionalUserRepository professionalUserRepository;
-    @MockBean
-    UserAccountMapService userAccountMapService;
-    @MockBean
-    protected PrdEnumService prdEnumService;
-    @MockBean
-    protected UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
-    @MockBean
-    protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
-    @MockBean
-    protected OrganisationByProfileIdsRequestValidator organisationByProfileIdsRequestValidator;
-    @MockBean
-    protected UsersInOrganisationsByOrganisationIdentifiersRequestValidator usersInOrgValidator;
-    @MockBean
-    protected ProfessionalUserReqValidator profExtUsrReqValidator;
-    @MockBean
-    protected PaymentAccountValidator paymentAccountValidator;
-    @MockBean
-    public OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
-    @MockBean
-    public IdamRepository idamRepository;
 
     @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;
@@ -140,6 +106,42 @@ public class ProviderTestConfiguration {
     @Bean()
     public MappingJackson2HttpMessageConverter newJsonConvert() {
         return new MappingJackson2HttpMessageConverter(new ObjectMapper());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public FeatureToggleService featureToggleService() {
+        return Mockito.mock(FeatureToggleService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PaymentAccountService paymentAccountService() {
+        return Mockito.mock(PaymentAccountService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OrganisationService organisationService() {
+        return Mockito.mock(OrganisationService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProfessionalUserService professionalUserService() {
+        return Mockito.mock(ProfessionalUserService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public IdamRepository idamRepository() {
+        return Mockito.mock(IdamRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
+        return new PactJwtGrantedAuthoritiesConverter(idamRepository);
     }
 
 }
