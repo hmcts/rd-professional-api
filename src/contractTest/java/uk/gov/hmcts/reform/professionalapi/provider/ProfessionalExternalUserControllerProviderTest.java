@@ -10,13 +10,19 @@ import feign.Request;
 import feign.Response;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.WebMvcProviderTest;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
@@ -43,6 +49,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -54,6 +61,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -66,7 +74,13 @@ import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
 @AutoConfigureMockMvc(addFilters = false)
-@ContextConfiguration(classes = {ProfessionalExternalUserControllerProviderTestConfiguration.class, WebConfig.class})
+@ImportAutoConfiguration(exclude = {
+    DataSourceAutoConfiguration.class,
+    HibernateJpaAutoConfiguration.class,
+    JpaRepositoriesAutoConfiguration.class
+})
+@Import({ProviderTestConfiguration.class, ProfessionalExternalUserControllerProviderTestConfiguration.class,
+    WebConfig.class})
 public class ProfessionalExternalUserControllerProviderTest extends WebMvcProviderTest {
 
     @Autowired
@@ -74,6 +88,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
     @Autowired
     OrganisationService organisationServiceMock;
+
+    @Autowired
+    ProfessionalUserService professionalUserServiceMock;
 
     @Autowired
     ProfessionalExternalUserController professionalExternalUserController;
@@ -154,6 +171,12 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         when(userProfileFeignClientMock.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(), any(), any(), anyBoolean(), any()))
+                .thenReturn(ResponseEntity.ok(professionalUsersEntityResponse));
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisationWithPageable(
+                any(), any(), anyBoolean(), any(), any()))
+                .thenReturn(ResponseEntity.ok(professionalUsersEntityResponse));
     }
 
     private ProfessionalUser setupInteractionsForProfessionalUser() throws JsonProcessingException {
@@ -193,6 +216,8 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
+        when(professionalUserServiceMock.findUserStatusByEmailAddress(anyString()))
+                .thenReturn(ResponseEntity.status(HttpStatus.OK).body(newUserResponse));
 
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
@@ -213,6 +238,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+
+        when(professionalUserServiceMock.modifyUserConfiguredAccessAndRoles(any(), anyString(), any()))
+                .thenReturn(ResponseEntity.ok(modifyUserRolesResponse));
 
         return professionalUser;
     }
@@ -336,6 +364,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+
+        when(professionalUserServiceMock.modifyUserConfiguredAccessAndRoles(any(), anyString(), any()))
+                .thenReturn(ResponseEntity.ok(modifyUserRolesResponse));
 
         List<UserConfiguredAccess> allUserConfiguredAccess = PactUtils.getUserConfiguredAccesses(professionalUser);
         when(userConfiguredAccessRepository.findByUserConfiguredAccessId_ProfessionalUser_Id(any()))

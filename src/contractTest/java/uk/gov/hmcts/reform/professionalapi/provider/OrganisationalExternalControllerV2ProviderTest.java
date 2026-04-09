@@ -8,12 +8,12 @@ import feign.Request;
 import feign.Response;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalControllerV2;
@@ -31,9 +31,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -48,7 +47,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalExternalPbasV2")
-@Import(OrganisationalExternalControllerV2ProviderTestConfiguration.class)
+@Import({OrganisationalExternalControllerV2ProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProviderTest {
 
     public static final String A_CLAIM = "aClaim";
@@ -64,15 +63,12 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
     OrganisationExternalControllerV2 organisationExternalControllerV2;
 
 
-    @MockBean
-    OrganisationRepository organisationRepository;
-
-    @MockBean
+    @MockitoBean
     Authentication authentication;
-    @MockBean
+    @MockitoBean
     SecurityContext securityContext;
     @Autowired
-    OrganisationServiceImpl organisationServiceImpl;
+    OrganisationService organisationService;
     @Autowired
     UserProfileFeignClient userProfileFeignClientMock;
     @Autowired
@@ -168,7 +164,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
 
         Organisation org = getCreateOrganisationResponse();
         OrganisationResponse response = new OrganisationResponse(org);
-        when(organisationServiceImpl.createOrganisationFrom(any())).thenReturn(response);
+        when(organisationService.createOrganisationFrom(any())).thenReturn(response);
 
 
     }
@@ -185,7 +181,7 @@ public class OrganisationalExternalControllerV2ProviderTest extends MockMvcProvi
             true,
             true);
 
-        when(organisationServiceImpl.retrieveOrganisationForV2Api(any(), anyBoolean()))
+        when(organisationService.retrieveOrganisationForV2Api(any(), anyBoolean()))
             .thenReturn(organisationEntityResponseV2);
 
     }

@@ -20,9 +20,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInter
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -38,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -53,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.util.Collections.emptyList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -64,7 +70,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
 
 @Provider("referenceData_organisationalInternal")
-@Import(OrganisationalInternalControllerProviderTestConfiguration.class)
+@Import({OrganisationalInternalControllerProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalInternalControllerProviderTest extends MockMvcProviderTest {
 
     @Autowired
@@ -88,6 +94,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     PrdEnumService prdEnumService;
+
+    @Autowired
+    OrganisationService organisationServiceMock;
 
     @Autowired
     OrganisationInternalController organisationInternalController;
@@ -127,6 +136,12 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         Organisation organisation = getOrganisation();
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationService.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
 
     }
 
@@ -135,7 +150,10 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationForGivenId() {
 
         Organisation organisation = getOrganisation();
+        organisation.setPaymentAccounts(emptyList());
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.retrieveOrganisation(anyString(), anyBoolean()))
+            .thenReturn(new OrganisationEntityResponse(organisation, true, true, true));
 
     }
 
@@ -177,6 +195,14 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE)))
                 .thenReturn(List.of(organisation));
+
+        OrganisationsDetailResponse response = new OrganisationsDetailResponse(
+            List.of(organisation), true, true, true);
+        response.setTotalRecords(1);
+        when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationServiceMock.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
+        when(organisationService.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -257,19 +283,30 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
     @SuppressWarnings("unchecked")
     @State("An Organisation exists for update")
-    public void setUpOrganisationForUpdate() {
+    public void setUpOrganisationForUpdate() throws JsonProcessingException {
 
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+
         Organisation updatedOrganisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
-
-        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.save(any())).thenReturn(updatedOrganisation);
 
+        ProfessionalUser professionalUser = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+        when(professionalUserService.findProfessionalUserById(any())).thenReturn(professionalUser);
+
+        UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(201).build());
     }
 
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -280,6 +317,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
         when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
@@ -304,9 +342,13 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         paymentAccount.setOrganisation(organisation);
 
         doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(paymentAccountRepository.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
         when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
+        when(paymentAccountService.updatePaymentAccountsStatusForAnOrganisation(anyList(), anyString()))
+            .thenReturn(new UpdatePbaStatusResponse(null, emptyList(),
+                org.springframework.http.HttpStatus.ACCEPTED.value()));
     }
 
     @SuppressWarnings("unchecked")
@@ -384,6 +426,29 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationWithStatusForGivenPbaStatus() {
         Organisation organisation = getOrganisationWithPbaStatus();
         when(organisationRepository.findByPbaStatus(any())).thenReturn(List.of(organisation));
+    }
+
+    @State("Receiving a request to DELETE active Users for the Organisation")
+    public void setUpOrganisationForDelete() {
+        Organisation organisation = getOrganisation();
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationService.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+    }
+
+    @State("On receiving get Organisations")
+    public void setUpOrganisationsForGet() {
+        Organisation organisation = getOrganisation();
+        OrganisationsDetailResponse response = new OrganisationsDetailResponse(
+            List.of(organisation), true, true, true);
+        response.setTotalRecords(1);
+        when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationServiceMock.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
+        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationService.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
     }
 
     //PACT test to delete user profile as part of ticket RDCC-7097
