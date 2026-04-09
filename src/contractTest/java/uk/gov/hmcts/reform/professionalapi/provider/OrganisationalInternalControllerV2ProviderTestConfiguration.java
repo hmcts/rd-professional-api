@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalControllerV2;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -21,36 +23,36 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 @Configuration
 public class OrganisationalInternalControllerV2ProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
 
-    @MockBean
+    @MockitoBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
 
-    @MockBean
+    @MockitoBean
     PaymentAccountRepository paymentAccountRepository;
 
-    @MockBean
+    @MockitoBean
     OrgAttributeRepository orgAttributeRepository;
 
-    @MockBean
+    @MockitoBean
     DxAddressRepository dxAddressRepository;
 
-    @MockBean
+    @MockitoBean
     ContactInformationRepository contactInformationRepository;
 
-    @MockBean
+    @MockitoBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeService userAttributeService;
 
-    @MockBean
+    @MockitoBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
 
@@ -68,7 +70,7 @@ public class OrganisationalInternalControllerV2ProviderTestConfiguration extends
 
     @Bean
     @Primary
-    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter() {
+    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
         return new PactJwtGrantedAuthoritiesConverter(idamRepository);
     }
 

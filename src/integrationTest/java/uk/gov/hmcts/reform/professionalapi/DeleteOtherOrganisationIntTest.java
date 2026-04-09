@@ -93,7 +93,11 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
     void returns_204_when_delete_active_otherOrganisation_with_one_pending_user_profile() {
 
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
-        String orgIdentifier = createAndActivateOtherOrganisation();
+        OrganisationOtherOrgsCreationRequest organisationCreationRequest = otherOrganisationRequestWithAllFields();
+        organisationCreationRequest.setStatus(OrganisationStatus.ACTIVE.name());
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisationV2(organisationCreationRequest);
+        String orgIdentifier = (String) response.get(ORG_IDENTIFIER);
         getUserProfileByEmailWireMock(HttpStatus.resolve(200));
         deleteUserProfileMock(HttpStatus.resolve(204));
         Map<String, Object> deleteResponse =
@@ -172,4 +176,3 @@ class DeleteOtherOrganisationIntTest extends AuthorizationEnabledIntegrationTest
     }
 
 }
-

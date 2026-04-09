@@ -1,70 +1,71 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @Configuration
 public class BulkCustomerDetailsProviderTestConfiguration extends ProviderTestConfiguration {
 
 
-    @MockBean
+    @MockitoBean
     BulkCustomerRequest bulkCustomerRequest;
 
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockBean
+    @MockitoBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
-    @MockBean
+    @MockitoBean
     protected PaymentAccountService paymentAccountService;
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
 
-    @MockBean
+    @MockitoBean
     PaymentAccountRepository paymentAccountRepository;
 
-    @MockBean
+    @MockitoBean
     DxAddressRepository dxAddressRepository;
 
-    @MockBean
+    @MockitoBean
     ContactInformationRepository contactInformationRepository;
 
-    @MockBean
+    @MockitoBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeService userAttributeService;
 
-    @MockBean
+    @MockitoBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
 
-    @MockBean
+    @MockitoBean
     MfaStatusService mfaStatusService;
 
-    @MockBean
+    @MockitoBean
     BulkCustomerOrganisationsDetailResponse response;
 
     @Bean
@@ -75,13 +76,13 @@ public class BulkCustomerDetailsProviderTestConfiguration extends ProviderTestCo
 
     @Bean
     @Primary
-    protected OrganisationServiceImpl organisationService() {
-        return new OrganisationServiceImpl();
+    public OrganisationService organisationService() {
+        return Mockito.mock(OrganisationService.class);
     }
 
     @Bean
     @Primary
-    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter() {
+    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
         return new PactJwtGrantedAuthoritiesConverter(idamRepository);
     }
 

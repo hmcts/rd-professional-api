@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -13,8 +15,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -143,6 +149,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     ProfessionalUserService professionalUserService;
     @Autowired
     OrgAttributeRepository orgAttributeRepository;
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+    @Autowired
+    PlatformTransactionManager platformTransactionManager;
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -185,12 +197,15 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void addAttributeToOrganisation(List<OrgAttributeRequest> orgAttributes, Organisation organisation) {
         if (orgAttributes != null) {
+            final Organisation managedOrganisation = (organisation != null && organisation.getId() != null)
+                    ? organisationRepository.getReferenceById(organisation.getId())
+                    : organisation;
             List<OrgAttribute> attributes = new ArrayList<>();
             orgAttributes.forEach(attReq -> {
                 OrgAttribute attribute = new OrgAttribute();
                 attribute.setKey(RefDataUtil.removeEmptySpaces(attReq.getKey()));
                 attribute.setValue(RefDataUtil.removeEmptySpaces(attReq.getValue()));
-                attribute.setOrganisation(organisation);
+                attribute.setOrganisation(managedOrganisation);
                 attributes.add(attribute);
             });
             organisation.setOrgAttributes(orgAttributeRepository.saveAll(attributes));
@@ -589,6 +604,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    @Transactional
     public OrganisationResponse updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier,
             Boolean isOrgApprovalRequest) {
@@ -617,7 +633,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         //Update Organisation service done
 
         if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
-            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), organisation);
+            addAttributeToOrganisation(orgCreationRequestV2.getOrgAttributes(), savedOrganisation);
         }
 
 
@@ -626,7 +642,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
         }
 
-        return new OrganisationResponse(organisation);
+        return new OrganisationResponse(savedOrganisation);
     }
 
     @Override
@@ -769,14 +785,22 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String prdAdminUserId) {
+        if (organisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+        }
+        Organisation managedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(organisation.getOrganisationIdentifier());
+        if (managedOrganisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+        }
         var deleteOrganisationResponse = new DeleteOrganisationResponse();
-        switch (organisation.getStatus()) {
+        switch (managedOrganisation.getStatus()) {
             case PENDING,REVIEW:
-                return deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId);
+                return deleteOrganisationEntity(managedOrganisation, deleteOrganisationResponse, prdAdminUserId);
             case ACTIVE:
-                deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
+                deleteOrganisationResponse = deleteUserProfile(managedOrganisation, deleteOrganisationResponse);
                 return deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
-                        ? deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId)
+                        ? deleteOrganisationEntity(managedOrganisation, deleteOrganisationResponse, prdAdminUserId)
                         : deleteOrganisationResponse;
             default:
                 throw new EmptyResultDataAccessException(ONE);
@@ -787,14 +811,103 @@ public class OrganisationServiceImpl implements OrganisationService {
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
                                                                 DeleteOrganisationResponse deleteOrganisationResponse,
                                                                 String prdAdminUserId) {
-        bulkCustomerDetailsRepository.deleteByOrganistion(organisation.getOrganisationIdentifier());
-        orgAttributeRepository.deleteByOrganistion(organisation.getId());
-        organisationRepository.deleteById(organisation.getId());
+        try {
+            runInRequiresNew(() -> {
+                bulkCustomerDetailsRepository.deleteByOrganistion(organisation.getOrganisationIdentifier());
+                orgAttributeRepository.deleteByOrganistion(organisation.getId());
+                organisationRepository.deleteById(organisation.getId());
+            });
+        } catch (RuntimeException ex) {
+            if (!isTransientOrganisationReference(ex)) {
+                throw ex;
+            }
+            log.warn("{}:: transient Organisation reference detected; falling back to direct deletes",
+                    loggingComponentName, ex);
+            if (entityManager != null) {
+                entityManager.clear();
+            }
+            runInRequiresNew(() -> forceDeleteOrganisation(organisation));
+        }
         deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
         log.info(loggingComponentName, organisation.getOrganisationIdentifier()
                 + "::organisation deleted by::prdadmin::" + prdAdminUserId);
         return deleteOrganisationResponse;
+    }
+
+    private void forceDeleteOrganisation(Organisation organisation) {
+        UUID organisationId = organisation.getId();
+
+        jdbcTemplate.update("""
+                delete from dbrefdata.user_configured_access
+                where professional_user_id in (
+                    select id from dbrefdata.professional_user where organisation_id = ?
+                )
+                """, organisationId);
+        jdbcTemplate.update("""
+                delete from dbrefdata.user_attribute
+                where professional_user_id in (
+                    select id from dbrefdata.professional_user where organisation_id = ?
+                )
+                """, organisationId);
+        jdbcTemplate.update("""
+                delete from dbrefdata.user_account_map
+                where professional_user_id in (
+                    select id from dbrefdata.professional_user where organisation_id = ?
+                ) or payment_account_id in (
+                    select id from dbrefdata.payment_account where organisation_id = ?
+                )
+                """, organisationId, organisationId);
+        jdbcTemplate.update("""
+                delete from dbrefdata.user_address_map
+                where professional_user_id in (
+                    select id from dbrefdata.professional_user where organisation_id = ?
+                ) or contact_address_id in (
+                    select id from dbrefdata.contact_information where organisation_id = ?
+                )
+                """, organisationId, organisationId);
+        jdbcTemplate.update("""
+                delete from dbrefdata.dx_address
+                where contact_information_id in (
+                    select id from dbrefdata.contact_information where organisation_id = ?
+                )
+                """, organisationId);
+        jdbcTemplate.update("delete from dbrefdata.contact_information where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.payment_account where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.professional_user where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.org_attributes where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.organisation_mfa_status where organisation_id = ?", organisationId);
+        jdbcTemplate.update("delete from dbrefdata.domain where organisation_id = ?", organisationId);
+        String organisationIdentifier = organisation.getOrganisationIdentifier();
+        if (organisationIdentifier != null) {
+            jdbcTemplate.update("delete from dbrefdata.bulk_customer_details where organisation_id = ?",
+                    organisationIdentifier);
+        }
+        jdbcTemplate.update("delete from dbrefdata.organisation where id = ?", organisationId);
+    }
+
+    private static boolean isTransientOrganisationReference(RuntimeException ex) {
+        Throwable current = ex;
+        while (current != null) {
+            String message = current.getMessage();
+            if (message != null
+                    && message.contains("persistent instance references an unsaved transient instance of")
+                    && message.contains(Organisation.class.getName())) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    private void runInRequiresNew(Runnable action) {
+        if (platformTransactionManager == null) {
+            action.run();
+            return;
+        }
+        TransactionTemplate template = new TransactionTemplate(platformTransactionManager);
+        template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        template.executeWithoutResult(status -> action.run());
     }
 
     private DeleteOrganisationResponse deleteUserProfile(Organisation organisation,
@@ -1038,4 +1151,3 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 }
-
