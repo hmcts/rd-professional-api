@@ -105,7 +105,12 @@ class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
     void returns_204_when_delete_active_organisation_with_one_pending_user_profile() {
 
         userProfileCreateUserWireMock(HttpStatus.resolve(201));
-        String orgIdentifier = createAndActivateOrganisation();
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
+            .status(OrganisationStatus.ACTIVE.name())
+            .build();
+        Map<String, Object> response =
+            professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifier = (String) response.get(ORG_IDENTIFIER);
         getUserProfileByEmailWireMock(HttpStatus.resolve(200));
         deleteUserProfileMock(HttpStatus.resolve(204));
         Map<String, Object> deleteResponse =

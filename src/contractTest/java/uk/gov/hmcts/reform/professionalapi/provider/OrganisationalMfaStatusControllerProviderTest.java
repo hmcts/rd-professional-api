@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWith
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getProfessionalUser;
 
 @Provider("referenceData_organisation_mfa")
-@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import({OrganisationalExternalControllerProviderTestConfiguration.class, ProviderTestConfiguration.class})
 @IgnoreNoPactsToVerify
 public class OrganisationalMfaStatusControllerProviderTest extends MockMvcProviderTest {
 

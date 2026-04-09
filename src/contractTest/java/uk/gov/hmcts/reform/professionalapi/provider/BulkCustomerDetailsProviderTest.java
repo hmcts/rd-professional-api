@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
@@ -11,17 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.BulkCustomerDetailsInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.BulkCustomerDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.util.UUID;
 
@@ -29,10 +25,9 @@ import static java.util.Objects.nonNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-
 @Provider("referenceData_bulkCustomerDetails")
-@ContextConfiguration(classes = {BulkCustomerDetailsInternalController.class})
-@Import(BulkCustomerDetailsProviderTestConfiguration.class)
+@Import({BulkCustomerDetailsInternalController.class, BulkCustomerDetailsProviderTestConfiguration.class,
+    ProviderTestConfiguration.class})
 public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
 
     public static final String ORG_NAME = "Org-Name";
@@ -45,11 +40,9 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
     @Autowired
     BulkCustomerDetailsInternalController bulkCustomerDetailsInternalController;
 
-    @MockBean
-    OrganisationServiceImpl organisationService;
+    @Autowired
+    OrganisationService organisationService;
 
-    @MockBean
-    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
 
     @Override
@@ -114,5 +107,3 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
         return bulkCustomerDetails;
     }
 }
-
-
