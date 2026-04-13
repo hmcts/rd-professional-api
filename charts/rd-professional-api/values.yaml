@@ -19,7 +19,7 @@ java:
     CRON_EXPRESSION: "* */10 * * * *"
   spotInstances:
     enabled: true
-  image: 'hmctspublic.azurecr.io/rd/professional-api:latest'
+  image: 'hmctsprod.azurecr.io/rd/professional-api:latest'
   keyVaults:
     rd:
       secrets:
