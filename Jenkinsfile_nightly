@@ -67,7 +67,7 @@ withNightlyPipeline(type, product, component) {
     env.Rules = params.SecurityRules
 
     // Var for testcontainers.org
-    env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
+    env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
@@ -116,7 +116,7 @@ withNightlyPipeline(type, product, component) {
 }
 
 def deleteFunctionalDbData() {
-    withDocker('hmctsprod.azurecr.io/imported/jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${FUNC_DATABASE_PASS} -v ${WORKSPACE}/deletescript/:/deletescript") {
+    withDocker('hmctspublic.azurecr.io/imported/jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${FUNC_DATABASE_PASS} -v ${WORKSPACE}/deletescript/:/deletescript") {
         sh "chmod +x /deletescript/delete-functional-data.sh"
         sh "/deletescript/delete-functional-data.sh \
                         ${FUNC_DATABASE_USER} \
