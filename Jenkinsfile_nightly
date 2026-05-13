@@ -58,8 +58,6 @@ def config = new AppPipelineConfig()
 config.vaultSecrets = secrets
 
 withNightlyPipeline(type, product, component) {
-
-
     env.TEST_URL = params.URL_TO_TEST
     env.TEST_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
     env.execution_environment = "aat"
@@ -71,6 +69,13 @@ withNightlyPipeline(type, product, component) {
 
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
+
+    // Authenticate Docker to hmctsprod ACR so Testcontainers can pull the Ryuk reaper
+    // and base images via TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX. Reuses the managed
+    // identity already established by `az login --identity` earlier in the pipeline.
+    sh '''
+      env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
+    '''
 
     enableMutationTest()
     enableFullFunctionalTest()
