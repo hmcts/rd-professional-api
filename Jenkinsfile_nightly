@@ -70,13 +70,6 @@ withNightlyPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
-    // Authenticate Docker to hmctsprod ACR so Testcontainers can pull the Ryuk reaper
-    // and base images via TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX. Reuses the managed
-    // identity already established by `az login --identity` earlier in the pipeline.
-    sh '''
-      env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
-    '''
-
     enableMutationTest()
     enableFullFunctionalTest()
     enableSecurityScan()
@@ -113,6 +106,13 @@ withNightlyPipeline(type, product, component) {
                 reportFiles          : "index.html",
                 reportName           : "Mutation Test Report"
         ]
+
+        // Authenticate Docker to hmctsprod ACR so Testcontainers can pull the Ryuk reaper
+        // and base images via TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX. Reuses the managed
+        // identity already established by `az login --identity` earlier in the pipeline.
+        sh '''
+          env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
+        '''
     }
 
     afterAlways('fortify-scan') {
