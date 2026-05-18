@@ -8,7 +8,7 @@ plugins {
     id 'application'
     id 'idea'
     id 'project-report'
-    id 'uk.gov.hmcts.java' version '0.12.67'
+    id 'uk.gov.hmcts.java' version '0.12.70'
     id 'jacoco'
     id 'pmd'
     id 'checkstyle'
@@ -32,7 +32,7 @@ def versions = [
         lombok          : '1.18.42',
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
-        reformLogging   : '6.1.9',
+        reformLogging   : '8.0.0',
         camel           : '3.22.4',
         pact_version    : '4.6.17',
         launchDarklySdk : '5.10.9',
