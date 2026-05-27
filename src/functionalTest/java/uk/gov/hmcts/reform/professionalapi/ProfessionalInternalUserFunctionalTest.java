@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -246,7 +247,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(existingUserCreationRequest.getEmail());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
+                hmctsAdmin, newUserCreationRequest, CONFLICT);
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
         log.info("inviteUserWithDuplicateUserShouldReturnConflict :: END");
     }
@@ -1226,4 +1227,5 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .sorted(Comparator.comparing(map -> (String) map.get(key)))
                 .collect(Collectors.toList());
     }
+
 }
