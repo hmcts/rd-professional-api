@@ -520,6 +520,21 @@ dependencyManagement {
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
       }
+      dependencySet(group: 'org.springframework', version: '6.2.19') {
+        entry 'spring-aop'
+        entry 'spring-aspects'
+        entry 'spring-beans'
+        entry 'spring-context'
+        entry 'spring-context-support'
+        entry 'spring-core'
+        entry 'spring-expression'
+        entry 'spring-jcl'
+        entry 'spring-jdbc'
+        entry 'spring-orm'
+        entry 'spring-tx'
+        entry 'spring-web'
+        entry 'spring-webmvc'
+      }
     }
 }
 
