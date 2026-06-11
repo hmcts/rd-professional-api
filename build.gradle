@@ -33,7 +33,7 @@ def versions = [
         sonarPitest     : '0.5',
         junitPitest     : '1.2.1',
         reformLogging   : '8.0.0',
-        camel           : '3.22.4',
+        camel           : '4.20.0',
         pact_version    : '4.6.17',
         launchDarklySdk : '5.10.9',
         junit           : '5.11.4',
@@ -374,7 +374,7 @@ dependencies {
         exclude group: 'com.google.guava', module: 'guava'
     }
 
-    testImplementation group: 'org.apache.camel', name: 'camel-test', version: versions.camel
+    testImplementation group: 'org.apache.camel', name: 'camel-test', version: '3.22.4'
     testImplementation group: 'org.apache.camel', name: 'camel-test-spring-junit5', version: versions.camel
     testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
 
@@ -391,12 +391,12 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.12.0'
     implementation group: 'org.apache.camel', name: 'camel-bean-validator', version: versions.camel
     implementation group: 'org.apache.camel', name: 'spi-annotations', version: '3.22.4'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: '4.14.0'
-    implementation group: 'org.apache.camel', name: 'camel-core',  version: '4.15.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-spring-boot-starter',  version: versions.camel
+    implementation group: 'org.apache.camel', name: 'camel-core',  version: versions.camel
     implementation group: 'org.apache.camel.springboot', name: 'camel-azure-starter',  version: '3.8.0'
-    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: '4.15.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-jdbc-starter',  version: versions.camel
 
-    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: '4.15.0'
+    implementation group: 'org.apache.camel.springboot', name: 'camel-bindy-starter', version: versions.camel
     //Added below dependencies for shedlock
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '6.10.0'
     implementation group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '6.10.0'
