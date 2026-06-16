@@ -25,7 +25,7 @@ plugins {
 
 
 ext {
-    springCloudVersion = '2025.0.0'
+    springCloudVersion = '2025.0.2'
 }
 
 def versions = [
