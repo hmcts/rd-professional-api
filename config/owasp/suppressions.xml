@@ -29,4 +29,25 @@
     </notes>
     <cve>CVE-2026-33117</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-06-16
+        False positive:
+        - camel-azure 3.8.0 (latest)
+        - camel-azure-starter 3.8.0 (latest)
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2024-23114</cve>
+    <cve>CVE-2023-34442</cve>
+    <cve>CVE-2026-27172</cve>
+    <cve>CVE-2024-22369</cve>
+    <cve>CVE-2026-25747</cve>
+    <cve>CVE-2024-22371</cve>
+    <cve>CVE-2026-40453</cve>
+    <cve>CVE-2026-40860</cve>
+    <cve>CVE-2026-33454</cve>
+    <cve>CVE-2026-40473</cve>
+  </suppress>
 </suppressions>
