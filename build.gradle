@@ -378,7 +378,7 @@ dependencies {
     testImplementation group: 'org.apache.camel', name: 'camel-test-spring-junit5', version: versions.camel
     testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
 
-    implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-rc-1'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools-v147', version: '4.44.0'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
