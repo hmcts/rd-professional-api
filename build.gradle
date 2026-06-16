@@ -542,6 +542,9 @@ dependencyManagement {
         entry 'feign-jackson'
         entry 'feign-slf4j'
       }
+      dependencySet(group: 'org.codehaus.plexus', version: '3.6.1') {
+        entry 'plexus-utils'
+      }
     }
 }
 
