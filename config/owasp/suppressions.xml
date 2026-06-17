@@ -50,4 +50,19 @@
     <cve>CVE-2026-33454</cve>
     <cve>CVE-2026-40473</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-06-17
+        False positive:
+        CVE-2025-15104 applies to camel validator librarie.
+        Affected libraries reported by dependency-check are:
+        - camel-bean-validator 4.20.0
+        - camel-validator 4.20.0
+        - camel-validator-starter 4.20.0
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2025-21199</cve>
+  </suppress>
 </suppressions>
