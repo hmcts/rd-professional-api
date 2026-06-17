@@ -63,6 +63,6 @@
         Versions of used libraries are their latest respectively.
       ]]>
     </notes>
-    <cve>CVE-2025-21199</cve>
+    <cve>CVE-2025-15104</cve>
   </suppress>
 </suppressions>
