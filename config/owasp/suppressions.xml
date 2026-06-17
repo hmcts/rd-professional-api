@@ -55,7 +55,7 @@
       <![CDATA[
         Reviewed 2026-06-17
         False positive:
-        CVE-2025-15104 applies to camel validator librarie.
+        CVE-2025-15104 applies to camel validator libraries.
         Affected libraries reported by dependency-check are:
         - camel-bean-validator 4.20.0
         - camel-validator 4.20.0
@@ -64,5 +64,18 @@
       ]]>
     </notes>
     <cve>CVE-2025-15104</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-06-17
+        False positive:
+        CVE-2025-7962 applies to angus-activation.
+        Affected libraries reported by dependency-check are:
+        - angus-activation 2.0.3
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2025-7962</cve>
   </suppress>
 </suppressions>
