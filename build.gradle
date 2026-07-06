@@ -36,6 +36,7 @@ def versions = [
         camel           : '4.20.0',
         pact_version    : '4.6.17',
         launchDarklySdk : '5.10.9',
+        jackson         : '2.22.0',
         junit           : '5.12.2',
         junitPlatform   : '1.12.2',
         log4j           : '2.26.0',
@@ -349,9 +350,21 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
 
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.20.0', ext: 'pom'
+    implementation (group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310') {
+        version {
+            strictly versions.jackson
+        }
+    }
+    implementation (group: 'com.fasterxml.jackson.core', name: 'jackson-databind') {
+        version {
+            strictly versions.jackson
+        }
+    }
+    implementation (group: 'com.fasterxml.jackson', name: 'jackson-bom', ext: 'pom') {
+        version {
+            strictly versions.jackson
+        }
+    }
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation 'com.github.hmcts:idam-java-client:3.0.4'
@@ -544,6 +557,20 @@ dependencyManagement {
       }
       dependencySet(group: 'org.codehaus.plexus', version: '3.6.1') {
         entry 'plexus-utils'
+      }
+      dependencySet(group: 'com.fasterxml.jackson.core', version: versions.jackson) {
+        entry 'jackson-core'
+        entry 'jackson-databind'
+      }
+      dependencySet(group: 'com.fasterxml.jackson.datatype', version: versions.jackson) {
+        entry 'jackson-datatype-jsr310'
+        entry 'jackson-datatype-jdk8'
+      }
+      dependencySet(group: 'com.fasterxml.jackson.dataformat', version: versions.jackson) {
+        entry 'jackson-dataformat-yaml'
+      }
+      dependencySet(group: 'com.fasterxml.jackson.module', version: versions.jackson) {
+        entry 'jackson-module-parameter-names'
       }
     }
 }
