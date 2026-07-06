@@ -78,4 +78,17 @@
     </notes>
     <cve>CVE-2025-7962</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-07-07
+        False positive:
+        CVE-2026-54515 applies to jackson libraries.
+        Affected libraries reported by dependency-check are:
+        - jackson-databind 2.22.0
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2026-54515</cve>
+  </suppress>
 </suppressions>
