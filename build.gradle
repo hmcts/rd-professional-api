@@ -23,7 +23,6 @@ plugins {
     id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.34'
 }
 
-
 ext {
     springCloudVersion = '2025.0.2'
 }
