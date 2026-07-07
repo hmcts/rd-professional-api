@@ -90,5 +90,19 @@
       ]]>
     </notes>
     <cve>CVE-2026-54515</cve>
+  </suppress>  
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-07-07
+        False positive:
+        CVE-2026-54399 and CVE-2026-54428 applies to httpcore libraries.
+        Affected libraries reported by dependency-check are:
+        - httpcore 4.4.16
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2026-54399</cve>
+    <cve>CVE-2026-54428</cve>
   </suppress>
 </suppressions>
