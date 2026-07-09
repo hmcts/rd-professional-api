@@ -105,4 +105,18 @@
     <cve>CVE-2026-54399</cve>
     <cve>CVE-2026-54428</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-07-09
+        False positive:
+        CVE-2026-43866 applies to httpcore libraries.
+        Affected libraries reported by dependency-check are:
+        - camel-azure 3.8.0
+        - camel-azure-starter 3.8.0
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2026-43866</cve>
+  </suppress>
 </suppressions>
