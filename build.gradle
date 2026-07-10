@@ -35,7 +35,7 @@ def versions = [
         camel           : '4.21.0',
         pact_version    : '4.7.3',
         launchDarklySdk : '5.10.9',
-        jackson         : '2.22.0',
+        jackson         : '2.22.1',
         junit           : '5.12.2',
         junitPlatform   : '1.12.2',
         log4j           : '2.26.0',
