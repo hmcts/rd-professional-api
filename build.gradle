@@ -43,7 +43,7 @@ def versions = [
         feign           : '3.8.0',
         bouncycastle    : '1.84',
         postgresql_tc   : '1.21.4',
-        serenity        : '4.2.34'
+        serenity        : '5.3.10'
 ]
 
 application {
