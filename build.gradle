@@ -39,7 +39,7 @@ def versions = [
         junit           : '5.12.2',
         junitPlatform   : '1.12.2',
         log4j           : '2.26.0',
-        reformS2sClient : '5.3.3',
+        reformS2sClient : '5.3.4',
         feign           : '3.8.0',
         bouncycastle    : '1.84',
         postgresql_tc   : '1.21.4',
