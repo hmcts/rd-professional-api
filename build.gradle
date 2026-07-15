@@ -38,7 +38,7 @@ def versions = [
         jackson         : '2.22.1',
         junit           : '5.12.2',
         junitPlatform   : '1.12.2',
-        log4j           : '2.26.0',
+        log4j           : '2.26.1',
         reformS2sClient : '5.3.3',
         feign           : '3.8.0',
         bouncycastle    : '1.84',
