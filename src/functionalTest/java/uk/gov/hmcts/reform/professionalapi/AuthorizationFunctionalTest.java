@@ -97,9 +97,6 @@ public class AuthorizationFunctionalTest {
     @Value("${resendInterval}")
     protected String resendInterval;
 
-    protected static final String caseworkerPcs = "caseworker-pcs";
-    protected static final String caseworkerPcsSolicitor = "caseworker-pcs-solicitor";
-
     protected static ProfessionalApiClient professionalApiClient;
 
     protected static IdamOpenIdClient idamOpenIdClient;
