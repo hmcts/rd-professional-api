@@ -420,15 +420,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_DELETE);
         }
 
-        if (userProfileUpdatedData.getUserAccessTypes() != null) {
-            try {
-                List<UserConfiguredAccess> all = userProfileUpdatedData.getUserAccessTypes().stream()
-                        .map(a -> mapToUserConfiguredAccess(professionalUser, a)).toList();
-                userConfiguredAccessRepository.saveAll(all);
-            } catch (Exception ex) {
-                throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
-            }
-        }
+        this.saveAllUserAccessTypes(professionalUser, userProfileUpdatedData.getUserAccessTypes());
         touchProfessionalUser(professionalUser);
     }
 
@@ -440,6 +432,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                         .toList();
                 userConfiguredAccessRepository.saveAll(all);
             } catch (Exception ex) {
+                log.error(ERROR_USER_CONFIGURED_CREATE, ex);
                 throw new ExternalApiException(HttpStatus.valueOf(500), ERROR_USER_CONFIGURED_CREATE);
             }
         }
