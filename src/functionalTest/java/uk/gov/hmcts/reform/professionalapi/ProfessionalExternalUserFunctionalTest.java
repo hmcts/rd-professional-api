@@ -148,7 +148,10 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
 
     public void inviteUserScenarios() {
-        inviteUserByPuiUserManagerShouldBeSuccess();
+        Map<String, List<String>> userRoles =
+                Map.of("Case Manager Role", List.of(puiCaseManager),
+                        "PCS Caseworker Roles", List.of(caseworkerPcs, caseworkerPcsSolicitor));
+        inviteUserByPuiUserManagerShouldBeSuccess(userRoles);
         // below test receives 504 from SIDAM intermittently, needs investigation:
         // inviteUserBySuperUserShouldBeSuccess();
     }
@@ -230,12 +233,20 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         suspendUserByPumShouldBeSuccess();
     }
 
-    public void inviteUserByPuiUserManagerShouldBeSuccess() {
+    public void inviteUserByPuiUserManagerShouldBeSuccess(Map<String, List<String>> userRoles) {
         log.info("inviteUserByPuiUserManagerShouldBeSuccess :: STARTED");
-        Map<String, Object> newUserResponse = professionalApiClient
-                .addNewUserToAnOrganisationExternal(createUserRequest(asList(puiCaseManager)),
-                        professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
-        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        userRoles.values().forEach(roles -> {
+            Map<String, Object> newUserResponse = professionalApiClient
+                    .addNewUserToAnOrganisationExternal(createUserRequest(roles),
+                            professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
+            String userIdentifier = newUserResponse.get("userIdentifier").toString();
+            assertThat(userIdentifier)
+                    .as("Failed to invite user with role: " + Arrays.toString(roles.toArray()))
+                    .isNotNull();
+            Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                    professionalApiClient.getMultipleAuthHeaders(pumBearerToken), userIdentifier);
+            validateRetrievedUsers(response, "ACTIVE", true);
+        });
         log.info("inviteUserByPuiUserManagerShouldBeSuccess :: END");
     }
 
