@@ -65,7 +65,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
         // DTSRD-6485 - Disabling flaky test temporarily until fix found.
-//        findOrganisationWithSinceDateGroupAccessScenarios();
+        // findOrganisationWithSinceDateGroupAccessScenarios();
         retrieveOrganisationsByProfileIds();
         retrieveOrganisationsUsersBySearchAfterGA();
         deleteOtherOrganisationScenarios();
@@ -101,7 +101,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     public void findOrganisationScenarios() {
         findOrganisationByIdByInternalUserShouldBeSuccess();
         // DTSRD-6485 - Disabling flaky test temporarily until fix found.
-//        findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
+        // findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();

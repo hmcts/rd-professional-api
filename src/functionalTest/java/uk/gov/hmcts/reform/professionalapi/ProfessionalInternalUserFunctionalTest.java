@@ -100,9 +100,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         setUpTestData();
         createOrganisationScenario();
         inviteMultipleUserScenarios();
-         // DTSRD-6485 - Disabling flaky test temporarily until fix found.
-//        findUserInternalScenarios();
-//        findOrganisationWithSinceDateScenarios(sinceDateTime);
+        // DTSRD-6485 - Disabling flaky test temporarily until fix found.
+        //  findUserInternalScenarios();
+        //   findOrganisationWithSinceDateScenarios(sinceDateTime);
     }
 
     public void inviteMultipleUserScenarios() {
