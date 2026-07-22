@@ -19,7 +19,7 @@ class PrdEnumRepositoryTest extends BaseRepository {
     void test_findAll() {
         List<PrdEnum> prdEnums = prdEnumRepository.findAll();
 
-        assertThat(prdEnums).hasSize(49);
+        assertThat(prdEnums).hasSize(51);
         assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isZero();
     }
 
@@ -47,5 +47,13 @@ class PrdEnumRepositoryTest extends BaseRepository {
 
         assertThat(prdEnums.get(47).getEnumName()).isEqualTo("caseworker-privatelaw");
         assertThat(prdEnums.get(48).getEnumName()).isEqualTo("caseworker-privatelaw-solicitor");
+    }
+
+    @Test
+    void test_findAll_manageOrg_pcs_roles() {
+        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
+
+        assertThat(prdEnums.get(49).getEnumName()).isEqualTo("caseworker-pcs");
+        assertThat(prdEnums.get(50).getEnumName()).isEqualTo("caseworker-pcs-solicitor");
     }
 }
