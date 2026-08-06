@@ -54,6 +54,9 @@ public interface OrganisationService {
     OrganisationsDetailResponse findByOrganisationStatus(LocalDateTime formattedSince, String status,
                                                          Pageable pageable);
 
+    OrganisationsDetailResponse findByOrganisationStatusAndSearch(LocalDateTime formattedSince, String status,
+                                                                  String searchFilter, Pageable pageable);
+
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
 
     List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable);

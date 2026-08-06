@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -171,11 +172,15 @@ public class OrganisationInternalController extends SuperController {
             @Parameter(name = "since") @RequestParam(value = "since", required = false) String lastUpdatedSince,
             @Parameter(name = "status") @RequestParam(value = "status", required = false) String status,
             @Parameter(name = "page") @RequestParam(value = "page", required = false) Integer page,
-            @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size) {
+            @Parameter(name = "size") @RequestParam(value = "size", required = false) Integer size,
+            @Parameter(name = "search_filter") @RequestParam(value = "search_filter", required = false)
+            String searchFilter) {
 
+        if (StringUtils.isNotBlank(searchFilter)) {
+            return retrieveOrganisationsByStatusAndSearch(lastUpdatedSince, status, searchFilter, page, size);
+        }
         return retrieveAllOrganisationsOrById(id, lastUpdatedSince, status, page, size);
     }
-
 
     @Operation(
             summary = "Retrieves an Organisation's Payment Accounts with a User's Email Address",

@@ -224,7 +224,8 @@ class OrganisationInternalControllerTest {
 
         when(organisationServiceMock.retrieveAllOrganisations(null, null)).thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, null, null);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(
+                null, null, null, null, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -240,7 +241,7 @@ class OrganisationInternalControllerTest {
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController
-                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, null, 1, null);
+                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null, null, 1, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -258,7 +259,7 @@ class OrganisationInternalControllerTest {
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
-                .getOrganisationIdentifier(), null, "PENDING", null, null);
+                .getOrganisationIdentifier(), null, "PENDING", null, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -275,7 +276,7 @@ class OrganisationInternalControllerTest {
                 .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null,
-                "PENDING", null, null);
+                "PENDING", null, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -293,7 +294,8 @@ class OrganisationInternalControllerTest {
         when(organisationServiceMock.retrieveAllOrganisations(null, pageable))
             .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, null, 1);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(
+                null, null, null, null, 1, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -313,7 +315,8 @@ class OrganisationInternalControllerTest {
         when(organisationServiceMock.retrieveAllOrganisations(null, pageable))
             .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, 1, null);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(
+                null, null, null, 1, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -334,7 +337,8 @@ class OrganisationInternalControllerTest {
         when(organisationServiceMock.findByOrganisationStatus(any(), any(), any()))
             .thenReturn(organisationsDetailResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, "PENDING", 1, 20);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(
+                null, null, "PENDING", 1, 20, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -342,7 +346,30 @@ class OrganisationInternalControllerTest {
                 .getOrganisations().size());
 
         verify(organisationServiceMock, times(1))
-            .findByOrganisationStatus(null, OrganisationStatus.PENDING.name(), pageable);
+                .findByOrganisationStatus(null, OrganisationStatus.PENDING.name(), pageable);
+    }
+
+    @Test
+    void test_RetrieveOrganisationByStatusAndSearchUsesFilteredPage() {
+        organisationsDetailResponse.setTotalRecords(1);
+        when(organisationServiceMock.findByOrganisationStatusAndSearch(any(), anyString(), anyString(), any()))
+                .thenReturn(organisationsDetailResponse);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(
+                null, null, "PENDING,REVIEW", 1, 10, "Northgate Legal");
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getHeaders().getFirst("total_records")).isEqualTo("1");
+        verify(organisationServiceMock).findByOrganisationStatusAndSearch(
+                null, "PENDING,REVIEW", "Northgate Legal", PageRequest.of(0, 10,
+                        Sort.by(new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase())
+                                .and(Sort.by(new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase()))));
+    }
+
+    @Test
+    void test_RetrieveOrganisationSearchRejectsMissingStatus() {
+        assertThrows(InvalidRequest.class, () -> organisationInternalController.retrieveOrganisations(
+                null, null, null, 1, 10, "Northgate"));
     }
 
     @Test

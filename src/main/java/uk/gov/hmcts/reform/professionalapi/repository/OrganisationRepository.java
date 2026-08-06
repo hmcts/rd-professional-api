@@ -52,6 +52,47 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @EntityGraph(value = "Organisation.alljoins")
     Page<Organisation> findByStatusIn(List<OrganisationStatus> statuses, Pageable pageable);
 
+    @EntityGraph(value = "Organisation.alljoins")
+    @Query(value = """
+            SELECT o FROM Organisation o
+            WHERE o.status IN :statuses
+              AND (:since IS NULL OR o.lastUpdated >= :since)
+              AND (
+                    LOWER(o.name) LIKE LOWER(CONCAT('%', :searchFilter, '%'))
+                 OR LOWER(o.sraId) LIKE LOWER(CONCAT('%', :searchFilter, '%'))
+                 OR EXISTS (
+                        SELECT ci FROM contact_information ci
+                        WHERE ci.organisation = o
+                          AND LOWER(REPLACE(ci.postCode, ' ', ''))
+                              LIKE LOWER(CONCAT('%', REPLACE(:searchFilter, ' ', ''), '%'))
+                    )
+                 OR EXISTS (
+                        SELECT pa FROM payment_account pa
+                        WHERE pa.organisation = o
+                          AND LOWER(pa.pbaNumber) LIKE LOWER(CONCAT('%', :searchFilter, '%'))
+                    )
+                 OR EXISTS (
+                        SELECT dx FROM dx_address dx
+                        WHERE dx.contactInformation.organisation = o
+                          AND (
+                                LOWER(dx.dxNumber) LIKE LOWER(CONCAT('%', :searchFilter, '%'))
+                             OR LOWER(dx.dxExchange) LIKE LOWER(CONCAT('%', :searchFilter, '%'))
+                          )
+                    )
+                 OR EXISTS (
+                        SELECT su FROM super_user_view su
+                        WHERE su.organisation = o
+                          AND LOWER(CONCAT(CONCAT(su.firstName, ' '), su.lastName))
+                              LIKE LOWER(CONCAT('%', :searchFilter, '%'))
+                    )
+              )
+            """)
+    Page<Organisation> findByStatusInAndSearchFilter(
+            @Param("statuses") List<OrganisationStatus> statuses,
+            @Param("since") LocalDateTime since,
+            @Param("searchFilter") String searchFilter,
+            Pageable pageable);
+
     List<Organisation> findByStatusInAndLastUpdatedGreaterThanEqual(List<OrganisationStatus> statuses,
                                                                     LocalDateTime since);
 

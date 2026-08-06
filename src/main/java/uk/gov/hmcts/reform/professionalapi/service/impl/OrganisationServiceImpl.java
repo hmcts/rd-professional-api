@@ -783,6 +783,24 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    public OrganisationsDetailResponse findByOrganisationStatusAndSearch(LocalDateTime since, String status,
+                                                                          String searchFilter, Pageable pageable) {
+        List<OrganisationStatus> statuses = new ArrayList<>(validateAndReturnStatusList(status));
+        Page<Organisation> organisationPage = organisationRepository.findByStatusInAndSearchFilter(
+                statuses, since, searchFilter, pageable);
+        List<Organisation> organisations = organisationPage.getContent();
+
+        if (isEmpty(organisations)) {
+            throw new EmptyResultDataAccessException(ONE);
+        }
+
+        OrganisationsDetailResponse response = new OrganisationsDetailResponse(organisations, true, true, false);
+        response.setTotalRecords(organisationPage.getTotalElements());
+        response.setMoreAvailable(getMoreAvailable(organisationPage));
+        return response;
+    }
+
+    @Override
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String prdAdminUserId) {
         if (organisation == null) {

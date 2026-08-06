@@ -1454,6 +1454,28 @@ class OrganisationServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void test_RetrieveOrganisationByStatusAndSearchUsesProviderFilteredPage() {
+        organisation.setStatus(OrganisationStatus.PENDING);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Organisation> organisationPage = mock(Page.class);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+        when(organisationPage.getTotalElements()).thenReturn(21L);
+        when(organisationPage.isLast()).thenReturn(false);
+        when(organisationRepository.findByStatusInAndSearchFilter(
+                List.of(OrganisationStatus.PENDING, REVIEW), null, "Northgate", pageable)).thenReturn(organisationPage);
+
+        OrganisationsDetailResponse response = sut.findByOrganisationStatusAndSearch(
+                null, "PENDING,REVIEW", "Northgate", pageable);
+
+        assertThat(response.getOrganisations()).hasSize(1);
+        assertThat(response.getTotalRecords()).isEqualTo(21L);
+        assertThat(response.isMoreAvailable()).isTrue();
+        verify(organisationRepository).findByStatusInAndSearchFilter(
+                List.of(OrganisationStatus.PENDING, REVIEW), null, "Northgate", pageable);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void test_RetrieveAnOrganisationsByStatusAndPaginationWithSince() throws JsonProcessingException {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();

@@ -234,6 +234,31 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationResponse);
     }
 
+    protected ResponseEntity<Object> retrieveOrganisationsByStatusAndSearch(String lastUpdatedSince, String status,
+                                                                             String searchFilter,
+                                                                             Integer page, Integer size) {
+        if (StringUtils.isEmpty(removeEmptySpaces(status)) || StringUtils.isEmpty(removeEmptySpaces(searchFilter))) {
+            throw new InvalidRequest("Status and search filter are required for organisation search");
+        }
+
+        LocalDateTime formattedSince = null;
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
+        }
+
+        Pageable pageable = createPageableByStatus(page, size);
+        if (pageable == null) {
+            pageable = createPageableByStatus(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
+        }
+        OrganisationsDetailResponse response = organisationService.findByOrganisationStatusAndSearch(
+                formattedSince, removeEmptySpaces(status).toUpperCase(), StringUtils.trim(searchFilter), pageable);
+
+        return ResponseEntity.status(200)
+                .header("total_records", String.valueOf(response.getTotalRecords()))
+                .body(response);
+    }
+
 
     protected ResponseEntity<Object> retrieveAllOrganisationsOrByIdForV2Api(String organisationIdentifier,
                                                                             String lastUpdatedSince, String status,
