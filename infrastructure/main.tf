@@ -57,6 +57,8 @@ module "db-professional-ref-data-v16" {
   pgsql_databases = [
     {
       name = "dbrefdata"
+      schemas_for_reader_access : ["dbrefdata"]
+      schemas_for_writer_access : ["dbrefdata"]
     }
   ]
 
