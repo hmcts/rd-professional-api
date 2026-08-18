@@ -571,7 +571,7 @@ dependencyManagement {
       dependencySet(group: 'com.fasterxml.jackson.module', version: versions.jackson) {
         entry 'jackson-module-parameter-names'
       }
-      dependencySet(group: 'org.apache.httpcomponents.client5', version: '5.6.3') {
+      dependencySet(group: 'org.apache.httpcomponents.client5', version: '5.6.4') {
         entry 'httpclient5'
       }
     }
