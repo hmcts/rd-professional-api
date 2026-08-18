@@ -532,7 +532,7 @@ dependencyManagement {
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
       }
-      dependencySet(group: 'org.springframework', version: '6.2.19') {
+      dependencySet(group: 'org.springframework', version: '7.0.8') {
         entry 'spring-aop'
         entry 'spring-aspects'
         entry 'spring-beans'
