@@ -1,5 +1,5 @@
 #!groovy
-@Library("Infrastructure")
+@Library("Infrastructure@2.5.1")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 

@@ -43,7 +43,7 @@ resource "azurerm_resource_group" "rg" {
 # Create the database server v16
 # Name and resource group name will be defaults (<product>-<component>-<env> and <product>-<component>-data-<env> respectively)
 module "db-professional-ref-data-v16" {
-  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=DTSPO-30107-additional-postgres-admins"
 
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
@@ -64,7 +64,6 @@ module "db-professional-ref-data-v16" {
 
   # Setup Access Reader db user
   force_user_permissions_trigger = "3"
-  enable_write_group_access      = true
 
   # Sets correct DB owner after migration to fix permissions
   enable_schema_ownership        = var.enable_schema_ownership
