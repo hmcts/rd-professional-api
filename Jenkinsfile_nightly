@@ -75,6 +75,10 @@ withNightlyPipeline(type, product, component) {
     enableSecurityScan()
     enableFortifyScan()
 
+    afterAlways('securityScan') {
+        sh 'rm -rf functional-output; rm -f api-report.html report.json glue.txt zap.out'
+    }
+
     afterAlways('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/**/*'
