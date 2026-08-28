@@ -132,4 +132,41 @@
     </notes>
     <cve>CVE-2026-66299</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-08-28
+        False positive:
+        CVE-2026-54285 applies to opentelemetry libraries in node.js up to version 2.8.0, not used in component.
+        Affected libraries reported by dependency-check are:
+        - opentelemetry-api 1.49.0
+        - opentelemetry-context 1.49.0
+        - opentelemetry-exporter-logging 1.49.0
+        - opentelemetry-sdk 1.49.0
+        - opentelemetry-sdk-common 1.49.0
+        - opentelemetry-sdk-extension-autoconfigure 1.49.0
+        - opentelemetry-sdk-extension-autoconfigure-spi 1.49.0
+        - opentelemetry-sdk-logs 1.49.0.jar
+        - opentelemetry-sdk-metrics 1.49.0
+        - opentelemetry-sdk-trace 1.49.0
+          Likely flagged due to partial name match with opentelemetry for node.js
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2026-54285</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-08-28
+        No remedy released:
+        CVE-2026-59230 applies to camel-azure libraries.
+        Affected libraries reported by dependency-check are:
+        - camel-azure 3.8.0
+        - camel-azure-starter 3.8.0
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2026-59230</cve>
+  </suppress>
 </suppressions>
