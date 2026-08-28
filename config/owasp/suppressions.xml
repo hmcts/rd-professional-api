@@ -155,4 +155,18 @@
     </notes>
     <cve>CVE-2026-54285</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-08-28
+        No remedy released:
+        CVE-2026-59230 applies to camel-azure libraries.
+        Affected libraries reported by dependency-check are:
+        - camel-azure 3.8.0
+        - camel-azure-starter 3.8.0
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2026-59230</cve>
+  </suppress>
 </suppressions>
