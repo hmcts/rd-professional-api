@@ -182,4 +182,5 @@
         <notes>https://tools.hmcts.net/jira/browse/DTSRD-6684 spring security</notes>
         <cve>CVE-2026-59270</cve>
   </suppress>
+  https://tools.hmcts.net/jira/browse/DTSRD-6685
 </suppressions>
