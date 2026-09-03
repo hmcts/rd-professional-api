@@ -177,10 +177,15 @@
         <cve>CVE-2026-59283</cve>
         <cve>CVE-2026-47893</cve>
         <cve>CVE-2026-59280</cve>
+        <cve>CVE-2026-47890</cve>
+        <cve>CVE-2026-47891</cve>
+        <cve>CVE-2026-59282</cve>
+        <cve>CVE-2026-59281</cve>
   </suppress>
   <suppress>
         <notes>https://tools.hmcts.net/jira/browse/DTSRD-6684 spring security</notes>
         <cve>CVE-2026-59270</cve>
+        <cve>CVE-2026-59276</cve>
   </suppress>
   <suppress>
         <notes>https://tools.hmcts.net/jira/browse/DTSRD-6685 spring cloud</notes>
