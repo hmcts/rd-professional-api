@@ -116,7 +116,7 @@ idam:
   security:
     issuerValidation: ${JWT_ISSUER_VALIDATION_ENABLED:false}
     allowed-issuers:
-      - http://localhost:5062/o
+      - https://idam-web-public.aat.platform.hmcts.net/o
 
 oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
