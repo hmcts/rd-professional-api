@@ -191,4 +191,51 @@
         <notes>https://tools.hmcts.net/jira/browse/DTSRD-6685 spring cloud</notes>
         <cve>CVE-2026-59284</cve>
   </suppress>
+  <!-- CVE-2026-47834 - Spring Data JPA 3.5.12 -->
+<suppress>
+    <notes><![CDATA[
+        CVE-2026-47834 - Spring Data JPA 3.5.12.
+        Temporary suppression pending upgrade to a patched Spring version.
+    ]]></notes>
+    <packageUrl regex="true">
+        ^pkg:maven/org\.springframework\.data/spring-data-jpa@3\.5\.12$
+    </packageUrl>
+    <cve>CVE-2026-47834</cve>
+</suppress>
+
+<!-- CVE-2026-41710 - Spring Retry 2.0.12 -->
+<suppress>
+    <notes><![CDATA[
+        CVE-2026-41710 - Spring Retry 2.0.12.
+        Temporary suppression pending upgrade to a patched version.
+    ]]></notes>
+    <packageUrl regex="true">
+        ^pkg:maven/org\.springframework\.retry/spring-retry@2\.0\.12$
+    </packageUrl>
+    <cve>CVE-2026-41710</cve>
+</suppress>
+
+<!-- CVE-2026-47841 - Spring Security 6.5.11 -->
+<suppress>
+    <notes><![CDATA[
+        CVE-2026-47841 - Spring Security 6.5.11.
+        Temporary suppression pending upgrade to a patched Spring version.
+    ]]></notes>
+    <packageUrl regex="true">
+        ^pkg:maven/org\.springframework\.security/spring-security-.*@6\.5\.11$
+    </packageUrl>
+    <cve>CVE-2026-47841</cve>
+</suppress>
+
+<!-- CVE-2026-47842 - Spring Security 6.5.11 -->
+<suppress>
+    <notes><![CDATA[
+        CVE-2026-47842 - Spring Security 6.5.11.
+        Temporary suppression pending upgrade to a patched Spring version.
+    ]]></notes>
+    <packageUrl regex="true">
+        ^pkg:maven/org\.springframework\.security/spring-security-.*@6\.5\.11$
+    </packageUrl>
+    <cve>CVE-2026-47842</cve>
+</suppress>
 </suppressions>
