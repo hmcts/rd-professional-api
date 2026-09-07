@@ -5,13 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
@@ -50,15 +53,26 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String firstName = "firstName";
     String lastName = "lastName";
 
+    @Autowired
+    FeatureToggleService featureToggleService;
+
     @Test
     @DisplayName("PRD External Test Scenarios For V2 API")
     @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
         + ".createOrganisationUsingExternalController", withFeature = true)
     void testExternalUserScenario() {
+        assumeFeatureEnabled("OrganisationExternalControllerV2.retrievePaymentAccountByEmail");
+        assumeFeatureEnabled("OrganisationExternalControllerV2.retrieveOrganisationUsingOrgIdentifier");
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
         retrieveOrganisationPbaScenarios();
         findOrganisationScenarios();
+    }
+
+    private void assumeFeatureEnabled(String mapKey) {
+        String flagName = featureToggleService.getLaunchDarklyMap().get(mapKey);
+        Assumptions.assumeTrue(featureToggleService.isFlagEnabled("rd_professional_api", flagName),
+                flagName + " feature flag is not released");
     }
 
     public void setUpOrgTestData() {
