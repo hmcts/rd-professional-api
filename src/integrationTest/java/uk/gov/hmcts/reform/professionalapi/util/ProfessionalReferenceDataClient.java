@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationByProfileIdsRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UsersInOrganisationsByOrganisationIdentifiersRequest;
@@ -1028,9 +1029,46 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    public ResponseEntity<Map> updateOrgSraException(
+        OrganisationSraUpdateRequest organisationSraUpdateRequest, String role) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH +  "/sra";
+
+        HttpEntity<OrganisationSraUpdateRequest> requestEntity = new HttpEntity<>(organisationSraUpdateRequest,
+            getMultipleAuthHeaders(role));
+        responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        return responseEntity;
+    }
+
+    public Map<String, Object> updateOrgSra(
+        OrganisationSraUpdateRequest organisationSraUpdateRequest, String role) {
+
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH +  "/sra";
+        try {
+            HttpEntity<OrganisationSraUpdateRequest> requestEntity = new HttpEntity<>(organisationSraUpdateRequest,
+                    getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status",String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+        Map<String, Object> organisationResponse = new HashMap<>();
+        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        organisationResponse.put("response_body", responseEntity.getBody());
+        return organisationResponse;
+    }
+
+
     public Map<String, Object> retrieveUsersInOrganisationsByOrganisationIdentifiers(
-            UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
-            UUID searchAfterUser, UUID searchAfterOrganisation) {
+        UsersInOrganisationsByOrganisationIdentifiersRequest request, Integer pageSize,
+        UUID searchAfterUser, UUID searchAfterOrganisation) {
         StringBuilder sb = new StringBuilder(baseV2IntUrl)
                 .append("/users?");
         if (pageSize != null) {
@@ -1044,5 +1082,6 @@ public class ProfessionalReferenceDataClient {
         }
         String uriPath = sb.toString();
         return postRequest(uriPath, request, null, null);
+
     }
 }
