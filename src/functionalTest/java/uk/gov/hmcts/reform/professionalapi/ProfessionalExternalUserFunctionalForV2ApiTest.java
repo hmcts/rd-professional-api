@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 
+import com.launchdarkly.sdk.server.LDClient;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
@@ -9,12 +10,12 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.System.getenv;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -53,9 +55,6 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String firstName = "firstName";
     String lastName = "lastName";
 
-    @Autowired
-    FeatureToggleService featureToggleService;
-
     @Test
     @DisplayName("PRD External Test Scenarios For V2 API")
     @ToggleEnable(mapKey = "OrganisationExternalControllerV2"
@@ -70,9 +69,17 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     }
 
     private void assumeFeatureEnabled(String mapKey) {
+        FeatureToggleServiceImpl featureToggleService = getFeatureToggleService();
         String flagName = featureToggleService.getLaunchDarklyMap().get(mapKey);
         Assumptions.assumeTrue(featureToggleService.isFlagEnabled("rd_professional_api", flagName),
                 flagName + " feature flag is not released");
+    }
+
+    private FeatureToggleServiceImpl getFeatureToggleService() {
+        FeatureToggleServiceImpl featureToggleService = new FeatureToggleServiceImpl(new LDClient(getenv("LD_SDK_KEY")),
+                "rd");
+        ReflectionTestUtils.setField(featureToggleService, "environment", getenv("execution_environment"));
+        return featureToggleService;
     }
 
     public void setUpOrgTestData() {
