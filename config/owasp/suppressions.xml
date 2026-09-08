@@ -202,6 +202,7 @@
     </packageUrl>
     <cve>CVE-2026-47834</cve>
 </suppress>
+
 <!-- CVE-2026-41710 - Spring Retry 2.0.12 -->
 <suppress>
     <notes><![CDATA[
@@ -213,6 +214,7 @@
     </packageUrl>
     <cve>CVE-2026-41710</cve>
 </suppress>
+
 <!-- CVE-2026-47841 - Spring Security 6.5.11 -->
 <suppress>
     <notes><![CDATA[
@@ -224,6 +226,7 @@
     </packageUrl>
     <cve>CVE-2026-47841</cve>
 </suppress>
+
 <!-- CVE-2026-47842 - Spring Security 6.5.11 -->
 <suppress>
     <notes><![CDATA[
