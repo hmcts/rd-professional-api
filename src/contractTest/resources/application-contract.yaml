@@ -5,6 +5,7 @@ s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-c
 s2s-name: rd_professional_api
 
 idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
+idam.security.issuerValidation: ${JWT_ISSUER_VALIDATION_ENABLED:false}
 oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:}
 idam.auth.clientId: ${OAUTH2_CLIENT_ID:}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}

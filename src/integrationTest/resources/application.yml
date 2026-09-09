@@ -54,6 +54,8 @@ idam:
   client:
     redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
     id: rd-professional-api
+  security:
+    issuerValidation: ${JWT_ISSUER_VALIDATION_ENABLED:false}
 
 
 ## IDAM feign connection
