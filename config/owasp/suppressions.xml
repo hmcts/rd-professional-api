@@ -190,6 +190,7 @@
   <suppress>
         <notes>https://tools.hmcts.net/jira/browse/DTSRD-6685 spring cloud</notes>
         <cve>CVE-2026-59284</cve>
+        <cve>CVE-2026-47834</cve>  
   </suppress>
   <!-- CVE-2026-47834 - Spring Data JPA 3.5.12 -->
 <suppress>
