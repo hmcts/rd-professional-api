@@ -183,7 +183,7 @@ pmd {
 }
 
 checkstyle {
-  toolVersion = '12.3.1'
+  toolVersion = '13.7.0'
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
