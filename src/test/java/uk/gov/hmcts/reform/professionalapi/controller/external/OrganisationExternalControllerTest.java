@@ -351,7 +351,8 @@ class OrganisationExternalControllerTest {
         organisations.add(organisation1);
         OrganisationMinimalInfoResponse organisationMinimalInfoResponse = new OrganisationMinimalInfoResponse(
                 organisation1, true);
-        when(organisationServiceMock.getOrganisationByStatus(any())).thenReturn(organisations);
+        when(organisationServiceMock.getOrganisationByStatusWithContactInformations(any()))
+                .thenReturn(organisations);
 
         ResponseEntity<List<OrganisationMinimalInfoResponse>> responseEntity =
                 organisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional(
@@ -360,19 +361,20 @@ class OrganisationExternalControllerTest {
         assertThat(minimalInfoResponseList).usingRecursiveFieldByFieldElementComparator()
                 .contains(organisationMinimalInfoResponse);
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
-        verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());
+        verify(organisationServiceMock, times(1)).getOrganisationByStatusWithContactInformations(any());
 
     }
 
     @Test
     void test_retrieveAllOrganisationsByStatus_should_return_404_when_no_active_orgs_found() {
         ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
-        when(organisationServiceMock.getOrganisationByStatus(any())).thenReturn(new ArrayList<>());
+        when(organisationServiceMock.getOrganisationByStatusWithContactInformations(any()))
+                .thenReturn(new ArrayList<>());
         Throwable raisedException = catchThrowable(() -> organisationExternalController
                 .retrieveOrganisationsByStatusWithAddressDetailsOptional(ACTIVE.name(), true));
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessageStartingWith("No Organisations found");
-        verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());
+        verify(organisationServiceMock, times(1)).getOrganisationByStatusWithContactInformations(any());
     }
 
     @Test
