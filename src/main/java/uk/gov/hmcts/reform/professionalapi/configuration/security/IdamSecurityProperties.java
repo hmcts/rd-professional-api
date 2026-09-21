@@ -14,4 +14,5 @@ import java.util.List;
 @ConfigurationProperties(prefix = "idam.security")
 public class IdamSecurityProperties {
     private List<String> allowedIssuers = new ArrayList<>();
+    private boolean issuerValidation;
 }

@@ -7,19 +7,14 @@ import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
-import net.serenitybdd.annotations.WithTag;
-import net.serenitybdd.annotations.WithTags;
-import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -42,13 +37,12 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.wiremock.IdamResponseTransformer;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,7 +58,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -72,15 +65,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.decodeJwtToken;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
-import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwksResponse;
 
 @Configuration
-@ExtendWith(SerenityJUnit5Extension.class)
-@WithTags({@WithTag("testType:Integration")})
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
-        "USER_PROFILE_URL:http://127.0.0.1:8091"})
+@TestPropertySource(properties = {"USER_PROFILE_URL:http://127.0.0.1:8091"})
 @DirtiesContext
 @SuppressWarnings("checkstyle:Indentation")
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
@@ -118,16 +105,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public ProfessionalUserServiceImpl professionalUserServiceImpl;
 
     @RegisterExtension
-    public static WireMockExtension s2sService = new WireMockExtension(8990);
-
-    @RegisterExtension
-    public static WireMockExtension userProfileService = new WireMockExtension(8091, new ExternalTransformer());
-
-    @RegisterExtension
-    public static WireMockExtension sidamService = new WireMockExtension(5000, new ExternalTransformer());
-
-    @RegisterExtension
-    public static WireMockExtension mockHttpServerForOidc = new WireMockExtension(7000);
+    public static WireMockExtension userProfileService = new WireMockExtension(8091, new IdamResponseTransformer());
 
     @Value("${prd.security.roles.hmcts-admin}")
     protected String hmctsAdmin;
@@ -180,55 +158,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @MockitoBean
     protected FeatureToggleServiceImpl featureToggleService;
 
-    @MockitoBean
-    protected JwtDecoder jwtDecoder;
-
     @BeforeEach
     public void setUpClient() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration, jwtDecoder);
+        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
         when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
-    }
-
-    @BeforeEach
-    public void setupIdamStubs() throws Exception {
-        s2sService.resetAll();
-        sidamService.resetAll();
-        mockHttpServerForOidc.resetAll();
-
-        LinkedHashMap<String,Object> data = new LinkedHashMap<>();
-        data.put("id","%s");
-        data.put("uid","%s");
-        data.put("forename","Super");
-        data.put("surname","User");
-        data.put("email","dummy@email.com");
-        data.put("roles",List.of("%s"));
-
-        s2sService.stubFor(get(urlEqualTo("/details"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", APPLICATION_JSON)
-                        .withBody("rd_professional_api")));
-
-        s2sService.stubFor(post(urlEqualTo("/lease"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", APPLICATION_JSON)
-                        .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ"
-                                + ".UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2"
-                                + "AUgA")));
-
-        sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", APPLICATION_JSON)
-                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(data))
-                        .withTransformers("external_user-token-response")));
-
-        mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", APPLICATION_JSON)
-                        .withBody(getDynamicJwksResponse())));
     }
 
     @BeforeEach
@@ -245,7 +178,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                         .withHeader("Content-Type", APPLICATION_JSON)
                         .withStatus(200)
-                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(data))));
+                        .withBody(getObjectMapper().writeValueAsString(data))));
     }
 
     public void userProfileGetPendingUserWireMock() {
@@ -261,7 +194,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                     .withHeader("Content-Type", APPLICATION_JSON)
                     .withStatus(200)
-                    .withBody(WireMockUtil.getObjectMapper().writeValueAsString(data))));
+                    .withBody(getObjectMapper().writeValueAsString(data))));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -279,7 +212,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                     .withHeader("Content-Type", "application/json")
                     .withStatus(201)
-                    .withBody(WireMockUtil.getObjectMapper().writeValueAsString(data))));
+                    .withBody(getObjectMapper().writeValueAsString(data))));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -436,11 +369,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return professionalUserRepository.findByUserIdentifier(userId).getOrganisation().getOrganisationIdentifier();
     }
 
-    public void userProfileCreateUserWireMock(HttpStatus status)  {
+    public static void userProfileCreateUserWireMock(HttpStatus status)  {
         userProfileCreateUserWireMock("testFn", "R", "dummy@email.com", "testFn", "L", "dummy@email.com", status);
     }
 
-    public void userProfileCreateUserWireMock(String firstName,
+    public static void userProfileCreateUserWireMock(String firstName,
                                               String lastName,
                                               String email,
                                               String firstName2,
@@ -627,7 +560,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     .errorDescription("BAD REQUEST")
                     .timeStamp("23:10")
                     .build();
-                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                body = getObjectMapper().writeValueAsString(errorResponse);
                 returnHttpStatus = 400;
             } else if (status.value() == 404) {
                 errorResponse = ErrorResponse
@@ -636,7 +569,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     .errorDescription("No User found with the given ID")
                     .timeStamp("23:10")
                     .build();
-                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                body = getObjectMapper().writeValueAsString(errorResponse);
                 returnHttpStatus = 404;
             } else if (status.value() == 412) {
                 errorResponse = ErrorResponse
@@ -645,7 +578,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     .errorDescription("One or more of the Roles provided is already assigned to the User")
                     .timeStamp("23:10")
                     .build();
-                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                body = getObjectMapper().writeValueAsString(errorResponse);
                 returnHttpStatus = 412;
             } else if (status.is5xxServerError()) {
 
@@ -686,21 +619,21 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 HashMap<String, String> data = new HashMap<>();
                 data.put("idamId", UUID.randomUUID().toString());
                 data.put("idamRegistrationResponse", "201");
-                body = WireMockUtil.getObjectMapper().writeValueAsString(data);
+                body = getObjectMapper().writeValueAsString(data);
             } else if (status == HttpStatus.BAD_REQUEST) {
                 errorResponse = ErrorResponse.builder()
                     .errorMessage("3 : There is a problem with your request. Please check and try again")
                     .errorDescription("User is not in PENDING state")
                     .timeStamp("23:10")
                     .build();
-                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                body = getObjectMapper().writeValueAsString(errorResponse);
             } else if (status == HttpStatus.NOT_FOUND) {
                 errorResponse = ErrorResponse.builder()
                     .errorMessage("4 : Resource not found")
                     .errorDescription("could not find user profile")
                     .timeStamp("23:10")
                     .build();
-                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                body = getObjectMapper().writeValueAsString(errorResponse);
             } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
                 errorResponse = ErrorResponse.builder()
                     .errorMessage("10 : The request was last made less than 1 hour ago. Please try after some time")
@@ -708,7 +641,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         + " Please try after some time", resendInterval))
                     .timeStamp("23:10")
                     .build();
-                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                body = getObjectMapper().writeValueAsString(errorResponse);
             } else if (status == HttpStatus.CONFLICT) {
                 errorResponse = ErrorResponse.builder()
                     .errorMessage("7 : Resend invite failed as user is already active. Wait for one hour "
@@ -717,7 +650,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         + "Wait for %s minutes for the system to refresh.", syncInterval))
                     .timeStamp("23:10")
                     .build();
-                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                body = getObjectMapper().writeValueAsString(errorResponse);
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -750,7 +683,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     .timeStamp("23:10")
                     .build();
                 returnHttpStatus = 400;
-                body = WireMockUtil.getObjectMapper().writeValueAsString(errorResponse);
+                body = getObjectMapper().writeValueAsString(errorResponse);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
@@ -776,16 +709,16 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             if (status.is2xxSuccessful()) {
                 data.put("statusCode", "204");
                 data.put("message", "User Profile Deleted Successfully");
-                body = WireMockUtil.getObjectMapper().writeValueAsString(data);
+                body = getObjectMapper().writeValueAsString(data);
                 returnHttpStatus = 204;
             } else if (status == HttpStatus.BAD_REQUEST) {
                 data.put("statusCode", "400");
                 data.put("message", "User Profile Delete Request has some problem");
-                body = WireMockUtil.getObjectMapper().writeValueAsString(data);
+                body = getObjectMapper().writeValueAsString(data);
             } else if (status == HttpStatus.NOT_FOUND) {
                 data.put("statusCode", "404");
                 data.put("message", "User Profile Not Found To Delete");
-                body = WireMockUtil.getObjectMapper().writeValueAsString(data);
+                body = getObjectMapper().writeValueAsString(data);
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -876,31 +809,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
 
-    public static class ExternalTransformer extends ResponseTransformer {
-        @Override
-        public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
 
-            String formatResponse = response.getBodyAsString();
-
-            String token = request.getHeader("Authorization");
-            String tokenBody = decodeJwtToken(token.split(" ")[1]);
-            LinkedList tokenInfo = getUserIdAndRoleFromToken(tokenBody);
-            formatResponse = format(formatResponse, tokenInfo.get(1), tokenInfo.get(1), tokenInfo.get(0));
-
-            return Response.Builder.like(response)
-                    .but().body(formatResponse)
-                    .build();
-        }
-
-        @Override
-        public String getName() {
-            return "external_user-token-response";
-        }
-
-        public boolean applyGlobally() {
-            return false;
-        }
-    }
 
     public void updateOrganisationWithGivenRequest(OrganisationCreationRequest organisationUpdateRequest,
                                                    String organisationIdentifier, String role, String status) {

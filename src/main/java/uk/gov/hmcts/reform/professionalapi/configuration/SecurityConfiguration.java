@@ -117,7 +117,7 @@ public class SecurityConfiguration {
     private OAuth2TokenValidator<Jwt> getIssuerValidator(IdamSecurityProperties securityProperties) {
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
         OAuth2TokenValidator<Jwt> validator;
-        if (Boolean.parseBoolean(System.getProperty("idam.security.issuerValidation"))) {
+        if (securityProperties.isIssuerValidation()) {
             log.debug("Validating issuers");
             validator = new DelegatingOAuth2TokenValidator<>(withTimestamp,
                     allowedIssuersValidator(securityProperties.getAllowedIssuers())

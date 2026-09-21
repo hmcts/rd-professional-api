@@ -13,9 +13,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -48,10 +48,10 @@ import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
+import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateAuthToken;
+import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateS2SToken;
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application.yml")
@@ -68,7 +68,6 @@ public class ProfessionalReferenceDataClient {
     private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI"
             + "6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private final Integer prdApiPort;
-    private final JwtDecoder jwtDecode;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate = new RestTemplate();
     private String baseUrl;
@@ -82,23 +81,19 @@ public class ProfessionalReferenceDataClient {
     private String baseV2IntUrl;
 
     private String issuer;
-    private long expiration;
 
     public Map<String, String> bearerTokenMap = new HashMap<>();
 
 
     public ProfessionalReferenceDataClient(int port, String issuer,
-                                           Long tokenExpirationInterval,
-                                           JwtDecoder jwtDecode) {
+                                           Long tokenExpirationInterval) {
         this.prdApiPort = port;
-        this.jwtDecode = jwtDecode;
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
         this.baseV2Url = "http://localhost:" + prdApiPort + APP_EXT_V2_BASE_PATH;
         this.baseV2IntUrl = "http://localhost:" + prdApiPort + APP_INT_V2_BASE_PATH;
         this.baseBulkIntUrl = "http://localhost:" + prdApiPort + APP_INT_BULK;
         this.issuer = issuer;
-        this.expiration = tokenExpirationInterval;
     }
 
     public Map<String, Object> createOrganisation(OrganisationCreationRequest request) {
@@ -595,7 +590,6 @@ public class ProfessionalReferenceDataClient {
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
         String bearerToken = getAndReturnBearerToken(userId, role);
-        mockJwtToken(role, userId, bearerToken);
         headers.add("Authorization", bearerToken);
 
         return headers;
@@ -619,10 +613,19 @@ public class ProfessionalReferenceDataClient {
         return headers;
     }
 
-    private final String getBearerToken(String userId, String role) {
+    private String getBearerToken(String userId, String role) {
 
-        return generateToken(issuer, expiration, userId, role);
+        return generateAuthToken(issuer, false, userId, role);
 
+    }
+
+    public static HttpHeaders getHttpHeaders(String issuer, boolean isExpired, String userId, String role) {
+        HttpHeaders headers = new HttpHeaders();
+        var userAuthToken = generateAuthToken(issuer, isExpired, userId, role);
+        headers.setBearerAuth(userAuthToken);
+        headers.add(SERVICE_AUTHORIZATION, "Bearer " + generateS2SToken("rd_professional_api"));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
     }
 
     private HttpHeaders getS2sTokenHeaders() {
@@ -782,11 +785,6 @@ public class ProfessionalReferenceDataClient {
             throw new RuntimeException(e);
         }
         return createJwt(token, jwt);
-    }
-
-    public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
-        String[] bearerTokenArray = bearerToken.split(" ");
-        when(jwtDecode.decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
     }
 
 

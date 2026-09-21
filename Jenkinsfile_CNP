@@ -60,6 +60,9 @@ withPipeline(type, product, component) {
     
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.IDAM_SECURITY_ALLOWED_ISSUERS_0 = "https://idam-web-public.aat.platform.hmcts.net/o"
+    env.OPEN_ID_API_BASE_URI = "https://idam-web-public.aat.platform.hmcts.net/o"
+    env.JWT_ISSUER_VALIDATION_ENABLED = true
 
     before('functionalTest:preview') {
         env.execution_environment = "preview"
@@ -168,7 +171,7 @@ withPipeline(type, product, component) {
             keepAll              : true,
             reportDir            : "target/site/serenity/",
             reportFiles          : "index.html",
-            reportName           : "Functional Tests Report"
+            reportName           : "Functional Tests (Serenity) Report"
         ]
     }
 
