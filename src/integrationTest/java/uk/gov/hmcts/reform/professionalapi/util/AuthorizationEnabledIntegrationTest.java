@@ -7,8 +7,12 @@ import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +73,8 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 @Configuration
 @TestPropertySource(properties = {"USER_PROFILE_URL:http://127.0.0.1:8091"})
 @DirtiesContext
+@ExtendWith(SerenityJUnit5Extension.class)
+@WithTags({@WithTag("testType:Integration")})
 @SuppressWarnings("checkstyle:Indentation")
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
