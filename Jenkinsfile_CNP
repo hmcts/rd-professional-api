@@ -107,16 +107,6 @@ withPipeline(type, product, component) {
 
     afterAlways('sonarscan') {
 
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-        publishHTML target: [
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "target/site/serenity/",
-                reportFiles          : "index.html",
-                reportName           : "Integration Tests (Serenity) Report"
-        ]
-
         publishHTML target: [
             allowMissing         : true,
             alwaysLinkToLastBuild: true,
