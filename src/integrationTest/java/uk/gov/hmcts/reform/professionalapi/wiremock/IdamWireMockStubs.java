@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.wiremock;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.List;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static uk.gov.hmcts.reform.professionalapi.util.SpringBootIntegrationTest.getObjectMapper;
 
 public final class IdamWireMockStubs {
@@ -18,7 +16,6 @@ public final class IdamWireMockStubs {
     }
 
     public static void registerDefaults(WireMockServer server) {
-
         server.stubFor(
                 get(urlPathEqualTo("/o/userinfo"))
                         .atPriority(10)
@@ -32,39 +29,6 @@ public final class IdamWireMockStubs {
         );
     }
 
-    public static StubMapping stubIdamWithInvalidRole(WireMockServer server) {
-        try {
-
-            return server.stubFor(get(urlPathMatching("/o/userinfo.*"))
-                    .atPriority(1)
-                    .willReturn(aResponse()
-                            .withStatus(200)
-                            .withHeader("Content-Type", "application/json")
-                            .withHeader("Connection", "close")
-                            .withBody(getUserDetailsJson())
-                            .withTransformers("user-token-response")));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    public static StubMapping stubIdamWithGivenRoleAndStatus(WireMockServer server, String status, List<String> roles) {
-        try {
-
-            return server.stubFor(get(urlPathMatching("/o/userinfo.*"))
-                    .atPriority(1)
-                    .willReturn(aResponse()
-                            .withStatus(200)
-                            .withHeader("Content-Type", "application/json")
-                            .withHeader("Connection", "close")
-                            .withBody(getUserDetailsJson())
-                            .withTransformers("user-token-response")));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static String getUserDetailsJson() {
         try {
             LinkedHashMap<String, Object> data = new LinkedHashMap<>();
@@ -74,9 +38,7 @@ public final class IdamWireMockStubs {
             data.put("surname", "User");
             data.put("email", "dummy@email.com");
             data.put("roles", List.of("%s"));
-
             return getObjectMapper().writeValueAsString(data);
-
         } catch (Exception e) {
             throw new IllegalStateException("Unable to create IDAM userinfo response", e);
         }

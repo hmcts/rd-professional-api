@@ -13,7 +13,6 @@ public class S2sWireMockStubs {
     }
 
     public static void registerDefaults(WireMockServer server) {
-
         server.stubFor(get(urlEqualTo("/details"))
                 .willReturn(aResponse()
                         .withStatus(200)

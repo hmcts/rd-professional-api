@@ -66,7 +66,7 @@ public class IdamResponseTransformer extends ResponseTransformer {
         }
     }
 
-    private static String @NonNull [] getParts(SignedJWT signedJwt) throws ParseException {
+    private static @NonNull String[] getParts(SignedJWT signedJwt) throws ParseException {
         String subject = signedJwt.getJWTClaimsSet().getSubject();
 
         if (subject == null || subject.isBlank()) {

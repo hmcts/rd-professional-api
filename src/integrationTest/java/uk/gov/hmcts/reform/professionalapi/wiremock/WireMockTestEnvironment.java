@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.wiremock;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 public final class WireMockTestEnvironment {
@@ -15,10 +17,7 @@ public final class WireMockTestEnvironment {
     private static final WireMockServer S2S_MOCK_SERVER =
             new WireMockServer(wireMockConfig().dynamicPort());
 
-    private static boolean started;
-
-    private WireMockTestEnvironment() {
-    }
+    private static final AtomicBoolean STARTED = new AtomicBoolean(false);
 
     static {
         Runtime.getRuntime().addShutdownHook(
@@ -26,8 +25,11 @@ public final class WireMockTestEnvironment {
         );
     }
 
-    public static synchronized void start() {
-        if (started) {
+    private WireMockTestEnvironment() {
+    }
+
+    public static void start() {
+        if (!STARTED.compareAndSet(false, true)) {
             return;
         }
 
@@ -35,8 +37,6 @@ public final class WireMockTestEnvironment {
             startOidcMockServer();
             startIdamMockServer();
             startS2sMockServer();
-
-            started = true;
         } catch (RuntimeException e) {
             stop();
             throw e;
@@ -88,12 +88,12 @@ public final class WireMockTestEnvironment {
         return "http://127.0.0.1:" + S2S_MOCK_SERVER.port();
     }
 
-    public static synchronized void stop() {
+    public static void stop() {
         stopServer(OIDC_MOCK_SERVER);
         stopServer(IDAM_MOCK_SERVER);
         stopServer(S2S_MOCK_SERVER);
 
-        started = false;
+        STARTED.set(false);
     }
 
     private static void stopServer(WireMockServer server) {
