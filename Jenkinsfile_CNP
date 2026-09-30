@@ -156,7 +156,7 @@ withPipeline(type, product, component) {
            keepAll              : true,
            reportDir            : "target/site/serenity/",
            reportFiles          : "index.html",
-           reportName           : "Functional Tests Report"
+           reportName           : "Functional Tests (Serenity) Report"
        ]
    }
 
@@ -168,7 +168,7 @@ withPipeline(type, product, component) {
             keepAll              : true,
             reportDir            : "target/site/serenity/",
             reportFiles          : "index.html",
-            reportName           : "Functional Tests Report"
+            reportName           : "Functional Tests (Serenity) Report"
         ]
     }
 
