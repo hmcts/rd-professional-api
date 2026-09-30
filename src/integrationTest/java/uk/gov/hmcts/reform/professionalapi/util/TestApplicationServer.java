@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationListener;
 public class TestApplicationServer
         implements ApplicationListener<WebServerInitializedEvent> {
 
-    private volatile int serverPort;
+    private int serverPort;
 
     public String getBaseUrl() {
         return "http://127.0.0.1:" + serverPort;
