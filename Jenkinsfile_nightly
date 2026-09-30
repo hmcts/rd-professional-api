@@ -89,7 +89,7 @@ withNightlyPipeline(type, product, component) {
                 keepAll              : true,
                 reportDir            : "target/site/serenity/",
                 reportFiles          : "index.html",
-                reportName           : "Functional Tests Report"
+                reportName           : "Functional Tests (Serenity) Report"
         ]
 
         print "calling delete script for nightly"
