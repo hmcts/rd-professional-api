@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 
-@Getter
+@Getter 
 public class TestApplicationServer
         implements ApplicationListener<WebServerInitializedEvent> {
 
