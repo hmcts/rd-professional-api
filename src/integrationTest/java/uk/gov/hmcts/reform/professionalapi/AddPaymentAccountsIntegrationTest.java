@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.util.WireMockUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -462,7 +461,7 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
         data.put("paymentAccounts", ImmutableList
             .of("PBAKQNROCA","PBA00000000","PBAKQNR1CA","PBAC013ABE","null"));
 
-        PbaRequest pbaRequest = convertJsonReqStringToObj(WireMockUtil.getObjectMapper().writeValueAsString(data));
+        PbaRequest pbaRequest = convertJsonReqStringToObj(getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
@@ -503,7 +502,7 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
         LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
         data.put("paymentBccounts", ImmutableList
             .of("PBAKQNROCA","PBA00000000","PBAKQNR1CA","PBAC013ABE","null"));
-        PbaRequest pbaRequest = convertJsonReqStringToObj(WireMockUtil.getObjectMapper().writeValueAsString(data));
+        PbaRequest pbaRequest = convertJsonReqStringToObj(getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
@@ -521,7 +520,7 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
         LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
         data.put("PaymentAccounts", ImmutableList.of("PBAKQNROCA"));
-        PbaRequest pbaRequest = convertJsonReqStringToObj(WireMockUtil.getObjectMapper().writeValueAsString(data));
+        PbaRequest pbaRequest = convertJsonReqStringToObj(getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
