@@ -60,6 +60,8 @@ public interface OrganisationService {
 
     List<Organisation> getOrganisationByStatus(OrganisationStatus status);
 
+    List<Organisation> getOrganisationByStatusWithContactInformations(OrganisationStatus status);
+
     List<PaymentAccount> addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation,
                                                      boolean pbasValidated, boolean isEditPba);
 
