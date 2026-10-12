@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationSraUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
@@ -27,6 +28,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOr
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateOrgSraResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdateSraResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -47,6 +50,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Collections.singletonList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -88,6 +92,7 @@ class OrganisationInternalControllerV2Test {
 
     private List<PrdEnum> prdEnumList;
 
+    private OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateRequest;
 
     @InjectMocks
     private OrganisationInternalControllerV2 organisationInternalController;
@@ -128,7 +133,6 @@ class OrganisationInternalControllerV2Test {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         organisation.setOrganisationIdentifier("AK57L4T");
-
         organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING",
                 "Status message",
                 "sra-id", "false", "number02", "company-url",
@@ -334,5 +338,64 @@ class OrganisationInternalControllerV2Test {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserById(any());
     }
+
+    @Test
+    void testUpdateOrgSraId() {
+        String newSraId1 = randomAlphabetic(7);
+        String newSraId2 = randomAlphabetic(7);
+        Organisation organisation1 = new Organisation("Org-Name-1", OrganisationStatus.ACTIVE, "sra-id",
+            "companyN", false, "www.org.com");
+        Organisation organisation2 = new Organisation("Org-Name-2", OrganisationStatus.ACTIVE, "sra-id-0",
+            "companyN", false, "www.org.com");
+
+        OrganisationSraUpdateRequest organisationNameUpdateRequest = new OrganisationSraUpdateRequest();
+        List<OrganisationSraUpdateRequest.OrganisationSraUpdateData> organisationSraUpdateDataList
+            = new ArrayList<>();
+        OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData1 =
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(
+                organisation1.getOrganisationIdentifier(),newSraId1);
+        OrganisationSraUpdateRequest.OrganisationSraUpdateData organisationSraUpdateData2 =
+            new OrganisationSraUpdateRequest.OrganisationSraUpdateData(
+                organisation2.getOrganisationIdentifier(),newSraId2);
+        organisationSraUpdateDataList.add(organisationSraUpdateData1);
+        organisationSraUpdateDataList.add(organisationSraUpdateData2);
+        organisationNameUpdateRequest.setOrganisationSraUpdateDataList(organisationSraUpdateDataList);
+
+        final List<UpdateOrgSraResponse> updateOrgSraResponsesList = new ArrayList<>();
+
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+            .thenReturn(organisationMock);
+        when(organisationIdentifierValidatorImpl.validateOrganisationId(any(),
+            any(),any())).thenReturn(updateOrgSraResponsesList);
+
+        when(organisationServiceMock.updateOrganisationSra(any(),any(),any()))
+            .thenReturn(createResponse(updateOrgSraResponsesList,organisation1.getOrganisationIdentifier()));
+        UpdateSraResponse updateNameResponse = new UpdateSraResponse("success",
+            "All names updated successfully",null);
+        when(organisationServiceMock. generateUpdateSraResponse(any()))
+            .thenReturn(updateNameResponse);
+        UpdateSraResponse response = organisationInternalController.updateOrganisationSra(
+            organisationNameUpdateRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo("success");
+        assertThat(response.getMessage()).isEqualTo("All names updated successfully");
+
+        verify(organisationServiceMock, times(2)).updateOrganisationSra(
+            any(), any(),any());
+        verify(organisationServiceMock, times(2)).getOrganisationByOrgIdentifier(any());
+
+    }
+
+
+    private List<UpdateOrgSraResponse> createResponse(List<UpdateOrgSraResponse> responses,String orgId) {
+
+        responses.add(new UpdateOrgSraResponse(orgId,
+            "success", HttpStatus.OK.value(),"Name updated successfully"));
+
+        return responses;
+    }
+
+
 
 }
