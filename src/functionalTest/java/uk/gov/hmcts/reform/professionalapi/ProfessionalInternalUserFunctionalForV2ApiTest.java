@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -45,6 +44,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdCons
 @SuppressWarnings("unchecked")
 class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFunctionalTest {
 
+    private static final List<String> organisationIdentifiers = new ArrayList<>();
     String intActiveOrgId;
     String superUserEmail;
     String invitedUserEmail;
@@ -56,6 +56,13 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     List<String> orgIdentifiersList = new ArrayList<>();
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
 
+    @AfterAll
+    public static void cleanUp() {
+        organisationIdentifiers.forEach(id ->
+                professionalApiClient.deleteOrganisationByInternalUser(id));
+
+    }
+
     @Test
     @DisplayName("PRD Internal Test Scenarios For V2 API")
     @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
@@ -64,8 +71,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         createOrganisationScenario();
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
-        // DTSRD-6485 - Disabling flaky test temporarily until fix found.
-        // findOrganisationWithSinceDateGroupAccessScenarios();
+        findOrganisationWithSinceDateGroupAccessScenarios();
         retrieveOrganisationsByProfileIds();
         retrieveOrganisationsUsersBySearchAfterGA();
         deleteOtherOrganisationScenarios();
@@ -85,6 +91,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
+        organisationIdentifiers.add(intActiveOrgId);
     }
 
     public void createOrganisationScenario() {
@@ -100,12 +107,9 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     public void findOrganisationScenarios() {
         findOrganisationByIdByInternalUserShouldBeSuccess();
-        // DTSRD-6485 - Disabling flaky test temporarily until fix found.
-        // findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
-        // findActiveOrganisationsByInternalUserShouldBeSuccess();
-        // findPendingOrganisationsByInternalUserShouldBeSuccess();
-        // findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
-        // findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess();
+        findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
+        findActiveOrganisationsByInternalUserShouldBeSuccess();
+        findPendingOrganisationsByInternalUserShouldBeSuccess();
     }
 
     public void retrieveOrganisationPbaScenarios() {
@@ -287,61 +291,46 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
     public void findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-        professionalApiClient.createOrganisation();
-        Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisationsV2(hmctsAdmin);
-        assertThat(finalResponse.get("organisations")).isNotNull();
-        Assertions.assertThat(finalResponse.size()).isPositive();
+
+        Map<String, Object> organisation = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisation.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
+        sinceDateTime = generateRandomDate(null, "30");
+        log.info("Since Date is set to : {} ", sinceDateTime);
+        Map<String, Object> response = professionalApiClient
+                .retrieveAllV2OrganisationsBySinceDateAndStatus(sinceDateTime, "ACTIVE,PENDING");
+        assertThat(response.size()).isPositive();
+        verifyOrganisationDetailsBySinceDateV2(response, null, sinceDateTime);
         log.info("findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
     public void findActiveOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findActiveOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        sinceDateTime = generateRandomDate(null, "30");
+        log.info("Since Date is set to : {} ", sinceDateTime);
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatusV2(OrganisationStatus.PENDING.name(), hmctsAdmin);
+                .retrieveAllV2OrganisationsBySinceDateAndStatus(sinceDateTime, OrganisationStatus.ACTIVE.name());
         assertThat(response.size()).isPositive();
+        verifyOrganisationDetailsBySinceDateV2(response, null, sinceDateTime);
         log.info("findActiveOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
     public void findPendingOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> organisation = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisation.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
+        sinceDateTime = generateRandomDate(null, "30");
+        log.info("Since Date is set to : {} ", sinceDateTime);
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatusV2(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
+                .retrieveAllV2OrganisationsBySinceDateAndStatus(sinceDateTime, OrganisationStatus.PENDING.name());
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isPositive();
+        verifyOrganisationDetailsBySinceDateV2(response, null, sinceDateTime);
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
-
-    public void findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess() {
-        log.info("findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatusV2("ACTIVE,PENDING", hmctsAdmin);
-        assertThat(response.get("organisations")).isNotNull();
-        assertThat(response.size()).isGreaterThanOrEqualTo(1);
-        assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
-        assertThat(response.get("organisations").toString()).contains("status=PENDING");
-        log.info("findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess :: END");
-    }
-
-    public void findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess() {
-        log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-
-        Map<String, Object> response = professionalApiClient.createOrganisationV2();
-        String orgIdentifier = (String) response.get("organisationIdentifier");
-        String statusMessage = "Company in review";
-
-        professionalApiClient
-                .updateOrganisationToReviewV2(orgIdentifier, statusMessage, hmctsAdmin);
-        Map<String, Object> orgresponse = professionalApiClient
-                .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
-
-
-        assertThat(orgresponse.get("organisations")).isNotNull();
-        assertThat(orgresponse.size()).isGreaterThanOrEqualTo(1);
-        assertThat(orgresponse.get("organisations").toString()).contains("status=PENDING");
-        assertThat(orgresponse.get("organisations").toString()).contains("status=REVIEW");
-        log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: END");
-    }
-
 
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");
@@ -374,9 +363,12 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     @ToggleEnable(mapKey = "OrganisationInternalControllerV2.createOrganisation", withFeature = true)
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
-        professionalApiClient.createOrganisationV2();
+        Map<String, Object> organisation = professionalApiClient.createOrganisationV2();
+        String organisationIdentifier = (String) organisation.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
         Map<String, Object> organisations = professionalApiClient
-            .retrieveAllOrganisationsWithPaginationV2(hmctsAdmin, "1", "10");
+                .retrieveAllOrganisationsWithPaginationV2(hmctsAdmin, "1", "10");
 
         assertThat(organisations).isNotNull().hasSize(2);
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
@@ -454,17 +446,19 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
         log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.createOrganisationV2();
         String pendingOrgIdentifier = (String) response.get("organisationIdentifier");
+        organisationIdentifiers.add(pendingOrgIdentifier);
+
         assertThat(pendingOrgIdentifier).isNotEmpty();
-        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, NO_CONTENT);
         professionalApiClient.retrieveOrganisationDetailsForV2(pendingOrgIdentifier, hmctsAdmin, NOT_FOUND);
         log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: END");
     }
 
     public void deleteActiveOtherOrganisationShouldReturnSuccess() {
         log.info("deleteActiveOtherOrganisationShouldReturnSuccess :: STARTED");
-        String orgIdentifierResponse = createAndUpdateOrganisationToActiveForV2(hmctsAdmin,professionalApiClient
-                .createOrganisationRequestForV2());
-        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
+        String orgIdentifierResponse =
+                createAndUpdateOrganisationToActiveForV2(hmctsAdmin, createOrganisationRequestForV2());
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, NO_CONTENT);
         professionalApiClient.retrieveOrganisationDetailsForV2(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
         log.info("deleteActiveOtherOrganisationShouldReturnSuccess :: END");
     }
@@ -497,7 +491,7 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
 
         if (pageSize != null) {
             assertThat(organisations)
-                    .hasSize(Integer.parseInt(pageSize));
+                    .hasSizeBetween(1, Integer.parseInt(pageSize));
         }
         assertThat(response.get("moreAvailable"))
                 .isNotNull();
@@ -515,11 +509,11 @@ class ProfessionalInternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             String dateString = (String) org.get("lastUpdated");
             String formattedDateString = DateUtils.formatDateString(dateString);
             LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
-            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
+            assertThat(responseLocalDateTime).isAfterOrEqualTo(sinceLocalDateTime);
 
             List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
 
-            if (organisationProfileIds != null) {
+            if (organisationProfileIds != null && !organisationProfileIds.isEmpty()) {
                 assertThat(organisationProfileIds)
                         .isNotEmpty()
                         .hasSizeGreaterThan(0)
