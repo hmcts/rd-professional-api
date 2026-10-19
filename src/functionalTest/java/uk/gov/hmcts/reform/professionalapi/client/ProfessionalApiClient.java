@@ -1580,7 +1580,7 @@ public class ProfessionalApiClient {
             .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
 
-    private RequestSpecification getMultipleAuthHeadersInternal() {
+    public RequestSpecification getMultipleAuthHeadersInternal() {
         return getMultipleAuthHeaders(idamOpenIdClient.getcwdAdminOpenIdToken("prd-admin"));
     }
 
@@ -1702,6 +1702,24 @@ public class ProfessionalApiClient {
         log.info("{}:: Delete PBA of organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
     }
+
+    public void deletePaymentAccountsOfOrganisationInternal(PbaRequest deletePbaRequest,
+                                                    RequestSpecification requestSpecification,
+                                                    String organisationIdentifier,
+                                                    HttpStatus expectedStatus) {
+        Response response = requestSpecification
+            .body(deletePbaRequest)
+            .delete("/refdata/internal/v1/organisations/pba/" + organisationIdentifier)
+            .andReturn();
+
+        response.then()
+            .assertThat()
+            .statusCode(expectedStatus.value());
+
+        log.info("{}:: Delete PBA of organisation status response: {}",
+            loggingComponentName, response.getStatusCode());
+    }
+
 
     public Object findOrganisationsByPbaStatus(HttpStatus expectedStatus, PbaStatus pbaStatus) {
 
