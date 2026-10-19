@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,9 +52,15 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
     String superUserEmail;
     String superUserId;
 
+    private static final List<String> organisationIdentifiers = new ArrayList<>();
     OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
-    String firstName = "firstName";
-    String lastName = "lastName";
+
+    @AfterAll
+    public static void cleanUp() {
+        organisationIdentifiers.forEach(id ->
+                professionalApiClient.deleteOrganisationByInternalUser(id));
+
+    }
 
     @Test
     @DisplayName("PRD External Test Scenarios For V2 API")
@@ -99,6 +106,7 @@ class ProfessionalExternalUserFunctionalForV2ApiTest extends AuthorizationFuncti
             List<Map<String, Object>> professionalUsersResponses =
                     (List<Map<String, Object>>) searchResponse.get("users");
             superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+            organisationIdentifiers.add(extActiveOrgId);
         }
     }
 
