@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
 
 public final class DateUtils {
     public static String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
@@ -31,13 +34,13 @@ public final class DateUtils {
     }
 
     public static String generateRandomDate(String daysToMinus, String minToMinus) {
-        LocalDateTime localDateTimeNow = LocalDateTime.now();
-        LocalDateTime localDateTime = convertStringToLocalDate(localDateTimeNow.toString());
+        Clock clock = Clock.systemUTC();
+        LocalDateTime localDateTime = LocalDateTime.now(clock);
         if (daysToMinus != null) {
             localDateTime = localDateTime.minusDays(Integer.parseInt(daysToMinus));
         } else if (minToMinus != null) {
             localDateTime = localDateTime.minusMinutes(Integer.parseInt(minToMinus));
         }
-        return localDateTime.toString().trim();
+        return localDateTime.format(ISO_DATE_TIME_FORMATTER);
     }
 }
