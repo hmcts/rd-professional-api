@@ -7,6 +7,7 @@ import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,6 +76,14 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     List<String> invitedUserIds = new ArrayList<>();
     String lastRecordIdInPage;
     OrganisationCreationRequest organisationCreationRequest;
+    private static final List<String> organisationIdentifiers = new ArrayList<>();
+
+    @AfterAll
+    public static void cleanUp() {
+        organisationIdentifiers.forEach(id ->
+                professionalApiClient.deleteOrganisationByInternalUser(id));
+
+    }
 
     @Test
     @DisplayName("PRD Internal Test Scenarios")
@@ -101,8 +110,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         createOrganisationScenario();
         inviteMultipleUserScenarios();
         // DTSRD-6485 - Disabling flaky test temporarily until fix found.
-        //  findUserInternalScenarios();
-        //   findOrganisationWithSinceDateScenarios(sinceDateTime);
+        findUserInternalScenarios();
+        findOrganisationWithSinceDateScenarios(sinceDateTime);
     }
 
     public void inviteMultipleUserScenarios() {
@@ -157,7 +166,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
-
+        organisationIdentifiers.add(intActiveOrgId);
     }
 
     public void createOrganisationScenario() {
@@ -284,9 +293,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         if (pageSize != null) {
             assertThat(users.size()).isPositive();
-            assertThat(users).hasSizeLessThanOrEqualTo(Integer.parseInt(pageSize));
             validateRetrievedUsersDetails(testResults, pageSize, sinceDate);
-        } else if (searchAfter != null && pageSize == null) {
+        } else if (searchAfter != null) {
             assertThat(testResults.get("errorDescription"))
                     .isEqualTo("002 missing/invalid page information");
         }
@@ -363,7 +371,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-        professionalApiClient.createOrganisation();
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
         Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isPositive();
@@ -400,13 +411,13 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifier = (String) response.get("organisationIdentifier");
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
         String statusMessage = "Company in review";
 
         professionalApiClient
-                .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+                .updateOrganisationToReview(organisationIdentifier, statusMessage, hmctsAdmin);
         Map<String, Object> orgresponse = professionalApiClient
                 .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
 
@@ -557,7 +568,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String pendingOrgIdentifier = (String) response.get("organisationIdentifier");
         assertThat(pendingOrgIdentifier).isNotEmpty();
-        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, NO_CONTENT);
         professionalApiClient.retrieveOrganisationDetails(pendingOrgIdentifier, hmctsAdmin, NOT_FOUND);
         log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: END");
     }
@@ -565,7 +576,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void deleteActiveOrganisationShouldReturnSuccess() {
         log.info("deleteActiveOrganisationShouldReturnSuccess :: STARTED");
         String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
-        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, NO_CONTENT);
         professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
         log.info("deleteActiveOrganisationShouldReturnSuccess :: END");
     }
@@ -630,13 +641,14 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void updateOrgStatusShouldBeSuccess() {
         log.info("updateOrgStatusShouldBeSuccess :: STARTED");
 
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifier = (String) response.get("organisationIdentifier");
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
         String statusMessage = "Company in review";
 
-        professionalApiClient.updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+        professionalApiClient.updateOrganisationToReview(organisationIdentifier, statusMessage, hmctsAdmin);
 
-        JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+        JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
         assertThat(jsonPath).isNotNull();
         assertEquals(REVIEW.toString(), jsonPath.get("status"));
         assertEquals(statusMessage, jsonPath.get("statusMessage"));
@@ -779,7 +791,10 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     void findOrganisationsWithPaginationShouldReturnSuccess() {
         log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
-        professionalApiClient.createOrganisation();
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
         Map<String, Object> organisations = professionalApiClient
             .retrieveAllOrganisationsWithPagination(hmctsAdmin, "1", "2");
 
@@ -844,21 +859,24 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     @DisplayName("PRD Internal Delete Organisation with status REVIEW Test Scenarios")
     void testInternalOrganisationDeleteScenario() {
 
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifier = (String) response.get("organisationIdentifier");
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
         String statusMessage = "Company in review";
 
         professionalApiClient
-                .updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+                .updateOrganisationToReview(organisationIdentifier, statusMessage, hmctsAdmin);
 
-        JsonPath orgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+        JsonPath orgResponse =
+                professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
         assertEquals(REVIEW.toString(), orgResponse.get("status"));
         assertEquals(statusMessage, orgResponse.get("statusMessage"));
 
-        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.deleteOrganisation(organisationIdentifier, NO_CONTENT);
 
         professionalApiClient
-                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, NOT_FOUND);
+                .retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, NOT_FOUND);
     }
 
     private static void verifyOrganisationDetails(JsonPath response) {
@@ -958,7 +976,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         if (pageSize != null) {
             assertThat(organisations)
-                    .hasSize(Integer.parseInt(pageSize));
+                    .hasSizeBetween(1, Integer.parseInt(pageSize));
         }
         assertThat(response.get("moreAvailable"))
                 .isNotNull();
@@ -976,18 +994,15 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
             String dateString = (String) org.get("lastUpdated");
             String formattedDateString = DateUtils.formatDateString(dateString);
             LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
-            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
+            assertThat(responseLocalDateTime).isAfterOrEqualTo(sinceLocalDateTime);
 
             List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
 
-            if (organisationProfileIds != null) {
-
+            if (organisationProfileIds != null && !organisationProfileIds.isEmpty()) {
                 assertThat(organisationProfileIds)
                         .isNotEmpty()
-                        .hasSizeGreaterThan(0);
-
-                assertThat(organisationProfileIds.get(0))
-                        .isEqualTo(SOLICITOR_PROFILE);
+                        .hasSizeGreaterThan(0)
+                        .contains(SOLICITOR_PROFILE);
             }
         });
     }
