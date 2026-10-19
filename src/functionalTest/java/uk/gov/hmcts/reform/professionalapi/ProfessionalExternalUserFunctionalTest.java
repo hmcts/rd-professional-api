@@ -6,6 +6,7 @@ import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,6 +76,14 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     OrganisationCreationRequest organisationCreationRequest;
     String firstName = "firstName";
     String lastName = "lastName";
+    private static final List<String> organisationIdentifiers = new ArrayList<>();
+
+    @AfterAll
+    public static void cleanUp() {
+        organisationIdentifiers.forEach(id ->
+                professionalApiClient.deleteOrganisationByInternalUser(id));
+
+    }
 
     @Test
     @DisplayName("PRD External Test Scenarios")
@@ -125,6 +134,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
             List<Map<String, Object>> professionalUsersResponses =
                     (List<Map<String, Object>>) searchResponse.get("users");
             superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+            organisationIdentifiers.add(extActiveOrgId);
         }
     }
 
@@ -276,7 +286,10 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
                 .superUser(superUserRequest)
                 .status("ACTIVE").build();
-        createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+
+        String organisationIdentifier =
+                createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+        organisationIdentifiers.add(organisationIdentifier);
 
         NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
 
@@ -368,6 +381,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
         String extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
                 hmctsAdmin);
+        organisationIdentifiers.add(extActiveOrgId);
 
         String bearerToken = inviteUser(puiCaseManager, extActiveOrgId, generateRandomEmail(),
                 "firstName2", "lastName2");
