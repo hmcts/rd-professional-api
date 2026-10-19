@@ -616,10 +616,15 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> retrieveAllOrganisationsV2(String role) {
+    public Map<String, Object> retrieveAllV2OrganisationsBySinceDateAndStatus(String sinceDateTime, String status) {
+        StringBuilder v2BaseURL = new StringBuilder(INTERNAL_BASE_URL_V2);
+        v2BaseURL
+                .append("?since=").append(sinceDateTime)
+                .append("&status=").append(status);
+
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
-                .get("/refdata/internal/v2/organisations?since=2026-01-10T00:00:00")
+                .get(v2BaseURL.toString())
                 .andReturn();
 
 
@@ -627,7 +632,8 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(OK.value());
 
-        log.info("{}:: Retrieve all orgs (Internal) response: {}", loggingComponentName, response.statusCode());
+        log.info("{}:: Retrieve all V2 orgs (Internal) by since and status response: {}", loggingComponentName,
+                response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -1196,13 +1202,13 @@ public class ProfessionalApiClient {
 
     public JsonPath retrieveOrganisationByUserId(String userId, HttpStatus status) {
 
-        Response response = getMultipleAuthHeadersInternal().log().all()
+        Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/orgDetails/" + userId)
                 .andReturn();
 
         log.info("{}:: find org by userId (Internal): {}", loggingComponentName, response.statusCode());
 
-        response.then().log().all()
+        response.then()
                 .assertThat()
                 .statusCode(status.value());
 
@@ -1536,7 +1542,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Response deleteOrganisation(String organisationId, String role, HttpStatus status) {
+    public Response deleteOrganisation(String organisationId, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
             .delete("/refdata/internal/v1/organisations/" + organisationId)
             .andReturn();
@@ -1550,21 +1556,15 @@ public class ProfessionalApiClient {
         return response;
     }
 
-    public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
+    public void deleteOrganisationByInternalUser(String organisationId) {
         Response response = getMultipleAuthHeadersInternal()
             .body("")
-            .delete("/refdata/external/v1/organisations/" + organisationId)
+            .delete("/refdata/internal/v1/organisations/" + organisationId)
             .andReturn();
 
         if (response.statusCode() != NO_CONTENT.value()) {
             log.info("{}:: Delete organisation response: {}", loggingComponentName, response.asString());
         }
-
-        response.then()
-            .assertThat()
-            .statusCode(status.value());
-
-
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
