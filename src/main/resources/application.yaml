@@ -5,16 +5,14 @@ management:
   endpoint:
     loggers:
       enabled: false
+    health:
+      show-details: "always"
   endpoints:
     jmx:
       exposure:
         include: 'health'
     web:
       base-path: "/"
-  endpoint:
-    health:
-      show-details: "always"
-
 spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
