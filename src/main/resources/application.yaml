@@ -2,6 +2,9 @@ server:
   port: ${PORT:8090}
 
 management:
+  endpoint:
+    loggers:
+      enabled: false
   endpoints:
     jmx:
       exposure:
@@ -104,10 +107,6 @@ security:
     - "/error"
     - "/favicon.ico"
 
-management:
-  endpoint:
-    loggers:
-      enabled: false
 ### dependency configuration
 idam:
   s2s-auth:
