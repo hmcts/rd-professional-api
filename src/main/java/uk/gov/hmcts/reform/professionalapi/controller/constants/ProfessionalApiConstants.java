@@ -8,7 +8,7 @@ public class ProfessionalApiConstants {
     }
 
     public static final String EMAIL_REGEX = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
-            + "[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+            + "[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,63}$";
 
     public static final int LENGTH_OF_UUID = 36;
     public static final int LENGTH_OF_ORGANISATION_IDENTIFIER = 7;
