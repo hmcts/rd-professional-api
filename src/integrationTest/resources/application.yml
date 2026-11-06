@@ -165,7 +165,6 @@ security:
     - "/health/readiness"
     - "/health/liveness"
     - "/actuator/**"
-    - "/loggers/**"
     - "/swagger-ui.html"
     - "/swagger-resources/**"
     - "/v3/**"
@@ -174,3 +173,8 @@ security:
     - "/csrf"
     - "/error"
     - "/favicon.ico"
+
+management:
+  endpoint:
+    loggers:
+      enabled: false
