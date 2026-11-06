@@ -145,7 +145,6 @@ class SecurityConfigurationTest {
                 "/health/liveness",
                 "/health/readiness",
                 "/status/health",
-                "/loggers/**",
                 "/");
 
         config.setAnonymousPaths(anonymousPaths);
