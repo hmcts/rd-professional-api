@@ -1,4 +1,4 @@
-BEGIN;
+begin;
 
 create temp table tmp_prd_user_ids on
 commit drop as
@@ -9,7 +9,6 @@ from
 where
     pu.email_address like '%@prdfunctestuser.com'
   and pu.created <= CURRENT_TIMESTAMP - interval '1 hour';
-
 
 create temp table tmp_org_ids on
 commit drop as
@@ -23,72 +22,369 @@ where
     pu.email_address like '%@prdfunctestuser.com'
   and pu.created <= CURRENT_TIMESTAMP - interval '1 hour';
 
-CREATE TEMP TABLE tmp_contacts_ids ON COMMIT DROP AS
-SELECT c.id
-FROM dbrefdata.contact_information c
-         JOIN tmp_org_ids t
-              ON c.organisation_id = t.id;
-
-
+create
+temp table tmp_contacts_ids on
+commit drop
+as
+select
+    c.id
+from
+    dbrefdata.contact_information c
+        join tmp_org_ids t
+             on
+                 c.organisation_id = t.id;
 -- BEFORE deleting counts
-SELECT 'user_attribute' AS table_name, count(*) AS before_delete_count FROM dbrefdata.user_attribute WHERE professional_user_id IN (SELECT id FROM tmp_prd_user_ids)
-UNION ALL
-SELECT 'user_account_map', count(*) FROM dbrefdata.user_account_map WHERE professional_user_id IN (SELECT id FROM tmp_prd_user_ids)
-UNION ALL
-SELECT 'professional_user', count(*) FROM dbrefdata.professional_user WHERE id IN (SELECT id FROM tmp_prd_user_ids)
-UNION ALL
-SELECT 'payment_account', count(*) FROM dbrefdata.payment_account WHERE organisation_id IN (SELECT id FROM tmp_org_ids)
-UNION ALL
-SELECT 'dx_address', count(*) FROM dbrefdata.dx_address WHERE contact_information_id IN (SELECT id FROM tmp_contacts_ids)
-UNION ALL
-SELECT 'contact_information', count(*) FROM dbrefdata.contact_information WHERE id IN (SELECT id FROM tmp_contacts_ids)
-UNION ALL
-SELECT 'organisation_mfa_status', count(*) FROM dbrefdata.organisation_mfa_status WHERE organisation_id IN (SELECT id FROM tmp_org_ids)
-UNION ALL
-SELECT 'org_attributes', count(*) FROM dbrefdata.org_attributes WHERE organisation_id IN (SELECT id FROM tmp_org_ids)
-UNION ALL
-SELECT 'organisation', count(*) FROM dbrefdata.organisation WHERE id IN (SELECT id FROM tmp_org_ids);
-
-
+select
+    'user_attribute' as table_name,
+    count(*) as before_delete_count
+from
+    dbrefdata.user_attribute
+where
+    professional_user_id in (
+        select
+            id
+        from
+            tmp_prd_user_ids)
+union all
+select
+    'user_account_map',
+    count(*)
+from
+    dbrefdata.user_account_map
+where
+    professional_user_id in (
+        select
+            id
+        from
+            tmp_prd_user_ids)
+union all
+select
+    'professional_user',
+    count(*)
+from
+    dbrefdata.professional_user
+where
+    id in (
+        select
+            id
+        from
+            tmp_prd_user_ids)
+union all
+select
+    'payment_account',
+    count(*)
+from
+    dbrefdata.payment_account
+where
+    organisation_id in (
+        select
+            id
+        from
+            tmp_org_ids)
+union all
+select
+    'dx_address',
+    count(*)
+from
+    dbrefdata.dx_address
+where
+    contact_information_id in (
+        select
+            id
+        from
+            tmp_contacts_ids)
+union all
+select
+    'contact_information',
+    count(*)
+from
+    dbrefdata.contact_information
+where
+    id in (
+        select
+            id
+        from
+            tmp_contacts_ids)
+union all
+select
+    'organisation_mfa_status',
+    count(*)
+from
+    dbrefdata.organisation_mfa_status
+where
+    organisation_id in (
+        select
+            id
+        from
+            tmp_org_ids)
+union all
+select
+    'org_attributes',
+    count(*)
+from
+    dbrefdata.org_attributes
+where
+    organisation_id in (
+        select
+            id
+        from
+            tmp_org_ids)
+union all
+select
+    'organisation',
+    count(*)
+from
+    dbrefdata.organisation
+where
+    id in (
+        select
+            id
+        from
+            tmp_org_ids);
 -- Deletes and prints the actual rows removed per table
-WITH del_user_attribute  AS (DELETE FROM dbrefdata.user_attribute  WHERE professional_user_id IN (SELECT id FROM tmp_prd_user_ids) RETURNING 1),
-    del_user_account_map  AS (DELETE FROM dbrefdata.user_account_map WHERE professional_user_id IN (SELECT id FROM tmp_prd_user_ids) RETURNING 1),
-    del_professional_user  AS (DELETE FROM dbrefdata.professional_user WHERE id IN (SELECT id FROM tmp_prd_user_ids) RETURNING 1),
-    del_payment_account AS (DELETE FROM dbrefdata.payment_account WHERE organisation_id IN (SELECT id FROM tmp_org_ids) RETURNING 1),
-    del_dx_address AS (DELETE FROM dbrefdata.dx_address WHERE contact_information_id IN (SELECT id FROM tmp_contacts_ids) RETURNING 1),
-    del_contact_information AS (DELETE FROM dbrefdata.contact_information WHERE id IN (SELECT id FROM tmp_contacts_ids) RETURNING 1),
-    del_organisation_mfa_status AS (DELETE FROM dbrefdata.organisation_mfa_status WHERE organisation_id IN (SELECT id FROM tmp_org_ids) RETURNING 1),
-    del_org_attributes AS (DELETE FROM dbrefdata.org_attributes WHERE organisation_id IN (SELECT id FROM tmp_org_ids) RETURNING 1),
-    del_organisation AS (DELETE FROM dbrefdata.organisation WHERE id IN (SELECT id FROM tmp_org_ids) RETURNING 1)
-SELECT (SELECT count(*) FROM del_user_attribute)      	  AS deleted_user_attribute,
-       (SELECT count(*) FROM del_user_account_map)    	  AS deleted_user_account_map,
-       (SELECT count(*) FROM del_professional_user)    	  AS deleted_professional_user,
-       (SELECT count(*) FROM del_payment_account)     	  AS deleted_payment_account,
-       (SELECT count(*) FROM del_dx_address)          	  AS deleted_dx_address,
-       (SELECT count(*) FROM del_contact_information) 	  AS deleted_contact_information,
-       (SELECT count(*) FROM del_organisation_mfa_status) AS deleted_organisation_mfa_status,
-       (SELECT count(*) FROM del_org_attributes)          AS deleted_org_attributes,
-       (SELECT count(*) FROM del_organisation)            AS deleted_organisation;
-
-
+with del_user_attribute as (
+delete
+from
+    dbrefdata.user_attribute
+where
+    professional_user_id in (
+        select
+            id
+        from
+            tmp_prd_user_ids) returning 1),
+    del_user_account_map as (
+delete
+from
+    dbrefdata.user_account_map
+where
+    professional_user_id in (
+    select
+    id
+    from
+    tmp_prd_user_ids) returning 1),
+    del_professional_user as (
+delete
+from
+    dbrefdata.professional_user
+where
+    id in (
+    select
+    id
+    from
+    tmp_prd_user_ids) returning 1),
+    del_payment_account as (
+delete
+from
+    dbrefdata.payment_account
+where
+    organisation_id in (
+    select
+    id
+    from
+    tmp_org_ids) returning 1),
+    del_dx_address as (
+delete
+from
+    dbrefdata.dx_address
+where
+    contact_information_id in (
+    select
+    id
+    from
+    tmp_contacts_ids) returning 1),
+    del_contact_information as (
+delete
+from
+    dbrefdata.contact_information
+where
+    id in (
+    select
+    id
+    from
+    tmp_contacts_ids) returning 1),
+    del_organisation_mfa_status as (
+delete
+from
+    dbrefdata.organisation_mfa_status
+where
+    organisation_id in (
+    select
+    id
+    from
+    tmp_org_ids) returning 1),
+    del_org_attributes as (
+delete
+from
+    dbrefdata.org_attributes
+where
+    organisation_id in (
+    select
+    id
+    from
+    tmp_org_ids) returning 1),
+    del_organisation as (
+delete
+from
+    dbrefdata.organisation
+where
+    id in (
+    select
+    id
+    from
+    tmp_org_ids) returning 1)
+select
+    (
+        select
+            count(*)
+        from
+            del_user_attribute) as deleted_user_attribute,
+    (
+        select
+            count(*)
+        from
+            del_user_account_map) as deleted_user_account_map,
+    (
+        select
+            count(*)
+        from
+            del_professional_user) as deleted_professional_user,
+    (
+        select
+            count(*)
+        from
+            del_payment_account) as deleted_payment_account,
+    (
+        select
+            count(*)
+        from
+            del_dx_address) as deleted_dx_address,
+    (
+        select
+            count(*)
+        from
+            del_contact_information) as deleted_contact_information,
+    (
+        select
+            count(*)
+        from
+            del_organisation_mfa_status) as deleted_organisation_mfa_status,
+    (
+        select
+            count(*)
+        from
+            del_org_attributes) as deleted_org_attributes,
+    (
+        select
+            count(*)
+        from
+            del_organisation) as deleted_organisation;
 -- AFTER deleting counts
-SELECT 'user_attribute' AS table_name, count(*) AS after_delete_count FROM dbrefdata.user_attribute WHERE professional_user_id IN (SELECT id FROM tmp_prd_user_ids)
-UNION ALL
-SELECT 'user_account_map', count(*) FROM dbrefdata.user_account_map WHERE professional_user_id IN (SELECT id FROM tmp_prd_user_ids)
-UNION ALL
-SELECT 'professional_user', count(*) FROM dbrefdata.professional_user WHERE id IN (SELECT id FROM tmp_prd_user_ids)
-UNION ALL
-SELECT 'payment_account', count(*) FROM dbrefdata.payment_account WHERE organisation_id IN (SELECT id FROM tmp_org_ids)
-UNION ALL
-SELECT 'dx_address', count(*) FROM dbrefdata.dx_address WHERE contact_information_id IN (SELECT id FROM tmp_contacts_ids)
-UNION ALL
-SELECT 'contact_information', count(*) FROM dbrefdata.contact_information WHERE id IN (SELECT id FROM tmp_contacts_ids)
-UNION ALL
-SELECT 'organisation_mfa_status', count(*) FROM dbrefdata.organisation_mfa_status WHERE organisation_id IN (SELECT id FROM tmp_org_ids)
-UNION ALL
-SELECT 'org_attributes', count(*) FROM dbrefdata.org_attributes WHERE organisation_id IN (SELECT id FROM tmp_org_ids)
-UNION ALL
-SELECT 'organisation', count(*) FROM dbrefdata.organisation WHERE id IN (SELECT id FROM tmp_org_ids);
+select
+    'user_attribute' as table_name,
+    count(*) as after_delete_count
+from
+    dbrefdata.user_attribute
+where
+    professional_user_id in (
+        select
+            id
+        from
+            tmp_prd_user_ids)
+union all
+select
+    'user_account_map',
+    count(*)
+from
+    dbrefdata.user_account_map
+where
+    professional_user_id in (
+        select
+            id
+        from
+            tmp_prd_user_ids)
+union all
+select
+    'professional_user',
+    count(*)
+from
+    dbrefdata.professional_user
+where
+    id in (
+        select
+            id
+        from
+            tmp_prd_user_ids)
+union all
+select
+    'payment_account',
+    count(*)
+from
+    dbrefdata.payment_account
+where
+    organisation_id in (
+        select
+            id
+        from
+            tmp_org_ids)
+union all
+select
+    'dx_address',
+    count(*)
+from
+    dbrefdata.dx_address
+where
+    contact_information_id in (
+        select
+            id
+        from
+            tmp_contacts_ids)
+union all
+select
+    'contact_information',
+    count(*)
+from
+    dbrefdata.contact_information
+where
+    id in (
+        select
+            id
+        from
+            tmp_contacts_ids)
+union all
+select
+    'organisation_mfa_status',
+    count(*)
+from
+    dbrefdata.organisation_mfa_status
+where
+    organisation_id in (
+        select
+            id
+        from
+            tmp_org_ids)
+union all
+select
+    'org_attributes',
+    count(*)
+from
+    dbrefdata.org_attributes
+where
+    organisation_id in (
+        select
+            id
+        from
+            tmp_org_ids)
+union all
+select
+    'organisation',
+    count(*)
+from
+    dbrefdata.organisation
+where
+    id in (
+        select
+            id
+        from
+            tmp_org_ids);
 
-COMMIT;
-
+commit;
