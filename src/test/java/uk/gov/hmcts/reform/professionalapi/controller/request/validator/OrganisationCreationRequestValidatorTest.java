@@ -307,6 +307,7 @@ class OrganisationCreationRequestValidatorTest {
                 organisationCreationRequestValidator.requestContactInformation(contactList));
     }
 
+    //test includes email with extension 63 characters long passes test
     @Test
     void test_should_validate_valid_email_and_should_not_throw_exception() {
 
@@ -314,7 +315,8 @@ class OrganisationCreationRequestValidatorTest {
             "test@test.com", "test1@test.com",
             "tes't@test.com", "Email.100@test.com", "email111@email.com", "email.100@email.com.au",
             "email@etst.com.com", "email_231_a@email.com", "email_100@test-test.ABC.CoM", "email-100@test.com",
-            "email-100@test.net", "email+100@test.com", "emAil-100@test-test.com", "e.mAil-100@test-test.com"};
+            "email-100@test.net", "email+100@test.com", "emAil-100@test-test.com", "e.mAil-100@test-test.com",
+            "foo@mail.bananarepublic","foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUY"};
 
         for (String email : validEmails) {
             assertDoesNotThrow(() ->
@@ -323,6 +325,7 @@ class OrganisationCreationRequestValidatorTest {
 
     }
 
+    //test includes email with extension 64 characters long fails test
     @Test
     void test_should_validate_valid_email_and_should_throw_exception() {
         String[] validEmails = new String[]{
@@ -330,7 +333,8 @@ class OrganisationCreationRequestValidatorTest {
             "email@.com.my", "email123@test.", "email123@.com", "email123@.com.com", ".email@email.com",
             "email()*@test.com", "eEmail()*@test.com", "email@%*.com", "email@email@test.com",
             "email@test.com.", "email..2002@test.com@", "-email.23@email.com", "$email.3@email.com",
-            "!email@email.com", "+@test61371@test.com", "_email.23@email.com", "email.23@-email.com"};
+            "!email@email.com", "+@test61371@test.com", "_email.23@email.com", "email.23@-email.com",
+            "foo@mail.bananarepublicfsZZEDdfdffdSDRFGTYHsdfghjkloiuytrewqasdfghjkLIUYw"};
 
         for (String email : validEmails) {
             assertThrows(InvalidRequest.class, () ->
