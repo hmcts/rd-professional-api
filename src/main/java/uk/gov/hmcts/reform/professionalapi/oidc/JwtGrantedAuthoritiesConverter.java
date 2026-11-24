@@ -1,12 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.oidc;
 
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +8,13 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
 
 /**
  * This class is used to parse the JWT Access token and returns the user info with GrantedAuthorities.
@@ -29,7 +29,7 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
 
     private final IdamRepository idamRepository;
 
-    private UserInfo userInfo;
+
 
     @Autowired
     public JwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
@@ -42,24 +42,18 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if (Boolean.TRUE.equals(jwt.containsClaim(TOKEN_NAME)) && jwt.getClaim(TOKEN_NAME).equals(ACCESS_TOKEN)) {
-            userInfo = idamRepository.getUserInfo(jwt.getTokenValue());
+        if (Boolean.TRUE.equals(jwt.hasClaim(TOKEN_NAME)) && jwt.getClaim(TOKEN_NAME).equals(ACCESS_TOKEN)) {
+            UserInfo userInfo = idamRepository.getUserInfo(jwt.getTokenValue());
             authorities = extractAuthorityFromClaims(userInfo.getRoles());
-
-
         }
         return authorities;
     }
 
+    @SuppressWarnings("java:S6204")
     private List<GrantedAuthority> extractAuthorityFromClaims(List<String> roles) {
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
-
-    public  UserInfo getUserInfo() {
-
-        return userInfo;
+                .collect(toList());
     }
 
 }

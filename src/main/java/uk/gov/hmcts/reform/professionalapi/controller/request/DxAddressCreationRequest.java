@@ -2,18 +2,19 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @Getter
 @Builder(builderMethodName = "dxAddressCreationRequest")
 public class DxAddressCreationRequest {
 
     @NotNull
-    @Pattern(regexp = "^(?:DX|NI) [0-9]{10}+$")
+    @Schema(name = "dxNumber", example = "string")
+    @Pattern(regexp = "^(?:DX|NI) \\d{10}+$")
     private final String dxNumber;
     @NotNull
     private final String dxExchange;

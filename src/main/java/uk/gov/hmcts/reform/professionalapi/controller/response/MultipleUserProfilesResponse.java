@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
+
+import java.util.List;
 
 @Getter
 @Setter

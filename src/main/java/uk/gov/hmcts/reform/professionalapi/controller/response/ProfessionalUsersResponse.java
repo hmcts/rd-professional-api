@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,5 +30,6 @@ public class ProfessionalUsersResponse extends ProfessionalUsersResponseWithoutR
         this.idamStatus = user.getIdamStatus() ==  null ? "" :  user.getIdamStatus().toString();
         this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();
         this.idamMessage = StringUtils.isBlank(user.getIdamMessage()) ? "" : user.getIdamMessage();
+        this.lastUpdated = user.getLastUpdated();
     }
 }

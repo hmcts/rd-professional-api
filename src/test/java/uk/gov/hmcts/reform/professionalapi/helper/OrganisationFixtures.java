@@ -1,24 +1,24 @@
 package uk.gov.hmcts.reform.professionalapi.helper;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import org.apache.commons.lang3.RandomStringUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.RandomStringUtils;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 public class OrganisationFixtures {
 
@@ -33,7 +33,7 @@ public class OrganisationFixtures {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(randomAlphanumeric(7).concat("@test.com"))
+                        .email(RandomStringUtils.secure().nextAlphanumeric(7).concat("@test.com"))
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
@@ -47,7 +47,7 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
                 .name("  some-  org -name  ")
-                .companyNumber(randomAlphabetic(8))
+                .companyNumber(RandomStringUtils.secure().nextAlphabetic(8))
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname    b    ")
                         .lastName(" some-         lname  ")
@@ -69,7 +69,7 @@ public class OrganisationFixtures {
             .sraId("sra-id")
             .sraRegulated("false")
             .companyUrl("company -url")
-            .companyNumber(randomAlphabetic(8))
+            .companyNumber(RandomStringUtils.secure().nextAlphabetic(8))
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
@@ -91,6 +91,98 @@ public class OrganisationFixtures {
                 .build()));
     }
 
+    public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFields() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey");
+        orgAttributeRequest.setValue("testValue");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        return new OrganisationOtherOrgsCreationRequest("some-org-name",
+                        "PENDING",
+                        "test",
+                        "sra-id",
+                        "false",
+                        "comNum",
+                        "company-url",
+                        aUserCreationRequest()
+                                .firstName("some-fname")
+                                .lastName("some-lname")
+                                .email("someone@somewhere.com")
+                                .build(),
+                        paymentAccounts,
+                        Collections
+                                .singletonList(aContactInformationCreationRequest()
+                                        .addressLine1("addressLine1")
+                                        .addressLine2("addressLine2")
+                                        .addressLine3("addressLine3")
+                                        .country("country")
+                                        .county("county")
+                                        .townCity("town-city")
+                                        .uprn("uprn")
+                                        .postCode("some-post-code")
+                                        .dxAddress(Collections
+                                                .singletonList(dxAddressCreationRequest()
+                                                        .dxNumber("DX 1234567890")
+                                                        .dxExchange("dxExchange").build()))
+                                        .build()),
+                        "Doctor",
+                        orgAttributeRequests);
+    }
+
+    public static OrganisationOtherOrgsCreationRequest otherOrganisationRequestWithAllFieldsAreUpdated() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        List<OrgAttributeRequest> orgAttributeRequests = new ArrayList<>();
+
+        OrgAttributeRequest orgAttributeRequest = new OrgAttributeRequest();
+
+        orgAttributeRequest.setKey("testKey1");
+        orgAttributeRequest.setValue("testValue1");
+
+        orgAttributeRequests.add(orgAttributeRequest);
+
+        return new OrganisationOtherOrgsCreationRequest("some-org-name1",
+                        "ACTIVE",
+                        "test",
+                        "sra-id1",
+                        "true",
+                        "comNum",
+                        "company-url1",
+                        aUserCreationRequest()
+                                .firstName("some-fname")
+                                .lastName("some-lname")
+                                .email("someone@somewhere.com")
+                                .build(),
+                        paymentAccounts,
+                        Collections
+                                .singletonList(aContactInformationCreationRequest()
+                                        .addressLine1("addressLine1")
+                                        .addressLine2("addressLine2")
+                                        .addressLine3("addressLine3")
+                                        .country("country")
+                                        .county("county")
+                                        .townCity("town-city")
+                                        .uprn("uprn")
+                                        .postCode("some-post-code")
+                                        .dxAddress(Collections
+                                                .singletonList(dxAddressCreationRequest()
+                                                        .dxNumber("DX 1234567890")
+                                                        .dxExchange("dxExchange").build()))
+                                        .build()),
+                        "Doctor1",
+                        orgAttributeRequests);
+    }
+
     public static OrganisationCreationRequest
             .OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
         Set<String> paymentAccounts = new HashSet<>();
@@ -102,7 +194,7 @@ public class OrganisationFixtures {
                 .sraId("sra-id1")
                 .sraRegulated("true")
                 .companyUrl("company-url1")
-                .companyNumber(randomAlphabetic(8))
+                .companyNumber(RandomStringUtils.secure().nextAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                 .firstName("somefname")
@@ -163,10 +255,6 @@ public class OrganisationFixtures {
     }
 
     public static List<ContactInformationCreationRequest> createContactInformationCreationRequests() {
-        Set<String> paymentAccounts = new HashSet<>();
-        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
-        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
-        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
 
         List<DxAddressCreationRequest> dx1 = new LinkedList<>();
         dx1.add(dxAddressCreationRequest()
@@ -224,7 +312,7 @@ public class OrganisationFixtures {
                 .sraId("sra-id")
                 .sraRegulated("false")
                 .companyUrl("company -url")
-                .companyNumber(randomAlphabetic(8))
+                .companyNumber(RandomStringUtils.secure().nextAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")

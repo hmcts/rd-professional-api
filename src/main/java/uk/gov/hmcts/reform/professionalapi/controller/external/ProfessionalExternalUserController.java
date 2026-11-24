@@ -1,27 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static org.apache.logging.log4j.util.Strings.isBlank;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_1;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_2;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_3;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_1;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_2;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_3;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-
-import java.util.Optional;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -34,14 +20,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
+import java.util.Optional;
+
+import static org.apache.logging.log4j.util.Strings.isBlank;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USERS_BY_ORG_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_1;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_2;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.GET_USER_STATUS_EMAIL_3;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -49,51 +49,52 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 )
 @RestController
 @Slf4j
+@SuppressWarnings("checkstyle:Indentation")
 public class ProfessionalExternalUserController extends SuperController {
 
-    @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
+    @Operation(
+            summary = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
                     + " returnRoles is False",
-            notes = GET_USERS_BY_ORG_1 + GET_USERS_BY_ORG_2 + GET_USERS_BY_ORG_3,
-            response = ProfessionalUsersEntityResponse.class,
-            responseContainer = "list",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+            description = GET_USERS_BY_ORG_1 + GET_USERS_BY_ORG_2 + GET_USERS_BY_ORG_3,
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
 
-    @ApiParam(
+    @Parameter(
             name = "showDeleted",
-            type = "string",
-            value = "Flag (True/False) to decide whether Deleted Users are included in the response"
+            description = "Flag (True/False) to decide whether Deleted Users are included in the response"
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "List of Professional Users and their details"
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid Organisation Identifier was provided"
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Organisation or Users found with the given ID"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "List of Professional Users and their details",
+            content = @Content(array = @ArraySchema(schema =
+            @Schema(implementation = ProfessionalUsersEntityResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid Organisation Identifier was provided"
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized Error : "
+                    + "The requested resource is restricted and requires authentication"
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied"
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation or Users found with the given ID"
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error"
+    )
+
     @GetMapping(
             value = "/users",
             produces = APPLICATION_JSON_VALUE
@@ -102,65 +103,72 @@ public class ProfessionalExternalUserController extends SuperController {
             "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor",
             "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker", "pui-caa"})
     public ResponseEntity<Object> findUsersByOrganisation(
-            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
-            @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted",
+            @Parameter(hidden = true) @OrgId String organisationIdentifier,
+            @Parameter(name = "showDeleted") @RequestParam(value = "showDeleted",
                     required = false) String showDeleted,
-            @ApiParam(name = "status") @RequestParam(value = "status",
+            @Parameter(name = "status") @RequestParam(value = "status",
                     required = false) String status,
-            @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles",
+            @Parameter(name = "returnRoles") @RequestParam(value = "returnRoles",
                     required = false, defaultValue = "true") Boolean returnRoles,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
-            @ApiParam(hidden = true) @UserId String userId) {
+            @RequestParam(value = "userIdentifier", required = false) String userIdentifier,
+            @Parameter(hidden = true) @UserId String userId) {
 
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
-        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
+        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(idamRepository.getUserInfo(getUserToken())
                 .getRoles(), PUI_USER_MANAGER)) {
             status = isBlank(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
+        if (userIdentifier != null) {
+            profExtUsrReqValidator.validateUuid(userIdentifier);
+            ProfessionalUser fetchingUser = professionalUserService.findProfessionalUserByUserIdentifier(
+                    userIdentifier);
+            profExtUsrReqValidator.validateOrganisationMatch(organisationIdentifier, fetchingUser);
+        }
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
+        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
                 page, size);
     }
 
-    @ApiOperation(
-            value = "Modify the Roles or Status of a User with the given ID",
-            notes = "**IDAM Roles to access API** : \n pui-user-manager",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Modify the User Configured Access and Roles or Status of a User with the given ID",
+            description = "**IDAM Roles to access API** : <br> pui-user-manager",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 201,
-                    message = "The User's Roles/Status have been modified",
-                    response = ModifyUserRolesResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "Invalid request provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No User found with the given ID"
-            ),
-            @ApiResponse(
-                    code = 412,
-                    message = "One or more of the Roles provided is already assigned to the User"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "201",
+            description = "The User's Roles/Status have been modified",
+            content = @Content(schema = @Schema(implementation = ModifyUserRolesResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request provided"
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied"
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No User found with the given ID"
+    )
+    @ApiResponse(
+            responseCode = "412",
+            description = "One or more of the Roles provided is already assigned to the User"
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error"
+    )
+
     @PutMapping(
             path = "/users/{userId}",
             produces = APPLICATION_JSON_VALUE
@@ -168,50 +176,53 @@ public class ProfessionalExternalUserController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured("pui-user-manager")
-    public ResponseEntity<Object> modifyRolesForExistingUserOfExternalOrganisation(
+    public ResponseEntity<Object> modifyUserConfiguredAccessAndRolesForExistingUserOfExternalOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "userProfileUpdatedData")
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
-            @ApiParam(hidden = true) @OrgId String orgId,
+            @Parameter(hidden = true) @OrgId String orgId,
             @PathVariable("userId") String userId,
-            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") String origin
     ) {
+        // Validate target user belongs to caller's organization
+        ProfessionalUser targetUser = professionalUserService.findProfessionalUserByUserIdentifier(userId);
+        profExtUsrReqValidator.validateOrganisationMatch(orgId, targetUser);
 
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
-
+        return professionalUserService
+                .modifyUserConfiguredAccessAndRoles(userProfileUpdatedData, userId, Optional.of(origin));
     }
 
-    @ApiOperation(
-            value = "Retrieves the Status of a User belonging to an Active Organisation with the given Email Address",
-            notes = GET_USER_STATUS_EMAIL_1 + GET_USER_STATUS_EMAIL_2 + GET_USER_STATUS_EMAIL_3,
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization"),
-                    @Authorization(value = "UserEmail")
+    @Operation(
+            summary = "Retrieves the Status of a User belonging to an Active Organisation with the given Email Address",
+            description = GET_USER_STATUS_EMAIL_1 + GET_USER_STATUS_EMAIL_2 + GET_USER_STATUS_EMAIL_3,
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization"),
+                    @SecurityRequirement(name = "UserEmail")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "The User Identifier of the User",
-                    response = NewUserResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid Email Address was provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No User belonging to an Active Organisation was found with the given Email Address"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "The User Identifier of the User",
+            content = @Content(schema = @Schema(implementation = NewUserResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid Email Address was provided"
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied"
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No User belonging to an Active Organisation was found with the given Email Address"
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error"
+    )
+
     @GetMapping(
             value = "/users/accountId",
             produces = APPLICATION_JSON_VALUE

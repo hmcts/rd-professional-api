@@ -1,15 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import javax.validation.ConstraintViolationException;
-
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,10 +15,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ExceptionMapperTest {
@@ -147,6 +149,21 @@ class ExceptionMapperTest {
                 .getErrorDescription());
 
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"bulkCustomerId", "idamId"})
+    void test_handle_missing_parameter_in_request(String parameterName) {
+        MissingServletRequestParameterException mex = new MissingServletRequestParameterException(parameterName,
+                                                                                                    "String");
+
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleMissingParams(mex);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(mex.getMessage(), ((ErrorResponse) responseEntity.getBody()).getErrorDescription());
+
+    }
+
+
 
     @Test
     void test_handle_external_api_exception() {

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.feign;
 import feign.Headers;
 import feign.RequestLine;
 import feign.Response;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @FeignClient(name = "UserProfileClient", url = "${userProfUrl}", configuration = FeignInterceptorConfiguration.class)
+@SuppressWarnings("checkstyle:Indentation")
 public interface UserProfileFeignClient {
 
     @PostMapping(value = "/v1/userprofile")

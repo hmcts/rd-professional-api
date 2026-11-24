@@ -1,7 +1,5 @@
 #!groovy
-@Library("Infrastructure")
-import uk.gov.hmcts.contino.AppPipelineDsl
-@Library("Infrastructure")
+@Library("Infrastructure@2.5.1")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
@@ -14,6 +12,9 @@ def secrets = [
                 secret('microservicekey-rd-professional-api', 'PROFESSIONAL_API_S2S_SECRET')
         ],
         'rd-${env}' : [
+                secret('ACCOUNT-KEY-PREVIEW', 'ACCOUNT_KEY_PREVIEW'),
+                secret('rd-prd-storage-account-name', 'ACCOUNT_NAME'),
+                secret('rd-prd-storage-account-primary-key', 'ACCOUNT_KEY'),
                 secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
                 secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
                 secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
@@ -38,6 +39,9 @@ def vaultOverrides = [
 // Configure branches to sync with master branch
 def branchesToSync = ['demo', 'ithc', 'perftest']
 
+// Var for testcontainers.org
+env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
+
 // Vars for Kubernetes
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.PACT_BROKER_URL = 'pact-broker.platform.hmcts.net'
@@ -53,22 +57,55 @@ withPipeline(type, product, component) {
     enableDbMigration('rd')
     disableLegacyDeployment()
     enableAksStagingDeployment()
-
-    // Sync demo and perftest with master branch
-    syncBranchesWithMaster(branchesToSync)
-
+    
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
 
     before('functionalTest:preview') {
         env.execution_environment = "preview"
+        env.TEST_URL = "http://rd-professional-api-preview.preview.hmcts.platform.net"
     }
 
     before('functionalTest:aat') {
         env.execution_environment = "aat"
+        env.TEST_URL = "http://rd-professional-api-aat.aat.hmcts.platform.net"
     }
 
-    after('sonarscan') {
+    before('smoketest:preview') {
+        env.execution_environment = "preview"
+        env.TEST_URL = "http://rd-professional-api-preview.preview.platform.hmcts.net"
+    }
+
+    before('smoketest:aat') {
+        env.execution_environment = "aat"
+        env.TEST_URL = "http://rd-professional-api-aat.aat.platform.hmcts.net"
+    }
+
+    // Sync demo and perftest with master branch
+    syncBranchesWithMaster(branchesToSync)
+
+    afterFailure('test') {
+
+        publishHTML target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/tests/test",
+                reportFiles          : "index.html",
+                reportName           : "Unit Tests Report"
+        ]
+
+        publishHTML target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/tests/integration",
+                reportFiles          : "index.html",
+                reportName           : "Integration Test Report"
+        ]
+    }
+
+    afterAlways('sonarscan') {
 
         publishHTML target: [
             allowMissing         : true,
@@ -89,7 +126,7 @@ withPipeline(type, product, component) {
         ]
     }
 
-   after('smoketest:preview') {
+    afterAlways('smoketest:preview') {
         publishHTML target: [
             allowMissing         : true,
             alwaysLinkToLastBuild: true,
@@ -100,7 +137,7 @@ withPipeline(type, product, component) {
         ]
     }
 
-   after('smoketest:aat') {
+    afterAlways('smoketest:aat') {
         publishHTML target: [
             allowMissing         : true,
             alwaysLinkToLastBuild: true,
@@ -111,7 +148,7 @@ withPipeline(type, product, component) {
         ]
    }
 
-   after('functionalTest:aat') {
+    afterAlways('functionalTest:aat') {
        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
        publishHTML target: [
            allowMissing         : true,
@@ -119,11 +156,11 @@ withPipeline(type, product, component) {
            keepAll              : true,
            reportDir            : "target/site/serenity/",
            reportFiles          : "index.html",
-           reportName           : "Functional Tests Report"
+           reportName           : "Functional Tests (Serenity) Report"
        ]
    }
 
-    after('functionalTest:preview') {
+    afterAlways('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
         publishHTML target: [
             allowMissing         : true,
@@ -131,11 +168,11 @@ withPipeline(type, product, component) {
             keepAll              : true,
             reportDir            : "target/site/serenity/",
             reportFiles          : "index.html",
-            reportName           : "Functional Tests Report"
+            reportName           : "Functional Tests (Serenity) Report"
         ]
     }
 
-    after('pact-provider-verification') {
+    afterAlways('pact-provider-verification') {
         publishHTML target: [
                      allowMissing         : true,
                      alwaysLinkToLastBuild: true,
@@ -146,86 +183,6 @@ withPipeline(type, product, component) {
                 ]
                 steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
-
-    after('sonarscan') {
-
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/test",
-            reportFiles          : "index.html",
-            reportName           : "Unit Tests Report"
-        ]
-
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/integration",
-            reportFiles          : "index.html",
-            reportName           : "Integration Test Report"
-        ]
-    }
-
-   after('smoketest:preview') {
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/smoke",
-            reportFiles          : "index.html",
-            reportName           : "Smoke Test Report"
-        ]
-    }
-
-   after('smoketest:aat') {
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/smoke",
-            reportFiles          : "index.html",
-            reportName           : "Smoke Test Report"
-        ]
-   }
-
-   after('functionalTest:aat') {
-       steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-       publishHTML target: [
-           allowMissing         : true,
-           alwaysLinkToLastBuild: true,
-           keepAll              : true,
-           reportDir            : "target/site/serenity/",
-           reportFiles          : "index.html",
-           reportName           : "Functional Tests Report"
-       ]
-   }
-
-    after('functionalTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-        publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "target/site/serenity/",
-            reportFiles          : "index.html",
-            reportName           : "Functional Tests Report"
-        ]
-    }
-
-    after('pact-provider-verification') {
-        publishHTML target: [
-                     allowMissing         : true,
-                     alwaysLinkToLastBuild: true,
-                     keepAll              : true,
-                    reportDir            : "build/reports/tests/runProviderPactVerification",
-                    reportFiles          : "index.html",
-                    reportName           : "Contract Tests Report"
-                ]
-                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
-    }
-
     onMaster() {
         enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
     }

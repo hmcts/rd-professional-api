@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.generator;
 
-import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
+
+import java.util.UUID;
 
 
 /**
@@ -35,7 +36,7 @@ public interface ProfessionalApiGenerator {
     static String generateUniqueAlphanumericId(int lengthOfString) {
         String generatedString = null;
         while (true) {
-            generatedString = RandomStringUtils.randomAlphanumeric(lengthOfString);
+            generatedString = RandomStringUtils.secure().nextAlphanumeric(lengthOfString);
             if (generatedString.matches(ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
                 break;
             }

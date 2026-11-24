@@ -2,35 +2,39 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.UUID;
-import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,9 +53,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatu
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
-@SerenityTest
+@ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
@@ -67,11 +70,20 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     String extActiveOrgId;
     String activeUserEmail;
     String activeUserId;
+    String newAddedUserId;
     String superUserEmail;
     String superUserId;
     OrganisationCreationRequest organisationCreationRequest;
     String firstName = "firstName";
     String lastName = "lastName";
+    private static final List<String> organisationIdentifiers = new ArrayList<>();
+
+    @AfterAll
+    public static void cleanUp() {
+        organisationIdentifiers.forEach(id ->
+                professionalApiClient.deleteOrganisationByInternalUser(id));
+
+    }
 
     @Test
     @DisplayName("PRD External Test Scenarios")
@@ -89,12 +101,22 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         suspendUserScenarios();
     }
 
+    @Test
+    @DisplayName("PRD Group Access External Test Scenarios")
+    void testExternalUserGroupAccessScenario() {
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiUserManager));
+        addNewUserAccessTypeScenarios();
+        updateAndAddNewUserAccessTypeScenarios();
+        inviteNewUserToOrganisationScenarios();
+    }
+
     public void setUpOrgTestData() {
         if (isEmpty(extActiveOrgId)) {
             log.info("Setting up organization...");
             superUserEmail = generateRandomEmail();
             organisationCreationRequest = createOrganisationRequest()
-                    .superUser(aUserCreationRequest()
+                    .superUser(UserCreationRequest.aUserCreationRequest()
                             .firstName(firstName)
                             .lastName(lastName)
                             .email(superUserEmail)
@@ -105,13 +127,14 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                     .build();
 
             organisationCreationRequest.setStatus("ACTIVE");
-            extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+            extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
             Map<String, Object> searchResponse = professionalApiClient
                     .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
             List<Map<String, Object>> professionalUsersResponses =
                     (List<Map<String, Object>>) searchResponse.get("users");
             superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+            organisationIdentifiers.add(extActiveOrgId);
         }
     }
 
@@ -135,9 +158,22 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
 
     public void inviteUserScenarios() {
-        inviteUserByPuiUserManagerShouldBeSuccess();
+        Map<String, List<String>> userRoles =
+                Map.of("Case Manager Role", List.of(puiCaseManager),
+                        "PCS Caseworker Roles", List.of(caseworkerPcs, caseworkerPcsSolicitor));
+        inviteUserByPuiUserManagerShouldBeSuccess(userRoles);
         // below test receives 504 from SIDAM intermittently, needs investigation:
         // inviteUserBySuperUserShouldBeSuccess();
+    }
+
+    public void inviteNewUserToOrganisationScenarios() {
+        // Adding and verifying user with access type
+        addNewUserToAnOrganisationShouldBeSuccess(true);
+        findUsersByUserIdentifier(true);
+
+        // Adding and verifying user without access type
+        addNewUserToAnOrganisationShouldBeSuccess(false);
+        findUsersByUserIdentifier(false);
     }
 
     public void findUsersByOrganisationScenarios() {
@@ -164,6 +200,18 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess();
     }
 
+    public void findUsersByUserIdentifierWithUserAccessType() {
+        findUserWithAccessTypeShouldBeSuccess();
+    }
+
+    public void findUsersByUserIdentifier(Boolean hasAccessType) {
+        findUserWithIdShouldBeSuccess(hasAccessType);
+    }
+
+    public void findUsersByUserIdentifierWithUserAccessTypesAndRoles() {
+        findUserWithAccessTypesAndRoleShouldBeSuccess();
+    }
+
     public void findUserStatusByEmailScenarios() {
         findUserStatusByEmailByPumShouldBeSuccess();
         findUserStatusByEmailInHeaderByPumShouldBeSuccess();
@@ -181,17 +229,45 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         addRolesByPendingExtUserShouldReturnForbidden();
     }
 
+    public void addNewUserAccessTypeScenarios() {
+        addUserAccessTypeShouldBeSuccess();
+        findUsersByUserIdentifierWithUserAccessType();;
+    }
+
+    public void updateAndAddNewUserAccessTypeScenarios() {
+        addOrUpdateUserAccessTypeShouldBeSuccess();
+        findUsersByUserIdentifierWithUserAccessTypesAndRoles();;
+    }
+
     public void suspendUserScenarios() {
         suspendUserByPumShouldBeSuccess();
     }
 
-    public void inviteUserByPuiUserManagerShouldBeSuccess() {
+    public void inviteUserByPuiUserManagerShouldBeSuccess(Map<String, List<String>> userRoles) {
         log.info("inviteUserByPuiUserManagerShouldBeSuccess :: STARTED");
-        Map<String, Object> newUserResponse = professionalApiClient
-                .addNewUserToAnOrganisationExternal(createUserRequest(asList(puiCaseManager)),
-                        professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
-        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        userRoles.values().forEach(roles -> {
+            Map<String, Object> newUserResponse = professionalApiClient
+                    .addNewUserToAnOrganisationExternal(createUserRequest(roles),
+                            professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
+            String userIdentifier = newUserResponse.get("userIdentifier").toString();
+            assertThat(userIdentifier)
+                    .as("Failed to invite user with role: " + Arrays.toString(roles.toArray()))
+                    .isNotNull();
+            Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                    professionalApiClient.getMultipleAuthHeaders(pumBearerToken), userIdentifier);
+            validateRetrievedUsers(response, "ACTIVE", true);
+        });
         log.info("inviteUserByPuiUserManagerShouldBeSuccess :: END");
+    }
+
+    public void addNewUserToAnOrganisationShouldBeSuccess(boolean hasAccessType) {
+        log.info("addNewUserToAnOrganisationShouldBeSuccess :: STARTED");
+        Map<String, Object> newUserResponse = professionalApiClient
+                    .addNewUserToAnOrganisationExternal(createUserRequest(asList(puiCaseManager), hasAccessType),
+                            professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        newAddedUserId = newUserResponse.get("userIdentifier").toString();
+        log.info("addNewUserToAnOrganisationShouldBeSuccess :: END");
     }
 
     public void inviteUserBySuperUserShouldBeSuccess() {
@@ -201,10 +277,19 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
                 professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
                         superUserRoles(), firstName, lastName, email));
 
+        UserCreationRequest superUserRequest = UserCreationRequest
+                .aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .build();
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
+                .superUser(superUserRequest)
                 .status("ACTIVE").build();
-        createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+
+        String organisationIdentifier =
+                createAndActivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+        organisationIdentifiers.add(organisationIdentifier);
 
         NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
 
@@ -283,6 +368,54 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         assertThat(professionalUsers.size()).isGreaterThan(1);
         validateRetrievedUsers(searchResponse, ACTIVE, false);
         log.info("findUsersBySystemAdminWithoutRolesRequiredShouldBeSuccess :: END");
+    }
+
+    @Test
+    @DisplayName("PRD External Test Scenarios: find org users should sort based on first name")
+    public void findOrganisationUsersSorted() {
+        String superUserEmail = generateRandomEmail();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .superUser(UserCreationRequest.aUserCreationRequest().firstName(firstName)
+                        .lastName(lastName).email(superUserEmail).build())
+                .status("ACTIVE").build();
+
+        String extActiveOrgId = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest,
+                hmctsAdmin);
+        organisationIdentifiers.add(extActiveOrgId);
+
+        String bearerToken = inviteUser(puiCaseManager, extActiveOrgId, generateRandomEmail(),
+                "firstName2", "lastName2");
+
+        NewUserCreationRequest newUserCreationRequest2 = createUserRequest(Arrays.asList(puiCaseManager),
+                "lastName1", "firstName1");
+
+        Map<String, Object> newUserResponse2 = professionalApiClient
+                .addNewUserToAnOrganisation(extActiveOrgId, puiCaseManager,
+                        newUserCreationRequest2, HttpStatus.CREATED);
+        assertThat(newUserResponse2).isNotNull();
+        assertThat(newUserResponse2.get("userIdentifier")).isNotNull();
+
+        Map<String, Object> response = professionalApiClient
+                .searchOrganisationUsersByReturnRolesParamExternal(OK,
+                        professionalApiClient.getMultipleAuthHeaders(bearerToken), "false");
+
+        assertThat(response.get("users")).asList().isNotEmpty();
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
+        assertThat(professionalUsersResponses.size()).isEqualTo(3);
+
+        HashMap firstUser = professionalUsersResponses.get(0);
+        assertThat(firstUser.get("firstName")).isEqualTo("firstName");
+        assertThat(firstUser.get("lastName")).isEqualTo("lastName");
+
+        HashMap secondUser = professionalUsersResponses.get(1);
+        assertThat(secondUser.get("firstName")).isEqualTo("firstName1");
+        assertThat(secondUser.get("lastName")).isEqualTo("lastName1");
+
+        HashMap thirdUser = professionalUsersResponses.get(2);
+        assertThat(thirdUser.get("firstName")).isEqualTo("firstName2");
+        assertThat(thirdUser.get("lastName")).isEqualTo("lastName2");
+
     }
 
     public void findOrgByPfmShouldBeSuccess() {
@@ -367,6 +500,32 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findActiveOrganisationByPumShouldBeSuccess :: END");
     }
 
+    public void findUserWithAccessTypeShouldBeSuccess() {
+        log.info("findUserWithAccessTypeShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        validateAccessTypesInRetrievedUser(response, "ACTIVE",
+                true,true, activeUserId);
+        log.info("findUserWithAccessTypeShouldBeSuccess :: END");
+    }
+
+    public void findUserWithIdShouldBeSuccess(Boolean hasAccessType) {
+        log.info("findUserWithIdShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), newAddedUserId);
+        validateAccessTypesInRetrievedUser(response, "PENDING",
+                false, hasAccessType, newAddedUserId);
+        log.info("findUserWithIdShouldBeSuccess :: END");
+    }
+
+    public void findUserWithAccessTypesAndRoleShouldBeSuccess() {
+        log.info("findUserWithAccessTypesAndRoleShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByUserIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        validateAccessTypesAndRolesInRetrievedUser(response,  true);
+        log.info("findUserWithAccessTypesAndRoleShouldBeSuccess :: END");
+    }
+
     public void findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess() {
         log.info("findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess :: STARTED");
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
@@ -421,6 +580,40 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("addRolesByPumShouldBeSuccess :: END");
     }
 
+    public void addUserAccessTypeShouldBeSuccess() {
+        log.info("addUserAccessTypeShouldBeSuccess :: STARTED");
+        UserAccessType userAccessType = new UserAccessType();
+        userAccessType.setAccessTypeId("testAccessTypeId");
+        userAccessType.setJurisdictionId("testJurisdictionId");
+        userAccessType.setOrganisationProfileId("testOrganisationProfileId");
+        userAccessType.setEnabled(true);
+        professionalApiClient.modifyUserToExistingUserForExternal(OK, addOrUpdateUserAccessType(userAccessType),
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        log.info("addUserAccessTypeShouldBeSuccess :: END");
+    }
+
+    public void addOrUpdateUserAccessTypeShouldBeSuccess() {
+        log.info("addOrUpdateUserAccessTypeShouldBeSuccess :: STARTED");
+        UserAccessType userAccessType2 = new UserAccessType();
+        userAccessType2.setAccessTypeId("testAccessTypeId2");
+        userAccessType2.setJurisdictionId("testJurisdictionId2");
+        userAccessType2.setOrganisationProfileId("testOrganisationProfileId2");
+        userAccessType2.setEnabled(false);
+
+        UserAccessType userAccessType3 = new UserAccessType();
+        userAccessType3.setAccessTypeId("testAccessTypeId3");
+        userAccessType3.setJurisdictionId("testJurisdictionId3");
+        userAccessType3.setOrganisationProfileId("testOrganisationProfileId3");
+        userAccessType3.setEnabled(true);
+
+        Set<UserAccessType> userAccessTypeSet = new HashSet<>();
+        userAccessTypeSet.add(userAccessType2);
+        userAccessTypeSet.add(userAccessType3);
+        professionalApiClient.modifyUserToExistingUserForExternal(OK, addOrUpdateUserAccessTypeAndRole(puiOrgManager,
+                        userAccessTypeSet),professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        log.info("addOrUpdateUserAccessTypeShouldBeSuccess :: END");
+    }
+
     public void deleteRolesByPumShouldBeSuccess() {
         log.info("deleteRolesByPumShouldBeSuccess :: STARTED");
         professionalApiClient.modifyUserToExistingUserForExternal(OK, deleteRoleRequest(puiOrgManager),
@@ -473,15 +666,34 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
         return bearerToken;
     }
 
+    public String inviteUser(String role,
+                             String orgId,
+                             String email,
+                             String firstName,
+                             String lastName) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(role);
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(userRoles);
+        newUserCreationRequest.setEmail(email);
+        String bearerToken = idamOpenIdClient.getExternalOpenIdToken(puiUserManager,
+                firstName, lastName, email);
+
+        Map<String, Object> pumInternalUserResponse = professionalApiClient
+                .addNewUserToAnOrganisation(orgId, hmctsAdmin, newUserCreationRequest, CREATED);
+        assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
+        return bearerToken;
+    }
+
     @Test
     @DisplayName("MFA Scenarios")
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationMfaStatusController.retrieveMfaStatusByUserId", withFeature = true)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void findMFAScenario() {
         setUpOrgTestData();
         findMFAByUserIDShouldBeSuccess();
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public void findMFAByUserIDShouldBeSuccess() {
         log.info("findMFAByUserIDShouldBeSuccess :: STARTED");
         Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
@@ -505,7 +717,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
@@ -523,7 +735,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
 
@@ -546,7 +757,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
@@ -564,7 +775,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void addPbaOfExistingOrganisationShouldBeSuccess() {
         log.info("addPaymentAccountsToOrganisation :: STARTED");
 
@@ -598,7 +808,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void testAddContactsInformationsToOrganisationScenariosShouldBeForbiddenWhenLDOff() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
@@ -619,7 +829,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
     @Test
     @DisplayName("Add Contact informations to organisations  Test Scenarios")
     @ToggleEnable(mapKey = "OrganisationExternalController.addContactInformationsToOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void testAddContactsInformationsToOrganisationScenariosShouldBeSuccessWhenLDON() {
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
@@ -677,7 +887,7 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     void deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deleteMultipleAddressesOfOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
@@ -697,7 +907,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void deleteMultipleAddressesOfOrganisationShouldBe404Failure() {
         log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: STARTED");
         setUpOrgTestData();
@@ -717,7 +926,6 @@ class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationExternalController.deleteMultipleAddressesOfOrganisation", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void deleteMultipleAddressesOfOrganisationShouldBeSuccess() {
         log.info("deleteMultipleAddressesOfOrganisationShouldBeSuccess :: STARTED");
         setUpOrgTestData();

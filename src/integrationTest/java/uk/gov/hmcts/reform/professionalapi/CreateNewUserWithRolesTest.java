@@ -1,21 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -29,6 +17,20 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
@@ -128,7 +130,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    void should_return_400_when_UP_fails_while_adding_new_user_to_an_active_organisation() {
+    void should_return_500_when_UP_fails_while_adding_new_user_to_an_active_organisation() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
@@ -150,7 +152,7 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
                         inviteUserCreationRequest("somenewuser@email.com", userRoles), hmctsAdmin,
                         userIdentifier);
 
-        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+        assertThat(newUserResponse.get("http_status")).isEqualTo("500");
         assertThat(newUserResponse).isNotNull();
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
@@ -179,28 +181,20 @@ class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     }
 
-    @Test
-    void returns_404_when_organisation_identifier_not_found() {
+    @ParameterizedTest
+    @CsvSource({
+        "AB83N5K,404",
+        "invalid-org-id,400"
+    })
+    void returns_404_when_organisation_identifier_not_found(String orgId,String statusCode) {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("AB83N5K",
+                professionalReferenceDataClient.addUserToOrganisation(orgId,
                         inviteUserCreationRequest("some@email.com", userRoles), hmctsAdmin);
 
-        assertThat(newUserResponse.get("http_status")).isEqualTo("404");
-    }
-
-    @Test
-    void returns_400_when_organisation_identifier_invalid() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("invalid-org-id",
-                        inviteUserCreationRequest("some@email.com", userRoles), hmctsAdmin);
-
-        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+        assertThat(newUserResponse.get("http_status")).isEqualTo(statusCode);
     }
 
 

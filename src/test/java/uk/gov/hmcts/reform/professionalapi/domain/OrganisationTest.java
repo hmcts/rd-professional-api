@@ -1,34 +1,44 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationTest {
 
     @Test
     void test_creates_organisation_correctly() {
+
+        BulkCustomerDetails bulkCustomerDetails = new BulkCustomerDetails();
+        bulkCustomerDetails.setBulkCustomerId("6601e79e-3169-461d-a751-59a33a5sdfd");
+        bulkCustomerDetails.setId(UUID.randomUUID());
+        bulkCustomerDetails.setPbaNumber("pba-1234567");
+        bulkCustomerDetails.setSidamId("6601e79e-3169-461d-a751-59a33a5sdfd");
+
         List<ContactInformation> contactInformations = new ArrayList<>();
 
         Organisation organisation = new Organisation("some-name", OrganisationStatus.ACTIVE,
-                "sra-id", "company-number", Boolean.FALSE, "company-url");
+            "sra-id", "company-number", Boolean.FALSE, "company-url");
+
         organisation.setLastUpdated(LocalDateTime.now());
         organisation.setCreated(LocalDateTime.now());
         organisation.setContactInformations(contactInformations);
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
         organisation.setStatusMessage("statusMessage");
+        organisation.setOrgType("testOrgType");
+        organisation.setBulkCustomerDetails(List.of(bulkCustomerDetails));
 
         assertThat(organisation.isOrganisationStatusActive()).isTrue();
         assertThat(organisation.getName()).isEqualTo("some-name");
@@ -44,6 +54,26 @@ class OrganisationTest {
         assertThat(organisation.getContactInformations()).isNotNull();
         assertThat(organisation.getOrganisationIdentifier()).isNotNull();
         assertThat(organisation.getOrganisationIdentifier()).hasSize(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        assertThat(organisation.getBulkCustomerDetails().get(0).getBulkCustomerId())
+            .isEqualTo(bulkCustomerDetails.getBulkCustomerId());
+        assertThat(organisation.getBulkCustomerDetails().get(0).getId())
+            .isEqualTo(bulkCustomerDetails.getId());
+        assertThat(organisation.getBulkCustomerDetails().get(0).getPbaNumber())
+            .isEqualTo(bulkCustomerDetails.getPbaNumber());
+        assertThat(organisation.getBulkCustomerDetails().get(0).getSidamId())
+            .isEqualTo(bulkCustomerDetails.getSidamId());
+        assertThat(organisation.getOrgType()).isEqualTo("testOrgType");
+    }
+
+    @Test
+    void test_adds_org_attributes_correctly() {
+        OrgAttribute orgAttributes = new OrgAttribute();
+        Organisation organisation = new Organisation();
+        organisation.addAttribute(orgAttributes);
+
+        assertThat(organisation.getOrgAttributes()).containsExactly(orgAttributes);
+        assertThat(organisation.getOrgAttributes()).isNotEmpty();
+
     }
 
     @Test
@@ -90,5 +120,32 @@ class OrganisationTest {
 
         assertThat(organisation.getOrganisationMfaStatus()).isNotNull();
         assertThat(organisation.getOrganisationMfaStatus()).isEqualTo(organisationMfaStatus);
+    }
+
+    @Test
+    void test_adds_organisation_bulk_customer_details_correctly() {
+        BulkCustomerDetails bulkCustomerDetails = new BulkCustomerDetails();
+        List<BulkCustomerDetails> bulkCustomerDetailsList = new ArrayList<>();
+        Organisation organisation = new Organisation();
+        bulkCustomerDetailsList.add(bulkCustomerDetails);
+        organisation.setBulkCustomerDetails(bulkCustomerDetailsList);
+
+        assertThat(organisation.getBulkCustomerDetails()).isNotNull();
+    }
+
+    @Test
+    void test_organisation_orgType_orgAttributes_correctly() {
+        OrgAttribute orgAttribute = new OrgAttribute();
+        List<OrgAttribute> orgAttributes = new ArrayList<>();
+        orgAttribute.setKey("TestKey");
+        orgAttribute.setValue("TestValue");
+        orgAttributes.add(orgAttribute);
+        Organisation organisation = new Organisation();
+        organisation.setOrgType("Doctor");
+        organisation.setOrgAttributes(orgAttributes);
+        organisation.addAttribute(orgAttribute);
+        assertThat(organisation.getOrgType()).isNotNull();
+        assertThat(organisation.getOrgType()).isEqualTo("Doctor");
+        assertThat(organisation.getOrgAttributes()).isNotNull();
     }
 }

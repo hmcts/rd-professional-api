@@ -1,20 +1,19 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-
-import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -192,6 +191,33 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
     }
 
     @Test
+    void retrieve_all_users_for_an_organisation_with_userIdentifier() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        NewUserCreationRequest userCreationRequest = inviteUserCreationRequest(randomAlphabetic(5)
+                + "@email.com", userRoles);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, userCreationRequest,
+                hmctsAdmin, userIdentifier);
+        NewUserCreationRequest userCreationRequest1 = inviteUserCreationRequest(randomAlphabetic(6)
+                + "@email.com", userRoles);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> profUser = professionalReferenceDataClient.addUserToOrganisationWithUserId(
+                organisationIdentifier, userCreationRequest1, hmctsAdmin, userIdentifier);
+
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationAndUserIdentifier(
+                organisationIdentifier, hmctsAdmin, profUser.get("userIdentifier").toString());
+
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
+
+    }
+
+    @Test
     void ac1_find_all_active_users_without_roles_for_an_organisation_should_return_200() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles(
@@ -332,6 +358,47 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
                 .findUsersByOrganisation(createAndActivateOrganisation(), "false", "invalidRole");
         assertThat(response.get("http_status")).isEqualTo("403");
         assertThat((String) response.get("response_body"))
-                .contains("{\"errorMessage\":\"9 : Access Denied\",\"errorDescription\":\"Access is denied\"");
+                .contains("{\"errorMessage\":\"9 : Access Denied\",\"errorDescription\":\"Access Denied\"");
+    }
+
+    @Test
+    void retrieve_all_users_for_an_organisation_with_userIdentifier_sorted() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        NewUserCreationRequest userCreationRequest = inviteUserCreationRequest(randomAlphabetic(5)
+                + "@email.com", "testLastName2", "testFirstName2", userRoles);
+        userProfileCreateUserWireMock("testFirstName2", "testLastName2", "dummy@email.com",
+                "testFirstName1", "testLastName1", "dummy@email.com", HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, userCreationRequest,
+                hmctsAdmin, userIdentifier);
+        NewUserCreationRequest userCreationRequest1 = inviteUserCreationRequest(randomAlphabetic(6)
+                + "@email.com", "testLastName1", "testFirstName1", userRoles);
+        userProfileCreateUserWireMock("testFirstName2", "testLastName2", "dummy@email.com",
+                "testFirstName1", "testLastName1", "dummy@email.com", HttpStatus.CREATED);
+        Map<String, Object> profUser = professionalReferenceDataClient.addUserToOrganisationWithUserId(
+                organisationIdentifier, userCreationRequest1, hmctsAdmin, userIdentifier);
+
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationAndUserIdentifier(
+                organisationIdentifier, hmctsAdmin, profUser.get("userIdentifier").toString());
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(3);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
+
+        HashMap firstUser = professionalUsersResponses.get(0);
+        assertThat(firstUser.get(USER_IDENTIFIER)).isNotNull();
+        assertThat(firstUser.get("firstName")).isEqualTo("testFirstName1");
+        assertThat(firstUser.get("lastName")).isEqualTo("testLastName1");
+
+        HashMap secondUser = professionalUsersResponses.get(1);
+        assertThat(secondUser.get(USER_IDENTIFIER)).isNotNull();
+        assertThat(secondUser.get("firstName")).isEqualTo("testFirstName2");
+        assertThat(secondUser.get("lastName")).isEqualTo("testLastName2");
     }
 }

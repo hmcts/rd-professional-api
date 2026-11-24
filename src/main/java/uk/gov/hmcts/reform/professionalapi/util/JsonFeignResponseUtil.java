@@ -2,22 +2,24 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Response;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
 
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseUtil {
     private static final ObjectMapper json = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).registerModule(new JavaTimeModule());
 
     private JsonFeignResponseUtil() {
 
@@ -46,7 +48,8 @@ public class JsonFeignResponseUtil {
         responseHeaders.entrySet().stream().forEach(e -> {
             if (!(e.getKey().equalsIgnoreCase("request-context") || e.getKey()
                     .equalsIgnoreCase("x-powered-by") || e.getKey()
-                    .equalsIgnoreCase("content-length"))) {
+                    .equalsIgnoreCase("content-length") || e.getKey()
+                    .equalsIgnoreCase("transfer-encoding"))) {
                 responseEntityHeaders.put(e.getKey(), new ArrayList<>(e.getValue()));
             }
         });

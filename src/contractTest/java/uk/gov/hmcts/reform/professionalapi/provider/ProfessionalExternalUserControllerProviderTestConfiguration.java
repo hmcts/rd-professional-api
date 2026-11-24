@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UserProfileUpdateRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
@@ -14,69 +16,78 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepos
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserConfiguredAccessRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
 @Configuration
 public class ProfessionalExternalUserControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     protected OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     protected ClientRegistrationRepository clientRegistrationRepository;
 
-    @MockBean
-    IdamRepository idamRepository;
-
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     ServiceAuthFilter serviceAuthFilter;
+
+    @MockitoBean
+    UserConfiguredAccessRepository userConfiguredAccessRepository;
+
+    @MockitoBean
+    UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
     @Primary
     @Bean
-    protected ProfessionalUserService professionalUserService() {
+    public ProfessionalUserService professionalUserService(ProfessionalUserRepository professionalUserRepository,
+                                                           UserProfileFeignClient userProfileFeignClient) {
         return new ProfessionalUserServiceImpl(organisationRepository,
                 professionalUserRepository,
                 userAttributeRepository,
                 prdEnumRepository,
                 userAttributeService,
-                userProfileFeignClient);
+                userProfileFeignClient,
+                userConfiguredAccessRepository,
+                userProfileUpdateRequestValidator);
     }
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeRepository userAttributeRepository;
 
-    @MockBean
+    @MockitoBean
+    UserAccountMapRepository userAccountMapRepository;
+
+    @MockitoBean
     PrdEnumRepository prdEnumRepository;
 
-    @MockBean
+    @MockitoBean
     UserAttributeServiceImpl userAttributeService;
 
-    @MockBean
+    @MockitoBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
-    @MockBean
+    @MockitoBean
     PaymentAccountRepository paymentAccountRepository;
 
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
-        return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
-            emf, professionalUserRepository, organisationService,
-            userAccountMapService, paymentAccountRepository);
+        return Mockito.mock(PaymentAccountService.class);
     }
 
     @Bean
@@ -93,7 +104,7 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
 
     @Bean
     @Primary
-    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter() {
+    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter(IdamRepository idamRepository) {
         return new PactJwtGrantedAuthoritiesConverter(idamRepository);
     }
 

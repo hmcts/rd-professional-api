@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
-import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getProfessionalUser;
-
 import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
@@ -16,8 +11,13 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getProfessionalUser;
+
 @Provider("referenceData_organisation_mfa")
-@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import({OrganisationalExternalControllerProviderTestConfiguration.class, ProviderTestConfiguration.class})
 @IgnoreNoPactsToVerify
 public class OrganisationalMfaStatusControllerProviderTest extends MockMvcProviderTest {
 

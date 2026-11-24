@@ -6,12 +6,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationValidationResponse;
@@ -22,14 +25,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_EMPTY_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_INVALID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_TYPE_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 @Component
@@ -63,7 +71,10 @@ public class OrganisationCreationRequestValidator {
         validators.forEach(v -> v.validate(organisationCreationRequest));
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
-
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            validateOrgType(orgCreationRequestV2.getOrgType());
+            validateOrgAttributesRequest(orgCreationRequestV2.getOrgAttributes());
+        }
     }
 
     public List<ContactInformationValidationResponse> validate(
@@ -71,7 +82,7 @@ public class OrganisationCreationRequestValidator {
 
         Optional<List<ContactInformationCreationRequest>> infoList =
                 Optional.ofNullable(contactInformationCreationRequests);
-        if (infoList.isPresent() && infoList.get().isEmpty()) {
+        if (infoList.isEmpty() || infoList.get().isEmpty()) {
             throw new InvalidRequest("Request is empty");
         }
 
@@ -105,6 +116,14 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
+    public void validateOrgType(String orgType) {
+        if (orgType == null || orgType.trim().isEmpty()) {
+            throw new InvalidRequest("orgType must not be null/empty");
+        } else if (!orgType.matches(ORG_TYPE_REGEX)) {
+            throw new InvalidRequest(ORG_TYPE_INVALID);
+        }
+    }
+
     public static boolean contains(String status) {
         for (OrganisationStatus type : OrganisationStatus.values()) {
             if (type.name().equalsIgnoreCase(status)) {
@@ -120,6 +139,36 @@ public class OrganisationCreationRequestValidator {
             throw new EmptyResultDataAccessException(1);
         }
     }
+
+
+    public void validateForEmptyOrNullInput(String bulkCustomerId, String idamId) {
+        if (isEmptyValue(bulkCustomerId) || isEmptyValue(idamId)) {
+            throw new InvalidRequest("Invalid Request");
+        }
+    }
+
+
+    public static void validateBulkCustomerRequest(BulkCustomerRequest bulkCustomerRequest) {
+        if (StringUtils.isBlank(bulkCustomerRequest.getBulkCustomerId())
+                || StringUtils.isBlank(bulkCustomerRequest.getIdamId())
+                || null == bulkCustomerRequest.getBulkCustomerId()
+                || null == bulkCustomerRequest.getIdamId()) {
+            throw new InvalidRequest("Mandatory fields are blank or null");
+        }
+
+    }
+
+    public void validateInputForSpecialCharacter(String inputRequest) {
+        if (isRegexSatisfied(inputRequest, ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
+            throw new InvalidRequest("Invalid Request");
+        }
+    }
+
+    public static boolean isRegexSatisfied(String stringToEvaluate, String regex) {
+        Matcher matcher = Pattern.compile(regex).matcher(stringToEvaluate);
+        return matcher.find();
+    }
+
 
     public void isOrganisationActive(Organisation organisation) {
 
@@ -144,6 +193,19 @@ public class OrganisationCreationRequestValidator {
         requestPaymentAccount(request.getPaymentAccount());
         requestContactInformation(request.getContactInformation());
     }
+
+    private void validateOrgAttributesRequest(List<OrgAttributeRequest> orgAttributes) {
+        if (orgAttributes != null) {
+            orgAttributes.forEach(orgAttribute -> {
+                if (orgAttribute.getKey() == null || orgAttribute.getKey().trim().isEmpty()
+                    || orgAttribute.getValue() == null || orgAttribute.getValue().trim().isEmpty()) {
+                    throw new InvalidRequest("Empty Org Attribute Value");
+                }
+            });
+        }
+    }
+
+
 
     private void requestSuperUserValidateAccount(UserCreationRequest superUser) {
         if (superUser == null || isEmptyValue(superUser.getFirstName())
@@ -232,7 +294,7 @@ public class OrganisationCreationRequestValidator {
         } catch (InvalidRequest invalidRequest) {
 
             var contactInfoBuilder = new ContactInformationValidationResponse();
-            contactInfoBuilder.setUprn(contactInformation.getUprn());
+            contactInfoBuilder.setUprn(contactInformation != null ? contactInformation.getUprn() : null);
             contactInfoBuilder.setValidAddress(false);
             contactInfoBuilder.setErrorDescription(invalidRequest.getMessage());
             contactInformationValidationResponses.add(contactInfoBuilder);
@@ -240,6 +302,7 @@ public class OrganisationCreationRequestValidator {
         }
 
     }
+
 
     public boolean isEmptyValue(String value) {
         return value != null && value.trim().isEmpty();
@@ -273,4 +336,3 @@ public class OrganisationCreationRequestValidator {
 
 
 }
-

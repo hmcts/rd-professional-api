@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class PrdEnumIdTest {

@@ -1,53 +1,58 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
-import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.time.LocalDateTime;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getOrganisationProfileIds;
+
+
+
 public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
     @JsonProperty
-    private OrganisationStatus status;
+    protected OrganisationStatus status;
     @JsonProperty
-    private String statusMessage;
+    protected String statusMessage;
     @JsonProperty
-    private String sraId;
+    protected String sraId;
     @JsonProperty
-    private Boolean sraRegulated;
+    protected Boolean sraRegulated;
     @JsonProperty
-    private String companyNumber;
+    protected String companyNumber;
     @JsonProperty
-    private String companyUrl;
+    protected String companyUrl;
     @JsonProperty
-    private SuperUserResponse superUser;
+    protected SuperUserResponse superUser;
     @JsonProperty
-    private List<String> paymentAccount;
+    protected List<String> paymentAccount;
     @JsonProperty
-    private List<String> pendingPaymentAccount = new ArrayList<>();
+    protected List<String> pendingPaymentAccount = new ArrayList<>();
     @JsonProperty
     @DateTimeFormat
-    private LocalDateTime dateReceived;
+    protected LocalDateTime dateReceived;
     @JsonProperty
     @DateTimeFormat
     @JsonInclude(ALWAYS)
-    private LocalDateTime dateApproved = null;
-
-
+    protected LocalDateTime dateApproved = null;
+    @JsonProperty
+    @DateTimeFormat
+    @JsonInclude(ALWAYS)
+    protected LocalDateTime lastUpdated = null;
+    @JsonProperty
+    protected List<String> organisationProfileIds;
 
     public OrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
@@ -59,7 +64,8 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         }
     }
 
-    private void getOrganisationEntityResponse(
+    @SuppressWarnings("java:S6204")
+    protected void getOrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
             Boolean isRequiredPendingPbas, Boolean isRequiredAllPbas) {
 
@@ -106,6 +112,9 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
 
         this.dateReceived = organisation.getCreated();
         this.dateApproved = organisation.getDateApproved();
-
+        this.lastUpdated = organisation.getLastUpdated();
+        this.organisationProfileIds = getOrganisationProfileIds(organisation);
     }
+
+
 }

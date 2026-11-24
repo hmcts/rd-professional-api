@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationEntityResponseTest {
@@ -20,6 +23,19 @@ class OrganisationEntityResponseTest {
                 false, false, true);
 
         assertThat(organisationEntityResponse).isNotNull();
+    }
+
+    @Test
+    void test_OrganisationEntityResponseWithProfileId() {
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
+        organisation.setOrgType(SOLICITOR_ORG);
+
+        OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(organisation,
+                false, false, true);
+
+        assertThat(organisationEntityResponse).isNotNull();
+        assertTrue(organisationEntityResponse.organisationProfileIds.contains(SOLICITOR_PROFILE));
     }
 
     @Test

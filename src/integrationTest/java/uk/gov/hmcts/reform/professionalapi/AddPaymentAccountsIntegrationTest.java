@@ -2,29 +2,31 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.INVALID_REQUEST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.MALFORMED_JSON;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ADD_PBA_REQUEST_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_USER_MUST_BE_ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ADD_PBA_REQUEST_EMPTY;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     ObjectMapper mapper = new ObjectMapper();
@@ -52,7 +54,45 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8)
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsAll(paymentAccountsToAdd);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_all_PaymentAccounts_Success_ShouldReturn_201_and_retrieve_pbas_external() {
+        Set<String> paymentAccountsToAdd = new HashSet<>();
+        paymentAccountsToAdd.add("PBA0000002");
+
+        PbaRequest pbaRequest = new PbaRequest();
+        pbaRequest.setPaymentAccounts(paymentAccountsToAdd);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient
+                .addPaymentsAccountsByOrgId(pbaRequest, puiFinanceManager, userId);
+
+        assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
+
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeaderForExternalUsers(
+                        "someone@somewhere.com", puiUserManager, userId);
+
+        Map<String, Object> organisationEntityResponse =
+                (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
+        List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
+        assertThat(paymentAccount)
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
                 .containsAll(paymentAccountsToAdd);
     }
 
@@ -89,8 +129,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8)
-                .containsAll(paymentAccountsToAdd);
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     @Test
@@ -128,7 +173,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8);
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     @Test
@@ -164,7 +215,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8);
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     @Test
@@ -260,7 +317,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8);
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     private String createActiveUserAndOrganisation(boolean isActive) {
@@ -392,19 +455,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
     @Test
     @SuppressWarnings("unchecked")
-    void test_add_PaymentAccounts_Success_Has_Null_Value_also_PBA_ShouldReturn_201() {
+    void test_add_PaymentAccounts_Success_Has_Null_Value_also_PBA_ShouldReturn_201() throws JsonProcessingException {
 
-        String request = "{\n"
-                + "    \"paymentAccounts\": [\n"
-                + "        \"PBAKQNROCA\",\n"
-                + "        \"PBA00000000\",\n"
-                + "        \"PBAKQNR1CA\",\n"
-                + "        \"PBAC013ABE\",\n"
-                + "        null\n"
-                + "    ]\n"
-                + "}";
+        LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
+        data.put("paymentAccounts", ImmutableList
+            .of("PBAKQNROCA","PBA00000000","PBAKQNR1CA","PBAC013ABE","null"));
 
-        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
+        PbaRequest pbaRequest = convertJsonReqStringToObj(getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
@@ -428,26 +485,24 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(10)
+                .hasSize(7)
+                .doesNotContain("PBAKQNROCA","PBAKQNR1CA","PBAC013ABE");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(3)
                 .contains("PBAKQNROCA","PBAKQNR1CA","PBAC013ABE");
 
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void test_add_PaymentAccounts_Failure_Has_Misspelled_payload_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Misspelled_payload_ShouldThrow_400() throws JsonProcessingException {
 
-        String request = "{\n"
-                + "    \"paymentBccounts\": [\n"
-                + "        \"PBAKQNROCA\",\n"
-                + "        \"PBA00000000\",\n"
-                + "        \"PBAKQNR1CA\",\n"
-                + "        \"PBAC013ABE\",\n"
-                + "        null\n"
-                + "    ]\n"
-                + "}";
-
-        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
+        LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
+        data.put("paymentBccounts", ImmutableList
+            .of("PBAKQNROCA","PBA00000000","PBAKQNR1CA","PBAC013ABE","null"));
+        PbaRequest pbaRequest = convertJsonReqStringToObj(getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
@@ -461,15 +516,11 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
 
     @Test
     @SuppressWarnings("unchecked")
-    void test_add_PaymentAccounts_Failure_Has_Misspelled02_payload_ShouldThrow_400() {
+    void test_add_PaymentAccounts_Failure_Has_Misspelled02_payload_ShouldThrow_400() throws JsonProcessingException {
 
-        String request = "{\n"
-                + "    \"PaymentAccounts\": [\n"
-                + "        \"PBAKQNROCA\",\n"
-                + "    ]\n"
-                + "}";
-
-        PbaRequest pbaRequest = convertJsonReqStringToObj(request);
+        LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
+        data.put("PaymentAccounts", ImmutableList.of("PBAKQNROCA"));
+        PbaRequest pbaRequest = convertJsonReqStringToObj(getObjectMapper().writeValueAsString(data));
 
         String userId = createActiveUserAndOrganisation(true);
 
@@ -546,8 +597,13 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount)
-                .hasSize(8)
-                .contains("PBA0000001","PBA0000001","PBA0000001");
+                .hasSize(7)
+                .doesNotContain("PBA0000002");
+
+        List<String> pendingPaymentAccounts = (List<String>) organisationEntityResponse.get("pendingPaymentAccount");
+        assertThat(pendingPaymentAccounts)
+                .hasSize(1)
+                .containsOnly("PBA0000002");
     }
 
     @Test
@@ -588,7 +644,9 @@ class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationT
                 + "        \" \"\n"
                 + "    ]\n"
                 + "}";
-
+        LinkedHashMap<Object,Object> data = new LinkedHashMap<>();
+        data.put("PaymentAccounts", ImmutableList
+            .of("PBAKQNROCB8","null","PBAKQNROCB8","null","PBA3DE3PKJ8","null"));
         PbaRequest pbaRequest = convertJsonReqStringToObj(request);
 
         String userId = createActiveUserAndOrganisation(true);

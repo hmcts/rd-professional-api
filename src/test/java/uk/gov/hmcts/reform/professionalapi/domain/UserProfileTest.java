@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+
+import java.util.UUID;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class UserProfileTest {

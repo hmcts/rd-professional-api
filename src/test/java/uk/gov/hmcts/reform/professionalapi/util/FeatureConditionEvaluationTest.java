@@ -3,13 +3,9 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +19,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.WelcomeController;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluatio
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.SERVICE_AUTHORIZATION;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class FeatureConditionEvaluationTest {
 
     FeatureToggleServiceImpl featureToggleService = mock(FeatureToggleServiceImpl.class);
@@ -84,6 +86,32 @@ class FeatureConditionEvaluationTest {
     }
 
     @Test
+    void testPreHandleWithTokenWithoutBearer() throws Exception {
+        Map<String, String> launchDarklyMap = Map.of("WelcomeController.test", "test-flag");
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        final String token = generateDummyS2SToken("rd_judicial_api");
+        when(httpRequest.getHeader(FeatureConditionEvaluation.SERVICE_AUTHORIZATION)).thenReturn(token);
+        when(featureToggleService.isFlagEnabled(anyString(),anyString())).thenReturn(true);
+        assertTrue(featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod));
+        verify(featureConditionEvaluation, times(1))
+                .preHandle(httpRequest, httpServletResponse, handlerMethod);
+    }
+
+    @Test
+    void testPreHandleWithoutS2SHeader() throws Exception {
+        Map<String, String> launchDarklyMap = Map.of("WelcomeController.test", "test-flag");
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(FeatureConditionEvaluation.SERVICE_AUTHORIZATION)).thenReturn(StringUtils.EMPTY);
+        when(featureToggleService.isFlagEnabled(anyString(),anyString())).thenReturn(true);
+        assertTrue(featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod));
+        verify(featureConditionEvaluation, times(1))
+                .preHandle(httpRequest, httpServletResponse, handlerMethod);
+    }
+
+
+    @Test
     void testPreHandleInvalidServletRequestAttributes() throws Exception {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("WelcomeController.test", "test-flag");
@@ -109,6 +137,12 @@ class FeatureConditionEvaluationTest {
         assertTrue(featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod));
         verify(featureConditionEvaluation, times(1))
             .preHandle(httpRequest, httpServletResponse, handlerMethod);
+    }
+
+    @Test
+    void testPreHandleWhenLdIsEmpty() throws Exception {
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(new HashMap<>());
+        assertTrue(featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod));
     }
 
     public static String generateDummyS2SToken(String serviceName) {

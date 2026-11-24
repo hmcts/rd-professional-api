@@ -2,20 +2,31 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import feign.Request;
 import feign.Response;
+import org.jetbrains.annotations.NotNull;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -25,22 +36,31 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import static java.util.Collections.emptyList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -50,20 +70,33 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
 
 @Provider("referenceData_organisationalInternal")
-@Import(OrganisationalInternalControllerProviderTestConfiguration.class)
+@Import({OrganisationalInternalControllerProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalInternalControllerProviderTest extends MockMvcProviderTest {
 
     @Autowired
     OrganisationRepository organisationRepository;
 
     @Autowired
+    OrgAttributeRepository orgAttributeRepository;
+
+    @Autowired
     PaymentAccountRepository paymentAccountRepository;
+
+
+    @Autowired
+    ProfessionalUserRepository professionalUserRepository;
+
+    @Autowired
+    BulkCustomerDetailsRepository bulkCustomerDetailsRepository;
 
     @Autowired
     ProfessionalUserService professionalUserService;
 
     @Autowired
     PrdEnumService prdEnumService;
+
+    @Autowired
+    OrganisationService organisationServiceMock;
 
     @Autowired
     OrganisationInternalController organisationInternalController;
@@ -88,6 +121,10 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public static final String COMPANY_NUMBER = "companyN";
     public static final String COMPANY_URL = "www.org.com";
 
+    public static final String PBA_NUMBER = "PBA1234567";
+
+
+
     @Override
     void setController() {
         testTarget.setControllers(organisationInternalController);
@@ -99,6 +136,12 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         Organisation organisation = getOrganisation();
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationService.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
 
     }
 
@@ -107,10 +150,42 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     public void setUpOrganisationForGivenId() {
 
         Organisation organisation = getOrganisation();
+        organisation.setPaymentAccounts(emptyList());
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.retrieveOrganisation(anyString(), anyBoolean()))
+            .thenReturn(new OrganisationEntityResponse(organisation, true, true, true));
 
     }
 
+    //retrieveOrganisationsWithPagination
+    @SuppressWarnings("unchecked")
+    @State("An organisation exists with pagination")
+    public void setUpOrganisationWithPagination() {
+
+        Organisation organisation = getOrganisation();
+        Page<Organisation> orgPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE, OrganisationStatus.PENDING),
+            any(Pageable.class))).thenReturn(orgPage);
+        when(orgPage.getContent()).thenReturn(List.of(organisation));
+    }
+
+
+    //retrieveOrganisationsWithStatusAndPagination
+    @SuppressWarnings("unchecked")
+    @State("An active organisation exists for given status and with pagination")
+    public void setUpOrganisationWithStatusAndPagination() {
+
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+            COMPANY_NUMBER, false, COMPANY_URL);
+        addSuperUser(organisation);
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class)))
+            .thenReturn(mock(Page.class));
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE), any(Pageable.class))
+                .getContent()).thenReturn(List.of(organisation));
+    }
+
+    @SuppressWarnings("unchecked")
     @State("Active organisations exists for a logged in user")
     public void setActiveOrganisationsForLoggedInUser() throws IOException {
 
@@ -118,7 +193,16 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(List.of(organisation));
+        when(organisationRepository.findByStatusIn(List.of(OrganisationStatus.ACTIVE)))
+                .thenReturn(List.of(organisation));
+
+        OrganisationsDetailResponse response = new OrganisationsDetailResponse(
+            List.of(organisation), true, true, true);
+        response.setTotalRecords(1);
+        when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationServiceMock.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
+        when(organisationService.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -137,6 +221,42 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
     }
 
+    @SuppressWarnings("unchecked")
+    @State("Active organisations exists for a logged in user using lastUpdatedSince")
+    public void setActiveOrganisationsForLoggedInUserUsingLastUpdatedSince() throws IOException {
+
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
+        addSuperUser(organisation);
+        organisation.setOrganisationIdentifier("M0AEAP0");
+        organisation.setLastUpdated(LocalDateTime.of(2023, 11, 20, 15, 51, 33));
+        organisation.setDateApproved(LocalDateTime.of(2023, 11, 19, 15, 51, 33));
+
+        Page<Organisation> pageable = Mockito.mock(Page.class);
+        when(pageable.getContent()).thenReturn(List.of(organisation));
+        when(pageable.getTotalElements()).thenReturn(1L);
+        when(pageable.isLast()).thenReturn(true);
+        when(organisationRepository.findByStatusInAndLastUpdatedGreaterThanEqual(any(), any(), any()))
+                .thenReturn(pageable);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUsers().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+    }
+
+    @SuppressWarnings("unchecked")
     @State("User invited to Organisation")
     public void setUpUserForInviteToOrganisation() throws IOException {
 
@@ -149,7 +269,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(professionalUserService
                 .findProfessionalUserByEmailAddress(anyString())).thenReturn(pu);
 
-        when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(List.of("role"));
+        when(prdEnumService.getPrdEnumByEnumType(anyString())).thenReturn(List.of("role"));
 
         UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
 
@@ -161,22 +281,35 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                         .status(201).build());
     }
 
+    @SuppressWarnings("unchecked")
     @State("An Organisation exists for update")
-    public void setUpOrganisationForUpdate() {
+    public void setUpOrganisationForUpdate() throws JsonProcessingException {
 
         Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+
         Organisation updatedOrganisation = new Organisation(ORG_NAME, OrganisationStatus.PENDING, SRA_ID,
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
-
-        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.save(any())).thenReturn(updatedOrganisation);
 
+        ProfessionalUser professionalUser = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
+        when(professionalUserService.findProfessionalUserById(any())).thenReturn(professionalUser);
+
+        UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class))
+                        .body(body, Charset.defaultCharset()).status(201).build());
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     @State("An Organisation with PBA accounts exists")
     public void setUpOrganisationForPBAsUpdate() {
 
@@ -184,6 +317,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
                 COMPANY_NUMBER, false, COMPANY_URL);
         addSuperUser(organisation);
 
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
         when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
@@ -192,25 +326,60 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     }
 
     //MFA put api test
+    @SuppressWarnings("unchecked")
     @State("An Organisation exists with MFA")
     public void setUpOrganisationForMfaUpdate() {
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(getOrgWithMfaStatus());
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     @State("Update an Organisation's PBA accounts")
     public void setUpOrganisationForUpdatingPBAs() {
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
-                "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
 
-        PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
+        PaymentAccount paymentAccount = new PaymentAccount(PBA_NUMBER);
         paymentAccount.setOrganisation(organisation);
 
         doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any(), any());
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
         when(paymentAccountRepository.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
         when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
+        when(paymentAccountService.updatePaymentAccountsStatusForAnOrganisation(anyList(), anyString()))
+            .thenReturn(new UpdatePbaStatusResponse(null, emptyList(),
+                org.springframework.http.HttpStatus.ACCEPTED.value()));
     }
 
+    @SuppressWarnings("unchecked")
+    @State("A page size & list of organisation profiles for a PRD internal organisation request")
+    public void setUpOrganisationWithPageSize() {
+        Organisation organisation = getOrganisation();
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
+        organisation.setId(UUID.randomUUID());
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), null, anyBoolean(), any(Pageable.class)))
+                .thenReturn(organisationPage);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+    }
+
+    @SuppressWarnings("unchecked")
+    @State("A page size, search after & list of organisation profiles for a PRD internal organisation request")
+    public void setUpOrganisationWithPageSizeAndSearchAfter() {
+        Organisation organisation = getOrganisation();
+        organisation.setOrgType(OrganisationTypeConstants.SOLICITOR_ORG);
+        organisation.setId(UUID.randomUUID());
+        organisation.setLastUpdated(LocalDateTime.now());
+
+        Page<Organisation> organisationPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepository.findByOrgTypeIn(anyList(), any(UUID.class), anyBoolean(), any(Pageable.class)))
+                .thenReturn(organisationPage);
+        when(organisationPage.getContent()).thenReturn(List.of(organisation));
+    }
 
     private void addSuperUser(Organisation organisation) {
         SuperUser superUser = new SuperUser("some-fname", "some-lname",
@@ -236,6 +405,13 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         contactInformation.setCreated(LocalDateTime.now());
         contactInformation.setId(UUID.randomUUID());
         organisation.setContactInformations(List.of(contactInformation));
+
+        SuperUser superUser = new SuperUser("firstName", "lastName",
+                "email", organisation);
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+        organisation.setUsers(users);
         return organisation;
     }
 
@@ -252,6 +428,40 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(organisationRepository.findByPbaStatus(any())).thenReturn(List.of(organisation));
     }
 
+    @State("Receiving a request to DELETE active Users for the Organisation")
+    public void setUpOrganisationForDelete() {
+        Organisation organisation = getOrganisation();
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+        when(organisationService.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
+        when(organisationService.deleteOrganisation(any(Organisation.class), any()))
+            .thenReturn(new DeleteOrganisationResponse(204, "Success"));
+    }
+
+    @State("On receiving get Organisations")
+    public void setUpOrganisationsForGet() {
+        Organisation organisation = getOrganisation();
+        OrganisationsDetailResponse response = new OrganisationsDetailResponse(
+            List.of(organisation), true, true, true);
+        response.setTotalRecords(1);
+        when(organisationServiceMock.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationServiceMock.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
+        when(organisationService.retrieveAllOrganisations(any(), any())).thenReturn(response);
+        when(organisationService.findByOrganisationStatus(any(), anyString(), any())).thenReturn(response);
+    }
+
+    //PACT test to delete user profile as part of ticket RDCC-7097
+    //@State({"A user profile delete request from prd"})
+    public void deleteUserProfile() throws JsonProcessingException {
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapperOne = new ObjectMapper();
+        String deleteBody = mapperOne.writeValueAsString(newUserResponse);
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
+    }
+
     private Organisation getOrganisationWithPbaStatus() {
         PaymentAccount paymentAccount = new PaymentAccount();
         paymentAccount.setPbaNumber("PBA12345");
@@ -259,8 +469,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         paymentAccount.setPbaStatus(PbaStatus.ACCEPTED);
         paymentAccount.setCreated(LocalDateTime.now());
         paymentAccount.setLastUpdated(LocalDateTime.now());
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
-                "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation(ORG_NAME, OrganisationStatus.ACTIVE, SRA_ID,
+                COMPANY_NUMBER, false, COMPANY_URL);
         organisation.setSraRegulated(true);
         organisation.setOrganisationIdentifier("org1");
         organisation.setPaymentAccounts(Collections.singletonList(paymentAccount));
@@ -271,4 +481,14 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         organisation.setUsers(Collections.singletonList(superUser));
         return organisation;
     }
+
+    @NotNull
+    private Map<String, Collection<String>> getResponseHeaders() {
+        Map<String, Collection<String>> responseHeaders = Maps.newHashMap();
+        responseHeaders.put("Content-Type",
+                Collections.singletonList("application/json"));
+        return responseHeaders;
+    }
+
+
 }

@@ -3,21 +3,44 @@ java:
   ingressHost: ${SERVICE_FQDN}
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-    POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-    POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-    POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    POSTGRES_NAME: "{{ .Values.postgresql.auth.database}}"
+    POSTGRES_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     LAUNCH_DARKLY_ENV: "preview"
+    CONTAINER_NAME: rd-prd-data
+    SCHEDULER_ENABLED: false
+    CRON_EXPRESSION: "* */10 * * * *"
+    JWT_ISSUER_VALIDATION_ENABLED: true
+    IDAM_SECURITY_ALLOWED_ISSUERS_0: https://idam-web-public.aat.platform.hmcts.net/o
+    IDAM_SECURITY_ALLOWED_ISSUERS_1: https://hmcts-access.aat.platform.hmcts.net/o
+    IDAM_SECURITY_ALLOWED_ISSUERS_2: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
   postgresql:
     enabled: true
-    postgresqlUsername: dbrefdata
-    postgresqlPassword: dbrefdata
-    postgresqlDatabase: dbrefdata
+    auth:
+      username: dbrefdata
+      password: dbrefdata
+      database: dbrefdata
   keyVaults:
     rd:
       secrets:
         - name: LD-SDK-KEY
           alias: LD_SDK_KEY
-        - name: ApplicationInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - name: professional-api-s2s-secret
           alias: PROFESSIONAL_API_S2S_SECRET
+        - name: rd-prd-storage-account-name
+          alias: ACCOUNT_NAME
+        - name: rd-prd-storage-account-primary-key
+          alias: ACCOUNT_KEY
+        - name: CONTAINER-NAME
+          alias: CONTAINER_NAME
+
+blobstorage:
+  resourceGroup: rd-aso-preview-rg
+  teamName: "RD"
+  location: uksouth
+  setup:
+    containers:
+      - rd-prd-data
+  enabled: true

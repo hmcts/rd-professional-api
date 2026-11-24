@@ -3,10 +3,10 @@ appVersion: "1.0"
 description: A Helm chart for rd-professional-api
 name: rd-professional-api
 home: https://github.com/hmcts/rd-professional-api
-version: 0.0.22
+version: 0.0.40
 maintainers:
   - name: Reference Data Team
 dependencies:
   - name: java
-    version: 3.7.3
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    version: 6.1.1
+    repository: 'oci://hmctsprod.azurecr.io/helm'

@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus.PENDING;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus.PENDING;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserStatusTest {

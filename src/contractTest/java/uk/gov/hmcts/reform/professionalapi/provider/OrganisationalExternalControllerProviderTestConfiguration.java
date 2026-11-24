@@ -1,13 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationMfaStatusController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
@@ -15,27 +18,26 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 
 @TestConfiguration
 public class OrganisationalExternalControllerProviderTestConfiguration extends ProviderTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     protected ProfessionalUserService professionalUserService;
 
-    @MockBean
+    @MockitoBean
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
-    @MockBean
+    @MockitoBean
     protected OrganisationService organisationService;
+
+    @MockitoBean
+    OrgAttributeRepository orgAttributeRepository;
 
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
-        return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
-            emf, professionalUserRepository, organisationService,
-            userAccountMapService, paymentAccountRepository);
+        return Mockito.mock(PaymentAccountService.class);
     }
 
     @Bean
@@ -50,13 +52,13 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
         return new OrganisationMfaStatusController();
     }
 
-    @MockBean
+    @MockitoBean
     protected JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    @MockBean
+    @MockitoBean
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
-    @MockBean
+    @MockitoBean
     OrganisationRepository organisationRepository;
 
     @Bean
@@ -65,9 +67,9 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
         return new MfaStatusServiceImpl();
     }
 
-    @MockBean
+    @MockitoBean
     protected PaymentAccountRepository paymentAccountRepository;
 
-    @MockBean
+    @MockitoBean
     ContactInformationRepository contactInformationRepositoryMock;
 }

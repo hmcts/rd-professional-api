@@ -1,33 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS_UPDATE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_INVALID;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
@@ -51,7 +28,30 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS_UPDATE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_INVALID;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
+
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class PaymentAccountServiceImplTest {
 
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
@@ -138,10 +138,8 @@ class PaymentAccountServiceImplTest {
     @Test
     void testEditPaymentAccountsByOrganisationIdentifier() {
 
-        Organisation organisationMock = mock(Organisation.class);
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
-        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
@@ -210,6 +208,7 @@ class PaymentAccountServiceImplTest {
         assertThat(sut.generateListOfAccountsToDelete(prefU, paymentAccounts)).isNotNull();
         listUserMap = sut.generateListOfAccountsToDelete(prefU, paymentAccounts);
         assertThat(listUserMap.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
+        assertThat(listUserMap.get(0).getPaymentAccount().getPbaNumber()).isEqualTo("PBA1234567");
     }
 
     @Test
@@ -261,6 +260,8 @@ class PaymentAccountServiceImplTest {
         assertThat(response.getPbaUpdateStatusResponses().get(0).getPbaNumber()).contains("PBA123");
         assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage())
                 .contains(ERROR_MSG_PBA_INVALID_FORMAT);
+        assertThat(pbaRequestList.get(0).getPbaNumber()).isEqualTo("PBA1234567");
+        assertThat(pbaRequestList.get(1).getPbaNumber()).isEqualTo("PBA123");
     }
 
     @Test
@@ -333,6 +334,9 @@ class PaymentAccountServiceImplTest {
         List<PbaUpdateStatusResponse> response = sut.acceptOrRejectPbas(pbasFromDb, pbaRequestList, new ArrayList<>());
 
         assertThat(response).isNotNull();
+        assertThat(pbaRequestList.get(0).getPbaNumber()).isEqualTo("PBA1234567");
+        assertThat(pbaRequestList.get(1).getPbaNumber()).isEqualTo("PBA7654321");
+
         verify(paymentAccount, times(1)).setPbaStatus(ACCEPTED);
         verify(paymentAccount, times(1)).setStatusMessage("ACCEPTED STATUS");
         verify(paymentAccountRepositoryMock, times(1)).deleteAll(any());

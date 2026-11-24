@@ -1,22 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-
-import java.util.Optional;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +23,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.SINCE_TIMESTAMP_FORMAT;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 
 
 @RequestMapping(
@@ -43,45 +47,49 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 @Validated
 @RestController
 @Slf4j
+@SuppressWarnings("checkstyle:Indentation")
 public class ProfessionalUserInternalController extends SuperController {
 
-    @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
-            notes = "**IDAM Roles to access API** :\n prd-admin,\n prd-aac-system",
-            response = ProfessionalUsersEntityResponse.class,
-            responseContainer = "list",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
+            description = "**IDAM Roles to access API** :<br> prd-admin,<br> prd-aac-system",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiParam(
+    @Parameter(
             name = "showDeleted",
-            type = "string",
-            value = "Flag (True/False) to decide whether Deleted Users are included in the response"
+            description = "Flag (True/False) to decide whether Deleted Users are included in the response"
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "List of Professional Users and their details"
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid Organisation Identifier was provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Organisation or Users found with the given ID"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "List of Professional Users and their details",
+            content = @Content(array = @ArraySchema(schema =
+            @Schema(implementation = ProfessionalUsersEntityResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid Organisation Identifier was provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation or Users found with the given ID",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @GetMapping(
             value = "/{orgId}/users",
             produces = APPLICATION_JSON_VALUE
@@ -90,54 +98,61 @@ public class ProfessionalUserInternalController extends SuperController {
     public ResponseEntity<Object> findUsersByOrganisation(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @RequestParam(value = "userIdentifier", required = false) String userIdentifier,
             @RequestParam(value = "showDeleted", required = false) String showDeleted,
-            @ApiParam(name = "returnRoles")
+            @Parameter(name = "returnRoles")
             @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size
     ) {
         var status = EMPTY;
-        if (isSystemRoleUser(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles())) {
+        if (isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles())) {
             status = ACTIVE;
         }
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
+        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status, page,
+                size);
     }
 
-    @ApiOperation(
-            value = "Modify the Roles or Status of a User",
-            notes = "**IDAM Roles to access API** :\n prd-admin",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "Modify the Roles or Status of a User",
+            description = "**IDAM Roles to access API** :<br> prd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 201,
-                    message = "The User's Roles/Status have been modified",
-                    response = ModifyUserRolesResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "Invalid request provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Organisation or User found with the given ID"
-            ),
-            @ApiResponse(
-                    code = 412,
-                    message = "One or more of the Roles provided is already assigned to the User"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
+
+    @ApiResponse(
+            responseCode = "201",
+            description = "The User's Roles/Status have been modified",
+            content = @Content(schema = @Schema(implementation = ModifyUserRolesResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "No Organisation or User found with the given ID",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "412",
+            description = "One or more of the Roles provided is already assigned to the User",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
     @PutMapping(
             path = "/{orgId}/users/{userId}",
             produces = APPLICATION_JSON_VALUE
@@ -145,17 +160,68 @@ public class ProfessionalUserInternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @Secured("prd-admin")
     public ResponseEntity<Object> modifyRolesForExistingUserOfOrganisation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "userProfileUpdatedData")
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message
                     = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") String orgId,
             @PathVariable("userId") String userId,
-            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") String origin
     ) {
 
         organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(orgId);
 
         //Received request to update user roles of an organisation
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, Optional.of(origin));
 
+    }
+
+    @Operation(
+            summary = "Retrieves the details of all users with a last updated date/time >= since, "
+                    + "or a single user by user identifier",
+            description = "**Bearer token not required to access API. Only a valid s2s token**",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization")
+            }
+    )
+    @Parameter(
+            name = "since",
+            description = "Timestamp to fetch users with last updated date/time >= since, "
+                    + "expected format: " + SINCE_TIMESTAMP_FORMAT
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "List of Users and their details",
+            content = @Content(array = @ArraySchema(schema =
+            @Schema(implementation = GetRefreshUsersResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid request has been provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
+
+    @GetMapping(
+            path = "/users",
+            produces = APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Object> getRefreshUsers(
+            @RequestParam(value = "since", required = false) String since,
+            @RequestParam(value = "userId", required = false) String userId,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "searchAfter", required = false) UUID searchAfter
+    ) {
+        organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(since, userId, pageSize, searchAfter);
+
+        return professionalUserService.fetchUsersForRefresh(since, userId, pageSize, searchAfter);
     }
 }

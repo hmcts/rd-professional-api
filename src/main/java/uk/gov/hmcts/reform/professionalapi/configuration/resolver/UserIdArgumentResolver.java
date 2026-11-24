@@ -1,24 +1,25 @@
 package uk.gov.hmcts.reform.professionalapi.configuration.resolver;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 
 
 @Slf4j
 public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Autowired
-    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
+    IdamRepository idamRepository;
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -38,10 +39,15 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
         String userId = null;
         //Inside UserIdArgumentResolver
-        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
+        UserInfo userInfo = idamRepository.getUserInfo(getUserToken());
         if (null != userInfo && StringUtils.isNotEmpty(userInfo.getUid())) {
             userId = userInfo.getUid().trim();
         }
         return userId;
+    }
+
+    public String getUserToken() {
+        var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return jwt.getTokenValue();
     }
 }

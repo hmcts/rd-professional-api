@@ -2,16 +2,23 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import feign.Request;
 import feign.Response;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -20,23 +27,25 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ContactInformationResponseWithDxAddress;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -44,8 +53,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -53,7 +62,6 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -82,10 +90,16 @@ import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationExternalControllerTest {
 
     @InjectMocks
     private OrganisationExternalController organisationExternalController;
+
+    private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
+
+    @InjectMocks
+    private OrganisationExternalControllerV2 organisationExternalControllerV2;
 
     private OrganisationResponse organisationResponse;
     private OrganisationEntityResponse organisationEntityResponse;
@@ -105,7 +119,9 @@ class OrganisationExternalControllerTest {
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private Response response;
-    private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+    private IdamRepository idamRepositoryMock;
+    private Authentication authentication;
+    private SecurityContext securityContext;
     private UserInfo userInfoMock;
     RefDataUtil refDataUtilMock;
     private PaymentAccountValidator paymentAccountValidator;
@@ -119,6 +135,8 @@ class OrganisationExternalControllerTest {
     private final PrdEnum anEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "JURISD_ID");
     private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, "pui-case-manager", "PRD_ROLE");
 
+    private static final String USER_JWT = "Bearer 8gf364fg367f67";
+
     private List<PrdEnum> prdEnumList;
 
     @BeforeEach
@@ -131,7 +149,9 @@ class OrganisationExternalControllerTest {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-        jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
+        idamRepositoryMock = mock(IdamRepository.class);
+        authentication = Mockito.mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
         userInfoMock = mock(UserInfo.class);
         paymentAccountValidator = mock(PaymentAccountValidator.class);
 
@@ -162,13 +182,19 @@ class OrganisationExternalControllerTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
+        HashSet<UserAccessType> userAccessTypes = new HashSet<>();
+        userAccessTypes.add(new UserAccessType("jurisdictionId", "organisationProfileId", "accessTypeId", false));
+
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles, false);
+                "some@email.com", userRoles, false, userAccessTypes);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("test", "PENDING", null,
+                "sra-id", "false", "number02", "company-url",
+                userCreationRequest, null, null,"Doctor",null);
         userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
                 "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles,
                 false);
@@ -190,6 +216,24 @@ class OrganisationExternalControllerTest {
                 .validate(any(OrganisationCreationRequest.class));
         verify(organisationServiceMock, times(1))
                 .createOrganisationFrom(organisationCreationRequest);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+
+    @Test
+    void test_CreateOrganisationV2() {
+        when(organisationServiceMock.createOrganisationFrom(organisationOtherOrgsCreationRequest))
+                .thenReturn(organisationResponse);
+
+        ResponseEntity<?> actual = organisationExternalControllerV2
+                .createOrganisationUsingExternalController(organisationOtherOrgsCreationRequest);
+
+        verify(organisationCreationRequestValidatorMock, times(1))
+                .validate(any(OrganisationOtherOrgsCreationRequest.class));
+        verify(organisationServiceMock, times(1))
+                .createOrganisationFrom(organisationOtherOrgsCreationRequest);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -219,8 +263,18 @@ class OrganisationExternalControllerTest {
         authorities.add(TestConstants.PUI_USER_MANAGER);
         String email = "test@email.com";
         when(httpRequest.getHeader(anyString())).thenReturn(email);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
+
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .header("aHeader", "aHeader")
+                .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(
                 UUID.randomUUID().toString().substring(0, 7));
@@ -229,7 +283,7 @@ class OrganisationExternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
         verify(httpRequest, times(2)).getHeader(anyString());
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
         verify(userInfoMock, times(1)).getRoles();
     }
 
@@ -241,7 +295,7 @@ class OrganisationExternalControllerTest {
         authorities.add(TestConstants.PUI_USER_MANAGER);
         String email = "test@email.com";
         when(httpRequest.getHeader(anyString())).thenReturn(email);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(
@@ -251,7 +305,7 @@ class OrganisationExternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
         verify(httpRequest, times(2)).getHeader(anyString());
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
         verify(userInfoMock, times(1)).getRoles();
 
     }
@@ -303,9 +357,9 @@ class OrganisationExternalControllerTest {
                 organisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional(
                         ACTIVE.name(), true);
         List<OrganisationMinimalInfoResponse> minimalInfoResponseList = responseEntity.getBody();
-        assertThat(minimalInfoResponseList).usingFieldByFieldElementComparator()
+        assertThat(minimalInfoResponseList).usingRecursiveFieldByFieldElementComparator()
                 .contains(organisationMinimalInfoResponse);
-        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(200);
         verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());
 
     }

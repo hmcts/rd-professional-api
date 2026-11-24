@@ -1,4 +1,5 @@
 {
+  "10049_Non-Storable Content_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore",
   "10021_X-Content-Type-Options Header Missing_http://rd-professional-api-aat.service.core-compute-aat.internal/_GET": "ignore",
   "10021_X-Content-Type-Options Header Missing_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?showDeleted=showDeleted_GET": "ignore",
@@ -190,5 +191,26 @@
   "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/addresses_DELETE" : "ignore",
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/addresses_DELETE" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/pbas_PUT" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/pbas_PUT" : "ignore"
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/pbas_PUT" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/pba/status_GET" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/pba/status_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/pba/status_GET" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/pba/status_GET" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/pba/status_PUT" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/pba/status_PUT" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/pba/status_PUT" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/pba/status_PUT" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/mfa_PUT" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/mfa_PUT" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/mfa_PUT" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/mfa_PUT" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/userId?origin=EXUI_PUT" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/userId?origin=EXUI_PUT" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations?id=id&page=10&size=10&status=status_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&status=status&userIdentifier=userIdentifier_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&userIdentifier=userIdentifier_GET" : "ignore",
+  "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&status=status&userIdentifier=userIdentifier_GET" : "ignore",
+  "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&userIdentifier=userIdentifier_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore",
+  "10021_X-Content-Type-Options Header Missing_http://rd-professional-api-aat.service.core-compute-aat.internal_GET" : "ignore"
 }

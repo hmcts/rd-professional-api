@@ -1,20 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -25,6 +12,18 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 class OrganisationIdentifierValidatorImplTest {
@@ -143,4 +142,37 @@ class OrganisationIdentifierValidatorImplTest {
         assertDoesNotThrow(() ->
                 organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation, NOT_FOUND));
     }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWhenBothParamsNull() {
+        assertThrows(InvalidRequest.class,() ->
+                organisationIdentifierValidatorImpl.validateGetRefreshUsersParams(null, null, null, null));
+    }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWithInvalidSize() {
+        UUID uuid = UUID.randomUUID();
+        assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
+                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, -1, uuid));
+    }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWithBadDateTimeFormat() {
+        assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl
+                .validateGetRefreshUsersParams("Bad date time pattern", null, null, null));
+    }
+
+    @Test
+    void test_validateGetRefreshUsersParamsWithValidFormat() {
+        assertDoesNotThrow(() -> organisationIdentifierValidatorImpl
+                .validateGetRefreshUsersParams("2023-12-05T14:49:53", null, 1, null));
+    }
+
+    @Test
+    void test_validateSince() {
+        assertThrows(InvalidRequest.class,() -> organisationIdentifierValidatorImpl.validateSince("bad format"));
+        organisationIdentifierValidatorImpl.validateSince(null);
+        organisationIdentifierValidatorImpl.validateSince("2023-12-05T14:49:53");
+    }
+
 }

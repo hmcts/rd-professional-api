@@ -1,17 +1,24 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.MultipleOrganisationsResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -20,7 +27,22 @@ public interface OrganisationService {
 
     OrganisationResponse createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest);
 
-    OrganisationsDetailResponse retrieveAllOrganisations();
+    OrganisationsDetailResponse retrieveAllOrganisations(LocalDateTime formattedSince, Pageable pageable);
+
+    BulkCustomerOrganisationsDetailResponse retrieveOrganisationDetailsForBulkCustomer(String bulkCustId,
+                                                                                       String idamId);
+
+    OrganisationsDetailResponseV2 retrieveAllOrganisationsForV2Api(LocalDateTime formattedSince, Pageable pageable);
+
+    OrganisationEntityResponseV2 retrieveOrganisationForV2Api(String organisationIdentifier,
+                                                              boolean isPendingPbaRequired);
+
+    MultipleOrganisationsResponse retrieveOrganisationsByProfileIdsWithPageable(List<String> organisationProfileIds,
+                                                                                Integer pageSize,
+                                                                                UUID searchAfter);
+
+    OrganisationsDetailResponseV2 findByOrganisationStatusForV2Api(LocalDateTime formattedSince, String status,
+                                                                   Pageable pageable);
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
@@ -29,16 +51,17 @@ public interface OrganisationService {
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
-    OrganisationsDetailResponse findByOrganisationStatus(String status);
+    OrganisationsDetailResponse findByOrganisationStatus(LocalDateTime formattedSince, String status,
+                                                         Pageable pageable);
 
     DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String userId);
 
-    List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses);
+    List<Organisation> getOrganisationByStatuses(List<OrganisationStatus> enumStatuses, Pageable pageable);
 
     List<Organisation> getOrganisationByStatus(OrganisationStatus status);
 
-    void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation, boolean pbasValidated,
-                                     boolean isEditPba);
+    List<PaymentAccount> addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation,
+                                                     boolean pbasValidated, boolean isEditPba);
 
     void deletePaymentsOfOrganisation(Set<String> paymentAccounts, Organisation organisation);
 
@@ -53,5 +76,9 @@ public interface OrganisationService {
             List<ContactInformationCreationRequest> contactInformationCreationRequest, String organisationIdentifier);
 
     void deleteMultipleAddressOfGivenOrganisation(Set<UUID> idsSet);
+
+    void deleteOrgAttribute(List<OrgAttributeRequest> orgAttributes, String organisationIdentifier);
+
+    ResponseEntity<OrganisationEntityResponse> retrieveOrganisationByUserId(String userId);
 
 }

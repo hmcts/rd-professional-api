@@ -1,5 +1,19 @@
 package uk.gov.hmcts.reform.professionalapi.oidc;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,21 +23,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
-
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
-import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
-
 @ExtendWith(MockitoExtension.class)
 class JwtGrantedAuthoritiesConverterTest {
 
@@ -31,6 +30,7 @@ class JwtGrantedAuthoritiesConverterTest {
     IdamRepository idamRepositoryMock;
     UserInfo userInfoMock;
     Jwt jwtMock;
+    private static final String USER_JWT = "Bearer 123456789asdfghjk";
 
     @BeforeEach
     void setUp() {
@@ -51,26 +51,26 @@ class JwtGrantedAuthoritiesConverterTest {
 
     @Test
     void test_shouldReturnEmptyAuthoritiesWhenClaimNotAvailable() {
-        when(jwtMock.containsClaim(anyString())).thenReturn(false);
+        when(jwtMock.hasClaim(anyString())).thenReturn(false);
 
         Collection<GrantedAuthority> authorities = converter.convert(jwtMock);
 
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
-        verify(jwtMock, times(1)).containsClaim(anyString());
+        verify(jwtMock, times(1)).hasClaim(anyString());
         verify(idamRepositoryMock, times(0)).getUserInfo(anyString());
     }
 
     @Test
     void test_shouldReturnEmptyAuthoritiesWhenClaimValueNotEquals() {
-        when(jwtMock.containsClaim(anyString())).thenReturn(true);
+        when(jwtMock.hasClaim(anyString())).thenReturn(true);
         when(jwtMock.getClaim(anyString())).thenReturn("Test");
 
         Collection<GrantedAuthority> authorities = converter.convert(jwtMock);
 
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
-        verify(jwtMock, times(1)).containsClaim(anyString());
+        verify(jwtMock, times(1)).hasClaim(anyString());
         verify(jwtMock, times(1)).getClaim(anyString());
         verify(idamRepositoryMock, times(0)).getUserInfo(anyString());
     }
@@ -79,7 +79,7 @@ class JwtGrantedAuthoritiesConverterTest {
     void test_shouldReturnEmptyAuthoritiesWhenIdamReturnsNoUsers() {
         List<String> roles = new ArrayList<>();
 
-        when(jwtMock.containsClaim(anyString())).thenReturn(true);
+        when(jwtMock.hasClaim(anyString())).thenReturn(true);
         when(jwtMock.getClaim(anyString())).thenReturn("access_token");
         when(jwtMock.getTokenValue()).thenReturn("access_token");
         when(userInfoMock.getRoles()).thenReturn(roles);
@@ -89,7 +89,7 @@ class JwtGrantedAuthoritiesConverterTest {
 
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
-        verify(jwtMock, times(1)).containsClaim(anyString());
+        verify(jwtMock, times(1)).hasClaim(anyString());
         verify(jwtMock, times(1)).getClaim(anyString());
         verify(jwtMock, times(1)).getTokenValue();
         verify(userInfoMock, times(1)).getRoles();
@@ -103,7 +103,7 @@ class JwtGrantedAuthoritiesConverterTest {
         roles.add(TestConstants.PUI_CASE_MANAGER);
         roles.add(TestConstants.PUI_FINANCE_MANAGER);
 
-        when(jwtMock.containsClaim(anyString())).thenReturn(true);
+        when(jwtMock.hasClaim(anyString())).thenReturn(true);
         when(jwtMock.getClaim(anyString())).thenReturn("access_token");
         when(jwtMock.getTokenValue()).thenReturn("access_token");
         when(userInfoMock.getRoles()).thenReturn(roles);
@@ -113,7 +113,7 @@ class JwtGrantedAuthoritiesConverterTest {
 
         assertNotNull(authorities);
         assertEquals(2, authorities.size());
-        verify(jwtMock, times(1)).containsClaim(anyString());
+        verify(jwtMock, times(1)).hasClaim(anyString());
         verify(jwtMock, times(1)).getClaim(anyString());
         verify(jwtMock, times(1)).getTokenValue();
         verify(userInfoMock, times(1)).getRoles();
@@ -126,20 +126,20 @@ class JwtGrantedAuthoritiesConverterTest {
         roles.add(TestConstants.PUI_CASE_MANAGER);
         roles.add(TestConstants.PUI_FINANCE_MANAGER);
 
-        when(jwtMock.containsClaim(anyString())).thenReturn(true);
+        when(jwtMock.hasClaim(anyString())).thenReturn(true);
         when(jwtMock.getClaim(anyString())).thenReturn("access_token");
         when(jwtMock.getTokenValue()).thenReturn("access_token");
         when(userInfoMock.getRoles()).thenReturn(roles);
         when(idamRepositoryMock.getUserInfo(anyString())).thenReturn(userInfoMock);
 
         converter.convert(jwtMock);
-        UserInfo userInfo = converter.getUserInfo();
+        UserInfo userInfo = idamRepositoryMock.getUserInfo(USER_JWT);
 
         assertThat(userInfo).isNotNull();
-        verify(jwtMock, times(1)).containsClaim(anyString());
+        verify(jwtMock, times(1)).hasClaim(anyString());
         verify(jwtMock, times(1)).getClaim(anyString());
         verify(jwtMock, times(1)).getTokenValue();
         verify(userInfoMock, times(1)).getRoles();
-        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
+        verify(idamRepositoryMock, times(2)).getUserInfo(anyString());
     }
 }

@@ -1,10 +1,54 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityJUnit5Extension;
+import uk.gov.hmcts.reform.professionalapi.util.DateUtils;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -13,46 +57,12 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.convertStringToLocalDate;
+import static uk.gov.hmcts.reform.professionalapi.util.DateUtils.generateRandomDate;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationProfileIdConstants.SOLICITOR_PROFILE;
 
-import io.restassured.response.Response;
-import lombok.extern.slf4j.Slf4j;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.util.FeatureToggleConditionExtension;
-import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-@SerenityTest
+@ExtendWith({CustomSerenityJUnit5Extension.class, SerenityJUnit5Extension.class, SpringExtension.class})
 @SpringBootTest
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
@@ -63,7 +73,17 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     String superUserEmail;
     String invitedUserEmail;
     String invitedUserId;
+    List<String> invitedUserIds = new ArrayList<>();
+    String lastRecordIdInPage;
     OrganisationCreationRequest organisationCreationRequest;
+    private static final List<String> organisationIdentifiers = new ArrayList<>();
+
+    @AfterAll
+    public static void cleanUp() {
+        organisationIdentifiers.forEach(id ->
+                professionalApiClient.deleteOrganisationByInternalUser(id));
+
+    }
 
     @Test
     @DisplayName("PRD Internal Test Scenarios")
@@ -81,11 +101,58 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         updateOrgStatusScenarios();
     }
 
+    @Test
+    @DisplayName("PRD Internal Test for Group Access Scenarios")
+    void testGroupAccessInternalScenario() {
+        String sinceDateTime = generateRandomDate(null, "30");
+        log.info("sinceDateTime set is : {} ", sinceDateTime);
+        setUpTestData();
+        createOrganisationScenario();
+        inviteMultipleUserScenarios();
+        findUserInternalScenarios();
+        findOrganisationWithSinceDateScenarios(sinceDateTime);
+    }
+
+    public void inviteMultipleUserScenarios() {
+        inviteUserByAnInternalOrgUser(generateRandomEmail());
+        for (int i = 0; i < 4; i++) {
+            inviteUserByAnInternalOrgUser(generateRandomEmail());
+        }
+    }
+
+    public void findUserInternalScenarios() {
+        String sinceDateTime = generateRandomDate(null, "5");
+        log.info("sinceDateTime set is : {} ", sinceDateTime);
+        findByUserIdOrAndSinceDate(null, invitedUserIds.get(0));
+        findByUserIdOrAndSinceDate(sinceDateTime, null);
+        findByUserIdOrAndSinceDate(sinceDateTime, invitedUserId);
+        findByUserIdOrAndSinceDate(null, null);
+
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "2", null);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, "1", lastRecordIdInPage);
+        findBySinceDatePageSizeOrAndSearchAfter(sinceDateTime, null, lastRecordIdInPage);
+
+        findByUserIdInvalidS2SToken(invitedUserIds.get(0));
+        findByUserIdNotFound("non-existing-id");
+    }
+
+    public void inviteUserByAnInternalOrgUser(String email) {
+        log.info("inviteUserByAnInternalOrgUser :: STARTED");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        invitedUserId = (String) newUserResponse.get("userIdentifier");
+        invitedUserIds.add(invitedUserId);
+        log.info("inviteUserByAnInternalOrgUser :: END");
+    }
+
     public void setUpTestData() {
         superUserEmail = generateRandomEmail();
         invitedUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest()
+                .superUser(UserCreationRequest.aUserCreationRequest()
                         .firstName("firstName")
                         .lastName("lastName")
                         .email(superUserEmail)
@@ -98,7 +165,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
- 
+        organisationIdentifiers.add(intActiveOrgId);
     }
 
     public void createOrganisationScenario() {
@@ -123,6 +190,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         findActiveOrganisationsByInternalUserShouldBeSuccess();
         findPendingOrganisationsByInternalUserShouldBeSuccess();
         findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess();
+        findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess();
+        findOrganisationByUserIdByInternalUserShouldBeSuccess();
     }
 
     public void retrieveOrganisationPbaScenarios() {
@@ -152,8 +221,8 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
-        Response response =
-                professionalApiClient.createOrganisationWithoutS2SToken(anOrganisationCreationRequest().build());
+        Response response = professionalApiClient.createOrganisationWithoutS2SToken(
+                OrganisationCreationRequest.anOrganisationCreationRequest().build());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
@@ -199,6 +268,50 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         log.info("findUsersByInternalUserWithRolesShouldReturnSuccess :: END");
     }
 
+    public void findByUserIdOrAndSinceDate(String sinceDate, String userId) {
+        log.info("findByUserIdOrAndSinceDate :: STARTED");
+        Map<String, Object> testResults = professionalApiClient
+                .retrieveUsersBySinceDateOrAndUserId(sinceDate, userId);
+        if ((userId != null && sinceDate != null) || (userId == null && sinceDate == null)) {
+            assertThat(testResults.get("errorDescription")).isEqualTo("001 missing/invalid parameter");
+        } else {
+            lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
+            assertNotNull(lastRecordIdInPage);
+            validateRetrievedUsersDetails(testResults, null, sinceDate);
+        }
+        log.info("findByUserIdOrAndSinceDate :: END");
+    }
+
+    public void findBySinceDatePageSizeOrAndSearchAfter(String sinceDate, String pageSize, String searchAfter) {
+        log.info("findBySinceDatePageSizeOrAndSearchAfter :: STARTED");
+
+        Map<String, Object> testResults = professionalApiClient
+                .retrieveUsersBySinceDatePageSizeOrAndSearchAfter(sinceDate, pageSize, searchAfter);
+        List<HashMap> users = (List<HashMap>) testResults.get("users");
+        lastRecordIdInPage = (String) testResults.get("lastRecordInPage");
+
+        if (pageSize != null) {
+            assertThat(users.size()).isPositive();
+            validateRetrievedUsersDetails(testResults, pageSize, sinceDate);
+        } else if (searchAfter != null) {
+            assertThat(testResults.get("errorDescription"))
+                    .isEqualTo("002 missing/invalid page information");
+        }
+        log.info("findBySinceDatePageSizeOrAndSearchAfter :: END");
+    }
+
+    public void findByUserIdInvalidS2SToken(String userId) {
+        log.info("findByUserIdWithInvalidS2SToken :: STARTED");
+        professionalApiClient
+                .retrieveUserByUnAuthorizedS2sToken(userId);
+    }
+
+    public void findByUserIdNotFound(String userId) {
+        log.info("findByUserIdWithInvalidS2SToken :: STARTED");
+        professionalApiClient
+                .retrieveUserByIdNotFound(userId);
+    }
+
     public void findUsersByInternalUserWithoutRolesShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithoutRolesShouldReturnSuccess :: STARTED");
         validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(intActiveOrgId, hmctsAdmin,
@@ -229,14 +342,38 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     public void findOrganisationByIdByInternalUserShouldBeSuccess() {
         log.info("findOrganisationByIdByInternalUserShouldBeSuccess :: STARTED");
-        validateSingleOrgResponse(professionalApiClient.retrieveOrganisationDetails(
-                intActiveOrgId, hmctsAdmin, OK), "ACTIVE");
+        var response = professionalApiClient.retrieveOrganisationDetails(
+                intActiveOrgId, hmctsAdmin, OK);
+        assertThat(response).isNotNull();
+        verifyOrganisationDetails(response);
         log.info("findOrganisationByIdByInternalUserShouldBeSuccess :: END");
+    }
+
+    public void findOrganisationByUserIdByInternalUserShouldBeSuccess() {
+        log.info("findOrganisationByUserIdByInternalUserShouldBeSuccess :: STARTED");
+        var usersByOrganisationResponse =
+                professionalApiClient.searchUsersByOrganisation(intActiveOrgId, hmctsAdmin,
+                        "False", OK, "false");
+        assertThat(usersByOrganisationResponse)
+                .isNotNull()
+                .hasSizeGreaterThanOrEqualTo(1);
+
+        var users = (List<Map<String, Object>>) usersByOrganisationResponse.get("users");
+        var userId = (String) users.get(0).get("userIdentifier");
+        var response = professionalApiClient.retrieveOrganisationByUserId(
+                userId, OK);
+
+        verifyOrganisationDetails(response);
+
+        log.info("findOrganisationByUserIdByInternalUserShouldBeSuccess :: END");
     }
 
     public void findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-        professionalApiClient.createOrganisation();
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
         Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isPositive();
@@ -261,15 +398,36 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     public void findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess() {
-        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        log.info("findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus("ACTIVE,PENDING", hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         assertThat(response.get("organisations").toString()).contains("status=ACTIVE");
         assertThat(response.get("organisations").toString()).contains("status=PENDING");
-        log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
+        log.info("findPendingAndActiveOrganisationsByInternalUserShouldBeSuccess :: END");
     }
+
+    public void findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess() {
+        log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: STARTED");
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+        String statusMessage = "Company in review";
+
+        professionalApiClient
+                .updateOrganisationToReview(organisationIdentifier, statusMessage, hmctsAdmin);
+        Map<String, Object> orgresponse = professionalApiClient
+                .retrieveOrganisationDetailsByStatus("PENDING,REVIEW", hmctsAdmin);
+
+
+        assertThat(orgresponse.get("organisations")).isNotNull();
+        assertThat(orgresponse.size()).isGreaterThanOrEqualTo(1);
+        assertThat(orgresponse.get("organisations").toString()).contains("status=PENDING");
+        assertThat(orgresponse.get("organisations").toString()).contains("status=REVIEW");
+        log.info("findPendingAndReviewOrganisationsByInternalUserShouldBeSuccess :: END");
+    }
+
 
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");
@@ -387,8 +545,9 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 pbaEditRequest, intActiveOrgId, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();
 
-        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
-        assertThat((List) org.get("paymentAccount")).contains(oldPba.toUpperCase())
+        JsonPath response = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
+        assertThat(response).isNotNull();
+        assertThat(response.getList("paymentAccount")).contains(oldPba.toUpperCase())
                 .contains(pba1.toUpperCase())
                 .contains(pba2.toUpperCase());
         log.info("editPaymentAccountsShouldReturnSuccess :: END");
@@ -408,7 +567,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String pendingOrgIdentifier = (String) response.get("organisationIdentifier");
         assertThat(pendingOrgIdentifier).isNotEmpty();
-        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, NO_CONTENT);
         professionalApiClient.retrieveOrganisationDetails(pendingOrgIdentifier, hmctsAdmin, NOT_FOUND);
         log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: END");
     }
@@ -416,7 +575,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void deleteActiveOrganisationShouldReturnSuccess() {
         log.info("deleteActiveOrganisationShouldReturnSuccess :: STARTED");
         String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
-        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, NO_CONTENT);
         professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
         log.info("deleteActiveOrganisationShouldReturnSuccess :: END");
     }
@@ -433,7 +592,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = true)
     void updateOrgMfaScenario() {
         setUpTestData();
@@ -461,7 +619,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @DisplayName("Update Organisation's MFA should return 403 when toggled off")
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = false)
     void updateOrgMfaShouldReturn403WhenToggledOff() {
         log.info("updateOrgMFAShouldReturn403 :: STARTED");
@@ -483,23 +640,23 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
     public void updateOrgStatusShouldBeSuccess() {
         log.info("updateOrgStatusShouldBeSuccess :: STARTED");
 
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifier = (String) response.get("organisationIdentifier");
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
         String statusMessage = "Company in review";
 
-        professionalApiClient.updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+        professionalApiClient.updateOrganisationToReview(organisationIdentifier, statusMessage, hmctsAdmin);
 
-        Map<String, Object> orgResponse = professionalApiClient
-                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
-        assertEquals(REVIEW.toString(), orgResponse.get("status"));
-        assertEquals(statusMessage, orgResponse.get("statusMessage"));
+        JsonPath jsonPath = professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+        assertThat(jsonPath).isNotNull();
+        assertEquals(REVIEW.toString(), jsonPath.get("status"));
+        assertEquals(statusMessage, jsonPath.get("statusMessage"));
 
         log.info("updateOrgStatusShouldBeSuccess :: END");
     }
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void retrieveOrgsByPbaStatusScenario() {
         setUpTestData();
         findOrganisationByPbaStatusShouldBeSuccessWithPbas();
@@ -517,7 +674,7 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
                 .filter(p -> p.getPbaNumbers().stream()
                         .anyMatch(r -> r.getStatusMessage() == null || !r.getStatusMessage()
                                 .equals(PBA_STATUS_MESSAGE_ACCEPTED))))
-                .allMatch(org -> org.getStatus().isActive());
+                .allSatisfy(org -> org.getStatus().isActive());
         assertThat(orgsResponse.stream().filter(o -> o.getSuperUser() != null)).hasSizeGreaterThan(0);
 
         var pbaByStatusResponses = new ArrayList<FetchPbaByStatusResponse>();
@@ -533,7 +690,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void findOrganisationByPbaStatusShouldReturn403WhenToggledOff() {
         log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: STARTED");
 
@@ -545,7 +701,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnSuccess() {
         log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
         setUpTestData();
@@ -583,7 +738,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnPartialSuccess() {
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
         setUpTestData();
@@ -618,7 +772,6 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
 
     @Test
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
     void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: STARTED");
         List<PbaUpdateRequest> pbaRequestList = new ArrayList<>();
@@ -632,5 +785,460 @@ class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest
         professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
 
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: END");
+    }
+
+    @Test
+    void findOrganisationsWithPaginationShouldReturnSuccess() {
+        log.info("findOrganisationsWithPaginationShouldReturnSuccess :: STARTED");
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
+        Map<String, Object> organisations = professionalApiClient
+            .retrieveAllOrganisationsWithPagination(hmctsAdmin, "1", "2");
+
+        assertThat(organisations).isNotNull().hasSize(2);
+
+        log.info("findOrganisationsWithPaginationShouldReturnSuccess :: END");
+    }
+
+    //Will add below code as soon as RDCC-7024 will be pushed in Dev branch
+    /*@Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when Org is ACTIVE")
+    void findOrganisationsForBulkCustomerShouldReturnSuccess() {
+        log.info("findOrganisationsForBulkCustomerShouldReturnSuccess :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfk";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf4";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, civilAdmin,sidamId, OK);
+
+        assertThat(organisations).isNotNull().hasSize(3);
+        assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a855");
+        assertThat(organisations.get("organisationName")).toString().contains("ORGTESTUSER-PBA-ACCEPTED");
+        assertThat(organisations.get("paymentAccount")).toString().contains("pba-3234569");
+
+
+        log.info("findOrganisationsForBulkCustomerShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when PBA statis is not ACCEPTED")
+    void findOrganisationsForBulkCustomerForPbaStatusIsNotAccepted() {
+        log.info("findOrganisationsForBulkCustomerForPBAStatusIsNotAccepted :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfj";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf6";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId, civilAdmin, sidamId, OK);
+
+        assertThat(organisations).isNotNull().hasSize(3);
+        assertThat(organisations.get("organisationId")).toString().contains("c5e5c75d-cced-4e57-97c8-e359ce33a857");
+        assertThat(organisations.get("organisationName")).toString().contains("ORGTESTUSER-PBA-ACCEPTED");
+        assertThat(organisations.get("paymentAccount")).toString().contains("");
+
+
+        log.info("findOrganisationsForBulkCustomerForPBAStatusIsNotAccepted :: END");
+    }
+
+    @Test
+    @DisplayName("PRD OrganisationDetail for bulk Customer when Org is PENDING")
+    void findOrganisationsForBulkCustomerForPendingOrg() {
+        log.info("findOrganisationsForBulkCustomerForPendingOrg :: STARTED");
+        String bulkCustomerId = "6601e79e-3169-461d-a751-59a33a5sdfl";
+        String sidamId = "6601e79e-3169-461d-a751-60a33a5sdf5";
+        Map<String, Object> organisations = professionalApiClient
+                .retrieveOrganisationForBulkCustomerDetails(bulkCustomerId,civilAdmin, sidamId, NOT_FOUND);
+
+        assertThat(organisations.get("status")).toString().contains("No Organisations found");
+
+
+        log.info("findOrganisationsForBulkCustomerForPendingOrg :: END");
+    }*/
+
+    @Test
+    @DisplayName("PRD Internal Delete Organisation with status REVIEW Test Scenarios")
+    void testInternalOrganisationDeleteScenario() {
+
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        organisationIdentifiers.add(organisationIdentifier);
+
+        String statusMessage = "Company in review";
+
+        professionalApiClient
+                .updateOrganisationToReview(organisationIdentifier, statusMessage, hmctsAdmin);
+
+        JsonPath orgResponse =
+                professionalApiClient.retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, OK);
+        assertEquals(REVIEW.toString(), orgResponse.get("status"));
+        assertEquals(statusMessage, orgResponse.get("statusMessage"));
+
+        professionalApiClient.deleteOrganisation(organisationIdentifier, NO_CONTENT);
+
+        professionalApiClient
+                .retrieveOrganisationDetails(organisationIdentifier, hmctsAdmin, NOT_FOUND);
+    }
+
+    private static void verifyOrganisationDetails(JsonPath response) {
+
+        String companyUrl = response.get("companyUrl");
+        assertThat(companyUrl)
+                .isNotNull()
+                .endsWith("-prd-func-test-company-url");
+
+        String organisationIdentifier = response.get("organisationIdentifier");
+        assertThat(organisationIdentifier)
+                .isNotNull();
+
+        Map<String, String> superUser = response.get("superUser");
+        assertThat(superUser)
+                .isNotNull();
+
+        String firstName = superUser.get("firstName");
+        assertThat(firstName)
+                .isNotNull()
+                .isEqualTo("firstName");
+
+        String lastName = superUser.get("lastName");
+        assertThat(lastName)
+                .isNotNull()
+                .endsWith("lastName");
+
+        String email = superUser.get("email");
+        assertThat(email)
+                .isNotNull()
+                .endsWith("@prdfunctestuser.com");
+
+        String sraId = response.get("sraId");
+        assertThat(sraId)
+                .isNotNull()
+                .endsWith("-prd-func-test-sra-id");
+
+        String companyNumber = response.get("companyNumber");
+        assertThat(companyNumber)
+                .isNotNull()
+                .endsWith("com");
+
+        String dateReceived = response.get("dateReceived");
+        assertThat(dateReceived)
+                .isNotNull();
+
+        String dateApproved = response.get("dateApproved");
+        assertThat(dateApproved)
+                .isNotNull();
+
+        String name = response.get("name");
+        assertThat(name)
+                .isNotNull()
+                .endsWith("-prd-func-test-name");
+
+        Boolean sraRegulated = response.get("sraRegulated");
+        assertThat(sraRegulated)
+                .isNotNull()
+                .isEqualTo(false);
+
+        String status = response.get("status");
+        assertThat(status)
+                .isNotNull()
+                .isEqualTo("ACTIVE");
+
+        List<String> pendingPaymentAccount = response.getList("pendingPaymentAccount");
+        assertThat(pendingPaymentAccount)
+                .isNotNull()
+                .isEmpty();
+
+        verifyContactInformationDetails(response);
+    }
+
+    public void findOrganisationWithSinceDateScenarios(String sinceDate) {
+        findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, null, null);
+        findOrganisationBySinceDateInternalShouldBeSuccess(sinceDate, "1", "2");
+    }
+
+    public void findOrganisationBySinceDateInternalShouldBeSuccess(String sinceDate, String page,
+                                                                   String pageSize) {
+        log.info("findOrganisationBySinceDateInternalShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationDetailsBySinceDate(
+                sinceDate, page, pageSize);
+        assertThat(response).isNotNull();
+        verifyOrganisationDetailsBySinceDate(response, pageSize, sinceDate);
+        log.info("findOrganisationBySinceDateInternalShouldBeSuccess :: END");
+    }
+
+    private static void verifyOrganisationDetailsBySinceDate(Map<String, Object> response,
+                                                             String pageSize, String sinceDate) {
+
+        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
+
+        assertThat(organisations)
+                .isNotNull()
+                .isNotEmpty();
+
+        if (pageSize != null) {
+            assertThat(organisations)
+                    .hasSizeBetween(1, Integer.parseInt(pageSize));
+        }
+        assertThat(response.get("moreAvailable"))
+                .isNotNull();
+
+        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
+
+        organisations.forEach(org -> {
+
+            assertThat(org.get("organisationIdentifier"))
+                    .isNotNull();
+
+            assertThat(org.get("lastUpdated"))
+                    .isNotNull();
+
+            String dateString = (String) org.get("lastUpdated");
+            String formattedDateString = DateUtils.formatDateString(dateString);
+            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
+            assertThat(responseLocalDateTime).isAfterOrEqualTo(sinceLocalDateTime);
+
+            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
+
+            if (organisationProfileIds != null && !organisationProfileIds.isEmpty()) {
+                assertThat(organisationProfileIds)
+                        .isNotEmpty()
+                        .hasSizeGreaterThan(0)
+                        .contains(SOLICITOR_PROFILE);
+            }
+        });
+    }
+
+    private static void verifyOrganisationDetailsBySinceDateV2(Map<String, Object> response,
+                                                               String pageSize, String sinceDate) {
+
+        List<HashMap> organisations = (List<HashMap>) response.get("organisations");
+
+        assertThat(organisations)
+                .isNotNull()
+                .isNotEmpty();
+
+        if (pageSize != null) {
+            assertThat(organisations)
+                    .hasSize(Integer.parseInt(pageSize));
+        }
+        assertThat(response.get("moreAvailable"))
+                .isNotNull();
+
+        LocalDateTime sinceLocalDateTime = convertStringToLocalDate(sinceDate);
+
+        organisations.forEach(org -> {
+
+            assertThat(org.get("organisationIdentifier"))
+                    .isNotNull();
+
+            assertThat(org.get("lastUpdated"))
+                    .isNotNull();
+
+            String dateString = (String) org.get("lastUpdated");
+            String formattedDateString = DateUtils.formatDateString(dateString);
+            LocalDateTime responseLocalDateTime = convertStringToLocalDate(formattedDateString);
+            assertTrue(responseLocalDateTime.isAfter(sinceLocalDateTime));
+
+            List<String> organisationProfileIds = (ArrayList<String>) org.get("organisationProfileIds");
+            assertThat(organisationProfileIds)
+                    .isNotEmpty()
+                    .hasSizeGreaterThan(0);
+
+            assertThat(organisationProfileIds.get(0))
+                    .isEqualTo(SOLICITOR_PROFILE);
+        });
+    }
+
+
+    private static void verifyContactInformationDetails(JsonPath response) {
+
+        List<Map<String, Object>> contactInformation = response.getList("contactInformation");
+        assertThat(contactInformation)
+                .isNotNull()
+                .hasSize(2);
+
+        contactInformation = sortByValue(contactInformation, "addressLine1");
+
+        final Map<String, Object> contactInformation1 = contactInformation.get(0);
+        final Map<String, Object> contactInformation2 = contactInformation.get(1);
+
+        String firstAddressUprn = (String) contactInformation1.get("uprn");
+        assertThat(firstAddressUprn)
+                .isNotNull()
+                .isEqualTo("uprn");
+
+        String firstAddressCountry = (String) contactInformation1.get("country");
+        assertThat(firstAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String firstAddressCreated = (String) contactInformation1.get("created");
+        assertThat(firstAddressCreated)
+                .isNotNull();
+
+        String firstAddressTownCity = (String) contactInformation1.get("townCity");
+        assertThat(firstAddressTownCity)
+                .isNotNull()
+                .isEqualTo("some-town-city");
+
+        String firstAddressCounty = (String) contactInformation1.get("county");
+        assertThat(firstAddressCounty)
+                .isNotNull()
+                .isEqualTo("some-county");
+
+        String firstAddressAddressLine1 = (String) contactInformation1.get("addressLine1");
+        assertThat(firstAddressAddressLine1)
+                .isNotNull()
+                .isEqualTo("addLine1");
+
+        assertThat(firstAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String firstAddressAddressLine2 = (String) contactInformation1.get("addressLine2");
+        assertThat(firstAddressAddressLine2)
+                .isNotNull()
+                .isEqualTo("addLine2");
+
+        String firstAddressPostCode1 = (String) contactInformation1.get("postCode");
+        assertThat(firstAddressPostCode1)
+                .isNotNull()
+                .isEqualTo("some-post-code");
+
+        String firstAddressAddressLine3 = (String) contactInformation1.get("addressLine3");
+        assertThat(firstAddressAddressLine3)
+                .isNotNull()
+                .isEqualTo("addLine3");
+
+        String firstAddressAddressId = (String) contactInformation1.get("addressId");
+        assertThat(firstAddressAddressId)
+                .isNotNull();
+
+        List<Map<String, Object>> firstAddressDxAddress =
+                (List<Map<String, Object>>) contactInformation1.get("dxAddress");
+        assertThat(firstAddressDxAddress)
+                .isNotNull()
+                .hasSize(2);
+
+        firstAddressDxAddress = sortByValue(firstAddressDxAddress, "dxNumber");
+
+        final Map<String, Object> firstAddressDxAddress1 = firstAddressDxAddress.get(0);
+        final Map<String, Object> firstAddressDxAddress2 = firstAddressDxAddress.get(1);
+
+        Object firstAddressDxNumber1 = firstAddressDxAddress1.get("dxNumber");
+        assertThat(firstAddressDxNumber1)
+                .isNotNull()
+                .isEqualTo("DX 123452222");
+
+        Object firstAddressDxExchange1 = firstAddressDxAddress1.get("dxExchange");
+        assertThat(firstAddressDxExchange1)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object firstAddressDxNumber2 = firstAddressDxAddress2.get("dxNumber");
+        assertThat(firstAddressDxNumber2)
+                .isNotNull()
+                .isEqualTo("DX 123456333");
+
+        Object firstAddressDxExchange2 = firstAddressDxAddress2.get("dxExchange");
+        assertThat(firstAddressDxExchange2)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        String secondAddressUprn = (String) contactInformation2.get("uprn");
+        assertThat(secondAddressUprn)
+                .isNotNull()
+                .isEqualTo("uprn1");
+
+        String secondAddressCountry = (String) contactInformation2.get("country");
+        assertThat(secondAddressCountry)
+                .isNotNull()
+                .isEqualTo("some-country");
+
+        String secondAddressCreated = (String) contactInformation2.get("created");
+        assertThat(secondAddressCreated)
+                .isNotNull();
+
+        String secondAddressTownCity = (String) contactInformation2.get("townCity");
+        assertThat(secondAddressTownCity)
+                .isNotNull()
+                .isEqualTo("some-town-city");
+
+        String secondAddressCounty = (String) contactInformation2.get("county");
+        assertThat(secondAddressCounty)
+                .isNotNull()
+                .isEqualTo("some-county");
+
+        String secondAddressAddressLine1 = (String) contactInformation2.get("addressLine1");
+        assertThat(secondAddressAddressLine1)
+                .isNotNull()
+                .isEqualTo("addressLine1");
+
+        String secondAddressAddressLine2 = (String) contactInformation2.get("addressLine2");
+        assertThat(secondAddressAddressLine2)
+                .isNotNull()
+                .isEqualTo("addressLine2");
+
+        String secondAddressPostCode = (String) contactInformation2.get("postCode");
+        assertThat(secondAddressPostCode)
+                .isNotNull()
+                .isEqualTo("some-post-code");
+
+        String secondAddressAddressLine3 = (String) contactInformation2.get("addressLine3");
+        assertThat(secondAddressAddressLine3)
+                .isNotNull()
+                .isEqualTo("addressLine3");
+
+        String secondAddressAddressId = (String) contactInformation2.get("addressId");
+        assertThat(secondAddressAddressId)
+                .isNotNull();
+
+        List<Map<String, Object>> secondAddressDxAddress =
+                (List<Map<String, Object>>) contactInformation2.get("dxAddress");
+        assertThat(secondAddressDxAddress)
+                .isNotNull()
+                .hasSize(3);
+
+        secondAddressDxAddress = sortByValue(secondAddressDxAddress, "dxNumber");
+
+        final Map<String, Object> secondAddressDxAddress1 = secondAddressDxAddress.get(0);
+        final Map<String, Object> secondAddressDxAddress2 = secondAddressDxAddress.get(1);
+        final Map<String, Object> secondAddressDxAddress3 = secondAddressDxAddress.get(2);
+
+        Object secondAddressDxNumber1 = secondAddressDxAddress1.get("dxNumber");
+        assertThat(secondAddressDxNumber1)
+                .isNotNull()
+                .isEqualTo("DX 123456777");
+
+        Object secondAddressDxExchange1 = secondAddressDxAddress1.get("dxExchange");
+        assertThat(secondAddressDxExchange1)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object secondAddressDxNumber2 = secondAddressDxAddress2.get("dxNumber");
+        assertThat(secondAddressDxNumber2)
+                .isNotNull()
+                .isEqualTo("DX 123456788");
+
+        Object secondAddressDxExchange2 = secondAddressDxAddress2.get("dxExchange");
+        assertThat(secondAddressDxExchange2)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+
+        Object secondAddressDxNumber3 = secondAddressDxAddress3.get("dxNumber");
+        assertThat(secondAddressDxNumber3)
+                .isNotNull()
+                .isEqualTo("DX 1234567890");
+
+        Object secondAddressDxExchange3 = secondAddressDxAddress3.get("dxExchange");
+        assertThat(secondAddressDxExchange3)
+                .isNotNull()
+                .isEqualTo("dxExchange");
+    }
+
+    private static List<Map<String, Object>> sortByValue(final List<Map<String, Object>> maps,
+                                                         final String key) {
+        return maps
+                .stream()
+                .sorted(Comparator.comparing(map -> (String) map.get(key)))
+                .collect(Collectors.toList());
     }
 }

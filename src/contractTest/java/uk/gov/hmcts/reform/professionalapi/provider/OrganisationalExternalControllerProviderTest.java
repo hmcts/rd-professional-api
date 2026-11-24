@@ -3,11 +3,17 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import feign.Request;
 import feign.Response;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
@@ -15,17 +21,20 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrgAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -38,15 +47,18 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalExternalPbas")
-@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import({OrganisationalExternalControllerProviderTestConfiguration.class, ProviderTestConfiguration.class})
 public class OrganisationalExternalControllerProviderTest extends MockMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
+    private static final String USER_JWT = "Bearer 8gf364fg367f67";
+    public static final String PBA_NUMBER = "PBA1234567";
 
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
@@ -59,6 +71,9 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+
+    @Autowired
+    IdamRepository idamRepositoryMock;
 
     @Autowired
     MfaStatusService mfaStatusService;
@@ -86,6 +101,14 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
     @Autowired
     ContactInformationRepository contactInformationRepositoryMock;
 
+    @Mock
+    Authentication authentication;
+    @Mock
+    SecurityContext securityContext;
+
+    @Autowired
+    OrgAttributeRepository orgAttributeRepository;
+
     @Override
     void setController() {
         testTarget.setControllers(organisationExternalController);
@@ -94,12 +117,26 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
     @State({"Pbas organisational data exists for identifier " + ORGANISATION_EMAIL})
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
 
+        Jwt jwt =   Jwt.withTokenValue(USER_JWT)
+                .claim("aClaim", "aClaim")
+                .claim("aud", Lists.newArrayList("ccd_gateway"))
+                .header("aHeader", "aHeader")
+                .build();
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(jwt);
+
         String name = "name";
         String sraId = "sraId";
         String companyNumber = "companyNumber";
         String companyUrl = "companyUrl";
 
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
+        Organisation organisation = professionalUser.getOrganisation();
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+        PaymentAccount paymentAccount = new PaymentAccount("paymentAccountA1");
+        paymentAccount.setPbaStatus(PbaStatus.ACCEPTED);
+        organisation.setPaymentAccounts(List.of(paymentAccount));
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
                 "firstName", "lastName", IdamStatus.ACTIVE);
@@ -112,10 +149,12 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
                         .request(mock(Request.class))
                         .body(body, Charset.defaultCharset()).status(200).build());
 
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
+        when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).build());
 
         when(professionalUserRepositoryMock.findByEmailAddress(ORGANISATION_EMAIL)).thenReturn(professionalUser);
+        when(paymentAccountService.findPaymentAccountsByEmail(ORGANISATION_EMAIL.toLowerCase()))
+            .thenReturn(organisation);
 
     }
 
@@ -153,6 +192,7 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
         PaymentAccount pa = new PaymentAccount();
         pa.setPbaNumber("pbaNumber");
+        pa.setPbaStatus(PbaStatus.ACCEPTED);
 
         organisation.setPaymentAccounts(Arrays.asList(pa));
         organisation.setUsers(Arrays.asList(su));

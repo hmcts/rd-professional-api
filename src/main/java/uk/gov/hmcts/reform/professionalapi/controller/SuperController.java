@@ -1,38 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
-
 import feign.FeignException;
 import feign.Response;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -48,9 +23,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
@@ -58,21 +36,24 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.BulkCustomerOrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -80,12 +61,45 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.UUID;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteMultipleAddressRequest;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEFAULT_PAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DEFAULT_PAGE_SIZE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_ADDRESS_LIST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_REQUEST_IS_EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_STATUS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateBulkCustomerRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeLeadingAndTailingSpaces;
 
 @RestController
 @Slf4j
@@ -95,6 +109,8 @@ public abstract class SuperController {
     protected OrganisationService organisationService;
     @Autowired
     protected ProfessionalUserService professionalUserService;
+    @Autowired
+    protected ProfessionalUserRepository professionalUserRepository;
     @Autowired
     protected PaymentAccountService paymentAccountService;
     @Autowired
@@ -112,9 +128,9 @@ public abstract class SuperController {
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
-    protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
-    @Autowired
     protected MfaStatusService mfaStatusService;
+    @Autowired
+    protected IdamRepository idamRepository;
 
     @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;
@@ -142,9 +158,6 @@ public abstract class SuperController {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
-
-    @Autowired
-    protected JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     private static final String SRA_REGULATED_FALSE = "false";
     private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
@@ -175,15 +188,26 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
+    protected ResponseEntity<Object> retrieveAllOrganisationsOrById(String organisationIdentifier,
+                                                                    String lastUpdatedSince,
+                                                                    String status, Integer page, Integer size) {
         var orgId = removeEmptySpaces(organisationIdentifier);
         var orgStatus = removeEmptySpaces(status);
+        long totalRecords = 1;
+
+        LocalDateTime formattedSince = null;
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
+        }
 
         Object organisationResponse = null;
+        var pageable = createPageable(page, size);
+
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-
-            organisationResponse = organisationService.retrieveAllOrganisations();
+            organisationResponse = organisationService.retrieveAllOrganisations(formattedSince, pageable);
+            totalRecords = ((OrganisationsDetailResponse) organisationResponse).getTotalRecords();
 
         } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
                 || (isNotEmpty(orgStatus) && isNotEmpty(orgId))) {
@@ -195,14 +219,103 @@ public abstract class SuperController {
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
             //Received request to retrieve organisation with status
 
-            organisationResponse = organisationService.findByOrganisationStatus(orgStatus.toUpperCase());
+            var pageableByStatus = createPageableByStatus(page,size);
+            organisationResponse = organisationService
+                        .findByOrganisationStatus(formattedSince, orgStatus.toUpperCase(), pageableByStatus);
+            totalRecords = ((OrganisationsDetailResponse) organisationResponse).getTotalRecords();
         }
 
         log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
 
-        return ResponseEntity
-                .status(200)
-                .body(organisationResponse);
+        if (pageable != null) {
+            return ResponseEntity.status(200).header("total_records",String.valueOf(totalRecords))
+                    .body(organisationResponse);
+        }
+        return ResponseEntity.status(200).body(organisationResponse);
+    }
+
+
+    protected ResponseEntity<Object> retrieveAllOrganisationsOrByIdForV2Api(String organisationIdentifier,
+                                                                            String lastUpdatedSince, String status,
+                                                                            Integer page, Integer size) {
+        var orgId = removeEmptySpaces(organisationIdentifier);
+        var orgStatus = removeEmptySpaces(status);
+        long totalRecords = 1;
+
+        LocalDateTime formattedSince = null;
+        if (lastUpdatedSince != null) {
+            organisationIdentifierValidatorImpl.validateSince(lastUpdatedSince);
+            formattedSince = LocalDateTime.parse(lastUpdatedSince, ISO_DATE_TIME_FORMATTER);
+        }
+
+        Object organisationResponse = null;
+        var pageable = createPageable(page, size);
+        var pageableByStatus = createPageableByStatus(page,size);
+
+        if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
+            //Received request to retrieve all organisations
+            organisationResponse = organisationService.retrieveAllOrganisationsForV2Api(formattedSince, pageable);
+            totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
+
+        } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
+                || (isNotEmpty(orgStatus) && isNotEmpty(orgId))) {
+            //Received request to retrieve organisation with ID
+
+            organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+            organisationResponse = organisationService.retrieveOrganisationForV2Api(orgId, true);
+
+        } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
+            //Received request to retrieve organisation with status
+
+            organisationResponse = organisationService
+                    .findByOrganisationStatusForV2Api(formattedSince, orgStatus.toUpperCase(), pageableByStatus);
+            totalRecords = ((OrganisationsDetailResponseV2) organisationResponse).getTotalRecords();
+        }
+
+        log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
+
+        if (pageable != null) {
+            return ResponseEntity.status(200).header("total_records",String.valueOf(totalRecords))
+                    .body(organisationResponse);
+        }
+        return ResponseEntity.status(200).body(organisationResponse);
+    }
+
+
+    private Pageable createPageable(Integer page, Integer size) {
+        Pageable pageable = null;
+        if (page != null || size != null) {
+            if (page != null && page < 1) {
+                throw new InvalidRequest("Default page number should start with page 1");
+            }
+            if (page == null) {
+                page = DEFAULT_PAGE;
+            } else if (size == null) {
+                size = DEFAULT_PAGE_SIZE;
+            }
+            var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+            pageable = createPageableObject(page - 1, size, Sort.by(order));
+        }
+        return pageable;
+    }
+
+    private Pageable createPageableByStatus(Integer page, Integer size) {
+        Pageable pageable = null;
+        if (page != null || size != null) {
+            if (page != null && page < 1) {
+                throw new InvalidRequest("Default page number should start with page 1");
+            }
+            if (page == null) {
+                page = DEFAULT_PAGE;
+            } else if (size == null) {
+                size = DEFAULT_PAGE_SIZE;
+            }
+            var order = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_STATUS).ignoreCase();
+            var name = new Sort.Order(Sort.DEFAULT_DIRECTION, ORG_NAME).ignoreCase();
+
+            pageable = createPageableObject(page - 1, size, Sort.by(order).and(Sort.by(name)));
+        }
+        return pageable;
     }
 
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {
@@ -214,12 +327,24 @@ public abstract class SuperController {
 
         return ResponseEntity
                 .status(200)
-                .body(new OrganisationPbaResponse(organisation, false, false, true));
+                .body(new OrganisationPbaResponse(organisation, false, true, false));
+    }
+
+    protected ResponseEntity<Object> retrievePaymentAccountByUserEmailForV2Api(String email) {
+
+        validateEmail(email);
+        var organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
+
+        checkOrganisationAndPbaExists(organisation);
+
+        return ResponseEntity
+                .status(200)
+                .body(new OrganisationPbaResponseV2(organisation,
+                        false, true, false,true));
     }
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
-        Boolean  isOrgApprovalRequest = false;
         if (isBlank(organisationCreationRequest.getStatus())) {
             throw new InvalidRequest("Mandatory field status is missing");
         }
@@ -240,6 +365,7 @@ public abstract class SuperController {
 
         var superUser = existingOrganisation.getUsers().get(0);
         var professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
+        Boolean  isOrgApprovalRequest = false;
         if ((existingOrganisation.getStatus().isPending() || existingOrganisation.getStatus().isReview())
                 && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
@@ -259,6 +385,10 @@ public abstract class SuperController {
                         loggingComponentName);
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
+        }
+        // deleting the orgAttribute array to add new changes
+        if (organisationCreationRequest instanceof OrganisationOtherOrgsCreationRequest orgCreationRequestV2) {
+            organisationService.deleteOrgAttribute(orgCreationRequestV2.getOrgAttributes(), organisationIdentifier);
         }
         organisationService.updateOrganisation(organisationCreationRequest, orgId,isOrgApprovalRequest);
         return ResponseEntity.status(200).build();
@@ -300,7 +430,8 @@ public abstract class SuperController {
 
         var organisationMinimalInfoResponses =
                 organisations.stream()
-                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address)).toList();
+                        .map(organisation -> new OrganisationMinimalInfoResponse(organisation, address))
+                        .collect(Collectors.toList());
 
         return ResponseEntity.status(200).body(organisationMinimalInfoResponses);
     }
@@ -311,11 +442,16 @@ public abstract class SuperController {
         var roles = newUserCreationRequest.getRoles();
         var professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest,
                 removeEmptySpaces(organisationIdentifier), roles);
+        ResponseEntity<Object> inviteResponse;
         if (newUserCreationRequest.isResendInvite() && resendInviteEnabled) {
-            return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles, organisationIdentifier);
+            inviteResponse = reInviteExpiredUser(newUserCreationRequest, professionalUser, roles,
+                    organisationIdentifier);
         } else {
-            return inviteNewUserToOrganisation(newUserCreationRequest, professionalUser, roles);
+            inviteResponse = inviteNewUserToOrganisation(newUserCreationRequest, professionalUser, roles);
         }
+
+        professionalUserService.saveAllUserAccessTypes(professionalUser, newUserCreationRequest.getUserAccessTypes());
+        return inviteResponse;
     }
 
     private ResponseEntity<Object> inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
@@ -345,9 +481,10 @@ public abstract class SuperController {
 
     private ResponseEntity<Object> reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest,
                                                        ProfessionalUser professionalUser, List<String> roles,
-                                                       String organisationIdentifier) {
+                                                           String organisationIdentifier) {
 
         Object responseBody = null;
+        //gets current user by email in prd
         var existingUser = professionalUserService
                 .findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
         if (existingUser == null) {
@@ -357,10 +494,21 @@ public abstract class SuperController {
             throw new AccessDeniedException("User does not belong to same organisation");
         }
 
+        //this creates user in user profile
         var responseEntity = createUserProfileFor(professionalUser, roles, false,
                 true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
+
+            NewUserResponse userProfileResponse = new NewUserResponse((UserProfileCreationResponse)
+                    responseEntity.getBody());
+
+            //then check if existing user and idam user id are same
+            if (!userProfileResponse.getUserIdentifier().equals(existingUser.getUserIdentifier())) {
+                //we need to then update user info
+                existingUser.setUserIdentifier(userProfileResponse.getUserIdentifier());
+                professionalUserRepository.save(existingUser);
+            }
+            responseBody = userProfileResponse;
         } else {
             log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE,
                     responseEntity.getStatusCode().value()));
@@ -386,9 +534,9 @@ public abstract class SuperController {
 
     }
 
-    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted,
-                                                               Boolean returnRoles, String status, Integer page,
-                                                               Integer size) {
+    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String userIdentifier,
+                                                               String showDeleted, Boolean returnRoles, String status,
+                                                               Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -399,17 +547,41 @@ public abstract class SuperController {
         showDeleted = getShowDeletedValue(showDeleted);
         returnRoles = getReturnRolesValue(returnRoles);
 
-        if (page != null) {
+        if (page != null && userIdentifier == null) {
             Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService
                     .findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles,
                             status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
-                    showDeleted, returnRoles, status);
+                    userIdentifier, showDeleted, returnRoles, status);
         }
         return responseEntity;
     }
+
+    protected ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomerId(
+                                                                            BulkCustomerRequest bulkCustomerRequest) {
+        var bulkCustId = removeLeadingAndTailingSpaces(bulkCustomerRequest.getBulkCustomerId());
+        var sidamId = removeLeadingAndTailingSpaces(bulkCustomerRequest.getIdamId());
+
+
+
+        organisationCreationRequestValidator.validateForEmptyOrNullInput(bulkCustId, sidamId);
+        validateBulkCustomerRequest(bulkCustomerRequest);
+        organisationCreationRequestValidator.validateInputForSpecialCharacter(bulkCustId);
+        organisationCreationRequestValidator.validateInputForSpecialCharacter(sidamId);
+
+        log.info("{} : Inside retrieveOrganisationDetailsForBulkCustomerId Valdiation success", loggingComponentName);
+
+        BulkCustomerOrganisationsDetailResponse bulkCustomerDetailResponse = null;
+
+        if (StringUtils.isNotEmpty(bulkCustId) && StringUtils.isNotEmpty(sidamId)) {
+            bulkCustomerDetailResponse = organisationService
+                    .retrieveOrganisationDetailsForBulkCustomer(bulkCustId,sidamId);
+        }
+        return ResponseEntity.status(200).body(bulkCustomerDetailResponse);
+    }
+
 
     protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
                                                             String orgId, String userId) {
@@ -440,14 +612,6 @@ public abstract class SuperController {
 
         //delete the passed pba account numbers from the organisation
         paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
-    }
-
-    protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
-                                                                      String userId, Optional<String> origin) {
-
-        userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
-
-        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
     }
 
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaUpdateRequest> pbaRequestList, String orgId) {
@@ -536,5 +700,10 @@ public abstract class SuperController {
                 .map(UUID::fromString)
                 .collect(Collectors.toSet());
         organisationService.deleteMultipleAddressOfGivenOrganisation(idsSet);
+    }
+
+    public String getUserToken() {
+        var jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return jwt.getTokenValue();
     }
 }

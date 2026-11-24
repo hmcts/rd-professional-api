@@ -1,22 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,19 +14,42 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetRefreshUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationInfo;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RefreshUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccessType;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ISO_DATE_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.professionalapi.util.OrganisationTypeConstants.SOLICITOR_ORG;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessionalUserInternalControllerTest {
@@ -49,18 +57,20 @@ class ProfessionalUserInternalControllerTest {
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
     private Organisation organisation;
-    private OrganisationIdentifierValidator organisationIdentifierValidatorMock;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorMock;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private UserProfileUpdateRequestValidator userProfileUpdateRequestValidatorMock;
     private ResponseEntity<Object> responseEntityMock;
     private UserProfileUpdatedData userProfileUpdatedData;
     List<String> prdAdminRoles;
     List<String> systemUserRoles;
-
+    private final String userIdentifier = "1234567";
     @InjectMocks
     private ProfessionalUserInternalController professionalUserInternalController;
     @Mock
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+    @Mock
+    IdamRepository idamRepositoryMock;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -68,7 +78,7 @@ class ProfessionalUserInternalControllerTest {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
-                "lastName", IdamStatus.ACTIVE.name(), null, null);
+                "lastName", IdamStatus.ACTIVE.name(), null, null, null);
 
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
@@ -108,10 +118,10 @@ class ProfessionalUserInternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
         when(professionalUserServiceMock
-                .findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class),
-                        any(String.class))).thenReturn(responseEntityMock);
+                .findProfessionalUsersByOrganisation(any(Organisation.class), anyString(), any(String.class),
+                        any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
+        when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", userRoles));
 
         lenient().doNothing().when(organisationIdentifierValidatorMock)
@@ -120,17 +130,17 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actual = professionalUserInternalController
                 .findUsersByOrganisation(organisation
-                        .getOrganisationIdentifier(), "true", true, null, null);
+                        .getOrganisationIdentifier(), userIdentifier,"true", true, null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(any(Organisation.class),
+                .findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
                         any(String.class), any(Boolean.class), any(String.class));
         verify(responseEntityMock, times(1)).getStatusCode();
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
 
@@ -147,10 +157,10 @@ class ProfessionalUserInternalControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
-                any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
+                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
+        when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
 
         lenient().doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
@@ -158,17 +168,18 @@ class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", true,
-                        null, null);
+                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier, "true",
+                        true, null, null);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "true", true,
+                        "");
         verify(responseEntityMock, times(1)).getStatusCode();
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
     @Test
@@ -184,10 +195,10 @@ class ProfessionalUserInternalControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class),
-                any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), anyString(),
+                any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
+        when(idamRepositoryMock.getUserInfo(anyString()))
                 .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
 
         lenient().doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
@@ -195,17 +206,18 @@ class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
-                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", true,
-                        null, null);
+                .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier,"true",
+                        true, null, null);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1))
                 .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1))
-                .findProfessionalUsersByOrganisation(organisation, "true", true, "");
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier,"true", true,
+                        "");
         verify(responseEntityMock, times(1)).getStatusCode();
-        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
     }
 
     @Test
@@ -221,20 +233,73 @@ class ProfessionalUserInternalControllerTest {
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(body);
         when(professionalUserServiceMock.modifyRolesForUser(any(), any(), any())).thenReturn(responseEntity);
 
-        when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedData))
-                .thenReturn(userProfileUpdatedData);
-
         String userId = UUID.randomUUID().toString();
         ResponseEntity<Object> actualData = professionalUserInternalController
-                .modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId,
-                        Optional.of("EXUI"));
+                .modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId, "EXUI");
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData,
                 userId, Optional.of("EXUI"));
-        verify(userProfileUpdateRequestValidatorMock, times(1))
-                .validateRequest(userProfileUpdatedData);
+        verify(organisationIdentifierValidatorMock, times(1))
+                .validateOrganisationExistsWithGivenOrgId("123456A");
+        verify(organisationIdentifierValidatorMock, times(1))
+                .validateOrganisationExistsWithGivenOrgId("123456A");
+    }
+
+    @Test
+    void test_GetRefreshUsersWithSince() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
+        OrganisationInfo orgInfo =
+                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of(SOLICITOR_ORG));
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser),
+                UUID.randomUUID(), false);
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        String since = currentDateTime.format(ISO_DATE_TIME_FORMATTER);
+        Integer page = 1;
+
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200)
+                .body(getRefreshUsersResponse);
+
+        when(professionalUserServiceMock.fetchUsersForRefresh(any(), eq(null), any(), any()))
+                .thenReturn(responseEntity);
+
+        ResponseEntity<Object> actualData = professionalUserInternalController
+                .getRefreshUsers(since, null, page, null);
+
+        assertThat(actualData).isNotNull();
+        assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(professionalUserServiceMock, times(1))
+                .fetchUsersForRefresh(since, null, page, null);
+    }
+
+    @Test
+    void test_GetRefreshUsers_SingleUser() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        UserAccessType userAccessType = new UserAccessType("jurisdictionId", "orgProfileId", "accessTypeId", false);
+        OrganisationInfo orgInfo =
+                new OrganisationInfo("orgId", OrganisationStatus.ACTIVE, LocalDateTime.now(), List.of(SOLICITOR_ORG));
+        RefreshUser refreshUser = new RefreshUser("uid", LocalDateTime.now(), orgInfo, List.of(userAccessType), null);
+        GetRefreshUsersResponse getRefreshUsersResponse = new GetRefreshUsersResponse(List.of(refreshUser),
+                UUID.randomUUID(), false);
+
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(getRefreshUsersResponse);
+
+        when(professionalUserServiceMock.fetchUsersForRefresh(eq(null), any(), eq(null), eq(null)))
+                .thenReturn(responseEntity);
+
+        ResponseEntity<Object> actualData = professionalUserInternalController
+                .getRefreshUsers(null, "uid", null, null);
+
+        assertThat(actualData).isNotNull();
+        assertThat(actualData.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(professionalUserServiceMock, times(1))
+                .fetchUsersForRefresh(null, "uid", null, null);
     }
 }

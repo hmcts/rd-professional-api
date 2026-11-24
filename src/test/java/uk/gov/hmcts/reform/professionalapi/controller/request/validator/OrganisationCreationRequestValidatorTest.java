@@ -4,16 +4,23 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidContactInformations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationOtherOrgsCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -29,10 +36,12 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
@@ -52,6 +61,9 @@ class OrganisationCreationRequestValidatorTest {
     private UserCreationRequest userCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
     private Exception myException;
+
+    private OrganisationOtherOrgsCreationRequest organisationOtherOrgsCreationRequest;
+
 
     @BeforeEach
     void setup() {
@@ -75,9 +87,25 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
+    void test_CallsAllValidatorsOrgTypeNOrgAtt() {
+        organisationOtherOrgsCreationRequest =
+                new OrganisationOtherOrgsCreationRequest("Company", "PENDING", "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,  "Doctor", null);
+        organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest);
+
+        verify(validator1, times(1)).validate(organisationOtherOrgsCreationRequest);
+        verify(validator2, times(1)).validate(organisationOtherOrgsCreationRequest);
+
+        assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isTrue();
+        assertThat(OrganisationCreationRequestValidator.contains("pend")).isFalse();
+    }
+
+    @Test
     void test_validateOrganisationIdentifierNull() {
         assertThrows(EmptyResultDataAccessException.class, () ->
                 organisationCreationRequestValidator.validateOrganisationIdentifier(null));
+
     }
 
     @Test
@@ -206,6 +234,35 @@ class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
+    void test_validateForEmptyOrNullInput() {
+
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateForEmptyOrNullInput("","idamId"));
+    }
+
+    @Test
+    void test_isRegexSatisfied() {
+
+        assertFalse(organisationCreationRequestValidator
+            .isRegexSatisfied("Valid1",ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX));
+    }
+
+    @Test
+    void test_validateBulkCustomerRequest() {
+
+        BulkCustomerRequest bulkCustomerRequest = BulkCustomerRequest
+            .abulkCustomerRequest().bulkCustomerId("").idamId("idamId").build();
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateBulkCustomerRequest(bulkCustomerRequest));
+    }
+
+    @Test
+    void test_validateInputForSpecialCharacter() {
+        assertThrows(InvalidRequest.class, () ->
+            organisationCreationRequestValidator.validateInputForSpecialCharacter("££"));
+    }
+
+    @Test
     void test_requestContactInformationDxAddwithInvalidLength() {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 12345678900000",
                 "DxExchange1234567890");
@@ -285,7 +342,7 @@ class OrganisationCreationRequestValidatorTest {
     void test_should_validate_mandatory_user_fields_and_not_throw_exception() {
 
         NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname",
-                "sl@test.com", new ArrayList<String>(), false);
+                "sl@test.com", new ArrayList<String>(), false, null);
 
         assertDoesNotThrow(() ->
                 OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request));
@@ -294,7 +351,7 @@ class OrganisationCreationRequestValidatorTest {
     @Test
     void test_should_validate_mandatory_user_fields_and_throw_exception() {
         NewUserCreationRequest request = new NewUserCreationRequest(null, null,
-                "al@test.com", new ArrayList<String>(), false);
+                "al@test.com", new ArrayList<String>(), false, null);
         assertThrows(InvalidRequest.class, () ->
                 OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request));
     }
@@ -454,4 +511,76 @@ class OrganisationCreationRequestValidatorTest {
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessageStartingWith(ERROR_MESSAGE_INVALID_STATUS_PASSED);
     }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"","D*&&&&&"})
+    void test_validateOrganisationRequestWithOrgTypeNull(String orgType) {
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null, orgType, null);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
+    }
+
+
+    @Test
+    void test_validateErrorMessageWhenOrgTypeIsNull() {
+
+        Throwable thrown = catchThrowable(() -> {
+            organisationCreationRequestValidator
+                    .validateOrgType(null);
+        });
+
+        assertThat(thrown)
+                .isInstanceOf(InvalidRequest.class)
+                .hasMessageContaining("orgType must not be null/empty");
+
+    }
+
+    @Test
+    void test_validateErrorMessageWhenOrgTypeIsNotMatchingTheRegex() {
+
+        Throwable thrown = catchThrowable(() -> {
+            organisationCreationRequestValidator
+                    .validateOrgType("&ascd");
+        });
+
+        assertThat(thrown)
+                .isInstanceOf(InvalidRequest.class)
+                .hasMessageContaining("Org Type is invalid - can only contain Alphabetic, empty space, ', "
+                        + "- characters and must be less than 256 characters");
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'',testValue",
+            "testKey,''",
+            ",testValue",
+            "testKey, ",
+            "'',testValue"
+    })
+    @SuppressWarnings("checkstyle:Indentation")
+    void test_validateOrganisationRequestWithOrgAttributeKeyEmpty(String key,String value) {
+
+        OrgAttributeRequest orgAttribute = new OrgAttributeRequest();
+
+        orgAttribute.setKey(key);
+        orgAttribute.setValue(value);
+
+        List<OrgAttributeRequest> orgAttributes = new ArrayList<>();
+
+        orgAttributes.add(orgAttribute);
+
+        organisationOtherOrgsCreationRequest = new OrganisationOtherOrgsCreationRequest("Company", "PENDING",
+                "SraId",
+                "true", null, "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null,"Doctor", orgAttributes);
+        assertThrows(InvalidRequest.class, () ->
+                organisationCreationRequestValidator.validate(organisationOtherOrgsCreationRequest));
+    }
+
 }
