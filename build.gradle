@@ -35,7 +35,7 @@ def versions = [
         camel           : '4.23.0',
         pact_version    : '4.6.17',
         launchDarklySdk : '5.10.9',
-        jackson         : '2.22.1',
+        jackson         : '2.13.2',
         junit           : '5.12.2',
         junitPlatform   : '1.12.2',
         log4j           : '2.26.1',
@@ -347,6 +347,13 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
+    implementation(group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
+        exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
+        exclude group: "org.apache.sling"
+    }
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '3.0.2'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
 
@@ -362,7 +369,7 @@ dependencies {
     }
     implementation (group: 'com.fasterxml.jackson', name: 'jackson-bom', ext: 'pom') {
         version {
-            strictly versions.jackson
+            strictly '2.13.2.20220324'
         }
     }
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
@@ -391,6 +398,9 @@ dependencies {
     testImplementation group: 'org.apache.camel', name: 'camel-test-spring-junit5', version: versions.camel
     testImplementation group: 'org.apache.camel', name: 'camel-test-junit5', version: versions.camel
 
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.11'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools', version: '4.0.0-rc-1'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-devtools-v147', version: '4.44.0'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
     implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
@@ -451,7 +461,11 @@ dependencies {
         exclude group: "net.bytebuddy", module: "byte-buddy"
         exclude group: "net.bytebuddy", module: "byte-buddy-agent"
     }
-    testImplementation 'com.github.hmcts:rd-commons-lib:0.1.4'
+    testImplementation ('com.github.hmcts:rd-commons-lib:0.1.4'){
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+    }
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.10'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.7'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.20.0'
 
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
@@ -472,6 +486,9 @@ dependencies {
     testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
     testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.9'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.15'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '3.0.10'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.8'
 
