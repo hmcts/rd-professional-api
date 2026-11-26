@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
@@ -111,7 +111,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     MfaStatusService mfaStatusService;
 
     @Autowired
-    MappingJackson2HttpMessageConverter httpMessageConverter;
+    JacksonJsonHttpMessageConverter httpMessageConverter;
 
     @Autowired
     OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;

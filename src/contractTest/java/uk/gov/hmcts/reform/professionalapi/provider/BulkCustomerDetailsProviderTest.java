@@ -4,7 +4,7 @@ import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import au.com.dius.pact.provider.spring.spring7.Spring7MockMvcTestTarget;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -60,7 +60,7 @@ public class BulkCustomerDetailsProviderTest extends MockMvcProviderTest {
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        Spring7MockMvcTestTarget testTarget = new Spring7MockMvcTestTarget();
         testTarget.setControllers(
                 bulkCustomerDetailsInternalController);
         if (nonNull(context)) {

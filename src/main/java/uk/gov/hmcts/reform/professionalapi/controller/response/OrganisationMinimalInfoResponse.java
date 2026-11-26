@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public class OrganisationMinimalInfoResponse {
     @JsonProperty
     protected List<ContactInformationResponse> contactInformation;
 
+    // Jackson 3 may treat this as a creator; keep it for service mapping only (Boot 3 parity)
+    @JsonIgnore
     public OrganisationMinimalInfoResponse(Organisation organisation, Boolean isAddressRequired) {
 
         getOrganisationMinimalInfoResponse(organisation, isAddressRequired);

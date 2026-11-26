@@ -49,9 +49,11 @@ public class BaseSecurityIntegrationTest extends AuthorizationEnabledIntegration
 
     protected RequestSpecification jwtRequest(String issuer, boolean expired) {
 
+        // Spring Framework 7: HttpHeaders is not a MultiValueMap; Rest Assured needs a Map
+        var springHeaders = getHttpHeaders(issuer, expired, null, hmctsAdmin);
         return SerenityRest.given()
                 .baseUri(testApplicationServer.getBaseUrl())
-                .headers(getHttpHeaders(issuer, expired, null, hmctsAdmin));
+                .headers(springHeaders.toSingleValueMap());
 
     }
 

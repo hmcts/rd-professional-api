@@ -1,49 +1,47 @@
 package uk.gov.hmcts.reform.professionalapi.configuration;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.ConstructorDetector;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
-
+/**
+ * Jackson 3 (Boot 4) mapper customisation preserving Boot 3 contracts:
+ * ISO dates, enum toString, ignore unknown, include null properties (Boot 3
+ * {@code DefaultObjectMapper} used ALWAYS — not the builder's NON_ABSENT),
+ * omitted primitives default, and no-arg + other constructor detection parity.
+ */
 @Configuration
 public class JacksonConfiguration {
 
-
-    /**
-     * An object mapper configured to support java.time and write Date and Times in ISO8601.
-     *
-     * @return Default ObjectMapper, used by Spring and HAL to serialise responses, and deserialise requests.
-     */
-    @Primary
-    @Bean(name = "DefaultObjectMapper")
-    public ObjectMapper defaultObjectMapper() {
-        return new ObjectMapper()
-                .registerModule(new Jdk8Module())
-                .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-                .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .configure(FAIL_ON_UNKNOWN_PROPERTIES,false);
-    }
-
     @Bean
-    @Primary
-    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
-        return new Jackson2ObjectMapperBuilder()
-            .featuresToEnable(READ_ENUMS_USING_TO_STRING)
-            .featuresToEnable(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
-            .featuresToEnable(WRITE_ENUMS_USING_TO_STRING)
-            .serializationInclusion(JsonInclude.Include.NON_ABSENT);
+    public JsonMapperBuilderCustomizer professionalApiJsonMapperCustomizer() {
+        return builder -> builder
+                // Match Boot 3 @Primary DefaultObjectMapper (no serializationInclusion).
+                // NON_ABSENT omitted nulls and broke ModifyUserRolesResponse size=3 contracts.
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.ALWAYS))
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+                // Boot 3 / Jackson 2 wrote fields in declaration order, not alphabetical
+                .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+                .enable(EnumFeature.READ_ENUMS_USING_TO_STRING)
+                .enable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+                .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .constructorDetector(
+                        ConstructorDetector.DEFAULT.withAllowImplicitWithDefaultConstructor(false));
     }
 
+    @Bean(name = "DefaultObjectMapper")
+    public JsonMapper defaultObjectMapper(JsonMapper.Builder builder) {
+        return builder.build();
+    }
 }

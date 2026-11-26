@@ -1,15 +1,19 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import au.com.dius.pact.provider.spring.spring7.Spring7MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration;
+import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration;
+import org.springframework.boot.security.oauth2.client.autoconfigure.servlet.OAuth2ClientWebSecurityAutoConfiguration;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.OAuth2ResourceServerAutoConfiguration;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.web.OAuth2ResourceServerWebSecurityAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,7 +21,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @ImportAutoConfiguration(exclude = {
     DataSourceAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class,
-    JpaRepositoriesAutoConfiguration.class
+    DataJpaRepositoriesAutoConfiguration.class,
+    OAuth2ClientAutoConfiguration.class,
+    OAuth2ClientWebSecurityAutoConfiguration.class,
+    OAuth2ResourceServerAutoConfiguration.class,
+    OAuth2ResourceServerWebSecurityAutoConfiguration.class
 })
 public class WebMvcProviderTest extends BaseProviderTest {
 
@@ -28,15 +36,19 @@ public class WebMvcProviderTest extends BaseProviderTest {
     @EnableAutoConfiguration(exclude = {
         DataSourceAutoConfiguration.class,
         HibernateJpaAutoConfiguration.class,
-        JpaRepositoriesAutoConfiguration.class
+        DataJpaRepositoriesAutoConfiguration.class,
+        OAuth2ClientAutoConfiguration.class,
+        OAuth2ClientWebSecurityAutoConfiguration.class,
+        OAuth2ResourceServerAutoConfiguration.class,
+        OAuth2ResourceServerWebSecurityAutoConfiguration.class
     })
-    static class TestBootConfig {
+    public static class TestBootConfig {
     }
 
     @BeforeEach
     void before(PactVerificationContext context) {
         if (context != null) {
-            context.setTarget(new MockMvcTestTarget(mockMvc));
+            context.setTarget(new Spring7MockMvcTestTarget(mockMvc));
         }
     }
 }

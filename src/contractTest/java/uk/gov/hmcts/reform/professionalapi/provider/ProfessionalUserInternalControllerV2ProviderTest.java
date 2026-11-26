@@ -3,8 +3,16 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration;
+import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration;
+import org.springframework.boot.security.oauth2.client.autoconfigure.servlet.OAuth2ClientWebSecurityAutoConfiguration;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.OAuth2ResourceServerAutoConfiguration;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.web.OAuth2ResourceServerWebSecurityAutoConfiguration;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +38,15 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserCon
 @Provider("referenceData_professionalInternalUsersV2")
 @WebMvcTest({ProfessionalUserInternalControllerV2.class})
 @AutoConfigureMockMvc(addFilters = false)
+@ImportAutoConfiguration(exclude = {
+    DataSourceAutoConfiguration.class,
+    HibernateJpaAutoConfiguration.class,
+    DataJpaRepositoriesAutoConfiguration.class,
+    OAuth2ClientAutoConfiguration.class,
+    OAuth2ClientWebSecurityAutoConfiguration.class,
+    OAuth2ResourceServerAutoConfiguration.class,
+    OAuth2ResourceServerWebSecurityAutoConfiguration.class
+})
 @Import({ProviderTestConfiguration.class, ProfessionalUserInternalControllerV2ProviderTestConfiguration.class,
     WebConfig.class})
 public class ProfessionalUserInternalControllerV2ProviderTest extends WebMvcProviderTest {

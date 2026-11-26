@@ -297,7 +297,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         //if there are only invalid PBAs
         if (isNotEmpty(invalidPbaResponses) && isEmpty(pbasFromRequest)) {
             return new UpdatePbaStatusResponse(
-                    null, invalidPbaResponses, HttpStatus.UNPROCESSABLE_ENTITY.value());
+                    null, invalidPbaResponses, HttpStatus.UNPROCESSABLE_CONTENT.value());
             //if there are some invalid PBAs and some valid PBAs that have been updated
         } else if (isNotEmpty(invalidPbaResponses) && isNotEmpty(pbasFromRequest)) {
             return new UpdatePbaStatusResponse(
