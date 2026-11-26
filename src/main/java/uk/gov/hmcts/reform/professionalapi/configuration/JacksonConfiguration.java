@@ -14,8 +14,9 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Jackson 3 (Boot 4) mapper customisation preserving Boot 3 contracts:
- * ISO dates, enum toString, ignore unknown, NON_ABSENT, omitted primitives default,
- * and no-arg + other constructor detection parity.
+ * ISO dates, enum toString, ignore unknown, include null properties (Boot 3
+ * {@code DefaultObjectMapper} used ALWAYS — not the builder's NON_ABSENT),
+ * omitted primitives default, and no-arg + other constructor detection parity.
  */
 @Configuration
 public class JacksonConfiguration {
@@ -23,7 +24,9 @@ public class JacksonConfiguration {
     @Bean
     public JsonMapperBuilderCustomizer professionalApiJsonMapperCustomizer() {
         return builder -> builder
-                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_ABSENT))
+                // Match Boot 3 @Primary DefaultObjectMapper (no serializationInclusion).
+                // NON_ABSENT omitted nulls and broke ModifyUserRolesResponse size=3 contracts.
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.ALWAYS))
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)

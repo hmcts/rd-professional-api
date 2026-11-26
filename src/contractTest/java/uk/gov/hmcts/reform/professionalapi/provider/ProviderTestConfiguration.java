@@ -57,7 +57,7 @@ public class ProviderTestConfiguration {
     @Bean(name = "DefaultObjectMapper")
     public JsonMapper defaultObjectMapper() {
         return JsonMapper.builder()
-                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_ABSENT))
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.ALWAYS))
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
