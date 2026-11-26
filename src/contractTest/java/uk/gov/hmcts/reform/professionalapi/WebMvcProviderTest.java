@@ -10,6 +10,10 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration;
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration;
+import org.springframework.boot.security.oauth2.client.autoconfigure.servlet.OAuth2ClientWebSecurityAutoConfiguration;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.OAuth2ResourceServerAutoConfiguration;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.web.OAuth2ResourceServerWebSecurityAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,7 +21,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @ImportAutoConfiguration(exclude = {
     DataSourceAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class,
-    DataJpaRepositoriesAutoConfiguration.class
+    DataJpaRepositoriesAutoConfiguration.class,
+    OAuth2ClientAutoConfiguration.class,
+    OAuth2ClientWebSecurityAutoConfiguration.class,
+    OAuth2ResourceServerAutoConfiguration.class,
+    OAuth2ResourceServerWebSecurityAutoConfiguration.class
 })
 public class WebMvcProviderTest extends BaseProviderTest {
 
@@ -28,9 +36,13 @@ public class WebMvcProviderTest extends BaseProviderTest {
     @EnableAutoConfiguration(exclude = {
         DataSourceAutoConfiguration.class,
         HibernateJpaAutoConfiguration.class,
-        DataJpaRepositoriesAutoConfiguration.class
+        DataJpaRepositoriesAutoConfiguration.class,
+        OAuth2ClientAutoConfiguration.class,
+        OAuth2ClientWebSecurityAutoConfiguration.class,
+        OAuth2ResourceServerAutoConfiguration.class,
+        OAuth2ResourceServerWebSecurityAutoConfiguration.class
     })
-    static class TestBootConfig {
+    public static class TestBootConfig {
     }
 
     @BeforeEach

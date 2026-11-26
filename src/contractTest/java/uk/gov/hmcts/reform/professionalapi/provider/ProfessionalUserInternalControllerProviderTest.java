@@ -7,6 +7,10 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration;
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration;
+import org.springframework.boot.security.oauth2.client.autoconfigure.servlet.OAuth2ClientWebSecurityAutoConfiguration;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.OAuth2ResourceServerAutoConfiguration;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.web.OAuth2ResourceServerWebSecurityAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -35,7 +39,11 @@ import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserCon
 @ImportAutoConfiguration(exclude = {
     DataSourceAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class,
-    DataJpaRepositoriesAutoConfiguration.class
+    DataJpaRepositoriesAutoConfiguration.class,
+    OAuth2ClientAutoConfiguration.class,
+    OAuth2ClientWebSecurityAutoConfiguration.class,
+    OAuth2ResourceServerAutoConfiguration.class,
+    OAuth2ResourceServerWebSecurityAutoConfiguration.class
 })
 @Import({ProviderTestConfiguration.class, ProfessionalUserInternalControllerProviderTestConfiguration.class,
     WebConfig.class})
