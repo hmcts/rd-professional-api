@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import au.com.dius.pact.provider.spring.spring7.Spring7MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration;
+import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ImportAutoConfiguration(exclude = {
     DataSourceAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class,
-    JpaRepositoriesAutoConfiguration.class
+    DataJpaRepositoriesAutoConfiguration.class
 })
 public class WebMvcProviderTest extends BaseProviderTest {
 
@@ -28,7 +28,7 @@ public class WebMvcProviderTest extends BaseProviderTest {
     @EnableAutoConfiguration(exclude = {
         DataSourceAutoConfiguration.class,
         HibernateJpaAutoConfiguration.class,
-        JpaRepositoriesAutoConfiguration.class
+        DataJpaRepositoriesAutoConfiguration.class
     })
     static class TestBootConfig {
     }
@@ -36,7 +36,7 @@ public class WebMvcProviderTest extends BaseProviderTest {
     @BeforeEach
     void before(PactVerificationContext context) {
         if (context != null) {
-            context.setTarget(new MockMvcTestTarget(mockMvc));
+            context.setTarget(new Spring7MockMvcTestTarget(mockMvc));
         }
     }
 }

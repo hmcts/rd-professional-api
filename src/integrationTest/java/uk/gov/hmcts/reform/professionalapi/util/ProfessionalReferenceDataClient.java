@@ -347,7 +347,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -371,7 +371,7 @@ public class ProfessionalReferenceDataClient {
                             params);
         } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -395,7 +395,7 @@ public class ProfessionalReferenceDataClient {
                             params);
         } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -419,7 +419,7 @@ public class ProfessionalReferenceDataClient {
                             params);
         } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -449,7 +449,7 @@ public class ProfessionalReferenceDataClient {
                             params);
         } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -471,7 +471,7 @@ public class ProfessionalReferenceDataClient {
                             params);
         } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -493,7 +493,7 @@ public class ProfessionalReferenceDataClient {
                             clasz,
                             params);
         } catch (HttpStatusCodeException ex) {
-            return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
+            return ResponseEntity.status(ex.getStatusCode().value()).body(ex.getResponseBodyAsString());
         }
         return responseEntity;
     }
@@ -513,7 +513,7 @@ public class ProfessionalReferenceDataClient {
                             params);
         } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -533,13 +533,13 @@ public class ProfessionalReferenceDataClient {
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
 
         Map<String, Object> organisationResponse = new HashMap<>();
-        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        organisationResponse.put("http_status", responseEntity.getStatusCode().value());
         return organisationResponse;
     }
 
@@ -554,13 +554,13 @@ public class ProfessionalReferenceDataClient {
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
 
         Map<String, Object> organisationResponse = new HashMap<>();
-        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        organisationResponse.put("http_status", responseEntity.getStatusCode().value());
         return organisationResponse;
     }
 
@@ -664,7 +664,7 @@ public class ProfessionalReferenceDataClient {
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -684,7 +684,7 @@ public class ProfessionalReferenceDataClient {
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -705,7 +705,7 @@ public class ProfessionalReferenceDataClient {
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -726,7 +726,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>();
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -747,7 +747,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>();
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -800,7 +800,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>();
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -821,7 +821,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>();
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -841,7 +841,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>();
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -859,7 +859,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>();
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -877,13 +877,13 @@ public class ProfessionalReferenceDataClient {
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
 
         Map<String, Object> deleteOrganisationResponse = new HashMap<>();
-        deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        deleteOrganisationResponse.put("http_status", responseEntity.getStatusCode().value());
         return deleteOrganisationResponse;
     }
 
@@ -897,13 +897,13 @@ public class ProfessionalReferenceDataClient {
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
 
         Map<String, Object> deleteOrganisationResponse = new HashMap<>();
-        deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        deleteOrganisationResponse.put("http_status", responseEntity.getStatusCode().value());
         return deleteOrganisationResponse;
     }
 
@@ -950,7 +950,7 @@ public class ProfessionalReferenceDataClient {
                     isUnauthorised ? getInvalidAuthHeaders(role) : (getMultipleAuthHeaders(role)));
             responseEntity = restTemplate.exchange(uriPath, HttpMethod.GET, request, clasz);
         } catch (HttpStatusCodeException ex) {
-            return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
+            return ResponseEntity.status(ex.getStatusCode().value()).body(ex.getResponseBodyAsString());
         }
         return responseEntity;
     }
@@ -967,7 +967,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>();
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -997,7 +997,7 @@ public class ProfessionalReferenceDataClient {
 
         } catch (RestClientResponseException ex) {
             var statusAndBody = new HashMap<String, Object>();
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
@@ -1019,7 +1019,7 @@ public class ProfessionalReferenceDataClient {
                             Map.class);
         } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("http_status", String.valueOf(ex.getStatusCode().value()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }

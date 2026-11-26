@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Response;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.cfg.ConstructorDetector;
+import tools.jackson.databind.json.JsonMapper;
 
+import java.io.BufferedReader;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,8 +19,13 @@ import java.util.Optional;
 
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseUtil {
-    private static final ObjectMapper json = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).registerModule(new JavaTimeModule());
+    private static final JsonMapper json = JsonMapper.builder()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+            // Match JacksonConfiguration: prefer no-arg when present (Boot 3 parity)
+            .constructorDetector(
+                    ConstructorDetector.DEFAULT.withAllowImplicitWithDefaultConstructor(false))
+            .build();
 
     private JsonFeignResponseUtil() {
 
@@ -27,24 +33,44 @@ public class JsonFeignResponseUtil {
 
     public static Optional<Object> decode(Response response, Object clazz) {
         try {
-            return Optional.of(json.readValue(response.body().asReader(Charset.defaultCharset()),
-                    (Class<Object>) clazz));
+            if (response == null) {
+                return Optional.empty();
+            }
+            Response.Body body = response.body();
+            if (body == null) {
+                return Optional.empty();
+            }
+            Reader rawReader = body.asReader(Charset.defaultCharset());
+            if (rawReader == null) {
+                return Optional.empty();
+            }
+            // Buffer so empty-body probe works; Feign InputStreamReaders often lack mark support
+            BufferedReader reader = rawReader instanceof BufferedReader buffered
+                    ? buffered
+                    : new BufferedReader(rawReader);
+            reader.mark(1);
+            int read = reader.read();
+            if (read < 0) {
+                return Optional.empty();
+            }
+            reader.reset();
+            return Optional.of(json.readValue(reader, (Class<Object>) clazz));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
     public static ResponseEntity<Object> toResponseEntity(Response response, Object clazz) {
-        Optional<Object>  payload = decode(response, clazz);
+        Optional<Object> payload = decode(response, clazz);
 
-        return new ResponseEntity<>(
-                payload.orElse(null),
-                convertHeaders(response.headers()),
-                HttpStatus.valueOf(response.status()));
+        return ResponseEntity
+                .status(HttpStatus.valueOf(response.status()))
+                .headers(convertHeaders(response.headers()))
+                .body(payload.orElse(null));
     }
 
-    public static MultiValueMap<String, String> convertHeaders(Map<String, Collection<String>> responseHeaders) {
-        MultiValueMap<String, String> responseEntityHeaders = new LinkedMultiValueMap<>();
+    public static HttpHeaders convertHeaders(Map<String, Collection<String>> responseHeaders) {
+        HttpHeaders responseEntityHeaders = new HttpHeaders();
         responseHeaders.entrySet().stream().forEach(e -> {
             if (!(e.getKey().equalsIgnoreCase("request-context") || e.getKey()
                     .equalsIgnoreCase("x-powered-by") || e.getKey()

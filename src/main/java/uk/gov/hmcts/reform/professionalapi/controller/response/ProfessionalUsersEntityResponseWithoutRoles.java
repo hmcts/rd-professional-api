@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -34,6 +35,7 @@ public class ProfessionalUsersEntityResponseWithoutRoles {
     }
 
     @JsonSetter("userProfiles")
+    @JsonAlias("users")
     public void setUserProfiles(List<ProfessionalUsersResponseWithoutRoles> userProfiles) {
         this.userProfiles = userProfiles;
     }

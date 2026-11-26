@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
@@ -343,8 +342,8 @@ public class RefDataUtil {
         } else {
             // since Headers are read only , it can't be modified.
             // Hence copied all existing headers into new one and added new header for pagination
-            MultiValueMap<String, String> originalHeaders = responseEntity.getHeaders();
-            originalHeaders.forEach(headers::put);
+            // Spring Framework 7: HttpHeaders no longer implements MultiValueMap
+            responseEntity.getHeaders().forEach(headers::put);
             headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));
         }
         return headers;

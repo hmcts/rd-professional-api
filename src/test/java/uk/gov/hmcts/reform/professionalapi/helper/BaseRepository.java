@@ -3,6 +3,10 @@ package uk.gov.hmcts.reform.professionalapi.helper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.cache.autoconfigure.CacheAutoConfiguration;
+import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -30,6 +34,13 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 
+@ImportAutoConfiguration({CacheAutoConfiguration.class, FlywayAutoConfiguration.class})
+@TestPropertySource(properties = {
+    // Let Flyway own schema/seed data (prd_enum); Boot 4 DataJpaTest defaults create-drop
+    "spring.jpa.hibernate.ddl-auto=none",
+    "spring.flyway.enabled=true",
+    "spring.flyway.create-schemas=true"
+})
 public class BaseRepository {
 
     @Autowired
@@ -107,8 +118,11 @@ public class BaseRepository {
 
         organisationMfaStatus = new OrganisationMfaStatus();
         organisationMfaStatus.setMfaStatus(EMAIL);
+        // Hibernate 6: MFA MapsId requires a managed Organisation; keep both sides in sync
+        organisation = organisationRepository.findById(organisation.getId()).orElseThrow();
         organisationMfaStatus.setOrganisation(organisation);
-        organisationMfaStatusRepository.save(organisationMfaStatus);
+        organisation.setOrganisationMfaStatus(organisationMfaStatus);
+        organisationMfaStatus = organisationMfaStatusRepository.save(organisationMfaStatus);
     }
 
     @AfterEach
@@ -120,8 +134,8 @@ public class BaseRepository {
         professionalUserRepository.deleteAll();
         bulkCustomerDetailsRepository.deleteAll();
         paymentAccountRepository.deleteAll();
+        organisationMfaStatusRepository.deleteAll();
         organisationRepository.deleteAll();
         prdEnumRepository.deleteAll();
-        organisationMfaStatusRepository.deleteAll();
     }
 }

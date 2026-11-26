@@ -26,6 +26,7 @@ public class ProfessionalUsersEntityResponse {
     private List<String> organisationProfileIds;
 
     @JsonProperty
+    @Setter
     private List<ProfessionalUsersResponse> users = new ArrayList<>();
 
     @JsonSetter("userProfiles")

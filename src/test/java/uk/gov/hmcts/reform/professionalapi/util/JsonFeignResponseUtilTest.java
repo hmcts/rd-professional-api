@@ -5,8 +5,8 @@ import feign.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 
 import java.io.IOException;
@@ -73,12 +73,12 @@ class JsonFeignResponseUtilTest {
                 "content-length"));
         header.put("content-encoding", list);
 
-        MultiValueMap<String, String> responseHeader = JsonFeignResponseUtil.convertHeaders(header);
-        assertThat(responseHeader).isNotEmpty();
+        HttpHeaders responseHeader = JsonFeignResponseUtil.convertHeaders(header);
+        assertThat(responseHeader.headerNames()).isNotEmpty();
 
         Collection<String> emptylist = new ArrayList<>();
         header.put("content-encoding", emptylist);
-        MultiValueMap<String, String> responseHeader1 = JsonFeignResponseUtil.convertHeaders(header);
+        HttpHeaders responseHeader1 = JsonFeignResponseUtil.convertHeaders(header);
 
         assertThat(responseHeader1.get("content-encoding")).isEmpty();
     }
@@ -96,7 +96,7 @@ class JsonFeignResponseUtilTest {
 
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCode().value()).isEqualTo(200);
-        assertThat(entity.getHeaders()).isNotEmpty();
+        assertThat(entity.getHeaders().headerNames()).isNotEmpty();
         assertThat(((ProfessionalUsersResponse) entity.getBody()).getUserIdentifier()).isEqualTo("1");
     }
 

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import lombok.Getter;
-import org.springframework.boot.web.context.WebServerInitializedEvent;
+import org.springframework.boot.web.server.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 
 @Getter 

@@ -333,7 +333,7 @@ class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
                                             + "]"
                                             + "}";
 
-        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmptyStatus, HttpStatus.UNPROCESSABLE_ENTITY,
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyEmptyStatus, HttpStatus.UNPROCESSABLE_CONTENT,
                 "Mandatory field Status missing");
     }
 
@@ -350,7 +350,7 @@ class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
                                                 + "]"
                                                 + "}";
 
-        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyMisspelledField, HttpStatus.UNPROCESSABLE_ENTITY,
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyMisspelledField, HttpStatus.UNPROCESSABLE_CONTENT,
                 "Mandatory field Status missing");
     }
 
@@ -367,8 +367,8 @@ class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
                                                 + "]"
                                                 + "}";
 
-        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpecChar, HttpStatus.UNPROCESSABLE_ENTITY,
-                "Value for Status field is invalid");
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpecChar,
+                HttpStatus.UNPROCESSABLE_CONTENT, "Value for Status field is invalid");
     }
 
     @Test
@@ -384,7 +384,7 @@ class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
                                                 + "]"
                                                 + "}";
 
-        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpace, HttpStatus.UNPROCESSABLE_ENTITY,
+        validateUpdatePaymentsAccountsResponse(orgId, pbaRequestBodyStatusWithSpace, HttpStatus.UNPROCESSABLE_CONTENT,
                 "Value for Status field is invalid");
     }
 
@@ -430,7 +430,7 @@ class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrati
             assertThat(pbaResponse).containsEntry("http_status", "200 OK");
         } else if (expectedStatus == HttpStatus.BAD_REQUEST) {
             assertThat(pbaResponse).containsEntry("http_status", "400");
-        } else if (expectedStatus == HttpStatus.UNPROCESSABLE_ENTITY) {
+        } else if (expectedStatus == HttpStatus.UNPROCESSABLE_CONTENT) {
             assertThat(pbaResponse).containsEntry("http_status", "422");
         }
 

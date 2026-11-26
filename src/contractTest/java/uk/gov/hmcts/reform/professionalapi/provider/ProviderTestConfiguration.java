@@ -1,33 +1,27 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.ConstructorDetector;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 
 @TestConfiguration
 public class ProviderTestConfiguration {
@@ -61,51 +55,44 @@ public class ProviderTestConfiguration {
 
     @Primary
     @Bean(name = "DefaultObjectMapper")
-    public ObjectMapper defaultObjectMapper() {
-        return new ObjectMapper()
-                .registerModule(new Jdk8Module())
-                .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(READ_ENUMS_USING_TO_STRING, true)
-                .configure(WRITE_ENUMS_USING_TO_STRING, true)
-                .configure(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE, true);
+    public JsonMapper defaultObjectMapper() {
+        return JsonMapper.builder()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_ABSENT))
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+                .enable(EnumFeature.READ_ENUMS_USING_TO_STRING)
+                .enable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+                .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .constructorDetector(
+                        ConstructorDetector.DEFAULT.withAllowImplicitWithDefaultConstructor(false))
+                .build();
     }
 
     @Bean
-    @Primary
-    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
-        return new Jackson2ObjectMapperBuilder()
-                .featuresToEnable(READ_ENUMS_USING_TO_STRING)
-                .featuresToEnable(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
-                .featuresToEnable(WRITE_ENUMS_USING_TO_STRING)
-                .serializationInclusion(JsonInclude.Include.NON_ABSENT);
-    }
-
-    @Bean
-    public RestTemplate restTemplate(ObjectMapper objectMapper) {
+    public RestTemplate restTemplate(JsonMapper jsonMapper) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate
                 .getMessageConverters()
-                .add(0, mappingJackson2HttpMessageConverter(objectMapper));
+                .add(0, jacksonJsonHttpMessageConverter(jsonMapper));
 
         return restTemplate;
     }
 
     @Bean
-    public RestOperations restOperations(ObjectMapper objectMapper) {
-        return restTemplate(objectMapper);
+    public RestOperations restOperations(JsonMapper jsonMapper) {
+        return restTemplate(jsonMapper);
     }
 
     @Bean(name = "httpMessageConverter")
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(ObjectMapper objectMapper) {
-        return new MappingJackson2HttpMessageConverter(objectMapper);
+    public JacksonJsonHttpMessageConverter jacksonJsonHttpMessageConverter(JsonMapper jsonMapper) {
+        return new JacksonJsonHttpMessageConverter(jsonMapper);
     }
 
-    @Bean()
-    public MappingJackson2HttpMessageConverter newJsonConvert() {
-        return new MappingJackson2HttpMessageConverter(new ObjectMapper());
+    @Bean
+    public JacksonJsonHttpMessageConverter newJsonConvert() {
+        return new JacksonJsonHttpMessageConverter(JsonMapper.builder().build());
     }
 
     @Bean

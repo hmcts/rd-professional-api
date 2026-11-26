@@ -5,7 +5,7 @@ import au.com.dius.pact.provider.junitsupport.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -35,7 +35,7 @@ public class OrganisationalInternalControllerV1ProviderTest extends MockMvcProvi
     ProfessionalUserRepository professionalUserRepositoryMock;
 
     @Autowired
-    MappingJackson2HttpMessageConverter httpMessageConverter;
+    JacksonJsonHttpMessageConverter httpMessageConverter;
 
     @Autowired
     OrganisationService organisationService;
