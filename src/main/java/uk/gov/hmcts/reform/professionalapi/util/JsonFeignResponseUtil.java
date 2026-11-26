@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -61,6 +62,9 @@ public class JsonFeignResponseUtil {
     }
 
     public static ResponseEntity<Object> toResponseEntity(Response response, Object clazz) {
+        if (response == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
         Optional<Object> payload = decode(response, clazz);
 
         return ResponseEntity
@@ -71,12 +75,16 @@ public class JsonFeignResponseUtil {
 
     public static HttpHeaders convertHeaders(Map<String, Collection<String>> responseHeaders) {
         HttpHeaders responseEntityHeaders = new HttpHeaders();
+        if (responseHeaders == null) {
+            return responseEntityHeaders;
+        }
         responseHeaders.entrySet().stream().forEach(e -> {
-            if (!(e.getKey().equalsIgnoreCase("request-context") || e.getKey()
+            if (e.getKey() != null && !(e.getKey().equalsIgnoreCase("request-context") || e.getKey()
                     .equalsIgnoreCase("x-powered-by") || e.getKey()
                     .equalsIgnoreCase("content-length") || e.getKey()
                     .equalsIgnoreCase("transfer-encoding"))) {
-                responseEntityHeaders.put(e.getKey(), new ArrayList<>(e.getValue()));
+                Collection<String> values = e.getValue() != null ? e.getValue() : List.of();
+                responseEntityHeaders.put(e.getKey(), new ArrayList<>(values));
             }
         });
 
