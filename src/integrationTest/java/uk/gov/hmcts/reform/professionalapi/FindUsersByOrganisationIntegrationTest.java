@@ -332,10 +332,11 @@ class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegra
 
     @Test
     void retrieve_pending_users_only_for_an_organisation_with_pui_caa_role_should_return_400() {
-        String id = createOrganisationRequest();
+        String userId = settingUpOrganisation("pui-caa");
         Map<String, Object> response = professionalReferenceDataClient
-                .findAllUsersForOrganisationByStatus("false", "PENDING", puiCaa, id);
+                .findAllUsersForOrganisationByStatus("false", "PENDING", puiCaa, userId);
         assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat((String) response.get("response_body")).contains("Required status param value equal to 'Active'");
     }
 
     @Test
