@@ -92,8 +92,8 @@ public class UserProfileMatchClient {
     }
 
     private HttpResponse<byte[]> send(HttpRequest request, SearchDeadline deadline) {
-        var future = http.sendAsync(request, response -> response.statusCode() == 200
-                ? HttpResponse.BodySubscribers.ofByteArray() : HttpResponse.BodySubscribers.replacing(new byte[0]));
+        var future = deadline.admit(() -> http.sendAsync(request, response -> response.statusCode() == 200
+                ? HttpResponse.BodySubscribers.ofByteArray() : HttpResponse.BodySubscribers.replacing(new byte[0])));
         try {
             return future.get(deadline.remainingNanos(), TimeUnit.NANOSECONDS);
         } catch (InterruptedException ex) {

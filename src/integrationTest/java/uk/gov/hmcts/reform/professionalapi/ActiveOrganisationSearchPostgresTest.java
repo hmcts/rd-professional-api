@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -29,10 +28,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
 @DataJpaTest(properties = {
-    "spring.datasource.url=${PRD_SEARCH_TEST_JDBC_URL}",
-    "spring.datasource.username=${PRD_SEARCH_TEST_DB_USER:prd_search_test}",
-    "spring.datasource.password=${PRD_SEARCH_TEST_DB_PASSWORD:prd_search_test}",
-    "spring.datasource.driver-class-name=org.postgresql.Driver",
+    "spring.datasource.url=jdbc:tc:postgresql:16:///dbrefdata",
+    "spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver",
     "spring.flyway.schemas=dbrefdata",
     "spring.flyway.locations=classpath:db/migration,classpath:db/postgres",
     "spring.jpa.show-sql=false"
@@ -40,7 +37,6 @@ import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTest
 @AutoConfigureTestDatabase(replace = NONE)
 @Import(ActiveOrganisationSearchRepository.class)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-@EnabledIfEnvironmentVariable(named = "PRD_SEARCH_TEST_JDBC_URL", matches = "jdbc:postgresql:.*")
 class ActiveOrganisationSearchPostgresTest {
 
     @Autowired
@@ -56,7 +52,7 @@ class ActiveOrganisationSearchPostgresTest {
         final var postcodeOnly = organisation(3, "JONES LLP", "ACTIVE", null);
         final var splitPostcode = organisation(4, "Smith Split", "ACTIVE", null);
         final var inactive = organisation(5, "Smith & Co", "PENDING", null);
-        final var exactLiteral = organisation(6, "SMI%TH _!\\ Partners", "ACTIVE", null);
+        final var exactLiteral = organisation(6, "ROWE SMI%TH _!\\ Partners", "ACTIVE", null);
         organisation(7, "RAW SMITH SW1A 1AA NAME", "ACTIVE", null);
         organisation(8, "DÉNÉ", "ACTIVE", null);
         final var pendingOnly = organisation(9, "PendOnly", "ACTIVE", null);

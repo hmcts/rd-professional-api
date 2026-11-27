@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
+import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,11 +10,14 @@ import com.google.common.collect.Maps;
 import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
@@ -126,10 +130,24 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
 
 
+    private final ActiveOrganisationSearchProviderStates search = new ActiveOrganisationSearchProviderStates();
+
+    @BeforeEach
+    void registerSearchStates(PactVerificationContext context) {
+        if (context != null) {
+            context.addStateChangeHandlers(search);
+        }
+    }
+
+    @AfterEach
+    void stopSearchWorkers() {
+        search.stopWorkers();
+    }
+
     @Override
     void setController() {
-        testTarget.setControllers(organisationInternalController);
-        testTarget.setMessageConverters(httpMessageConverter);
+        testTarget.setControllers(organisationInternalController, search.controller());
+        testTarget.setMessageConverters(new ByteArrayHttpMessageConverter(), httpMessageConverter);
     }
 
     @State("Users exists for an Organisation")

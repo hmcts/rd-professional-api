@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -45,30 +46,52 @@ public class ActiveOrganisationSearch {
             new SynchronousQueue<>(), Thread.ofVirtual().name("active-search-", 0).factory());
     private final ThreadPoolExecutor batches = new ThreadPoolExecutor(SHARED_BATCH_WORKERS, SHARED_BATCH_WORKERS, 30,
             TimeUnit.SECONDS, new ArrayBlockingQueue<>(64), Thread.ofVirtual().name("active-search-up-", 0).factory());
+    private final ThreadPoolExecutor details = new ThreadPoolExecutor(4, 4, 30, TimeUnit.SECONDS,
+            new SynchronousQueue<>(), Thread.ofVirtual().name("active-detail-up-", 0).factory());
 
     private final ActiveOrganisationSearchRepository repository;
     private final UserProfileMatchClient profileClient;
     private final ObjectMapper mapper;
+    private final SearchCancellation cancellations;
 
     public ActiveOrganisationSearch(ActiveOrganisationSearchRepository repository, UserProfileMatchClient profileClient,
-                                    ObjectMapper mapper) {
+                                    ObjectMapper mapper, SearchCancellation cancellations) {
         this.repository = repository;
         this.profileClient = profileClient;
         this.mapper = mapper;
+        this.cancellations = cancellations;
     }
 
     public Response search(String term, int page, int size, String bearer, SearchDeadline deadline) {
-        return withDeadline(() -> runSearch(term, (page - 1L) * size, size, bearer, deadline), deadline);
+        return search(term, page, size, bearer, deadline, null);
+    }
+
+    public Response search(String term, int page, int size, String bearer, SearchDeadline deadline, UUID searchId) {
+        return withDeadline(searches, () -> {
+            deadline.remainingNanos();
+            var budget = searchId == null ? deadline : deadline.cancellable(cancellations.register(searchId, bearer));
+            return runSearch(term, (page - 1L) * size, size, bearer, budget);
+        }, deadline);
+    }
+
+    public void cancel(UUID searchId, String bearer) {
+        cancellations.cancel(searchId, bearer);
     }
 
     Profile profileForInternalDetail(String userId, String bearer) {
         var deadline = new SearchDeadline(Duration.ofSeconds(25));
-        return withDeadline(() -> lookup(List.of(userId), "", bearer, profileClient.serviceToken(deadline), deadline)
-                .get(userId), deadline);
+        return withDeadline(details,
+                () -> profileClient.match(List.of(userId), "", bearer, profileClient.serviceToken(deadline), deadline)
+                        .matchedProfiles().stream().findFirst().orElse(null), deadline);
     }
 
-    private <T> T withDeadline(Callable<T> operation, SearchDeadline deadline) {
-        Future<T> search = submitSearch(operation);
+    private <T> T withDeadline(ThreadPoolExecutor executor, Callable<T> operation, SearchDeadline deadline) {
+        final Future<T> search;
+        try {
+            search = executor.submit(operation);
+        } catch (RejectedExecutionException ex) {
+            throw overloaded();
+        }
         try {
             return search.get(deadline.remainingNanos(), TimeUnit.NANOSECONDS);
         } catch (TimeoutException ex) {
@@ -80,14 +103,6 @@ public class ActiveOrganisationSearch {
             throw searchFailure(ex);
         } finally {
             search.cancel(true);
-        }
-    }
-
-    private <T> Future<T> submitSearch(Callable<T> search) {
-        try {
-            return searches.submit(search);
-        } catch (RejectedExecutionException ex) {
-            throw overloaded();
         }
     }
 
@@ -133,6 +148,7 @@ public class ActiveOrganisationSearch {
         var body = new OrganisationsDetailResponse(page.rows().stream().map(Row::organisation).toList());
         body.setMoreAvailable(page.moreAvailable());
         deadline.remainingNanos();
+        deadline.checkCancellation();
         try {
             var json = mapper.writeValueAsBytes(body);
             deadline.remainingNanos();
@@ -160,7 +176,7 @@ public class ActiveOrganisationSearch {
                     pending.add(batch);
                     next = end;
                 }
-                var batch = completed.poll(deadline.remainingNanos(), TimeUnit.NANOSECONDS);
+                var batch = deadline.awaitBatch(completed);
                 if (batch == null) {
                     throw SearchDeadline.expired();
                 }
@@ -203,6 +219,7 @@ public class ActiveOrganisationSearch {
     void shutdown() {
         searches.shutdownNow();
         batches.shutdownNow();
+        details.shutdownNow();
     }
 
     private static final class Batch extends FutureTask<MatchResponse> {

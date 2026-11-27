@@ -14,6 +14,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.NoOrganisationUsersException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -68,6 +71,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -640,37 +644,30 @@ class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void shouldThrowResourceNotFoundExceptionWhenNoUsersReturnedWithPageable() {
-        Pageable pageableMock = mock(Pageable.class);
-        Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
+    void reportsNoUsersOnlyWhenTheFirstPageHasNoResultsAndZeroTotal() {
+        var firstPage = PageRequest.of(0, 10);
+        var beyondLastPage = PageRequest.of(2, 10);
+        when(professionalUserRepository.findByOrganisation(organisation, firstPage))
+                .thenReturn(Page.empty(firstPage));
+        when(professionalUserRepository.findByOrganisation(organisation, beyondLastPage))
+                .thenReturn(new PageImpl<>(List.of(), beyondLastPage, 1));
 
-        when(professionalUserRepository.findByOrganisation(organisation, pageableMock))
-                .thenReturn(professionalUserPage);
-
-        assertThrows(ResourceNotFoundException.class, () ->
-                professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false",
-                false, "Active", pageableMock));
-
-        verify(professionalUserRepository, times(1))
-                .findByOrganisation(organisation, pageableMock);
+        assertThrowsExactly(NoOrganisationUsersException.class, () -> professionalUserService
+                .findProfessionalUsersByOrganisationWithPageable(organisation, "false", false, "", firstPage));
+        assertThrowsExactly(ResourceNotFoundException.class, () -> professionalUserService
+                .findProfessionalUsersByOrganisationWithPageable(organisation, "false", false, "", beyondLastPage));
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void test_shouldThrowResourceNotFoundExceptionWhenNoUsersReturned() {
-        Pageable pageableMock = mock(Pageable.class);
-        Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
+    void distinguishesAnEmptyOrganisationFromASpecificUserMiss() {
+        when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(List.of());
+        when(professionalUserRepository.findByOrganisationAndUserIdentifier(organisation, userIdentifier))
+                .thenReturn(List.of());
 
-        when(professionalUserRepository.findByOrganisation(organisation, pageableMock))
-                .thenReturn(professionalUserPage);
-
-        assertThrows(ResourceNotFoundException.class, () ->
-                professionalUserService.findProfessionalUsersByOrganisation(organisation, userIdentifier,
-                        "false", false, "Active"));
-
-        verify(professionalUserRepository, times(1))
-                .findByOrganisationAndUserIdentifier(organisation, userIdentifier);
+        assertThrowsExactly(NoOrganisationUsersException.class, () -> professionalUserService
+                .findProfessionalUsersByOrganisation(organisation, null, "false", false, ""));
+        assertThrowsExactly(ResourceNotFoundException.class, () -> professionalUserService
+                .findProfessionalUsersByOrganisation(organisation, userIdentifier, "false", false, ""));
     }
 
     @Test

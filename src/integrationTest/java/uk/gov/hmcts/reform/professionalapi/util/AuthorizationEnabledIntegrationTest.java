@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.wiremock.IdamResponseTransformer;
+import uk.gov.hmcts.reform.professionalapi.wiremock.UserProfileMatchResponseTransformer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -111,7 +113,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public ProfessionalUserServiceImpl professionalUserServiceImpl;
 
     @RegisterExtension
-    public static WireMockExtension userProfileService = new WireMockExtension(8091, new IdamResponseTransformer());
+    public static WireMockExtension userProfileService =
+        new WireMockExtension(8091, new IdamResponseTransformer(), new UserProfileMatchResponseTransformer());
 
     @Value("${prd.security.roles.hmcts-admin}")
     protected String hmctsAdmin;
@@ -185,6 +188,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withHeader("Content-Type", APPLICATION_JSON)
                         .withStatus(200)
                         .withBody(getObjectMapper().writeValueAsString(data))));
+        userProfileService.stubFor(post(urlPathEqualTo("/v1/userprofile/users/match"))
+            .withRequestBody(equalToJson("""
+                {"userIds":["${json-unit.any-string}"],"fullNameContains":""}
+                """))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", APPLICATION_JSON)
+                .withTransformerParameter("firstName", "testFn")
+                .withTransformerParameter("lastName", "testLn")
+                .withTransformerParameter("email", "dummy@email.com")
+                .withTransformers(UserProfileMatchResponseTransformer.NAME)
+                .withStatus(200)));
     }
 
     public void userProfileGetPendingUserWireMock() {
@@ -443,7 +457,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "}";
 
         userProfileService.stubFor(
-                post(urlPathMatching("/v1/userprofile/users.*"))
+                post(urlPathEqualTo("/v1/userprofile/users"))
                         .willReturn(
                                 aResponse()
                                         .withHeader("Content-Type", APPLICATION_JSON)
@@ -489,7 +503,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "}";
 
         userProfileService.stubFor(
-                post(urlPathMatching("/v1/userprofile/users.*"))
+                post(urlPathEqualTo("/v1/userprofile/users"))
                         .withQueryParam("rolesRequired", equalTo("false"))
                         .willReturn(
                                 aResponse()
@@ -535,7 +549,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "}";
 
         userProfileService.stubFor(
-                post(urlPathMatching("/v1/userprofile/users.*"))
+                post(urlPathEqualTo("/v1/userprofile/users"))
                         .willReturn(
                                 aResponse()
                                         .withHeader("Content-Type", APPLICATION_JSON)

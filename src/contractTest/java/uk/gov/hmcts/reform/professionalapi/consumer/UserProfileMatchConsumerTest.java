@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.provider;
+package uk.gov.hmcts.reform.professionalapi.consumer;
 
 import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;

@@ -233,6 +233,25 @@ task runProviderPactVerification(type: Test) {
     include "uk/gov/hmcts/reform/professionalapi/provider/**"
 }
 
+def consumerPacts = layout.buildDirectory.dir('consumer-pacts')
+tasks.register('runConsumerPactTests', Test) {
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+    include "uk/gov/hmcts/reform/professionalapi/consumer/**"
+    reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/contract')
+    outputs.dir(consumerPacts)
+    systemProperty 'pact.rootDir', consumerPacts.get().asFile.absolutePath
+    systemProperty 'pact.writer.overwrite', 'true'
+}
+
+tasks.register('runAndPublishConsumerPactTests') {
+    dependsOn tasks.named('pactPublish')
+}
+tasks.named('pactPublish') {
+    dependsOn tasks.named('runConsumerPactTests')
+}
+
 task fortifyScan(type: JavaExec) {
     mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
@@ -249,7 +268,8 @@ def getCheckedOutGitCommitHash() {
 
 pact {
     publish {
-        pactDirectory = 'pacts'
+        pactDirectory = consumerPacts.get().asFile.absolutePath
+        pactBrokerUrl = findProperty('pact.broker.url') ?: System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
         tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
         version = project.pactVersion
     }
@@ -495,6 +515,7 @@ dependencies {
     smokeTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
 
     integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+    integrationTestImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.postgresql_tc
     integrationTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
     integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
     integrationTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform

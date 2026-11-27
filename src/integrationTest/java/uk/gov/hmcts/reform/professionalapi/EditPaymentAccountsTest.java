@@ -318,6 +318,7 @@ class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
     private void validateRetrievePaymentAccountsResponse(String orgId, int expectedPaymentAccountSize) {
         Map<String, Object> paymentAccountsResponse = professionalReferenceDataClient
                 .retrieveSingleOrganisation(orgId, hmctsAdmin);
+        assertThat(paymentAccountsResponse).containsEntry("http_status", "200 OK");
 
         var paymentAccounts = (List<PaymentAccount>) paymentAccountsResponse.get("paymentAccount");
 

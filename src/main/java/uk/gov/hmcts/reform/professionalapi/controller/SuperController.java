@@ -8,6 +8,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.NoOrganisationUsersException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.BulkCustomerRequest;
@@ -45,6 +47,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponseV2;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
@@ -95,12 +99,15 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valu
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndMoreThanRequiredAddressExists;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.generateResponseEntityWithPaginationHeader;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getOrganisationProfileIds;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.matchAddressIdsWithOrgContactInformationIds;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeLeadingAndTailingSpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgInfoInGetUserResponseAndSort;
 
 @RestController
 @Slf4j
@@ -538,26 +545,43 @@ public abstract class SuperController {
     protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String userIdentifier,
                                                                String showDeleted, Boolean returnRoles, String status,
                                                                Integer page, Integer size) {
+        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status,
+                page, size, false);
+    }
+
+    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String userIdentifier,
+                                                               String showDeleted, Boolean returnRoles, String status,
+                                                               Integer page, Integer size, boolean allowEmpty) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation, NOT_FOUND);
-        ResponseEntity<Object> responseEntity;
 
         showDeleted = getShowDeletedValue(showDeleted);
         returnRoles = getReturnRolesValue(returnRoles);
 
-        if (page != null && userIdentifier == null) {
-            Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
-            responseEntity = professionalUserService
-                    .findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles,
-                            status, pageable);
-        } else {
-            responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
+        Pageable pageable = page != null && userIdentifier == null
+                ? createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME)) : null;
+        try {
+            if (pageable != null) {
+                return professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation,
+                        showDeleted, returnRoles, status, pageable);
+            }
+            return professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
                     userIdentifier, showDeleted, returnRoles, status);
+        } catch (NoOrganisationUsersException ex) {
+            if (!allowEmpty) {
+                throw ex;
+            }
+            Object body = returnRoles ? new ProfessionalUsersEntityResponse()
+                    : new ProfessionalUsersEntityResponseWithoutRoles();
+            var response = setOrgInfoInGetUserResponseAndSort(ResponseEntity.ok(body), organisationIdentifier,
+                    existingOrganisation.getStatus(), getOrganisationProfileIds(existingOrganisation));
+            return pageable == null ? response : ResponseEntity.ok()
+                    .headers(generateResponseEntityWithPaginationHeader(pageable, Page.empty(pageable), response))
+                    .body(response.getBody());
         }
-        return responseEntity;
     }
 
     protected ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomerId(

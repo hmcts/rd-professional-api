@@ -103,14 +103,13 @@ public class ProfessionalUserInternalController extends SuperController {
             @Parameter(name = "returnRoles")
             @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
             @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "size", required = false) Integer size
+            @RequestParam(value = "size", required = false) Integer size,
+            @Parameter(description = "Return an empty list when the active organisation has no users")
+            @RequestParam(value = "allowEmpty", defaultValue = "false") boolean allowEmpty
     ) {
-        var status = EMPTY;
-        if (isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles())) {
-            status = ACTIVE;
-        }
-        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles, status, page,
-                size);
+        boolean systemUser = isSystemRoleUser(idamRepository.getUserInfo(getUserToken()).getRoles());
+        return searchUsersByOrganisation(organisationIdentifier, userIdentifier, showDeleted, returnRoles,
+                systemUser ? ACTIVE : EMPTY, page, size, allowEmpty && !systemUser);
     }
 
     @Operation(

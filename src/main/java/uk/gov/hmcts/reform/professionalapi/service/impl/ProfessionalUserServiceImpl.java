@@ -17,6 +17,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.NoOrganisationUsersException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -261,7 +262,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 : professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
-            throw new ResourceNotFoundException("No Users were found for the given organisation");
+            String message = "No Users were found for the given organisation";
+            if (userIdentifier == null) {
+                throw new NoOrganisationUsersException(message);
+            }
+            throw new ResourceNotFoundException(message);
         }
         return retrieveUserProfiles(showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier(),
                 organisation.getStatus(),
@@ -316,7 +321,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 pageable);
 
         if (professionalUsers.getContent().isEmpty()) {
-            throw new ResourceNotFoundException("No Users found for page number " + pageable.getPageNumber());
+            String message = "No Users found for page number " + pageable.getPageNumber();
+            if (professionalUsers.getTotalElements() == 0 && pageable.getPageNumber() == 0) {
+                throw new NoOrganisationUsersException(message);
+            }
+            throw new ResourceNotFoundException(message);
         }
 
         return professionalUsers;

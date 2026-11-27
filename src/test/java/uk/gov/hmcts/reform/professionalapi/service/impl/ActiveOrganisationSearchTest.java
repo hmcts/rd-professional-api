@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -49,11 +51,43 @@ class ActiveOrganisationSearchTest {
     private final ActiveOrganisationSearchRepository repository = mock(ActiveOrganisationSearchRepository.class);
     private final UserProfileMatchClient profiles = mock(UserProfileMatchClient.class);
     private final ObjectMapper mapper = new ObjectMapper();
-    private final ActiveOrganisationSearch search = new ActiveOrganisationSearch(repository, profiles, mapper);
+    private final ActiveOrganisationSearch search = new ActiveOrganisationSearch(repository, profiles, mapper,
+            mock(SearchCancellation.class));
 
     @AfterEach
     void shutdown() {
         search.shutdown();
+    }
+
+    @Test
+    void detailStillResolvesItsProfileWhenBothSearchPoolsAreFull() throws Exception {
+        var release = new CountDownLatch(1);
+        var active = new CountDownLatch(48);
+        Runnable block = () -> {
+            active.countDown();
+            try {
+                release.await();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        };
+        var coordinators = (ThreadPoolExecutor) ReflectionTestUtils.getField(search, "searches");
+        var batches = (ThreadPoolExecutor) ReflectionTestUtils.getField(search, "batches");
+        var profile = new Profile("view-id", "Current", "Admin", "current@example.test");
+        when(profiles.serviceToken(any())).thenReturn(SERVICE_TOKEN);
+        when(profiles.match(eq(List.of("view-id")), eq(""), eq(BEARER), eq(SERVICE_TOKEN), any()))
+                .thenReturn(new MatchResponse(List.of(profile), List.of()));
+
+        try {
+            IntStream.range(0, 32).forEach(ignored -> coordinators.execute(block));
+            IntStream.range(0, 80).forEach(ignored -> batches.execute(block));
+            assertThat(active.await(5, TimeUnit.SECONDS)).isTrue();
+            assertThat(coordinators.getActiveCount()).isEqualTo(32);
+            assertThat(batches.getQueue().remainingCapacity()).isZero();
+            assertThat(search.profileForInternalDetail("view-id", BEARER)).isEqualTo(profile);
+        } finally {
+            release.countDown();
+        }
     }
 
     @Test

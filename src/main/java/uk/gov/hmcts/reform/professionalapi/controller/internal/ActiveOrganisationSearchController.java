@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.SearchDeadline;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE;
@@ -32,6 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class ActiveOrganisationSearchController {
 
     private static final String DEADLINE_HEADER = "X-Organisation-Search-Deadline";
+    private static final String SEARCH_ID_HEADER = "X-Organisation-Search-Id";
     private static final long MAX_BUDGET_MILLIS = 25_000;
     private static final int MAX_BODY_BYTES = 6 * 1024 * 1024;
 
@@ -57,7 +60,8 @@ public class ActiveOrganisationSearchController {
     @PostMapping(path = "/refdata/internal/v1/organisations/search",
             consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<byte[]> search(HttpServletRequest servletRequest, @RequestHeader(AUTHORIZATION) String bearer,
-                                         @RequestHeader(value = DEADLINE_HEADER, required = false) String supplied) {
+                                         @RequestHeader(value = DEADLINE_HEADER, required = false) String supplied,
+                                         @RequestHeader(value = SEARCH_ID_HEADER, required = false) UUID searchId) {
         final var deadline = deadline(supplied);
         var request = readRequest(servletRequest);
         deadline.remainingNanos();
@@ -73,10 +77,18 @@ public class ActiveOrganisationSearchController {
         }
         int page = positiveInteger("page", request.page(), 1);
         int size = positiveInteger("size", request.size(), defaultPageSize);
-        var response = search.search(term, page, size, bearer, deadline);
+        var response = searchId == null ? search.search(term, page, size, bearer, deadline)
+                : search.search(term, page, size, bearer, deadline, searchId);
         return ResponseEntity.ok().contentType(APPLICATION_JSON)
                 .header("total_records", Long.toString(response.totalRecords()))
                 .body(response.json());
+    }
+
+    @Secured("prd-admin")
+    @PostMapping(path = "/refdata/internal/v1/organisations/search/{searchId}/cancel")
+    public ResponseEntity<Void> cancel(@PathVariable UUID searchId, @RequestHeader(AUTHORIZATION) String bearer) {
+        search.cancel(searchId, bearer);
+        return ResponseEntity.noContent().build();
     }
 
     private Request readRequest(HttpServletRequest servletRequest) {
