@@ -269,7 +269,9 @@ def getCheckedOutGitCommitHash() {
 pact {
     publish {
         pactDirectory = consumerPacts.get().asFile.absolutePath
-        pactBrokerUrl = findProperty('pact.broker.url') ?: System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
+        def brokerUrl = findProperty('pact.broker.url') ?: System.getenv('PACT_BROKER_FULL_URL') ?: 'http://localhost:9292'
+        def brokerScheme = System.getenv('PACT_BROKER_SCHEME') ?: 'https'
+        pactBrokerUrl = brokerUrl.contains('://') ? brokerUrl : "${brokerScheme}://${brokerUrl}"
         tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
         version = project.pactVersion
     }
