@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
 import jakarta.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -70,6 +72,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,6 +83,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationInternalControllerTest {
+    private static final String ADMIN_BEARER = "Bearer prd-admin";
+
     private OrganisationResponse organisationResponse;
     private OrganisationsDetailResponse organisationsDetailResponse;
     private OrganisationEntityResponse organisationEntityResponse;
@@ -232,11 +237,23 @@ class OrganisationInternalControllerTest {
         verify(organisationServiceMock, times(1)).retrieveAllOrganisations(null, null);
     }
 
+    @AfterEach
+    void resetRequest() {
+        RequestContextHolder.resetRequestAttributes();
+    }
+
+    private static void bindAdminRequest() {
+        var request = new MockHttpServletRequest();
+        request.addHeader("Authorization", ADMIN_BEARER);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+    }
+
     @Test
     void test_RetrieveOrganisationByIdWithStatusNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveOrganisation(any(String.class), any(boolean.class)))
+        bindAdminRequest();
+        when(organisationServiceMock.retrieveInternalOrganisation(any(String.class), eq(ADMIN_BEARER)))
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController
@@ -247,14 +264,15 @@ class OrganisationInternalControllerTest {
         assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(1);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
+                .retrieveInternalOrganisation(organisation.getOrganisationIdentifier(), ADMIN_BEARER);
     }
 
     @Test
     void test_RetrieveOrganisationByIdWithStatusNotNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveOrganisation(any(String.class), any(boolean.class)))
+        bindAdminRequest();
+        when(organisationServiceMock.retrieveInternalOrganisation(any(String.class), eq(ADMIN_BEARER)))
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
@@ -264,7 +282,7 @@ class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisation(organisation.getOrganisationIdentifier(), true);
+                .retrieveInternalOrganisation(organisation.getOrganisationIdentifier(), ADMIN_BEARER);
     }
 
     @Test

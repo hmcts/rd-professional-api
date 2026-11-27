@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -137,6 +138,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAccountMapService userAccountMapService;
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
+    private final ActiveOrganisationSearch activeOrganisationSearch;
     @Autowired
     PrdEnumService prdEnumService;
     @Autowired
@@ -158,6 +160,10 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
+
+    public OrganisationServiceImpl(ActiveOrganisationSearch activeOrganisationSearch) {
+        this.activeOrganisationSearch = activeOrganisationSearch;
+    }
 
     @Override
     @Transactional
@@ -685,6 +691,54 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired,
                                     false);
+    }
+
+    @Override
+    public OrganisationEntityResponse retrieveInternalOrganisation(String organisationIdentifier, String bearer) {
+        var organisation = internalDetailOrganisation(organisationIdentifier);
+        var response = new OrganisationEntityResponse(organisation, true, true, false);
+        updateInternalDetailProfile(organisation, response, bearer);
+        return response;
+    }
+
+    @Override
+    public OrganisationEntityResponseV2 retrieveInternalOrganisationForV2Api(String organisationIdentifier,
+                                                                               String bearer) {
+        var organisation = internalDetailOrganisation(organisationIdentifier);
+        var response = new OrganisationEntityResponseV2(organisation, true, true, false, true);
+        updateInternalDetailProfile(organisation, response, bearer);
+        return response;
+    }
+
+    private Organisation internalDetailOrganisation(String organisationIdentifier) {
+        var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        if (organisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+        }
+        if (organisation.getContactInformation().size() > 1) {
+            sortContactInfoByCreatedDateAsc(organisation);
+        }
+        return organisation;
+    }
+
+    private void updateInternalDetailProfile(Organisation organisation, OrganisationEntityResponse response,
+                                             String bearer) {
+        if (!organisation.isOrganisationStatusActive() || organisation.getUsers().isEmpty()) {
+            return;
+        }
+        var representative = organisation.getUsers().stream()
+                .min(Comparator.comparing(SuperUser::getCreated, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(user -> user.getId().toString()))
+                .orElseThrow();
+        response.setSuperUser(new SuperUserResponse(representative));
+        String userId = representative.getUserIdentifier();
+        if (userId == null || userId.isBlank()) {
+            return;
+        }
+        var profile = activeOrganisationSearch.profileForInternalDetail(userId, bearer);
+        if (profile != null) {
+            response.setSuperUser(new SuperUserResponse(profile.firstName(), profile.lastName(), profile.email()));
+        }
     }
 
     @Override

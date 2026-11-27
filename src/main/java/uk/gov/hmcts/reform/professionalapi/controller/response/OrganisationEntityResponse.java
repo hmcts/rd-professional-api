@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     @JsonProperty
     protected String companyUrl;
     @JsonProperty
+    @Setter
     protected SuperUserResponse superUser;
     @JsonProperty
     protected List<String> paymentAccount;
@@ -64,11 +67,24 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         }
     }
 
-    @SuppressWarnings("java:S6204")
+    public OrganisationEntityResponse(
+            Organisation organisation, Boolean isRequiredContactInfo, Boolean isRequiredPendingPbas,
+            Boolean isRequiredAllPbas, SuperUser selectedUser) {
+        getOrganisationEntityResponse(organisation, isRequiredContactInfo, isRequiredPendingPbas,
+                isRequiredAllPbas, selectedUser);
+    }
+
     protected void getOrganisationEntityResponse(
             Organisation organisation, Boolean isRequiredContactInfo,
             Boolean isRequiredPendingPbas, Boolean isRequiredAllPbas) {
+        var users = organisation.getUsers();
+        getOrganisationEntityResponse(organisation, isRequiredContactInfo, isRequiredPendingPbas,
+                isRequiredAllPbas, users.isEmpty() ? null : users.getFirst());
+    }
 
+    private void getOrganisationEntityResponse(
+            Organisation organisation, Boolean isRequiredContactInfo, Boolean isRequiredPendingPbas,
+            Boolean isRequiredAllPbas, SuperUser selectedUser) {
         this.organisationIdentifier = ObjectUtils.isEmpty(organisation.getOrganisationIdentifier())
                 ? "" : organisation.getOrganisationIdentifier();
         this.name = organisation.getName();
@@ -78,8 +94,8 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-        if (!organisation.getUsers().isEmpty()) {
-            this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
+        if (selectedUser != null) {
+            this.superUser = new SuperUserResponse(selectedUser);
         }
 
         if (Boolean.TRUE.equals(isRequiredAllPbas)) {

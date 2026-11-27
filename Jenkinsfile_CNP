@@ -184,10 +184,10 @@ withPipeline(type, product, component) {
                 steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
     onMaster() {
-        enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
     }
     onPR() {
-        enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
 
     }
 }

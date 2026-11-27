@@ -23,6 +23,10 @@ public class OrganisationsDetailResponse {
     @Setter
     boolean moreAvailable;
 
+    public OrganisationsDetailResponse(List<OrganisationEntityResponse> organisations) {
+        this.organisations = List.copyOf(organisations);
+    }
+
     public OrganisationsDetailResponse(
             List<Organisation> organisations, Boolean isRequiredContactInfo,
             Boolean isRequiredPendingPbas, Boolean isRequiredAllPbas) {

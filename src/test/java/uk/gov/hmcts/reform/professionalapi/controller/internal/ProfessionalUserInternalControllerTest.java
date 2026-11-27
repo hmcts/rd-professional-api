@@ -2,16 +2,25 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.NoOrganisationUsersException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
@@ -39,9 +48,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -93,6 +104,13 @@ class ProfessionalUserInternalControllerTest {
         systemUserRoles.add("prd-aac-system");
 
         MockitoAnnotations.openMocks(this);
+        Jwt jwt = Jwt.withTokenValue("test-jwt").header("alg", "RS256").subject("admin").build();
+        SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt));
+    }
+
+    @AfterEach
+    void clearAuthentication() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -130,7 +148,7 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actual = professionalUserInternalController
                 .findUsersByOrganisation(organisation
-                        .getOrganisationIdentifier(), userIdentifier,"true", true, null, null);
+                        .getOrganisationIdentifier(), userIdentifier,"true", true, null, null, false);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -169,7 +187,7 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier, "true",
-                        true, null, null);
+                        true, null, null, false);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -207,7 +225,7 @@ class ProfessionalUserInternalControllerTest {
 
         ResponseEntity<?> actualRolesFalse = professionalUserInternalController
                 .findUsersByOrganisation(organisation.getOrganisationIdentifier(), userIdentifier,"true",
-                        true, null, null);
+                        true, null, null, false);
         assertThat(actualRolesFalse).isNotNull();
         assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
@@ -218,6 +236,56 @@ class ProfessionalUserInternalControllerTest {
                         "");
         verify(responseEntityMock, times(1)).getStatusCode();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(ints = 0)
+    void returnsEmptyUsersOnlyWhenRequested(Integer page) {
+        String id = organisation.getOrganisationIdentifier();
+        final boolean rolesRequired = page != null;
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(id)).thenReturn(organisation);
+        when(idamRepositoryMock.getUserInfo(anyString()))
+                .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
+        var noUsers = new NoOrganisationUsersException("No users");
+        if (page == null) {
+            when(professionalUserServiceMock.findProfessionalUsersByOrganisation(eq(organisation), isNull(),
+                    eq("false"), eq(false), eq(""))).thenThrow(noUsers);
+        } else {
+            when(professionalUserServiceMock.findProfessionalUsersByOrganisationWithPageable(eq(organisation),
+                    eq("false"), eq(true), eq(""), any())).thenThrow(noUsers);
+        }
+
+        assertThatThrownBy(() -> professionalUserInternalController.findUsersByOrganisation(id, null, "false",
+                rolesRequired, page, 10, false)).isSameAs(noUsers);
+        var response = professionalUserInternalController.findUsersByOrganisation(id, null, "false",
+                rolesRequired, page, 10, true);
+        var json = new ObjectMapper().valueToTree(response.getBody());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(json.path("organisationIdentifier").asText()).isEqualTo(id);
+        assertThat(json.path("organisationStatus").asText()).isEqualTo("ACTIVE");
+        assertThat(json.path("users").isArray()).isTrue();
+        assertThat(json.path("users").isEmpty()).isTrue();
+        if (page != null) {
+            assertThat(response.getHeaders().getFirst("paginationInfo"))
+                    .contains("totalElements = 0", "totalPages = 0", "currentPage = 0");
+        }
+    }
+
+    @Test
+    void doesNotReturnAnEmptyListForAProfileDependencyFailure() {
+        String id = organisation.getOrganisationIdentifier();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(id)).thenReturn(organisation);
+        when(idamRepositoryMock.getUserInfo(anyString()))
+                .thenReturn(new UserInfo("", "", "", "", "", prdAdminRoles));
+        var dependencyFailure = new ExternalApiException(HttpStatus.BAD_GATEWAY, "Profile dependency failed");
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(eq(organisation), isNull(),
+                eq("false"), eq(false), eq(""))).thenThrow(dependencyFailure);
+
+        assertThatThrownBy(() -> professionalUserInternalController.findUsersByOrganisation(id, null, "false",
+                false, null, null, true)).isSameAs(dependencyFailure);
     }
 
     @Test

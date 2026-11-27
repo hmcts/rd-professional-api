@@ -1,0 +1,249 @@
+{
+  "consumer": {
+    "name": "xui_approveorg"
+  },
+  "interactions": [
+    {
+      "description": "Active browse includes an organisation without an administrator",
+      "providerState": "Active browse includes an organisation without an administrator",
+      "request": {
+        "body": {
+          "page": 1,
+          "searchTerm": "",
+          "size": 10,
+          "statuses": [
+            "ACTIVE"
+          ]
+        },
+        "headers": {
+          "Authorization": "Bearer test-token",
+          "Content-Type": "application/json",
+          "ServiceAuthorization": "Bearer s2s-token",
+          "X-Organisation-Search-Deadline": "4102444800000"
+        },
+        "matchingRules": {
+          "$.headers['X-Organisation-Search-Deadline']": {
+            "match": "regex",
+            "regex": "^[0-9]{13}$"
+          }
+        },
+        "method": "POST",
+        "path": "/refdata/internal/v1/organisations/search"
+      },
+      "response": {
+        "body": {
+          "moreAvailable": false,
+          "organisations": [
+            {
+              "companyNumber": "A1000",
+              "companyUrl": "https://example.invalid",
+              "contactInformation": [
+                {
+                  "addressLine1": "1 Synthetic Street",
+                  "dxAddress": [
+                    {
+                      "dxExchange": "Synthetic",
+                      "dxNumber": "DX1"
+                    }
+                  ],
+                  "postCode": "SW1A 1AA"
+                }
+              ],
+              "dateReceived": "2026-01-01T00:00:00",
+              "name": "Smith Legal",
+              "organisationIdentifier": "SYN0001",
+              "organisationProfileIds": [
+                "SOLICITOR_PROFILE",
+                "ORGANISATION_PROFILE"
+              ],
+              "paymentAccount": [
+                "PBA0000001"
+              ],
+              "pendingPaymentAccount": [
+                "PBA0000002"
+              ],
+              "sraId": "synthetic-sra",
+              "sraRegulated": true,
+              "status": "ACTIVE"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "total_records": "1"
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "Active combined search has a current administrator",
+      "providerState": "Active combined search has a current administrator",
+      "request": {
+        "body": {
+          "page": 1,
+          "searchTerm": "smith SW1A 1AA",
+          "size": 10,
+          "statuses": [
+            "ACTIVE"
+          ]
+        },
+        "headers": {
+          "Authorization": "Bearer test-token",
+          "Content-Type": "application/json",
+          "ServiceAuthorization": "Bearer s2s-token",
+          "X-Organisation-Search-Deadline": "4102444800000"
+        },
+        "matchingRules": {
+          "$.headers['X-Organisation-Search-Deadline']": {
+            "match": "regex",
+            "regex": "^[0-9]{13}$"
+          }
+        },
+        "method": "POST",
+        "path": "/refdata/internal/v1/organisations/search"
+      },
+      "response": {
+        "body": {
+          "moreAvailable": false,
+          "organisations": [
+            {
+              "companyNumber": "A1000",
+              "companyUrl": "https://example.invalid",
+              "contactInformation": [
+                {
+                  "addressLine1": "1 Synthetic Street",
+                  "dxAddress": [
+                    {
+                      "dxExchange": "Synthetic",
+                      "dxNumber": "DX1"
+                    }
+                  ],
+                  "postCode": "SW1A 1AA"
+                }
+              ],
+              "dateReceived": "2026-01-01T00:00:00",
+              "name": "Smith Legal",
+              "organisationIdentifier": "SYN0001",
+              "organisationProfileIds": [
+                "SOLICITOR_PROFILE",
+                "ORGANISATION_PROFILE"
+              ],
+              "paymentAccount": [
+                "PBA0000001"
+              ],
+              "pendingPaymentAccount": [
+                "PBA0000002"
+              ],
+              "sraId": "synthetic-sra",
+              "sraRegulated": true,
+              "status": "ACTIVE",
+              "superUser": {
+                "email": "ada@example.invalid",
+                "firstName": "Ada",
+                "lastName": "Smith"
+              }
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "total_records": "1"
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "Active search beyond the last page preserves its exact total",
+      "providerState": "Active search beyond the last page preserves its exact total",
+      "request": {
+        "body": {
+          "page": 14,
+          "searchTerm": "smith SW1A 1AA",
+          "size": 10,
+          "statuses": [
+            "ACTIVE"
+          ]
+        },
+        "headers": {
+          "Authorization": "Bearer test-token",
+          "Content-Type": "application/json",
+          "ServiceAuthorization": "Bearer s2s-token",
+          "X-Organisation-Search-Deadline": "4102444800000"
+        },
+        "matchingRules": {
+          "$.headers['X-Organisation-Search-Deadline']": {
+            "match": "regex",
+            "regex": "^[0-9]{13}$"
+          }
+        },
+        "method": "POST",
+        "path": "/refdata/internal/v1/organisations/search"
+      },
+      "response": {
+        "body": {
+          "moreAvailable": false,
+          "organisations": []
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "total_records": "123"
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "Active search has no matches",
+      "providerState": "Active search has no matches",
+      "request": {
+        "body": {
+          "page": 1,
+          "searchTerm": "absent",
+          "size": 10,
+          "statuses": [
+            "ACTIVE"
+          ]
+        },
+        "headers": {
+          "Authorization": "Bearer test-token",
+          "Content-Type": "application/json",
+          "ServiceAuthorization": "Bearer s2s-token",
+          "X-Organisation-Search-Deadline": "4102444800000"
+        },
+        "matchingRules": {
+          "$.headers['X-Organisation-Search-Deadline']": {
+            "match": "regex",
+            "regex": "^[0-9]{13}$"
+          }
+        },
+        "method": "POST",
+        "path": "/refdata/internal/v1/organisations/search"
+      },
+      "response": {
+        "body": {
+          "moreAvailable": false,
+          "organisations": []
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "total_records": "0"
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-js": {
+      "version": "16.5.0"
+    },
+    "pactRust": {
+      "ffi": "0.5.4",
+      "models": "1.3.11"
+    },
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  },
+  "provider": {
+    "name": "referenceData_organisationalInternal"
+  }
+}

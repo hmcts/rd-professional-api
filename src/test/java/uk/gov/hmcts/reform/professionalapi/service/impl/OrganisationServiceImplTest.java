@@ -15,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -215,8 +214,7 @@ class OrganisationServiceImplTest {
     private List<PaymentAccount> emptypaymentAccounts;
     Set<String> emptypaymentAccountList;
 
-    @InjectMocks
-    private OrganisationServiceImpl sut;
+    private final OrganisationServiceImpl sut = new OrganisationServiceImpl(mock(ActiveOrganisationSearch.class));
 
     private final ProfessionalUserService professionalUserServiceMock
             = mock(ProfessionalUserService.class);
@@ -240,6 +238,8 @@ class OrganisationServiceImplTest {
         sut.setBulkCustomerDetailsRepository(bulkCustomerDetailsRepositoryMock);
         sut.setJdbcTemplate(jdbcTemplateMock);
         sut.setEntityManager(entityManagerMock);
+        sut.setOrgAttributeRepository(orgAttributeRepository);
+        sut.setProfessionalUserService(professionalUserServiceMock);
 
         paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";

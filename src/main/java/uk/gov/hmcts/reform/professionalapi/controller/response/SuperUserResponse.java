@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 @NoArgsConstructor
+@AllArgsConstructor
 public class SuperUserResponse {
 
     @JsonProperty

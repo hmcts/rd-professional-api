@@ -15,8 +15,8 @@ public class WireMockExtension extends WireMockServer implements BeforeAllCallba
         super(port);
     }
 
-    public WireMockExtension(int port, ResponseTransformer transformer) {
-        super(wireMockConfig().extensions(transformer).port(port));
+    public WireMockExtension(int port, ResponseTransformer... transformers) {
+        super(wireMockConfig().extensions(transformers).port(port));
     }
 
     @Override

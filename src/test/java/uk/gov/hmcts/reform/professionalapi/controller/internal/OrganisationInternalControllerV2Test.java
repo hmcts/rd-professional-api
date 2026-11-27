@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
 import jakarta.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrgAttributeRequest;
@@ -50,6 +54,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -61,6 +66,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 class OrganisationInternalControllerV2Test {
+    private static final String ADMIN_BEARER = "Bearer prd-admin";
+
     private OrganisationsDetailResponseV2 organisationsDetailResponse;
     private OrganisationEntityResponseV2 organisationEntityResponse;
     private OrganisationService organisationServiceMock;
@@ -179,11 +186,23 @@ class OrganisationInternalControllerV2Test {
                 .retrieveAllOrganisationsForV2Api(formattedSince, null);
     }
 
+    @AfterEach
+    void resetRequest() {
+        RequestContextHolder.resetRequestAttributes();
+    }
+
+    private static void bindAdminRequest() {
+        var request = new MockHttpServletRequest();
+        request.addHeader("Authorization", ADMIN_BEARER);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+    }
+
     @Test
     void test_RetrieveOrganisationByIdWithStatusNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveOrganisationForV2Api(any(String.class), any(boolean.class)))
+        bindAdminRequest();
+        when(organisationServiceMock.retrieveInternalOrganisationForV2Api(any(String.class), eq(ADMIN_BEARER)))
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController
@@ -194,14 +213,15 @@ class OrganisationInternalControllerV2Test {
         assertThat(actual.getHeaders().get("total_records")).hasSizeGreaterThanOrEqualTo(1);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisationForV2Api(organisation.getOrganisationIdentifier(), true);
+                .retrieveInternalOrganisationForV2Api(organisation.getOrganisationIdentifier(), ADMIN_BEARER);
     }
 
     @Test
     void test_RetrieveOrganisationByIdWithStatusNotNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveOrganisationForV2Api(any(String.class), any(boolean.class)))
+        bindAdminRequest();
+        when(organisationServiceMock.retrieveInternalOrganisationForV2Api(any(String.class), eq(ADMIN_BEARER)))
                 .thenReturn(organisationEntityResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
@@ -211,7 +231,7 @@ class OrganisationInternalControllerV2Test {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1))
-                .retrieveOrganisationForV2Api(organisation.getOrganisationIdentifier(), true);
+                .retrieveInternalOrganisationForV2Api(organisation.getOrganisationIdentifier(), ADMIN_BEARER);
     }
 
     @Test
