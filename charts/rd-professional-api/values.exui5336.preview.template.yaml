@@ -1,0 +1,3 @@
+java:
+  environment:
+    USER_PROFILE_URL: https://rd-user-profile-api-pr-1372.preview.platform.hmcts.net
