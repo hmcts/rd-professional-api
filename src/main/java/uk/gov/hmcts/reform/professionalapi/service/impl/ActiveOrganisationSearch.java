@@ -237,6 +237,21 @@ public class ActiveOrganisationSearch {
         }
     }
 
-    public record Response(long totalRecords, byte[] json) {
+    public static final class Response {
+        private final long totalRecords;
+        private final byte[] json;
+
+        public Response(long totalRecords, byte[] json) {
+            this.totalRecords = totalRecords;
+            this.json = json;
+        }
+
+        public long totalRecords() {
+            return totalRecords;
+        }
+
+        public byte[] json() {
+            return json;
+        }
     }
 }

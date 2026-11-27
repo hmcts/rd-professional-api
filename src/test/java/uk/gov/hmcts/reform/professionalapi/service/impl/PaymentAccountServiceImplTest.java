@@ -84,7 +84,7 @@ class PaymentAccountServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        organisationService = new OrganisationServiceImpl();
+        organisationService = new OrganisationServiceImpl(mock(ActiveOrganisationSearch.class));
         organisationService.setPaymentAccountValidator(paymentAccountValidatorMock);
         organisationService.setPaymentAccountRepository(paymentAccountRepositoryMock);
 

@@ -559,29 +559,37 @@ public abstract class SuperController {
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation, NOT_FOUND);
 
         showDeleted = getShowDeletedValue(showDeleted);
-        returnRoles = getReturnRolesValue(returnRoles);
+        boolean includeRoles = getReturnRolesValue(returnRoles);
 
         Pageable pageable = page != null && userIdentifier == null
                 ? createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME)) : null;
         try {
             if (pageable != null) {
                 return professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation,
-                        showDeleted, returnRoles, status, pageable);
+                        showDeleted, includeRoles, status, pageable);
             }
             return professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
-                    userIdentifier, showDeleted, returnRoles, status);
+                    userIdentifier, showDeleted, includeRoles, status);
         } catch (NoOrganisationUsersException ex) {
             if (!allowEmpty) {
                 throw ex;
             }
-            Object body = returnRoles ? new ProfessionalUsersEntityResponse()
-                    : new ProfessionalUsersEntityResponseWithoutRoles();
-            var response = setOrgInfoInGetUserResponseAndSort(ResponseEntity.ok(body), organisationIdentifier,
-                    existingOrganisation.getStatus(), getOrganisationProfileIds(existingOrganisation));
-            return pageable == null ? response : ResponseEntity.ok()
-                    .headers(generateResponseEntityWithPaginationHeader(pageable, Page.empty(pageable), response))
-                    .body(response.getBody());
         }
+        return emptyOrganisationUsers(organisationIdentifier, existingOrganisation, includeRoles, pageable);
+    }
+
+    private ResponseEntity<Object> emptyOrganisationUsers(String organisationIdentifier, Organisation organisation,
+                                                           boolean includeRoles, Pageable pageable) {
+        Object body = includeRoles ? new ProfessionalUsersEntityResponse()
+                : new ProfessionalUsersEntityResponseWithoutRoles();
+        var response = setOrgInfoInGetUserResponseAndSort(ResponseEntity.ok(body),
+                organisationIdentifier, organisation.getStatus(),
+                getOrganisationProfileIds(organisation));
+        if (pageable == null) {
+            return response;
+        }
+        var headers = generateResponseEntityWithPaginationHeader(pageable, Page.empty(pageable), response);
+        return new ResponseEntity<>(response.getBody(), headers, response.getStatusCode());
     }
 
     protected ResponseEntity<BulkCustomerOrganisationsDetailResponse> retrieveOrganisationDetailsForBulkCustomerId(

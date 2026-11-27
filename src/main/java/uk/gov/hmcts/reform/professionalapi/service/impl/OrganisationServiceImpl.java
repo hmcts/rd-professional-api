@@ -137,8 +137,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAccountMapService userAccountMapService;
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
-    @Autowired
-    ActiveOrganisationSearch activeOrganisationSearch;
+    private final ActiveOrganisationSearch activeOrganisationSearch;
     @Autowired
     PrdEnumService prdEnumService;
     @Autowired
@@ -160,6 +159,10 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
+
+    public OrganisationServiceImpl(ActiveOrganisationSearch activeOrganisationSearch) {
+        this.activeOrganisationSearch = activeOrganisationSearch;
+    }
 
     @Override
     @Transactional

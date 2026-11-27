@@ -40,7 +40,7 @@ class UserProfileMatchClientTest {
         server.start();
         var tokens = mock(AuthTokenGenerator.class);
         when(tokens.generate()).thenReturn(PRD_TOKEN);
-        client = new UserProfileMatchClient("http://127.0.0.1:" + server.getAddress().getPort(),
+        client = new UserProfileMatchClient("http://127.0.0.1:" + server.getAddress().getPort() + "///",
                 new ObjectMapper(), tokens);
     }
 

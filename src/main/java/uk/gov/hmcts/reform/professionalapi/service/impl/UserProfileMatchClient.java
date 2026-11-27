@@ -42,7 +42,11 @@ public class UserProfileMatchClient {
 
     public UserProfileMatchClient(@Value("${userProfUrl}") String baseUrl, ObjectMapper mapper,
                                   AuthTokenGenerator tokenGenerator) {
-        this.endpoint = URI.create(baseUrl.replaceFirst("/+$", "") + "/v1/userprofile/users/match");
+        int end = baseUrl.length();
+        while (end > 0 && baseUrl.charAt(end - 1) == '/') {
+            end--;
+        }
+        this.endpoint = URI.create(baseUrl.substring(0, end) + "/v1/userprofile/users/match");
         this.mapper = mapper;
         var strictResponseMapper = mapper.copy();
         strictResponseMapper.coercionConfigFor(LogicalType.Textual)

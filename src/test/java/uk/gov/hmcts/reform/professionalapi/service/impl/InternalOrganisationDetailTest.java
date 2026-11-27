@@ -30,7 +30,7 @@ class InternalOrganisationDetailTest {
     private final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
     private final UserProfileFeignClient legacyClient = mock(UserProfileFeignClient.class);
     private final ActiveOrganisationSearch search = mock(ActiveOrganisationSearch.class);
-    private final OrganisationServiceImpl service = new OrganisationServiceImpl();
+    private final OrganisationServiceImpl service = new OrganisationServiceImpl(search);
     private final Organisation org = new Organisation("Synthetic organisation", ACTIVE, null, null, false, null);
 
     InternalOrganisationDetailTest() {
@@ -38,7 +38,6 @@ class InternalOrganisationDetailTest {
         when(repo.findByOrganisationIdentifier(ORG_ID)).thenReturn(org);
         service.setOrganisationRepository(repo);
         service.setUserProfileFeignClient(legacyClient);
-        service.setActiveOrganisationSearch(search);
     }
 
     @ParameterizedTest
