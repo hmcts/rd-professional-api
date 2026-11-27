@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.BulkCustomerDetailsRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -725,7 +726,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (!organisation.isOrganisationStatusActive() || organisation.getUsers().isEmpty()) {
             return;
         }
-        String userId = organisation.getUsers().getFirst().getUserIdentifier();
+        var representative = organisation.getUsers().stream()
+                .min(Comparator.comparing(SuperUser::getCreated, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(user -> user.getId().toString()))
+                .orElseThrow();
+        response.setSuperUser(new SuperUserResponse(representative));
+        String userId = representative.getUserIdentifier();
         if (userId == null || userId.isBlank()) {
             return;
         }

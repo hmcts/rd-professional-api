@@ -9,11 +9,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.hmcts.reform.professionalapi.repository.ActiveOrganisationSearchRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ActiveOrganisationSearchRepository.Page;
 import uk.gov.hmcts.reform.professionalapi.repository.ActiveOrganisationSearchRepository.Representative;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ActiveOrganisationSearch;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.SearchDeadline;
 
 import java.sql.SQLException;
@@ -25,6 +30,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
 @DataJpaTest(properties = {
@@ -44,6 +50,12 @@ class ActiveOrganisationSearchPostgresTest {
 
     @Autowired
     private ActiveOrganisationSearchRepository search;
+
+    @Autowired
+    private OrganisationRepository organisations;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @Test
     void filtersRealNestedFieldsAndKeepsExactPageOrderAndAdministratorReassignments() {
@@ -149,6 +161,28 @@ class ActiveOrganisationSearchPostgresTest {
     }
 
     @Test
+    void searchAndBothDetailVersionsSelectTheSameAdministrator() {
+        var org = organisation(1, "Parity", "ACTIVE", null);
+        administrator(org, UUID.fromString("80000000-0000-0000-0000-000000000000"), "later-id", "Other");
+        var selected = administrator(org, UUID.fromString("7fffffff-ffff-ffff-ffff-ffffffffffff"),
+                "selected", "Selected");
+        var mapper = new ObjectMapper().findAndRegisterModules();
+        var row = page("Parity", 0, 10, Map.of()).rows().getFirst();
+        assertThat(row.representative()).isEqualTo(selected);
+        assertThat(mapper.valueToTree(row.organisation()).at("/superUser/firstName").asText())
+                .isEqualTo("Selected");
+
+        var service = new OrganisationServiceImpl(mock(ActiveOrganisationSearch.class));
+        service.setOrganisationRepository(organisations);
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            var v1 = service.retrieveInternalOrganisation("T000001", "Bearer caller");
+            var v2 = service.retrieveInternalOrganisationForV2Api("T000001", "Bearer caller");
+            assertThat(mapper.valueToTree(v1).at("/superUser/firstName").asText()).isEqualTo("Selected");
+            assertThat(mapper.valueToTree(v2).at("/superUser/firstName").asText()).isEqualTo("Selected");
+        });
+    }
+
+    @Test
     void postgresStatementTimeoutCancelsAQueryWaitingOnALock() throws SQLException {
         try (var connection = jdbc.getDataSource().getConnection(); var statement = connection.createStatement()) {
             connection.setAutoCommit(false);
@@ -228,7 +262,10 @@ class ActiveOrganisationSearchPostgresTest {
     }
 
     private Representative administrator(UUID org, int number, String identifier, String firstName) {
-        var id = new UUID(0, number);
+        return administrator(org, new UUID(0, number), identifier, firstName);
+    }
+
+    private Representative administrator(UUID org, UUID id, String identifier, String firstName) {
         jdbc.update("""
                 INSERT INTO dbrefdata.professional_user (id, organisation_id, user_identifier, first_name,
                     last_name, email_address, created, last_updated)

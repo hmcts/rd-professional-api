@@ -13,6 +13,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserProfileMatchClient.Profile;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -69,6 +72,48 @@ class InternalOrganisationDetailTest {
         assertThat(firstName(detail(v2))).isEqualTo("Current");
         assertThat(org.getUsers().getFirst().getFirstName()).isEqualTo("Stored");
         verifyNoInteractions(legacyClient);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void selectsTheSameAdministratorAsSearchForStoredAndCurrentProfiles(boolean v2) {
+        var nullDate = addAdministrator("null-date");
+        nullDate.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        var later = addAdministrator("later");
+        later.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
+        later.setCreated(LocalDateTime.of(2024, 1, 2, 0, 0));
+        var higherId = addAdministrator("higher-id");
+        higherId.setId(UUID.fromString("80000000-0000-0000-0000-000000000000"));
+        higherId.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        var selected = addAdministrator("selected");
+        selected.setId(UUID.fromString("7fffffff-ffff-ffff-ffff-ffffffffffff"));
+        selected.setCreated(higherId.getCreated());
+        selected.setFirstName("Selected");
+        when(search.profileForInternalDetail("selected", BEARER))
+                .thenReturn(null)
+                .thenReturn(new Profile("selected", "Current", "Profile", "current@example.test"));
+
+        assertThat(firstName(detail(v2))).isEqualTo("Selected");
+        assertThat(firstName(detail(v2))).isEqualTo("Current");
+        assertThat(org.getUsers().getFirst()).isSameAs(nullDate);
+        verifyNoInteractions(legacyClient);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void keepsSelectedStoredAdministratorWhenItsIdentifierIsAbsentOrBlank(boolean v2) {
+        var later = addAdministrator("later");
+        later.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
+        later.setCreated(LocalDateTime.of(2024, 1, 2, 0, 0));
+        var selected = addAdministrator(null);
+        selected.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        selected.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        selected.setFirstName("Selected");
+
+        assertThat(firstName(detail(v2))).isEqualTo("Selected");
+        selected.setUserIdentifier(" \t");
+        assertThat(firstName(detail(v2))).isEqualTo("Selected");
+        verifyNoInteractions(search, legacyClient);
     }
 
     @ParameterizedTest
