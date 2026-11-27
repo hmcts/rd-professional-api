@@ -64,6 +64,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -152,7 +153,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         Organisation organisation = getOrganisation();
         organisation.setPaymentAccounts(emptyList());
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
-        when(organisationServiceMock.retrieveOrganisation(anyString(), anyBoolean()))
+        when(organisationServiceMock.retrieveInternalOrganisation(anyString(), nullable(String.class)))
             .thenReturn(new OrganisationEntityResponse(organisation, true, true, true));
 
     }

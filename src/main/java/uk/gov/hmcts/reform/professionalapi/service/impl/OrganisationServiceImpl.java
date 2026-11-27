@@ -138,6 +138,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
     @Autowired
+    ActiveOrganisationSearch activeOrganisationSearch;
+    @Autowired
     PrdEnumService prdEnumService;
     @Autowired
     UserAttributeService userAttributeService;
@@ -685,6 +687,49 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationEntityResponse(organisation, true, isPendingPbaRequired,
                                     false);
+    }
+
+    @Override
+    public OrganisationEntityResponse retrieveInternalOrganisation(String organisationIdentifier, String bearer) {
+        var organisation = internalDetailOrganisation(organisationIdentifier);
+        var response = new OrganisationEntityResponse(organisation, true, true, false);
+        updateInternalDetailProfile(organisation, response, bearer);
+        return response;
+    }
+
+    @Override
+    public OrganisationEntityResponseV2 retrieveInternalOrganisationForV2Api(String organisationIdentifier,
+                                                                               String bearer) {
+        var organisation = internalDetailOrganisation(organisationIdentifier);
+        var response = new OrganisationEntityResponseV2(organisation, true, true, false, true);
+        updateInternalDetailProfile(organisation, response, bearer);
+        return response;
+    }
+
+    private Organisation internalDetailOrganisation(String organisationIdentifier) {
+        var organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        if (organisation == null) {
+            throw new EmptyResultDataAccessException(ONE);
+        }
+        if (organisation.getContactInformation().size() > 1) {
+            sortContactInfoByCreatedDateAsc(organisation);
+        }
+        return organisation;
+    }
+
+    private void updateInternalDetailProfile(Organisation organisation, OrganisationEntityResponse response,
+                                             String bearer) {
+        if (!organisation.isOrganisationStatusActive() || organisation.getUsers().isEmpty()) {
+            return;
+        }
+        String userId = organisation.getUsers().getFirst().getUserIdentifier();
+        if (userId == null || userId.isBlank()) {
+            return;
+        }
+        var profile = activeOrganisationSearch.profileForInternalDetail(userId, bearer);
+        if (profile != null) {
+            response.setSuperUser(new SuperUserResponse(profile.firstName(), profile.lastName(), profile.email()));
+        }
     }
 
     @Override

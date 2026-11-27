@@ -70,6 +70,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -214,7 +215,7 @@ public abstract class SuperController {
             //Received request to retrieve organisation with ID
 
             organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-            organisationResponse = organisationService.retrieveOrganisation(orgId, true);
+            organisationResponse = organisationService.retrieveInternalOrganisation(orgId, detailBearer());
 
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
             //Received request to retrieve organisation with status
@@ -262,7 +263,7 @@ public abstract class SuperController {
             //Received request to retrieve organisation with ID
 
             organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-            organisationResponse = organisationService.retrieveOrganisationForV2Api(orgId, true);
+            organisationResponse = organisationService.retrieveInternalOrganisationForV2Api(orgId, detailBearer());
 
         } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
             //Received request to retrieve organisation with status
@@ -630,6 +631,13 @@ public abstract class SuperController {
         var existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         return existingOrganisation;
+    }
+
+    private String detailBearer() {
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes) {
+            return attributes.getRequest().getHeader(AUTHORIZATION);
+        }
+        return null;
     }
 
     public String getUserEmail(String email) {

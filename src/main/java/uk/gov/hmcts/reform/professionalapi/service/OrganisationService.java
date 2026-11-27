@@ -46,6 +46,10 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier, boolean isPendingPbaRequired);
 
+    OrganisationEntityResponse retrieveInternalOrganisation(String organisationIdentifier, String bearer);
+
+    OrganisationEntityResponseV2 retrieveInternalOrganisationForV2Api(String organisationIdentifier, String bearer);
+
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
                                             String organisationIdentifier,Boolean isOrgApprovalRequest);
 
